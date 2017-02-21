@@ -10,15 +10,19 @@
 
 #include "WorkflowFile.h"
 
+
 using namespace lemon;
 
 namespace WRENCH {
 
+		// Forward reference
+		class Workflow;
 
 
 		/* Task meta-data class */
 		class WorkflowTask {
 
+				// Workflow class must be a friend so as to access the private constructor, etc.
 				friend class Workflow;
 
 				/* Task-state enum */
@@ -38,7 +42,8 @@ namespace WRENCH {
 				State state;
 
 		private:
-				std::shared_ptr<ListDigraph> DAG;  // pointer to the underlying DAG
+				Workflow *workflow; 	// Containing workflow
+				std::shared_ptr<ListDigraph> DAG; 	// Containing workflow
 				ListDigraph::Node DAG_node; // pointer to the underlying DAG node
 				std::map<std::string, std::shared_ptr<WorkflowFile>> output_files;  // List of output files
 				std::map<std::string, std::shared_ptr<WorkflowFile>> input_files;   // List of input files

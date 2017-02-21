@@ -100,6 +100,7 @@ namespace WRENCH {
 			// Create the WorkflowTask object
 			std::shared_ptr<WorkflowTask> task(new WorkflowTask(id, execution_time, num_procs));
 			// Create a DAG node for it
+			task->workflow = this;
 			task->DAG = DAG;
 			task->DAG_node = DAG->addNode();
 			// Add it to the DAG node's metadata

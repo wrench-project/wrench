@@ -1,0 +1,15 @@
+WRENCH::Workflow
+	- Implement a "create from DAX" method
+
+WRENCH::Platform
+    - implement it
+
+WRENCH::Simulation
+    - implement it
+
+WRENCH::ComputeService
+    - implement it
+
+  
+WRENCH::StorageService
+    - implement it
