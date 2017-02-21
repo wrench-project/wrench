@@ -9,6 +9,8 @@ set(SOURCE_FILES main.cpp
         workflow/Exception.h
         workflow/WorkflowTask.h
         workflow/WorkflowTask.cpp
-        workflow/WorkflowFile.h)
+        workflow/WorkflowFile.h
+        platform/Platform.cpp
+        platform/Platform.h)
 
 add_executable(wrench ${SOURCE_FILES})

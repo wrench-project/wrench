@@ -1,7 +1,17 @@
-//
-// Created by Henri Casanova on 2/18/17.
-//
-
+/**
+ *  @file    WorkflowTask.h
+ *  @author  Henri Casanova
+ *  @date    2/21/2017
+ *  @version 1.0
+ *
+ *  @brief WRENCH::WorkflowTask class implementation
+ *
+ *  @section DESCRIPTION
+ *
+ *  The WRENCH::WorkflowTask class represents a computational
+ *  task in a WRENCH:Workflow.
+ *
+ */
 #ifndef WRENCH_WORKFLOWTASK_H
 #define WRENCH_WORKFLOWTASK_H
 

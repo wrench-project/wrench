@@ -1,6 +1,17 @@
-//
-// Created by Henri Casanova on 2/18/17.
-//
+/**
+ *  @file    Workflow.h
+ *  @author  Henri Casanova
+ *  @date    2/21/2017
+ *  @version 1.0
+ *
+ *  @brief WRENCH::Platform class implementation
+ *
+ *  @section DESCRIPTION
+ *
+ *  The WRENCH::Platform class provides all basic functionality
+ *  to represent/instantiate/manipulate a SimGrid simulation platform.
+ *
+ */
 
 #ifndef WRENCH_WORKFLOW_H
 #define WRENCH_WORKFLOW_H

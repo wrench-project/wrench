@@ -1,6 +1,16 @@
-//
-// Created by Henri Casanova on 2/18/17.
-//
+/**
+ *  @file    WorkflowFile.h
+ *  @author  Henri Casanova
+ *  @date    2/21/2017
+ *  @version 1.0
+ *
+ *  @brief WRENCH::WorkflowFile class implementation
+ *
+ *  @section DESCRIPTION
+ *
+ *  The WRENCH::WorkflowFile class represents a data file used in a WRENCH::Workflow.
+ *
+ */
 
 #ifndef WRENCH_WORKFLOWFILE_H
 #define WRENCH_WORKFLOWFILE_H

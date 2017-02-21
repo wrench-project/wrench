@@ -10,6 +10,5 @@ WRENCH::Simulation
 WRENCH::ComputeService
     - implement it
 
-  
 WRENCH::StorageService
     - implement it
