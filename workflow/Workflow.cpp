@@ -60,9 +60,8 @@ namespace WRENCH {
 		/******************************/
 
 		/**
-		 * @brief  Default  constructor
+		 * @brief  Constructor
 		 *
-		 * @return nothing
 		 */
 
 		Workflow::Workflow() {
@@ -71,9 +70,8 @@ namespace WRENCH {
 		};
 
 		/**
-		 * @brief  Default  destructor
+		 * @brief  Destructor
 		 *
-		 * @return nothing
 		 */
 		Workflow::~Workflow() {
 		};

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-project(wrench)
+project(simulation)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -15,6 +15,6 @@ set(SOURCE_FILES main.cpp
         workflow/WorkflowTask.cpp
         workflow/WorkflowFile.h
         platform/Platform.cpp
-        platform/Platform.h)
+        platform/Platform.h simulation/Simulation.cpp simulation/Simulation.h wrench.h)
 
-add_executable(wrench ${SOURCE_FILES})
+add_executable(simulation ${SOURCE_FILES})

@@ -26,10 +26,23 @@ namespace WRENCH {
 		/******************************/
 		/**      PUBLIC METHODS     **/
 		/******************************/
+
+		/**
+		 * @brief  Constructor
+		 *
+		 * @param filename is the path to a XML SimGrid platform description file
+		 */
 		Platform::Platform(std::string filename) {
+
 			MSG_create_environment(filename.c_str());
 		}
 
+		/**
+		 * @brief  Destructor
+		 *
+		 */
+		Platform::~Platform() {
 
+		}
 
 };

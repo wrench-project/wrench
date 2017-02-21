@@ -1,9 +1,14 @@
 
 #include <iostream>
 
-#include "workflow/Workflow.h"
+#include "wrench.h"
 
-int main() {
+int main(int argc, char **argv) {
+
+	WRENCH::Simulation simulation;
+
+	simulation.init(&argc, argv);
+
 	std::cerr << "Creating a bogus workflow..." << std::endl;
 
 	WRENCH::Workflow workflow;
