@@ -1,0 +1,14 @@
+cmake_minimum_required(VERSION 3.6)
+project(wrench)
+
+set(CMAKE_CXX_STANDARD 11)
+
+set(SOURCE_FILES main.cpp
+        workflow/Workflow.cpp
+        workflow/Workflow.h
+        workflow/Exception.h
+        workflow/WorkflowTask.h
+        workflow/WorkflowTask.cpp
+        workflow/WorkflowFile.h)
+
+add_executable(wrench ${SOURCE_FILES})
