@@ -16,10 +16,15 @@
 #ifndef WRENCH_PLATFORM_H
 #define WRENCH_PLATFORM_H
 
+#include <string>
+
 namespace WRENCH {
 
 
 		class Platform {
+
+		public:
+				Platform(std::string filename);
 
 		};
 

@@ -14,6 +14,7 @@
  */
 
 #include "Platform.h"
+#include <simgrid/msg.h>
 
 namespace WRENCH {
 
@@ -22,10 +23,13 @@ namespace WRENCH {
 		/******************************/
 
 
-
-
 		/******************************/
 		/**      PUBLIC METHODS     **/
 		/******************************/
+		Platform::Platform(std::string filename) {
+			MSG_create_environment(filename.c_str());
+		}
+
+
 
 };
