@@ -22,9 +22,8 @@ namespace WRENCH {
 
 		}
 
-
 		/**
-		 * @brief Simulation initialization method
+		 * @brief Simulation initialization method. This method has to be called first.
 		 *
 		 * @param argc is a pointer to the number of arguments passed to main()
 		 * @param argv is the list of arguments passed to main()
@@ -34,5 +33,15 @@ namespace WRENCH {
 			MSG_init(argc, argv);
 		}
 
+		/**
+ * @brief Simulation initialization method. This method has to be called first.
+ *
+ * @param argc is a pointer to the number of arguments passed to main()
+ * @param argv is the list of arguments passed to main()
+ */
+
+		void Simulation::launch() {
+			MSG_main();
+		}
 
 };

@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "wrench.h"
+#include "computation/ComputeService.h"
 
 int main(int argc, char **argv) {
 
@@ -52,7 +53,19 @@ int main(int argc, char **argv) {
 	std::cerr << t3->id << " has " << t3->getNumberOfParents() << " parents" << std::endl;
 	std::cerr << t4->id << " has " << t4->getNumberOfParents() << " parents" << std::endl;
 
-	workflow.exportToEPS("workflow.eps");
+//	workflow.exportToEPS("workflow.eps");
+
+	std::cerr << "Instantiating SimGrid platform..." << std::endl;
+	WRENCH::Platform platform("./two_hosts.xml");
+
+	std::cerr << "Instantiating a ComputeService..." << std::endl;
+	WRENCH::ComputeService no_op = WRENCH::ComputeService("no_op");
+	no_op.start("Tremblay");
+
+	std::cerr << "Launching the Simulation..." << std::endl;
+	simulation.launch();
+
+
 
 	return 0;
 }

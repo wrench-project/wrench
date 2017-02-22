@@ -10,11 +10,11 @@ link_libraries(simgrid emon)
 set(SOURCE_FILES main.cpp
         workflow/Workflow.cpp
         workflow/Workflow.h
-        workflow/Exception.h
+        Exception/Exception.h
         workflow/WorkflowTask.h
         workflow/WorkflowTask.cpp
         workflow/WorkflowFile.h
         platform/Platform.cpp
-        platform/Platform.h simulation/Simulation.cpp simulation/Simulation.h wrench.h)
+        platform/Platform.h simulation/Simulation.cpp simulation/Simulation.h wrench.h computation/ComputeService.cpp computation/ComputeService.h)
 
 add_executable(simulation ${SOURCE_FILES})

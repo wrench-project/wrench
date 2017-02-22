@@ -14,6 +14,7 @@ namespace WRENCH {
 			~Simulation();
 
 			void init(int *, char **);
+			void launch();
 
 	};
 
