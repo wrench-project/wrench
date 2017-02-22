@@ -15,6 +15,6 @@ set(SOURCE_FILES main.cpp
         workflow/WorkflowTask.cpp
         workflow/WorkflowFile.h
         platform/Platform.cpp
-        platform/Platform.h simulation/Simulation.cpp simulation/Simulation.h wrench.h computation/ComputeService.cpp computation/ComputeService.h)
+        platform/Platform.h simulation/Simulation.cpp simulation/Simulation.h wrench.h computation/ComputeService.cpp computation/ComputeService.h simgrid_util/SimulatedService.cpp simgrid_util/SimulatedService.h)
 
 add_executable(simulation ${SOURCE_FILES})

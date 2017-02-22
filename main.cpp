@@ -59,11 +59,23 @@ int main(int argc, char **argv) {
 	WRENCH::Platform platform("./two_hosts.xml");
 
 	std::cerr << "Instantiating a ComputeService..." << std::endl;
-	WRENCH::ComputeService no_op = WRENCH::ComputeService("no_op");
-	no_op.start("Tremblay");
+	WRENCH::ComputeService no_op_1 = WRENCH::ComputeService("no_op");
+	no_op_1.start("Tremblay");
+
+	std::cerr << "Instantiating another ComputeService..." << std::endl;
+	WRENCH::ComputeService no_op_2 = WRENCH::ComputeService("no_op");
+	no_op_2.start("Jupiter");
+
+	std::cerr << "Instantiating another ComputeService..." << std::endl;
+	WRENCH::ComputeService no_op_3 = WRENCH::ComputeService("no_op");
+	no_op_3.start("Jupiter");
+
+
 
 	std::cerr << "Launching the Simulation..." << std::endl;
 	simulation.launch();
+
+	std::cerr << "Simulation done!" << std::endl;
 
 
 

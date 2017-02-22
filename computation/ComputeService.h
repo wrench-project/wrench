@@ -8,23 +8,20 @@
 #include <string>
 #include <simgrid/msg.h>
 
+#include "../simgrid_util/SimulatedService.h"
+
 namespace WRENCH {
 
-		class ComputeService {
-
-		private:
-				std::string service_name;
-				std::string mailbox_name; // The SimGrid mailbox the service is listening on
+		class ComputeService: public SimulatedService {
 
 		public:
 				ComputeService(std::string);
 				~ComputeService();
 
-				void start(std::string);
-				void stop();
-
 		private:
-				 static int main(int argc, char **argv);
+				int main();
+
+		protected:
 
 		};
 };
