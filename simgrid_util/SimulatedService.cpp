@@ -6,10 +6,27 @@
 #include "../Exception/Exception.h"
 
 #include <simgrid/msg.h>
-#include <stdlib.h>
 
 namespace WRENCH {
 
+		/**
+		 * @brief Constructor
+		 *
+		 * @param service_name is a string to identify the service (doesn't have to be unique)
+		 */
+
+		SimulatedService::SimulatedService(std::string service_name) {
+			this->service_name = service_name;
+			this->mailbox = service_name + "_" + std::to_string(getNewUniqueNumber());
+			MSG_function_register(service_name.c_str(), this->main_stub);
+		}
+
+		/**
+		 * @brief Default Constructor
+		 *
+		 */
+
+		SimulatedService::~SimulatedService() {}
 
 		/**
 		 * @brief main-stub to circumvent the fact that one must provide a pointer to a static
@@ -49,9 +66,6 @@ namespace WRENCH {
 			char **argv = (char **)calloc(sizeof(char *), (size_t) argc);
 			/* Ugly Hack to pass the instance to the function */
 			argv[0] = (char *)this;
-
-			// Set the mailbox
-			this->mailbox_name = this->service_name + "_" + hostname + "_" + std::to_string(getNewUniqueNumber());
 
 			msg_process_t process = MSG_process_create_with_arguments(this->service_name.c_str(), this->main_stub , NULL, host, argc, argv);
 			if (!process) {

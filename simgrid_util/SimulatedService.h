@@ -15,12 +15,15 @@ namespace WRENCH {
 				void start(std::string hostname);
 
 		protected:
+				SimulatedService(std::string service_name);
+				virtual ~SimulatedService();
+
 				static int main_stub(int argc, char **argv);  // must be static
 				virtual int main() = 0; // purely virtual
 				static int getNewUniqueNumber();
 
 				std::string service_name;
-				std::string mailbox_name;
+				std::string mailbox;
 
 		};
 };

@@ -12,29 +12,25 @@
 namespace WRENCH {
 
 		/**
-		 * @brief Constructor of the generic ComputeService class
-		 *
-		 * @param service_name is a string that describes the service name
+		 * @brief Constructor
 		 */
-		ComputeService::ComputeService(std::string service_name) {
-			this->service_name = service_name;
-			MSG_function_register(service_name.c_str(), this->main_stub);
-		}
-
-		/**
-		 * @brief Default Destructor
-		 *
-		 */
-		ComputeService::~ComputeService() {
+		 ComputeService::ComputeService(std::string service_name) : SimulatedService(service_name) {
 
 		}
 
 		/**
-		 *
+		 * @brief Destructor
+		 */
+		 ComputeService::~ComputeService() {
+
+		}
+
+		/**
+		 * @brief The main routine of the service
 		 */
 		int ComputeService::main() {
-			std::cerr << "IN MAIN OF A SERVICE " << this->service_name << " ON HOST " << MSG_host_get_name(MSG_host_self()) <<
-					" listening on mailbox " << this->mailbox_name << std::endl;
+			std::cerr << "IN MAIN OF A COMPUTE SERVICE " << this->service_name << " ON HOST " << MSG_host_get_name(MSG_host_self()) <<
+					" listening on mailbox " << this->mailbox << std::endl;
 			return 0;
 		}
 

@@ -18,6 +18,7 @@ namespace WRENCH {
 				ComputeService(std::string);
 				~ComputeService();
 
+
 		private:
 				int main();
 
