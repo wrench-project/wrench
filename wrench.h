@@ -8,5 +8,6 @@
 #include "platform/platform.h"
 #include "workflow/workflow.h"
 #include "simulation/Simulation.h"
+#include "wms/simple_WMS/SimpleWMS.h"
 
 #endif //WRENCH_WRENCH_H

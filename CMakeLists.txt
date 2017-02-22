@@ -15,6 +15,26 @@ set(SOURCE_FILES main.cpp
         workflow/WorkflowTask.cpp
         workflow/WorkflowFile.h
         platform/Platform.cpp
-        platform/Platform.h simulation/Simulation.cpp simulation/Simulation.h wrench.h computation/ComputeService.cpp computation/ComputeService.h simgrid_util/DaemonWithMailbox.cpp simgrid_util/DaemonWithMailbox.h computation/sequential_task_executor/SequentialTaskExecutor.cpp computation/sequential_task_executor/SequentialTaskExecutor.h computation/sequential_task_executor/SequentialTaskExecutorDaemon.cpp computation/sequential_task_executor/SequentialTaskExecutorDaemon.h)
+        platform/Platform.h
+        simulation/Simulation.cpp
+        simulation/Simulation.h
+        wrench.h
+        compute_services/ComputeService.cpp
+        compute_services/ComputeService.h
+        simgrid_util/DaemonWithMailbox.cpp
+        simgrid_util/DaemonWithMailbox.h
+        compute_services/sequential_task_executor/SequentialTaskExecutor.cpp
+        compute_services/sequential_task_executor/SequentialTaskExecutor.h
+        compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
+        compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.h
+        simgrid_util/SimgridMessages.cpp
+        simgrid_util/SimgridMessages.h
+        simgrid_util/SimgridMailbox.cpp
+        simgrid_util/SimgridMailbox.h wms/WMS.cpp wms/WMS.h
+        wms/simple_WMS/SimpleWMS.cpp
+        wms/simple_WMS/SimpleWMSDaemon.h
+        wms/simple_WMS/SimpleWMSDaemon.cpp
+        wms/simple_WMS/SimpleWMS.h
+        )
 
 add_executable(simulation ${SOURCE_FILES})

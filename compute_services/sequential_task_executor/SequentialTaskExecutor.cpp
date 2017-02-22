@@ -9,17 +9,16 @@ namespace WRENCH {
 
 		SequentialTaskExecutor::SequentialTaskExecutor(std::string hostname) : ComputeService("sequential_task_executor") {
 			this->hostname = hostname;
+			// Creating the main daemon
 			this->main_daemon = new SequentialTaskExecutorDaemon();
+			// Starting the main daemon
+			this->main_daemon->start(this->hostname);
 		}
 
 		SequentialTaskExecutor::~SequentialTaskExecutor() {
 
 		}
 
-		int SequentialTaskExecutor::start() {
-			this->main_daemon->start(this->hostname);
-			return 0;
-		}
 
 		int SequentialTaskExecutor::stop() {
 

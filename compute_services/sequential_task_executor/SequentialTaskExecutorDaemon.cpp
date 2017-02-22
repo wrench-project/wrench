@@ -5,7 +5,11 @@
 #include <iostream>
 #include <simgrid/msg.h>
 
+
 #include "SequentialTaskExecutorDaemon.h"
+#include "../../simgrid_util/SimgridMessages.h"
+#include "../../simgrid_util/SimgridMailbox.h"
+
 
 namespace WRENCH {
 
@@ -19,6 +23,20 @@ namespace WRENCH {
 
 		int SequentialTaskExecutorDaemon::main() {
 			std::cerr << "New Sequential Task Executor Daemon started on host " << MSG_host_get_name(MSG_host_self()) << " listening on mailbox" << this->mailbox << std::endl;
+
+			while(true) {
+				SimgridMessage *message =SimgridMailbox::get(this->mailbox);
+				switch(message->type) {
+					case SimgridMessage::STOP_DAEMON:
+						delete message;
+						break;
+					default:
+						delete message;
+						break;
+				}
+
+			}
+
 			std::cerr << "Sequential Task Executor Daemon started on host " << MSG_host_get_name(MSG_host_self()) << " terminating" << std::endl;
 			return 0;
 		}

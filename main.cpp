@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "wrench.h"
-#include "computation/sequential_task_executor/SequentialTaskExecutor.h"
+#include "compute_services/sequential_task_executor/SequentialTaskExecutor.h"
 
 int main(int argc, char **argv) {
 
@@ -59,20 +59,17 @@ int main(int argc, char **argv) {
 	WRENCH::Platform platform("./two_hosts.xml");
 
 	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
-	WRENCH::SequentialTaskExecutor no_op_1 = WRENCH::SequentialTaskExecutor("Tremblay");
-	no_op_1.start();
+	platform.addSequentialTaskExecutor("Tremblay");
 
-	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
-	WRENCH::SequentialTaskExecutor no_op_2 = WRENCH::SequentialTaskExecutor("Tremblay");
-	no_op_2.start();
-
+	std::cerr << "Instantiating another Sequential Task Executor on Tremblay..." << std::endl;
+	platform.addSequentialTaskExecutor("Tremblay");
 
 	std::cerr << "Instantiating a Sequential Task Executor on Jupiter..." << std::endl;
-	WRENCH::SequentialTaskExecutor no_op_3 = WRENCH::SequentialTaskExecutor("Jupiter");
-	no_op_3.start();
+	platform.addSequentialTaskExecutor("Jupiter");
 
 
-
+	std::cerr << "Instantiating a WMS on Tremblay..." << std::endl;
+	WRENCH::SimpleWMS wms(&platform, &workflow, "Tremblay");
 	std::cerr << "Launching the Simulation..." << std::endl;
 	simulation.launch();
 

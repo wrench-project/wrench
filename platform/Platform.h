@@ -17,6 +17,7 @@
 #define WRENCH_PLATFORM_H
 
 #include <string>
+#include "../compute_services/ComputeService.h"
 
 namespace WRENCH {
 
@@ -26,6 +27,12 @@ namespace WRENCH {
 		public:
 				Platform(std::string filename);
 				~Platform();
+
+				void addSequentialTaskExecutor(std::string hostname);
+
+		private:
+				std::vector<std::shared_ptr<ComputeService>> compute_services;
+
 		};
 
 };

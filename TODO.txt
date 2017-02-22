@@ -1,14 +1,26 @@
+Make a pass to do all shared_ptr / unique_ptr when needed.
+Make a pass to deal with the destrictors.
+valgrind it all
+
 WRENCH::Workflow
 	- Implement a "create from DAX" method
 
 WRENCH::Platform
-    - implement it
+    - first version done. It does nothing, as it likely should
 
 WRENCH::Simulation
-    - implement it
+    - first version done. It does very little, as it likely should
 
 WRENCH::ComputeService
-    - implement it
+    - implemented a first version
+            - Use unique_ptr to point to daemons
+            - finish a sequential executor implementation
+
+simgrid_util:
+    - Imple,ent the messages and mailbox abstractions
 
 WRENCH::StorageService
     - implement it
+
+
+Probably creates a WRENCH_Internal:: namespace so that users only see the WRENCH:: namespace? Standard in C++?

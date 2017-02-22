@@ -16,7 +16,7 @@ namespace WRENCH {
 				SequentialTaskExecutor(std::string hostname);
 				~SequentialTaskExecutor();
 
-				int start();
+//				int start();
 				int stop();
 				int runTask(std::shared_ptr<WorkflowTask> task);
 
