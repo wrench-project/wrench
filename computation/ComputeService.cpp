@@ -14,8 +14,8 @@ namespace WRENCH {
 		/**
 		 * @brief Constructor
 		 */
-		 ComputeService::ComputeService(std::string service_name) : SimulatedService(service_name) {
-
+		 ComputeService::ComputeService(std::string service_name) {
+			this->service_name = service_name;
 		}
 
 		/**
@@ -24,15 +24,5 @@ namespace WRENCH {
 		 ComputeService::~ComputeService() {
 
 		}
-
-		/**
-		 * @brief The main routine of the service
-		 */
-		int ComputeService::main() {
-			std::cerr << "IN MAIN OF A COMPUTE SERVICE " << this->service_name << " ON HOST " << MSG_host_get_name(MSG_host_self()) <<
-					" listening on mailbox " << this->mailbox << std::endl;
-			return 0;
-		}
-
 
 };

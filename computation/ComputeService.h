@@ -8,21 +8,24 @@
 #include <string>
 #include <simgrid/msg.h>
 
-#include "../simgrid_util/SimulatedService.h"
+#include "../simgrid_util/DaemonWithMailbox.h"
+#include "../workflow/WorkflowTask.h"
 
 namespace WRENCH {
 
-		class ComputeService: public SimulatedService {
+		class ComputeService {
 
 		public:
 				ComputeService(std::string);
-				~ComputeService();
+				virtual ~ComputeService();
 
+				/* Virtual methods to implement in derived classes */
+				virtual int start() = 0;
+				virtual int stop() = 0;
+				virtual int runTask(std::shared_ptr<WorkflowTask> task) = 0;
 
 		private:
-				int main();
-
-		protected:
+				std::string service_name;
 
 		};
 };

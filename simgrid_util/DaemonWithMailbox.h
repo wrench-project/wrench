@@ -9,21 +9,23 @@
 
 namespace WRENCH {
 
-		class SimulatedService {
+		class DaemonWithMailbox {
 
 		public:
+				std::string mailbox;
+
 				void start(std::string hostname);
 
 		protected:
-				SimulatedService(std::string service_name);
-				virtual ~SimulatedService();
+				DaemonWithMailbox(std::string mailbox_prefix);
+				virtual ~DaemonWithMailbox();
 
+		private:
 				static int main_stub(int argc, char **argv);  // must be static
 				virtual int main() = 0; // purely virtual
 				static int getNewUniqueNumber();
 
-				std::string service_name;
-				std::string mailbox;
+
 
 		};
 };

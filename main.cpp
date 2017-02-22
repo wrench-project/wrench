@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include "wrench.h"
-#include "computation/ComputeService.h"
+#include "computation/sequential_task_executor/SequentialTaskExecutor.h"
 
 int main(int argc, char **argv) {
 
@@ -58,17 +58,18 @@ int main(int argc, char **argv) {
 	std::cerr << "Instantiating SimGrid platform..." << std::endl;
 	WRENCH::Platform platform("./two_hosts.xml");
 
-	std::cerr << "Instantiating a ComputeService..." << std::endl;
-	WRENCH::ComputeService no_op_1 = WRENCH::ComputeService("no_op");
-	no_op_1.start("Tremblay");
+	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
+	WRENCH::SequentialTaskExecutor no_op_1 = WRENCH::SequentialTaskExecutor("Tremblay");
+	no_op_1.start();
 
-	std::cerr << "Instantiating another ComputeService..." << std::endl;
-	WRENCH::ComputeService no_op_2 = WRENCH::ComputeService("no_op");
-	no_op_2.start("Jupiter");
+	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
+	WRENCH::SequentialTaskExecutor no_op_2 = WRENCH::SequentialTaskExecutor("Tremblay");
+	no_op_2.start();
 
-	std::cerr << "Instantiating another ComputeService..." << std::endl;
-	WRENCH::ComputeService no_op_3 = WRENCH::ComputeService("no_op");
-	no_op_3.start("Jupiter");
+
+	std::cerr << "Instantiating a Sequential Task Executor on Jupiter..." << std::endl;
+	WRENCH::SequentialTaskExecutor no_op_3 = WRENCH::SequentialTaskExecutor("Jupiter");
+	no_op_3.start();
 
 
 

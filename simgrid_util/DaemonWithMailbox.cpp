@@ -2,7 +2,7 @@
 // Created by Henri Casanova on 2/21/17.
 //
 
-#include "SimulatedService.h"
+#include "DaemonWithMailbox.h"
 #include "../Exception/Exception.h"
 
 #include <simgrid/msg.h>
@@ -15,10 +15,9 @@ namespace WRENCH {
 		 * @param service_name is a string to identify the service (doesn't have to be unique)
 		 */
 
-		SimulatedService::SimulatedService(std::string service_name) {
-			this->service_name = service_name;
-			this->mailbox = service_name + "_" + std::to_string(getNewUniqueNumber());
-			MSG_function_register(service_name.c_str(), this->main_stub);
+		DaemonWithMailbox::DaemonWithMailbox(std::string mailbox_prefix) {
+			this->mailbox = mailbox + "_" + std::to_string(getNewUniqueNumber());
+			MSG_function_register(this->mailbox.c_str(), this->main_stub);
 		}
 
 		/**
@@ -26,7 +25,7 @@ namespace WRENCH {
 		 *
 		 */
 
-		SimulatedService::~SimulatedService() {}
+		DaemonWithMailbox::~DaemonWithMailbox() {}
 
 		/**
 		 * @brief main-stub to circumvent the fact that one must provide a pointer to a static
@@ -35,7 +34,7 @@ namespace WRENCH {
 		 * @param argv
 		 * @return 0 on success
 		 */
-		int SimulatedService::main_stub(int argc, char **argv) {
+		int DaemonWithMailbox::main_stub(int argc, char **argv) {
 
 			if (argc != 1) {
 				throw Exception("A simulated service stub for main() should take exactly one \"command-line\" argument");
@@ -45,7 +44,7 @@ namespace WRENCH {
 			// This is a pretty bad hack in which the main method gets, which must be static,
 			// gets a pointer to the instance via command-line arguments, and overwriting it
 			// with a bogus string that will be freed automatically by SimGrid!
-			SimulatedService *simulated_service_object = (SimulatedService *)argv[0];
+			DaemonWithMailbox *simulated_service_object = (DaemonWithMailbox *)argv[0];
 			argv[0] = strdup("SimGrid can free me!");
 
 			return simulated_service_object->main();
@@ -54,8 +53,7 @@ namespace WRENCH {
 		/**
 		 * @brief Method to start an instance of the service on a host
 		 */
-		void SimulatedService::start(std::string hostname) {
-			static int sequence_number = 0;
+		void DaemonWithMailbox::start(std::string hostname) {
 
 			msg_host_t host = MSG_host_by_name(hostname.c_str());
 			if (!host) {
@@ -67,15 +65,15 @@ namespace WRENCH {
 			/* Ugly Hack to pass the instance to the function */
 			argv[0] = (char *)this;
 
-			msg_process_t process = MSG_process_create_with_arguments(this->service_name.c_str(), this->main_stub , NULL, host, argc, argv);
+			msg_process_t process = MSG_process_create_with_arguments(this->mailbox.c_str(), this->main_stub , NULL, host, argc, argv);
 			if (!process) {
-				throw Exception("Cannot start process " + this->service_name + " on host " + hostname);
+				throw Exception("Cannot start process " + this->mailbox + " on host " + hostname);
 			}
 
 			return;
 		}
 
-		 int SimulatedService::getNewUniqueNumber() {
+		 int DaemonWithMailbox::getNewUniqueNumber() {
 			static int number = 0;
 			return (number++);
 		}
