@@ -41,7 +41,7 @@ namespace WRENCH {
 			}
 
 
-			// This is a pretty bad hack in which the main method gets, which must be static,
+			// This is a pretty bad/clever hack in which the main method gets, which must be static,
 			// gets a pointer to the instance via command-line arguments, and overwriting it
 			// with a bogus string that will be freed automatically by SimGrid!
 			DaemonWithMailbox *simulated_service_object = (DaemonWithMailbox *)argv[0];

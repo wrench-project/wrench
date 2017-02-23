@@ -2,8 +2,8 @@
 // Created by Henri Casanova on 2/21/17.
 //
 
-#ifndef SIMULATION_SIMULATEDSERVICE_H
-#define SIMULATION_SIMULATEDSERVICE_H
+#ifndef WRENCH_DAEMONWITHMAILBOX_H
+#define WRENCH_DAEMONWITHMAILBOX_H
 
 #include <string>
 
@@ -31,4 +31,4 @@ namespace WRENCH {
 };
 
 
-#endif //SIMULATION_SIMULATEDSERVICE_H
+#endif //WRENCH_DAEMONWITHMAILBOX_H

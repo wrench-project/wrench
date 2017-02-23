@@ -1,6 +1,20 @@
+
+- add an addWMS to the platform
+- implemtn platform.shutdown()
+
+
+Kill the services when destroying the platform (i.e., in its destructor)
+  or in fact when to do it (to avoid the "deadlock" message)"?
+
+    - Using MSG_process_kill?
+    - Or sending a "nice" DAEMON_STOP message
+
+
 Make a pass to do all shared_ptr / unique_ptr when needed.
 Make a pass to deal with the destrictors.
 valgrind it all
+
+------------------------------------------------------------
 
 WRENCH::Workflow
 	- Implement a "create from DAX" method

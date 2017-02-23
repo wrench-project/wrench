@@ -207,4 +207,13 @@ namespace WRENCH {
 			std::cerr << "Export to EPS broken / not implemented at the moment" << std::endl;
 		}
 
+		/**
+		 * @brief method to get the number of tasks in the workflow
+		 * @return number of tasks
+		 */
+		int Workflow::getNumberOfTasks() {
+			return this->tasks.size();
+
+		}
+
 }

@@ -56,25 +56,24 @@ int main(int argc, char **argv) {
 //	workflow.exportToEPS("workflow.eps");
 
 	std::cerr << "Instantiating SimGrid platform..." << std::endl;
-	WRENCH::Platform platform("./two_hosts.xml");
+	simulation.createPlatform("./two_hosts.xml");
 
 	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
-	platform.addSequentialTaskExecutor("Tremblay");
+	simulation.createSequentialTaskExecutor("Tremblay");
 
 	std::cerr << "Instantiating another Sequential Task Executor on Tremblay..." << std::endl;
-	platform.addSequentialTaskExecutor("Tremblay");
+	simulation.createSequentialTaskExecutor("Tremblay");
 
 	std::cerr << "Instantiating a Sequential Task Executor on Jupiter..." << std::endl;
-	platform.addSequentialTaskExecutor("Jupiter");
+	simulation.createSequentialTaskExecutor("Jupiter");
 
 
 	std::cerr << "Instantiating a WMS on Tremblay..." << std::endl;
-	WRENCH::SimpleWMS wms(&platform, &workflow, "Tremblay");
+	simulation.createSimpleWMS(&workflow, "Tremblay");
+
 	std::cerr << "Launching the Simulation..." << std::endl;
 	simulation.launch();
-
 	std::cerr << "Simulation done!" << std::endl;
-
 
 
 	return 0;

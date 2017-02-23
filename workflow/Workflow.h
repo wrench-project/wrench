@@ -59,6 +59,8 @@ namespace WRENCH {
 
 				void exportToEPS(std::string);
 
+				int getNumberOfTasks();
+
 
 
 

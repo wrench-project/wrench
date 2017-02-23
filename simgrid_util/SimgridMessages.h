@@ -2,8 +2,8 @@
 // Created by Henri Casanova on 2/22/17.
 //
 
-#ifndef SIMULATION_SIMGRIDMESSAGES_H
-#define SIMULATION_SIMGRIDMESSAGES_H
+#ifndef WRENCH_SIMGRIDMESSAGES_H
+#define WRENCH_SIMGRIDMESSAGES_H
 
 #include <string>
 
@@ -36,4 +36,4 @@ namespace WRENCH {
 
 
 
-#endif //SIMULATION_SIMGRIDMESSAGES_H
+#endif //WRENCH_SIMGRIDMESSAGES_H

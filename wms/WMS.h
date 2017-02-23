@@ -2,22 +2,24 @@
 // Created by Henri Casanova on 2/22/17.
 //
 
-#ifndef SIMULATION_WMS_H
-#define SIMULATION_WMS_H
+#ifndef WRENCH_WMS_H
+#define WRENCH_WMS_H
 
 #include "../workflow/Workflow.h"
 #include "../platform/Platform.h"
 
 namespace WRENCH {
 
+		class Platform;
+		class Workflow;
+
 		class WMS {
 
 		public:
-				WMS(Platform *p, Workflow *w);
+				WMS(Workflow *w);
 				virtual ~WMS();
 
 		private:
-				Platform *platform;
 				Workflow *workflow;
 
 		};
@@ -25,4 +27,4 @@ namespace WRENCH {
 };
 
 
-#endif //SIMULATION_WMS_H
+#endif //WRENCH_WMS_H

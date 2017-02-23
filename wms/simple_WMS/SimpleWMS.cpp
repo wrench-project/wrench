@@ -3,17 +3,17 @@
 //
 
 #include "SimpleWMS.h"
-#include "./SimpleWMSDaemon.h"
 
 namespace WRENCH {
 
-
-		SimpleWMS::SimpleWMS(Platform *p, Workflow *w, std::string hostname): WMS(p, w) {
+//		SimpleWMS::SimpleWMS(std::shared_ptr<Simulation> s, Workflow *w, std::string hostname): WMS(w) {
+		SimpleWMS::SimpleWMS(Workflow *w, std::string hostname): WMS(w) {
 			// Create the daemon
-			this->wms_process = new SimpleWMSDaemon(p, w);
+			this->wms_process = new SimpleWMSDaemon(w);
 			this->wms_process->start(hostname);
 
 		}
+
 
 		SimpleWMS::~SimpleWMS() {
 

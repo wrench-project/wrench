@@ -6,8 +6,7 @@
 
 namespace WRENCH {
 
-		WMS::WMS(Platform *p, Workflow *w) {
-			this->platform = p;
+		WMS::WMS(Workflow *w) {
 			this->workflow = w;
 		}
 

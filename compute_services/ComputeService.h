@@ -5,10 +5,7 @@
 #ifndef SIMULATION_COMPUTESERVICE_H
 #define SIMULATION_COMPUTESERVICE_H
 
-#include <string>
-#include <simgrid/msg.h>
 
-#include "../simgrid_util/DaemonWithMailbox.h"
 #include "../workflow/WorkflowTask.h"
 
 namespace WRENCH {

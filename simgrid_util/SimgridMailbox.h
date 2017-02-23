@@ -2,8 +2,8 @@
 // Created by Henri Casanova on 2/22/17.
 //
 
-#ifndef SIMULATION_SIMGRIDMAILBOX_H
-#define SIMULATION_SIMGRIDMAILBOX_H
+#ifndef WRENCH_SIMGRIDMAILBOX_H
+#define WRENCH_SIMGRIDMAILBOX_H
 
 #include <string>
 #include "SimgridMessages.h"
@@ -24,4 +24,4 @@ namespace WRENCH {
 };
 
 
-#endif //SIMULATION_SIMGRIDMAILBOX_H
+#endif //WRENCH_SIMGRIDMAILBOX_H

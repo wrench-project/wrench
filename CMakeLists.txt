@@ -30,11 +30,13 @@ set(SOURCE_FILES main.cpp
         simgrid_util/SimgridMessages.cpp
         simgrid_util/SimgridMessages.h
         simgrid_util/SimgridMailbox.cpp
-        simgrid_util/SimgridMailbox.h wms/WMS.cpp wms/WMS.h
+        simgrid_util/SimgridMailbox.h
+        wms/WMS.cpp
+        wms/WMS.h
         wms/simple_WMS/SimpleWMS.cpp
+        wms/simple_WMS/SimpleWMS.h
         wms/simple_WMS/SimpleWMSDaemon.h
         wms/simple_WMS/SimpleWMSDaemon.cpp
-        wms/simple_WMS/SimpleWMS.h
         )
 
 add_executable(simulation ${SOURCE_FILES})

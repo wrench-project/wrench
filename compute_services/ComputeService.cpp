@@ -4,10 +4,6 @@
 
 #include "ComputeService.h"
 
-#include <simgrid/msg.h>
-#include <string>
-#include <iostream>
-#include "../Exception/Exception.h"
 
 namespace WRENCH {
 
