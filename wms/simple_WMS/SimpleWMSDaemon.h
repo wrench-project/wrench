@@ -10,21 +10,20 @@
 
 namespace WRENCH {
 
-//		class Simulation;
+		class Simulation;
 
 
 		class SimpleWMSDaemon: public DaemonWithMailbox {
 
 
 		public:
-//				SimpleWMSDaemon(std::shared_ptr<Simulation> s, Workflow *w);
-				SimpleWMSDaemon(Workflow *w);
+				SimpleWMSDaemon(Simulation *, Workflow *w);
 				~SimpleWMSDaemon();
 
 		private:
 				int main();
 
-//				std::shared_ptr<Simulation> simulation;
+				Simulation *simulation;
 				Workflow *workflow;
 
 		};

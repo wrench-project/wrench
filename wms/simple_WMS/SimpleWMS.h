@@ -6,19 +6,17 @@
 #define WRENCH_SIMPLEWMS_H
 
 #include "../WMS.h"
-//#include "../../simulation/Simulation.h"
 #include "SimpleWMSDaemon.h"
 
 namespace WRENCH {
 
-//		class Simulation;
+		class Simulation;
 
 		class SimpleWMS : public WMS {
 
 
 		public:
-//				SimpleWMS(std::shared_ptr<Simulation> s, Workflow *w, std::string hostname);
-				SimpleWMS(Workflow *w, std::string hostname);
+				SimpleWMS(Simulation *s, Workflow *w, std::string hostname);
 				~SimpleWMS();
 
 		private:

@@ -10,6 +10,8 @@
 #include "../../simgrid_util/SimgridMessages.h"
 #include "../../simgrid_util/SimgridMailbox.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(sequential_task_executor_daemon, "Log category for Sequential Task Executor Daemon");
+
 
 namespace WRENCH {
 
@@ -22,7 +24,9 @@ namespace WRENCH {
 		}
 
 		int SequentialTaskExecutorDaemon::main() {
-			std::cerr << "New Sequential Task Executor Daemon started on host " << MSG_host_get_name(MSG_host_self()) << " listening on mailbox" << this->mailbox << std::endl;
+			XBT_INFO("New Sequential Task Executor Daemon started on host %s (%s) ",
+							 MSG_host_get_name(MSG_host_self()),
+							 this->mailbox.c_str());
 
 			while(true) {
 				SimgridMessage *message =SimgridMailbox::get(this->mailbox);
@@ -34,6 +38,11 @@ namespace WRENCH {
 						delete message;
 						break;
 				}
+
+				XBT_INFO("Sequential Task Executor Daemon  on host %s ",
+								 MSG_host_get_name(MSG_host_self()));
+
+				return 0;
 
 			}
 

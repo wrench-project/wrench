@@ -4,6 +4,7 @@
 
 #include "SequentialTaskExecutor.h"
 #include "SequentialTaskExecutorDaemon.h"
+#include "../../simgrid_util/SimgridMailbox.h"
 
 namespace WRENCH {
 
@@ -21,7 +22,7 @@ namespace WRENCH {
 
 
 		int SequentialTaskExecutor::stop() {
-
+			SimgridMailbox::put(this->main_daemon->mailbox, new StopDaemonMessage());
 			return 0;
 		}
 

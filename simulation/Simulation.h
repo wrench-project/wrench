@@ -20,21 +20,24 @@ namespace WRENCH {
 //		class SequentialTaskExecutor;
 //		class Workflow;
 
+		class Simulation;
 
-	class Simulation {
+	class Simulation  {
 
 		public:
 			Simulation();
 			~Simulation();
 
-
 			void init(int *, char **);
-
 			void createPlatform(std::string);
 			void createSequentialTaskExecutor(std::string hostname);
 			void createSimpleWMS(Workflow *w, std::string hostname);
 
+			unsigned long getNumberSequentialTaskExecutors();
+
 			void launch();
+
+			void shutdown();
 
 	private:
 

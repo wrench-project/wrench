@@ -81,14 +81,25 @@ namespace WRENCH {
 			std::shared_ptr<SimpleWMS> wms;
 
 			try {
-//				wms = std::make_shared<SimpleWMS>(std::make_shared<Simulation>(this), w, hostname);
-				wms = std::make_shared<SimpleWMS>(w, hostname);
+				wms = std::make_shared<SimpleWMS>(this, w, hostname);
 			} catch (Exception e) {
 				throw e;
 			}
 
 			// Add it to the list of WMSes
 			WMSes.push_back(wms);
+
+		}
+
+		unsigned long Simulation::getNumberSequentialTaskExecutors() {
+			return compute_services.size();
+		}
+
+		void Simulation::shutdown() {
+
+			for(std::shared_ptr<SequentialTaskExecutor> executor : this->compute_services) {
+				executor->stop();
+			}
 
 		}
 
