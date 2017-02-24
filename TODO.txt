@@ -1,37 +1,17 @@
 
-- add an addWMS to the platform
-- implemtn platform.shutdown()
-
-
-Kill the services when destroying the platform (i.e., in its destructor)
-  or in fact when to do it (to avoid the "deadlock" message)"?
-
-    - Using MSG_process_kill?
-    - Or sending a "nice" DAEMON_STOP message
-
-
-Make a pass to do all shared_ptr / unique_ptr when needed.
-Make a pass to deal with the destrictors.
-valgrind it all
 
 ------------------------------------------------------------
 
 WRENCH::Workflow
 	- Implement a "create from DAX" method
 
-WRENCH::Platform
-    - first version done. It does nothing, as it likely should
-
-WRENCH::Simulation
-    - first version done. It does very little, as it likely should
 
 WRENCH::ComputeService
-    - implemented a first version
-            - Use unique_ptr to point to daemons
-            - finish a sequential executor implementation
+    - finish a sequential executor implementation
 
 simgrid_util:
-    - Imple,ent the messages and mailbox abstractions
+    - Messages:
+        - use a unique pointer to avoid new/delete
 
 WRENCH::StorageService
     - implement it

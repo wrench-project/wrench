@@ -23,7 +23,7 @@ namespace WRENCH {
 
 		private:
 				std::string hostname;
-				SequentialTaskExecutorDaemon *main_daemon;
+				std::unique_ptr<SequentialTaskExecutorDaemon> main_daemon;
 
 		};
 };

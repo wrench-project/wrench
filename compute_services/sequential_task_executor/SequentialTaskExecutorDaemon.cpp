@@ -39,15 +39,12 @@ namespace WRENCH {
 						break;
 				}
 
-				XBT_INFO("Sequential Task Executor Daemon  on host %s ",
-								 MSG_host_get_name(MSG_host_self()));
+				XBT_INFO("Sequential Task Executor Daemon on host %s terminated!", MSG_host_get_name(MSG_host_self()));
 
 				return 0;
 
 			}
 
-			std::cerr << "Sequential Task Executor Daemon started on host " << MSG_host_get_name(MSG_host_self()) << " terminating" << std::endl;
-			return 0;
 		}
 
 };

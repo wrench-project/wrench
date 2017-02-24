@@ -20,7 +20,7 @@ namespace WRENCH {
 				~SimpleWMS();
 
 		private:
-				SimpleWMSDaemon *wms_process;
+				std::unique_ptr<SimpleWMSDaemon> wms_process;
 		};
 }
 

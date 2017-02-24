@@ -3,7 +3,6 @@
 //
 
 #include "SequentialTaskExecutor.h"
-#include "SequentialTaskExecutorDaemon.h"
 #include "../../simgrid_util/SimgridMailbox.h"
 
 namespace WRENCH {
@@ -11,7 +10,7 @@ namespace WRENCH {
 		SequentialTaskExecutor::SequentialTaskExecutor(std::string hostname) : ComputeService("sequential_task_executor") {
 			this->hostname = hostname;
 			// Creating the main daemon
-			this->main_daemon = new SequentialTaskExecutorDaemon();
+			this->main_daemon = std::unique_ptr<SequentialTaskExecutorDaemon>(new SequentialTaskExecutorDaemon());
 			// Starting the main daemon
 			this->main_daemon->start(this->hostname);
 		}
