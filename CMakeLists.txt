@@ -27,16 +27,16 @@ set(SOURCE_FILES main.cpp
         compute_services/sequential_task_executor/SequentialTaskExecutor.h
         compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
         compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.h
-        simgrid_util/SimgridMessages.cpp
-        simgrid_util/SimgridMessages.h
-        simgrid_util/SimgridMailbox.cpp
-        simgrid_util/SimgridMailbox.h
+        simgrid_util/Message.cpp
+        simgrid_util/Message.h
+        simgrid_util/Mailbox.cpp
+        simgrid_util/Mailbox.h
         wms/WMS.cpp
         wms/WMS.h
         wms/simple_WMS/SimpleWMS.cpp
         wms/simple_WMS/SimpleWMS.h
         wms/simple_WMS/SimpleWMSDaemon.h
         wms/simple_WMS/SimpleWMSDaemon.cpp
-        )
+        simgrid_util/Computation.cpp simgrid_util/Computation.h)
 
 add_executable(simulation ${SOURCE_FILES})

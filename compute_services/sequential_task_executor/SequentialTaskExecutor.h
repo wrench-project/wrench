@@ -18,7 +18,7 @@ namespace WRENCH {
 
 //				int start();
 				int stop();
-				int runTask(std::shared_ptr<WorkflowTask> task);
+				int runTask(std::shared_ptr<WorkflowTask> task, std::string callback_mailbox);
 
 
 		private:

@@ -3,7 +3,9 @@
 //
 
 #include "SequentialTaskExecutor.h"
-#include "../../simgrid_util/SimgridMailbox.h"
+#include "../../simgrid_util/Mailbox.h"
+
+#include <simgrid/msg.h>
 
 namespace WRENCH {
 
@@ -21,12 +23,14 @@ namespace WRENCH {
 
 
 		int SequentialTaskExecutor::stop() {
-			SimgridMailbox::put(this->main_daemon->mailbox, new StopDaemonMessage());
+			Mailbox::put(this->main_daemon->mailbox, new StopDaemonMessage());
 			return 0;
 		}
 
-		int SequentialTaskExecutor::runTask(std::shared_ptr<WorkflowTask> task) {
+		int SequentialTaskExecutor::runTask(std::shared_ptr<WorkflowTask> task, std::string callback_mailbox) {
 
+			// Send the message to the daemon
+			Mailbox::put(this->main_daemon->mailbox, new RunTaskMessage(task, callback_mailbox));
 			return 0;
 		};
 

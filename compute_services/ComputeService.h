@@ -18,7 +18,7 @@ namespace WRENCH {
 
 				/* Virtual methods to implement in derived classes */
 				virtual int stop() = 0;
-				virtual int runTask(std::shared_ptr<WorkflowTask> task) = 0;
+				virtual int runTask(std::shared_ptr<WorkflowTask> task, std::string callback_mailbox) = 0;
 
 		private:
 				std::string service_name;

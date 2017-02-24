@@ -7,8 +7,9 @@
 
 
 #include "SequentialTaskExecutorDaemon.h"
-#include "../../simgrid_util/SimgridMessages.h"
-#include "../../simgrid_util/SimgridMailbox.h"
+#include "../../simgrid_util/Message.h"
+#include "../../simgrid_util/Mailbox.h"
+#include "../../simgrid_util/Computation.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(sequential_task_executor_daemon, "Log category for Sequential Task Executor Daemon");
 
@@ -28,22 +29,48 @@ namespace WRENCH {
 							 MSG_host_get_name(MSG_host_self()),
 							 this->mailbox.c_str());
 
-			while(true) {
-				SimgridMessage *message =SimgridMailbox::get(this->mailbox);
+			bool keep_going = true;
+			while(keep_going) {
+
+				Message *message = Mailbox::get(this->mailbox);
 				switch(message->type) {
-					case SimgridMessage::STOP_DAEMON:
-						delete message;
+
+					case Message::STOP_DAEMON: {
+						StopDaemonMessage *m = (StopDaemonMessage *)message;
+						keep_going = false;
 						break;
-					default:
-						delete message;
+					}
+
+					case Message::RUN_TASK: {
+						RunTaskMessage *m = (RunTaskMessage *)message;
+
+						/* Run the task */
+						XBT_INFO("Executing task %s",
+										 m->task->id.c_str());
+						Computation::simulateComputation(m->task->execution_time);
+
+						/* Send the callback */
+						XBT_INFO("Notifying mailbox %s that task %s has finished",
+										 m->callback_mailbox.c_str(),
+										 m->task->id.c_str());
+
+						Mailbox::put(m->callback_mailbox, new TaskDoneMessage(m->task));
 						break;
+					}
+
+					default: {
+						XBT_INFO("UNKNOWN MESSAGE TYPE - ABORTING");
+						keep_going = false;
+						break;
+					}
 				}
 
-				XBT_INFO("Sequential Task Executor Daemon on host %s terminated!", MSG_host_get_name(MSG_host_self()));
-
-				return 0;
-
 			}
+
+			XBT_INFO("Sequential Task Executor Daemon on host %s terminated!", MSG_host_get_name(MSG_host_self()));
+			return 0;
+
+
 
 		}
 

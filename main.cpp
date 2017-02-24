@@ -58,11 +58,11 @@ int main(int argc, char **argv) {
 	std::cerr << "Instantiating SimGrid platform..." << std::endl;
 	simulation.createPlatform("./two_hosts.xml");
 
-	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
-	simulation.createSequentialTaskExecutor("Tremblay");
-
-	std::cerr << "Instantiating another Sequential Task Executor on Tremblay..." << std::endl;
-	simulation.createSequentialTaskExecutor("Tremblay");
+//	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
+//	simulation.createSequentialTaskExecutor("Tremblay");
+//
+//	std::cerr << "Instantiating another Sequential Task Executor on Tremblay..." << std::endl;
+//	simulation.createSequentialTaskExecutor("Tremblay");
 
 	std::cerr << "Instantiating a Sequential Task Executor on Jupiter..." << std::endl;
 	simulation.createSequentialTaskExecutor("Jupiter");

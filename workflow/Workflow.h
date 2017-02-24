@@ -38,7 +38,7 @@ namespace WRENCH {
 
 		private:
 				bool pathExists(std::shared_ptr<WorkflowTask>, std::shared_ptr<WorkflowTask>);
-				void updateTaskState(std::shared_ptr<WorkflowTask>);
+				void updateTaskReadyState(std::shared_ptr<WorkflowTask>);
 
 
 		public:
@@ -59,9 +59,13 @@ namespace WRENCH {
 
 				void exportToEPS(std::string);
 
-				int getNumberOfTasks();
+				unsigned long getNumberOfTasks();
 
 
+				void makeTaskCompleted(std::shared_ptr<WorkflowTask> task);
+
+				// For initial testing
+				std::shared_ptr<WorkflowTask> getSomeReadyTask();
 
 
 

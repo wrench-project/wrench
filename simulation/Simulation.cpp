@@ -70,7 +70,7 @@ namespace WRENCH {
 			}
 
 			// Add it to the list of Compute Services
-			compute_services.push_back(executor);
+			sequential_task_executors.push_back(executor);
 
 		}
 
@@ -92,12 +92,17 @@ namespace WRENCH {
 		}
 
 		unsigned long Simulation::getNumberSequentialTaskExecutors() {
-			return compute_services.size();
+			return sequential_task_executors.size();
 		}
+
+		std::shared_ptr<SequentialTaskExecutor> Simulation::getSomeSequentialTaskExecutor() {
+			return sequential_task_executors[0];
+		}
+
 
 		void Simulation::shutdown() {
 
-			for(std::shared_ptr<SequentialTaskExecutor> executor : this->compute_services) {
+			for(std::shared_ptr<SequentialTaskExecutor> executor : this->sequential_task_executors) {
 				executor->stop();
 			}
 

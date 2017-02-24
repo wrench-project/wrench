@@ -1,9 +1,10 @@
 
-
 ------------------------------------------------------------
 
 WRENCH::Workflow
 	- Implement a "create from DAX" method
+	- Figure out whether tasks should specify flops or reference times
+	   (right now, machines are specified as 1flop/sec, so #secs = #flops
 
 
 WRENCH::ComputeService
@@ -15,6 +16,5 @@ simgrid_util:
 
 WRENCH::StorageService
     - implement it
-
 
 Probably creates a WRENCH_Internal:: namespace so that users only see the WRENCH:: namespace? Standard in C++?

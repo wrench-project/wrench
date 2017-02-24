@@ -38,9 +38,14 @@ namespace WRENCH {
 		}
 
 		/*
-		 * updateTaskState()
+		 * updateTaskReadyState()
 		 */
-		void Workflow::updateTaskState(std::shared_ptr<WorkflowTask> task) {
+		void Workflow::updateTaskReadyState(std::shared_ptr<WorkflowTask> task) {
+
+			if (task->state != WorkflowTask::NOT_READY) {
+				return;
+			}
+
 			WorkflowTask::State putative_state = WorkflowTask::READY;
 			// Iterate through the parents
 			for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
@@ -136,7 +141,7 @@ namespace WRENCH {
 		void Workflow::addControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dst) {
 			if (!pathExists(src, dst)) {
 				DAG->addArc(src->DAG_node, dst->DAG_node);
-				updateTaskState(dst);
+				updateTaskReadyState(dst);
 			}
 		}
 
@@ -211,9 +216,30 @@ namespace WRENCH {
 		 * @brief method to get the number of tasks in the workflow
 		 * @return number of tasks
 		 */
-		int Workflow::getNumberOfTasks() {
+		unsigned long Workflow::getNumberOfTasks() {
 			return this->tasks.size();
 
 		}
+
+		std::shared_ptr<WorkflowTask> Workflow::getSomeReadyTask() {
+
+			std::map<std::string, std::shared_ptr<WorkflowTask>>::iterator it;
+			for (it = this->tasks.begin(); it != this->tasks.end(); it++ )
+			{
+				std::shared_ptr<WorkflowTask> task = it->second;
+				if (task->getState() == WorkflowTask::READY) {
+					return task;
+				}
+			}
+			return nullptr;
+		}
+
+		void Workflow::makeTaskCompleted(std::shared_ptr<WorkflowTask> task) {
+			task->state = WorkflowTask::COMPLETED;
+			for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
+				updateTaskReadyState((*DAG_node_map)[(*DAG).source(a)]);
+			}
+		}
+
 
 }

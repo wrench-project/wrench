@@ -34,6 +34,7 @@ namespace WRENCH {
 			void createSimpleWMS(Workflow *w, std::string hostname);
 
 			unsigned long getNumberSequentialTaskExecutors();
+			std::shared_ptr<SequentialTaskExecutor> getSomeSequentialTaskExecutor();
 
 			void launch();
 
@@ -42,7 +43,7 @@ namespace WRENCH {
 	private:
 
 			std::shared_ptr<Platform> platform;
-			std::vector<std::shared_ptr<SequentialTaskExecutor>> compute_services;
+			std::vector<std::shared_ptr<SequentialTaskExecutor>> sequential_task_executors;
 			std::vector<std::shared_ptr<SimpleWMS>> WMSes;
 
 	};
