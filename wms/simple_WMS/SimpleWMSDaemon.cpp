@@ -47,7 +47,8 @@ namespace WRENCH {
 				// Wait for its completion
 				XBT_INFO("Waiting for task %s to complete...", ready_task->id.c_str());
 
-				TaskDoneMessage *m = (TaskDoneMessage *)Mailbox::get(this->mailbox);
+				std::unique_ptr<Message> message = Mailbox::get(this->mailbox);
+				std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage*>(message.release()));
 
 				XBT_INFO("Notified that task %s has completed", m->task->id.c_str());
 

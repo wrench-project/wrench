@@ -32,18 +32,17 @@ namespace WRENCH {
 			bool keep_going = true;
 			while(keep_going) {
 
-				Message *message = Mailbox::get(this->mailbox);
+				std::unique_ptr<Message> message = Mailbox::get(this->mailbox);
+
 				switch(message->type) {
 
 					case Message::STOP_DAEMON: {
-						StopDaemonMessage *m = (StopDaemonMessage *)message;
 						keep_going = false;
 						break;
 					}
 
 					case Message::RUN_TASK: {
-						RunTaskMessage *m = (RunTaskMessage *)message;
-
+						std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage*>(message.release()));
 						/* Run the task */
 						XBT_INFO("Executing task %s",
 										 m->task->id.c_str());

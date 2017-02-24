@@ -15,7 +15,7 @@ namespace WRENCH {
 		Mailbox::~Mailbox() {
 		}
 
-		Message *Mailbox::get(std::string mailbox) {
+		std::unique_ptr<Message> Mailbox::get(std::string mailbox) {
 			msg_task_t msg_task = NULL;
 			if (MSG_task_receive(&msg_task, mailbox.c_str())) {
 				XBT_INFO("MAILBOX.GET ERROR");
@@ -24,7 +24,7 @@ namespace WRENCH {
 
 			Message *message = (Message *)MSG_task_get_data(msg_task);
 			MSG_task_destroy(msg_task);
-			return message;
+			return std::unique_ptr<Message>(message);
 		}
 
 		void Mailbox::put(std::string mailbox, Message *m) {
