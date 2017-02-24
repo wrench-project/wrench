@@ -9,14 +9,14 @@
 #include <vector>
 #include "../workflow/Workflow.h"
 #include "../compute_services/sequential_task_executor/SequentialTaskExecutor.h"
-#include "../wms/simple_WMS/SimpleWMS.h"
+#include "../wms/simple_WMS/SequentialRandomWMS.h"
 #include "../platform/Platform.h"
 
 
 namespace WRENCH {
 
 //		class Platform;
-//		class SimpleWMS;
+//		class SequentialRandomWMS;
 //		class SequentialTaskExecutor;
 //		class Workflow;
 
@@ -44,7 +44,7 @@ namespace WRENCH {
 
 			std::shared_ptr<Platform> platform;
 			std::vector<std::shared_ptr<SequentialTaskExecutor>> sequential_task_executors;
-			std::vector<std::shared_ptr<SimpleWMS>> WMSes;
+			std::vector<std::shared_ptr<SequentialRandomWMS>> WMSes;
 
 	};
 

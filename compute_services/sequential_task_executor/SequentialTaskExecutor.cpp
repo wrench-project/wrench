@@ -30,7 +30,7 @@ namespace WRENCH {
 		int SequentialTaskExecutor::runTask(std::shared_ptr<WorkflowTask> task, std::string callback_mailbox) {
 
 			// Send the message to the daemon
-			Mailbox::put(this->main_daemon->mailbox, new RunTaskMessage(task, callback_mailbox));
+			Mailbox::iput(this->main_daemon->mailbox, new RunTaskMessage(task, callback_mailbox));
 			return 0;
 		};
 

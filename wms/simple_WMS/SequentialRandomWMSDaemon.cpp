@@ -5,7 +5,7 @@
 #include <iostream>
 #include <simgrid/msg.h>
 
-#include "SimpleWMSDaemon.h"
+#include "SequentialRandomWMSDaemon.h"
 #include "../../simulation/Simulation.h"
 #include "../../simgrid_util/Mailbox.h"
 
@@ -13,16 +13,16 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms_daemon, "Log category for Simple WMS Dae
 
 namespace WRENCH {
 
-		SimpleWMSDaemon::SimpleWMSDaemon(Simulation *s, Workflow *w): DaemonWithMailbox("simple_wms_daemon") {
+		SequentialRandomWMSDaemon::SequentialRandomWMSDaemon(Simulation *s, Workflow *w): DaemonWithMailbox("simple_wms_daemon") {
 			this->simulation = s;
 			this->workflow = w;
 		}
 
-		SimpleWMSDaemon::~SimpleWMSDaemon() {
+		SequentialRandomWMSDaemon::~SequentialRandomWMSDaemon() {
 		}
 
 
-		int SimpleWMSDaemon::main() {
+		int SequentialRandomWMSDaemon::main() {
 			XBT_INFO("Starting on host %s listening on mailbox %s", MSG_host_get_name(MSG_host_self()), this->mailbox.c_str());
 			XBT_INFO("About to execute a workflow with %lu tasks on a platform with %lu sequential executors",
 							 this->workflow->getNumberOfTasks(),

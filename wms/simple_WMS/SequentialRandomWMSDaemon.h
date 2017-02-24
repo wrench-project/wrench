@@ -13,12 +13,12 @@ namespace WRENCH {
 		class Simulation;
 
 
-		class SimpleWMSDaemon: public DaemonWithMailbox {
+		class SequentialRandomWMSDaemon: public DaemonWithMailbox {
 
 
 		public:
-				SimpleWMSDaemon(Simulation *, Workflow *w);
-				~SimpleWMSDaemon();
+				SequentialRandomWMSDaemon(Simulation *, Workflow *w);
+				~SequentialRandomWMSDaemon();
 
 		private:
 				int main();

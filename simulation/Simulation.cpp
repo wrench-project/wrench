@@ -78,10 +78,10 @@ namespace WRENCH {
 		void Simulation::createSimpleWMS(Workflow *w, std::string hostname) {
 
 			// Create the WMS
-			std::shared_ptr<SimpleWMS> wms;
+			std::shared_ptr<SequentialRandomWMS> wms;
 
 			try {
-				wms = std::make_shared<SimpleWMS>(this, w, hostname);
+				wms = std::make_shared<SequentialRandomWMS>(this, w, hostname);
 			} catch (Exception e) {
 				throw e;
 			}

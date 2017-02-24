@@ -18,6 +18,7 @@ namespace WRENCH {
 
 				static std::unique_ptr<Message> get(std::string mailbox);
 				static void put(std::string mailbox, Message *m);
+				static void iput(std::string mailbox, Message *m);
 
 		};
 
