@@ -19,38 +19,44 @@
 
 namespace WRENCH {
 
-		/******************************/
-		/**      PRIVATE METHODS     **/
-		/******************************/
 
 		/**
-		 * Constructor
-		 **/
+		 * @brief Constructor
+		 *
+		 * @param string is the task id
+		 * @param t is the task execution time
+		 * @param n is the number of processors for running the task
+		 */
 		WorkflowTask::WorkflowTask(const std::string string, const double t, const int n) {
 			id = string;
-			execution_time = t;
+			flops = t;
 			number_of_processors = n;
 			state = WorkflowTask::READY;
 		}
 
 		/**
-		 * addInputFile():
-		 *   - will not do anything if file is already present
-		 **/
+		 * @brief adds an input file to the task
+		 *
+		 * @param f is a shared_ptr to the file
+		 */
 		void WorkflowTask::addInputFile(std::shared_ptr<WorkflowFile> f) {
 			addFileToMap(input_files, f);
 		}
 
 		/**
-		 * addOutputFile():
-		 *   - will not do anything if file is already present
-		 **/
+		 * @brief adds an output file to the task
+		 *
+		 * @param f is a shared_ptr to the file
+		 */
 		void WorkflowTask::addOutputFile(std::shared_ptr<WorkflowFile> f) {
 			addFileToMap(output_files, f);
 		}
 
 		/**
-		 * Generic helper function to implement the above
+		 * @brief helper method to add a file to a map if necessary
+		 *
+		 * @param map is the map
+		 * @param f is a shared_ptr to a file
 		 */
 		void WorkflowTask::addFileToMap(std::map<std::string, std::shared_ptr<WorkflowFile>> map,
 																		std::shared_ptr<WorkflowFile> f) {
@@ -60,13 +66,8 @@ namespace WRENCH {
 		}
 
 
-		/******************************/
-		/**      PUBLIC METHODS      **/
-		/******************************/
-
 
 		/**
-		 *
 		 * @brief Computes the number of children of a task
 		 *
 		 * @return number of children
@@ -80,7 +81,6 @@ namespace WRENCH {
 		}
 
 		/**
-		 *
 		 * @brief Computes the number of parents of a task
 		 *
 		 * @return number of parents
@@ -94,7 +94,6 @@ namespace WRENCH {
 		}
 
 		/**
-		 *
 		 * @brief Returns the state of the task
 		 *
 		 * @return task state

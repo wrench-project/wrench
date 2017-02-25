@@ -1,23 +1,29 @@
-//
-// Created by Henri Casanova on 2/22/17.
-//
+/**
+ *  @file    WMS.h
+ *  @author  Henri Casanova
+ *  @date    2/24/2017
+ *  @version 1.0
+ *
+ *  @brief WRENCH::WMS class implementation
+ *
+ *  @section DESCRIPTION
+ *
+ *  The WRENCH::WMS is a mostly abstract implementation of a WMS
+ *
+ */
+
 
 #ifndef WRENCH_WMS_H
 #define WRENCH_WMS_H
 
 #include "../workflow/Workflow.h"
-#include "../platform/Platform.h"
 
 namespace WRENCH {
-
-		class Platform;
-		class Workflow;
 
 		class WMS {
 
 		public:
 				WMS(Workflow *w);
-				virtual ~WMS();
 
 		private:
 				Workflow *workflow;

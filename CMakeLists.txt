@@ -10,7 +10,7 @@ link_libraries(simgrid emon)
 set(SOURCE_FILES main.cpp
         workflow/Workflow.cpp
         workflow/Workflow.h
-        exception/Exception.h
+        exception/WRENCHException.h
         workflow/WorkflowTask.h
         workflow/WorkflowTask.cpp
         workflow/WorkflowFile.h
@@ -33,10 +33,17 @@ set(SOURCE_FILES main.cpp
         simgrid_util/Mailbox.h
         wms/WMS.cpp
         wms/WMS.h
-        wms/simple_WMS/SequentialRandomWMS.cpp
-        wms/simple_WMS/SequentialRandomWMS.h
-        wms/simple_WMS/SequentialRandomWMSDaemon.h
-        wms/simple_WMS/SequentialRandomWMSDaemon.cpp
-        simgrid_util/Computation.cpp simgrid_util/Computation.h)
+        wms/sequential_random_WMS/SequentialRandomWMS.cpp
+        wms/sequential_random_WMS/SequentialRandomWMS.h
+        wms/sequential_random_WMS/SequentialRandomWMSDaemon.h
+        wms/sequential_random_WMS/SequentialRandomWMSDaemon.cpp
+        simgrid_util/Computation.cpp
+        simgrid_util/Computation.h
+        simgrid_util/Host.cpp
+        simgrid_util/Host.h
+        simgrid_util/Environment.cpp
+        simgrid_util/Environment.h
+        simgrid_util/Clock.cpp
+        simgrid_util/Clock.h)
 
 add_executable(simulation ${SOURCE_FILES})

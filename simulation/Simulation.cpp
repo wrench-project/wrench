@@ -1,9 +1,20 @@
-//
-// Created by Henri Casanova on 2/21/17.
-//
+/**
+ *  @file    Simulation.cpp
+ *  @author  Henri Casanova
+ *  @date    2/24/2017
+ *  @version 1.0
+ *
+ *  @brief WRENCH::Simulation class implementation
+ *
+ *  @section DESCRIPTION
+ *
+ *  The WRENCH::Simulation class is a top-level class that keeps track of
+ *  everything.
+ *
+ */
 
 #include "Simulation.h"
-#include "../exception/Exception.h"
+#include "../exception/WRENCHException.h"
 
 #include <simgrid/msg.h>
 
@@ -31,18 +42,18 @@ namespace WRENCH {
 		 */
 
 		void Simulation::init(int *argc, char **argv) {
-			MSG_init(argc, argv);
+			MSG_init(argc, argv); // TODO: Move this MSG call to a wrapper in simgrid_util
 		}
 
 		/**
- * @brief Simulation initialization method. This method has to be called first.
- *
- * @param argc is a pointer to the number of arguments passed to main()
- * @param argv is the list of arguments passed to main()
- */
+		 * @brief Simulation initialization method. This method has to be called first.
+		 *
+		 * @param argc is a pointer to the number of arguments passed to main()
+		 * @param argv is the list of arguments passed to main()
+		 */
 
 		void Simulation::launch() {
-			MSG_main();
+			MSG_main();  // TODO: Move this MSG call to a wrapper in simgrid_util
 		}
 
 		/**
@@ -65,7 +76,7 @@ namespace WRENCH {
 			std::shared_ptr<SequentialTaskExecutor> executor;
 			try {
 				executor = std::make_shared<SequentialTaskExecutor>(hostname);
-			} catch (Exception e) {
+			} catch (WRENCHException e) {
 				throw e;
 			}
 
@@ -74,7 +85,12 @@ namespace WRENCH {
 
 		}
 
-
+		/**
+		 * @brief method to instantiave a simple WMS on a host
+		 *
+		 * @param w is the workflow that the WMS will execute
+		 * @param hostname is the name of the host in the physical platform
+		 */
 		void Simulation::createSimpleWMS(Workflow *w, std::string hostname) {
 
 			// Create the WMS
@@ -82,7 +98,7 @@ namespace WRENCH {
 
 			try {
 				wms = std::make_shared<SequentialRandomWMS>(this, w, hostname);
-			} catch (Exception e) {
+			} catch (WRENCHException e) {
 				throw e;
 			}
 
@@ -91,15 +107,18 @@ namespace WRENCH {
 
 		}
 
-		unsigned long Simulation::getNumberSequentialTaskExecutors() {
-			return sequential_task_executors.size();
-		}
-
+		/**
+		 * @brief temporary debug method to get the first sequential task executor
+		 *
+		 * @return
+		 */
 		std::shared_ptr<SequentialTaskExecutor> Simulation::getSomeSequentialTaskExecutor() {
 			return sequential_task_executors[0];
 		}
 
-
+		/**
+		 * @brief method to shutdown all running compute services on the platform
+		 */
 		void Simulation::shutdown() {
 
 			for(std::shared_ptr<SequentialTaskExecutor> executor : this->sequential_task_executors) {

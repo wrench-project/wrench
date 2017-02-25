@@ -14,19 +14,10 @@
  */
 
 #include "Platform.h"
+#include "../simgrid_util/Environment.h"
 
-#include <simgrid/msg.h>
 
 namespace WRENCH {
-
-		/******************************/
-		/**      PRIVATE METHODS     **/
-		/******************************/
-
-
-		/******************************/
-		/**      PUBLIC METHODS     **/
-		/******************************/
 
 		/**
 		 * @brief  Constructor
@@ -34,7 +25,7 @@ namespace WRENCH {
 		 * @param filename is the path to a XML SimGrid platform description file
 		 */
 		Platform::Platform(std::string filename) {
-			MSG_create_environment(filename.c_str());
+			Environment::createEnvironmentFromXML(filename);
 		}
 
 		/**

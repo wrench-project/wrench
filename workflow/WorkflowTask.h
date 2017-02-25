@@ -47,9 +47,12 @@ namespace WRENCH {
 
 		public:
 				std::string id;
-				double execution_time; 			// in seconds
+				double flops;
 				int number_of_processors;		// currently vague: cores? nodes?
 				State state;
+				double submit_date = -1.0;
+				double start_date = -1.0;
+				double end_date = -1.0;
 
 		private:
 				Workflow *workflow; 	// Containing workflow
@@ -71,9 +74,6 @@ namespace WRENCH {
 				int getNumberOfChildren();
 				int getNumberOfParents();
 				WorkflowTask::State getState();
-
-
-
 
 		};
 

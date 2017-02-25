@@ -41,17 +41,17 @@ int main(int argc, char **argv) {
 
 	std::cerr << "Task states: " << t1->getState() << t2->getState() << t3->getState() << t4->getState() << std::endl;
 
-	std::cerr << "Counting children..." << std::endl;
-	std::cerr << t1->id << " has " << t1->getNumberOfChildren() << " children" << std::endl;
-	std::cerr << t2->id << " has " << t2->getNumberOfChildren() << " children" << std::endl;
-	std::cerr << t3->id << " has " << t3->getNumberOfChildren() << " children" << std::endl;
-	std::cerr << t4->id << " has " << t4->getNumberOfChildren() << " children" << std::endl;
-
-	std::cerr << "Counting parents..." << std::endl;
-	std::cerr << t1->id << " has " << t1->getNumberOfParents() << " parents" << std::endl;
-	std::cerr << t2->id << " has " << t2->getNumberOfParents() << " parents" << std::endl;
-	std::cerr << t3->id << " has " << t3->getNumberOfParents() << " parents" << std::endl;
-	std::cerr << t4->id << " has " << t4->getNumberOfParents() << " parents" << std::endl;
+//	std::cerr << "Counting children..." << std::endl;
+//	std::cerr << t1->id << " has " << t1->getNumberOfChildren() << " children" << std::endl;
+//	std::cerr << t2->id << " has " << t2->getNumberOfChildren() << " children" << std::endl;
+//	std::cerr << t3->id << " has " << t3->getNumberOfChildren() << " children" << std::endl;
+//	std::cerr << t4->id << " has " << t4->getNumberOfChildren() << " children" << std::endl;
+//
+//	std::cerr << "Counting parents..." << std::endl;
+//	std::cerr << t1->id << " has " << t1->getNumberOfParents() << " parents" << std::endl;
+//	std::cerr << t2->id << " has " << t2->getNumberOfParents() << " parents" << std::endl;
+//	std::cerr << t3->id << " has " << t3->getNumberOfParents() << " parents" << std::endl;
+//	std::cerr << t4->id << " has " << t4->getNumberOfParents() << " parents" << std::endl;
 
 //	workflow.exportToEPS("workflow.eps");
 

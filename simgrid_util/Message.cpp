@@ -1,6 +1,16 @@
-//
-// Created by Henri Casanova on 2/22/17.
-//
+/**
+ *  @file    Message.cpp
+ *  @author  Henri Casanova
+ *  @date    2/21/2017
+ *  @version 1.0
+ *
+ *  @brief WRENCH::Message class implementations
+ *
+ *  @section DESCRIPTION
+ *
+ *  The WRENCH::Message and derived classes are MSG wrappers
+ *
+ */
 
 #include "Message.h"
 
@@ -16,14 +26,14 @@ namespace WRENCH {
 		}
 
 
-		/** STOP_DAEMON_MESSAGE **/
+		/** STOP_DAEMON MESSAGE **/
 		// TODO: MAke the "1024" below configurable somehow
 		StopDaemonMessage::StopDaemonMessage(): Message(STOP_DAEMON, 1024.00) {
 		}
 		StopDaemonMessage::~StopDaemonMessage() {
 		}
 
-		/** RUN_TASK_MESSAGE **/
+		/** RUN_TASK MESSAGE **/
 		// TODO: MAke the "1024" below configurable somehow
 		RunTaskMessage::RunTaskMessage(std::shared_ptr<WorkflowTask> t, std::string cb): Message(RUN_TASK, 1024.0) {
 			this->task = t;
@@ -32,7 +42,7 @@ namespace WRENCH {
 		RunTaskMessage::~RunTaskMessage() {
 		}
 
-		/** RUN_TASK_MESSAGE **/
+		/** TASK_DONE MESSAGE **/
 		// TODO: MAke the "1024" below configurable somehow
 		TaskDoneMessage::TaskDoneMessage(std::shared_ptr<WorkflowTask> t): Message(TASK_DONE, 1024.0) {
 			this->task = t;

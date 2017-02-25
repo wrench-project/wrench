@@ -20,14 +20,14 @@
 
 namespace WRENCH {
 
-		class Exception: public std::exception {
+		class WRENCHException: public std::exception {
 
 		private:
 				std::string message;
 
 		public:
 
-				Exception(const std::string string) {
+				WRENCHException(const std::string string) {
 					message = string;
 				}
 

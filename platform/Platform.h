@@ -26,7 +26,6 @@ namespace WRENCH {
 		public:
 				Platform(std::string filename);
 				~Platform();
-
 		};
 
 };

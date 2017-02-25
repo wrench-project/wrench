@@ -1,9 +1,19 @@
-//
-// Created by Henri Casanova on 2/21/17.
-//
+/**
+ *  @file    DaemonWithMailbox.cpp
+ *  @author  Henri Casanova
+ *  @date    2/24/2017
+ *  @version 1.0
+ *
+ *  @brief WRENCH::DaemonWithMailbox class implementation
+ *
+ *  @section DESCRIPTION
+ *
+ *  The WRENCH::DaemonWithMailbox class is a MSG wrapper for a running processes that listens on a particular mailbox
+ *
+ */
 
 #include "DaemonWithMailbox.h"
-#include "../Exception/Exception.h"
+#include "../exception/WRENCHException.h"
 
 #include <simgrid/msg.h>
 
@@ -22,7 +32,6 @@ namespace WRENCH {
 
 		/**
 		 * @brief Default Constructor
-		 *
 		 */
 
 		DaemonWithMailbox::~DaemonWithMailbox() {}
@@ -37,14 +46,13 @@ namespace WRENCH {
 		int DaemonWithMailbox::main_stub(int argc, char **argv) {
 
 			if (argc != 1) {
-				throw Exception("A simulated service stub for main() should take exactly one \"command-line\" argument");
+				throw WRENCHException("A simulated service stub for main() should take exactly one \"command-line\" argument");
 			}
 
-
-			// This is a pretty bad/clever hack in which the main method gets, which must be static,
+			// This is a pretty bad/clever hack in which the main method, which must be static,
 			// gets a pointer to the instance via command-line arguments, and overwriting it
 			// with a bogus string that will be freed automatically by SimGrid!
-			DaemonWithMailbox *simulated_service_object = (DaemonWithMailbox *)argv[0];
+			DaemonWithMailbox *simulated_service_object = (DaemonWithMailbox *) argv[0];
 			argv[0] = strdup("SimGrid can free me!");
 
 			return simulated_service_object->main();
@@ -57,27 +65,32 @@ namespace WRENCH {
 
 			msg_host_t host = MSG_host_by_name(hostname.c_str());
 			if (!host) {
-				throw Exception("Unknown host " + hostname);
+				throw WRENCHException("Unknown host " + hostname);
 			}
 
 			int argc = 1;
-			char **argv = (char **)calloc(sizeof(char *), (size_t) argc);
+			char **argv = (char **) calloc(sizeof(char *), (size_t) argc);
 			/* Ugly Hack to pass the instance to the function */
-			argv[0] = (char *)this;
+			argv[0] = (char *) this;
 
-			msg_process_t process = MSG_process_create_with_arguments(this->mailbox.c_str(), this->main_stub , NULL, host, argc, argv);
+			msg_process_t process = MSG_process_create_with_arguments(this->mailbox.c_str(), this->main_stub, NULL, host,
+																																argc, argv);
 			if (!process) {
-				throw Exception("Cannot start process " + this->mailbox + " on host " + hostname);
+				throw WRENCHException("Cannot start process " + this->mailbox + " on host " + hostname);
 			}
 
 			return;
 		}
 
-		 int DaemonWithMailbox::getNewUniqueNumber() {
+		/**
+		 * @brief This method is used to generate a unique number for each newly generated daemon,
+		 *        which is typically used to make sure that mailbox names are unique.
+		 *
+		 * @return a unique number
+		 */
+		int DaemonWithMailbox::getNewUniqueNumber() {
 			static int number = 0;
 			return (number++);
 		}
-
-
 
 };

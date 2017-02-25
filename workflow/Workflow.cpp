@@ -18,7 +18,7 @@
 #include <lemon/bfs.h>
 
 #include "Workflow.h"
-#include "../Exception/Exception.h"
+#include "../exception/WRENCHException.h"
 
 
 namespace WRENCH {
@@ -97,7 +97,7 @@ namespace WRENCH {
 
 			// Check that the task doesn't really exist
 			if (tasks[id]) {
-				throw Exception("Task ID already exists");
+				throw WRENCHException("Task ID already exists");
 			}
 
 			// Create the WorkflowTask object
@@ -123,7 +123,7 @@ namespace WRENCH {
 		 */
 		std::shared_ptr<WorkflowTask> Workflow::getWorkflowTaskByID(const std::string id) {
 			if (!tasks[id]) {
-				throw Exception("Unknown WorkflowTask ID " + id);
+				throw WRENCHException("Unknown WorkflowTask ID " + id);
 			}
 			return tasks[id];
 		}
@@ -193,7 +193,7 @@ namespace WRENCH {
 		 */
 		std::shared_ptr<WorkflowFile> Workflow::getWorkflowFileByID(const std::string id) {
 			if (!files[id]) {
-				throw Exception("Unknown WorkflowFile ID " + id);
+				throw WRENCHException("Unknown WorkflowFile ID " + id);
 			}
 			return files[id];
 		}

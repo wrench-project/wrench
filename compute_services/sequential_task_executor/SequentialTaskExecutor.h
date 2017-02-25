@@ -1,6 +1,17 @@
-//
-// Created by Henri Casanova on 2/22/17.
-//
+/**
+ *  @file    SequentialTaskExecutor.h
+ *  @author  Henri Casanova
+ *  @date    2/24/2017
+ *  @version 1.0
+ *
+ *  @brief WRENCH::SequentialTaskExecutor class implementation
+ *
+ *  @section DESCRIPTION
+ *
+ *  The WRENCH::SequentialTaskExecutor class implements a simple
+ *  Compute Service abstraction.
+ *
+ */
 
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTOR_H
 #define SIMULATION_SEQUENTIALTASKEXECUTOR_H
@@ -16,14 +27,12 @@ namespace WRENCH {
 				SequentialTaskExecutor(std::string hostname);
 				~SequentialTaskExecutor();
 
-//				int start();
-				int stop();
+				void stop();
 				int runTask(std::shared_ptr<WorkflowTask> task, std::string callback_mailbox);
-
 
 		private:
 				std::string hostname;
-				std::unique_ptr<SequentialTaskExecutorDaemon> main_daemon;
+				std::unique_ptr<SequentialTaskExecutorDaemon> daemon;
 
 		};
 };

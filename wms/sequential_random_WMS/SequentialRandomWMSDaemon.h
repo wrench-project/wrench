@@ -1,6 +1,17 @@
-//
-// Created by Henri Casanova on 2/22/17.
-//
+/**
+ *  @file    SequentialRandomWMSDaemon.h
+ *  @author  Henri Casanova
+ *  @date    2/24/2017
+ *  @version 1.0
+ *
+ *  @brief WRENCH::SequentialRandomWMSDaemon class implementation
+ *
+ *  @section DESCRIPTION
+ *
+ *  The WRENCH::SequentialRandomWMSDaemon class implements the daemon for a simple WMS abstraction
+ *
+ */
+
 
 #ifndef WRENCH_SIMPLEWMSDAEMON_H
 #define WRENCH_SIMPLEWMSDAEMON_H
@@ -10,15 +21,12 @@
 
 namespace WRENCH {
 
-		class Simulation;
-
+		class Simulation; // forward ref
 
 		class SequentialRandomWMSDaemon: public DaemonWithMailbox {
 
-
 		public:
 				SequentialRandomWMSDaemon(Simulation *, Workflow *w);
-				~SequentialRandomWMSDaemon();
 
 		private:
 				int main();

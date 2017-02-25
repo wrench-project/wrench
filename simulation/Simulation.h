@@ -9,44 +9,39 @@
 #include <vector>
 #include "../workflow/Workflow.h"
 #include "../compute_services/sequential_task_executor/SequentialTaskExecutor.h"
-#include "../wms/simple_WMS/SequentialRandomWMS.h"
+#include "../wms/sequential_random_WMS/SequentialRandomWMS.h"
 #include "../platform/Platform.h"
 
 
 namespace WRENCH {
 
-//		class Platform;
-//		class SequentialRandomWMS;
-//		class SequentialTaskExecutor;
-//		class Workflow;
 
-		class Simulation;
+		class Simulation; // forward ref
 
-	class Simulation  {
+		class Simulation  {
 
 		public:
-			Simulation();
-			~Simulation();
+				Simulation();
+				~Simulation();
 
-			void init(int *, char **);
-			void createPlatform(std::string);
-			void createSequentialTaskExecutor(std::string hostname);
-			void createSimpleWMS(Workflow *w, std::string hostname);
+				void init(int *, char **);
+				void createPlatform(std::string);
+				void createSequentialTaskExecutor(std::string hostname);
+				void createSimpleWMS(Workflow *w, std::string hostname);
 
-			unsigned long getNumberSequentialTaskExecutors();
-			std::shared_ptr<SequentialTaskExecutor> getSomeSequentialTaskExecutor();
+				std::shared_ptr<SequentialTaskExecutor> getSomeSequentialTaskExecutor();
 
-			void launch();
+				void launch();
 
-			void shutdown();
+				void shutdown();
 
-	private:
+		private:
 
-			std::shared_ptr<Platform> platform;
-			std::vector<std::shared_ptr<SequentialTaskExecutor>> sequential_task_executors;
-			std::vector<std::shared_ptr<SequentialRandomWMS>> WMSes;
+				std::shared_ptr<Platform> platform;
+				std::vector<std::shared_ptr<SequentialTaskExecutor>> sequential_task_executors;
+				std::vector<std::shared_ptr<SequentialRandomWMS>> WMSes;
 
-	};
+		};
 
 };
 
