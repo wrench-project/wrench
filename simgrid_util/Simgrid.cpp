@@ -14,6 +14,7 @@
 
 
 #include "Simgrid.h"
+#include "../exception/WRENCHException.h"
 
 #include <simgrid/msg.h>
 
@@ -24,7 +25,9 @@ namespace WRENCH {
 		}
 
 		void Simgrid::runSimulation() {
-			MSG_main();
+			if (MSG_main() != MSG_OK) {
+				throw WRENCHException("Simgrid::runSimulation(): Error");
+			}
 		}
 
 };

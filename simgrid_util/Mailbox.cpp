@@ -32,11 +32,16 @@ namespace WRENCH {
 		std::unique_ptr<Message> Mailbox::get(std::string mailbox) {
 			msg_task_t msg_task = NULL;
 			if (MSG_task_receive(&msg_task, mailbox.c_str())) {
-				throw WRENCHException("Could not receive task from mailbox");
+				throw WRENCHException("Mailbox::get(): Could not receive task from mailbox");
 			}
 
 			Message *message = (Message *)MSG_task_get_data(msg_task);
-			MSG_task_destroy(msg_task);
+			if (message == NULL) {
+				throw WRENCHException("Mailbox::get(): NULL message in task");
+			}
+			if (MSG_task_destroy(msg_task)) {
+				throw WRENCHException("Mailbox::get(): Can't destroy task");
+			}
 			return std::unique_ptr<Message>(message);
 		}
 
@@ -49,7 +54,9 @@ namespace WRENCH {
 		void Mailbox::put(std::string mailbox, Message *m) {
 			msg_task_t msg_task;
 			msg_task = MSG_task_create("", 0, m->size, (void *)m);
-			MSG_task_send(msg_task, mailbox.c_str());
+			if (MSG_task_send(msg_task, mailbox.c_str()) != MSG_OK) {
+				throw WRENCHException("Mailbox::put(): Can't sent task");
+			}
 			return;
 
 		}
@@ -67,8 +74,11 @@ namespace WRENCH {
 			msg_task = MSG_task_create("", 0, m->size, (void *)m);
 			// Using a "fire and forget" dsend(), passing null as the "callback if failure", which
 			// is probably good enough for now
-			MSG_task_dsend(msg_task, mailbox.c_str(), nullptr);
+			MSG_task_dsend(msg_task, mailbox.c_str(), Mailbox::iput_failure_handler);
 			return;
 		}
 
+		void Mailbox::iput_failure_handler(void *arg) {
+			throw WRENCHException("Mailbox::iput(): Couldn't send task");
+		}
 }

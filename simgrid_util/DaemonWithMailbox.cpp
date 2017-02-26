@@ -46,7 +46,7 @@ namespace WRENCH {
 		int DaemonWithMailbox::main_stub(int argc, char **argv) {
 
 			if (argc != 1) {
-				throw WRENCHException("A simulated service stub for main() should take exactly one \"command-line\" argument");
+				throw WRENCHException("DaemonWithMailbox::main_stub(): Exactly one \"command-line\" argument required");
 			}
 
 			// This is a pretty bad/clever hack in which the main method, which must be static,
@@ -76,7 +76,7 @@ namespace WRENCH {
 			msg_process_t process = MSG_process_create_with_arguments(this->mailbox.c_str(), this->main_stub, NULL, host,
 																																argc, argv);
 			if (!process) {
-				throw WRENCHException("Cannot start process " + this->mailbox + " on host " + hostname);
+				throw WRENCHException("DaemonWithMailbox::start(): Cannot start process " + this->mailbox + " on host " + hostname);
 			}
 
 			return;

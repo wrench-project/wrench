@@ -14,6 +14,8 @@
 
 
 #include "Computation.h"
+#include "../exception/WRENCHException.h"
+#include "Host.h"
 
 #include <simgrid/msg.h>
 
@@ -24,9 +26,13 @@ namespace WRENCH {
 			// Create a computational task
 			msg_task_t t = MSG_task_create("", flops, 0.0, NULL);
 			// Execute it on the local host
-			MSG_task_execute(t);
+			if (MSG_task_execute(t) != MSG_OK) {
+				throw WRENCHException("Computation::simulateComputation(): Cannot execute task on host " + Host::getHostName());
+			}
 			// Destroy it
-			MSG_task_destroy(t);
+			if (MSG_task_destroy(t) != MSG_OK) {
+				throw WRENCHException("Computation::simulateComputation(): Cannot destroy task");
+			}
 			return;
 		}
 

@@ -20,6 +20,8 @@
 namespace WRENCH {
 
 		void Environment::createEnvironmentFromXML(std::string filename) {
+			// TODO: Raise exception is file is not found, since MSG_create_environment
+			//       returns void
 			MSG_create_environment(filename.c_str());
 		}
 

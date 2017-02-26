@@ -14,12 +14,17 @@
 
 
 #include "Host.h"
+#include "../exception/WRENCHException.h"
 #include <simgrid/msg.h>
 
 namespace WRENCH {
 
 		std::string Host::getHostName() {
-			return std::string(MSG_host_get_name(MSG_host_self()));
+			msg_host_t host = MSG_host_self();
+			if (host == NULL) {
+				throw WRENCHException("Host::getHostName(): Can't get local host name");
+			}
+			return std::string(MSG_host_get_name(host));
 		}
 
 }
