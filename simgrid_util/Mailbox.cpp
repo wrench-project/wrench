@@ -55,7 +55,9 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief A non-blocking method to send a message to a mailbox
+		 * @brief A non-blocking method to send a message to a mailbox. This
+		 *        is a "fire and forget" method, meaning that there is no
+		 *        provided method to check that the put() has completed.
 		 *
 		 * @param mailbox is the mailbox name
 		 * @param m is the message
@@ -63,7 +65,7 @@ namespace WRENCH {
 		void Mailbox::iput(std::string mailbox, Message *m) {
 			msg_task_t msg_task;
 			msg_task = MSG_task_create("", 0, m->size, (void *)m);
-			// Using a dsend(), passing null as the "callback if failure", which
+			// Using a "fire and forget" dsend(), passing null as the "callback if failure", which
 			// is probably good enough for now
 			MSG_task_dsend(msg_task, mailbox.c_str(), nullptr);
 			return;
