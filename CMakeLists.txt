@@ -44,6 +44,8 @@ set(SOURCE_FILES main.cpp
         simgrid_util/Environment.cpp
         simgrid_util/Environment.h
         simgrid_util/Clock.cpp
-        simgrid_util/Clock.h)
+        simgrid_util/Clock.h 
+	simgrid_util/Simgrid.cpp 
+	simgrid_util/Simgrid.h)
 
 add_executable(simulation ${SOURCE_FILES})

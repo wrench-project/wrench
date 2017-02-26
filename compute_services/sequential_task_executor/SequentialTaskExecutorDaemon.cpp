@@ -88,7 +88,7 @@ namespace WRENCH {
 				}
 			}
 
-			XBT_INFO("Sequential Task Executor Daemon on host %s terminated!", MSG_host_get_name(MSG_host_self()));
+			XBT_INFO("Sequential Task Executor Daemon on host %s terminated!", Host::getHostName().c_str());
 			return 0;
 		}
 

@@ -15,8 +15,7 @@
 
 #include "Simulation.h"
 #include "../exception/WRENCHException.h"
-
-#include <simgrid/msg.h>
+#include "../simgrid_util/Simgrid.h"
 
 namespace WRENCH {
 
@@ -42,7 +41,7 @@ namespace WRENCH {
 		 */
 
 		void Simulation::init(int *argc, char **argv) {
-			MSG_init(argc, argv); // TODO: Move this MSG call to a wrapper in simgrid_util
+			Simgrid::initialize(argc, argv);
 		}
 
 		/**
@@ -53,7 +52,7 @@ namespace WRENCH {
 		 */
 
 		void Simulation::launch() {
-			MSG_main();  // TODO: Move this MSG call to a wrapper in simgrid_util
+			Simgrid::runSimulation();
 		}
 
 		/**

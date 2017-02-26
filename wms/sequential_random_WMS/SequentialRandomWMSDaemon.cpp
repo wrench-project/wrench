@@ -18,6 +18,7 @@
 #include "SequentialRandomWMSDaemon.h"
 #include "../../simulation/Simulation.h"
 #include "../../simgrid_util/Mailbox.h"
+#include "../../simgrid_util/Host.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms_daemon, "Log category for Simple WMS Daemon");
 
@@ -40,7 +41,7 @@ namespace WRENCH {
 		 * @return 0 on completion
 		 */
 		int SequentialRandomWMSDaemon::main() {
-			XBT_INFO("Starting on host %s listening on mailbox %s", MSG_host_get_name(MSG_host_self()), this->mailbox.c_str());
+			XBT_INFO("Starting on host %s listening on mailbox %s", Host::getHostName().c_str(), this->mailbox.c_str());
 			XBT_INFO("About to execute a workflow with %lu tasks",this->workflow->getNumberOfTasks());
 
 			/** Stupid Scheduling/Execution Algorithm **/
@@ -77,7 +78,7 @@ namespace WRENCH {
 			XBT_INFO("Simple WMS Daemon is shutting down all Compute Services");
 			this->simulation->shutdown();
 
-			XBT_INFO("Simple WMS Daemon started on host %s terminating", MSG_host_get_name(MSG_host_self()));
+			XBT_INFO("Simple WMS Daemon started on host %s terminating", Host::getHostName().c_str());
 
 			return 0;
 		}
