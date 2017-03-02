@@ -6,6 +6,13 @@
 
 int main(int argc, char **argv) {
 
+	if (argc != 2) {
+		std::cerr << "Usage: " << argv[0] << "<xml platform file>" << std::endl;
+		exit(1);
+	}
+
+	char *platform_file = argv[1];
+
 	WRENCH::Simulation simulation;
 
 	simulation.init(&argc, argv);
@@ -21,7 +28,7 @@ int main(int argc, char **argv) {
 	std::shared_ptr <WRENCH::WorkflowTask> t3 = workflow.addTask("T3", 10.0, 1);
 	std::shared_ptr <WRENCH::WorkflowTask> t4 = workflow.addTask("T4", 30.0, 1);
 
-	std::cerr << "Task states: " << t1->getState() << t2->getState() << t3->getState() << t4->getState() << std::endl;
+	//std::cerr << "Task states: " << t1->getState() << t2->getState() << t3->getState() << t4->getState() << std::endl;
 	std::cerr << "Adding control dependency edges..." << std::endl;
 	workflow.addControlDependency(t1, t2);
 	workflow.addControlDependency(t1, t2);  // redundant, and should be ignored
@@ -56,7 +63,7 @@ int main(int argc, char **argv) {
 //	workflow.exportToEPS("workflow.eps");
 
 	std::cerr << "Instantiating SimGrid platform..." << std::endl;
-	simulation.createPlatform("./two_hosts.xml");
+	simulation.createPlatform(platform_file);
 
 //	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
 //	simulation.createSequentialTaskExecutor("Tremblay");
