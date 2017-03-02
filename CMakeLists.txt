@@ -1,51 +1,59 @@
 cmake_minimum_required(VERSION 3.6)
-project(simulation)
+project(wrench)
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(/usr/include /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
 
 link_libraries(simgrid emon)
 
-set(SOURCE_FILES main.cpp
-        workflow/Workflow.cpp
-        workflow/Workflow.h
-        exception/WRENCHException.h
-        workflow/WorkflowTask.h
-        workflow/WorkflowTask.cpp
-        workflow/WorkflowFile.h
-        platform/Platform.cpp
-        platform/Platform.h
-        simulation/Simulation.cpp
-        simulation/Simulation.h
-        wrench.h
-        compute_services/ComputeService.cpp
-        compute_services/ComputeService.h
-        simgrid_util/DaemonWithMailbox.cpp
-        simgrid_util/DaemonWithMailbox.h
-        compute_services/sequential_task_executor/SequentialTaskExecutor.cpp
-        compute_services/sequential_task_executor/SequentialTaskExecutor.h
-        compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
-        compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.h
-        simgrid_util/Message.cpp
-        simgrid_util/Message.h
-        simgrid_util/Mailbox.cpp
-        simgrid_util/Mailbox.h
-        wms/WMS.cpp
-        wms/WMS.h
-        wms/sequential_random_WMS/SequentialRandomWMS.cpp
-        wms/sequential_random_WMS/SequentialRandomWMS.h
-        wms/sequential_random_WMS/SequentialRandomWMSDaemon.h
-        wms/sequential_random_WMS/SequentialRandomWMSDaemon.cpp
-        simgrid_util/Computation.cpp
-        simgrid_util/Computation.h
-        simgrid_util/Host.cpp
-        simgrid_util/Host.h
-        simgrid_util/Environment.cpp
-        simgrid_util/Environment.h
-        simgrid_util/Clock.cpp
-        simgrid_util/Clock.h 
-	simgrid_util/Simgrid.cpp 
-	simgrid_util/Simgrid.h)
+set(SOURCE_FILES src/wrench/main.cpp
+        src/wrench/workflow/Workflow.cpp
+        src/wrench/workflow/Workflow.h
+        src/wrench/exception/WRENCHException.h
+        src/wrench/workflow/WorkflowTask.h
+        src/wrench/workflow/WorkflowTask.cpp
+        src/wrench/workflow/WorkflowFile.h
+        src/wrench/platform/Platform.cpp
+        src/wrench/platform/Platform.h
+        src/wrench/simulation/Simulation.cpp
+        src/wrench/simulation/Simulation.h
+        src/wrench/compute_services/ComputeService.cpp
+        src/wrench/compute_services/ComputeService.h
+        src/wrench/simgrid_util/DaemonWithMailbox.cpp
+        src/wrench/simgrid_util/DaemonWithMailbox.h
+        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutor.cpp
+        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutor.h
+        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
+        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.h
+        src/wrench/simgrid_util/Message.cpp
+        src/wrench/simgrid_util/Message.h
+        src/wrench/simgrid_util/Mailbox.cpp
+        src/wrench/simgrid_util/Mailbox.h
+        src/wrench/wms/WMS.cpp
+        src/wrench/wms/WMS.h
+        src/wrench/wms/sequential_random_WMS/SequentialRandomWMS.cpp
+        src/wrench/wms/sequential_random_WMS/SequentialRandomWMS.h
+        src/wrench/wms/sequential_random_WMS/SequentialRandomWMSDaemon.h
+        src/wrench/wms/sequential_random_WMS/SequentialRandomWMSDaemon.cpp
+        src/wrench/simgrid_util/Computation.cpp
+        src/wrench/simgrid_util/Computation.h
+        src/wrench/simgrid_util/Host.cpp
+        src/wrench/simgrid_util/Host.h
+        src/wrench/simgrid_util/Environment.cpp
+        src/wrench/simgrid_util/Environment.h
+        src/wrench/simgrid_util/Clock.cpp
+        src/wrench/simgrid_util/Clock.h
+        src/wrench/simgrid_util/Simgrid.cpp
+        src/wrench/simgrid_util/Simgrid.h)
 
+set(INCLUDE_FILES include/wrench.h)
+
+#Generate the static library from the sources
+add_library(wrench STATIC ${SOURCE_FILES})
+install(TARGETS wrench DESTINATION lib)
+install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
+
+# TODO: temporary simulation test binary
 add_executable(simulation ${SOURCE_FILES})
+install(TARGETS simulation DESTINATION bin)
