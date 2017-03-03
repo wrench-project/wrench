@@ -8,10 +8,9 @@ compiler:
 
 before_script:
   - sudo apt-get install simgrid
-  - wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz -O lemon.tar.gz
-  - tar -xvf lemon.tar.gz
-  - cd lemon
-  - mkdir build & cd build & cmake .. & sudo make install
+  - wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
+  - tar -xvf lemon-1.3.1.tar.gz
+  - cd lemon-1.3.1 & mkdir build & cd build & cmake .. & sudo make install
   - cd ../.. & rm -rf lemon*
   - mkdir build
   - cd build
