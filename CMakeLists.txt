@@ -5,9 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
 
-link_libraries(simgrid emon)
-
-set(SOURCE_FILES src/wrench/main.cpp
+set(SOURCE_FILES
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/Workflow.h
         src/wrench/exception/WRENCHException.h
@@ -45,15 +43,21 @@ set(SOURCE_FILES src/wrench/main.cpp
         src/wrench/simgrid_util/Clock.cpp
         src/wrench/simgrid_util/Clock.h
         src/wrench/simgrid_util/Simgrid.cpp
-        src/wrench/simgrid_util/Simgrid.h)
+        src/wrench/simgrid_util/Simgrid.h
+        src/wrench/main.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
 
+find_library(SIMGRID_LIB NAMES simgrid)
+find_library(LEMON_LIB NAMES emon)
+
 #Generate the static library from the sources
 add_library(wrench STATIC ${SOURCE_FILES})
+target_link_libraries(wrench ${SIMGRID_LIB} ${LEMON_LIB})
 install(TARGETS wrench DESTINATION lib)
 install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
 
 # TODO: temporary simulation test binary
 add_executable(simulation ${SOURCE_FILES})
+target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB})
 install(TARGETS simulation DESTINATION bin)
