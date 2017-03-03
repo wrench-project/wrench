@@ -2,31 +2,12 @@ language: cpp
 
 sudo: required
 
-compiler:
-  - gcc
-  - clang
-
-os:
-  - linux
-  - osx
-
-addons:
-  apt:
-    sources:
-    # add PPAs with more up-to-date toolchains
-    - ubuntu-toolchain-r-test
-    - llvm-toolchain-precise-3.6
-    packages:
-    # install toolchains
-    - gcc-5
-    - g++-5
-    - clang-3.6
-
 matrix:
   include:
+    - os: osx
+      compiler: clang
     - os: linux
-      dist: trusty
-    - compiler: gcc
+      compiler: gcc
       addons:
         apt:
           sources:
@@ -34,7 +15,8 @@ matrix:
           packages:
             - g++-4.9
       env: COMPILER=g++-4.9
-    - compiler: gcc
+    - os: linux
+      compiler: gcc
       addons:
         apt:
           sources:
@@ -42,7 +24,17 @@ matrix:
           packages:
             - g++-5
       env: COMPILER=g++-5
-    - compiler: clang
+    - os: linux
+          compiler: gcc
+          addons:
+            apt:
+              sources:
+                - ubuntu-toolchain-r-test
+              packages:
+                - g++-6
+          env: COMPILER=g++-6
+    - os: linux
+      compiler: clang
       addons:
         apt:
           sources:
@@ -51,7 +43,8 @@ matrix:
           packages:
             - clang-3.6
       env: COMPILER=clang++-3.6
-    - compiler: clang
+    - os: linux
+      compiler: clang
       addons:
         apt:
           sources:
@@ -62,6 +55,7 @@ matrix:
       env: COMPILER=clang++-3.7
 
 before_script:
+  - cmake --version
   - sudo apt-get install simgrid
   - wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
   - tar -xvf lemon-1.3.1.tar.gz
