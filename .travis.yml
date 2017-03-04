@@ -6,19 +6,11 @@ matrix:
   include:
     - os: osx
       compiler: clang
-    - os: linux
-      compiler: gcc
-      dist: trusty
       addons:
         apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports
           packages:
-            - g++-4.9
-            - cmake
-            - cmake-data
-      env: COMPILER=g++-4.9
+            - python3
+            - doxygen
     - os: linux
       compiler: gcc
       dist: trusty
@@ -31,6 +23,7 @@ matrix:
             - g++-5
             - cmake
             - cmake-data
+            - doxygen
       env: COMPILER=g++-5
     - os: linux
       compiler: gcc
@@ -44,6 +37,7 @@ matrix:
             - g++-6
             - cmake
             - cmake-data
+            - doxygen
       env: COMPILER=g++-6
     - os: linux
       compiler: clang
@@ -58,6 +52,7 @@ matrix:
             - clang-3.6
             - cmake
             - cmake-data
+            - doxygen
       env: COMPILER=clang++-3.6
     - os: linux
       compiler: clang
@@ -72,13 +67,18 @@ matrix:
             - clang-3.7
             - cmake
             - cmake-data
+            - doxygen
       env: COMPILER=clang++-3.7
 
 before_script:
   - cmake --version
+  # install Simgrid dependencies
+  - sudo apt-get install libboost1.48-all-dev libboost-graph1.48-dev libboost-graph-parallel1.48-dev libboost-iostreams1.48-dev libboost-math1.48-dev libboost-program-options1.48-dev libboost-python1.48-dev libboost-signals1.48-dev libboost-thread1.48-dev libboost-wave1.48-dev
+  # install Simgrid
   - wget https://gforge.inria.fr/frs/download.php/file/36384/SimGrid-3.14.159.tar.gz
   - tar xf SimGrid-3.14.159.tar.gz
   - cd SimGrid-3.14.159 && cmake . && make && sudo make install
+  # install Lemon
   - wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
   - tar -xvf lemon-1.3.1.tar.gz
   - cd lemon-1.3.1 && cmake . && make && sudo make install
