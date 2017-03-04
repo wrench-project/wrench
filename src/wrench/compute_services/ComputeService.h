@@ -17,7 +17,7 @@
 #define SIMULATION_COMPUTESERVICE_H
 
 
-#include "../workflow/WorkflowTask.h"
+#include "workflow/WorkflowTask.h"
 
 namespace WRENCH {
 

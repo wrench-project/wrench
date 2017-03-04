@@ -6,34 +6,11 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
 
 set(SOURCE_FILES
-        src/wrench/workflow/Workflow.cpp
-        src/wrench/workflow/Workflow.h
         src/wrench/exception/WRENCHException.h
-        src/wrench/workflow/WorkflowTask.h
-        src/wrench/workflow/WorkflowTask.cpp
-        src/wrench/workflow/WorkflowFile.h
-        src/wrench/platform/Platform.cpp
-        src/wrench/platform/Platform.h
-        src/wrench/simulation/Simulation.cpp
-        src/wrench/simulation/Simulation.h
-        src/wrench/compute_services/ComputeService.cpp
-        src/wrench/compute_services/ComputeService.h
-        src/wrench/simgrid_util/DaemonWithMailbox.cpp
-        src/wrench/simgrid_util/DaemonWithMailbox.h
-        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutor.cpp
-        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutor.h
-        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
-        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.h
         src/wrench/simgrid_util/Message.cpp
         src/wrench/simgrid_util/Message.h
         src/wrench/simgrid_util/Mailbox.cpp
         src/wrench/simgrid_util/Mailbox.h
-        src/wrench/wms/WMS.cpp
-        src/wrench/wms/WMS.h
-        src/wrench/wms/sequential_random_WMS/SequentialRandomWMS.cpp
-        src/wrench/wms/sequential_random_WMS/SequentialRandomWMS.h
-        src/wrench/wms/sequential_random_WMS/SequentialRandomWMSDaemon.h
-        src/wrench/wms/sequential_random_WMS/SequentialRandomWMSDaemon.cpp
         src/wrench/simgrid_util/Computation.cpp
         src/wrench/simgrid_util/Computation.h
         src/wrench/simgrid_util/Host.cpp
@@ -44,6 +21,29 @@ set(SOURCE_FILES
         src/wrench/simgrid_util/Clock.h
         src/wrench/simgrid_util/Simgrid.cpp
         src/wrench/simgrid_util/Simgrid.h
+        src/wrench/simgrid_util/DaemonWithMailbox.cpp
+        src/wrench/simgrid_util/DaemonWithMailbox.h
+        src/wrench/workflow/Workflow.cpp
+        src/wrench/workflow/Workflow.h
+        src/wrench/workflow/WorkflowTask.h
+        src/wrench/workflow/WorkflowTask.cpp
+        src/wrench/workflow/WorkflowFile.h
+        src/wrench/platform/Platform.cpp
+        src/wrench/platform/Platform.h
+        src/wrench/wms/WMS.cpp
+        src/wrench/wms/WMS.h
+        src/wrench/wms/sequential_random_WMS/SequentialRandomWMS.cpp
+        src/wrench/wms/sequential_random_WMS/SequentialRandomWMS.h
+        src/wrench/wms/sequential_random_WMS/SequentialRandomWMSDaemon.h
+        src/wrench/wms/sequential_random_WMS/SequentialRandomWMSDaemon.cpp
+        src/wrench/compute_services/ComputeService.cpp
+        src/wrench/compute_services/ComputeService.h
+        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutor.cpp
+        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutor.h
+        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
+        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.h
+        src/wrench/simulation/Simulation.cpp
+        src/wrench/simulation/Simulation.h
         src/wrench/main.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
