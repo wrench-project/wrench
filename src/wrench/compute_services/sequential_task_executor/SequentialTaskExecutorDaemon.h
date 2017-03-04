@@ -16,7 +16,7 @@
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H
 #define SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H
 
-#include "../../simgrid_util/DaemonWithMailbox.h"
+#include "simgrid_util/DaemonWithMailbox.h"
 
 namespace WRENCH {
 		class SequentialTaskExecutorDaemon: public DaemonWithMailbox {

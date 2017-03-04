@@ -14,7 +14,7 @@
 
 
 #include "Host.h"
-#include "../exception/WRENCHException.h"
+#include "exception/WRENCHException.h"
 #include <simgrid/msg.h>
 
 namespace WRENCH {

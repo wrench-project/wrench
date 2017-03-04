@@ -16,8 +16,8 @@
 #ifndef WRENCH_SIMPLEWMSDAEMON_H
 #define WRENCH_SIMPLEWMSDAEMON_H
 
-#include "../../simgrid_util/DaemonWithMailbox.h"
-#include "../../workflow/Workflow.h"
+#include "simgrid_util/DaemonWithMailbox.h"
+#include "workflow/Workflow.h"
 
 namespace WRENCH {
 

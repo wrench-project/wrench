@@ -14,7 +14,7 @@
 
 
 #include "Computation.h"
-#include "../exception/WRENCHException.h"
+#include "exception/WRENCHException.h"
 #include "Host.h"
 
 #include <simgrid/msg.h>

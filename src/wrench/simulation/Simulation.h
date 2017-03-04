@@ -7,10 +7,10 @@
 
 #include <string>
 #include <vector>
-#include "../workflow/Workflow.h"
-#include "../compute_services/sequential_task_executor/SequentialTaskExecutor.h"
-#include "../wms/sequential_random_WMS/SequentialRandomWMS.h"
-#include "../platform/Platform.h"
+#include "workflow/Workflow.h"
+#include "compute_services/sequential_task_executor/SequentialTaskExecutor.h"
+#include "wms/sequential_random_WMS/SequentialRandomWMS.h"
+#include "platform/Platform.h"
 
 
 namespace WRENCH {

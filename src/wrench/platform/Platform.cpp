@@ -14,7 +14,7 @@
  */
 
 #include "Platform.h"
-#include "../simgrid_util/Environment.h"
+#include "simgrid_util/Environment.h"
 
 
 namespace WRENCH {

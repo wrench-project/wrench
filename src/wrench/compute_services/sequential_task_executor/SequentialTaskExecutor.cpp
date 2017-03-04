@@ -14,7 +14,7 @@
  */
 
 #include "SequentialTaskExecutor.h"
-#include "../../simgrid_util/Mailbox.h"
+#include "simgrid_util/Mailbox.h"
 
 namespace WRENCH {
 

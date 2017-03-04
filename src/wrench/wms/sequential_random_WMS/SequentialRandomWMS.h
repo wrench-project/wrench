@@ -15,7 +15,7 @@
 #ifndef WRENCH_SIMPLEWMS_H
 #define WRENCH_SIMPLEWMS_H
 
-#include "../WMS.h"
+#include "wms/WMS.h"
 #include "SequentialRandomWMSDaemon.h"
 
 namespace WRENCH {

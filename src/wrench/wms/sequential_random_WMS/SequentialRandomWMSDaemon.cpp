@@ -16,9 +16,9 @@
 #include <simgrid/msg.h>
 
 #include "SequentialRandomWMSDaemon.h"
-#include "../../simulation/Simulation.h"
-#include "../../simgrid_util/Mailbox.h"
-#include "../../simgrid_util/Host.h"
+#include "simulation/Simulation.h"
+#include "simgrid_util/Mailbox.h"
+#include "simgrid_util/Host.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms_daemon, "Log category for Simple WMS Daemon");
 

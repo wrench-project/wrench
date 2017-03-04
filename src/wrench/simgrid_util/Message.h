@@ -16,7 +16,7 @@
 #define WRENCH_SIMGRIDMESSAGES_H
 
 #include <string>
-#include "../workflow/WorkflowTask.h"
+#include "workflow/WorkflowTask.h"
 
 namespace WRENCH {
 

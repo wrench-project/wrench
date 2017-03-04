@@ -14,8 +14,8 @@
  */
 
 #include "Simulation.h"
-#include "../exception/WRENCHException.h"
-#include "../simgrid_util/Simgrid.h"
+#include "exception/WRENCHException.h"
+#include "simgrid_util/Simgrid.h"
 
 namespace WRENCH {
 

@@ -18,7 +18,7 @@
 #include <lemon/bfs.h>
 
 #include "Workflow.h"
-#include "../exception/WRENCHException.h"
+#include "exception/WRENCHException.h"
 
 
 namespace WRENCH {

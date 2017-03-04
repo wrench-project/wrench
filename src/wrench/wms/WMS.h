@@ -16,7 +16,7 @@
 #ifndef WRENCH_WMS_H
 #define WRENCH_WMS_H
 
-#include "../workflow/Workflow.h"
+#include "workflow/Workflow.h"
 
 namespace WRENCH {
 

@@ -13,7 +13,7 @@
  */
 
 #include "DaemonWithMailbox.h"
-#include "../exception/WRENCHException.h"
+#include "exception/WRENCHException.h"
 
 #include <simgrid/msg.h>
 
