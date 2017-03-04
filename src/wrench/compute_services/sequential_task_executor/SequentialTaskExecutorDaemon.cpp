@@ -21,7 +21,7 @@
 #include "simgrid_util/Mailbox.h"
 #include "simgrid_util/Computation.h"
 #include "simgrid_util/Host.h"
-#include "simgrid_util/CLock.h"
+#include "simgrid_util/Clock.h"
 #include "exception/WRENCHException.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(sequential_task_executor_daemon, "Log category for Sequential Task Executor Daemon");
