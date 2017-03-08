@@ -56,19 +56,19 @@ namespace WRENCH {
 
 		private:
 				Workflow *workflow; 	// Containing workflow
-				std::shared_ptr<ListDigraph> DAG; 	// Containing workflow
+				ListDigraph *DAG; 	// Containing workflow
 				ListDigraph::Node DAG_node; // pointer to the underlying DAG node
-				std::map<std::string, std::shared_ptr<WorkflowFile>> output_files;  // List of output files
-				std::map<std::string, std::shared_ptr<WorkflowFile>> input_files;   // List of input files
+				std::map<std::string, WorkflowFile *> output_files;  // List of output files
+				std::map<std::string, WorkflowFile *> input_files;   // List of input files
 
 
 		private:
 				// Private constructor
 				WorkflowTask(const std::string id, const double t, const int n);
 
-				void addInputFile(std::shared_ptr<WorkflowFile> f);
-				void addOutputFile(std::shared_ptr<WorkflowFile> f);
-				void addFileToMap(std::map<std::string, std::shared_ptr<WorkflowFile>> map, std::shared_ptr<WorkflowFile> f);
+				void addInputFile(WorkflowFile *);
+				void addOutputFile(WorkflowFile *);
+				void addFileToMap(std::map<std::string, WorkflowFile*> map, WorkflowFile *f);
 
 		public:
 				int getNumberOfChildren();

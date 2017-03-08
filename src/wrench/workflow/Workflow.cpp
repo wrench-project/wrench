@@ -30,8 +30,10 @@ namespace WRENCH {
 		/*
 		 * pathExists()
 		 */
-		bool Workflow::pathExists(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dst) {
+		bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
 			Bfs<ListDigraph> bfs(*DAG);
+
+
 			bool reached = bfs.run(src->DAG_node, dst->DAG_node);
 			//std::cout << "PATH from " << src->id << " to " << dst->id << ": " << reached << std::endl;
 			return reached;
@@ -40,7 +42,7 @@ namespace WRENCH {
 		/*
 		 * updateTaskReadyState()
 		 */
-		void Workflow::updateTaskReadyState(std::shared_ptr<WorkflowTask> task) {
+		void Workflow::updateTaskReadyState(WorkflowTask *task) {
 
 			if (task->state != WorkflowTask::NOT_READY) {
 				return;
@@ -70,8 +72,9 @@ namespace WRENCH {
 		 */
 
 		Workflow::Workflow() {
-			DAG = std::make_shared<ListDigraph>();
-			DAG_node_map = std::make_shared<ListDigraph::NodeMap<std::shared_ptr<WorkflowTask>>>(*DAG);
+			DAG = std::unique_ptr<ListDigraph>(new ListDigraph());
+			DAG_node_map = std::unique_ptr<ListDigraph::NodeMap<WorkflowTask*>>(
+							new ListDigraph::NodeMap<WorkflowTask*>(*DAG));
 		};
 
 		/**
@@ -89,9 +92,9 @@ namespace WRENCH {
 		 * @param execution_time is a reference execution time in second
 		 * @param num_procs is a number of processors
 		 *
-		 * @return a SHARED POINTER to a WorkflowTask object
+		 * @return a pointer to a WorkflowTask object
 		 */
-		std::shared_ptr<WorkflowTask> Workflow::addTask(const std::string id,
+		 WorkflowTask* Workflow::addTask(const std::string id,
 																										double execution_time,
 																										int num_procs = 1) {
 
@@ -101,15 +104,15 @@ namespace WRENCH {
 			}
 
 			// Create the WorkflowTask object
-			std::shared_ptr<WorkflowTask> task(new WorkflowTask(id, execution_time, num_procs));
+			WorkflowTask  *task = new WorkflowTask(id, execution_time, num_procs);
 			// Create a DAG node for it
 			task->workflow = this;
-			task->DAG = DAG;
+			task->DAG = this->DAG.get();
 			task->DAG_node = DAG->addNode();
 			// Add it to the DAG node's metadata
 			(*DAG_node_map)[task->DAG_node] = task;
 			// Add it to the set of workflow tasks
-			tasks[task->id] = task;
+			tasks[task->id] = std::unique_ptr<WorkflowTask>(task); // owner
 
 			return task;
 		}
@@ -119,13 +122,13 @@ namespace WRENCH {
 		 *
 		 * @param id is a string id
 		 *
-		 * @return a SHARED POINTER to a WorkflowTask object
+		 * @return a pointer to a WorkflowTask object
 		 */
-		std::shared_ptr<WorkflowTask> Workflow::getWorkflowTaskByID(const std::string id) {
+		WorkflowTask* Workflow::getWorkflowTaskByID(const std::string id) {
 			if (!tasks[id]) {
 				throw WRENCHException("Unknown WorkflowTask ID " + id);
 			}
-			return tasks[id];
+			return tasks[id].get();
 		}
 
 
@@ -138,7 +141,7 @@ namespace WRENCH {
 		 *
 		 * @return nothing
 		 */
-		void Workflow::addControlDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dst) {
+		void Workflow::addControlDependency(WorkflowTask *src, WorkflowTask *dst) {
 			if (!pathExists(src, dst)) {
 				DAG->addArc(src->DAG_node, dst->DAG_node);
 				updateTaskReadyState(dst);
@@ -156,12 +159,11 @@ namespace WRENCH {
 		 *
 		 * @return nothing
 		 */
-		void Workflow::addDataDependency(std::shared_ptr<WorkflowTask> src, std::shared_ptr<WorkflowTask> dst,
-																		 std::shared_ptr<WorkflowFile> file) {
+		void Workflow::addDataDependency(WorkflowTask *src, WorkflowTask *dst,
+																		 WorkflowFile *file) {
 			src->addOutputFile(file);
 			dst->addInputFile(file);
 			addControlDependency(src, dst);
-
 		}
 
 
@@ -172,14 +174,13 @@ namespace WRENCH {
 		 * @param id is a unique string id
 		 * @param size is a file size in bytes
 		 *
-		 * @return a SHARED POINTER to a WorkflowFile object
+		 * @return a pointer to a WorkflowFile object
 		 */
-		std::shared_ptr<WorkflowFile> Workflow::addFile(const std::string id,
-																										double size) {
+		WorkflowFile * Workflow::addFile(const std::string id, double size) {
 			// Create the WorkflowFile object
-			std::shared_ptr<WorkflowFile> file(new WorkflowFile(id, size));
+			WorkflowFile *file = new WorkflowFile(id, size);
 			// Add if to the set of workflow files
-			files[file->id] = file;
+			files[file->id] = std::unique_ptr<WorkflowFile>(file);
 
 			return file;
 		}
@@ -189,13 +190,13 @@ namespace WRENCH {
 		 *
 		 * @param id is a string id
 		 *
-		 * @return a SHARED POINTER to a WorkflowFile object
+		 * @return a pointer to a WorkflowFile object
 		 */
-		std::shared_ptr<WorkflowFile> Workflow::getWorkflowFileByID(const std::string id) {
+		WorkflowFile *Workflow::getWorkflowFileByID(const std::string id) {
 			if (!files[id]) {
 				throw WRENCHException("Unknown WorkflowFile ID " + id);
 			}
-			return files[id];
+			return files[id].get();
 		}
 
 		/**
@@ -221,12 +222,12 @@ namespace WRENCH {
 
 		}
 
-		std::shared_ptr<WorkflowTask> Workflow::getSomeReadyTask() {
+		WorkflowTask *Workflow::getSomeReadyTask() {
 
-			std::map<std::string, std::shared_ptr<WorkflowTask>>::iterator it;
+			std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
 			for (it = this->tasks.begin(); it != this->tasks.end(); it++ )
 			{
-				std::shared_ptr<WorkflowTask> task = it->second;
+				WorkflowTask *task = it->second.get();
 				if (task->getState() == WorkflowTask::READY) {
 					return task;
 				}
@@ -234,7 +235,7 @@ namespace WRENCH {
 			return nullptr;
 		}
 
-		void Workflow::makeTaskCompleted(std::shared_ptr<WorkflowTask> task) {
+		void Workflow::makeTaskCompleted(WorkflowTask *task) {
 			task->state = WorkflowTask::COMPLETED;
 			for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
 				updateTaskReadyState((*DAG_node_map)[(*DAG).source(a)]);

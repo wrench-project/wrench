@@ -37,18 +37,18 @@ namespace WRENCH {
 		/**
 		 * @brief adds an input file to the task
 		 *
-		 * @param f is a shared_ptr to the file
+		 * @param f is a pointer to the file
 		 */
-		void WorkflowTask::addInputFile(std::shared_ptr<WorkflowFile> f) {
+		void WorkflowTask::addInputFile(WorkflowFile *f) {
 			addFileToMap(input_files, f);
 		}
 
 		/**
 		 * @brief adds an output file to the task
 		 *
-		 * @param f is a shared_ptr to the file
+		 * @param f is a pointer to the file
 		 */
-		void WorkflowTask::addOutputFile(std::shared_ptr<WorkflowFile> f) {
+		void WorkflowTask::addOutputFile(WorkflowFile *f) {
 			addFileToMap(output_files, f);
 		}
 
@@ -56,10 +56,10 @@ namespace WRENCH {
 		 * @brief helper method to add a file to a map if necessary
 		 *
 		 * @param map is the map
-		 * @param f is a shared_ptr to a file
+		 * @param f is a pointer to a file
 		 */
-		void WorkflowTask::addFileToMap(std::map<std::string, std::shared_ptr<WorkflowFile>> map,
-																		std::shared_ptr<WorkflowFile> f) {
+		void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile*> map,
+																		WorkflowFile * f) {
 			if (!map[f->id]) {
 				map[f->id] = f;
 			}

@@ -31,8 +31,8 @@ namespace WRENCH {
 		/**
 		 * @brief Constructor
 		 */
-		SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(): DaemonWithMailbox("sequential_task_executor_daemon") {
-
+		SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(ComputeService *cs): DaemonWithMailbox("sequential_task_executor_daemon") {
+			this->compute_service = cs;
 		}
 
 		/**
@@ -77,7 +77,7 @@ namespace WRENCH {
 						XBT_INFO("Notifying mailbox %s that task %s has finished",
 										 m->callback_mailbox.c_str(),
 										 m->task->id.c_str());
-						Mailbox::iput(m->callback_mailbox, new TaskDoneMessage(m->task));
+						Mailbox::iput(m->callback_mailbox, new TaskDoneMessage(m->task, this->compute_service));
 
 						break;
 					}

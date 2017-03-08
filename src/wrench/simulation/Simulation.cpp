@@ -61,7 +61,7 @@ namespace WRENCH {
 		 * @param filename is the path to a SimGrid XML platform descritpion file
 		 */
 		void Simulation::createPlatform(std::string filename) {
-			this->platform = std::make_shared<Platform>(filename);
+			this->platform = std::unique_ptr<Platform>(new Platform(filename));
 		}
 
 		/**
@@ -72,15 +72,15 @@ namespace WRENCH {
 		void Simulation::createSequentialTaskExecutor(std::string hostname) {
 
 			// Create the compute service
-			std::shared_ptr<SequentialTaskExecutor> executor;
+			std::unique_ptr<SequentialTaskExecutor> executor;
 			try {
-				executor = std::make_shared<SequentialTaskExecutor>(hostname);
+				executor = std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(hostname));
 			} catch (WRENCHException e) {
 				throw e;
 			}
 
 			// Add it to the list of Compute Services
-			sequential_task_executors.push_back(executor);
+			sequential_task_executors.push_back(std::move(executor));
 
 		}
 
@@ -93,16 +93,16 @@ namespace WRENCH {
 		void Simulation::createSimpleWMS(Workflow *w, std::string hostname) {
 
 			// Create the WMS
-			std::shared_ptr<SequentialRandomWMS> wms;
+			std::unique_ptr<SequentialRandomWMS> wms;
 
 			try {
-				wms = std::make_shared<SequentialRandomWMS>(this, w, hostname);
+				wms = std::unique_ptr<SequentialRandomWMS>(new SequentialRandomWMS(this, w, hostname));
 			} catch (WRENCHException e) {
 				throw e;
 			}
 
 			// Add it to the list of WMSes
-			WMSes.push_back(wms);
+			WMSes.push_back(std::move(wms));
 
 		}
 
@@ -111,8 +111,8 @@ namespace WRENCH {
 		 *
 		 * @return
 		 */
-		std::shared_ptr<SequentialTaskExecutor> Simulation::getSomeSequentialTaskExecutor() {
-			return sequential_task_executors[0];
+		SequentialTaskExecutor *Simulation::getSomeSequentialTaskExecutor() {
+			return sequential_task_executors[0].get();
 		}
 
 		/**
@@ -120,8 +120,8 @@ namespace WRENCH {
 		 */
 		void Simulation::shutdown() {
 
-			for(std::shared_ptr<SequentialTaskExecutor> executor : this->sequential_task_executors) {
-				executor->stop();
+			for (int i=0; i < this->sequential_task_executors.size(); i++) {
+				this->sequential_task_executors[i]->stop();
 			}
 
 		}

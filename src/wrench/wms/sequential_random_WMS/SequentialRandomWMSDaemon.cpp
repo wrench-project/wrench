@@ -49,7 +49,7 @@ namespace WRENCH {
 			while(true) {
 
 				// Look for a ready task
-				std::shared_ptr<WorkflowTask> ready_task = this->workflow->getSomeReadyTask();
+				WorkflowTask* ready_task = this->workflow->getSomeReadyTask();
 
 				// If none, we're done
 				if (!ready_task) {

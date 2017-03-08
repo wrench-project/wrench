@@ -22,15 +22,17 @@ namespace WRENCH {
 		 *
 		 * @param service_name is the name of the compute service
 		 */
-		 ComputeService::ComputeService(std::string service_name) {
+		ComputeService::ComputeService(std::string service_name) {
 			this->service_name = service_name;
 		}
 
 		/**
 		 * @brief Destructor
 		 */
-		 ComputeService::~ComputeService() {
+		ComputeService::~ComputeService() {
 
 		}
+
+
 
 };

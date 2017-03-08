@@ -16,17 +16,19 @@
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H
 #define SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H
 
+#include <compute_services/ComputeService.h>
 #include "simgrid_util/DaemonWithMailbox.h"
 
 namespace WRENCH {
 		class SequentialTaskExecutorDaemon: public DaemonWithMailbox {
 
 		public:
-				SequentialTaskExecutorDaemon();
+				SequentialTaskExecutorDaemon(ComputeService *cs);
 				~SequentialTaskExecutorDaemon();
 
 		private:
 				int main();
+				ComputeService *compute_service;
 
 		};
 }

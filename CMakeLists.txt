@@ -58,6 +58,6 @@ install(TARGETS wrench DESTINATION lib)
 install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
 
 # TODO: temporary simulation test binary
-add_executable(simulation ${SOURCE_FILES})
+add_executable(simulation ${SOURCE_FILES} src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.h src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.h)
 target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB})
 install(TARGETS simulation DESTINATION bin)

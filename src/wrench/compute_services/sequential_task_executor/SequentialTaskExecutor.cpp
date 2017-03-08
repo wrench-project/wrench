@@ -27,7 +27,7 @@ namespace WRENCH {
 			this->hostname = hostname;
 
 			// Create the daemon
-			this->daemon = std::unique_ptr<SequentialTaskExecutorDaemon>(new SequentialTaskExecutorDaemon());
+			this->daemon = std::unique_ptr<SequentialTaskExecutorDaemon>(new SequentialTaskExecutorDaemon(this));
 			// Start the daemon on the host
 			this->daemon->start(this->hostname);
 		}
@@ -50,11 +50,11 @@ namespace WRENCH {
 		/**
 		 * @brief Causes the service to execute a workflow task
 		 *
-		 * @param task is a shared_ptr to the workflow task
+		 * @param task is a pointer to the workflow task
 		 * @param callback_mailbox is the name of a mailbox to which a "task done" callback will be sent
 		 * @return 0 on success
 		 */
-		int SequentialTaskExecutor::runTask(std::shared_ptr<WorkflowTask> task, std::string callback_mailbox) {
+		int SequentialTaskExecutor::runTask(WorkflowTask *task, std::string callback_mailbox) {
 
 			// Asynchronously send a "run a task" message to the daemon's mailbox
 			Mailbox::iput(this->daemon->mailbox, new RunTaskMessage(task, callback_mailbox));

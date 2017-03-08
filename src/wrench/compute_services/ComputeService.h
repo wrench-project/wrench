@@ -25,11 +25,13 @@ namespace WRENCH {
 
 		public:
 				ComputeService(std::string);
+
 				virtual ~ComputeService();
 
 				// Virtual methods to implement in derived classes
 				virtual void stop() = 0;
-				virtual int runTask(std::shared_ptr<WorkflowTask> task, std::string callback_mailbox) = 0;
+
+				virtual int runTask(WorkflowTask *task, std::string callback_mailbox) = 0;
 
 		private:
 				std::string service_name;

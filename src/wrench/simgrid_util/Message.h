@@ -16,6 +16,7 @@
 #define WRENCH_SIMGRIDMESSAGES_H
 
 #include <string>
+#include <compute_services/ComputeService.h>
 #include "workflow/WorkflowTask.h"
 
 namespace WRENCH {
@@ -28,7 +29,7 @@ namespace WRENCH {
 				enum Type {
 						STOP_DAEMON,
 						RUN_TASK,
-						TASK_DONE
+						TASK_DONE,
 				};
 
 				Message(Type t, double s);
@@ -46,21 +47,21 @@ namespace WRENCH {
 
 		// Derived struct
 		struct RunTaskMessage: public Message {
-				RunTaskMessage(std::shared_ptr<WorkflowTask>, std::string cb);
+				RunTaskMessage(WorkflowTask*, std::string cb);
 				~RunTaskMessage();
-				std::shared_ptr<WorkflowTask> task;
+				WorkflowTask *task;
 				std::string callback_mailbox;
 		};
 
 		// Derived struct
 		struct TaskDoneMessage: public Message {
-				TaskDoneMessage(std::shared_ptr<WorkflowTask>);
+				TaskDoneMessage(WorkflowTask *, ComputeService*);
 				~TaskDoneMessage();
-				std::shared_ptr<WorkflowTask> task;
+				WorkflowTask *task;
+				ComputeService *compute_service;
 		};
 
 };
-
 
 
 #endif //WRENCH_SIMGRIDMESSAGES_H

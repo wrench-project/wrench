@@ -28,7 +28,7 @@ namespace WRENCH {
 				~SequentialTaskExecutor();
 
 				void stop();
-				int runTask(std::shared_ptr<WorkflowTask> task, std::string callback_mailbox);
+				int runTask(WorkflowTask *task, std::string callback_mailbox);
 
 		private:
 				std::string hostname;

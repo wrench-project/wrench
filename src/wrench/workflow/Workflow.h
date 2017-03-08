@@ -30,42 +30,40 @@ namespace WRENCH {
 		class Workflow {
 
 		private:
-				std::shared_ptr<ListDigraph> DAG;  // Lemon DiGraph
-				std::shared_ptr<ListDigraph::NodeMap<std::shared_ptr<WorkflowTask>>> DAG_node_map;  // Lemon map
+				std::unique_ptr<ListDigraph> DAG;  // Lemon DiGraph
+				std::unique_ptr<ListDigraph::NodeMap<WorkflowTask*>> DAG_node_map;  // Lemon map
 
-				std::map<std::string, std::shared_ptr<WorkflowTask>> tasks;  // STL map
-				std::map<std::string, std::shared_ptr<WorkflowFile>> files;  // STL map
+				std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
+				std::map<std::string, std::unique_ptr<WorkflowFile>> files;
 
 		private:
-				bool pathExists(std::shared_ptr<WorkflowTask>, std::shared_ptr<WorkflowTask>);
-				void updateTaskReadyState(std::shared_ptr<WorkflowTask>);
+				bool pathExists(WorkflowTask *, WorkflowTask *);
+				void updateTaskReadyState(WorkflowTask *);
 
 
 		public:
 				Workflow();
 				~Workflow();
 
-				std::shared_ptr<WorkflowTask> addTask(std::string, double, int);
-				std::shared_ptr<WorkflowTask> getWorkflowTaskByID(const std::string);
+				WorkflowTask *addTask(std::string, double, int);
+				WorkflowTask *getWorkflowTaskByID(const std::string);
 
-				void addControlDependency(std::shared_ptr<WorkflowTask>,
-																	std::shared_ptr<WorkflowTask>);
-				void addDataDependency(std::shared_ptr<WorkflowTask>,
-																				 std::shared_ptr<WorkflowTask>,
-																				 std::shared_ptr<WorkflowFile>);
+				void addControlDependency(WorkflowTask *,
+																	WorkflowTask *);
+				void addDataDependency(WorkflowTask *, WorkflowTask *, WorkflowFile *);
 
-				std::shared_ptr<WorkflowFile> addFile(const std::string, double);
-				std::shared_ptr<WorkflowFile> getWorkflowFileByID(const std::string);
+				WorkflowFile *addFile(const std::string, double);
+				WorkflowFile *getWorkflowFileByID(const std::string);
 
 				void exportToEPS(std::string);
 
 				unsigned long getNumberOfTasks();
 
 
-				void makeTaskCompleted(std::shared_ptr<WorkflowTask> task);
+				void makeTaskCompleted(WorkflowTask *task);
 
 				// For initial testing
-				std::shared_ptr<WorkflowTask> getSomeReadyTask();
+				WorkflowTask* getSomeReadyTask();
 
 
 

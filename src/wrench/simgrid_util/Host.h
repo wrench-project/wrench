@@ -17,12 +17,15 @@
 #define SIMULATION_HOST_H
 
 #include <string>
+#include <simgrid/msg.h>
 
 namespace WRENCH {
 		class Host {
 		public:
 				static std::string getHostName();
-
+				static int getNumCores();
+		private:
+				static msg_host_t get_local_host();
 		};
 };
 
