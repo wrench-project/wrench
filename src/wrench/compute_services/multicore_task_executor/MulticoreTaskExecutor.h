@@ -25,14 +25,16 @@
 
 namespace WRENCH {
 
-class MulticoreTaskExecutor: public ComputeService {
+		class MulticoreTaskExecutor : public ComputeService {
 
 
 		public:
 				MulticoreTaskExecutor(std::string hostname);
+
 				~MulticoreTaskExecutor();
 
 				void stop();
+
 				int runTask(WorkflowTask *task, std::string callback_mailbox);
 
 		private:
@@ -41,7 +43,6 @@ class MulticoreTaskExecutor: public ComputeService {
 				std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
 		};
 };
-
 
 
 #endif //WRENCH_MULTICORETASKEXECUTOR_H

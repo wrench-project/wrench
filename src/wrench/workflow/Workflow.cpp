@@ -40,8 +40,6 @@ namespace WRENCH {
 		}
 
 
-
-
 		/******************************/
 		/**      PUBLIC METHODS     **/
 		/******************************/
@@ -247,8 +245,7 @@ namespace WRENCH {
 
 			switch(state) {
 				// Make a task completed, which may cause its children to become ready
-				case WorkflowTask::COMPLETED:
-				{
+				case WorkflowTask::COMPLETED: {
 					if (task->getState() != WorkflowTask::RUNNING) {
 						throw WRENCHException("Workflow::updateTaskState(): Cannot set non-running task state to completed");
 					}
@@ -261,8 +258,7 @@ namespace WRENCH {
 					}
 					break;
 				}
-				case WorkflowTask::READY:
-				{
+				case WorkflowTask::READY: {
 					if (task->getState() != WorkflowTask::NOT_READY) {
 						throw WRENCHException("Workflow::updateTaskState(): Cannot set non-not_ready task state to ready");
 					}
@@ -278,29 +274,23 @@ namespace WRENCH {
 
 					break;
 				}
-
-				case WorkflowTask::SCHEDULED:
-				{
+				case WorkflowTask::SCHEDULED: {
 					task->setState(WorkflowTask::SCHEDULED);
 					break;
 				}
-				case WorkflowTask::RUNNING:
-				{
+				case WorkflowTask::RUNNING: {
 					task->setState(WorkflowTask::RUNNING);
 					break;
 				}
-				case WorkflowTask::FAILED:
-				{
+				case WorkflowTask::FAILED: {
 					task->setState(WorkflowTask::FAILED);
 					break;
 				}
-				case WorkflowTask::NOT_READY:
-				{
+				case WorkflowTask::NOT_READY: {
 					task->setState(WorkflowTask::NOT_READY);
 					break;
 				}
-				default:
-				{
+				default: {
 					throw WRENCHException("Workflow::updateTaskState(): invalid state");
 				}
 			}

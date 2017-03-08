@@ -40,8 +40,8 @@ namespace WRENCH {
 
 			std::cerr << "Creating the main daemon" << std::endl;
 			// Create the daemon
-			std::vector<SequentialTaskExecutor*> executor_ptrs;
-			for (int i=0; i < this->sequential_task_executors.size(); i++) {
+			std::vector<SequentialTaskExecutor *> executor_ptrs;
+			for (int i = 0; i < this->sequential_task_executors.size(); i++) {
 				executor_ptrs.push_back(this->sequential_task_executors[i].get());
 			}
 			this->daemon = std::unique_ptr<MulticoreTaskExecutorDaemon>(
@@ -64,7 +64,7 @@ namespace WRENCH {
 		 */
 		void MulticoreTaskExecutor::stop() {
 			// Stop all sequential task executors
-			for ( auto &seq_exec : this->sequential_task_executors ) {
+			for (auto &seq_exec : this->sequential_task_executors) {
 				seq_exec->stop();
 
 			}
@@ -86,7 +86,6 @@ namespace WRENCH {
 			Mailbox::iput(this->daemon->mailbox, new RunTaskMessage(task, callback_mailbox));
 			return 0;
 		};
-
 
 
 }

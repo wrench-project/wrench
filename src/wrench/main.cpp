@@ -23,42 +23,28 @@ int main(int argc, char **argv) {
 
 	std::cerr << "Creating two tasks..." << std::endl;
 
-	WRENCH::WorkflowTask *t1 = workflow.addTask("T1", 60.0, 1);
+	WRENCH::WorkflowTask *t1 = workflow.addTask("T1", 1.0, 1);
 	WRENCH::WorkflowTask *t2 = workflow.addTask("T2", 10.0, 1);
 	WRENCH::WorkflowTask *t3 = workflow.addTask("T3", 10.0, 1);
-	WRENCH::WorkflowTask *t4 = workflow.addTask("T4", 30.0, 1);
+	WRENCH::WorkflowTask *t4 = workflow.addTask("T4", 10.0, 1);
+	WRENCH::WorkflowTask *t5 = workflow.addTask("T5", 1.0, 1);
 
-//	std::cerr << "Task states: " << t1->getState() << t2->getState() << t3->getState() << t4->getState() << std::endl;
 	std::cerr << "Adding control dependency edges..." << std::endl;
 	workflow.addControlDependency(t1, t2);
-	workflow.addControlDependency(t1, t2);  // redundant, and should be ignored
-	workflow.addControlDependency(t3, t4);
+	workflow.addControlDependency(t1, t3);
+	workflow.addControlDependency(t1, t4);
 
-//	std::cerr << "Task states: " << t1->getState() << t2->getState() << t3->getState() << t4->getState() << std::endl;
+	std::cerr << "Creating a few  files..." << std::endl;
 
-	std::cerr << "Creating a couple of files..." << std::endl;
-
-	WRENCH::WorkflowFile *f1 = workflow.addFile("file1", 1000.0);
-	WRENCH::WorkflowFile *f2 = workflow.addFile("file2", 2000.0);
+	WRENCH::WorkflowFile *f2 = workflow.addFile("file2", 1000.0);
+	WRENCH::WorkflowFile *f3 = workflow.addFile("file3", 2000.0);
+	WRENCH::WorkflowFile *f4 = workflow.addFile("file4", 2000.0);
 
 	std::cerr << "Adding data dependencies..." << std::endl;
 
-	workflow.addDataDependency(t2, t4, f1);
-	workflow.addDataDependency(t3, t4, f2);
-
-//	std::cerr << "Task states: " << t1->getState() << t2->getState() << t3->getState() << t4->getState() << std::endl;
-
-//	std::cerr << "Counting children..." << std::endl;
-//	std::cerr << t1->id << " has " << t1->getNumberOfChildren() << " children" << std::endl;
-//	std::cerr << t2->id << " has " << t2->getNumberOfChildren() << " children" << std::endl;
-//	std::cerr << t3->id << " has " << t3->getNumberOfChildren() << " children" << std::endl;
-//	std::cerr << t4->id << " has " << t4->getNumberOfChildren() << " children" << std::endl;
-//
-//	std::cerr << "Counting parents..." << std::endl;
-//	std::cerr << t1->id << " has " << t1->getNumberOfParents() << " parents" << std::endl;
-//	std::cerr << t2->id << " has " << t2->getNumberOfParents() << " parents" << std::endl;
-//	std::cerr << t3->id << " has " << t3->getNumberOfParents() << " parents" << std::endl;
-//	std::cerr << t4->id << " has " << t4->getNumberOfParents() << " parents" << std::endl;
+	workflow.addDataDependency(t2, t5, f2);
+	workflow.addDataDependency(t3, t5, f3);
+	workflow.addDataDependency(t4, t5, f4);
 
 //	workflow.exportToEPS("workflow.eps");
 
@@ -81,7 +67,6 @@ int main(int argc, char **argv) {
 	std::cerr << "Launching the Simulation..." << std::endl;
 	simulation.launch();
 	std::cerr << "Simulation done!" << std::endl;
-
 
 	return 0;
 }

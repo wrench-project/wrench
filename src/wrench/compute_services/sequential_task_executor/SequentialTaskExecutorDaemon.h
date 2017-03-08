@@ -20,14 +20,16 @@
 #include "simgrid_util/DaemonWithMailbox.h"
 
 namespace WRENCH {
-		class SequentialTaskExecutorDaemon: public DaemonWithMailbox {
+		class SequentialTaskExecutorDaemon : public DaemonWithMailbox {
 
 		public:
 				SequentialTaskExecutorDaemon(ComputeService *cs);
+
 				~SequentialTaskExecutorDaemon();
 
 		private:
 				int main();
+
 				ComputeService *compute_service;
 
 		};

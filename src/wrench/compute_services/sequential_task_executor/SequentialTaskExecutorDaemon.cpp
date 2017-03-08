@@ -31,7 +31,7 @@ namespace WRENCH {
 		/**
 		 * @brief Constructor
 		 */
-		SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(ComputeService *cs):
+		SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(ComputeService *cs) :
 						DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
 			this->compute_service = cs;
 		}
@@ -40,7 +40,6 @@ namespace WRENCH {
 		 * @brief Destructor
 		 */
 		SequentialTaskExecutorDaemon::~SequentialTaskExecutorDaemon() {
-
 		}
 
 		/**
@@ -53,12 +52,12 @@ namespace WRENCH {
 							 this->mailbox.c_str());
 
 			bool keep_going = true;
-			while(keep_going) {
+			while (keep_going) {
 
 				// Wait for a message
 				std::unique_ptr<Message> message = Mailbox::get(this->mailbox);
 
-				switch(message->type) {
+				switch (message->type) {
 
 					case Message::STOP_DAEMON: {
 						keep_going = false;
@@ -66,15 +65,16 @@ namespace WRENCH {
 					}
 
 					case Message::RUN_TASK: {
-						std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage*>(message.release()));
+						std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage *>(message.release()));
+
 						// Run the task
 						XBT_INFO("Executing task %s",
 										 m->task->id.c_str());
+
 						m->task->setRunning();
 						Computation::simulateComputation(m->task->flops);
 						m->task->end_date = Clock::getClock();
 						m->task->setCompleted();
-
 
 						// Send the callback
 						XBT_INFO("Notifying mailbox %s that task %s has finished",

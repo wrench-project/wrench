@@ -17,7 +17,7 @@
 namespace WRENCH {
 
 
-		class Simulation; // forward ref
+		class Simulation;
 
 		class Simulation  {
 
@@ -30,20 +30,24 @@ namespace WRENCH {
 				void createSequentialTaskExecutor(std::string hostname);
 				void createMulticoreTaskExecutor(std::string hostname);
 				void createSimpleWMS(Workflow *w, std::string hostname);
+				void launch();
+				void shutdown();
 
+				/** for testing development purposes **/
 				SequentialTaskExecutor *getSomeSequentialTaskExecutor();
 				MulticoreTaskExecutor *getSomeMulticoreTaskExecutor();
 
-				void launch();
 
-				void shutdown();
 
 		private:
 
 				std::unique_ptr<Platform> platform;
+
+				std::vector<std::unique_ptr<SequentialRandomWMS>> WMSes;
+
+				/** for testing development purposes **/
 				std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
 				std::vector<std::unique_ptr<MulticoreTaskExecutor>> multicore_task_executors;
-				std::vector<std::unique_ptr<SequentialRandomWMS>> WMSes;
 
 		};
 

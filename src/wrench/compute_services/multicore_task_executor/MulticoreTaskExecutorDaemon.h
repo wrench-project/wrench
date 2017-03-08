@@ -24,11 +24,12 @@
 #include <set>
 
 namespace WRENCH {
-		
-		class MulticoreTaskExecutorDaemon: public DaemonWithMailbox {
+
+		class MulticoreTaskExecutorDaemon : public DaemonWithMailbox {
 
 		public:
 				MulticoreTaskExecutorDaemon(std::vector<SequentialTaskExecutor *>, ComputeService *cs);
+
 				~MulticoreTaskExecutorDaemon();
 
 
@@ -36,6 +37,7 @@ namespace WRENCH {
 				std::set<SequentialTaskExecutor *> idle_sequential_task_executors;
 				std::set<SequentialTaskExecutor *> busy_sequential_task_executors;
 				std::queue<WorkflowTask *> task_queue;
+
 				int main();
 
 				ComputeService *compute_service;
