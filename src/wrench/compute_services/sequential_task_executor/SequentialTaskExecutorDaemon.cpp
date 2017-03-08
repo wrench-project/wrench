@@ -31,7 +31,8 @@ namespace WRENCH {
 		/**
 		 * @brief Constructor
 		 */
-		SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(ComputeService *cs): DaemonWithMailbox("sequential_task_executor_daemon") {
+		SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(ComputeService *cs):
+						DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
 			this->compute_service = cs;
 		}
 
@@ -48,8 +49,7 @@ namespace WRENCH {
 		 * @return 0 on termination
 		 */
 		int SequentialTaskExecutorDaemon::main() {
-			XBT_INFO("New Sequential Task Executor Daemon started on host %s (%s) ",
-							 Host::getHostName().c_str(),
+			XBT_INFO("New Sequential Task Executor starting (%s) ",
 							 this->mailbox.c_str());
 
 			bool keep_going = true;

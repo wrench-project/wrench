@@ -30,7 +30,8 @@ namespace WRENCH {
 		 * @param s is a pointer to the simulation
 		 * @param w is a pointer to the workflow to execute
 		 */
-		SequentialRandomWMSDaemon::SequentialRandomWMSDaemon(Simulation *s, Workflow *w): DaemonWithMailbox("simple_wms_daemon") {
+		SequentialRandomWMSDaemon::SequentialRandomWMSDaemon(Simulation *s, Workflow *w):
+						DaemonWithMailbox("simple_wms", "simple_wms") {
 			this->simulation = s;
 			this->workflow = w;
 		}

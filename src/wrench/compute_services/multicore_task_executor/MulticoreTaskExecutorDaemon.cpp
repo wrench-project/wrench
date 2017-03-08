@@ -34,7 +34,7 @@ namespace WRENCH {
 		 */
 		MulticoreTaskExecutorDaemon::MulticoreTaskExecutorDaemon(
 						std::vector<SequentialTaskExecutor *> executors,
-						ComputeService *cs): DaemonWithMailbox("Multicore_task_executor_daemon") {
+						ComputeService *cs): DaemonWithMailbox("multicore_task_executor", "multicore_task_executor") {
 
 			this->compute_service = cs;
 
@@ -59,8 +59,8 @@ namespace WRENCH {
 		 * @return 0 on termination
 		 */
 		int MulticoreTaskExecutorDaemon::main() {
-			XBT_INFO("New Multicore Task Executor Daemon started on host %s (%s) with %ld cores ",
-							 Host::getHostName().c_str(),  this->mailbox.c_str(), this->idle_sequential_task_executors.size());
+			XBT_INFO("New Multicore Task Executor starting (%s) with %ld cores ",
+							   this->mailbox.c_str(), this->idle_sequential_task_executors.size());
 
 
 			std::map<WorkflowTask*, std::string> callback_mailboxes;

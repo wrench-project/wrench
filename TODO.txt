@@ -2,8 +2,9 @@
 
 Deal with error handling via nice exceptions, etc.
 
+- ComputeService mailboxes are created with an empty prefix... weird...
+
 
 WRENCH::Workflow
 	- Implement a "create from DAX" method
-
 

@@ -24,16 +24,18 @@ namespace WRENCH {
 
 		public:
 				std::string mailbox;
+				std::string process_name;
 
 				void start(std::string hostname);
 
 		protected:
-				DaemonWithMailbox(std::string mailbox_prefix);
+				DaemonWithMailbox(std::string mailbox_prefix, std::string process_name);
 
 				virtual ~DaemonWithMailbox();
 
 		private:
 				static int getNewUniqueNumber();
+
 
 				static int main_stub(int argc, char **argv);  // must be static to be passed to SimGrid
 				virtual int main() = 0;

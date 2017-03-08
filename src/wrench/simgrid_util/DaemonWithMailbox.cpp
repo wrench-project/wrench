@@ -25,8 +25,9 @@ namespace WRENCH {
 		 * @param service_name is a string to identify the service (doesn't have to be unique)
 		 */
 
-		DaemonWithMailbox::DaemonWithMailbox(std::string mailbox_prefix) {
-			this->mailbox = mailbox + "_" + std::to_string(getNewUniqueNumber());
+		DaemonWithMailbox::DaemonWithMailbox(std::string mailbox_prefix, std::string process_name) {
+			this->mailbox = mailbox_prefix + "_mailbox_" + std::to_string(getNewUniqueNumber());
+			this->process_name = process_name;
 			MSG_function_register(this->mailbox.c_str(), this->main_stub);
 		}
 
@@ -73,7 +74,7 @@ namespace WRENCH {
 			/* Ugly Hack to pass the instance to the function */
 			argv[0] = (char *) this;
 
-			msg_process_t process = MSG_process_create_with_arguments(this->mailbox.c_str(), this->main_stub, NULL, host,
+			msg_process_t process = MSG_process_create_with_arguments(this->process_name.c_str(), this->main_stub, NULL, host,
 																																argc, argv);
 			if (!process) {
 				throw WRENCHException("DaemonWithMailbox::start(): Cannot start process " + this->mailbox + " on host " + hostname);

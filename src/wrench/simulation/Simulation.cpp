@@ -14,6 +14,7 @@
  */
 
 #include <compute_services/multicore_task_executor/MulticoreTaskExecutor.h>
+#include <xbt/log.h>
 #include "Simulation.h"
 #include "exception/WRENCHException.h"
 #include "simgrid_util/Simgrid.h"
@@ -42,6 +43,8 @@ namespace WRENCH {
 		 */
 
 		void Simulation::init(int *argc, char **argv) {
+			// Set the logging format
+			xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
 			Simgrid::initialize(argc, argv);
 		}
 

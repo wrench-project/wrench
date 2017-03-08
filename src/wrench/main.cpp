@@ -2,9 +2,12 @@
 #include <iostream>
 
 #include "wrench.h"
-#include "compute_services/sequential_task_executor/SequentialTaskExecutor.h"
 
 int main(int argc, char **argv) {
+
+	WRENCH::Simulation simulation;
+
+	simulation.init(&argc, argv);
 
 	if (argc != 2) {
 		std::cerr << "Usage: " << argv[0] << "<xml platform file>" << std::endl;
@@ -13,9 +16,6 @@ int main(int argc, char **argv) {
 
 	char *platform_file = argv[1];
 
-	WRENCH::Simulation simulation;
-
-	simulation.init(&argc, argv);
 
 	std::cerr << "Creating a bogus workflow..." << std::endl;
 
