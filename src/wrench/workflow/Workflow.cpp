@@ -39,27 +39,7 @@ namespace WRENCH {
 			return reached;
 		}
 
-		/*
-		 * updateTaskReadyState()
-		 */
-		void Workflow::updateTaskReadyState(WorkflowTask *task) {
 
-			if (task->state != WorkflowTask::NOT_READY) {
-				return;
-			}
-
-			WorkflowTask::State putative_state = WorkflowTask::READY;
-			// Iterate through the parents
-			for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
-				WorkflowTask::State  parent_state = (*DAG_node_map)[(*DAG).source(a)]->state;
-				if (parent_state != WorkflowTask::COMPLETED) {
-					putative_state = WorkflowTask::NOT_READY;
-					break;
-				}
-			}
-			task->state = putative_state;
-			return;
-		}
 
 
 		/******************************/
@@ -77,13 +57,6 @@ namespace WRENCH {
 							new ListDigraph::NodeMap<WorkflowTask*>(*DAG));
 		};
 
-		/**
-		 * @brief  Destructor
-		 *
-		 */
-		Workflow::~Workflow() {
-		};
-
 
 		/**
 		 * @brief Creates and adds a new task to the workflow
@@ -94,9 +67,9 @@ namespace WRENCH {
 		 *
 		 * @return a pointer to a WorkflowTask object
 		 */
-		 WorkflowTask* Workflow::addTask(const std::string id,
-																										double execution_time,
-																										int num_procs = 1) {
+		WorkflowTask* Workflow::addTask(const std::string id,
+																		double execution_time,
+																		int num_procs = 1) {
 
 			// Check that the task doesn't really exist
 			if (tasks[id]) {
@@ -144,7 +117,9 @@ namespace WRENCH {
 		void Workflow::addControlDependency(WorkflowTask *src, WorkflowTask *dst) {
 			if (!pathExists(src, dst)) {
 				DAG->addArc(src->DAG_node, dst->DAG_node);
-				updateTaskReadyState(dst);
+				if (src->getState() != WorkflowTask::COMPLETED) {
+					updateTaskState(dst, WorkflowTask::NOT_READY);
+				}
 			}
 		}
 
@@ -222,25 +197,113 @@ namespace WRENCH {
 
 		}
 
-		WorkflowTask *Workflow::getSomeReadyTask() {
+		/**
+		 * @brief method to get a vector of the ready tasks (very inefficiently
+		 *        implemented right now)
+		 * @return vector of pointers to workflow tasks
+		 */
+		std::vector<WorkflowTask *> Workflow::getReadyTasks() {
+
+			std::vector<WorkflowTask *> task_list;
 
 			std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
 			for (it = this->tasks.begin(); it != this->tasks.end(); it++ )
 			{
 				WorkflowTask *task = it->second.get();
 				if (task->getState() == WorkflowTask::READY) {
-					return task;
+					task_list.push_back(task);
 				}
 			}
-			return nullptr;
+			return task_list;
 		}
 
-		void Workflow::makeTaskCompleted(WorkflowTask *task) {
-			task->state = WorkflowTask::COMPLETED;
-			for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
-				updateTaskReadyState((*DAG_node_map)[(*DAG).source(a)]);
+
+
+		/**
+		 * @brief method to check whether all tasks are complete
+		 *
+		 * @return true or false
+		 */
+		bool Workflow::isDone() {
+			std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
+			for (it = this->tasks.begin(); it != this->tasks.end(); it++ )
+			{
+				WorkflowTask *task = it->second.get();
+				// std::cerr << "==> " << task->id << " " << task->state << std::endl;
+				if (task->getState() != WorkflowTask::COMPLETED) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		/**
+		 * @brief method to update the state of a task, and propagate the change
+		 *        to other tasks if necessary.
+		 * @param task is a pointer to the task
+		 * @param state is the new task state
+		 */
+		void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state){
+
+			switch(state) {
+				// Make a task completed, which may cause its children to become ready
+				case WorkflowTask::COMPLETED:
+				{
+					if (task->getState() != WorkflowTask::RUNNING) {
+						throw WRENCHException("Workflow::updateTaskState(): Cannot set non-running task state to completed");
+					}
+					task->setState(WorkflowTask::COMPLETED);
+					// Go through the children and make them ready if possible
+					for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
+						WorkflowTask *child = (*DAG_node_map)[(*DAG).target(a)];
+						updateTaskState(child, WorkflowTask::READY);
+
+					}
+					break;
+				}
+				case WorkflowTask::READY:
+				{
+					if (task->getState() != WorkflowTask::NOT_READY) {
+						throw WRENCHException("Workflow::updateTaskState(): Cannot set non-not_ready task state to ready");
+					}
+					// Go through the parent and check whether they are all completed
+					for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
+						WorkflowTask *parent = (*DAG_node_map)[(*DAG).source(a)];
+						if (parent->getState() != WorkflowTask::COMPLETED) {
+							// At least one parent is not in the COMPLETED state
+							return;
+						}
+					}
+					task->setState(WorkflowTask::READY);
+
+					break;
+				}
+
+				case WorkflowTask::SCHEDULED:
+				{
+					task->setState(WorkflowTask::SCHEDULED);
+					break;
+				}
+				case WorkflowTask::RUNNING:
+				{
+					task->setState(WorkflowTask::RUNNING);
+					break;
+				}
+				case WorkflowTask::FAILED:
+				{
+					task->setState(WorkflowTask::FAILED);
+					break;
+				}
+				case WorkflowTask::NOT_READY:
+				{
+					task->setState(WorkflowTask::NOT_READY);
+					break;
+				}
+				default:
+				{
+					throw WRENCHException("Workflow::updateTaskState(): invalid state");
+				}
 			}
 		}
-
 
 }

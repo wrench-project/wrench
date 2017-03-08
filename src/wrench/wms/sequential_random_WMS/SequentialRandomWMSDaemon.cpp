@@ -48,28 +48,26 @@ namespace WRENCH {
 
 			while(true) {
 
-				// Look for a ready task
-				WorkflowTask* ready_task = this->workflow->getSomeReadyTask();
-
-				// If none, we're done
-				if (!ready_task) {
-					break;
+				// Submit all ready tasks for execution
+				std::vector<WorkflowTask*> ready_tasks = this->workflow->getReadyTasks();
+				XBT_INFO("There are %ld ready tasks", ready_tasks.size());
+				for (int i=0; i < ready_tasks.size(); i++) {
+					XBT_INFO("Submitting task %s for execution", ready_tasks[i]->id.c_str());
+					ready_tasks[i]->setScheduled();
+					this->simulation->getSomeMulticoreTaskExecutor()->runTask(
+									ready_tasks[i], this->mailbox);
 				}
 
-				// Submit the task for execution
-				XBT_INFO("Submitting task %s for execution", ready_task->id.c_str());
-				this->simulation->getSomeSequentialTaskExecutor()->runTask(ready_task, this->mailbox);
-
-				// Wait for its completion
-				XBT_INFO("Waiting for task %s to complete...", ready_task->id.c_str());
-
+				// Wait for a task completion
+				XBT_INFO("Waiting for a task to complete...");
 				std::unique_ptr<Message> message = Mailbox::get(this->mailbox);
 				std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage*>(message.release()));
 
 				XBT_INFO("Notified that task %s has completed", m->task->id.c_str());
 
-				// Update task state
-				workflow->makeTaskCompleted(m->task);
+				if (workflow->isDone()) {
+					break;
+				}
 			}
 
 			XBT_INFO("Workflow execution is complete!");

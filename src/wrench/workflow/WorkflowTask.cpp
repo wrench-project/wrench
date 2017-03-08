@@ -16,6 +16,7 @@
 
 #include <lemon/list_graph.h>
 #include "WorkflowTask.h"
+#include "Workflow.h"
 
 namespace WRENCH {
 
@@ -101,6 +102,42 @@ namespace WRENCH {
 		WorkflowTask::State WorkflowTask::getState() {
 			return state;
 		}
+
+		/**
+		 * @brief Sets the state of the task
+		 */
+		 void WorkflowTask::setState(WorkflowTask::State state) {
+			this->state = state;
+		}
+
+		/**
+		 * @brief Sets the task to the scheduled state
+		 * @param task
+		 */
+
+		void WorkflowTask::setScheduled() {
+			this->workflow->updateTaskState(this, WorkflowTask::SCHEDULED);
+		}
+
+
+		/**
+		 * @brief Sets the task to the running state
+		 * @param task
+		 */
+
+		void WorkflowTask::setRunning() {
+				this->workflow->updateTaskState(this, WorkflowTask::RUNNING);
+		}
+
+		/**
+		 * @brief Sets the task to the completed state
+		 * @param task
+		 */
+
+		void WorkflowTask::setCompleted() {
+			this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
+		}
+
 
 };
 

@@ -20,20 +20,15 @@
 namespace WRENCH {
 
 		std::string Host::getHostName() {
-			return std::string(MSG_host_get_name(get_local_host()));
-		}
-
-		int Host::getNumCores() {
-			return MSG_host_get_core_number(get_local_host());
-		}
-
-		msg_host_t Host::get_local_host() {
-			msg_host_t host = MSG_host_self();
-			if (host == NULL) {
+			msg_host_t local_host = MSG_host_self();
+			if (local_host == NULL) {
 				throw WRENCHException("Host::getHostName(): Can't get local host name");
 			}
-			return host;
+			return std::string(MSG_host_get_name(local_host));
 		}
 
+		int Host::getNumCores(std::string hostname) {
+			return MSG_host_get_core_number(MSG_get_host_by_name(hostname.c_str()));
+		}
 
 }

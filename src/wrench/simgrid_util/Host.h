@@ -23,7 +23,7 @@ namespace WRENCH {
 		class Host {
 		public:
 				static std::string getHostName();
-				static int getNumCores();
+				static int getNumCores(std::string);
 		private:
 				static msg_host_t get_local_host();
 		};

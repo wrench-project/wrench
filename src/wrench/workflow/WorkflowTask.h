@@ -35,6 +35,7 @@ namespace WRENCH {
 				// Workflow class must be a friend so as to access the private constructor, etc.
 				friend class Workflow;
 
+		public:
 				/* Task-state enum */
 				enum State {
 						READY,
@@ -49,12 +50,12 @@ namespace WRENCH {
 				std::string id;
 				double flops;
 				int number_of_processors;		// currently vague: cores? nodes?
-				State state;
 				double submit_date = -1.0;
 				double start_date = -1.0;
 				double end_date = -1.0;
 
 		private:
+				State state;
 				Workflow *workflow; 	// Containing workflow
 				ListDigraph *DAG; 	// Containing workflow
 				ListDigraph::Node DAG_node; // pointer to the underlying DAG node
@@ -65,15 +66,19 @@ namespace WRENCH {
 		private:
 				// Private constructor
 				WorkflowTask(const std::string id, const double t, const int n);
-
 				void addInputFile(WorkflowFile *);
 				void addOutputFile(WorkflowFile *);
 				void addFileToMap(std::map<std::string, WorkflowFile*> map, WorkflowFile *f);
+				void setState(WorkflowTask::State);
+
 
 		public:
 				int getNumberOfChildren();
 				int getNumberOfParents();
 				WorkflowTask::State getState();
+				void setScheduled();
+				void setRunning();
+				void setCompleted();
 
 		};
 

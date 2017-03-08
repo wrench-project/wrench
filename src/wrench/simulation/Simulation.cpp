@@ -13,6 +13,7 @@
  *
  */
 
+#include <compute_services/multicore_task_executor/MulticoreTaskExecutor.h>
 #include "Simulation.h"
 #include "exception/WRENCHException.h"
 #include "simgrid_util/Simgrid.h"
@@ -85,6 +86,26 @@ namespace WRENCH {
 		}
 
 		/**
+		 * @brief method to instantiate a multicore task executor on a host
+		 *
+		 * @param hostname is the name of the host in the physical platform
+		 */
+		void Simulation::createMulticoreTaskExecutor(std::string hostname) {
+
+			// Create the compute service
+			std::unique_ptr<MulticoreTaskExecutor> executor;
+			try {
+				executor = std::unique_ptr<MulticoreTaskExecutor>(new MulticoreTaskExecutor(hostname));
+			} catch (WRENCHException e) {
+				throw e;
+			}
+
+			// Add it to the list of Compute Services
+			multicore_task_executors.push_back(std::move(executor));
+
+		}
+
+		/**
 		 * @brief method to instantiave a simple WMS on a host
 		 *
 		 * @param w is the workflow that the WMS will execute
@@ -112,7 +133,16 @@ namespace WRENCH {
 		 * @return
 		 */
 		SequentialTaskExecutor *Simulation::getSomeSequentialTaskExecutor() {
-			return sequential_task_executors[0].get();
+			return this->sequential_task_executors[0].get();
+		}
+
+		/**
+		 * @brief temporary debug method to get the first multicore task executor
+		 *
+		 * @return
+		 */
+		MulticoreTaskExecutor *Simulation::getSomeMulticoreTaskExecutor() {
+			return this->multicore_task_executors[0].get();
 		}
 
 		/**
@@ -122,6 +152,9 @@ namespace WRENCH {
 
 			for (int i=0; i < this->sequential_task_executors.size(); i++) {
 				this->sequential_task_executors[i]->stop();
+			}
+			for (int i=0; i < this->multicore_task_executors.size(); i++) {
+				this->multicore_task_executors[i]->stop();
 			}
 
 		}

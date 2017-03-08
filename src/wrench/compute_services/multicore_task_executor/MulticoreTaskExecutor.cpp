@@ -29,13 +29,16 @@ namespace WRENCH {
 			this->hostname = hostname;
 
 			// Create and start one sequential task executor daemon per core
-			int num_cores = Host::getNumCores();
+			int num_cores = Host::getNumCores(hostname);
+			std::cerr << "num_cores = " << num_cores << std::endl;
 			for (int i = 0; i < num_cores; i++) {
+				std::cerr << "Creating a Sequential Task Executor" << std::endl;
 				std::unique_ptr<SequentialTaskExecutor> seq_executor =
-								std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(this->daemon->mailbox));
+								std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(this->hostname));
 				this->sequential_task_executors.push_back(std::move(seq_executor));
 			}
 
+			std::cerr << "Creating the main daemon" << std::endl;
 			// Create the daemon
 			std::vector<SequentialTaskExecutor*> executor_ptrs;
 			for (int i=0; i < this->sequential_task_executors.size(); i++) {

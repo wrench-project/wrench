@@ -84,20 +84,21 @@ namespace WRENCH {
 					case Message::RUN_TASK: {
 						std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage *>(message.release()));
 
+						XBT_INFO("Asked to run task %s", m->task->id.c_str());
+
 						// Just add the task to the task queue
 						this->task_queue.push(m->task);
 
 						// Remember the callback mailbox
 						callback_mailboxes[m->task] = m->callback_mailbox;
-
+						break;
 					}
 
 					/** One of my cores finished a task **/
 					case Message::TASK_DONE: {
 						std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
 
-						// Send the callback
-						XBT_INFO("One of my cores finished task %s ",  m->task->id.c_str());
+						XBT_INFO("One of my cores completed task %s", m->task->id.c_str());
 
 						// Put that core's executor back into the pull of idle cores
 						SequentialTaskExecutor *executor = (SequentialTaskExecutor *)(m->compute_service);
@@ -107,7 +108,7 @@ namespace WRENCH {
 						// Send the callback to the originator
 						std::string callback_mailbox = callback_mailboxes[m->task];
 						Mailbox::iput(callback_mailbox, new TaskDoneMessage(m->task, this->compute_service));
-
+						break;
 
 					}
 
@@ -128,6 +129,7 @@ namespace WRENCH {
 					this->idle_sequential_task_executors.erase(executor);
 					this->busy_sequential_task_executors.insert(executor);
 
+					XBT_INFO("Running task %s on one of my cores", to_run->id.c_str());
 					executor->runTask(to_run, this->mailbox);
 				}
 

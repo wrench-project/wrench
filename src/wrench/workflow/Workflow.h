@@ -38,33 +38,34 @@ namespace WRENCH {
 
 		private:
 				bool pathExists(WorkflowTask *, WorkflowTask *);
-				void updateTaskReadyState(WorkflowTask *);
 
 
 		public:
+
+				/** Constructor and the like **/
 				Workflow();
-				~Workflow();
 
 				WorkflowTask *addTask(std::string, double, int);
 				WorkflowTask *getWorkflowTaskByID(const std::string);
 
-				void addControlDependency(WorkflowTask *,
-																	WorkflowTask *);
-				void addDataDependency(WorkflowTask *, WorkflowTask *, WorkflowFile *);
-
 				WorkflowFile *addFile(const std::string, double);
 				WorkflowFile *getWorkflowFileByID(const std::string);
 
-				void exportToEPS(std::string);
+				void addControlDependency(WorkflowTask *, WorkflowTask *);
+				void addDataDependency(WorkflowTask *, WorkflowTask *, WorkflowFile *);
 
+				/** Update task state **/
+			  void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
+
+
+				/** Get information from the workflow **/
+			  // TODO: Make these efficient - Right now they are really naively implemented
 				unsigned long getNumberOfTasks();
+				bool isDone();
+				std::vector<WorkflowTask *> getReadyTasks();
 
-
-				void makeTaskCompleted(WorkflowTask *task);
-
-				// For initial testing
-				WorkflowTask* getSomeReadyTask();
-
+				/** misc **/
+				void exportToEPS(std::string);
 
 
 

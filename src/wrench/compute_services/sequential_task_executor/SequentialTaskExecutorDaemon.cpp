@@ -70,8 +70,11 @@ namespace WRENCH {
 						// Run the task
 						XBT_INFO("Executing task %s",
 										 m->task->id.c_str());
+						m->task->setRunning();
 						Computation::simulateComputation(m->task->flops);
 						m->task->end_date = Clock::getClock();
+						m->task->setCompleted();
+
 
 						// Send the callback
 						XBT_INFO("Notifying mailbox %s that task %s has finished",
