@@ -16,6 +16,7 @@
 #include <lemon/list_graph.h>
 #include <lemon/graph_to_eps.h>
 #include <lemon/bfs.h>
+#include <pugixml.hpp>
 
 #include "Workflow.h"
 #include "exception/WRENCHException.h"
@@ -27,15 +28,19 @@ namespace WRENCH {
 		/**      PRIVATE METHODS     **/
 		/******************************/
 
-		/*
-		 * pathExists()
+
+		/**
+		 * @brief method to determine whether one source is an ancestor of a destination task
+		 *
+		 * @param src is a pointer to the source task
+		 * @param dst is a pointer to the destination task
+		 * @return true if there is a path from src to dst
 		 */
 		bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
 			Bfs<ListDigraph> bfs(*DAG);
 
 
 			bool reached = bfs.run(src->DAG_node, dst->DAG_node);
-			//std::cout << "PATH from " << src->id << " to " << dst->id << ": " << reached << std::endl;
 			return reached;
 		}
 
@@ -121,23 +126,23 @@ namespace WRENCH {
 			}
 		}
 
-		/**
-		 * @brief Creates a data dependency between two workflow tasks. Will add a file
-		 *        to the input/output sets of the tasks (if not already there), and will add
-		 *        a control dependency between the two tasks if necessary.
-		 *
-		 * @param src is the source task
-		 * @param dst is the destination task
-		 * @param file is the datA file
-		 *
-		 * @return nothing
-		 */
-		void Workflow::addDataDependency(WorkflowTask *src, WorkflowTask *dst,
-																		 WorkflowFile *file) {
-			src->addOutputFile(file);
-			dst->addInputFile(file);
-			addControlDependency(src, dst);
-		}
+//		/**
+//		 * @brief Creates a data dependency between two workflow tasks. Will add a file
+//		 *        to the input/output sets of the tasks (if not already there), and will add
+//		 *        a control dependency between the two tasks if necessary.
+//		 *
+//		 * @param src is the source task
+//		 * @param dst is the destination task
+//		 * @param file is the datA file
+//		 *
+//		 * @return nothing
+//		 */
+//		void Workflow::addDataDependency(WorkflowTask *src, WorkflowTask *dst,
+//																		 WorkflowFile *file) {
+//			src->addOutputFile(file);
+//			dst->addInputFile(file);
+//			addControlDependency(src, dst);
+//		}
 
 
 
@@ -152,6 +157,7 @@ namespace WRENCH {
 		WorkflowFile * Workflow::addFile(const std::string id, double size) {
 			// Create the WorkflowFile object
 			WorkflowFile *file = new WorkflowFile(id, size);
+			file->workflow = this;
 			// Add if to the set of workflow files
 			files[file->id] = std::unique_ptr<WorkflowFile>(file);
 
@@ -182,7 +188,7 @@ namespace WRENCH {
 			// TODO: Figure out why this doesn't compile
 			// (even though the standalone Lemon "export to EPS" example compiles fine
 
-			//graphToEps(*DAG, eps_filename).run();
+			graphToEps(*DAG, eps_filename).run();
 			std::cerr << "Export to EPS broken / not implemented at the moment" << std::endl;
 		}
 
@@ -294,6 +300,40 @@ namespace WRENCH {
 					throw WRENCHException("Workflow::updateTaskState(): invalid state");
 				}
 			}
+		}
+
+		/**
+		 * @brief method to create a workflow based on a DAX file
+		 *
+		 * @param filename is the path to the file
+		 */
+		void Workflow::loadFromDAX(const std::string filename) {
+			pugi::xml_document dax_tree;
+
+			//TODO: catch some exception if file isn't there
+			pugi::xml_parse_result result = dax_tree.load_file(filename.c_str());
+
+			// Check that result is valid
+			if (!result) {
+				throw WRENCHException("Workflow::loadFromDAX(): Invalid DAX file");
+			}
+
+			pugi::xml_node dag = dax_tree.child("adag");
+
+			for (pugi::xml_node job = dag.child("job"); job; job = job.next_sibling("job")) {
+				std::string id = job.attribute("id").value();
+				std::string name = job.attribute("name").value();
+				double flops = std::strtod(job.attribute("runtime").value(), NULL);
+				int num_procs = 1;
+				if (job.attribute("num_procs")) {
+					num_procs = std::stoi(job.attribute("num_procs").value());
+				}
+				this->addTask(id+name, flops, num_procs);
+			}
+
+
+
+
 		}
 
 }

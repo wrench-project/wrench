@@ -28,6 +28,7 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowTask.h
         src/wrench/workflow/WorkflowTask.cpp
         src/wrench/workflow/WorkflowFile.h
+        src/wrench/workflow/WorkflowFile.cpp
         src/wrench/platform/Platform.cpp
         src/wrench/platform/Platform.h
         src/wrench/wms/WMS.cpp
@@ -49,15 +50,16 @@ set(SOURCE_FILES
 set(INCLUDE_FILES include/wrench.h)
 
 find_library(SIMGRID_LIB NAMES simgrid)
+find_library(PUGIXML_LIB NAMES pugixml /opt/local/lib/)
 find_library(LEMON_LIB NAMES emon)
 
 #Generate the static library from the sources
 add_library(wrench STATIC ${SOURCE_FILES})
-target_link_libraries(wrench ${SIMGRID_LIB} ${LEMON_LIB})
+target_link_libraries(wrench ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS wrench DESTINATION lib)
 install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
 
 # TODO: temporary simulation test binary
-add_executable(simulation ${SOURCE_FILES} src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.h src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.h)
-target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB})
+add_executable(simulation ${SOURCE_FILES} src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.h src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.h src/wrench/workflow/WorkflowFile.cpp src/wrench/workflow/WorkflowFile.h)
+target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS simulation DESTINATION bin)

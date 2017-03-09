@@ -52,7 +52,9 @@ namespace WRENCH {
 				WorkflowFile *getWorkflowFileByID(const std::string);
 
 				void addControlDependency(WorkflowTask *, WorkflowTask *);
-				void addDataDependency(WorkflowTask *, WorkflowTask *, WorkflowFile *);
+				//void addDataDependency(WorkflowTask *, WorkflowTask *, WorkflowFile *);
+
+				void loadFromDAX(const std::string filename);
 
 				/** Update task state **/
 			  void updateTaskState(WorkflowTask *task, WorkflowTask::State state);

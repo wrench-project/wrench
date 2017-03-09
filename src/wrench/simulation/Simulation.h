@@ -37,8 +37,6 @@ namespace WRENCH {
 				SequentialTaskExecutor *getSomeSequentialTaskExecutor();
 				MulticoreTaskExecutor *getSomeMulticoreTaskExecutor();
 
-
-
 		private:
 
 				std::unique_ptr<Platform> platform;

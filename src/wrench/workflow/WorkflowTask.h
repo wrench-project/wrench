@@ -66,13 +66,15 @@ namespace WRENCH {
 		private:
 				// Private constructor
 				WorkflowTask(const std::string id, const double t, const int n);
-				void addInputFile(WorkflowFile *);
-				void addOutputFile(WorkflowFile *);
+
 				void addFileToMap(std::map<std::string, WorkflowFile*> map, WorkflowFile *f);
 				void setState(WorkflowTask::State);
 
 
 		public:
+				std::string getId();
+				void addInputFile(WorkflowFile *);
+				void addOutputFile(WorkflowFile *);
 				int getNumberOfChildren();
 				int getNumberOfParents();
 				WorkflowTask::State getState();

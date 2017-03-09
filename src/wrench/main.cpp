@@ -30,9 +30,6 @@ int main(int argc, char **argv) {
 	WRENCH::WorkflowTask *t5 = workflow.addTask("T5", 1.0, 1);
 
 	std::cerr << "Adding control dependency edges..." << std::endl;
-	workflow.addControlDependency(t1, t2);
-	workflow.addControlDependency(t1, t3);
-	workflow.addControlDependency(t1, t4);
 
 	std::cerr << "Creating a few  files..." << std::endl;
 
@@ -42,11 +39,25 @@ int main(int argc, char **argv) {
 
 	std::cerr << "Adding data dependencies..." << std::endl;
 
-	workflow.addDataDependency(t2, t5, f2);
-	workflow.addDataDependency(t3, t5, f3);
-	workflow.addDataDependency(t4, t5, f4);
+	t1->addOutputFile(f2);
+	t1->addOutputFile(f3);
+	t1->addOutputFile(f4);
 
-//	workflow.exportToEPS("workflow.eps");
+	t2->addInputFile(f2);
+	t3->addInputFile(f3);
+	t4->addInputFile(f4);
+
+	workflow.addControlDependency(t2, t5);
+	workflow.addControlDependency(t3, t5);
+	workflow.addControlDependency(t4, t5);
+
+
+	//workflow.exportToEPS("workflow.eps");
+
+//	workflow.loadFromDAX("../GENOME.d.351024866.5.dax");
+	std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
+
+	//return 0;
 
 	std::cerr << "Instantiating SimGrid platform..." << std::endl;
 	simulation.createPlatform(platform_file);

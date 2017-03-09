@@ -1,7 +1,7 @@
 /**
  *  @file    WorkflowFile.h
  *  @author  Henri Casanova
- *  @date    2/21/2017
+ *  @date    3/9/2017
  *  @version 1.0
  *
  *  @brief WRENCH::WorkflowFile class implementation
@@ -12,29 +12,46 @@
  *
  */
 
+
 #ifndef WRENCH_WORKFLOWFILE_H
 #define WRENCH_WORKFLOWFILE_H
 
+#include <string>
 #include <map>
-#include <lemon/list_graph.h>
-
 
 namespace WRENCH {
 
+		class WorkflowTask;
+		class Workflow;
+
+// Workflow class must be a friend so as to access the private constructor, etc.
 
 		class WorkflowFile {
+
+				friend class Workflow;
+				friend class WorkflowTask;
 
 		public:
 				std::string id;
 				double size; // in bytes
 
-				WorkflowFile(const std::string &string, double s) {
-					id = string;
-					size = s;
-				};
+		protected:
+				void setOutputOf(WorkflowTask *task);
+				WorkflowTask *getOutputOf();
+				void setInputOf(WorkflowTask *task);
+				std::map<std::string, WorkflowTask *> getInputOf();
+
+
+		private:
+				Workflow *workflow; // Containing workflow
+
+				WorkflowFile(const std::string, double);
+
+				WorkflowTask *output_of;
+				std::map<std::string, WorkflowTask *> input_of;
+
 		};
 
 };
-
 
 #endif //WRENCH_WORKFLOWFILE_H

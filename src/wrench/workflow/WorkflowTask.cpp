@@ -42,6 +42,11 @@ namespace WRENCH {
 		 */
 		void WorkflowTask::addInputFile(WorkflowFile *f) {
 			addFileToMap(input_files, f);
+			f->setInputOf(this);
+			// Perhaps add a control dependency?
+			if (f->getOutputOf()) {
+				workflow->addControlDependency(f->getOutputOf(), this);
+			}
 		}
 
 		/**
@@ -51,6 +56,12 @@ namespace WRENCH {
 		 */
 		void WorkflowTask::addOutputFile(WorkflowFile *f) {
 			addFileToMap(output_files, f);
+			f->setOutputOf(this);
+			// Perhaps add control dependencies?
+			for (auto const &x : f->getInputOf()) {
+				workflow->addControlDependency(this, x.second);
+			}
+
 		}
 
 		/**
@@ -61,12 +72,19 @@ namespace WRENCH {
 		 */
 		void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile*> map,
 																		WorkflowFile * f) {
-			if (!map[f->id]) {
-				map[f->id] = f;
-			}
+			map[f->id] = f;
+
 		}
 
 
+		/**
+		 * @brief Returns the id of the task
+		 *
+		 * @return
+		 */
+		std::string WorkflowTask::getId() {
+			return this->id;
+		}
 
 		/**
 		 * @brief Computes the number of children of a task
@@ -106,7 +124,7 @@ namespace WRENCH {
 		/**
 		 * @brief Sets the state of the task
 		 */
-		 void WorkflowTask::setState(WorkflowTask::State state) {
+		void WorkflowTask::setState(WorkflowTask::State state) {
 			this->state = state;
 		}
 
@@ -126,7 +144,7 @@ namespace WRENCH {
 		 */
 
 		void WorkflowTask::setRunning() {
-				this->workflow->updateTaskState(this, WorkflowTask::RUNNING);
+			this->workflow->updateTaskState(this, WorkflowTask::RUNNING);
 		}
 
 		/**
