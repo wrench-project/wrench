@@ -126,25 +126,6 @@ namespace WRENCH {
 			}
 		}
 
-//		/**
-//		 * @brief Creates a data dependency between two workflow tasks. Will add a file
-//		 *        to the input/output sets of the tasks (if not already there), and will add
-//		 *        a control dependency between the two tasks if necessary.
-//		 *
-//		 * @param src is the source task
-//		 * @param dst is the destination task
-//		 * @param file is the datA file
-//		 *
-//		 * @return nothing
-//		 */
-//		void Workflow::addDataDependency(WorkflowTask *src, WorkflowTask *dst,
-//																		 WorkflowFile *file) {
-//			src->addOutputFile(file);
-//			dst->addInputFile(file);
-//			addControlDependency(src, dst);
-//		}
-
-
 
 		/**
 		 * @brief Adds a new file to the workflow specification
@@ -169,13 +150,14 @@ namespace WRENCH {
 		 *
 		 * @param id is a string id
 		 *
-		 * @return a pointer to a WorkflowFile object
+		 * @return a pointer to a WorkflowFile object, nullptr if not found
 		 */
 		WorkflowFile *Workflow::getWorkflowFileByID(const std::string id) {
 			if (!files[id]) {
-				throw WRENCHException("Unknown WorkflowFile ID " + id);
+				return nullptr;
+			} else {
+				return files[id].get();
 			}
-			return files[id].get();
 		}
 
 		/**
@@ -310,17 +292,17 @@ namespace WRENCH {
 		void Workflow::loadFromDAX(const std::string filename) {
 			pugi::xml_document dax_tree;
 
-			//TODO: catch some exception if file isn't there
-			pugi::xml_parse_result result = dax_tree.load_file(filename.c_str());
-
-			// Check that result is valid
-			if (!result) {
+			if (!dax_tree.load_file(filename.c_str())) {
 				throw WRENCHException("Workflow::loadFromDAX(): Invalid DAX file");
 			}
 
+			// Get the root node
 			pugi::xml_node dag = dax_tree.child("adag");
 
+			// Iterate through the "job" nodes
 			for (pugi::xml_node job = dag.child("job"); job; job = job.next_sibling("job")) {
+				WorkflowTask *task;
+				// Get the job attributes
 				std::string id = job.attribute("id").value();
 				std::string name = job.attribute("name").value();
 				double flops = std::strtod(job.attribute("runtime").value(), NULL);
@@ -328,12 +310,32 @@ namespace WRENCH {
 				if (job.attribute("num_procs")) {
 					num_procs = std::stoi(job.attribute("num_procs").value());
 				}
-				this->addTask(id+name, flops, num_procs);
+				// Create the task
+				task = this->addTask(id + "_" + name, flops, num_procs);
+				std::cerr << "Created task " << task->getId() << std::endl;
+
+
+				// Go through the children "uses" nodes
+				for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
+					// get the "uses" attributes
+					// TODO: There are several attributes that we're ignoring for now...
+					std::string id = uses.attribute("file").value();
+					double size = std::strtod(uses.attribute("size").value(), NULL);
+					std::string link = uses.attribute("link").value();
+					// Check whether the file already exist
+						WorkflowFile *file = this->getWorkflowFileByID(id);
+					if (!file) {
+						file = this->addFile(id, size);
+					}
+					if (link == "input") {
+						task->addInputFile(file);
+					}
+					if (link == "output") {
+						task->addOutputFile(file);
+					}
+					// TODO: Are there other types of "link" values?
+				}
 			}
-
-
-
-
 		}
 
 }

@@ -38,8 +38,8 @@ namespace WRENCH {
 		public:
 				/* Task-state enum */
 				enum State {
-						READY,
 						NOT_READY,
+						READY,
 						SCHEDULED,
 						RUNNING,
 						COMPLETED,
