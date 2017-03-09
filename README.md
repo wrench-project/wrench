@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/wrench-project/wrench.png)](https://travis-ci.org/wrench-project/wrench)
+[![Build Status][travis-badge]][travis-link]
+[![License: LGPL v3][license-badge]](LICENSE.md)
 
 # WRENCH source repo
 
@@ -11,3 +12,8 @@
 One of the following:
   - g++ - version 5 or superior
   - clang version 3.6 or superior
+
+
+[travis-badge]:    https://travis-ci.org/wrench-project/wrench.svg?branch=master
+[travis-link]:     https://travis-ci.org/wrench-project/wrench
+[license-badge]:   https://img.shields.io/badge/License-LGPL%20v3-blue.svg
