@@ -9,12 +9,13 @@ int main(int argc, char **argv) {
 
 	simulation.init(&argc, argv);
 
-	if (argc != 2) {
-		std::cerr << "Usage: " << argv[0] << "<xml platform file>" << std::endl;
+	if (argc != 3) {
+		std::cerr << "Usage: " << argv[0] << "<xml platform file> <dax file>" << std::endl;
 		exit(1);
 	}
 
 	char *platform_file = argv[1];
+	char *dax_file = argv[2];
 
 
 	std::cerr << "Creating a bogus workflow..." << std::endl;
@@ -54,7 +55,7 @@ int main(int argc, char **argv) {
 
 	//workflow.exportToEPS("workflow.eps");
 
-	workflow.loadFromDAX("../GENOME.d.351024866.5.dax");
+	workflow.loadFromDAX(dax_file);
 	std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
 //	std::cerr << "Number of childern of root task: " << workflow.getReadyTasks()[0]->getNumberOfChildren() << std::endl;
 
