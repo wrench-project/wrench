@@ -30,7 +30,6 @@ namespace WRENCH {
 
 			// Create and start one sequential task executor daemon per core
 			int num_cores = S4U_Simulation::getNumCores(this->hostname);
-			std::cerr << "num_cores = " << num_cores << std::endl;
 			for (int i = 0; i < num_cores; i++) {
 				std::cerr << "Creating a Sequential Task Executor" << std::endl;
 				std::unique_ptr<SequentialTaskExecutor> seq_executor =
@@ -56,7 +55,6 @@ namespace WRENCH {
 		 * @brief Destructor
 		 */
 		MulticoreTaskExecutor::~MulticoreTaskExecutor() {
-
 		}
 
 		/**

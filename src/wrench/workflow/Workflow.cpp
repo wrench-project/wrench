@@ -119,7 +119,9 @@ namespace WRENCH {
 		 */
 		void Workflow::addControlDependency(WorkflowTask *src, WorkflowTask *dst) {
 			if (!pathExists(src, dst)) {
+
 				DAG->addArc(src->DAG_node, dst->DAG_node);
+
 				if (src->getState() != WorkflowTask::COMPLETED) {
 					updateTaskState(dst, WorkflowTask::NOT_READY);
 				}
@@ -312,7 +314,6 @@ namespace WRENCH {
 				}
 				// Create the task
 				task = this->addTask(id + "_" + name, flops, num_procs);
-				std::cerr << "Created task " << task->getId() << std::endl;
 
 
 				// Go through the children "uses" nodes
@@ -320,10 +321,13 @@ namespace WRENCH {
 					// get the "uses" attributes
 					// TODO: There are several attributes that we're ignoring for now...
 					std::string id = uses.attribute("file").value();
+
 					double size = std::strtod(uses.attribute("size").value(), NULL);
 					std::string link = uses.attribute("link").value();
 					// Check whether the file already exist
+					std::cerr.flush();
 						WorkflowFile *file = this->getWorkflowFileByID(id);
+
 					if (!file) {
 						file = this->addFile(id, size);
 					}

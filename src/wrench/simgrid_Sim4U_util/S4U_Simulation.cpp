@@ -25,7 +25,7 @@ namespace WRENCH {
 
 		// TODO: Implement
 		void S4U_Simulation::compute(double flop) {
-			//esimgrid::s4u::this_actor::execute(flop);
+			//simgrid::s4u::this_actor::execute(flop);
 			std::cerr << "Should be simulating computation delay :( " << std::endl;
 		}
 

@@ -57,6 +57,11 @@ int main(int argc, char **argv) {
 
 	workflow.loadFromDAX(dax_file);
 	std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
+	std::cerr.flush();
+	std::cerr.flush();
+	std::cerr.flush();
+	std::cerr.flush();
+	std::cerr.flush();
 //	std::cerr << "Number of childern of root task: " << workflow.getReadyTasks()[0]->getNumberOfChildren() << std::endl;
 
 //	return 0;

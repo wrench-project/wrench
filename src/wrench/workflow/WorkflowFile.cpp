@@ -31,6 +31,8 @@ namespace WRENCH {
 		WorkflowFile::WorkflowFile(const std::string string, double s) {
 			this->id = string;
 			this->size = s;
+			this->output_of = nullptr;
+			this->input_of = {};
 		};
 
 		/**

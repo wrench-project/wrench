@@ -42,7 +42,9 @@ namespace WRENCH {
 		 */
 		void WorkflowTask::addInputFile(WorkflowFile *f) {
 			addFileToMap(input_files, f);
+
 			f->setInputOf(this);
+
 			// Perhaps add a control dependency?
 			if (f->getOutputOf()) {
 				workflow->addControlDependency(f->getOutputOf(), this);
