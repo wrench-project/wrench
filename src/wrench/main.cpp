@@ -69,14 +69,14 @@ int main(int argc, char **argv) {
 	std::cerr << "Instantiating SimGrid platform..." << std::endl;
 	simulation.createPlatform(platform_file);
 
-//	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
-//	simulation.createSequentialTaskExecutor("Tremblay");
+	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
+	simulation.createSequentialTaskExecutor("Tremblay");
 //
 //	std::cerr << "Instantiating another Sequential Task Executor on Tremblay..." << std::endl;
 //	simulation.createSequentialTaskExecutor("Tremblay");
 
-	std::cerr << "Instantiating a Multicore Task Executor on Jupiter..." << std::endl;
-	simulation.createMulticoreTaskExecutor("Jupiter");
+//	std::cerr << "Instantiating a Multicore Task Executor on Jupiter..." << std::endl;
+//	simulation.createMulticoreTaskExecutor("Jupiter");
 
 
 	std::cerr << "Instantiating a WMS on Tremblay..." << std::endl;

@@ -66,11 +66,8 @@ namespace WRENCH {
 						std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage *>(message.release()));
 
 						// Run the task
-						XBT_INFO("Executing task %s",
-										 m->task->id.c_str());
-
+						XBT_INFO("Executing task %s", m->task->id.c_str());
 						m->task->setRunning();
-
 						S4U_Simulation::compute(m->task->flops);
 						m->task->end_date = S4U_Simulation::getClock();
 						m->task->setCompleted();

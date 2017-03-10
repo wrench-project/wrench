@@ -25,17 +25,12 @@ namespace WRENCH {
 
 		// TODO: Implement
 		void S4U_Simulation::compute(double flop) {
-			//simgrid::s4u::this_actor::execute(flop);
-			std::cerr << "Should be simulating computation delay :( " << std::endl;
+			// TODO: Should do an execute() there, but it doesn't work.... for now
+			simgrid::s4u::this_actor::sleep_for(flop);
 		}
 
 		int S4U_Simulation::getNumCores(std::string hostname) {
-			const char *property = simgrid::s4u::Host::by_name(hostname)->property("num_cores");
-			if (!property) {
-				return 1;
-			} else {
-				return std::stoi(property);
-			}
+			return simgrid::s4u::Host::by_name(hostname)->coreCount();
 		}
 
 		 double S4U_Simulation::getClock() {

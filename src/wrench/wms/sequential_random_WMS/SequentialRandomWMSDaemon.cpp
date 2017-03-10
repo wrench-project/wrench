@@ -54,7 +54,9 @@ namespace WRENCH {
 				for (int i=0; i < ready_tasks.size(); i++) {
 					XBT_INFO("Submitting task %s for execution", ready_tasks[i]->id.c_str());
 					ready_tasks[i]->setScheduled();
-					this->simulation->getSomeMulticoreTaskExecutor()->runTask(
+//					this->simulation->getSomeMulticoreTaskExecutor()->runTask(
+//									ready_tasks[i], this->mailbox_name);
+					this->simulation->getSomeSequentialTaskExecutor()->runTask(
 									ready_tasks[i], this->mailbox_name);
 				}
 
