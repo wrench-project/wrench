@@ -16,14 +16,15 @@
 #ifndef WRENCH_SIMPLEWMSDAEMON_H
 #define WRENCH_SIMPLEWMSDAEMON_H
 
-#include "simgrid_util/DaemonWithMailbox.h"
+#include <simgrid_Sim4U_util/S4U_DaemonWithMailbox.h>
+//#include "simgrid_MSG_util/MSG_DaemonWithMailbox.h"
 #include "workflow/Workflow.h"
 
 namespace WRENCH {
 
 		class Simulation; // forward ref
 
-		class SequentialRandomWMSDaemon: public DaemonWithMailbox {
+		class SequentialRandomWMSDaemon: public S4U_DaemonWithMailbox {
 
 		public:
 				SequentialRandomWMSDaemon(Simulation *, Workflow *w);

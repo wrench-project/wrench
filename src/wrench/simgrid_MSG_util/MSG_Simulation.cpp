@@ -13,20 +13,20 @@
  */
 
 
-#include "Simgrid.h"
+#include "MSG_Simulation.h"
 #include "exception/WRENCHException.h"
 
 #include <simgrid/msg.h>
 
 namespace WRENCH {
 
-		void Simgrid::initialize(int *argc, char **argv) {
+		void MSG_Simulation::initialize(int *argc, char **argv) {
 			MSG_init(argc, argv);
 		}
 
-		void Simgrid::runSimulation() {
+		void MSG_Simulation::runSimulation() {
 			if (MSG_main() != MSG_OK) {
-				throw WRENCHException("Simgrid::runSimulation(): Error");
+				throw WRENCHException("MSG_Simulation::runSimulation(): Error");
 			}
 		}
 

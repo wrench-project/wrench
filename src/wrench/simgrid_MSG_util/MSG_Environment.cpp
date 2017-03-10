@@ -13,13 +13,13 @@
  */
 
 
-#include "Environment.h"
+#include "MSG_Environment.h"
 
 #include <simgrid/msg.h>
 
 namespace WRENCH {
 
-		void Environment::createEnvironmentFromXML(std::string filename) {
+		void MSG_Environment::createEnvironmentFromXML(std::string filename) {
 			// TODO: Raise exception is file is not found, since MSG_create_environment
 			//       returns void
 			MSG_create_environment(filename.c_str());

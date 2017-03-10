@@ -17,15 +17,15 @@
 #define WRENCH_MULTICORETASKEXECUTORDAEMON_H
 
 
-#include <simgrid_util/DaemonWithMailbox.h>
+#include <simgrid_MSG_util/MSG_DaemonWithMailbox.h>
 #include <compute_services/sequential_task_executor/SequentialTaskExecutor.h>
-#include <simgrid_util/Message.h>
+#include <simulation/SimulationMessage.h>
 #include <queue>
 #include <set>
 
 namespace WRENCH {
 
-		class MulticoreTaskExecutorDaemon : public DaemonWithMailbox {
+		class MulticoreTaskExecutorDaemon : public S4U_DaemonWithMailbox {
 
 		public:
 				MulticoreTaskExecutorDaemon(std::vector<SequentialTaskExecutor *>, ComputeService *cs);

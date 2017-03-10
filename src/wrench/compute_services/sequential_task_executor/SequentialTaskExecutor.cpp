@@ -13,8 +13,8 @@
  *
  */
 
+#include <simgrid_Sim4U_util/S4U_Mailbox.h>
 #include "SequentialTaskExecutor.h"
-#include "simgrid_util/Mailbox.h"
 
 namespace WRENCH {
 
@@ -44,7 +44,7 @@ namespace WRENCH {
 		 */
 		void SequentialTaskExecutor::stop() {
 			// Send a termination message to the daemon's mailbox
-			Mailbox::put(this->daemon->mailbox, new StopDaemonMessage());
+			S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
 		}
 
 		/**
@@ -57,7 +57,7 @@ namespace WRENCH {
 		int SequentialTaskExecutor::runTask(WorkflowTask *task, std::string callback_mailbox) {
 
 			// Asynchronously send a "run a task" message to the daemon's mailbox
-			Mailbox::iput(this->daemon->mailbox, new RunTaskMessage(task, callback_mailbox));
+			S4U_Mailbox::iput(this->daemon->mailbox_name, new RunTaskMessage(task, callback_mailbox));
 			return 0;
 		};
 

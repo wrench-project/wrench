@@ -20,7 +20,7 @@
 
 namespace WRENCH {
 
-		class DaemonWithMailbox {
+		class MSG_DaemonWithMailbox {
 
 		public:
 				std::string mailbox;
@@ -29,9 +29,9 @@ namespace WRENCH {
 				void start(std::string hostname);
 
 		protected:
-				DaemonWithMailbox(std::string mailbox_prefix, std::string process_name);
+				MSG_DaemonWithMailbox(std::string mailbox_prefix, std::string process_name);
 
-				virtual ~DaemonWithMailbox();
+				virtual ~MSG_DaemonWithMailbox();
 
 		private:
 				static int getNewUniqueNumber();

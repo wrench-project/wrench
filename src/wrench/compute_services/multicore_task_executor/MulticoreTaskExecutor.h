@@ -20,7 +20,7 @@
 #include <workflow/WorkflowTask.h>
 #include <compute_services/ComputeService.h>
 #include <compute_services/sequential_task_executor/SequentialTaskExecutor.h>
-#include <simgrid_util/Message.h>
+#include <simulation/SimulationMessage.h>
 #include "MulticoreTaskExecutorDaemon.h"
 
 namespace WRENCH {

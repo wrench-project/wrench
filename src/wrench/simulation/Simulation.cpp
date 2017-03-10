@@ -17,7 +17,7 @@
 #include <xbt/log.h>
 #include "Simulation.h"
 #include "exception/WRENCHException.h"
-#include "simgrid_util/Simgrid.h"
+//#include "simgrid_MSG_util/MSG_Simulation.h"
 
 namespace WRENCH {
 
@@ -25,14 +25,13 @@ namespace WRENCH {
 		 * @brief Default constructor
 		 */
 		Simulation::Simulation() {
-			this->platform = nullptr;
+			this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
 		}
 
 		/**
 		 * @brief Default destructor
 		 */
 		Simulation::~Simulation() {
-
 		}
 
 		/**
@@ -45,7 +44,7 @@ namespace WRENCH {
 		void Simulation::init(int *argc, char **argv) {
 			// Set the logging format
 			xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
-			Simgrid::initialize(argc, argv);
+			this->s4u_simulation->initialize(argc, argv);
 		}
 
 		/**
@@ -56,7 +55,7 @@ namespace WRENCH {
 		 */
 
 		void Simulation::launch() {
-			Simgrid::runSimulation();
+			this->s4u_simulation->runSimulation();
 		}
 
 		/**
@@ -65,7 +64,7 @@ namespace WRENCH {
 		 * @param filename is the path to a SimGrid XML platform descritpion file
 		 */
 		void Simulation::createPlatform(std::string filename) {
-			this->platform = std::unique_ptr<Platform>(new Platform(filename));
+			this->s4u_simulation->setupPlatform(filename);
 		}
 
 		/**
@@ -109,7 +108,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief method to instantiave a simple WMS on a host
+		 * @brief method to instantiate a simple WMS on a host
 		 *
 		 * @param w is the workflow that the WMS will execute
 		 * @param hostname is the name of the host in the physical platform

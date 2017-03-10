@@ -14,11 +14,10 @@
 
 #include <iostream>
 #include <simgrid/msg.h>
+#include <simgrid_Sim4U_util/S4U_Mailbox.h>
 
 #include "SequentialRandomWMSDaemon.h"
 #include "simulation/Simulation.h"
-#include "simgrid_util/Mailbox.h"
-#include "simgrid_util/Host.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms_daemon, "Log category for Simple WMS Daemon");
 
@@ -31,7 +30,7 @@ namespace WRENCH {
 		 * @param w is a pointer to the workflow to execute
 		 */
 		SequentialRandomWMSDaemon::SequentialRandomWMSDaemon(Simulation *s, Workflow *w):
-						DaemonWithMailbox("simple_wms", "simple_wms") {
+						S4U_DaemonWithMailbox("simple_wms", "simple_wms") {
 			this->simulation = s;
 			this->workflow = w;
 		}
@@ -42,7 +41,7 @@ namespace WRENCH {
 		 * @return 0 on completion
 		 */
 		int SequentialRandomWMSDaemon::main() {
-			XBT_INFO("Starting on host %s listening on mailbox %s", Host::getHostName().c_str(), this->mailbox.c_str());
+			XBT_INFO("Starting on host %s listening on mailbox %s", S4U_Simulation::getHostName().c_str(), this->mailbox_name.c_str());
 			XBT_INFO("About to execute a workflow with %lu tasks",this->workflow->getNumberOfTasks());
 
 			/** Stupid Scheduling/Execution Algorithm **/
@@ -56,12 +55,12 @@ namespace WRENCH {
 					XBT_INFO("Submitting task %s for execution", ready_tasks[i]->id.c_str());
 					ready_tasks[i]->setScheduled();
 					this->simulation->getSomeMulticoreTaskExecutor()->runTask(
-									ready_tasks[i], this->mailbox);
+									ready_tasks[i], this->mailbox_name);
 				}
 
 				// Wait for a task completion
 				XBT_INFO("Waiting for a task to complete...");
-				std::unique_ptr<Message> message = Mailbox::get(this->mailbox);
+				std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
 				std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage*>(message.release()));
 
 				XBT_INFO("Notified that task %s has completed", m->task->id.c_str());
@@ -77,7 +76,7 @@ namespace WRENCH {
 			XBT_INFO("Simple WMS Daemon is shutting down all Compute Services");
 			this->simulation->shutdown();
 
-			XBT_INFO("Simple WMS Daemon started on host %s terminating", Host::getHostName().c_str());
+			XBT_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
 
 			return 0;
 		}

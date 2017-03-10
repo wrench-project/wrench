@@ -18,7 +18,7 @@
 
 namespace WRENCH {
 
-		class Simgrid {
+		class MSG_Simulation {
 
 		public:
 				static void initialize(int *argc, char **argv);

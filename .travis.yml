@@ -84,7 +84,7 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p python3; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
   - cmake --version
-  # install Simgrid
+  # install MSG_Simulation
   - wget https://gforge.inria.fr/frs/download.php/file/36384/SimGrid-3.14.159.tar.gz
   - tar xf SimGrid-3.14.159.tar.gz
   - cd SimGrid-3.14.159 && cmake . && make && sudo make install && cd ..

@@ -20,7 +20,7 @@
 #include <simgrid/msg.h>
 
 namespace WRENCH {
-		class Host {
+		class MSG_Host {
 		public:
 				static std::string getHostName();
 				static int getNumCores(std::string);

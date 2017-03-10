@@ -18,7 +18,7 @@
 #include <string>
 
 namespace WRENCH {
-		class Environment {
+		class MSG_Environment {
 		public:
 				static void createEnvironmentFromXML(std::string filename);
 		};

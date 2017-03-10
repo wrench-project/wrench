@@ -12,12 +12,12 @@
  *
  */
 
-#include "Clock.h"
+#include "MSG_Clock.h"
 #include <simgrid/msg.h>
 
 namespace WRENCH {
 
-		double Clock::getClock() {
+		double MSG_Clock::getClock() {
 			return MSG_get_clock();
 		}
 

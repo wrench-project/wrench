@@ -14,7 +14,7 @@
  */
 
 #include "Platform.h"
-#include "simgrid_util/Environment.h"
+#include "simgrid_MSG_util/MSG_Environment.h"
 
 
 namespace WRENCH {
@@ -25,7 +25,7 @@ namespace WRENCH {
 		 * @param filename is the path to a XML SimGrid platform description file
 		 */
 		Platform::Platform(std::string filename) {
-			Environment::createEnvironmentFromXML(filename);
+			MSG_Environment::createEnvironmentFromXML(filename);
 		}
 
 		/**

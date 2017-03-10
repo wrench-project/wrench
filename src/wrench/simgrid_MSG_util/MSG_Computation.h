@@ -18,7 +18,7 @@
 
 namespace WRENCH {
 
-		class Computation {
+		class MSG_Computation {
 
 		public:
 				static void simulateComputation(double second);

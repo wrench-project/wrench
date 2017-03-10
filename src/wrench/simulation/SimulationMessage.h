@@ -23,7 +23,7 @@ namespace WRENCH {
 
 
 		// Base struct
-		struct Message {
+		struct SimulationMessage {
 
 				// Message type enum
 				enum Type {
@@ -32,21 +32,21 @@ namespace WRENCH {
 						TASK_DONE,
 				};
 
-				Message(Type t, double s);
-				virtual ~Message();
+				SimulationMessage(Type t, double s);
+				virtual ~SimulationMessage();
 
 				Type type;
 				double size;
 		};
 
 		// Derived struct
-		struct StopDaemonMessage: public Message {
+		struct StopDaemonMessage: public SimulationMessage {
 				StopDaemonMessage();
 				~StopDaemonMessage();
 		};
 
 		// Derived struct
-		struct RunTaskMessage: public Message {
+		struct RunTaskMessage: public SimulationMessage {
 				RunTaskMessage(WorkflowTask*, std::string cb);
 				~RunTaskMessage();
 				WorkflowTask *task;
@@ -54,7 +54,7 @@ namespace WRENCH {
 		};
 
 		// Derived struct
-		struct TaskDoneMessage: public Message {
+		struct TaskDoneMessage: public SimulationMessage {
 				TaskDoneMessage(WorkflowTask *, ComputeService*);
 				~TaskDoneMessage();
 				WorkflowTask *task;

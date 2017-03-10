@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 	simulation.init(&argc, argv);
 
 	if (argc != 3) {
-		std::cerr << "Usage: " << argv[0] << "<xml platform file> <dax file>" << std::endl;
+		std::cerr << "Usage: " << argv[0] << " <xml platform file> <dax file>" << std::endl;
 		exit(1);
 	}
 

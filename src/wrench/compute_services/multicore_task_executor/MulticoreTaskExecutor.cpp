@@ -14,9 +14,9 @@
  */
 
 #include <workflow/WorkflowTask.h>
-#include <simgrid_util/Host.h>
+#include <simgrid_Sim4U_util/S4U_Mailbox.h>
+#include <simgrid_Sim4U_util/S4U_Simulation.h>
 #include "MulticoreTaskExecutor.h"
-#include "simgrid_util/Mailbox.h"
 
 namespace WRENCH {
 
@@ -29,7 +29,7 @@ namespace WRENCH {
 			this->hostname = hostname;
 
 			// Create and start one sequential task executor daemon per core
-			int num_cores = Host::getNumCores(hostname);
+			int num_cores = S4U_Simulation::getNumCores(this->hostname);
 			std::cerr << "num_cores = " << num_cores << std::endl;
 			for (int i = 0; i < num_cores; i++) {
 				std::cerr << "Creating a Sequential Task Executor" << std::endl;
@@ -70,7 +70,7 @@ namespace WRENCH {
 			}
 
 			// Send a termination message to the daemon's mailbox
-			Mailbox::put(this->daemon->mailbox, new StopDaemonMessage());
+			S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
 		}
 
 		/**
@@ -83,7 +83,7 @@ namespace WRENCH {
 		int MulticoreTaskExecutor::runTask(WorkflowTask *task, std::string callback_mailbox) {
 
 			// Asynchronously send a "run a task" message to the daemon's mailbox
-			Mailbox::iput(this->daemon->mailbox, new RunTaskMessage(task, callback_mailbox));
+			S4U_Mailbox::iput(this->daemon->mailbox_name, new RunTaskMessage(task, callback_mailbox));
 			return 0;
 		};
 

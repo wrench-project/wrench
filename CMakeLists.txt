@@ -7,22 +7,22 @@ include_directories(src/wrench/ include /usr/include /usr/local/include /opt/loc
 
 set(SOURCE_FILES
         src/wrench/exception/WRENCHException.h
-        src/wrench/simgrid_util/Message.cpp
-        src/wrench/simgrid_util/Message.h
-        src/wrench/simgrid_util/Mailbox.cpp
-        src/wrench/simgrid_util/Mailbox.h
-        src/wrench/simgrid_util/Computation.cpp
-        src/wrench/simgrid_util/Computation.h
-        src/wrench/simgrid_util/Host.cpp
-        src/wrench/simgrid_util/Host.h
-        src/wrench/simgrid_util/Environment.cpp
-        src/wrench/simgrid_util/Environment.h
-        src/wrench/simgrid_util/Clock.cpp
-        src/wrench/simgrid_util/Clock.h
-        src/wrench/simgrid_util/Simgrid.cpp
-        src/wrench/simgrid_util/Simgrid.h
-        src/wrench/simgrid_util/DaemonWithMailbox.cpp
-        src/wrench/simgrid_util/DaemonWithMailbox.h
+        src/wrench/simulation/SimulationMessage.cpp
+        src/wrench/simulation/SimulationMessage.h
+        src/wrench/simgrid_MSG_util/MSG_Mailbox.cpp
+        src/wrench/simgrid_MSG_util/MSG_Mailbox.h
+        src/wrench/simgrid_MSG_util/MSG_Computation.cpp
+        src/wrench/simgrid_MSG_util/MSG_Computation.h
+        src/wrench/simgrid_MSG_util/MSG_Host.cpp
+        src/wrench/simgrid_MSG_util/MSG_Host.h
+        src/wrench/simgrid_MSG_util/MSG_Environment.cpp
+        src/wrench/simgrid_MSG_util/MSG_Environment.h
+        src/wrench/simgrid_MSG_util/MSG_Clock.cpp
+        src/wrench/simgrid_MSG_util/MSG_Clock.h
+        src/wrench/simgrid_MSG_util/MSG_Simulation.cpp
+        src/wrench/simgrid_MSG_util/MSG_Simulation.h
+        src/wrench/simgrid_MSG_util/MSG_DaemonWithMailbox.cpp
+        src/wrench/simgrid_MSG_util/MSG_DaemonWithMailbox.h
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/Workflow.h
         src/wrench/workflow/WorkflowTask.h
@@ -50,7 +50,7 @@ set(SOURCE_FILES
 set(INCLUDE_FILES include/wrench.h)
 
 find_library(SIMGRID_LIB NAMES simgrid)
-find_library(PUGIXML_LIB NAMES pugixml /opt/local/lib/)
+find_library(PUGIXML_LIB NAMES pugixml)
 find_library(LEMON_LIB NAMES emon)
 
 #Generate the static library from the sources
@@ -60,6 +60,6 @@ install(TARGETS wrench DESTINATION lib)
 install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
 
 # TODO: temporary simulation test binary
-add_executable(simulation ${SOURCE_FILES} src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.h src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.h src/wrench/workflow/WorkflowFile.cpp src/wrench/workflow/WorkflowFile.h)
+add_executable(simulation ${SOURCE_FILES} src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.h src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.cpp src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.h src/wrench/workflow/WorkflowFile.cpp src/wrench/workflow/WorkflowFile.h src/wrench/simgrid_Sim4U_util/S4U_DaemonWithMailbox.cpp src/wrench/simgrid_Sim4U_util/S4U_DaemonWithMailbox.h src/wrench/simgrid_Sim4U_util/S4U_DaemonWithMailboxActor.cpp src/wrench/simgrid_Sim4U_util/S4U_DaemonWithMailboxActor.h src/wrench/simgrid_Sim4U_util/S4U_Simulation.cpp src/wrench/simgrid_Sim4U_util/S4U_Simulation.h src/wrench/simgrid_Sim4U_util/S4U_Mailbox.cpp src/wrench/simgrid_Sim4U_util/S4U_Mailbox.h)
 target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS simulation DESTINATION bin)

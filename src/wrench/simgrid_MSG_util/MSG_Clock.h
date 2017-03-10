@@ -20,7 +20,7 @@
 namespace WRENCH {
 
 
-		class Clock {
+		class MSG_Clock {
 
 		public:
 				static double getClock();
