@@ -25,7 +25,7 @@ namespace WRENCH {
 
 		// TODO: Implement
 		void S4U_Simulation::compute(double flop) {
-			//simgrid::s4u::this_actor::execute(flop);
+			//esimgrid::s4u::this_actor::execute(flop);
 			std::cerr << "Should be simulating computation delay :( " << std::endl;
 		}
 
@@ -39,11 +39,8 @@ namespace WRENCH {
 		}
 
 		 double S4U_Simulation::getClock() {
-			 // TODO: How de we do this in S4U?
-			 return 666.666;
+			 return simgrid::s4u::Engine::instance()->getClock();
 		 }
-
-
 
 
 };

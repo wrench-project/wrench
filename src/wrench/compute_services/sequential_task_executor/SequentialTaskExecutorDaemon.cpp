@@ -72,8 +72,6 @@ namespace WRENCH {
 						m->task->setRunning();
 
 						S4U_Simulation::compute(m->task->flops);
-
-						// TODO: Find a way to get the clock()
 						m->task->end_date = S4U_Simulation::getClock();
 						m->task->setCompleted();
 

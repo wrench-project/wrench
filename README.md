@@ -6,7 +6,8 @@
 ### Prerequisites
 
   - Install Lemon C++ library - version 1.3.1 or superior (https://lemon.cs.elte.hu/)
-  - Install SimGrid - version 3.14 or superior (http://simgrid.gforge.inria.fr/)
+  - Install SimGrid - unstable S4U-enabled version (http://simgrid.gforge.inria.fr/)
+  - Install PugiXML
 
 #### Compiler
 One of the following:

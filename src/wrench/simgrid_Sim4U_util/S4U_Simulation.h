@@ -16,7 +16,7 @@ namespace WRENCH {
 				void setupPlatform(std::string);
 				void runSimulation();
 
-				static double getClock();
+				static double getClock(); // TODO: Annoyingly non-static
 
 				static std::string getHostName();
 				static int getNumCores(std::string hostname);
