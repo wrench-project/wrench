@@ -1,24 +1,13 @@
 /**
- *  @file    SequentialTaskExecutorDaemon.h
- *  @author  Henri Casanova
- *  @date    2/22/2017
- *  @version 1.0
- *
- *  @brief WRENCH::SequentialTaskExecutorDaemon class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::SequentialTaskExecutorDaemon class implements the daemon for a simple
- *  Compute Service abstraction.
- *
+ *  @brief WRENCH::SequentialTaskExecutorDaemon implements the daemon for the
+ *  SequentialTaskExecutor Compute Service abstraction.
  */
 
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H
 #define SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H
 
 #include <compute_services/ComputeService.h>
-#include <simgrid_Sim4U_util/S4U_DaemonWithMailbox.h>
-//#include "simgrid_MSG_util/MSG_DaemonWithMailbox.h"
+#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
 
 namespace WRENCH {
 		class SequentialTaskExecutorDaemon : public S4U_DaemonWithMailbox {
@@ -26,15 +15,11 @@ namespace WRENCH {
 		public:
 				SequentialTaskExecutorDaemon(ComputeService *cs);
 
-				~SequentialTaskExecutorDaemon();
-
 		private:
 				int main();
-
 				ComputeService *compute_service;
 
 		};
 }
-
 
 #endif //SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H

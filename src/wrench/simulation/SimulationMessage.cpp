@@ -1,15 +1,6 @@
 /**
- *  @file    Message.cpp
- *  @author  Henri Casanova
- *  @date    2/21/2017
- *  @version 1.0
- *
- *  @brief WRENCH::Message class implementations
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::Message and derived classes are MSG wrappers
- *
+ *  @brief WRENCH::SimulationMessage and derived classes to encapsulate
+ *  control/data messages exchanged by simulated processes
  */
 
 #include "SimulationMessage.h"
@@ -21,16 +12,10 @@ namespace WRENCH {
 			type = t;
 			size = s;
 		}
-		SimulationMessage::~SimulationMessage() {
-
-		}
-
 
 		/** STOP_DAEMON MESSAGE **/
 		// TODO: MAke the "1024" below configurable somehow
 		StopDaemonMessage::StopDaemonMessage(): SimulationMessage(STOP_DAEMON, 1024.00) {
-		}
-		StopDaemonMessage::~StopDaemonMessage() {
 		}
 
 		/** RUN_TASK MESSAGE **/
@@ -39,8 +24,6 @@ namespace WRENCH {
 			this->task = t;
 			this->callback_mailbox = cb;
 		}
-		RunTaskMessage::~RunTaskMessage() {
-		}
 
 		/** TASK_DONE MESSAGE **/
 		// TODO: MAke the "1024" below configurable somehow
@@ -48,10 +31,5 @@ namespace WRENCH {
 			this->task = t;
 			this->compute_service = cs;
 		}
-		TaskDoneMessage::~TaskDoneMessage() {
-		}
-
-
-
 
 };

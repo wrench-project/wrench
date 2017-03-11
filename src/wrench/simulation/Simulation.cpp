@@ -1,59 +1,40 @@
 /**
- *  @file    Simulation.cpp
- *  @author  Henri Casanova
- *  @date    2/24/2017
- *  @version 1.0
- *
- *  @brief WRENCH::Simulation class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::Simulation class is a top-level class that keeps track of
- *  everything.
- *
+ *  @brief WRENCH::Simulation is a top-level class that keeps track of
+ *  the simulation state.
  */
 
 #include <compute_services/multicore_task_executor/MulticoreTaskExecutor.h>
 #include <xbt/log.h>
 #include "Simulation.h"
 #include "exception/WRENCHException.h"
-//#include "simgrid_MSG_util/MSG_Simulation.h"
 
 namespace WRENCH {
 
 		/**
-		 * @brief Default constructor
+		 * @brief Default constructor, which creates a simulation
 		 */
 		Simulation::Simulation() {
+			// Customize the logging format
+			xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
+
+			// Create the S4U simulation wrapper
 			this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
 		}
 
 		/**
-		 * @brief Default destructor
-		 */
-		Simulation::~Simulation() {
-		}
-
-		/**
-		 * @brief Simulation initialization method. This method has to be called first.
+		 * @brief initializes the simulation
 		 *
-		 * @param argc is a pointer to the number of arguments passed to main()
-		 * @param argv is the list of arguments passed to main()
+		 * @param argc
+		 * @param argv
 		 */
-
 		void Simulation::init(int *argc, char **argv) {
-			// Set the logging format
-			xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
 			this->s4u_simulation->initialize(argc, argv);
 		}
 
 		/**
-		 * @brief Simulation initialization method. This method has to be called first.
+		 * @brief Launches the simulation
 		 *
-		 * @param argc is a pointer to the number of arguments passed to main()
-		 * @param argv is the list of arguments passed to main()
 		 */
-
 		void Simulation::launch() {
 			this->s4u_simulation->runSimulation();
 		}
@@ -68,7 +49,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief method to instantiate a sequential task executor on a host
+		 * @brief Instantiate a sequential task executor on a host
 		 *
 		 * @param hostname is the name of the host in the physical platform
 		 */
@@ -84,11 +65,11 @@ namespace WRENCH {
 
 			// Add it to the list of Compute Services
 			sequential_task_executors.push_back(std::move(executor));
-
+			return;
 		}
 
 		/**
-		 * @brief method to instantiate a multicore task executor on a host
+		 * @brief Instantiate a multicore task executor on a host
 		 *
 		 * @param hostname is the name of the host in the physical platform
 		 */
@@ -104,20 +85,19 @@ namespace WRENCH {
 
 			// Add it to the list of Compute Services
 			multicore_task_executors.push_back(std::move(executor));
-
+			return;
 		}
 
 		/**
-		 * @brief method to instantiate a simple WMS on a host
+		 * @brief Instantiate a simple WMS on a host
 		 *
-		 * @param w is the workflow that the WMS will execute
-		 * @param hostname is the name of the host in the physical platform
+		 * @param w is a pointer to the workflow that the WMS will execute
+		 * @param hostname is the name of the host on which to start the WMS
 		 */
 		void Simulation::createSimpleWMS(Workflow *w, std::string hostname) {
 
 			// Create the WMS
 			std::unique_ptr<SequentialRandomWMS> wms;
-
 			try {
 				wms = std::unique_ptr<SequentialRandomWMS>(new SequentialRandomWMS(this, w, hostname));
 			} catch (WRENCHException e) {
@@ -126,7 +106,7 @@ namespace WRENCH {
 
 			// Add it to the list of WMSes
 			WMSes.push_back(std::move(wms));
-
+			return;
 		}
 
 		/**
@@ -148,7 +128,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief method to shutdown all running compute services on the platform
+		 * @brief Shutdown all running compute services on the platform
 		 */
 		void Simulation::shutdown() {
 
@@ -160,6 +140,5 @@ namespace WRENCH {
 			}
 
 		}
-
 
 };

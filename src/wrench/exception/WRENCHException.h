@@ -1,15 +1,5 @@
 /**
- *  @file    Exception.h
- *  @author  Henri Casanova
- *  @date    2/21/2017
- *  @version 1.0
- *
- *  @brief WRENCH::Exception class implementation
- *
- *  @section DESCRIPTION
- *
- *  For now, just a basic Exception class
- *
+ *  @brief WRENCH::Exception implements a simple Exception class.
  */
 
 #ifndef WRENCH_EXCEPTION_H

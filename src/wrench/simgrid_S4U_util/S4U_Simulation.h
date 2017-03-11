@@ -1,6 +1,6 @@
-//
-// Created by Henri Casanova on 3/9/17.
-//
+/**
+ * @brief S4U_Simulation is an S4U Wrapper
+ */
 
 #ifndef WRENCH_S4U_SIMULATION_H
 #define WRENCH_S4U_SIMULATION_H
@@ -15,12 +15,9 @@ namespace WRENCH {
 				void initialize(int *argc, char **argv);
 				void setupPlatform(std::string);
 				void runSimulation();
-
-				static double getClock(); // TODO: Annoyingly non-static
-
+				static double getClock();
 				static std::string getHostName();
 				static int getNumCores(std::string hostname);
-
 				static void compute(double);
 
 		private:

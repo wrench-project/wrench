@@ -1,18 +1,19 @@
-//
-// Created by Henri Casanova on 2/21/17.
-//
+/**
+ *  @brief WRENCH::Simulation is a top-level class that keeps track of
+ *  the simulation state.
+ */
 
 #ifndef WRENCH_SIMULATION_H
 #define WRENCH_SIMULATION_H
 
 #include <string>
 #include <vector>
-#include "simgrid_Sim4U_util/S4U_Simulation.h"
+#include "simgrid_S4U_util/S4U_Simulation.h"
 #include "workflow/Workflow.h"
 #include "compute_services/sequential_task_executor/SequentialTaskExecutor.h"
 #include "compute_services/multicore_task_executor/MulticoreTaskExecutor.h"
 #include "wms/sequential_random_WMS/SequentialRandomWMS.h"
-#include "platform/Platform.h"
+#include "simgrid_MSG_util/MSG_Platform.h"
 
 
 namespace WRENCH {
@@ -24,8 +25,6 @@ namespace WRENCH {
 
 		public:
 				Simulation();
-				~Simulation();
-
 				void init(int *, char **);
 				void createPlatform(std::string);
 				void createSequentialTaskExecutor(std::string hostname);

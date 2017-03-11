@@ -1,6 +1,6 @@
-//
-// Created by Henri Casanova on 3/9/17.
-//
+/**
+ * @brief S4U_Mailbox is a S4U wrapper
+ */
 
 #ifndef WRENCH_S4U_MAILBOX_H
 #define WRENCH_S4U_MAILBOX_H

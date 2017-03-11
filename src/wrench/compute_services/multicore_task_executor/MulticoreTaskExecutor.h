@@ -1,16 +1,6 @@
 /**
- *  @file    MulticoreTaskExecutor.h
- *  @author  Henri Casanova
- *  @date    3/7/2017
- *  @version 1.0
- *
- *  @brief WRENCH::MulticoreTaskExecutor class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::MulticoreTaskExecutor class implements a simple
- *  Compute Service abstraction.
- *
+ *  @brief WRENCH::MulticoreTaskExecutor implements a simple
+ *  Compute Service abstraction for a multi-core task executor.
  */
 
 #ifndef WRENCH_MULTICORETASKEXECUTOR_H
@@ -27,14 +17,9 @@ namespace WRENCH {
 
 		class MulticoreTaskExecutor : public ComputeService {
 
-
 		public:
 				MulticoreTaskExecutor(std::string hostname);
-
-				~MulticoreTaskExecutor();
-
 				void stop();
-
 				int runTask(WorkflowTask *task, std::string callback_mailbox);
 
 		private:

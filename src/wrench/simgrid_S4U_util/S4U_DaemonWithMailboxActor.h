@@ -1,6 +1,7 @@
-//
-// Created by Henri Casanova on 3/9/17.
-//
+/**
+* @brief S4U_DaemonWithMailboxDaemon implements the actor for a generic "running daemon that
+*        listens on a mailbox" abstraction
+*/
 
 #ifndef WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
 #define WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
@@ -12,10 +13,7 @@
 
 #include "S4U_DaemonWithMailbox.h"
 
-
 namespace WRENCH {
-
-		//class Sim4U_DaemonWithMailbox;
 
 		class S4U_DaemonWithMailboxActor {
 

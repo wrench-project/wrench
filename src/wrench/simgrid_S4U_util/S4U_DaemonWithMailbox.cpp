@@ -1,6 +1,7 @@
-//
-// Created by Henri Casanova on 3/9/17.
-//
+/**
+ * @brief S4U_DaemonWithMailbox implements a generic "running daemon that
+ *        listens on a mailbox" abstraction
+ */
 
 #include "S4U_DaemonWithMailbox.h"
 #include "S4U_DaemonWithMailboxActor.h"
@@ -9,18 +10,25 @@
 
 namespace WRENCH {
 
+		/**
+		 * @brief Constructor
+		 *
+		 * @param process_name is the name of the simulated process/actor
+		 * @param mailbox_prefix is the prefix of the mailbox (to which a unique integer is appended)
+		 */
 		S4U_DaemonWithMailbox::S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix) {
 			static int unique_int = 0;
 			this->process_name = process_name;
 			this->mailbox_name = mailbox_prefix + "_" + std::to_string(unique_int++);
 		}
 
-
+		/**
+		 * @brief Start the daemon
+		 * @param hostname
+		 */
 		void S4U_DaemonWithMailbox::start(std::string hostname) {
-			// Start the actor
-			std::cerr << "Starting the actor..." << std::endl;
 			this->actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
-																										 simgrid::s4u::Host::by_name("Tremblay"),
+																										 simgrid::s4u::Host::by_name(hostname),
 																										 S4U_DaemonWithMailboxActor(this));
 		}
 

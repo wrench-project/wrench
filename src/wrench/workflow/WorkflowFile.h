@@ -1,17 +1,6 @@
 /**
- *  @file    WorkflowFile.h
- *  @author  Henri Casanova
- *  @date    3/9/2017
- *  @version 1.0
- *
- *  @brief WRENCH::WorkflowFile class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::WorkflowFile class represents a data file used in a WRENCH::Workflow.
- *
+ *  @brief WRENCH::WorkflowFile represents a data file used in a WRENCH::Workflow.
  */
-
 
 #ifndef WRENCH_WORKFLOWFILE_H
 #define WRENCH_WORKFLOWFILE_H
@@ -23,8 +12,6 @@ namespace WRENCH {
 
 		class WorkflowTask;
 		class Workflow;
-
-// Workflow class must be a friend so as to access the private constructor, etc.
 
 		class WorkflowFile {
 
@@ -44,9 +31,7 @@ namespace WRENCH {
 
 		private:
 				Workflow *workflow; // Containing workflow
-
 				WorkflowFile(const std::string, double);
-
 				WorkflowTask *output_of;
 				std::map<std::string, WorkflowTask *> input_of;
 

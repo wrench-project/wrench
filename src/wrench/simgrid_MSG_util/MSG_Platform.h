@@ -21,11 +21,11 @@
 
 namespace WRENCH {
 
-		class Platform {
+		class MSG_Platform {
 
 		public:
-				Platform(std::string filename);
-				~Platform();
+				MSG_Platform(std::string filename);
+				~MSG_Platform();
 		};
 
 };

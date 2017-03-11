@@ -1,20 +1,10 @@
 /**
- *  @file    SequentialRandomWMSDaemon.cpp
- *  @author  Henri Casanova
- *  @date    2/24/2017
- *  @version 1.0
- *
- *  @brief WRENCH::SequentialRandomWMSDaemon class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::SequentialRandomWMSDaemon class implements the daemon for a simple WMS abstraction
- *
+ *  @brief WRENCH::SequentialRandomWMSDaemon implements the daemon for a simple WMS abstraction
  */
 
 #include <iostream>
 #include <simgrid/msg.h>
-#include <simgrid_Sim4U_util/S4U_Mailbox.h>
+#include <simgrid_S4U_util/S4U_Mailbox.h>
 
 #include "SequentialRandomWMSDaemon.h"
 #include "simulation/Simulation.h"
@@ -36,7 +26,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief main method of the daemon
+		 * @brief main method of the WMS daemon
 		 *
 		 * @return 0 on completion
 		 */
@@ -73,7 +63,6 @@ namespace WRENCH {
 			}
 
 			XBT_INFO("Workflow execution is complete!");
-
 
 			XBT_INFO("Simple WMS Daemon is shutting down all Compute Services");
 			this->simulation->shutdown();

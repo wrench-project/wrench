@@ -1,13 +1,13 @@
-//
-// Created by Henri Casanova on 3/9/17.
-//
+/**
+ * @brief S4U_DaemonWithMailbox implements a generic "running daemon that
+ *        listens on a mailbox" abstraction
+ */
 
 #ifndef WRENCH_SIM4U_DAEMONWITHMAILBOX_H
 #define WRENCH_SIM4U_DAEMONWITHMAILBOX_H
 
 #include <string>
 #include <simgrid/s4u.hpp>
-//#include "Sim4U_DaemonWithMailboxActor.h"
 
 namespace WRENCH {
 
@@ -22,7 +22,6 @@ namespace WRENCH {
 				virtual int main() = 0;
 
 		private:
-
 				simgrid::s4u::ActorPtr actor;
 
 		};

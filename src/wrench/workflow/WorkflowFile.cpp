@@ -1,18 +1,6 @@
-
 /**
- *  @file    WorkflowFile.cpp
- *  @author  Henri Casanova
- *  @date    3/9/2017
- *  @version 1.0
- *
- *  @brief WRENCH::WorkflowFile class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::WorkflowFile class represents a data file used in a WRENCH::Workflow.
- *
+ *  @brief WRENCH::WorkflowFile represents a data file used in a WRENCH::Workflow.
  */
-
 
 #include <map>
 
@@ -28,15 +16,15 @@ namespace WRENCH {
 		 * @param string is the file name/id
 		 * @param s is the file size
 		 */
-		WorkflowFile::WorkflowFile(const std::string string, double s) {
-			this->id = string;
+		WorkflowFile::WorkflowFile(const std::string name, double s) {
+			this->id = name;
 			this->size = s;
 			this->output_of = nullptr;
 			this->input_of = {};
 		};
 
 		/**
-		 * @brief Method to define the task that outputs this file
+		 * @brief Define the task that outputs this file
 		 *
 		 * @param task is the task
 		 */
@@ -45,7 +33,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Method to get the task the outputs this file
+		 * @brief Get the task the outputs this file
 		 *
 		 * @return a pointer to a WorkflowTask
 		 */
@@ -55,7 +43,7 @@ namespace WRENCH {
 
 
 		/**
-		 * @brief Method to add a task that uses this file as input
+		 * @brief Add a task that uses this file as input
 		 *
 		 * @param task is the task
 		 */
@@ -64,14 +52,13 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Method to get the set of tasks that use this file as input
+		 * @brief Get the set of tasks that use this file as input
 		 *
 		 * @return a map of pointers to WorkflowTask
 		 */
 		std::map<std::string, WorkflowTask *> WorkflowFile::getInputOf() {
 			return this->input_of;
 		};
-
 
 };
 

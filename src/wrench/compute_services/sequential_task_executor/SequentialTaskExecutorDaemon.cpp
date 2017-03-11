@@ -1,22 +1,12 @@
 /**
- *  @file    SequentialTaskExecutorDaemon.cpp
- *  @author  Henri Casanova
- *  @date    2/22/2017
- *  @version 1.0
- *
- *  @brief WRENCH::SequentialTaskExecutorDaemon class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::SequentialTaskExecutorDaemon class implements the daemon for a simple
- *  Compute Service abstraction.
- *
+ *  @brief WRENCH::SequentialTaskExecutorDaemon implements the daemon for the
+ *  SequentialTaskExecutor Compute Service abstraction.
  */
 
 #include <iostream>
 #include <simgrid/msg.h>
-#include <simgrid_Sim4U_util/S4U_Mailbox.h>
-#include <simgrid_Sim4U_util/S4U_Simulation.h>
+#include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <simgrid_S4U_util/S4U_Simulation.h>
 
 #include "SequentialTaskExecutorDaemon.h"
 #include "simulation/SimulationMessage.h"
@@ -28,6 +18,8 @@ namespace WRENCH {
 
 		/**
 		 * @brief Constructor
+		 *
+		 * @param cs is a pointer to the corresponding compute service
 		 */
 		SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(ComputeService *cs) :
 						S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
@@ -35,19 +27,13 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Destructor
-		 */
-		SequentialTaskExecutorDaemon::~SequentialTaskExecutorDaemon() {
-		}
-
-		/**
-		 * @brief main() method of the daemon
+		 * @brief Main method of the sequential task executor daemon
 		 *
 		 * @return 0 on termination
 		 */
 		int SequentialTaskExecutorDaemon::main() {
-			XBT_INFO("New Sequential Task Executor starting (%s) ",
-							 this->mailbox_name.c_str());
+
+			XBT_INFO("New Sequential Task Executor starting (%s) ", this->mailbox_name.c_str());
 
 			bool keep_going = true;
 			while (keep_going) {
@@ -69,10 +55,12 @@ namespace WRENCH {
 						XBT_INFO("Executing task %s", m->task->id.c_str());
 						m->task->setRunning();
 						S4U_Simulation::compute(m->task->flops);
+
+						// Set the task completion time and state
 						m->task->end_date = S4U_Simulation::getClock();
 						m->task->setCompleted();
 
-						// Send the callback
+						// Send the callback to the task submitter
 						XBT_INFO("Notifying mailbox %s that task %s has finished",
 										 m->callback_mailbox.c_str(),
 										 m->task->id.c_str());

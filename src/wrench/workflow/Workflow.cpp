@@ -1,16 +1,6 @@
 /**
- *  @file    Workflow.cpp
- *  @author  Henri Casanova
- *  @date    2/21/2017
- *  @version 1.0
- *
- *  @brief WRENCH::Workflow class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::Workflow class provides all basic functionality
+ * @brief WRENCH::Workflow provides all basic functionality
  *  to represent/instantiate/manipulate a WRENCH Workflow.
- *
  */
 
 #include <lemon/list_graph.h>
@@ -30,7 +20,7 @@ namespace WRENCH {
 
 
 		/**
-		 * @brief method to determine whether one source is an ancestor of a destination task
+		 * @brief Determine whether one source is an ancestor of a destination task
 		 *
 		 * @param src is a pointer to the source task
 		 * @param dst is a pointer to the destination task
@@ -51,7 +41,6 @@ namespace WRENCH {
 
 		/**
 		 * @brief  Constructor
-		 *
 		 */
 
 		Workflow::Workflow() {
@@ -62,7 +51,7 @@ namespace WRENCH {
 
 
 		/**
-		 * @brief Creates and adds a new task to the workflow
+		 * @brief Create and add a new task to the workflow
 		 *
 		 * @param id is a unique string id
 		 * @param execution_time is a reference execution time in second
@@ -94,7 +83,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Finds a WorkflowTask object based on its ID
+		 * @brief Find a WorkflowTask object based on its ID
 		 *
 		 * @param id is a string id
 		 *
@@ -109,7 +98,7 @@ namespace WRENCH {
 
 
 		/**
-		 * @brief Creates a control dependency between two workflow tasks. Will not
+		 * @brief Create a control dependency between two workflow tasks. Will not
 		 *        do anything if there is already a path between the two tasks.
 		 *
 		 * @param src is the source task
@@ -130,7 +119,7 @@ namespace WRENCH {
 
 
 		/**
-		 * @brief Adds a new file to the workflow specification
+		 * @brief Add a new file to the workflow specification
 		 *
 		 * @param id is a unique string id
 		 * @param size is a file size in bytes
@@ -148,7 +137,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Finds a WorkflowFile object based on its ID
+		 * @brief Find a WorkflowFile object based on its ID
 		 *
 		 * @param id is a string id
 		 *
@@ -163,21 +152,18 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Outputs a workflow's dependency graph to EPS
+		 * @brief Output a workflow's dependency graph to EPS
 		 *
 		 * @param eps_filename is a filename to which the EPS content is saved
 		 *
 		 */
 		void Workflow::exportToEPS(std::string eps_filename) {
-			// TODO: Figure out why this doesn't compile
-			// (even though the standalone Lemon "export to EPS" example compiles fine
-
 			graphToEps(*DAG, eps_filename).run();
 			std::cerr << "Export to EPS broken / not implemented at the moment" << std::endl;
 		}
 
 		/**
-		 * @brief method to get the number of tasks in the workflow
+		 * @brief Get the number of tasks in the workflow
 		 * @return number of tasks
 		 */
 		unsigned long Workflow::getNumberOfTasks() {
@@ -186,7 +172,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief method to get a vector of the ready tasks (very inefficiently
+		 * @brief Get a vector of the ready tasks (very inefficiently
 		 *        implemented right now)
 		 * @return vector of pointers to workflow tasks
 		 */
@@ -205,10 +191,8 @@ namespace WRENCH {
 			return task_list;
 		}
 
-
-
 		/**
-		 * @brief method to check whether all tasks are complete
+		 * @brief Check whether all tasks are complete
 		 *
 		 * @return true or false
 		 */
@@ -226,7 +210,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief method to update the state of a task, and propagate the change
+		 * @brief Update the state of a task, and propagate the change
 		 *        to other tasks if necessary.
 		 * @param task is a pointer to the task
 		 * @param state is the new task state
@@ -287,7 +271,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief method to create a workflow based on a DAX file
+		 * @brief Create a workflow based on a DAX file
 		 *
 		 * @param filename is the path to the file
 		 */
@@ -342,4 +326,4 @@ namespace WRENCH {
 			}
 		}
 
-}
+};

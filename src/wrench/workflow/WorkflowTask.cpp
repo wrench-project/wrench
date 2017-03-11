@@ -1,25 +1,12 @@
 /**
- *  @file    WorkflowTask.cpp
- *  @author  Henri Casanova
- *  @date    2/21/2017
- *  @version 1.0
- *
- *  @brief WRENCH::WorkflowTask class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::WorkflowTask class represents a computational
- *  task in a WRENCH:Workflow.
- *
+ *  @brief WRENCH::WorkflowFile represents a data file used in a WRENCH::Workflow.
  */
-
 
 #include <lemon/list_graph.h>
 #include "WorkflowTask.h"
 #include "Workflow.h"
 
 namespace WRENCH {
-
 
 		/**
 		 * @brief Constructor
@@ -36,7 +23,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief adds an input file to the task
+		 * @brief Add an input file to the task
 		 *
 		 * @param f is a pointer to the file
 		 */
@@ -52,7 +39,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief adds an output file to the task
+		 * @brief Add an output file to the task
 		 *
 		 * @param f is a pointer to the file
 		 */
@@ -67,7 +54,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief helper method to add a file to a map if necessary
+		 * @brief Helper method to add a file to a map if necessary
 		 *
 		 * @param map is the map
 		 * @param f is a pointer to a file
@@ -75,12 +62,11 @@ namespace WRENCH {
 		void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile*> map,
 																		WorkflowFile * f) {
 			map[f->id] = f;
-
 		}
 
 
 		/**
-		 * @brief Returns the id of the task
+		 * @brief Get the id of the task
 		 *
 		 * @return
 		 */
@@ -89,7 +75,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Computes the number of children of a task
+		 * @brief Get the number of children of a task
 		 *
 		 * @return number of children
 		 */
@@ -102,7 +88,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Computes the number of parents of a task
+		 * @brief Get the number of parents of a task
 		 *
 		 * @return number of parents
 		 */
@@ -115,7 +101,7 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Returns the state of the task
+		 * @brief Get the state of the task
 		 *
 		 * @return task state
 		 */
@@ -124,40 +110,35 @@ namespace WRENCH {
 		}
 
 		/**
-		 * @brief Sets the state of the task
+		 * @brief Set the state of the task
 		 */
 		void WorkflowTask::setState(WorkflowTask::State state) {
 			this->state = state;
 		}
 
 		/**
-		 * @brief Sets the task to the scheduled state
+		 * @brief Set the task to the scheduled state
 		 * @param task
 		 */
-
 		void WorkflowTask::setScheduled() {
 			this->workflow->updateTaskState(this, WorkflowTask::SCHEDULED);
 		}
 
-
 		/**
-		 * @brief Sets the task to the running state
+		 * @brief Set the task to the running state
 		 * @param task
 		 */
-
 		void WorkflowTask::setRunning() {
 			this->workflow->updateTaskState(this, WorkflowTask::RUNNING);
 		}
 
 		/**
-		 * @brief Sets the task to the completed state
+		 * @brief Set the task to the completed state
 		 * @param task
 		 */
-
 		void WorkflowTask::setCompleted() {
 			this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
 		}
-
 
 };
 

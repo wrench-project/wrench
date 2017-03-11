@@ -1,15 +1,5 @@
 /**
- *  @file    WMS.cpp
- *  @author  Henri Casanova
- *  @date    2/24/2017
- *  @version 1.0
- *
- *  @brief WRENCH::WMS class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::WMS is a mostly abstract implementation of a WMS
- *
+ * @brief WRENCH::WMS is a mostly abstract implementation of a WMS
  */
 
 #include "WMS.h"

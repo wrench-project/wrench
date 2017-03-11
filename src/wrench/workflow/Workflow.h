@@ -1,16 +1,6 @@
 /**
- *  @file    Workflow.h
- *  @author  Henri Casanova
- *  @date    2/21/2017
- *  @version 1.0
- *
- *  @brief WRENCH::Platform class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::Platform class provides all basic functionality
- *  to represent/instantiate/manipulate a SimGrid simulation platform.
- *
+ * @brief WRENCH::Workflow provides all basic functionality
+ *  to represent/instantiate/manipulate a WRENCH Workflow.
  */
 
 #ifndef WRENCH_WORKFLOW_H
@@ -32,13 +22,10 @@ namespace WRENCH {
 		private:
 				std::unique_ptr<ListDigraph> DAG;  // Lemon DiGraph
 				std::unique_ptr<ListDigraph::NodeMap<WorkflowTask*>> DAG_node_map;  // Lemon map
-
 				std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
 				std::map<std::string, std::unique_ptr<WorkflowFile>> files;
 
-		private:
 				bool pathExists(WorkflowTask *, WorkflowTask *);
-
 
 		public:
 
@@ -68,8 +55,6 @@ namespace WRENCH {
 
 				/** misc **/
 				void exportToEPS(std::string);
-
-
 
 		};
 

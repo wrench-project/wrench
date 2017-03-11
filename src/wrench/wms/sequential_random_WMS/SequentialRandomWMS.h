@@ -1,15 +1,5 @@
 /**
- *  @file    SequentialRandomWMS.h
- *  @author  Henri Casanova
- *  @date    2/24/2017
- *  @version 1.0
- *
- *  @brief WRENCH::SequentialRandomWMS class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::SequentialRandomWMS class implements a simple WMS abstraction
- *
+ * @brief WRENCH::SequentialRandomWMS implements a simple WMS abstraction
  */
 
 #ifndef WRENCH_SIMPLEWMS_H
@@ -23,7 +13,6 @@ namespace WRENCH {
 		class Simulation;
 
 		class SequentialRandomWMS : public WMS {
-
 
 		public:
 				SequentialRandomWMS(Simulation *s, Workflow *w, std::string hostname);

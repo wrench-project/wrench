@@ -1,22 +1,12 @@
 /**
- *  @file    MulticoreTaskExecutorDaemon.cpp
- *  @author  Henri Casanova
- *  @date    3/7/2017
- *  @version 1.0
- *
- *  @brief WRENCH::MulticoreTaskExecutorDaemon class implementation
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::MulticoreTaskExecutorDaemon class implements the daemon for a simple
- *  Compute Service abstraction.
- *
+ *  @brief WRENCH::MulticoreTaskExecutorDaemon implements the daemon for the
+ *  MultucoreTaskExecutor  Compute Service abstraction.
  */
 
 #include "MulticoreTaskExecutorDaemon.h"
 #include <exception/WRENCHException.h>
-#include <simgrid_Sim4U_util/S4U_Mailbox.h>
-#include <simgrid_Sim4U_util/S4U_Simulation.h>
+#include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <simgrid_S4U_util/S4U_Simulation.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_task_executor_daemon, "Log category for Multicore Task Executor Daemon");
 
@@ -24,30 +14,30 @@ namespace WRENCH {
 
 		/**
 		 * @brief Constructor
+		 *
+		 * @param executors is a vector of sequential task executor compute services
+		 * @param cs is a pointer to the compute service for this daemon
 		 */
 		MulticoreTaskExecutorDaemon::MulticoreTaskExecutorDaemon(
 						std::vector<SequentialTaskExecutor *> executors,
 						ComputeService *cs) : S4U_DaemonWithMailbox("multicore_task_executor", "multicore_task_executor") {
 
-			this->compute_service = cs;
 
 			// Initialize the set of idle executors (cores)
 			this->idle_sequential_task_executors = {};
 			for (int i = 0; i < executors.size(); i++) {
 				this->idle_sequential_task_executors.insert(executors[i]);
 			}
+
 			// Initialize the set of busy executors (cores)
 			this->busy_sequential_task_executors = {};
+
+			// Set the pointer to the corresponding compute service
+			this->compute_service = cs;
 		}
 
 		/**
-		 * @brief Destructor
-		 */
-		MulticoreTaskExecutorDaemon::~MulticoreTaskExecutorDaemon() {
-		}
-
-		/**
-		 * @brief main() method of the daemon
+		 * @brief Main method of the daemon
 		 *
 		 * @return 0 on termination
 		 */
@@ -55,9 +45,11 @@ namespace WRENCH {
 			XBT_INFO("New Multicore Task Executor starting (%s) with %ld cores ",
 							 this->mailbox_name.c_str(), this->idle_sequential_task_executors.size());
 
+			// Map to keep track of the callback mailboxes of the workflow tasks
 			std::map<WorkflowTask *, std::string> callback_mailboxes;
 
 			bool keep_going = true;
+
 			while (keep_going) {
 
 				// Wait for a message
@@ -66,13 +58,11 @@ namespace WRENCH {
 				// Process the message
 				switch (message->type) {
 
-					/** I should terminate **/
 					case SimulationMessage::STOP_DAEMON: {
 						keep_going = false;
 						break;
 					}
 
-						/** I was asked to run a task **/
 					case SimulationMessage::RUN_TASK: {
 						std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage *>(message.release()));
 
@@ -81,12 +71,11 @@ namespace WRENCH {
 						// Just add the task to the task queue
 						this->task_queue.push(m->task);
 
-						// Remember the callback mailbox
+						// Keep track of the callback mailbox
 						callback_mailboxes[m->task] = m->callback_mailbox;
 						break;
 					}
 
-						/** One of my cores finished a task **/
 					case SimulationMessage::TASK_DONE: {
 						std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
 
@@ -107,7 +96,6 @@ namespace WRENCH {
 					default: {
 						throw WRENCHException("Unknown message type");
 					}
-
 				}
 
 				// Run tasks while possible
@@ -116,15 +104,15 @@ namespace WRENCH {
 					WorkflowTask *to_run = task_queue.front();
 					task_queue.pop();
 
-					// Get an idle executor and make it busy
+					// Get an idle sequential task executor and mark it as busy
 					SequentialTaskExecutor *executor = *(this->idle_sequential_task_executors.begin());
 					this->idle_sequential_task_executors.erase(executor);
 					this->busy_sequential_task_executors.insert(executor);
 
+					// Start the task on the sequential task executor
 					XBT_INFO("Running task %s on one of my cores", to_run->id.c_str());
 					executor->runTask(to_run, this->mailbox_name);
 				}
-
 			}
 
 			XBT_INFO("Multicore Task Executor Daemon on host %s terminated!", S4U_Simulation::getHostName().c_str());

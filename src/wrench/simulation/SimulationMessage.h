@@ -1,15 +1,6 @@
 /**
- *  @file    Message.h
- *  @author  Henri Casanova
- *  @date    2/21/2017
- *  @version 1.0
- *
- *  @brief WRENCH::Message class implementations
- *
- *  @section DESCRIPTION
- *
- *  The WRENCH::Message and derived classes are MSG wrappers
- *
+ *  @brief WRENCH::SimulationMessage and derived classes to encapsulate
+ *  control/data messages exchanged by simulated processes
  */
 
 #ifndef WRENCH_SIMGRIDMESSAGES_H
@@ -20,7 +11,6 @@
 #include "workflow/WorkflowTask.h"
 
 namespace WRENCH {
-
 
 		// Base struct
 		struct SimulationMessage {
@@ -33,7 +23,6 @@ namespace WRENCH {
 				};
 
 				SimulationMessage(Type t, double s);
-				virtual ~SimulationMessage();
 
 				Type type;
 				double size;
@@ -42,13 +31,11 @@ namespace WRENCH {
 		// Derived struct
 		struct StopDaemonMessage: public SimulationMessage {
 				StopDaemonMessage();
-				~StopDaemonMessage();
 		};
 
 		// Derived struct
 		struct RunTaskMessage: public SimulationMessage {
 				RunTaskMessage(WorkflowTask*, std::string cb);
-				~RunTaskMessage();
 				WorkflowTask *task;
 				std::string callback_mailbox;
 		};
@@ -56,12 +43,10 @@ namespace WRENCH {
 		// Derived struct
 		struct TaskDoneMessage: public SimulationMessage {
 				TaskDoneMessage(WorkflowTask *, ComputeService*);
-				~TaskDoneMessage();
 				WorkflowTask *task;
 				ComputeService *compute_service;
 		};
 
 };
-
 
 #endif //WRENCH_SIMGRIDMESSAGES_H
