@@ -47,6 +47,7 @@ namespace WRENCH {
 				ComputeService *compute_service;
 		};
 
+
 };
 
 #endif //WRENCH_SIMGRIDMESSAGES_H

@@ -22,7 +22,6 @@ namespace WRENCH {
 						std::vector<SequentialTaskExecutor *> executors,
 						ComputeService *cs) : S4U_DaemonWithMailbox("multicore_task_executor", "multicore_task_executor") {
 
-
 			// Initialize the set of idle executors (cores)
 			this->idle_sequential_task_executors = {};
 			for (int i = 0; i < executors.size(); i++) {
@@ -89,7 +88,7 @@ namespace WRENCH {
 						// Send the callback to the originator
 						std::string callback_mailbox = callback_mailboxes[m->task];
 						callback_mailboxes.erase(m->task);
-						S4U_Mailbox::iput(callback_mailbox, new TaskDoneMessage(m->task, this->compute_service));
+						S4U_Mailbox::put(callback_mailbox, new TaskDoneMessage(m->task, this->compute_service));
 						break;
 					}
 

@@ -48,8 +48,7 @@ namespace WRENCH {
 		 * @param flops is the number of flops
 		 */
 		void S4U_Simulation::compute(double flops) {
-			// TODO: Should do an execute() there, but it doesn't work.... for now
-			simgrid::s4u::this_actor::sleep_for(flops);
+			simgrid::s4u::this_actor::execute(flops);
 		}
 
 		/**

@@ -67,7 +67,7 @@ namespace WRENCH {
 		int MulticoreTaskExecutor::runTask(WorkflowTask *task, std::string callback_mailbox) {
 
 			// Asynchronously send a "run a task" message to the daemon's mailbox
-			S4U_Mailbox::iput(this->daemon->mailbox_name, new RunTaskMessage(task, callback_mailbox));
+			S4U_Mailbox::put(this->daemon->mailbox_name, new RunTaskMessage(task, callback_mailbox));
 			return 0;
 		};
 

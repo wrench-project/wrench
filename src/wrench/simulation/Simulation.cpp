@@ -115,7 +115,11 @@ namespace WRENCH {
 		 * @return
 		 */
 		SequentialTaskExecutor *Simulation::getSomeSequentialTaskExecutor() {
-			return this->sequential_task_executors[0].get();
+			if (this->sequential_task_executors.size() > 0) {
+				return this->sequential_task_executors[0].get();
+			} else {
+				return nullptr;
+			}
 		}
 
 		/**
@@ -124,7 +128,11 @@ namespace WRENCH {
 		 * @return
 		 */
 		MulticoreTaskExecutor *Simulation::getSomeMulticoreTaskExecutor() {
-			return this->multicore_task_executors[0].get();
+			if (this->multicore_task_executors.size() > 0) {
+				return this->multicore_task_executors[0].get();
+			} else {
+				return nullptr;
+			}
 		}
 
 		/**

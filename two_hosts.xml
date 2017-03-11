@@ -11,10 +11,4 @@
       <link_ctn id="1"/>
     </route>
   </AS>
-
-  <trace id="Tremblay_power" periodicity="6.0">
-    1.0 0.5
-    4.0 1.0
-  </trace>
-  <trace_connect trace="Tremblay_power" element="Tremblay" kind="SPEED"/>
 </platform>

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <simgrid/msg.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <exception/WRENCHException.h>
 
 #include "SequentialRandomWMSDaemon.h"
 #include "simulation/Simulation.h"
@@ -40,14 +41,23 @@ namespace WRENCH {
 
 				// Submit all ready tasks for execution
 				std::vector<WorkflowTask*> ready_tasks = this->workflow->getReadyTasks();
-				XBT_INFO("There are %ld ready tasks", ready_tasks.size());
+				if (ready_tasks.size() > 0) {
+					XBT_INFO("There are %ld ready tasks", ready_tasks.size());
+				}
 				for (int i=0; i < ready_tasks.size(); i++) {
 					XBT_INFO("Submitting task %s for execution", ready_tasks[i]->id.c_str());
 					ready_tasks[i]->setScheduled();
-//					this->simulation->getSomeMulticoreTaskExecutor()->runTask(
-//									ready_tasks[i], this->mailbox_name);
-					this->simulation->getSomeSequentialTaskExecutor()->runTask(
-									ready_tasks[i], this->mailbox_name);
+					ComputeService *cs;
+
+					cs = this->simulation->getSomeMulticoreTaskExecutor();
+					if (!cs) {
+						cs = this->simulation->getSomeSequentialTaskExecutor();
+					}
+					if (cs) {
+						cs->runTask(ready_tasks[i], this->mailbox_name);
+					} else {
+						throw WRENCHException("No compute resources!");
+					}
 				}
 
 				// Wait for a task completion

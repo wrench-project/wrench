@@ -18,7 +18,7 @@
 
 #include <simgrid/msg.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Log category for Mailbox");
+XBT_LOG_NEW_DEFAULT_CATEGORY(msg_mailbox, "Log category for Mailbox");
 
 namespace WRENCH {
 

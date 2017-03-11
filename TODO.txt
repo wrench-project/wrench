@@ -1,10 +1,5 @@
 
 
-Deal with error handling via nice exceptions, etc.
+- Deal with error handling via nice exceptions, etc.
 
-- ComputeService mailboxes are created with an empty prefix... weird...
-
-
-WRENCH::Workflow
-	- Implement a "create from DAX" method
-
+- Figure out how to do asynchronous communication

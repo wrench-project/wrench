@@ -7,6 +7,8 @@
 #include "S4U_Mailbox.h"
 #include <simgrid/s4u.hpp>
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
+
 namespace WRENCH {
 
 		/**
@@ -19,7 +21,6 @@ namespace WRENCH {
 
 		  simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 		  SimulationMessage *msg = static_cast<SimulationMessage*>(simgrid::s4u::this_actor::recv(mailbox));
-
 			if (msg == NULL) {
 				throw WRENCHException("Mailbox::get(): NULL message in task");
 			}
@@ -34,10 +35,11 @@ namespace WRENCH {
 		 * @param m is the message
 		 */
 		void S4U_Mailbox::put(std::string mailbox_name, SimulationMessage *msg) {
+
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 			simgrid::s4u::this_actor::send(mailbox, msg, (size_t)msg->size);
-			return;
 
+			return;
 		}
 
 		/**
@@ -51,12 +53,8 @@ namespace WRENCH {
 		void S4U_Mailbox::iput(std::string mailbox_name, SimulationMessage *msg) {
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 			simgrid::s4u::Comm &comm = simgrid::s4u::Comm::send_async(mailbox, msg, (int)msg->size);
-//			comm.wait();
 			//TODO: Can we do a dsend() so that we ignore the comm?
-			// TODO: This is synchronous for now!
-//			simgrid::s4u::this_actor::send(mailbox, msg, (size_t)msg->size);
 			return;
-
 		}
 
 };
