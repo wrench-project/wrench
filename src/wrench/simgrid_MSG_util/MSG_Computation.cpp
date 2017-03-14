@@ -1,4 +1,11 @@
 /**
+ * Copyright (c) 2017. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
  *  @file    Computation.cpp
  *  @author  Henri Casanova
  *  @date    2/24/2017
@@ -20,7 +27,7 @@
 #include <simgrid/msg.h>
 
 
-namespace WRENCH {
+namespace wrench {
 
 		void MSG_Computation::simulateComputation(double flops) {
 			// Create a computational task

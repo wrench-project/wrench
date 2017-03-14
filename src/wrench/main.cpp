@@ -5,7 +5,7 @@
 
 int main(int argc, char **argv) {
 
-	WRENCH::Simulation simulation;
+	wrench::Simulation simulation;
 
 	simulation.init(&argc, argv);
 
@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 
 	std::cerr << "Creating a bogus workflow..." << std::endl;
 
-	WRENCH::Workflow workflow;
+	wrench::Workflow workflow;
 
 //	std::cerr << "Creating a few tasks..." << std::endl;
 //
@@ -58,10 +58,10 @@ int main(int argc, char **argv) {
 	workflow.loadFromDAX(dax_file);
 	std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
 	std::cerr.flush();
-	std::cerr.flush();
-	std::cerr.flush();
-	std::cerr.flush();
-	std::cerr.flush();
+//	std::cerr.flush();
+//	std::cerr.flush();
+//	std::cerr.flush();
+//	std::cerr.flush();
 //	std::cerr << "Number of childern of root task: " << workflow.getReadyTasks()[0]->getNumberOfChildren() << std::endl;
 
 //	return 0;

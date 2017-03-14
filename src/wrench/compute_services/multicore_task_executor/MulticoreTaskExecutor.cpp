@@ -1,4 +1,11 @@
 /**
+ * Copyright (c) 2017. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
  *  @brief WRENCH::MulticoreTaskExecutor implements a simple
  *  Compute Service abstraction for a multi-core task executor.
  *
@@ -9,7 +16,7 @@
 #include <simgrid_S4U_util/S4U_Simulation.h>
 #include "MulticoreTaskExecutor.h"
 
-namespace WRENCH {
+namespace wrench {
 
 		/**
 		 * @brief Constructor that starts the daemon for the service on a host
