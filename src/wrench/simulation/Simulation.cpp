@@ -133,32 +133,6 @@ namespace wrench {
 		throw WRENCHException("No compute resources!");
 	}
 
-//	/**
-//	 * @brief temporary debug method to get the first sequential task executor
-//	 *
-//	 * @return
-//	 */
-//	SequentialTaskExecutor *Simulation::getSomeSequentialTaskExecutor() {
-//		if (this->sequential_task_executors.size() > 0) {
-//			return this->sequential_task_executors[0].get();
-//		} else {
-//			return nullptr;
-//		}
-//	}
-
-//	/**
-//	 * @brief temporary debug method to get the first multicore task executor
-//	 *
-//	 * @return
-//	 */
-//	MulticoreTaskExecutor *Simulation::getSomeMulticoreTaskExecutor() {
-//		if (this->multicore_task_executors.size() > 0) {
-//			return this->multicore_task_executors[0].get();
-//		} else {
-//			return nullptr;
-//		}
-//	}
-
 	/**
 	 * @brief Shutdown all running compute services on the platform
 	 */
@@ -167,12 +141,6 @@ namespace wrench {
 		for (int i = 0; i < this->compute_services.size(); i++) {
 			this->compute_services[i]->stop();
 		}
-//		for (int i = 0; i < this->sequential_task_executors.size(); i++) {
-//			this->sequential_task_executors[i]->stop();
-//		}
-//		for (int i = 0; i < this->multicore_task_executors.size(); i++) {
-//			this->multicore_task_executors[i]->stop();
-//		}
 	}
 
 };

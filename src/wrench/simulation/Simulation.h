@@ -42,8 +42,6 @@ namespace wrench {
 
 		/** for testing development purposes **/
 		int runTask(WorkflowTask *task, std::string callback_mailbox);
-//		SequentialTaskExecutor *getSomeSequentialTaskExecutor();
-//		MulticoreTaskExecutor *getSomeMulticoreTaskExecutor();
 
 	private:
 		std::unique_ptr<S4U_Simulation> s4u_simulation;
@@ -51,11 +49,7 @@ namespace wrench {
 //				std::unique_ptr<Platform> platform;
 		std::vector<std::unique_ptr<SequentialRandomWMS>> WMSes;
 		std::vector<std::unique_ptr<ComputeService>> compute_services;
-
-		/** for testing development purposes **/
-//		std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
-//		std::vector<std::unique_ptr<MulticoreTaskExecutor>> multicore_task_executors;
-
+		
 	};
 
 };
