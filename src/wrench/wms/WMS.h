@@ -6,25 +6,26 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief WRENCH::WMS is a mostly abstract implementation of a WMS
+ * @brief wrench::WMS is a mostly abstract implementation of a WMS
  */
 
 #ifndef WRENCH_WMS_H
 #define WRENCH_WMS_H
 
 #include "workflow/Workflow.h"
+#include "wms/scheduler/Scheduler.h"
 
 namespace wrench {
 
-		class WMS {
+	class WMS {
 
-		public:
-				WMS(Workflow *w);
+	public:
+		WMS(Workflow *w, Scheduler *s);
 
-		private:
-				Workflow *workflow;
-
-		};
+	private:
+		Workflow *workflow;
+		Scheduler *scheduler;
+	};
 
 };
 

@@ -14,6 +14,5 @@
 #include "simgrid_MSG_util/MSG_Platform.h"
 #include "workflow/Workflow.h"
 #include "simulation/Simulation.h"
-#include "wms/sequential_random_WMS/SequentialRandomWMS.h"
 
 #endif //WRENCH_WRENCH_H

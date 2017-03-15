@@ -6,15 +6,14 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::SequentialRandomWMSDaemon implements the daemon for a simple WMS abstraction
+ *  @brief WRENCH::SimpleWMSDaemon implements the daemon for a simple WMS abstraction
  */
 
 #include <iostream>
 #include <simgrid/msg.h>
-#include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <exception/WRENCHException.h>
 
-#include "SequentialRandomWMSDaemon.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "wms/engine/simple_wms/SimpleWMSDaemon.h"
 #include "simulation/Simulation.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms_daemon, "Log category for Simple WMS Daemon");
@@ -26,11 +25,13 @@ namespace wrench {
 	 *
 	 * @param s is a pointer to the simulation
 	 * @param w is a pointer to the workflow to execute
+	 * @param sc is a pointer to a scheduler
 	 */
-	SequentialRandomWMSDaemon::SequentialRandomWMSDaemon(Simulation *s, Workflow *w) :
+	SimpleWMSDaemon::SimpleWMSDaemon(Simulation *s, Workflow *w, Scheduler *sc) :
 			S4U_DaemonWithMailbox("simple_wms", "simple_wms") {
 		this->simulation = s;
 		this->workflow = w;
+		this->scheduler = sc;
 	}
 
 	/**
@@ -38,37 +39,19 @@ namespace wrench {
 	 *
 	 * @return 0 on completion
 	 */
-	int SequentialRandomWMSDaemon::main() {
+	int SimpleWMSDaemon::main() {
 		XBT_INFO("Starting on host %s listening on mailbox %s", S4U_Simulation::getHostName().c_str(),
 		         this->mailbox_name.c_str());
 		XBT_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
-
-		/** Stupid Scheduling/Execution Algorithm **/
 
 		while (true) {
 
 			// Submit all ready tasks for execution
 			std::vector<WorkflowTask *> ready_tasks = this->workflow->getReadyTasks();
-			if (ready_tasks.size() > 0) {
-				XBT_INFO("There are %ld ready tasks", ready_tasks.size());
-			}
-			for (int i = 0; i < ready_tasks.size(); i++) {
-				XBT_INFO("Submitting task %s for execution", ready_tasks[i]->id.c_str());
-				ready_tasks[i]->setScheduled();
-				try {
-					this->simulation->runTask(ready_tasks[i], this->mailbox_name);
-				} catch (WRENCHException e) {
-					// there are no resources available, then setting the task to ready state again
-					ready_tasks[i]->setReady();
-				}
-			}
+			std::vector<std::unique_ptr<ComputeService>> &compute_services = this->simulation->getComputeServices();
 
-			// Wait for a task completion
-			XBT_INFO("Waiting for a task to complete...");
-			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
-			std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
-
-			XBT_INFO("Notified that task %s has completed", m->task->id.c_str());
+			// Run ready tasks with defined scheduler implementation
+			this->scheduler->runTasks(ready_tasks, compute_services, this->mailbox_name);
 
 			if (workflow->isDone()) {
 				break;

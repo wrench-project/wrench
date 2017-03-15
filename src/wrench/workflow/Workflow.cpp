@@ -15,7 +15,7 @@
 #include <lemon/bfs.h>
 #include <pugixml.hpp>
 
-#include "Workflow.h"
+#include "workflow/Workflow.h"
 #include "exception/WRENCHException.h"
 
 
@@ -237,8 +237,10 @@ namespace wrench {
 				break;
 			}
 			case WorkflowTask::READY: {
-				if (task->getState() != WorkflowTask::NOT_READY
-				    && task->getState() != WorkflowTask::SCHEDULED) {
+				if (task->getState() == WorkflowTask::READY) {
+					return;
+				}
+				if (task->getState() != WorkflowTask::NOT_READY) {
 					throw WRENCHException("Workflow::updateTaskState(): Cannot set non-not_ready task state to ready");
 				}
 				// Go through the parent and check whether they are all completed

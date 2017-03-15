@@ -13,21 +13,19 @@
 #define WRENCH_SIMPLEWMS_H
 
 #include "wms/WMS.h"
-#include "SequentialRandomWMSDaemon.h"
+#include "wms/scheduler/Scheduler.h"
+#include "SimpleWMSDaemon.h"
 
 namespace wrench {
 
-		class Simulation;
+	class Simulation;
 
-		class SequentialRandomWMS : public WMS {
+	class SimpleWMS : public WMS {
+	public:
+		SimpleWMS(Simulation *s, Workflow *w, Scheduler *sc, std::string hostname);
 
-		public:
-				SequentialRandomWMS(Simulation *s, Workflow *w, std::string hostname);
-
-		private:
-				std::unique_ptr<SequentialRandomWMSDaemon> wms_process;
-		};
+	private:
+		std::unique_ptr<SimpleWMSDaemon> wms_process;
+	};
 }
-
-
 #endif //WRENCH_SIMPLEWMS_H

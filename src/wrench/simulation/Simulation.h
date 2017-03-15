@@ -20,13 +20,11 @@
 #include "workflow/Workflow.h"
 #include "compute_services/sequential_task_executor/SequentialTaskExecutor.h"
 #include "compute_services/multicore_task_executor/MulticoreTaskExecutor.h"
-#include "wms/sequential_random_WMS/SequentialRandomWMS.h"
+#include "wms/WMS.h"
 #include "simgrid_MSG_util/MSG_Platform.h"
 
 
 namespace wrench {
-
-	class Simulation;
 
 	class Simulation {
 
@@ -36,20 +34,18 @@ namespace wrench {
 		void createPlatform(std::string);
 		void createSequentialTaskExecutor(std::string hostname);
 		void createMulticoreTaskExecutor(std::string hostname);
-		void createSimpleWMS(Workflow *w, std::string hostname);
+		void createWMS(Workflow *w, Scheduler *s, std::string hostname);
 		void launch();
 		void shutdown();
-
-		/** for testing development purposes **/
-		int runTask(WorkflowTask *task, std::string callback_mailbox);
+		std::vector<std::unique_ptr<ComputeService>> &getComputeServices();
 
 	private:
 		std::unique_ptr<S4U_Simulation> s4u_simulation;
 
 //				std::unique_ptr<Platform> platform;
-		std::vector<std::unique_ptr<SequentialRandomWMS>> WMSes;
+		std::vector<std::unique_ptr<WMS>> WMSes;
 		std::vector<std::unique_ptr<ComputeService>> compute_services;
-		
+
 	};
 
 };

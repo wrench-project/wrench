@@ -10,10 +10,9 @@
  *  the simulation state.
  */
 
-#include <compute_services/multicore_task_executor/MulticoreTaskExecutor.h>
-#include <xbt/log.h>
-
-#include "Simulation.h"
+#include "compute_services/multicore_task_executor/MulticoreTaskExecutor.h"
+#include "wms/engine/simple_wms/SimpleWMS.h"
+#include "simulation/Simulation.h"
 #include "exception/WRENCHException.h"
 
 namespace wrench {
@@ -100,14 +99,15 @@ namespace wrench {
 	 * @brief Instantiate a simple WMS on a host
 	 *
 	 * @param w is a pointer to the workflow that the WMS will execute
+	 * @param s is a pointer to a scheduler implementation
 	 * @param hostname is the name of the host on which to start the WMS
 	 */
-	void Simulation::createSimpleWMS(Workflow *w, std::string hostname) {
+	void Simulation::createWMS(Workflow *w, Scheduler *s, std::string hostname) {
 
 		// Create the WMS
-		std::unique_ptr<SequentialRandomWMS> wms;
+		std::unique_ptr<WMS> wms;
 		try {
-			wms = std::unique_ptr<SequentialRandomWMS>(new SequentialRandomWMS(this, w, hostname));
+			wms = std::unique_ptr<SimpleWMS>(new SimpleWMS(this, w, s, hostname));
 		} catch (WRENCHException e) {
 			throw e;
 		}
@@ -118,19 +118,12 @@ namespace wrench {
 	}
 
 	/**
-	 * @brief Run a task in an available host
+	 * @brief Obtain the list of compute services
 	 *
-	 * @param task is a pointer the workflow task
-	 * @param callback_mailbox is the name of a mailbox to which a "task done" callback will be sent
-	 * @return 0 on success
+	 * @return vector of compute services
 	 */
-	int Simulation::runTask(WorkflowTask *task, std::string callback_mailbox) {
-		for (int i = 0; i < this->compute_services.size(); i++) {
-			if (this->compute_services[i]->hasIdleCore()) {
-				return this->compute_services[i]->runTask(task, callback_mailbox);
-			}
-		}
-		throw WRENCHException("No compute resources!");
+	std::vector<std::unique_ptr<ComputeService>> &Simulation::getComputeServices() {
+		return this->compute_services;
 	}
 
 	/**

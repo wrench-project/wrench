@@ -6,32 +6,33 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::SequentialRandomWMSDaemon implements the daemon for a simple WMS abstraction
+ *  @brief WRENCH::SimpleWMSDaemon implements the daemon for a simple WMS abstraction
  */
 
 #ifndef WRENCH_SIMPLEWMSDAEMON_H
 #define WRENCH_SIMPLEWMSDAEMON_H
 
-#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
+#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
 #include "workflow/Workflow.h"
+#include "wms/scheduler/Scheduler.h"
 
 namespace wrench {
 
-		class Simulation; // forward ref
+	class Simulation; // forward ref
 
-		class SequentialRandomWMSDaemon: public S4U_DaemonWithMailbox {
+	class SimpleWMSDaemon : public S4U_DaemonWithMailbox {
 
-		public:
-				SequentialRandomWMSDaemon(Simulation *, Workflow *w);
+	public:
+		SimpleWMSDaemon(Simulation *, Workflow *w, Scheduler *s);
 
-		private:
-				int main();
+	private:
+		int main();
 
-				Simulation *simulation;
-				Workflow *workflow;
+		Simulation *simulation;
+		Workflow *workflow;
+		Scheduler *scheduler;
 
-		};
+	};
 }
-
 
 #endif //WRENCH_SIMPLEWMSDAEMON_H
