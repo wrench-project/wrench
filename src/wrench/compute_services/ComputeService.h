@@ -18,19 +18,20 @@
 
 namespace wrench {
 
-		class ComputeService {
+	class ComputeService {
 
-		public:
-				ComputeService(std::string);
+	public:
+		ComputeService(std::string);
 
-				// Virtual methods to implement in derived classes
-				virtual void stop() = 0;
-				virtual int runTask(WorkflowTask *task, std::string callback_mailbox) = 0;
+		// Virtual methods to implement in derived classes
+		virtual void stop() = 0;
+		virtual int runTask(WorkflowTask *task, std::string callback_mailbox) = 0;
+		virtual bool hasIdleCore() = 0;
 
-		private:
-				std::string service_name;
+	private:
+		std::string service_name;
 
-		};
+	};
 };
 
 

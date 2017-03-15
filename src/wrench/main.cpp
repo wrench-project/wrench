@@ -73,11 +73,15 @@ int main(int argc, char **argv) {
 //	simulation.createSequentialTaskExecutor("Tremblay");
 
 	std::cerr << "Instantiating a  Task Executor on Jupiter..." << std::endl;
-	simulation.createSequentialTaskExecutor("Jupiter");
+//	simulation.createSequentialTaskExecutor("Jupiter");
+	simulation.createMulticoreTaskExecutor("c-1.me");
+//	simulation.createMulticoreTaskExecutor("c-2.me");
+//	simulation.createMulticoreTaskExecutor("c-3.me");
 
 
 	std::cerr << "Instantiating a WMS on Tremblay..." << std::endl;
-	simulation.createSimpleWMS(&workflow, "Tremblay");
+//	simulation.createSimpleWMS(&workflow, "Tremblay");
+	simulation.createSimpleWMS(&workflow, "c-0.me");
 
 	std::cerr << "Launching the Simulation..." << std::endl;
 	simulation.launch();

@@ -43,6 +43,15 @@ namespace wrench {
 	}
 
 	/**
+	 * @brief Whether the executor has at least an idle core
+	 *
+	 * @return True when idle
+	 */
+	bool MulticoreTaskExecutorDaemon::hasIdleCore() {
+		return this->idle_sequential_task_executors.size() > 0;
+	}
+
+	/**
 	 * @brief Main method of the daemon
 	 *
 	 * @return 0 on termination
@@ -87,7 +96,7 @@ namespace wrench {
 					XBT_INFO("One of my cores completed task %s", m->task->id.c_str());
 
 					// Put that core's executor back into the pull of idle cores
-					SequentialTaskExecutor *executor = (SequentialTaskExecutor * )(m->compute_service);
+					SequentialTaskExecutor *executor = (SequentialTaskExecutor *) (m->compute_service);
 					this->busy_sequential_task_executors.erase(executor);
 					this->idle_sequential_task_executors.insert(executor);
 

@@ -29,8 +29,17 @@ namespace wrench {
 	 * @param cs is a pointer to the corresponding compute service
 	 */
 	SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(ComputeService *cs) :
-			S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
+			S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor"), busy(false) {
 		this->compute_service = cs;
+	}
+
+	/**
+	 * @brief Whether this executor is idle or busy
+	 *
+	 * @return True when idle
+	 */
+	bool SequentialTaskExecutorDaemon::isIdle() {
+		return !busy;
 	}
 
 	/**
@@ -60,12 +69,14 @@ namespace wrench {
 
 					// Run the task
 					XBT_INFO("Executing task %s", m->task->id.c_str());
+					this->busy = true;
 					m->task->setRunning();
 					S4U_Simulation::compute(m->task->flops);
 
 					// Set the task completion time and state
 					m->task->end_date = S4U_Simulation::getClock();
 					m->task->setCompleted();
+					this->busy = false;
 
 					// Send the callback to the task submitter
 					XBT_INFO("Notifying mailbox %s that task %s has finished",

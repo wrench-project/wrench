@@ -237,7 +237,8 @@ namespace wrench {
 				break;
 			}
 			case WorkflowTask::READY: {
-				if (task->getState() != WorkflowTask::NOT_READY) {
+				if (task->getState() != WorkflowTask::NOT_READY
+				    && task->getState() != WorkflowTask::SCHEDULED) {
 					throw WRENCHException("Workflow::updateTaskState(): Cannot set non-not_ready task state to ready");
 				}
 				// Go through the parent and check whether they are all completed

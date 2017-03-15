@@ -64,7 +64,7 @@ namespace wrench {
 	void Simulation::createSequentialTaskExecutor(std::string hostname) {
 
 		// Create the compute service
-		std::unique_ptr<SequentialTaskExecutor> executor;
+		std::unique_ptr<ComputeService> executor;
 		try {
 			executor = std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(hostname));
 		} catch (WRENCHException e) {
@@ -72,7 +72,7 @@ namespace wrench {
 		}
 
 		// Add it to the list of Compute Services
-		sequential_task_executors.push_back(std::move(executor));
+		compute_services.push_back(std::move(executor));
 		return;
 	}
 
@@ -84,7 +84,7 @@ namespace wrench {
 	void Simulation::createMulticoreTaskExecutor(std::string hostname) {
 
 		// Create the compute service
-		std::unique_ptr<MulticoreTaskExecutor> executor;
+		std::unique_ptr<ComputeService> executor;
 		try {
 			executor = std::unique_ptr<MulticoreTaskExecutor>(new MulticoreTaskExecutor(hostname));
 		} catch (WRENCHException e) {
@@ -92,7 +92,7 @@ namespace wrench {
 		}
 
 		// Add it to the list of Compute Services
-		multicore_task_executors.push_back(std::move(executor));
+		compute_services.push_back(std::move(executor));
 		return;
 	}
 
@@ -118,43 +118,61 @@ namespace wrench {
 	}
 
 	/**
-	 * @brief temporary debug method to get the first sequential task executor
+	 * @brief Run a task in an available host
 	 *
-	 * @return
+	 * @param task is a pointer the workflow task
+	 * @param callback_mailbox is the name of a mailbox to which a "task done" callback will be sent
+	 * @return 0 on success
 	 */
-	SequentialTaskExecutor *Simulation::getSomeSequentialTaskExecutor() {
-		if (this->sequential_task_executors.size() > 0) {
-			return this->sequential_task_executors[0].get();
-		} else {
-			return nullptr;
+	int Simulation::runTask(WorkflowTask *task, std::string callback_mailbox) {
+		for (int i = 0; i < this->compute_services.size(); i++) {
+			if (this->compute_services[i]->hasIdleCore()) {
+				return this->compute_services[i]->runTask(task, callback_mailbox);
+			}
 		}
+		throw WRENCHException("No compute resources!");
 	}
 
-	/**
-	 * @brief temporary debug method to get the first multicore task executor
-	 *
-	 * @return
-	 */
-	MulticoreTaskExecutor *Simulation::getSomeMulticoreTaskExecutor() {
-		if (this->multicore_task_executors.size() > 0) {
-			return this->multicore_task_executors[0].get();
-		} else {
-			return nullptr;
-		}
-	}
+//	/**
+//	 * @brief temporary debug method to get the first sequential task executor
+//	 *
+//	 * @return
+//	 */
+//	SequentialTaskExecutor *Simulation::getSomeSequentialTaskExecutor() {
+//		if (this->sequential_task_executors.size() > 0) {
+//			return this->sequential_task_executors[0].get();
+//		} else {
+//			return nullptr;
+//		}
+//	}
+
+//	/**
+//	 * @brief temporary debug method to get the first multicore task executor
+//	 *
+//	 * @return
+//	 */
+//	MulticoreTaskExecutor *Simulation::getSomeMulticoreTaskExecutor() {
+//		if (this->multicore_task_executors.size() > 0) {
+//			return this->multicore_task_executors[0].get();
+//		} else {
+//			return nullptr;
+//		}
+//	}
 
 	/**
 	 * @brief Shutdown all running compute services on the platform
 	 */
 	void Simulation::shutdown() {
 
-		for (int i = 0; i < this->sequential_task_executors.size(); i++) {
-			this->sequential_task_executors[i]->stop();
+		for (int i = 0; i < this->compute_services.size(); i++) {
+			this->compute_services[i]->stop();
 		}
-		for (int i = 0; i < this->multicore_task_executors.size(); i++) {
-			this->multicore_task_executors[i]->stop();
-		}
-
+//		for (int i = 0; i < this->sequential_task_executors.size(); i++) {
+//			this->sequential_task_executors[i]->stop();
+//		}
+//		for (int i = 0; i < this->multicore_task_executors.size(); i++) {
+//			this->multicore_task_executors[i]->stop();
+//		}
 	}
 
 };

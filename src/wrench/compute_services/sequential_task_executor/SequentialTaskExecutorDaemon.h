@@ -17,16 +17,18 @@
 #include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
 
 namespace wrench {
-		class SequentialTaskExecutorDaemon : public S4U_DaemonWithMailbox {
 
-		public:
-				SequentialTaskExecutorDaemon(ComputeService *cs);
+	class SequentialTaskExecutorDaemon : public S4U_DaemonWithMailbox {
 
-		private:
-				int main();
-				ComputeService *compute_service;
+	public:
+		SequentialTaskExecutorDaemon(ComputeService *cs);
+		bool isIdle();
 
-		};
+	private:
+		int main();
+		ComputeService *compute_service;
+		bool busy;
+	};
 }
 
 #endif //SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H

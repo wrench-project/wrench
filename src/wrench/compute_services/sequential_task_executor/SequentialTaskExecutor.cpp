@@ -51,4 +51,12 @@ namespace wrench {
 		return 0;
 	};
 
+	/**
+	 * @brief Whether the executor is idle or busy
+	 *
+	 * @return True when idle
+	 */
+	bool SequentialTaskExecutor::hasIdleCore() {
+		return this->daemon->isIdle();
+	}
 }

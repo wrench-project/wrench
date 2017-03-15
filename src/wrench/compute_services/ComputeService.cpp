@@ -14,13 +14,13 @@
 
 namespace wrench {
 
-		/**
-		 * @brief Constructor
-		 *
-		 * @param service_name is the name of the compute service
-		 */
-		ComputeService::ComputeService(std::string service_name) {
-			this->service_name = service_name;
-		}
+	/**
+	 * @brief Constructor
+	 *
+	 * @param service_name is the name of the compute service
+	 */
+	ComputeService::ComputeService(std::string service_name) {
+		this->service_name = service_name;
+	}
 
 };

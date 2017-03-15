@@ -18,18 +18,19 @@
 
 namespace wrench {
 
-		class SequentialTaskExecutor : public ComputeService {
+	class SequentialTaskExecutor : public ComputeService {
 
-		public:
-				SequentialTaskExecutor(std::string hostname);
-				void stop();
-				int runTask(WorkflowTask *task, std::string callback_mailbox);
+	public:
+		SequentialTaskExecutor(std::string hostname);
+		void stop();
+		int runTask(WorkflowTask *task, std::string callback_mailbox);
+		bool hasIdleCore();
 
-		private:
-				std::string hostname;
-				std::unique_ptr<SequentialTaskExecutorDaemon> daemon;
+	private:
+		std::string hostname;
+		std::unique_ptr<SequentialTaskExecutorDaemon> daemon;
 
-		};
+	};
 };
 
 

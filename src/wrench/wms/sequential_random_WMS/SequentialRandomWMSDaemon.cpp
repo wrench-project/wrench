@@ -55,16 +55,11 @@ namespace wrench {
 			for (int i = 0; i < ready_tasks.size(); i++) {
 				XBT_INFO("Submitting task %s for execution", ready_tasks[i]->id.c_str());
 				ready_tasks[i]->setScheduled();
-				ComputeService *cs;
-
-				cs = this->simulation->getSomeMulticoreTaskExecutor();
-				if (!cs) {
-					cs = this->simulation->getSomeSequentialTaskExecutor();
-				}
-				if (cs) {
-					cs->runTask(ready_tasks[i], this->mailbox_name);
-				} else {
-					throw WRENCHException("No compute resources!");
+				try {
+					this->simulation->runTask(ready_tasks[i], this->mailbox_name);
+				} catch (WRENCHException e) {
+					// there are no resources available, then setting the task to ready state again
+					ready_tasks[i]->setReady();
 				}
 			}
 

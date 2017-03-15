@@ -22,18 +22,19 @@
 
 namespace wrench {
 
-		class MulticoreTaskExecutor : public ComputeService {
+	class MulticoreTaskExecutor : public ComputeService {
 
-		public:
-				MulticoreTaskExecutor(std::string hostname);
-				void stop();
-				int runTask(WorkflowTask *task, std::string callback_mailbox);
+	public:
+		MulticoreTaskExecutor(std::string hostname);
+		void stop();
+		int runTask(WorkflowTask *task, std::string callback_mailbox);
+		bool hasIdleCore();
 
-		private:
-				std::string hostname;
-				std::unique_ptr<MulticoreTaskExecutorDaemon> daemon;
-				std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
-		};
+	private:
+		std::string hostname;
+		std::unique_ptr<MulticoreTaskExecutorDaemon> daemon;
+		std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
+	};
 };
 
 

@@ -124,6 +124,14 @@ namespace wrench {
 	}
 
 	/**
+	 * @brief Set the task to the ready state
+	 * @param task
+	 */
+	void WorkflowTask::setReady() {
+		this->workflow->updateTaskState(this, WorkflowTask::READY);
+	}
+
+	/**
 	 * @brief Set the task to the scheduled state
 	 * @param task
 	 */

@@ -72,6 +72,7 @@ namespace wrench {
 		int getNumberOfChildren();
 		int getNumberOfParents();
 		WorkflowTask::State getState();
+		void setReady();
 		void setScheduled();
 		void setRunning();
 		void setCompleted();
