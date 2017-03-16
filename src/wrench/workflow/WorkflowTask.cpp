@@ -76,10 +76,19 @@ namespace wrench {
 	/**
 	 * @brief Get the id of the task
 	 *
-	 * @return
+	 * @return the id
 	 */
 	std::string WorkflowTask::getId() {
 		return this->id;
+	}
+
+	/**
+	 * @brief Get the number of flops of the task
+	 *
+	 * @return the number of flops
+	 */
+	double WorkflowTask::getFlops() {
+		return this->flops;
 	}
 
 	/**

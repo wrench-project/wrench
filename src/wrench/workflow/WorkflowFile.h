@@ -29,14 +29,12 @@ namespace wrench {
 				std::string id;
 				double size; // in bytes
 
-		protected:
+		private:
 				void setOutputOf(WorkflowTask *task);
 				WorkflowTask *getOutputOf();
 				void setInputOf(WorkflowTask *task);
 				std::map<std::string, WorkflowTask *> getInputOf();
 
-
-		private:
 				Workflow *workflow; // Containing workflow
 				WorkflowFile(const std::string, double);
 				WorkflowTask *output_of;

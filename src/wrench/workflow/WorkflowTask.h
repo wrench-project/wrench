@@ -27,12 +27,13 @@ namespace wrench {
 	/* Task meta-data class */
 	class WorkflowTask {
 
-		// Workflow class must be a friend so as to access the private constructor, etc.
-		friend class Workflow;
-		friend class MulticoreTaskExecutorDaemon;
-		friend class SequentialTaskExecutorDaemon;
+	/***************/
+	/**   PUBLIC  **/
+	/***************/
+
 
 	public:
+
 		/* Task-state enum */
 		enum State {
 			NOT_READY,
@@ -43,49 +44,65 @@ namespace wrench {
 			FAILED
 		};
 
-	public:
-		std::string id;
-		double flops;
-		int number_of_processors;        // currently vague: cores? nodes?
-		double submit_date = -1.0;
-		double start_date = -1.0;
-		double end_date = -1.0;
-
-	private:
-		State state;
-		Workflow *workflow;    // Containing workflow
-		lemon::ListDigraph *DAG;    // Containing workflow
-		lemon::ListDigraph::Node DAG_node; // pointer to the underlying DAG node
-		std::map<std::string, WorkflowFile *> output_files;  // List of output files
-		std::map<std::string, WorkflowFile *> input_files;   // List of input files
-
-	protected:
-		std::stack<std::string> callback_mailbox_stack;
-		std::string pop_callback_mailbox();
-		void push_callback_mailbox(std::string);
-
-
-	private:
-		// Private constructor
-		WorkflowTask(const std::string id, const double t, const int n);
-
-		void addFileToMap(std::map<std::string, WorkflowFile *> map, WorkflowFile *f);
-		void setState(WorkflowTask::State);
-
-
-	public:
+		/* Getters */
 		std::string getId();
-		void addInputFile(WorkflowFile *);
-		void addOutputFile(WorkflowFile *);
+		double getFlops();
 		int getNumberOfChildren();
 		int getNumberOfParents();
 		WorkflowTask::State getState();
-		void setReady();
-		void setScheduled();
-		void setRunning();
-		void setCompleted();
-		std::string getCallbackMailbox();
 
+
+		/* Adding Files */
+		void addInputFile(WorkflowFile *);
+		void addOutputFile(WorkflowFile *);
+
+
+
+	/***************/
+	/**  PRIVATE  **/
+	/***************/
+
+	friend class Workflow;
+	friend class MulticoreTaskExecutorDaemon;
+	friend class SequentialTaskExecutorDaemon;
+	friend class RandomScheduler;
+
+	private:
+
+			std::string id;										// Task ID
+			double flops;											// Number of flops
+			int number_of_processors;        	// currently vague: cores? nodes?
+			double scheduled_date = -1.0;			// Date at which task was scheduled (getter?)
+			double start_date = -1.0;					// Date at which task began execution (getter?)
+			double end_date = -1.0;						// Date at which task finished execution (getter?)
+
+			State state;
+			Workflow *workflow;    																// Containing workflow
+			lemon::ListDigraph *DAG;    													// Containing workflow
+			lemon::ListDigraph::Node DAG_node;									 	// pointer to the underlying DAG node
+			std::map<std::string, WorkflowFile *> output_files;  	// List of output files
+			std::map<std::string, WorkflowFile *> input_files;   	// List of input files
+
+
+			// Private constructor (called by Workflow)
+			WorkflowTask(const std::string id, const double t, const int n);
+
+			// Only WRENCH internals can change a task state
+			void setState(WorkflowTask::State);
+			void setReady();
+			void setScheduled();
+			void setRunning();
+			void setCompleted();
+
+			// Callback mailbox management
+			std::stack<std::string> callback_mailbox_stack;		// Stack of callback mailboxes
+			std::string getCallbackMailbox();
+			std::string pop_callback_mailbox();
+			void push_callback_mailbox(std::string);
+
+
+			// Private helper function
+			void addFileToMap(std::map<std::string, WorkflowFile *> map, WorkflowFile *f);
 
 	};
 

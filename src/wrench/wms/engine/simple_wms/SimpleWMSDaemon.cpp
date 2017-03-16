@@ -56,7 +56,7 @@ namespace wrench {
 			// Wait for a task completion
 //			XBT_INFO("Waiting for a task to complete...");
 			WorkflowTask *completed_task = workflow->waitForNextTaskCompletion();
-			XBT_INFO("Notified that task %s has completed", completed_task->id.c_str());
+			XBT_INFO("Notified that task %s has completed", completed_task->getId().c_str());
 
 			if (workflow->isDone()) {
 				break;

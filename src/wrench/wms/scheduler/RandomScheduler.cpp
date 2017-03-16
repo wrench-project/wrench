@@ -37,7 +37,7 @@ namespace wrench {
 			XBT_INFO("There are %ld ready tasks", ready_tasks.size());
 		}
 		for (int i = 0; i < ready_tasks.size(); i++) {
-			XBT_INFO("Submitting task %s for execution", ready_tasks[i]->id.c_str());
+			XBT_INFO("Submitting task %s for execution", ready_tasks[i]->getId().c_str());
 
 			// schedule task to first available compute resource
 			for (int j = 0; j < compute_services.size(); j++) {
