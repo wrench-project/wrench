@@ -20,17 +20,11 @@
 
 namespace wrench {
 
-	// Forward reference
-	class Workflow;
-
-
-	/* Task meta-data class */
 	class WorkflowTask {
 
 	/***************/
 	/**   PUBLIC  **/
 	/***************/
-
 
 	public:
 
@@ -55,7 +49,6 @@ namespace wrench {
 		/* Adding Files */
 		void addInputFile(WorkflowFile *);
 		void addOutputFile(WorkflowFile *);
-
 
 
 	/***************/

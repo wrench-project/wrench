@@ -23,22 +23,13 @@ using namespace lemon;
 
 namespace wrench {
 
-
 	class Workflow {
 
-	private:
-		std::unique_ptr<ListDigraph> DAG;  // Lemon DiGraph
-		std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
-
-		std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
-		std::map<std::string, std::unique_ptr<WorkflowFile>> files;
-
-		bool pathExists(WorkflowTask *, WorkflowTask *);
-
-		std::string callback_mailbox;
+	/**************/
+	/**  PUBLIC  **/
+	/**************/
 
 	public:
-		/** Constructor and the like **/
 		Workflow();
 
 		WorkflowTask *addTask(std::string, double, int);
@@ -52,23 +43,43 @@ namespace wrench {
 
 		void loadFromDAX(const std::string filename);
 
-		/** Update task state **/
-		void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
-
-		/** Method to get the callback mailbox associated with the workflow **/
-		std::string getCallbackMailbox();
-
 		/** Get information from the workflow **/
 		// TODO: Make these efficient - Right now they are really naively implemented
 		unsigned long getNumberOfTasks();
 		bool isDone();
 		std::vector<WorkflowTask *> getReadyTasks();
 
+		/** misc **/
+		void exportToEPS(std::string);
+
+	/***************/
+	/**  PRIVATE  **/
+	/***************/
+
+	friend class WorkflowTask;
+	friend class SimpleWMSDaemon;
+
+	private:
+
+		std::unique_ptr<ListDigraph> DAG;  // Lemon DiGraph
+		std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
+
+		std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
+		std::map<std::string, std::unique_ptr<WorkflowFile>> files;
+
+		bool pathExists(WorkflowTask *, WorkflowTask *);
+
+		std::string callback_mailbox;
+
+		/** Update task state **/
+		void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
+
+		/** Method to get the callback mailbox associated with the workflow **/
+		std::string getCallbackMailbox();
+
 		/** Method to wait for a task completion **/
 		WorkflowTask *waitForNextTaskCompletion();
 
-				/** misc **/
-		void exportToEPS(std::string);
 
 	};
 
