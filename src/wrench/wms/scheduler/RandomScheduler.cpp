@@ -19,6 +19,11 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(random_scheduler, "Log category for Random Schedule
 namespace wrench {
 
 	/**
+	 * Default constructor
+	 */
+	RandomScheduler::RandomScheduler() {}
+
+	/**
 	 * Schedule and run a set of ready tasks in available compute resources
 	 *
 	 * @param ready_tasks is a vector of ready tasks

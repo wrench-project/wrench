@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include "wrench.h"
-#include "wms/scheduler/RandomScheduler.h"
 
 int main(int argc, char **argv) {
 
@@ -81,9 +80,9 @@ int main(int argc, char **argv) {
 
 
 	std::cerr << "Instantiating a WMS on Tremblay..." << std::endl;
-	wrench::RandomScheduler scheduler;
+	wrench::Scheduler *scheduler = wrench::SchedulerFactory::getInstance()->Create(1);
 //	simulation.createWMS(&workflow, "Tremblay");
-	simulation.createWMS(&workflow, &scheduler, "c-0.me");
+	simulation.createWMS(&workflow, scheduler, "c-0.me");
 
 	std::cerr << "Launching the Simulation..." << std::endl;
 	simulation.launch();
