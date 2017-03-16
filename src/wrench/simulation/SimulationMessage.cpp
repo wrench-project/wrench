@@ -27,9 +27,8 @@ namespace wrench {
 
 		/** RUN_TASK MESSAGE **/
 		// TODO: MAke the "1024" below configurable somehow
-		RunTaskMessage::RunTaskMessage(WorkflowTask *t, std::string cb): SimulationMessage(RUN_TASK, 1024.0) {
+		RunTaskMessage::RunTaskMessage(WorkflowTask *t): SimulationMessage(RUN_TASK, 1024.0) {
 			this->task = t;
-			this->callback_mailbox = cb;
 		}
 
 		/** TASK_DONE MESSAGE **/

@@ -44,10 +44,10 @@ namespace wrench {
 	 *
 	 * @return 0 on success
 	 */
-	int SequentialTaskExecutor::runTask(WorkflowTask *task, std::string callback_mailbox) {
+	int SequentialTaskExecutor::runTask(WorkflowTask *task) {
 
 		// Send a "run a task" message to the daemon's mailbox
-		S4U_Mailbox::put(this->daemon->mailbox_name, new RunTaskMessage(task, callback_mailbox));
+		S4U_Mailbox::put(this->daemon->mailbox_name, new RunTaskMessage(task));
 		return 0;
 	};
 

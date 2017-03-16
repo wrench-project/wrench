@@ -27,6 +27,7 @@ namespace wrench {
 		flops = t;
 		number_of_processors = n;
 		state = WorkflowTask::READY;
+		callback_mailbox_stack = {};
 	}
 
 	/**
@@ -154,6 +155,37 @@ namespace wrench {
 	void WorkflowTask::setCompleted() {
 		this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
 	}
+
+	/**
+	 * @brief Get the callback mailbox name for this task
+	 * @return the callbackmailbox name
+	 */
+	std::string WorkflowTask::getCallbackMailbox() {
+		return this->workflow->getCallbackMailbox();
+	}
+
+	/**
+	 * @brief Gets the "next" callback mailbox (returns the
+	 *         workflow mailbox if the mailbox stack is empty)
+	 * @return the next callback mailbox
+	 */
+	std::string WorkflowTask::pop_callback_mailbox() {
+		if (this->callback_mailbox_stack.size() == 0) {
+			return this->workflow->getCallbackMailbox();
+		} else {
+			std::string mailbox = this->callback_mailbox_stack.top();
+			this->callback_mailbox_stack.pop();
+			return mailbox;
+		}
+	}
+
+	/**
+	 *
+	 */
+	void WorkflowTask::push_callback_mailbox(std::string mailbox) {
+		this->callback_mailbox_stack.push(mailbox);
+	}
+
 
 };
 

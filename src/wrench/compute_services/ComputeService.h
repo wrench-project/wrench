@@ -25,7 +25,7 @@ namespace wrench {
 
 		// Virtual methods to implement in derived classes
 		virtual void stop() = 0;
-		virtual int runTask(WorkflowTask *task, std::string callback_mailbox) = 0;
+		virtual int runTask(WorkflowTask *task) = 0;
 		virtual bool hasIdleCore() = 0;
 
 	private:

@@ -71,10 +71,10 @@ namespace wrench {
 	 * @param callback_mailbox is the name of a mailbox to which a "task done" callback will be sent
 	 * @return 0 on success
 	 */
-	int MulticoreTaskExecutor::runTask(WorkflowTask *task, std::string callback_mailbox) {
+	int MulticoreTaskExecutor::runTask(WorkflowTask *task) {
 
 		// Asynchronously send a "run a task" message to the daemon's mailbox
-		S4U_Mailbox::put(this->daemon->mailbox_name, new RunTaskMessage(task, callback_mailbox));
+		S4U_Mailbox::put(this->daemon->mailbox_name, new RunTaskMessage(task));
 		return 0;
 	};
 

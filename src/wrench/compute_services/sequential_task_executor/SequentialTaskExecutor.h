@@ -23,7 +23,7 @@ namespace wrench {
 	public:
 		SequentialTaskExecutor(std::string hostname);
 		void stop();
-		int runTask(WorkflowTask *task, std::string callback_mailbox);
+		int runTask(WorkflowTask *task);
 		bool hasIdleCore();
 
 	private:

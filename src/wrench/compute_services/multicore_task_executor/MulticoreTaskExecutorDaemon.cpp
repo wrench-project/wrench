@@ -60,9 +60,6 @@ namespace wrench {
 		XBT_INFO("New Multicore Task Executor starting (%s) with %ld cores ",
 		         this->mailbox_name.c_str(), this->idle_sequential_task_executors.size());
 
-		// Map to keep track of the callback mailboxes of the workflow tasks
-		std::map<WorkflowTask *, std::string> callback_mailboxes;
-
 		bool keep_going = true;
 		while (keep_going) {
 
@@ -85,8 +82,6 @@ namespace wrench {
 					// Just add the task to the task queue
 					this->task_queue.push(m->task);
 
-					// Keep track of the callback mailbox
-					callback_mailboxes[m->task] = m->callback_mailbox;
 					break;
 				}
 
@@ -101,9 +96,7 @@ namespace wrench {
 					this->idle_sequential_task_executors.insert(executor);
 
 					// Send the callback to the originator
-					std::string callback_mailbox = callback_mailboxes[m->task];
-					callback_mailboxes.erase(m->task);
-					S4U_Mailbox::put(callback_mailbox, new TaskDoneMessage(m->task, this->compute_service));
+					S4U_Mailbox::put(m->task->getCallbackMailbox(), new TaskDoneMessage(m->task, this->compute_service));
 					break;
 				}
 
@@ -125,7 +118,8 @@ namespace wrench {
 
 				// Start the task on the sequential task executor
 				XBT_INFO("Running task %s on one of my cores", to_run->id.c_str());
-				executor->runTask(to_run, this->mailbox_name);
+				to_run->push_callback_mailbox(this->mailbox_name);
+				executor->runTask(to_run);
 			}
 		}
 

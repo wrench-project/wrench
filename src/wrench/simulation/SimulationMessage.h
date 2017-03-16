@@ -42,9 +42,8 @@ namespace wrench {
 
 		// Derived struct
 		struct RunTaskMessage: public SimulationMessage {
-				RunTaskMessage(WorkflowTask*, std::string cb);
+				RunTaskMessage(WorkflowTask*);
 				WorkflowTask *task;
-				std::string callback_mailbox;
 		};
 
 		// Derived struct

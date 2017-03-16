@@ -19,8 +19,7 @@ namespace wrench {
 	class RandomScheduler : public Scheduler {
 
 		void runTasks(std::vector<WorkflowTask *> ready_tasks,
-		              std::vector<std::unique_ptr<ComputeService>> &compute_services,
-		              std::string callback_mailbox);
+		              std::vector<std::unique_ptr<ComputeService>> &compute_services);
 	};
 }
 

@@ -29,8 +29,7 @@ namespace wrench {
 		 * @param callback_mailbox is the name of the mailbox
 		 */
 		virtual void runTasks(std::vector<WorkflowTask *> ready_tasks,
-		                      std::vector<std::unique_ptr<ComputeService>> &compute_services,
-		                      std::string callback_mailbox) = 0;
+		                      std::vector<std::unique_ptr<ComputeService>> &compute_services) = 0;
 	};
 
 }

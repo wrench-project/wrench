@@ -51,7 +51,12 @@ namespace wrench {
 			std::vector<std::unique_ptr<ComputeService>> &compute_services = this->simulation->getComputeServices();
 
 			// Run ready tasks with defined scheduler implementation
-			this->scheduler->runTasks(ready_tasks, compute_services, this->mailbox_name);
+			this->scheduler->runTasks(ready_tasks, compute_services);
+
+			// Wait for a task completion
+//			XBT_INFO("Waiting for a task to complete...");
+			WorkflowTask *completed_task = workflow->waitForNextTaskCompletion();
+			XBT_INFO("Notified that task %s has completed", completed_task->id.c_str());
 
 			if (workflow->isDone()) {
 				break;

@@ -14,6 +14,7 @@
 
 #include <map>
 #include <lemon/list_graph.h>
+#include <stack>
 #include "WorkflowFile.h"
 
 
@@ -28,6 +29,8 @@ namespace wrench {
 
 		// Workflow class must be a friend so as to access the private constructor, etc.
 		friend class Workflow;
+		friend class MulticoreTaskExecutorDaemon;
+		friend class SequentialTaskExecutorDaemon;
 
 	public:
 		/* Task-state enum */
@@ -56,6 +59,11 @@ namespace wrench {
 		std::map<std::string, WorkflowFile *> output_files;  // List of output files
 		std::map<std::string, WorkflowFile *> input_files;   // List of input files
 
+	protected:
+		std::stack<std::string> callback_mailbox_stack;
+		std::string pop_callback_mailbox();
+		void push_callback_mailbox(std::string);
+
 
 	private:
 		// Private constructor
@@ -76,6 +84,8 @@ namespace wrench {
 		void setScheduled();
 		void setRunning();
 		void setCompleted();
+		std::string getCallbackMailbox();
+
 
 	};
 

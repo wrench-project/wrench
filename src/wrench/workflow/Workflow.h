@@ -35,6 +35,8 @@ namespace wrench {
 
 		bool pathExists(WorkflowTask *, WorkflowTask *);
 
+		std::string callback_mailbox;
+
 	public:
 		/** Constructor and the like **/
 		Workflow();
@@ -53,6 +55,8 @@ namespace wrench {
 		/** Update task state **/
 		void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
 
+		/** Method to get the callback mailbox associated with the workflow **/
+		std::string getCallbackMailbox();
 
 		/** Get information from the workflow **/
 		// TODO: Make these efficient - Right now they are really naively implemented
@@ -60,7 +64,10 @@ namespace wrench {
 		bool isDone();
 		std::vector<WorkflowTask *> getReadyTasks();
 
-		/** misc **/
+		/** Method to wait for a task completion **/
+		WorkflowTask *waitForNextTaskCompletion();
+
+				/** misc **/
 		void exportToEPS(std::string);
 
 	};

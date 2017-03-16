@@ -14,6 +14,8 @@
 #include <lemon/graph_to_eps.h>
 #include <lemon/bfs.h>
 #include <pugixml.hpp>
+#include <simulation/SimulationMessage.h>
+#include <simgrid_S4U_util/S4U_Mailbox.h>
 
 #include "workflow/Workflow.h"
 #include "exception/WRENCHException.h"
@@ -49,9 +51,11 @@ namespace wrench {
 	 * @brief  Constructor
 	 */
 	Workflow::Workflow() {
+		static int unique_int = 0;
 		DAG = std::unique_ptr<ListDigraph>(new ListDigraph());
 		DAG_node_map = std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>>(
 				new ListDigraph::NodeMap<WorkflowTask *>(*DAG));
+		this->callback_mailbox = std::string("workflow_mailbox_") + std::to_string(unique_int++);
 	};
 
 
@@ -315,7 +319,7 @@ namespace wrench {
 
 				double size = std::strtod(uses.attribute("size").value(), NULL);
 				std::string link = uses.attribute("link").value();
-				// Check whether the file already exist
+				// Check whether the file already exists
 				std::cerr.flush();
 				WorkflowFile *file = this->getWorkflowFileByID(id);
 
@@ -331,6 +335,29 @@ namespace wrench {
 				// TODO: Are there other types of "link" values?
 			}
 		}
+	}
+
+	/**
+	 * @brief Get the mailbox name associated to this workflow, i.e.,
+	 *        the mailbox to which "TASK_DONE" messages are sent
+	 *
+	 * @return the mailbox name
+	 */
+	std::string Workflow::getCallbackMailbox() {
+		return this->callback_mailbox;
+	}
+
+	/**
+	 * @brief Wait for a task completion
+	 * @return the completed task
+	 */
+	WorkflowTask *Workflow::waitForNextTaskCompletion() {
+		// Get the message
+		std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->callback_mailbox);
+		// Cast it to the right message time
+		std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
+		// Return the task
+		return m->task;
 	}
 
 };
