@@ -12,14 +12,17 @@
 #ifndef WRENCH_RANDOMSCHEDULER_H
 #define WRENCH_RANDOMSCHEDULER_H
 
-#include "wms/scheduler/Scheduler.h"
+#include "wms/scheduler/SchedulerFactory.h"
 
 namespace wrench {
 
-	class RandomScheduler : public Scheduler {
+	class RandomScheduler : public SchedulerTmpl<1, RandomScheduler> {
 
-		void runTasks(std::vector<WorkflowTask *> ready_tasks,
-		              std::vector<std::unique_ptr<ComputeService>> &compute_services);
+	public:
+		RandomScheduler();
+
+		virtual void runTasks(std::vector<WorkflowTask *> ready_tasks,
+		                      std::vector<std::unique_ptr<ComputeService>> &compute_services);
 	};
 }
 

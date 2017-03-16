@@ -46,6 +46,9 @@ set(SOURCE_FILES
         src/wrench/wms/engine/simple_wms/SimpleWMSDaemon.h
         src/wrench/wms/engine/simple_wms/SimpleWMSDaemon.cpp
         src/wrench/wms/scheduler/Scheduler.h
+        src/wrench/wms/scheduler/SchedulerTmpl.h
+        src/wrench/wms/scheduler/SchedulerFactory.h
+        src/wrench/wms/scheduler/SchedulerFactory.cpp
         src/wrench/wms/scheduler/RandomScheduler.h
         src/wrench/wms/scheduler/RandomScheduler.cpp
         src/wrench/compute_services/ComputeService.cpp

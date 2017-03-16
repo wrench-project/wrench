@@ -12,15 +12,20 @@
 #ifndef WRENCH_SCHEDULER_H
 #define WRENCH_SCHEDULER_H
 
-#include <map>
-
 #include "workflow/WorkflowTask.h"
 #include "compute_services/ComputeService.h"
 
 namespace wrench {
 
 	class Scheduler {
+
+	protected:
+		Scheduler() {};
+		uint16_t sched_type;
+
 	public:
+		virtual ~Scheduler() {};
+
 		/**
 		 * Schedule and run a set of ready tasks in available compute resources
 		 *
