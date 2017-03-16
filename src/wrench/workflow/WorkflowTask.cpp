@@ -72,7 +72,6 @@ namespace wrench {
 		map[f->id] = f;
 	}
 
-
 	/**
 	 * @brief Get the id of the task
 	 *
@@ -138,7 +137,7 @@ namespace wrench {
 	 * @param task
 	 */
 	void WorkflowTask::setReady() {
-		this->workflow->updateTaskState(this, WorkflowTask::READY);
+		this->workflow->update_task_state(this, WorkflowTask::READY);
 	}
 
 	/**
@@ -146,7 +145,7 @@ namespace wrench {
 	 * @param task
 	 */
 	void WorkflowTask::setScheduled() {
-		this->workflow->updateTaskState(this, WorkflowTask::SCHEDULED);
+		this->workflow->update_task_state(this, WorkflowTask::SCHEDULED);
 	}
 
 	/**
@@ -154,7 +153,7 @@ namespace wrench {
 	 * @param task
 	 */
 	void WorkflowTask::setRunning() {
-		this->workflow->updateTaskState(this, WorkflowTask::RUNNING);
+		this->workflow->update_task_state(this, WorkflowTask::RUNNING);
 	}
 
 	/**
@@ -162,7 +161,7 @@ namespace wrench {
 	 * @param task
 	 */
 	void WorkflowTask::setCompleted() {
-		this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
+		this->workflow->update_task_state(this, WorkflowTask::COMPLETED);
 	}
 
 	/**
@@ -170,7 +169,7 @@ namespace wrench {
 	 * @return the callbackmailbox name
 	 */
 	std::string WorkflowTask::getCallbackMailbox() {
-		return this->workflow->getCallbackMailbox();
+		return this->workflow->get_callback_mailbox();
 	}
 
 	/**
@@ -180,7 +179,7 @@ namespace wrench {
 	 */
 	std::string WorkflowTask::pop_callback_mailbox() {
 		if (this->callback_mailbox_stack.size() == 0) {
-			return this->workflow->getCallbackMailbox();
+			return this->workflow->get_callback_mailbox();
 		} else {
 			std::string mailbox = this->callback_mailbox_stack.top();
 			this->callback_mailbox_stack.pop();

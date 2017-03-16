@@ -121,7 +121,7 @@ namespace wrench {
 			DAG->addArc(src->DAG_node, dst->DAG_node);
 
 			if (src->getState() != WorkflowTask::COMPLETED) {
-				updateTaskState(dst, WorkflowTask::NOT_READY);
+				update_task_state(dst, WorkflowTask::NOT_READY);
 			}
 		}
 	}
@@ -222,20 +222,20 @@ namespace wrench {
 	 * @param task is a pointer to the task
 	 * @param state is the new task state
 	 */
-	void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state) {
+	void Workflow::update_task_state(WorkflowTask *task, WorkflowTask::State state) {
 
 		switch (state) {
 			// Make a task completed, which may cause its children to become ready
 			case WorkflowTask::COMPLETED: {
 				if (task->getState() != WorkflowTask::RUNNING) {
 					throw WRENCHException(
-							"Workflow::updateTaskState(): Cannot set non-running task state to completed");
+							"Workflow::update_task_state(): Cannot set non-running task state to completed");
 				}
 				task->setState(WorkflowTask::COMPLETED);
 				// Go through the children and make them ready if possible
 				for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
 					WorkflowTask *child = (*DAG_node_map)[(*DAG).target(a)];
-					updateTaskState(child, WorkflowTask::READY);
+					update_task_state(child, WorkflowTask::READY);
 
 				}
 				break;
@@ -245,7 +245,7 @@ namespace wrench {
 					return;
 				}
 				if (task->getState() != WorkflowTask::NOT_READY) {
-					throw WRENCHException("Workflow::updateTaskState(): Cannot set non-not_ready task state to ready");
+					throw WRENCHException("Workflow::update_task_state(): Cannot set non-not_ready task state to ready");
 				}
 				// Go through the parent and check whether they are all completed
 				for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
@@ -276,7 +276,7 @@ namespace wrench {
 				break;
 			}
 			default: {
-				throw WRENCHException("Workflow::updateTaskState(): invalid state");
+				throw WRENCHException("Workflow::update_task_state(): invalid state");
 			}
 		}
 	}
@@ -343,7 +343,7 @@ namespace wrench {
 	 *
 	 * @return the mailbox name
 	 */
-	std::string Workflow::getCallbackMailbox() {
+	std::string Workflow::get_callback_mailbox() {
 		return this->callback_mailbox;
 	}
 
@@ -351,13 +351,8 @@ namespace wrench {
 	 * @brief Wait for a task completion
 	 * @return the completed task
 	 */
-	WorkflowTask *Workflow::waitForNextTaskCompletion() {
-		// Get the message
-		std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->callback_mailbox);
-		// Cast it to the right message time
-		std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
-		// Return the task
-		return m->task;
+	std::unique_ptr<WorkflowExecutionEvent> Workflow::wait_for_next_execution_event() {
+			return WorkflowExecutionEvent::get_next_execution_event(this->callback_mailbox);
 	}
 
 };

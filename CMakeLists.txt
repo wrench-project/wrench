@@ -63,7 +63,12 @@ set(SOURCE_FILES
         src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.h
         src/wrench/simulation/Simulation.cpp
         src/wrench/simulation/Simulation.h
-        src/wrench/main.cpp)
+        src/wrench/pilotjob_manager/PilotjobManager.cpp
+        src/wrench/pilotjob_manager/PilotJobManager.h
+        src/wrench/pilotjob_manager/Pilotjob.cpp
+        src/wrench/pilotjob_manager/Pilotjob.h
+        src/wrench/main.cpp src/wrench/pilotjob_manager/PilotjobmanagerDaemon.cpp
+        src/wrench/pilotjob_manager/PilotjobmanagerDaemon.h src/wrench/simulation/WorkflowExecutionEvent.cpp src/wrench/simulation/WorkflowExecutionEvent.h)
 
 set(INCLUDE_FILES include/wrench.h)
 

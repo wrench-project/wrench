@@ -15,6 +15,7 @@
 
 #include <lemon/list_graph.h>
 #include <map>
+#include <simulation/WorkflowExecutionEvent.h>
 
 #include "WorkflowTask.h"
 #include "WorkflowFile.h"
@@ -72,14 +73,13 @@ namespace wrench {
 		std::string callback_mailbox;
 
 		/** Update task state **/
-		void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
+		void update_task_state(WorkflowTask *task, WorkflowTask::State state);
 
 		/** Method to get the callback mailbox associated with the workflow **/
-		std::string getCallbackMailbox();
+		std::string get_callback_mailbox();
 
-		/** Method to wait for a task completion **/
-		WorkflowTask *waitForNextTaskCompletion();
-
+		/** Method to wait the next event **/
+		std::unique_ptr<WorkflowExecutionEvent> wait_for_next_execution_event();
 
 	};
 

@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include <simgrid/msg.h>
+#include <exception/WRENCHException.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/engine/simple_wms/SimpleWMSDaemon.h"
@@ -53,11 +54,19 @@ namespace wrench {
 			// Run ready tasks with defined scheduler implementation
 			this->scheduler->runTasks(ready_tasks, compute_services);
 
-			// Wait for a task completion
-//			XBT_INFO("Waiting for a task to complete...");
-			WorkflowTask *completed_task = workflow->waitForNextTaskCompletion();
-			XBT_INFO("Notified that task %s has completed", completed_task->getId().c_str());
+			// Wait for a workflow execution event
+			std::unique_ptr<WorkflowExecutionEvent> event = workflow->wait_for_next_execution_event();
 
+			switch(event->type) {
+				case WorkflowExecutionEvent::TASK_COMPLETION: {
+					XBT_INFO("Notified that task %s has completed", event->task->getId().c_str());
+					break;
+				}
+				default: {
+					throw WRENCHException("Unknown workflow execution event type");
+				}
+			}
+			
 			if (workflow->isDone()) {
 				break;
 			}

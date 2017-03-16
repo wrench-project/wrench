@@ -93,7 +93,6 @@ namespace wrench {
 			std::string pop_callback_mailbox();
 			void push_callback_mailbox(std::string);
 
-
 			// Private helper function
 			void addFileToMap(std::map<std::string, WorkflowFile *> map, WorkflowFile *f);
 

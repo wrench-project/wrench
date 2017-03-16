@@ -1,5 +1,14 @@
 
+- Implement an ExecutionEvent class
+
+- Make sure a Multicore Executor sends back "TASK_FAILED" message if it's stopped in the
+  middle of running tasks
 
 - Deal with error handling via nice exceptions, etc.
 
-- Figure out how to do asynchronous communication
+- Figure out how/whether to do asynchronous communication
+
+- What happens if on stops a MulticoreExecutor while some jobs are running
+    - Yet another "error" behavior
+
+- Deal with failure traces...
