@@ -31,7 +31,8 @@ namespace wrench {
 	private:
 		std::set<SequentialTaskExecutor *> idle_sequential_task_executors;
 		std::set<SequentialTaskExecutor *> busy_sequential_task_executors;
-		std::queue<WorkflowTask *> task_queue;
+		std::queue<WorkflowTask *> waiting_task_queue;
+		std::set<WorkflowTask *> running_task_set;
 
 		int main();
 

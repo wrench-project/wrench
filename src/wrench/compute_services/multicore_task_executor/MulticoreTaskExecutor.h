@@ -18,6 +18,7 @@
 #include <compute_services/ComputeService.h>
 #include <compute_services/sequential_task_executor/SequentialTaskExecutor.h>
 #include <simulation/SimulationMessage.h>
+#include <simulation/Simulation.h>
 #include "MulticoreTaskExecutorDaemon.h"
 
 namespace wrench {
@@ -25,7 +26,7 @@ namespace wrench {
 	class MulticoreTaskExecutor : public ComputeService {
 
 	public:
-		MulticoreTaskExecutor(std::string hostname);
+		MulticoreTaskExecutor(std::string hostname, Simulation *simulation);
 		void stop();
 		int runTask(WorkflowTask *task);
 		bool hasIdleCore();

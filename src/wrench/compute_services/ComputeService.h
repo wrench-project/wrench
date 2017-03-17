@@ -18,19 +18,31 @@
 
 namespace wrench {
 
+	class Simulation;
+
 	class ComputeService {
 
 	public:
-		ComputeService(std::string);
+
+			enum State {
+					RUNNING,
+					TERMINATED
+			};
+
+			ComputeService(std::string, Simulation *simulation);
 
 		// Virtual methods to implement in derived classes
-		virtual void stop() = 0;
 		virtual int runTask(WorkflowTask *task) = 0;
 		virtual bool hasIdleCore() = 0;
+		virtual void stop();
 
-	private:
+		std::string getName();
+		ComputeService::State getState();
+
+	protected:
+		ComputeService::State state;
 		std::string service_name;
-
+		Simulation *simulation;  // pointer to the simulation object
 	};
 };
 

@@ -14,6 +14,7 @@
 #include <workflow/WorkflowTask.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simgrid_S4U_util/S4U_Simulation.h>
+#include <exception/WRENCHException.h>
 #include "MulticoreTaskExecutor.h"
 
 namespace wrench {
@@ -23,7 +24,9 @@ namespace wrench {
 	 *
 	 * @param hostname is the name of the host
 	 */
-	MulticoreTaskExecutor::MulticoreTaskExecutor(std::string hostname) : ComputeService("multicore_task_executor") {
+	MulticoreTaskExecutor::MulticoreTaskExecutor(std::string hostname, Simulation *simulation) :
+					ComputeService("multicore_task_executor", simulation) {
+
 		this->hostname = hostname;
 
 		// Start one sequential task executor daemon per core
@@ -31,7 +34,7 @@ namespace wrench {
 		for (int i = 0; i < num_cores; i++) {
 			// Start a sequential task executor
 			std::unique_ptr<SequentialTaskExecutor> seq_executor =
-					std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(this->hostname));
+					std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(this->hostname, nullptr));
 			// Add it to the list of sequential task executors
 			this->sequential_task_executors.push_back(std::move(seq_executor));
 		}
@@ -55,13 +58,11 @@ namespace wrench {
 	 * @brief Stop the multi-core task executor
 	 */
 	void MulticoreTaskExecutor::stop() {
-		// Stop all sequential task executors
-		for (auto &seq_exec : this->sequential_task_executors) {
-			seq_exec->stop();
-		}
-
 		// Send a termination message to the daemon's mailbox
 		S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
+
+		// Call the generic stopping method
+		ComputeService::stop();
 	}
 
 	/**
@@ -73,6 +74,9 @@ namespace wrench {
 	 */
 	int MulticoreTaskExecutor::runTask(WorkflowTask *task) {
 
+		if (this->state == ComputeService::TERMINATED) {
+			throw WRENCHException("Trying to run a task on a compute service that's terminated");
+		}
 		// Asynchronously send a "run a task" message to the daemon's mailbox
 		S4U_Mailbox::put(this->daemon->mailbox_name, new RunTaskMessage(task));
 		return 0;

@@ -26,6 +26,11 @@ namespace wrench {
 
 		// Create the S4U simulation wrapper
 		this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
+
+		// Initialize lists
+//		this->running_compute_services = {};
+//		this->terminated_compute_services = {};
+//		this->WMSes = {};
 	}
 
 	/**
@@ -55,25 +60,25 @@ namespace wrench {
 		this->s4u_simulation->setupPlatform(filename);
 	}
 
-	/**
-	 * @brief Instantiate a sequential task executor on a host
-	 *
-	 * @param hostname is the name of the host in the physical platform
-	 */
-	void Simulation::createSequentialTaskExecutor(std::string hostname) {
-
-		// Create the compute service
-		std::unique_ptr<ComputeService> executor;
-		try {
-			executor = std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(hostname));
-		} catch (WRENCHException e) {
-			throw e;
-		}
-
-		// Add it to the list of Compute Services
-		compute_services.push_back(std::move(executor));
-		return;
-	}
+//	/**
+//	 * @brief Instantiate a sequential task executor on a host
+//	 *
+//	 * @param hostname is the name of the host in the physical platform
+//	 */
+//	void Simulation::createSequentialTaskExecutor(std::string hostname) {
+//
+//		// Create the compute service
+//		std::unique_ptr<ComputeService> executor;
+//		try {
+//			executor = std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(hostname));
+//		} catch (WRENCHException e) {
+//			throw e;
+//		}
+//
+//		// Add it to the list of Compute Services
+//		compute_services.push_back(std::move(executor));
+//		return;
+//	}
 
 	/**
 	 * @brief Instantiate a multicore task executor on a host
@@ -85,13 +90,13 @@ namespace wrench {
 		// Create the compute service
 		std::unique_ptr<ComputeService> executor;
 		try {
-			executor = std::unique_ptr<MulticoreTaskExecutor>(new MulticoreTaskExecutor(hostname));
+			executor = std::unique_ptr<MulticoreTaskExecutor>(new MulticoreTaskExecutor(hostname, this));
 		} catch (WRENCHException e) {
 			throw e;
 		}
 
 		// Add it to the list of Compute Services
-		compute_services.push_back(std::move(executor));
+		running_compute_services.push_back(std::move(executor));
 		return;
 	}
 
@@ -122,8 +127,12 @@ namespace wrench {
 	 *
 	 * @return vector of compute services
 	 */
-	std::vector<std::unique_ptr<ComputeService>> &Simulation::getComputeServices() {
-		return this->compute_services;
+	std::set<ComputeService *> Simulation::getComputeServices() {
+		std::set<ComputeService *> set = {};
+		for (int i=0; i < this->running_compute_services.size(); i++) {
+			set.insert(this->running_compute_services[i].get());
+		}
+		return set;
 	}
 
 	/**
@@ -131,9 +140,27 @@ namespace wrench {
 	 */
 	void Simulation::shutdown() {
 
-		for (int i = 0; i < this->compute_services.size(); i++) {
-			this->compute_services[i]->stop();
+		for (int i=0; i < this->running_compute_services.size(); i++) {
+			this->running_compute_services[i]->stop();
 		}
+	}
+
+		/**
+		 * @brief Remove a compute service from the list of known compute services
+		 *
+		 * @param cs is the compute service
+		 */
+	void Simulation::mark_compute_service_as_terminated(ComputeService *compute_service) {
+			for (int i=0; i < this->running_compute_services.size(); i++) {
+				if (this->running_compute_services[i].get() == compute_service) {
+					this->terminated_compute_services.push_back(std::move(this->running_compute_services[i]));
+					this->running_compute_services.erase(this->running_compute_services.begin() + i);
+					return;
+				}
+			}
+			// If we didn't find the service, this means it was a hidden service that was
+			// used as a building block for another higher-level service, which is fine
+			return;
 	}
 
 };

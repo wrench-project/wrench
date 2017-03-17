@@ -49,10 +49,21 @@ namespace wrench {
 
 			// Submit all ready tasks for execution
 			std::vector<WorkflowTask *> ready_tasks = this->workflow->getReadyTasks();
-			std::vector<std::unique_ptr<ComputeService>> &compute_services = this->simulation->getComputeServices();
+			std::set<ComputeService *> compute_services = this->simulation->getComputeServices();
+
+			if (compute_services.size() == 0) {
+				XBT_INFO("Aborting - No compute services available!");
+				break;
+			}
 
 			// Run ready tasks with defined scheduler implementation
 			this->scheduler->runTasks(ready_tasks, compute_services);
+
+//			// DEBUG:
+//			XBT_INFO("Terminanating all service");
+//			for (auto cs : compute_services) {
+//				cs->stop();
+//			}
 
 			// Wait for a workflow execution event
 			std::unique_ptr<WorkflowExecutionEvent> event = workflow->wait_for_next_execution_event();
@@ -62,17 +73,25 @@ namespace wrench {
 					XBT_INFO("Notified that task %s has completed", event->task->getId().c_str());
 					break;
 				}
+				case WorkflowExecutionEvent::TASK_FAILURE: {
+					XBT_INFO("Notified that task %s has failed (it's back in the ready state)", event->task->getId().c_str());
+					break;
+				}
 				default: {
 					throw WRENCHException("Unknown workflow execution event type");
 				}
 			}
-			
+
 			if (workflow->isDone()) {
 				break;
 			}
 		}
 
-		XBT_INFO("Workflow execution is complete!");
+		if (workflow->isDone()) {
+			XBT_INFO("Workflow execution is complete!");
+		} else {
+			XBT_INFO("Workflow execution is incomplete, but there are no more compute services...");
+		}
 
 		XBT_INFO("Simple WMS Daemon is shutting down all Compute Services");
 		this->simulation->shutdown();

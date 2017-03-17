@@ -38,4 +38,11 @@ namespace wrench {
 			this->compute_service = cs;
 		}
 
+		/** TASK_FAILED MESSAGE **/
+		// TODO: MAke the "1024" below configurable somehow
+		TaskFailedMessage::TaskFailedMessage(WorkflowTask *t, ComputeService *cs): SimulationMessage(TASK_FAILED, 1024.0) {
+			this->task = t;
+			this->compute_service = cs;
+		}
+
 };

@@ -27,6 +27,7 @@ namespace wrench {
 						STOP_DAEMON,
 						RUN_TASK,
 						TASK_DONE,
+						TASK_FAILED
 				};
 
 				SimulationMessage(Type t, double s);
@@ -49,6 +50,13 @@ namespace wrench {
 		// Derived struct
 		struct TaskDoneMessage: public SimulationMessage {
 				TaskDoneMessage(WorkflowTask *, ComputeService*);
+				WorkflowTask *task;
+				ComputeService *compute_service;
+		};
+
+		// Derived struct
+		struct TaskFailedMessage: public SimulationMessage {
+				TaskFailedMessage(WorkflowTask *, ComputeService*);
 				WorkflowTask *task;
 				ComputeService *compute_service;
 		};

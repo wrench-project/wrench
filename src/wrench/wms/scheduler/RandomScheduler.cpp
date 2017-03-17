@@ -10,6 +10,7 @@
  */
 
 #include <xbt.h>
+#include <set>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/scheduler/RandomScheduler.h"
@@ -31,7 +32,7 @@ namespace wrench {
 	 * @param callback_mailbox is the name of the mailbox
 	 */
 	void RandomScheduler::runTasks(std::vector<WorkflowTask *> ready_tasks,
-	                               std::vector<std::unique_ptr<ComputeService>> &compute_services) {
+	                               std::set<ComputeService *> &compute_services) {
 
 		if (ready_tasks.size() > 0) {
 			XBT_INFO("There are %ld ready tasks", ready_tasks.size());
@@ -40,10 +41,10 @@ namespace wrench {
 			XBT_INFO("Submitting task %s for execution", ready_tasks[i]->getId().c_str());
 
 			// schedule task to first available compute resource
-			for (int j = 0; j < compute_services.size(); j++) {
-				if (compute_services[j]->hasIdleCore()) {
+			for (auto cs : compute_services) {
+				if (cs->hasIdleCore()) {
 					ready_tasks[i]->setScheduled();
-					compute_services[j]->runTask(ready_tasks[i]);
+					cs->runTask(ready_tasks[i]);
 					break;
 				}
 			}

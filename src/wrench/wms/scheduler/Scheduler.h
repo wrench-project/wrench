@@ -14,6 +14,7 @@
 
 #include "workflow/WorkflowTask.h"
 #include "compute_services/ComputeService.h"
+#include <set>
 
 namespace wrench {
 
@@ -34,7 +35,7 @@ namespace wrench {
 		 * @param callback_mailbox is the name of the mailbox
 		 */
 		virtual void runTasks(std::vector<WorkflowTask *> ready_tasks,
-		                      std::vector<std::unique_ptr<ComputeService>> &compute_services) = 0;
+		                      std::set<ComputeService *> &compute_services) = 0;
 	};
 
 }

@@ -40,6 +40,14 @@ namespace wrench {
 					return event;
 				}
 
+				case SimulationMessage::TASK_FAILED: {
+					std::unique_ptr<TaskFailedMessage> m(static_cast<TaskFailedMessage *>(message.release()));
+					event->type = WorkflowExecutionEvent::TASK_FAILURE;
+					event->task = m->task;
+					event->compute_service = m->compute_service;
+					return event;
+				}
+
 				default: {
 					throw WRENCHException("Non-handled message type when generating execution event");
 				}

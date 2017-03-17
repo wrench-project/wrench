@@ -22,7 +22,7 @@ namespace wrench {
 		RandomScheduler();
 
 		virtual void runTasks(std::vector<WorkflowTask *> ready_tasks,
-		                      std::vector<std::unique_ptr<ComputeService>> &compute_services);
+		                      std::set<ComputeService *> &compute_services);
 	};
 }
 

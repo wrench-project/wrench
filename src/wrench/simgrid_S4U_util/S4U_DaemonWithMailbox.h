@@ -27,6 +27,7 @@ namespace wrench {
 		S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix);
 		void start(std::string hostname);
 		virtual int main() = 0;
+		void kill_actor();
 
 	private:
 		simgrid::s4u::ActorPtr actor;

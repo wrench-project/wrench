@@ -32,19 +32,26 @@ namespace wrench {
 		Simulation();
 		void init(int *, char **);
 		void createPlatform(std::string);
-		void createSequentialTaskExecutor(std::string hostname);
+//		void createSequentialTaskExecutor(std::string hostname);
 		void createMulticoreTaskExecutor(std::string hostname);
 		void createWMS(Workflow *w, Scheduler *s, std::string hostname);
 		void launch();
 		void shutdown();
-		std::vector<std::unique_ptr<ComputeService>> &getComputeServices();
+		std::set<ComputeService *> getComputeServices();
+
 
 	private:
+			friend class ComputeService;
+
 		std::unique_ptr<S4U_Simulation> s4u_simulation;
 
-//				std::unique_ptr<Platform> platform;
 		std::vector<std::unique_ptr<WMS>> WMSes;
-		std::vector<std::unique_ptr<ComputeService>> compute_services;
+
+		std::vector<std::unique_ptr<ComputeService>> running_compute_services;
+		std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
+
+		void mark_compute_service_as_terminated(ComputeService *cs);
+
 
 	};
 

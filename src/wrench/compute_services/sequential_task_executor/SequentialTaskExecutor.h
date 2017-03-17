@@ -13,16 +13,20 @@
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTOR_H
 #define SIMULATION_SEQUENTIALTASKEXECUTOR_H
 
+#include <compute_services/ComputeService.h>
 #include "compute_services/ComputeService.h"
 #include "SequentialTaskExecutorDaemon.h"
 
 namespace wrench {
 
-	class SequentialTaskExecutor : public ComputeService {
+	class Simulation;
+
+	class SequentialTaskExecutor : ComputeService {
 
 	public:
-		SequentialTaskExecutor(std::string hostname);
+		SequentialTaskExecutor(std::string hostname, Simulation *simulation);
 		void stop();
+		void kill();
 		int runTask(WorkflowTask *task);
 		bool hasIdleCore();
 

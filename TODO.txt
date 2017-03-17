@@ -1,5 +1,5 @@
 
-- Implement an ExecutionEvent class
+[DONE] Implement an ExecutionEvent class
 
 - Make sure a Multicore Executor sends back "TASK_FAILED" message if it's stopped in the
   middle of running tasks
