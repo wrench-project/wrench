@@ -30,6 +30,7 @@ namespace wrench {
 			};
 
 			ComputeService(std::string, Simulation *simulation);
+			ComputeService(std::string);
 
 		// Virtual methods to implement in derived classes
 		virtual int runTask(WorkflowTask *task) = 0;

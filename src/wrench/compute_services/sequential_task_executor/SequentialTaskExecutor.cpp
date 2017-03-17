@@ -17,9 +17,11 @@
 namespace wrench {
 
 	/**
-	 * @brief Constructor, which starts the daemon for the service on a host
+	 * @brief Constructor, which starts the daemon for the service on a host, and
+	 *         registers the SequentialTaskExecutor to a WRENCH Simulation
 	 *
 	 * @param hostname is the name of the host
+	 * @param simulation is a pointer to a WRENCH simulation
 	 */
 	SequentialTaskExecutor::SequentialTaskExecutor(std::string hostname, Simulation *simulation) :
 					ComputeService("sequential_task_executor", simulation) {
@@ -29,6 +31,20 @@ namespace wrench {
 		// Start the daemon on the host
 		this->daemon->start(this->hostname);
 	}
+
+		/**
+	 * @brief Constructor, which starts the daemon for the service on a host
+	 *
+	 * @param hostname is the name of the host
+	 */
+		SequentialTaskExecutor::SequentialTaskExecutor(std::string hostname) :
+						ComputeService("sequential_task_executor") {
+			this->hostname = hostname;
+			// Create the daemon
+			this->daemon = std::unique_ptr<SequentialTaskExecutorDaemon>(new SequentialTaskExecutorDaemon(this));
+			// Start the daemon on the host
+			this->daemon->start(this->hostname);
+		}
 
 	/**
 	 * @brief Terminate the sequential task executor

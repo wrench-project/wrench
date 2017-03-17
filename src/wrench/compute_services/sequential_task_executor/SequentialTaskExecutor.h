@@ -25,6 +25,7 @@ namespace wrench {
 
 	public:
 		SequentialTaskExecutor(std::string hostname, Simulation *simulation);
+		SequentialTaskExecutor(std::string hostname);
 		void stop();
 		void kill();
 		int runTask(WorkflowTask *task);

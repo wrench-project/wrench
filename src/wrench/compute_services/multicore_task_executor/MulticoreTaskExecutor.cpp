@@ -20,9 +20,11 @@
 namespace wrench {
 
 	/**
-	 * @brief Constructor that starts the daemon for the service on a host
+	 * @brief Constructor that starts the daemon for the service on a host,
+	 *        registering it with a WRENCH Simulation
 	 *
 	 * @param hostname is the name of the host
+	 * @param simulation is a pointer to a Simulation
 	 */
 	MulticoreTaskExecutor::MulticoreTaskExecutor(std::string hostname, Simulation *simulation) :
 					ComputeService("multicore_task_executor", simulation) {
@@ -32,9 +34,9 @@ namespace wrench {
 		// Start one sequential task executor daemon per core
 		int num_cores = S4U_Simulation::getNumCores(this->hostname);
 		for (int i = 0; i < num_cores; i++) {
-			// Start a sequential task executor
+			// Start a sequential task executor (unregistered to the simulation)
 			std::unique_ptr<SequentialTaskExecutor> seq_executor =
-					std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(this->hostname, nullptr));
+					std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(this->hostname));
 			// Add it to the list of sequential task executors
 			this->sequential_task_executors.push_back(std::move(seq_executor));
 		}

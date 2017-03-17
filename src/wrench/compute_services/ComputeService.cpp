@@ -16,15 +16,31 @@
 namespace wrench {
 
 	/**
-	 * @brief Constructor
+	 * @brief Constructor, which links back the ComputeService
+	 *        to a Simulation (i.e.g, "registering" the ComputeService).
+	 *        This means that the Simulation can provide access to
+	 *        the ComputeService when queried.
 	 *
 	 * @param service_name is the name of the compute service
+	 * @param simulation is a pointer to a WRENCH simulation
 	 */
 	ComputeService::ComputeService(std::string service_name, Simulation *simulation) {
 		this->service_name = service_name;
 		this->simulation = simulation;
 		this->state = ComputeService::RUNNING;
 	}
+
+  /**
+	 * @brief Constructor
+	 *
+	 * @param service_name is the name of the compute service
+	 */
+	ComputeService::ComputeService(std::string service_name) {
+		this->service_name = service_name;
+		this->simulation = nullptr;
+		this->state = ComputeService::RUNNING;
+	}
+
 
 		/**
 		 * @brief Stop the compute service - must be called by the stop()
