@@ -27,7 +27,6 @@ namespace wrench {
 		flops = t;
 		number_of_processors = n;
 		state = WorkflowTask::READY;
-		callback_mailbox_stack = {};
 	}
 
 	/**
