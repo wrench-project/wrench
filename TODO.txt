@@ -4,8 +4,28 @@
 [DONE] Make sure a Multicore Executor sends back "TASK_FAILED" message if it's stopped in the
   middle of running tasks
 
+---------------------------------------------------------------------
+
+- Create a Job class
+
+- Create a map of properties for ComputeService
+    map<enum, string>
+    getProperty()
+
+- ComputeService
+    - implement all methods and return exception
+
+- Prototype PilotJob
+
+
+---------------------------------------------------------------------
+
 - Deal with error handling via nice exceptions, etc.
 
-- Figure out how/whether to do asynchronous communication
-
 - Deal with failure traces...
+
+-----------------------------------------------------------------------
+
+
+- Dealing with removing "friend class" with Visitor pattern:
+     https://sourcemaking.com/design_patterns/visitor/cpp/1

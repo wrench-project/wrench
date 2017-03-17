@@ -71,7 +71,7 @@ namespace wrench {
 	 * @return 0 on success
 	 */
 	int SequentialTaskExecutor::runTask(WorkflowTask *task) {
-		if (this->state == ComputeService::TERMINATED) {
+		if (this->state == ComputeService::DOWN) {
 			throw WRENCHException("Trying to run a task on a compute service that's terminated");
 		}
 		// Send a "run a task" message to the daemon's mailbox

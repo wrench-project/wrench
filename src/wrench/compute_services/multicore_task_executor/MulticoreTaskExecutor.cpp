@@ -76,7 +76,7 @@ namespace wrench {
 	 */
 	int MulticoreTaskExecutor::runTask(WorkflowTask *task) {
 
-		if (this->state == ComputeService::TERMINATED) {
+		if (this->state == ComputeService::DOWN) {
 			throw WRENCHException("Trying to run a task on a compute service that's terminated");
 		}
 		// Asynchronously send a "run a task" message to the daemon's mailbox

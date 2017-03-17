@@ -82,7 +82,7 @@ namespace wrench {
 					XBT_INFO("Notifying mailbox %s that task %s has finished",
 					         m->task->getCallbackMailbox().c_str(),
 					         m->task->id.c_str());
-					S4U_Mailbox::iput(m->task->pop_callback_mailbox(),
+					S4U_Mailbox::put(m->task->pop_callback_mailbox(),
 														new TaskDoneMessage(m->task, this->compute_service));
 
 					break;

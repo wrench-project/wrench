@@ -25,8 +25,8 @@ namespace wrench {
 	public:
 
 		enum State {
-			RUNNING,
-			TERMINATED
+			UP,
+			DOWN
 		};
 
 		ComputeService(std::string, Simulation *simulation);

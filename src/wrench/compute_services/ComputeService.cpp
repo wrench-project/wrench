@@ -27,7 +27,7 @@ namespace wrench {
 	ComputeService::ComputeService(std::string service_name, Simulation *simulation) {
 		this->service_name = service_name;
 		this->simulation = simulation;
-		this->state = ComputeService::RUNNING;
+		this->state = ComputeService::UP;
 	}
 
 	/**
@@ -38,7 +38,7 @@ namespace wrench {
 	ComputeService::ComputeService(std::string service_name) {
 		this->service_name = service_name;
 		this->simulation = nullptr;
-		this->state = ComputeService::RUNNING;
+		this->state = ComputeService::UP;
 	}
 
 
@@ -47,7 +47,7 @@ namespace wrench {
 	 *        method of derived classes
 	 */
 	void ComputeService::stop() {
-		this->state = ComputeService::TERMINATED;
+		this->state = ComputeService::DOWN;
 		// Notify the simulation that the service is terminated, if that
 		// service was registered with the simulation
 		if (this->simulation) {
