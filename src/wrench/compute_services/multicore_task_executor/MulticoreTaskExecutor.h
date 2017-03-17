@@ -14,12 +14,12 @@
 #define WRENCH_MULTICORETASKEXECUTOR_H
 
 
-#include <workflow/WorkflowTask.h>
-#include <compute_services/ComputeService.h>
-#include <compute_services/sequential_task_executor/SequentialTaskExecutor.h>
-#include <simulation/SimulationMessage.h>
-#include <simulation/Simulation.h>
-#include "MulticoreTaskExecutorDaemon.h"
+#include "workflow/WorkflowTask.h"
+#include "compute_services/ComputeService.h"
+#include "compute_services/sequential_task_executor/SequentialTaskExecutor.h"
+#include "simulation/SimulationMessage.h"
+#include "simulation/Simulation.h"
+#include "compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.h"
 
 namespace wrench {
 

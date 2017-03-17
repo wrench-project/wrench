@@ -24,13 +24,13 @@ namespace wrench {
 
 	public:
 
-			enum State {
-					RUNNING,
-					TERMINATED
-			};
+		enum State {
+			RUNNING,
+			TERMINATED
+		};
 
-			ComputeService(std::string, Simulation *simulation);
-			ComputeService(std::string);
+		ComputeService(std::string, Simulation *simulation);
+		ComputeService(std::string);
 
 		// Virtual methods to implement in derived classes
 		virtual int runTask(WorkflowTask *task) = 0;

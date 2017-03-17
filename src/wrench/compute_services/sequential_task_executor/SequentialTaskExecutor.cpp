@@ -10,9 +10,9 @@
  *  sequential Compute Service abstraction.
  */
 
-#include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <exception/WRENCHException.h>
-#include "SequentialTaskExecutor.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "exception/WRENCHException.h"
+#include "compute_services/sequential_task_executor/SequentialTaskExecutor.h"
 
 namespace wrench {
 

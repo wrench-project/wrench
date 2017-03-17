@@ -9,6 +9,8 @@ set(SOURCE_FILES
         src/wrench/exception/WRENCHException.h
         src/wrench/simulation/SimulationMessage.cpp
         src/wrench/simulation/SimulationMessage.h
+        src/wrench/simulation/WorkflowExecutionEvent.cpp
+        src/wrench/simulation/WorkflowExecutionEvent.h
         src/wrench/simgrid_MSG_util/MSG_Mailbox.cpp
         src/wrench/simgrid_MSG_util/MSG_Mailbox.h
         src/wrench/simgrid_MSG_util/MSG_Computation.cpp
@@ -61,14 +63,16 @@ set(SOURCE_FILES
         src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.h
         src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.cpp
         src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.h
-        src/wrench/simulation/Simulation.cpp
-        src/wrench/simulation/Simulation.h
         src/wrench/pilotjob_manager/PilotjobManager.cpp
         src/wrench/pilotjob_manager/PilotJobManager.h
         src/wrench/pilotjob_manager/Pilotjob.cpp
         src/wrench/pilotjob_manager/Pilotjob.h
-        src/wrench/main.cpp src/wrench/pilotjob_manager/PilotjobmanagerDaemon.cpp
-        src/wrench/pilotjob_manager/PilotjobmanagerDaemon.h src/wrench/simulation/WorkflowExecutionEvent.cpp src/wrench/simulation/WorkflowExecutionEvent.h)
+        src/wrench/pilotjob_manager/PilotjobmanagerDaemon.cpp
+        src/wrench/pilotjob_manager/PilotjobmanagerDaemon.h
+        src/wrench/simulation/Simulation.cpp
+        src/wrench/simulation/Simulation.h
+        src/wrench/main.cpp
+        )
 
 set(INCLUDE_FILES include/wrench.h)
 

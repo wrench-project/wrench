@@ -13,7 +13,7 @@
 #define WRENCH_PILOTJOB_H
 
 
-#include <compute_services/ComputeService.h>
+#include "compute_services/ComputeService.h"
 
 namespace wrench {
 

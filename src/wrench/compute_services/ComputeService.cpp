@@ -10,7 +10,7 @@
  */
 
 #include "ComputeService.h"
-#include "../simulation/Simulation.h"
+#include "simulation/Simulation.h"
 
 
 namespace wrench {
@@ -30,11 +30,11 @@ namespace wrench {
 		this->state = ComputeService::RUNNING;
 	}
 
-  /**
-	 * @brief Constructor
-	 *
-	 * @param service_name is the name of the compute service
-	 */
+	/**
+	   * @brief Constructor
+	   *
+	   * @param service_name is the name of the compute service
+	   */
 	ComputeService::ComputeService(std::string service_name) {
 		this->service_name = service_name;
 		this->simulation = nullptr;
@@ -42,17 +42,17 @@ namespace wrench {
 	}
 
 
-		/**
-		 * @brief Stop the compute service - must be called by the stop()
-		 *        method of derived classes
-		 */
+	/**
+	 * @brief Stop the compute service - must be called by the stop()
+	 *        method of derived classes
+	 */
 	void ComputeService::stop() {
-			this->state = ComputeService::TERMINATED;
-			// Notify the simulation that the service is terminated, if that
-			// service was registered with the simulation
-			if (this->simulation) {
-				this->simulation->mark_compute_service_as_terminated(this);
-			}
+		this->state = ComputeService::TERMINATED;
+		// Notify the simulation that the service is terminated, if that
+		// service was registered with the simulation
+		if (this->simulation) {
+			this->simulation->mark_compute_service_as_terminated(this);
+		}
 	}
 
 	/**

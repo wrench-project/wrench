@@ -11,7 +11,7 @@
  */
 
 #include <string>
-#include <simgrid_S4U_util/S4U_Simulation.h>
+#include "simgrid_S4U_util/S4U_Simulation.h"
 #include "PilotJobManager.h"
 #include "PilotJobManagerDaemon.h"
 

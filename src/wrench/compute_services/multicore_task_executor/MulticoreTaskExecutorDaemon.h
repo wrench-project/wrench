@@ -14,11 +14,11 @@
 #ifndef WRENCH_MULTICORETASKEXECUTORDAEMON_H
 #define WRENCH_MULTICORETASKEXECUTORDAEMON_H
 
-
-#include <compute_services/sequential_task_executor/SequentialTaskExecutor.h>
-#include <simulation/SimulationMessage.h>
 #include <queue>
 #include <set>
+
+#include "compute_services/sequential_task_executor/SequentialTaskExecutor.h"
+#include "simulation/SimulationMessage.h"
 
 namespace wrench {
 

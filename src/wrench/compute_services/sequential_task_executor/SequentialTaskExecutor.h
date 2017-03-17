@@ -13,7 +13,7 @@
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTOR_H
 #define SIMULATION_SEQUENTIALTASKEXECUTOR_H
 
-#include <compute_services/ComputeService.h>
+#include "compute_services/ComputeService.h"
 #include "compute_services/ComputeService.h"
 #include "SequentialTaskExecutorDaemon.h"
 

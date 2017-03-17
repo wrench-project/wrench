@@ -11,11 +11,11 @@
  *
  */
 
-#include <workflow/WorkflowTask.h>
-#include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <simgrid_S4U_util/S4U_Simulation.h>
-#include <exception/WRENCHException.h>
-#include "MulticoreTaskExecutor.h"
+#include "workflow/WorkflowTask.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "simgrid_S4U_util/S4U_Simulation.h"
+#include "exception/WRENCHException.h"
+#include "compute_services/multicore_task_executor/MulticoreTaskExecutor.h"
 
 namespace wrench {
 

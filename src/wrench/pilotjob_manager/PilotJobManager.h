@@ -15,7 +15,7 @@
 #define WRENCH_PILOTJOBMANAGER_H
 
 #include <vector>
-#include <compute_services/ComputeService.h>
+#include "compute_services/ComputeService.h"
 
 namespace wrench {
 

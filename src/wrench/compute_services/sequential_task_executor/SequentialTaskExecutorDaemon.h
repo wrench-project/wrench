@@ -13,8 +13,8 @@
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H
 #define SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H
 
-#include <compute_services/ComputeService.h>
-#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
+#include "compute_services/ComputeService.h"
+#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
 
 namespace wrench {
 
