@@ -30,20 +30,12 @@ namespace wrench {
 			ComputeService *cs) : S4U_DaemonWithMailbox("multicore_task_executor", "multicore_task_executor") {
 
 		// Initialize the set of idle executors (cores)
-		this->idle_sequential_task_executors = {};
 		for (int i = 0; i < executors.size(); i++) {
 			this->idle_sequential_task_executors.insert(executors[i]);
 		}
 
-		// Initialize the set of busy executors (cores)
-		this->busy_sequential_task_executors = {};
-
 		// Set the pointer to the corresponding compute service
 		this->compute_service = cs;
-
-		// Initialize the task queues
-		this->waiting_task_queue = {};
-		this->running_task_set = {};
 	}
 
 	/**
