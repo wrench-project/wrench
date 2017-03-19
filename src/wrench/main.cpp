@@ -72,14 +72,13 @@ int main(int argc, char **argv) {
 //	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
 //	simulation.createSequentialTaskExecutor("Tremblay");
 
-	std::cerr << "Instantiating a  Task Executor on Jupiter..." << std::endl;
-//	simulation.createSequentialTaskExecutor("Jupiter");
+	std::cerr << "Instantiating a  MultiCore Job executor on c-1.me..." << std::endl;
 	simulation.createMulticoreTaskExecutor("c-1.me");
 //	simulation.createMulticoreTaskExecutor("c-2.me");
 //	simulation.createMulticoreTaskExecutor("c-3.me");
 
 
-	std::cerr << "Instantiating a WMS on Tremblay..." << std::endl;
+	std::cerr << "Instantiating a WMS on c-0.me..." << std::endl;
 	wrench::Scheduler *scheduler = wrench::SchedulerFactory::getInstance()->Create(1);
 //	simulation.createWMS(&workflow, "Tremblay");
 	simulation.createWMS(&workflow, scheduler, "c-0.me");

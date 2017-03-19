@@ -61,15 +61,16 @@ namespace wrench {
 				this->scheduler->runTasks(ready_tasks, compute_services);
 
 				// Wait for a workflow execution event
-				std::unique_ptr<WorkflowExecutionEvent> event = workflow->wait_for_next_execution_event();
+				std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
 
 				switch(event->type) {
-					case WorkflowExecutionEvent::TASK_COMPLETION: {
-						XBT_INFO("Notified that task %s has completed", event->task->getId().c_str());
+					case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+						StandardJob *job = (StandardJob *)(event->job);
+						XBT_INFO("Notified that a %ld-task job has completed", job->tasks.size());
 						break;
 					}
-					case WorkflowExecutionEvent::TASK_FAILURE: {
-						XBT_INFO("Notified that task %s has failed (it's back in the ready state)", event->task->getId().c_str());
+					case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+						XBT_INFO("Notified that as job has failed (it's back in the ready state)");
 						break;
 					}
 					default: {

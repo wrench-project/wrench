@@ -7,7 +7,7 @@
  * (at your option) any later version.
  *
  *  @brief WRENCH::SequentialTaskExecutorDaemon implements the daemon for the
- *  SequentialTaskExecutor Compute Service abstraction.
+ *  SequentialTaskExecutor.
  */
 
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTORDAEMON_H
@@ -18,16 +18,17 @@
 
 namespace wrench {
 
+	class SequentialTaskExecutor;
+
 	class SequentialTaskExecutorDaemon : public S4U_DaemonWithMailbox {
 
 	public:
-		SequentialTaskExecutorDaemon(ComputeService *cs);
-		bool isIdle();
+		SequentialTaskExecutorDaemon(std::string callback_mailbox, SequentialTaskExecutor *);
 
 	private:
 		int main();
-		ComputeService *compute_service;
-		bool busy;
+		std::string callback_mailbox;
+			SequentialTaskExecutor *task_executor;
 	};
 }
 

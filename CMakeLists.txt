@@ -9,8 +9,8 @@ set(SOURCE_FILES
         src/wrench/exception/WRENCHException.h
         src/wrench/simulation/SimulationMessage.cpp
         src/wrench/simulation/SimulationMessage.h
-        src/wrench/simulation/WorkflowExecutionEvent.cpp
-        src/wrench/simulation/WorkflowExecutionEvent.h
+        src/wrench/workflow_execution_events/WorkflowExecutionEvent.cpp
+        src/wrench/workflow_execution_events/WorkflowExecutionEvent.h
         src/wrench/simgrid_MSG_util/MSG_Mailbox.cpp
         src/wrench/simgrid_MSG_util/MSG_Mailbox.h
         src/wrench/simgrid_MSG_util/MSG_Computation.cpp
@@ -55,14 +55,14 @@ set(SOURCE_FILES
         src/wrench/wms/scheduler/RandomScheduler.cpp
         src/wrench/compute_services/ComputeService.cpp
         src/wrench/compute_services/ComputeService.h
-        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutor.cpp
-        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutor.h
-        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
-        src/wrench/compute_services/sequential_task_executor/SequentialTaskExecutorDaemon.h
-        src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.cpp
-        src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutor.h
-        src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.cpp
-        src/wrench/compute_services/multicore_task_executor/MulticoreTaskExecutorDaemon.h
+        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.cpp
+        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.h
+        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
+        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorDaemon.h
+        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.cpp
+        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.h
+        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.cpp
+        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h
         src/wrench/pilotjob_manager/Pilotjob.cpp
         src/wrench/pilotjob_manager/Pilotjob.h
         src/wrench/pilotjob_manager/PilotjobManagerDaemon.cpp
@@ -72,7 +72,10 @@ set(SOURCE_FILES
         src/wrench/simulation/Simulation.cpp
         src/wrench/simulation/Simulation.h
         src/wrench/main.cpp
-        )
+        src/wrench/workflow_job/WorkflowJob.cpp
+        src/wrench/workflow_job/WorkflowJob.h
+        src/wrench/workflow_job/StandardJob.cpp
+        src/wrench/workflow_job/StandardJob.h)
 
 set(INCLUDE_FILES include/wrench.h)
 

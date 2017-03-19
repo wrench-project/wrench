@@ -18,7 +18,7 @@ namespace wrench {
 
 		WorkflowExecutionEvent::WorkflowExecutionEvent() {
 			this->type = WorkflowExecutionEvent::UNDEFINED;
-			this->task = nullptr;
+			this->job = nullptr;
 			this->compute_service = nullptr;
 		}
 
@@ -32,18 +32,18 @@ namespace wrench {
 
 			switch (message->type) {
 
-				case SimulationMessage::TASK_DONE: {
-					std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
-					event->type = WorkflowExecutionEvent::TASK_COMPLETION;
-					event->task = m->task;
+				case SimulationMessage::STANDARD_JOB_DONE: {
+					std::unique_ptr<JobDoneMessage> m(static_cast<JobDoneMessage *>(message.release()));
+					event->type = WorkflowExecutionEvent::STANDARD_JOB_COMPLETION;
+					event->job = m->job;
 					event->compute_service = m->compute_service;
 					return event;
 				}
 
-				case SimulationMessage::TASK_FAILED: {
-					std::unique_ptr<TaskFailedMessage> m(static_cast<TaskFailedMessage *>(message.release()));
-					event->type = WorkflowExecutionEvent::TASK_FAILURE;
-					event->task = m->task;
+				case SimulationMessage::STANDARD_JOB_FAILED: {
+					std::unique_ptr<JobFailedMessage> m(static_cast<JobFailedMessage *>(message.release()));
+					event->type = WorkflowExecutionEvent::STANDARD_JOB_FAILURE;
+					event->job = m->job;
 					event->compute_service = m->compute_service;
 					return event;
 				}

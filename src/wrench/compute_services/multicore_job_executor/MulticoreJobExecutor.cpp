@@ -15,7 +15,7 @@
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 #include "exception/WRENCHException.h"
-#include "compute_services/multicore_task_executor/MulticoreTaskExecutor.h"
+#include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 
 namespace wrench {
 
@@ -26,30 +26,13 @@ namespace wrench {
 	 * @param hostname is the name of the host
 	 * @param simulation is a pointer to a Simulation
 	 */
-	MulticoreTaskExecutor::MulticoreTaskExecutor(std::string hostname, Simulation *simulation) :
-					ComputeService("multicore_task_executor", simulation) {
+	MulticoreJobExecutor::MulticoreJobExecutor(std::string hostname, Simulation *simulation) :
+					ComputeService("multicore_job_executor", simulation) {
 
 		this->hostname = hostname;
-
-		// Start one sequential task executor daemon per core
-		int num_cores = S4U_Simulation::getNumCores(this->hostname);
-		for (int i = 0; i < num_cores; i++) {
-			// Start a sequential task executor (unregistered to the simulation)
-			std::unique_ptr<SequentialTaskExecutor> seq_executor =
-					std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(this->hostname));
-			// Add it to the list of sequential task executors
-			this->sequential_task_executors.push_back(std::move(seq_executor));
-		}
-
-		// Create a list of raw pointers to the sequential task executors
-		std::vector<SequentialTaskExecutor *> executor_ptrs;
-		for (int i = 0; i < this->sequential_task_executors.size(); i++) {
-			executor_ptrs.push_back(this->sequential_task_executors[i].get());
-		}
-
 		// Create the main daemon
-		this->daemon = std::unique_ptr<MulticoreTaskExecutorDaemon>(
-				new MulticoreTaskExecutorDaemon(executor_ptrs, this));
+		this->daemon = std::unique_ptr<MulticoreJobExecutorDaemon>(
+						new MulticoreJobExecutorDaemon(this));
 
 		// Start the daemon
 		this->daemon->start(this->hostname);
@@ -59,7 +42,7 @@ namespace wrench {
 	/**
 	 * @brief Stop the multi-core task executor
 	 */
-	void MulticoreTaskExecutor::stop() {
+	void MulticoreJobExecutor::stop() {
 		// Send a termination message to the daemon's mailbox
 		S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
 
@@ -74,22 +57,25 @@ namespace wrench {
 	 * @param callback_mailbox is the name of a mailbox to which a "task done" callback will be sent
 	 * @return 0 on success
 	 */
-	int MulticoreTaskExecutor::runTask(WorkflowTask *task) {
+	int MulticoreJobExecutor::runJob(StandardJob *job) {
 
 		if (this->state == ComputeService::DOWN) {
 			throw WRENCHException("Trying to run a task on a compute service that's terminated");
 		}
-		// Asynchronously send a "run a task" message to the daemon's mailbox
-		S4U_Mailbox::put(this->daemon->mailbox_name, new RunTaskMessage(task));
+		// Synchronously send a "run a task" message to the daemon's mailbox
+		S4U_Mailbox::put(this->daemon->mailbox_name, new RunJobMessage(job));
 		return 0;
 	};
 
 	/**
-	 * @brief Check whether the service has at least an idle core
+	 * @brief Finds out how many idle cores the compute service has
 	 *
 	 * @return
 	 */
-	bool MulticoreTaskExecutor::hasIdleCore() {
-		return this->daemon->hasIdleCore();
+	unsigned long MulticoreJobExecutor::numIdleCores() {
+		S4U_Mailbox::put(this->daemon->mailbox_name, new NumIdleCoresRequestMessage());
+		std::unique_ptr<SimulationMessage> msg= S4U_Mailbox::get(this->daemon->mailbox_name + "_answers");
+		std::unique_ptr<NumIdleCoresAnswerMessage> m(static_cast<NumIdleCoresAnswerMessage *>(msg.release()));
+		return m->num_idle_cores;
 	}
 }

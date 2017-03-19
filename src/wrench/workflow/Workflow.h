@@ -15,7 +15,7 @@
 
 #include <lemon/list_graph.h>
 #include <map>
-#include <simulation/WorkflowExecutionEvent.h>
+#include <workflow_execution_events/WorkflowExecutionEvent.h>
 
 #include "WorkflowTask.h"
 #include "WorkflowFile.h"
@@ -59,6 +59,7 @@ namespace wrench {
 
 	friend class WorkflowTask;
 	friend class SimpleWMSDaemon;
+	friend class StandardJob;
 
 	private:
 
@@ -76,10 +77,10 @@ namespace wrench {
 		void update_task_state(WorkflowTask *task, WorkflowTask::State state);
 
 		/** Method to get the callback mailbox associated with the workflow **/
-		std::string get_callback_mailbox();
+		std::string getCallbackMailbox();
 
 		/** Method to wait the next event **/
-		std::unique_ptr<WorkflowExecutionEvent> wait_for_next_execution_event();
+		std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
 
 	};
 

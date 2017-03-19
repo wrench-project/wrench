@@ -14,6 +14,8 @@
 #define SIMULATION_COMPUTESERVICE_H
 
 
+#include <workflow_job/WorkflowJob.h>
+#include <workflow_job/StandardJob.h>
 #include "workflow/WorkflowTask.h"
 
 namespace wrench {
@@ -29,16 +31,21 @@ namespace wrench {
 			DOWN
 		};
 
+		/** Constructors **/
 		ComputeService(std::string, Simulation *simulation);
 		ComputeService(std::string);
 
-		// Virtual methods to implement in derived classes
-		virtual int runTask(WorkflowTask *task) = 0;
-		virtual bool hasIdleCore() = 0;
-		virtual void stop();
+		/** Job execution **/
+		virtual int runJob(StandardJob *job);
 
+		/** Information getting **/
+		virtual unsigned long numIdleCores() = 0;
 		std::string getName();
 		ComputeService::State getState();
+
+		/** Stopping **/
+		virtual void stop();
+
 
 	protected:
 		ComputeService::State state;

@@ -12,6 +12,7 @@
 
 #include "S4U_DaemonWithMailbox.h"
 #include "S4U_DaemonWithMailboxActor.h"
+#include "S4U_Mailbox.h"
 
 #include <simgrid/s4u.hpp>
 
@@ -24,9 +25,8 @@ namespace wrench {
 	 * @param mailbox_prefix is the prefix of the mailbox (to which a unique integer is appended)
 	 */
 	S4U_DaemonWithMailbox::S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix) {
-		static int unique_int = 0;
 		this->process_name = process_name;
-		this->mailbox_name = mailbox_prefix + "_" + std::to_string(unique_int++);
+		this->mailbox_name = S4U_Mailbox::generateUniqueMailboxName(mailbox_prefix);
 	}
 
 	/**

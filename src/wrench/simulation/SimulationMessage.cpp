@@ -25,24 +25,49 @@ namespace wrench {
 		StopDaemonMessage::StopDaemonMessage(): SimulationMessage(STOP_DAEMON, 1024.00) {
 		}
 
+		/** RUN_JOB MESSAGE **/
+		// TODO: MAke the "1024" below configurable somehow
+		RunJobMessage::RunJobMessage(WorkflowJob *job): SimulationMessage(RUN_STANDARD_JOB, 1024.0) {
+			this->job = job;
+		}
+
+		/** JOB_DONE MESSAGE **/
+		// TODO: MAke the "1024" below configurable somehow
+		JobDoneMessage::JobDoneMessage(WorkflowJob *job, ComputeService *cs): SimulationMessage(STANDARD_JOB_DONE, 1024.0) {
+			this->job = job;
+			this->compute_service = cs;
+		}
+
+		/** JOB_FAILED MESSAGE **/
+		// TODO: MAke the "1024" below configurable somehow
+		JobFailedMessage::JobFailedMessage(WorkflowJob *job, ComputeService *cs): SimulationMessage(STANDARD_JOB_FAILED, 1024.0) {
+			this->job = job;
+			this->compute_service = cs;
+		}
+
 		/** RUN_TASK MESSAGE **/
 		// TODO: MAke the "1024" below configurable somehow
-		RunTaskMessage::RunTaskMessage(WorkflowTask *t): SimulationMessage(RUN_TASK, 1024.0) {
-			this->task = t;
+		RunTaskMessage::RunTaskMessage(WorkflowTask *task): SimulationMessage(RUN_TASK, 1024.0) {
+			this->task = task;
 		}
 
 		/** TASK_DONE MESSAGE **/
 		// TODO: MAke the "1024" below configurable somehow
-		TaskDoneMessage::TaskDoneMessage(WorkflowTask *t, ComputeService *cs): SimulationMessage(TASK_DONE, 1024.0) {
-			this->task = t;
-			this->compute_service = cs;
+		TaskDoneMessage::TaskDoneMessage(WorkflowTask *task, SequentialTaskExecutor *executor): SimulationMessage(TASK_DONE, 1024.0) {
+			this->task = task;
+			this->task_executor = executor;
 		}
 
-		/** TASK_FAILED MESSAGE **/
+		/** NUM_IDLE_CORES_REQUEST MESSAGE **/
 		// TODO: MAke the "1024" below configurable somehow
-		TaskFailedMessage::TaskFailedMessage(WorkflowTask *t, ComputeService *cs): SimulationMessage(TASK_FAILED, 1024.0) {
-			this->task = t;
-			this->compute_service = cs;
+		NumIdleCoresRequestMessage::NumIdleCoresRequestMessage() : SimulationMessage(NUM_IDLE_CORES_REQUEST, 1024.0) {
 		}
+
+		/** NUM_IDLE_CORES_ANSWER MESSAGE **/
+		// TODO: MAke the "1024" below configurable somehow
+		NumIdleCoresAnswerMessage::NumIdleCoresAnswerMessage(unsigned long num) : SimulationMessage(NUM_IDLE_CORES_ANSWER, 1024.0) {
+			this->num_idle_cores = num;
+		}
+
 
 };

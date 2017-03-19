@@ -7,7 +7,7 @@
  * (at your option) any later version.
  *
  *  @brief WRENCH::SequentialTaskExecutorDaemon implements the daemon for the
- *  SequentialTaskExecutor Compute Service abstraction.
+ *  SequentialTaskExecutor.
  */
 
 #include <iostream>
@@ -28,18 +28,10 @@ namespace wrench {
 	 *
 	 * @param cs is a pointer to the corresponding compute service
 	 */
-	SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(ComputeService *cs) :
-			S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor"), busy(false) {
-		this->compute_service = cs;
-	}
-
-	/**
-	 * @brief Whether this executor is idle or busy
-	 *
-	 * @return True when idle
-	 */
-	bool SequentialTaskExecutorDaemon::isIdle() {
-		return !busy;
+	SequentialTaskExecutorDaemon::SequentialTaskExecutorDaemon(std::string cb, SequentialTaskExecutor *executor) :
+			S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
+		this->callback_mailbox = cb;
+		this->task_executor = executor;
 	}
 
 	/**
@@ -68,22 +60,20 @@ namespace wrench {
 					std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage *>(message.release()));
 
 					// Run the task
-					XBT_INFO("Executing task %s", m->task->id.c_str());
-					this->busy = true;
+					XBT_INFO("Executing task %s", m->task->getId().c_str());
 					m->task->setRunning();
 					S4U_Simulation::compute(m->task->flops);
 
 					// Set the task completion time and state
 					m->task->end_date = S4U_Simulation::getClock();
 					m->task->setCompleted();
-					this->busy = false;
 
-					// Send the callback to the task submitter
+					// Send the callback
 					XBT_INFO("Notifying mailbox %s that task %s has finished",
-					         m->task->getCallbackMailbox().c_str(),
+					         this->callback_mailbox.c_str(),
 					         m->task->id.c_str());
-					S4U_Mailbox::put(m->task->pop_callback_mailbox(),
-														new TaskDoneMessage(m->task, this->compute_service));
+					S4U_Mailbox::put(this->callback_mailbox,
+														new TaskDoneMessage(m->task, this->task_executor));
 
 					break;
 				}

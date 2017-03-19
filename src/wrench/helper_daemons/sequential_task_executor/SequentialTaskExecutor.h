@@ -7,7 +7,7 @@
  * (at your option) any later version.
  *
  *  @brief WRENCH::SequentialTaskExecutor class implements a simple
- *  sequential Compute Service abstraction.
+ *  sequential task executor abstraction.
  */
 
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTOR_H
@@ -21,15 +21,13 @@ namespace wrench {
 
 	class Simulation;
 
-	class SequentialTaskExecutor : ComputeService {
+	class SequentialTaskExecutor {
 
 	public:
-		SequentialTaskExecutor(std::string hostname, Simulation *simulation);
-		SequentialTaskExecutor(std::string hostname);
+		SequentialTaskExecutor(std::string hostname, std::string callback_mailbox);
 		void stop();
 		void kill();
 		int runTask(WorkflowTask *task);
-		bool hasIdleCore();
 
 	private:
 		std::string hostname;

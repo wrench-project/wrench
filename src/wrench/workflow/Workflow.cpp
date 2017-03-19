@@ -51,11 +51,10 @@ namespace wrench {
 	 * @brief  Constructor
 	 */
 	Workflow::Workflow() {
-		static int unique_int = 0;
 		DAG = std::unique_ptr<ListDigraph>(new ListDigraph());
 		DAG_node_map = std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>>(
 				new ListDigraph::NodeMap<WorkflowTask *>(*DAG));
-		this->callback_mailbox = std::string("workflow_mailbox_") + std::to_string(unique_int++);
+		this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
 	};
 
 
@@ -259,10 +258,6 @@ namespace wrench {
 
 				break;
 			}
-			case WorkflowTask::SCHEDULED: {
-				task->setState(WorkflowTask::SCHEDULED);
-				break;
-			}
 			case WorkflowTask::RUNNING: {
 				task->setState(WorkflowTask::RUNNING);
 				break;
@@ -343,7 +338,7 @@ namespace wrench {
 	 *
 	 * @return the mailbox name
 	 */
-	std::string Workflow::get_callback_mailbox() {
+	std::string Workflow::getCallbackMailbox() {
 		return this->callback_mailbox;
 	}
 
@@ -351,7 +346,7 @@ namespace wrench {
 	 * @brief Wait for a task completion
 	 * @return the completed task
 	 */
-	std::unique_ptr<WorkflowExecutionEvent> Workflow::wait_for_next_execution_event() {
+	std::unique_ptr<WorkflowExecutionEvent> Workflow::waitForNextExecutionEvent() {
 			return WorkflowExecutionEvent::get_next_execution_event(this->callback_mailbox);
 	}
 

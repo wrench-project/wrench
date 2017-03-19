@@ -26,13 +26,13 @@ namespace wrench {
 		public:
 				enum EventType {
 						UNDEFINED,
-						TASK_COMPLETION,
-						TASK_FAILURE
+						STANDARD_JOB_COMPLETION,
+						STANDARD_JOB_FAILURE
 				};
 
 
 				WorkflowExecutionEvent::EventType type;
-				WorkflowTask *task;
+				WorkflowJob *job;
 				ComputeService *compute_service;
 
 		private:

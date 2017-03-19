@@ -15,7 +15,8 @@
 
 #include <string>
 #include <compute_services/ComputeService.h>
-#include "workflow/WorkflowTask.h"
+#include <helper_daemons/sequential_task_executor/SequentialTaskExecutor.h>
+#include "workflow_job/WorkflowJob.h"
 
 namespace wrench {
 
@@ -25,9 +26,13 @@ namespace wrench {
 				// Message type enum
 				enum Type {
 						STOP_DAEMON,
+						RUN_STANDARD_JOB,
+						STANDARD_JOB_DONE,
+						STANDARD_JOB_FAILED,
 						RUN_TASK,
 						TASK_DONE,
-						TASK_FAILED
+						NUM_IDLE_CORES_REQUEST,
+						NUM_IDLE_CORES_ANSWER,
 				};
 
 				SimulationMessage(Type t, double s);
@@ -42,6 +47,26 @@ namespace wrench {
 		};
 
 		// Derived struct
+		struct RunJobMessage: public SimulationMessage {
+				RunJobMessage(WorkflowJob*);
+				WorkflowJob *job;
+		};
+
+		// Derived struct
+		struct JobDoneMessage: public SimulationMessage {
+				JobDoneMessage(WorkflowJob *, ComputeService*);
+				WorkflowJob *job;
+				ComputeService *compute_service;
+		};
+
+		// Derived struct
+		struct JobFailedMessage: public SimulationMessage {
+				JobFailedMessage(WorkflowJob *, ComputeService*);
+				WorkflowJob *job;
+				ComputeService *compute_service;
+		};
+
+		// Derived struct
 		struct RunTaskMessage: public SimulationMessage {
 				RunTaskMessage(WorkflowTask*);
 				WorkflowTask *task;
@@ -49,18 +74,21 @@ namespace wrench {
 
 		// Derived struct
 		struct TaskDoneMessage: public SimulationMessage {
-				TaskDoneMessage(WorkflowTask *, ComputeService*);
+				TaskDoneMessage(WorkflowTask *, SequentialTaskExecutor *);
 				WorkflowTask *task;
-				ComputeService *compute_service;
+				SequentialTaskExecutor *task_executor;
 		};
 
 		// Derived struct
-		struct TaskFailedMessage: public SimulationMessage {
-				TaskFailedMessage(WorkflowTask *, ComputeService*);
-				WorkflowTask *task;
-				ComputeService *compute_service;
+		struct NumIdleCoresRequestMessage: public SimulationMessage {
+				NumIdleCoresRequestMessage();
 		};
 
+		// Derived struct
+		struct NumIdleCoresAnswerMessage: public SimulationMessage {
+				NumIdleCoresAnswerMessage(unsigned long);
+				unsigned long num_idle_cores;
+		};
 
 };
 

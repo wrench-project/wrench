@@ -23,10 +23,11 @@ namespace wrench {
 	 * @param n is the number of processors for running the task
 	 */
 	WorkflowTask::WorkflowTask(const std::string string, const double t, const int n) {
-		id = string;
-		flops = t;
-		number_of_processors = n;
-		state = WorkflowTask::READY;
+		this->id = string;
+		this->flops = t;
+		this->number_of_processors = n;
+		this->state = WorkflowTask::READY;
+		this->job = nullptr;
 	}
 
 	/**
@@ -140,14 +141,6 @@ namespace wrench {
 	}
 
 	/**
-	 * @brief Set the task to the scheduled state
-	 * @param task
-	 */
-	void WorkflowTask::setScheduled() {
-		this->workflow->update_task_state(this, WorkflowTask::SCHEDULED);
-	}
-
-	/**
 	 * @brief Set the task to the running state
 	 * @param task
 	 */
@@ -161,36 +154,6 @@ namespace wrench {
 	 */
 	void WorkflowTask::setCompleted() {
 		this->workflow->update_task_state(this, WorkflowTask::COMPLETED);
-	}
-
-	/**
-	 * @brief Get the callback mailbox name for this task
-	 * @return the callbackmailbox name
-	 */
-	std::string WorkflowTask::getCallbackMailbox() {
-		return this->workflow->get_callback_mailbox();
-	}
-
-	/**
-	 * @brief Gets the "next" callback mailbox (returns the
-	 *         workflow mailbox if the mailbox stack is empty)
-	 * @return the next callback mailbox
-	 */
-	std::string WorkflowTask::pop_callback_mailbox() {
-		if (this->callback_mailbox_stack.size() == 0) {
-			return this->workflow->get_callback_mailbox();
-		} else {
-			std::string mailbox = this->callback_mailbox_stack.top();
-			this->callback_mailbox_stack.pop();
-			return mailbox;
-		}
-	}
-
-	/**
-	 *
-	 */
-	void WorkflowTask::push_callback_mailbox(std::string mailbox) {
-		this->callback_mailbox_stack.push(mailbox);
 	}
 
 

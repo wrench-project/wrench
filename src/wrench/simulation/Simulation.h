@@ -18,8 +18,7 @@
 
 #include "simgrid_S4U_util/S4U_Simulation.h"
 #include "workflow/Workflow.h"
-#include "compute_services/sequential_task_executor/SequentialTaskExecutor.h"
-#include "compute_services/multicore_task_executor/MulticoreTaskExecutor.h"
+#include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 #include "wms/WMS.h"
 #include "simgrid_MSG_util/MSG_Platform.h"
 
@@ -32,7 +31,6 @@ namespace wrench {
 		Simulation();
 		void init(int *, char **);
 		void createPlatform(std::string);
-//		void createSequentialTaskExecutor(std::string hostname);
 		void createMulticoreTaskExecutor(std::string hostname);
 		void createWMS(Workflow *w, Scheduler *s, std::string hostname);
 		void launch();
