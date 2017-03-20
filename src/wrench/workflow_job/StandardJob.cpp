@@ -43,6 +43,9 @@ namespace wrench {
 		StandardJob::StandardJob(WorkflowTask *task) {
 			this->type = WorkflowJob::STANDARD;
 
+			if (task->getState() != WorkflowTask::READY) {
+				throw WRENCHException("All tasks in a StandardJob must be READY");
+			}
 			this->tasks.push_back(task);
 			task->job = this;
 			this->num_completed_tasks = 0;

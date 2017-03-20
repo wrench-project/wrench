@@ -26,6 +26,7 @@ namespace wrench {
 		static std::string getHostName();
 		static int getNumCores(std::string hostname);
 		static void compute(double);
+		static void sleep(double);
 
 	private:
 		simgrid::s4u::Engine *engine;
