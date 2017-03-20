@@ -76,10 +76,11 @@ set(SOURCE_FILES
         src/wrench/workflow_job/WorkflowJob.h
         src/wrench/workflow_job/StandardJob.cpp
         src/wrench/workflow_job/StandardJob.h
+        src/wrench/helper_daemons/daemon_terminator/DaemonTerminatorDaemon.cpp
+        src/wrench/helper_daemons/daemon_terminator/DaemonTerminatorDaemon.h
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminator.cpp
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminator.h
-        src/wrench/helper_daemons/daemon_terminator/DaemonTerminatorDaemon.cpp
-        src/wrench/helper_daemons/daemon_terminator/DaemonTerminatorDaemon.h)
+        )
 
 set(INCLUDE_FILES include/wrench.h)
 
