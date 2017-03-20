@@ -77,8 +77,8 @@ namespace wrench {
 		 * @param the job
 		 * @return
 		 */
-		int ComputeService::runJob(StandardJob *job) {
-			throw WRENCHException("The compute service does not implement runJob(StandardJob *)");
+		int ComputeService::runStandardJob(StandardJob *job) {
+			throw WRENCHException("The compute service does not implement runStandardJob(StandardJob *)");
 		}
 
 		/**
@@ -86,8 +86,8 @@ namespace wrench {
 		 * @param property_name
 		 * @return true or false
 		 */
-		bool ComputeService::hasProperty(std::string property_name) {
-			return (this->property_list.find(property_name) != this->property_list.end());
+		bool ComputeService::hasProperty(ComputeService::Property property) {
+			return (this->property_list.find(property) != this->property_list.end());
 		}
 
 		/**
@@ -95,12 +95,22 @@ namespace wrench {
 		 * @param the property_name
 		 * @return a property value, or nullptr if the property does not exist
 		 */
-		std::string ComputeService::getProperty(std::string property_name) {
-			if (this->property_list.find(property_name) != this->property_list.end()) {
-				return this->property_list[property_name];
+		std::string ComputeService::getProperty(ComputeService::Property property) {
+			if (this->property_list.find(property) != this->property_list.end()) {
+				return this->property_list[property];
 			} else {
 				return nullptr;
 			}
 		}
+
+		/**
+		 * @brief Set a property value
+		 * @param property is the property
+		 * @param value is the value
+		 */
+		void ComputeService::setProperty(ComputeService::Property property, std::string value) {
+			this->property_list[property] = value;
+		}
+
 
 };

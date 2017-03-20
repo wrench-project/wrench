@@ -29,13 +29,16 @@ namespace wrench {
 	MulticoreJobExecutor::MulticoreJobExecutor(std::string hostname, Simulation *simulation) :
 					ComputeService("multicore_job_executor", simulation) {
 
-		this->hostname = hostname;
+		// Set all relevant properties
+		this->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, "yes");
+		this->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, "no");
+
 		// Create the main daemon
 		this->daemon = std::unique_ptr<MulticoreJobExecutorDaemon>(
 						new MulticoreJobExecutorDaemon(this));
 
-		// Start the daemon
-		this->daemon->start(this->hostname);
+		// Start the daemon on the same host
+		this->daemon->start(hostname);
 
 	}
 
@@ -57,11 +60,16 @@ namespace wrench {
 	 * @param callback_mailbox is the name of a mailbox to which a "task done" callback will be sent
 	 * @return 0 on success
 	 */
-	int MulticoreJobExecutor::runJob(StandardJob *job) {
+	int MulticoreJobExecutor::runStandardJob(StandardJob *job) {
+
+		if (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) != "yes") {
+			throw WRENCHException("Implementation error: this compute service should have the SUPPORTS_STANDARD_JOBS property set to 'yes'");
+		}
 
 		if (this->state == ComputeService::DOWN) {
 			throw WRENCHException("Trying to run a task on a compute service that's terminated");
 		}
+
 		// Synchronously send a "run a task" message to the daemon's mailbox
 		S4U_Mailbox::put(this->daemon->mailbox_name, new RunJobMessage(job));
 		return 0;

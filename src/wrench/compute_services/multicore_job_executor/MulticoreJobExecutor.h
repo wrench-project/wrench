@@ -28,11 +28,10 @@ namespace wrench {
 	public:
 		MulticoreJobExecutor(std::string hostname, Simulation *simulation);
 		void stop();
-		int runJob(StandardJob *job);
+		int runStandardJob(StandardJob *job);
 		unsigned long numIdleCores();
 
 	private:
-		std::string hostname;
 		std::unique_ptr<MulticoreJobExecutorDaemon> daemon;
 		std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
 	};

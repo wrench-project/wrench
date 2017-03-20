@@ -45,7 +45,7 @@ namespace wrench {
 					if (cs_num_idle_cores > 0) {
 						XBT_INFO("Submitting task %s for execution", ready_tasks[i]->getId().c_str());
 						StandardJob *job = new StandardJob(ready_tasks[i]);
-						cs->runJob(job);
+						cs->runStandardJob(job);
 						successfully_scheduled = true;
 						break;
 					}
