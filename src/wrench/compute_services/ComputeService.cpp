@@ -81,4 +81,26 @@ namespace wrench {
 			throw WRENCHException("The compute service does not implement runJob(StandardJob *)");
 		}
 
+		/**
+		 * @brief Check whether a property is set
+		 * @param property_name
+		 * @return true or false
+		 */
+		bool ComputeService::hasProperty(std::string property_name) {
+			return (this->property_list.find(property_name) != this->property_list.end());
+		}
+
+		/**
+		 * @brief Return a property value
+		 * @param the property_name
+		 * @return a property value, or nullptr if the property does not exist
+		 */
+		std::string ComputeService::getProperty(std::string property_name) {
+			if (this->property_list.find(property_name) != this->property_list.end()) {
+				return this->property_list[property_name];
+			} else {
+				return nullptr;
+			}
+		}
+
 };

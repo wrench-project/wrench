@@ -20,38 +20,43 @@
 
 namespace wrench {
 
-	class Simulation;
+		class Simulation;
 
-	class ComputeService {
+		class ComputeService {
 
-	public:
+		public:
 
-		enum State {
-			UP,
-			DOWN
+				enum State {
+						UP,
+						DOWN
+				};
+
+				/** Constructors **/
+				ComputeService(std::string, Simulation *simulation);
+				ComputeService(std::string);
+
+				/** Job execution **/
+				virtual int runJob(StandardJob *job);
+
+				/** Information getting **/
+				virtual unsigned long numIdleCores() = 0;
+				std::string getName();
+				ComputeService::State getState();
+
+				/** Stopping **/
+				virtual void stop();
+
+				/** Getting properties **/
+				bool hasProperty(std::string);
+				std::string getProperty(std::string);
+
+
+		protected:
+				ComputeService::State state;
+				std::string service_name;
+				Simulation *simulation;  // pointer to the simulation object
+				std::map<std::string, std::string> property_list;
 		};
-
-		/** Constructors **/
-		ComputeService(std::string, Simulation *simulation);
-		ComputeService(std::string);
-
-		/** Job execution **/
-		virtual int runJob(StandardJob *job);
-
-		/** Information getting **/
-		virtual unsigned long numIdleCores() = 0;
-		std::string getName();
-		ComputeService::State getState();
-
-		/** Stopping **/
-		virtual void stop();
-
-
-	protected:
-		ComputeService::State state;
-		std::string service_name;
-		Simulation *simulation;  // pointer to the simulation object
-	};
 };
 
 
