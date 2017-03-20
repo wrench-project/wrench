@@ -13,13 +13,14 @@
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTOR_H
 #define SIMULATION_SEQUENTIALTASKEXECUTOR_H
 
-#include "SequentialTaskExecutorDaemon.h"
 #include "workflow/WorkflowTask.h"
+#include "SequentialTaskExecutorDaemon.h"
+
+#include <memory>
+
 
 namespace wrench {
-
-	class Simulation;
-
+		
 	class SequentialTaskExecutor {
 
 	public:

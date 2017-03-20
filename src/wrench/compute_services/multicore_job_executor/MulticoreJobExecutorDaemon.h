@@ -16,6 +16,7 @@
 
 #include <queue>
 #include <set>
+#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
 
 #include "helper_daemons/sequential_task_executor/SequentialTaskExecutor.h"
 #include "simulation/SimulationMessage.h"

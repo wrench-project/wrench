@@ -13,9 +13,11 @@
 #define WRENCH_WORKFLOWTASK_H
 
 #include <map>
-#include <lemon/list_graph.h>
 #include <stack>
-#include <workflow_job/WorkflowJob.h>
+
+#include <lemon/list_graph.h>
+
+#include "workflow_job/WorkflowJob.h"
 #include "WorkflowFile.h"
 
 
