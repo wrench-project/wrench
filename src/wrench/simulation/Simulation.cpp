@@ -11,9 +11,10 @@
  */
 
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
-#include "wms/engine/simple_wms/SimpleWMS.h"
 #include "simulation/Simulation.h"
 #include "exception/WRENCHException.h"
+#include "wms/engine/EngineFactory.h"
+#include "wms/scheduler/SchedulerFactory.h"
 
 namespace wrench {
 
@@ -101,21 +102,21 @@ namespace wrench {
 	}
 
 	/**
-	 * @brief Instantiate a simple WMS on a host
+	 * @brief Instantiate a WMS on a host
 	 *
+	 * @param wms_id is an ID for a WMS implementation
+	 * @param sched_id is an ID for a scheduler implementation
 	 * @param w is a pointer to the workflow that the WMS will execute
-	 * @param s is a pointer to a scheduler implementation
 	 * @param hostname is the name of the host on which to start the WMS
 	 */
-	void Simulation::createWMS(Workflow *w, Scheduler *s, std::string hostname) {
+	void Simulation::createWMS(int wms_id, int sched_id, Workflow *w, std::string hostname) {
 
-		// Create the WMS
-		std::unique_ptr<WMS> wms;
-		try {
-			wms = std::unique_ptr<SimpleWMS>(new SimpleWMS(this, w, s, hostname));
-		} catch (WRENCHException e) {
-			throw e;
-		}
+		// Obtaining scheduler
+		Scheduler *scheduler = SchedulerFactory::getInstance()->Create(sched_id);
+
+		// Obtaining and configuring WMS
+		std::unique_ptr<WMS> wms = EngineFactory::getInstance()->Create(wms_id);
+		wms->configure(this, w, scheduler, hostname);
 
 		// Add it to the list of WMSes
 		WMSes.push_back(std::move(wms));
@@ -129,7 +130,7 @@ namespace wrench {
 	 */
 	std::set<ComputeService *> Simulation::getComputeServices() {
 		std::set<ComputeService *> set = {};
-		for (int i=0; i < this->running_compute_services.size(); i++) {
+		for (int i = 0; i < this->running_compute_services.size(); i++) {
 			set.insert(this->running_compute_services[i].get());
 		}
 		return set;
@@ -140,27 +141,27 @@ namespace wrench {
 	 */
 	void Simulation::shutdown() {
 
-		for (int i=0; i < this->running_compute_services.size(); i++) {
+		for (int i = 0; i < this->running_compute_services.size(); i++) {
 			this->running_compute_services[i]->stop();
 		}
 	}
 
-		/**
-		 * @brief Remove a compute service from the list of known compute services
-		 *
-		 * @param cs is the compute service
-		 */
+	/**
+	 * @brief Remove a compute service from the list of known compute services
+	 *
+	 * @param cs is the compute service
+	 */
 	void Simulation::mark_compute_service_as_terminated(ComputeService *compute_service) {
-			for (int i=0; i < this->running_compute_services.size(); i++) {
-				if (this->running_compute_services[i].get() == compute_service) {
-					this->terminated_compute_services.push_back(std::move(this->running_compute_services[i]));
-					this->running_compute_services.erase(this->running_compute_services.begin() + i);
-					return;
-				}
+		for (int i = 0; i < this->running_compute_services.size(); i++) {
+			if (this->running_compute_services[i].get() == compute_service) {
+				this->terminated_compute_services.push_back(std::move(this->running_compute_services[i]));
+				this->running_compute_services.erase(this->running_compute_services.begin() + i);
+				return;
 			}
-			// If we didn't find the service, this means it was a hidden service that was
-			// used as a building block for another higher-level service, which is fine
-			return;
+		}
+		// If we didn't find the service, this means it was a hidden service that was
+		// used as a building block for another higher-level service, which is fine
+		return;
 	}
 
 };

@@ -12,26 +12,19 @@
 #ifndef WRENCH_SIMPLEWMSDAEMON_H
 #define WRENCH_SIMPLEWMSDAEMON_H
 
-#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
-#include "workflow/Workflow.h"
-#include "wms/scheduler/Scheduler.h"
+#include "wms/engine/EngineDaemon.h"
 
 namespace wrench {
 
 	class Simulation; // forward ref
 
-	class SimpleWMSDaemon : public S4U_DaemonWithMailbox {
+	class SimpleWMSDaemon : public EngineDaemon {
 
 	public:
 		SimpleWMSDaemon(Simulation *, Workflow *w, Scheduler *s);
 
 	private:
 		int main();
-
-		Simulation *simulation;
-		Workflow *workflow;
-		Scheduler *scheduler;
-
 	};
 }
 
