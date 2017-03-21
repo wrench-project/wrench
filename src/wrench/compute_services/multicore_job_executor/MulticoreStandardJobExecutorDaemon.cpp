@@ -6,27 +6,27 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::MulticoreJobExecutorDaemon implements the daemon for the
- *  MultucoreTaskExecutor  Compute Service abstraction.
+ *  @brief wrench::MulticoreStandardJobExecutorDaemon implements the daemon for the
+ *  MulticoreStandardJobExecutor  Compute Service abstraction.
  */
 
-#include "compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h"
+#include "compute_services/multicore_job_executor/MulticoreStandardJobExecutorDaemon.h"
 #include "exception/WRENCHException.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_task_executor_daemon, "Log category for Multicore Task Executor Daemon");
+XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_task_executor_daemon, "Log category for Multicore Standard Job Executor Daemon");
 
 namespace wrench {
 
 		/**
 		 * @brief Constructor
 		 *
-		 * @param executors is a vector of sequential task executor compute services
+		 * @param executors is a vector of sequential task executors
 		 * @param cs is a pointer to the compute service for this daemon
 		 */
-		MulticoreJobExecutorDaemon::MulticoreJobExecutorDaemon(
-						ComputeService *cs) : S4U_DaemonWithMailbox("multicore_job_executor", "multicore_job_executor") {
+		MulticoreStandardJobExecutorDaemon::MulticoreStandardJobExecutorDaemon(
+						ComputeService *cs) : S4U_DaemonWithMailbox("multicore_standard_job_executor", "multicore_standard_job_executor") {
 
 
 
@@ -39,7 +39,7 @@ namespace wrench {
 		 *
 		 * @return True when idle
 		 */
-		bool MulticoreJobExecutorDaemon::hasIdleCore() {
+		bool MulticoreStandardJobExecutorDaemon::hasIdleCore() {
 			return this->idle_sequential_task_executors.size() > 0;
 		}
 
@@ -48,7 +48,7 @@ namespace wrench {
 		 *
 		 * @return 0 on termination
 		 */
-		int MulticoreJobExecutorDaemon::main() {
+		int MulticoreStandardJobExecutorDaemon::main() {
 			XBT_INFO("New Multicore Job Executor starting (%s) with %ld cores ",
 							 this->mailbox_name.c_str(), this->idle_sequential_task_executors.size());
 

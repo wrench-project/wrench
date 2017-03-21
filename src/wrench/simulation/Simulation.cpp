@@ -10,7 +10,7 @@
  *  the simulation state.
  */
 
-#include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
+#include "compute_services/multicore_job_executor/MulticoreStandardJobExecutor.h"
 #include "wms/engine/simple_wms/SimpleWMS.h"
 #include "simulation/Simulation.h"
 #include "exception/WRENCHException.h"
@@ -90,7 +90,7 @@ namespace wrench {
 		// Create the compute service
 		std::unique_ptr<ComputeService> executor;
 		try {
-			executor = std::unique_ptr<MulticoreJobExecutor>(new MulticoreJobExecutor(hostname, this));
+			executor = std::unique_ptr<MulticoreStandardJobExecutor>(new MulticoreStandardJobExecutor(hostname, this));
 		} catch (WRENCHException e) {
 			throw e;
 		}

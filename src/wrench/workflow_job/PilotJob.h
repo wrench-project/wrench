@@ -13,11 +13,12 @@
 #define WRENCH_PILOTJOB_H
 
 
-#include "compute_services/ComputeService.h"
 
 namespace wrench {
 
-		class Pilotjob {
+		class ComputeService;
+
+		class PilotJob {
 		public:
 				enum State {
 						SUBMITTED,
@@ -25,8 +26,8 @@ namespace wrench {
 						EXPIRING
 				};
 
-				Pilotjob();
-				Pilotjob::State getState();
+				PilotJob();
+				PilotJob::State getState();
 				ComputeService *getComputeService();
 				void stop();
 

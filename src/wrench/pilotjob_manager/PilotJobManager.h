@@ -19,17 +19,17 @@
 
 namespace wrench {
 
-		class Pilotjob;
-		class PilotjobManagerDaemon;
+		class PilotJob;
+		class PilotJobManagerDaemon;
 
-		class PilotjobManager {
+		class PilotJobManager {
 			public:
-				PilotjobManager();
-				std::vector<Pilotjob*> get_running_pilot_jobs();
-				std::vector<Pilotjob*> get_submitted_pilot_jobs();
+				PilotJobManager();
+				std::vector<PilotJob*> get_running_pilot_jobs();
+				std::vector<PilotJob*> get_submitted_pilot_jobs();
 
 			private:
-				std::unique_ptr<PilotjobManagerDaemon> daemon;
+				std::unique_ptr<PilotJobManagerDaemon> daemon;
 				void newSubmittedPilotjob(ComputeService *);
 
 		};

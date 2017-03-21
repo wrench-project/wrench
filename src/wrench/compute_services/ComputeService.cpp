@@ -73,12 +73,21 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Run a job
+		 * @brief Run a standard job
 		 * @param the job
 		 * @return
 		 */
 		int ComputeService::runStandardJob(StandardJob *job) {
 			throw WRENCHException("The compute service does not implement runStandardJob(StandardJob *)");
+		}
+
+		/**
+		 * @brif Run a pilot job
+		 * @param the job
+		 * @return
+		 */
+		int ComputeService::runPilotJob(PilotJob *job) {
+			throw WRENCHException("The compute service does not implement runPilogjob(PilotJob *)");
 		}
 
 		/**

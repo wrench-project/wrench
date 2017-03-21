@@ -12,15 +12,15 @@
 
 #include <string>
 #include "simgrid_S4U_util/S4U_Simulation.h"
-#include "PilotjobManager.h"
-#include "PilotjobManagerDaemon.h"
+#include "PilotJobManager.h"
+#include "PilotJobManagerDaemon.h"
 
 namespace wrench {
 
-		PilotjobManager::PilotjobManager() {
+		PilotJobManager::PilotJobManager() {
 			// Create the  daemon
-			this->daemon = std::unique_ptr<PilotjobManagerDaemon>(
-							new PilotjobManagerDaemon());
+			this->daemon = std::unique_ptr<PilotJobManagerDaemon>(
+							new PilotJobManagerDaemon());
 
 			// Start the daemon
 			std::string localhost = S4U_Simulation::getHostName();

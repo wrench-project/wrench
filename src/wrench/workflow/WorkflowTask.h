@@ -63,7 +63,7 @@ namespace wrench {
 
 				friend class StandardJob;
 				friend class Workflow;
-				friend class MulticoreJobExecutorDaemon;
+				friend class MulticoreStandardJobExecutorDaemon;
 				friend class SequentialTaskExecutorDaemon;
 				friend class RandomScheduler;
 

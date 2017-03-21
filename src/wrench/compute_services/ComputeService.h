@@ -16,6 +16,7 @@
 
 #include <workflow_job/WorkflowJob.h>
 #include <workflow_job/StandardJob.h>
+#include <workflow_job/PilotJob.h>
 #include "workflow/WorkflowTask.h"
 
 namespace wrench {
@@ -42,6 +43,7 @@ namespace wrench {
 
 				/** Job execution **/
 				virtual int runStandardJob(StandardJob *job);
+				virtual int runPilotJob(PilotJob *job);
 
 				/** Information getting **/
 				virtual unsigned long numIdleCores() = 0;

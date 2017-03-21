@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::MulticoreTaskExecutor implements a simple
+ *  @brief wrench::MulticoreJobExecutor implements a simple
  *  Compute Service abstraction for a multi-core task executor.
  *
  */
@@ -15,7 +15,7 @@
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 #include "exception/WRENCHException.h"
-#include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
+#include "compute_services/multicore_job_executor/MulticoreStandardJobExecutor.h"
 
 namespace wrench {
 
@@ -26,16 +26,16 @@ namespace wrench {
 	 * @param hostname is the name of the host
 	 * @param simulation is a pointer to a Simulation
 	 */
-	MulticoreJobExecutor::MulticoreJobExecutor(std::string hostname, Simulation *simulation) :
-					ComputeService("multicore_job_executor", simulation) {
+	MulticoreStandardJobExecutor::MulticoreStandardJobExecutor(std::string hostname, Simulation *simulation) :
+					ComputeService("multicore_standard_job_executor", simulation) {
 
 		// Set all relevant properties
 		this->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, "yes");
 		this->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, "no");
 
 		// Create the main daemon
-		this->daemon = std::unique_ptr<MulticoreJobExecutorDaemon>(
-						new MulticoreJobExecutorDaemon(this));
+		this->daemon = std::unique_ptr<MulticoreStandardJobExecutorDaemon>(
+						new MulticoreStandardJobExecutorDaemon(this));
 
 		// Start the daemon on the same host
 		this->daemon->start(hostname);
@@ -43,9 +43,9 @@ namespace wrench {
 	}
 
 	/**
-	 * @brief Stop the multi-core task executor
+	 * @brief Stop the service
 	 */
-	void MulticoreJobExecutor::stop() {
+	void MulticoreStandardJobExecutor::stop() {
 		// Send a termination message to the daemon's mailbox
 		S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
 
@@ -60,7 +60,7 @@ namespace wrench {
 	 * @param callback_mailbox is the name of a mailbox to which a "task done" callback will be sent
 	 * @return 0 on success
 	 */
-	int MulticoreJobExecutor::runStandardJob(StandardJob *job) {
+	int MulticoreStandardJobExecutor::runStandardJob(StandardJob *job) {
 
 		if (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) != "yes") {
 			throw WRENCHException("Implementation error: this compute service should have the SUPPORTS_STANDARD_JOBS property set to 'yes'");
@@ -76,11 +76,11 @@ namespace wrench {
 	};
 
 	/**
-	 * @brief Finds out how many idle cores the compute service has
+	 * @brief Finds out how many idle cores the  service has
 	 *
 	 * @return
 	 */
-	unsigned long MulticoreJobExecutor::numIdleCores() {
+	unsigned long MulticoreStandardJobExecutor::numIdleCores() {
 		S4U_Mailbox::put(this->daemon->mailbox_name, new NumIdleCoresRequestMessage());
 		std::unique_ptr<SimulationMessage> msg= S4U_Mailbox::get(this->daemon->mailbox_name + "_answers");
 		std::unique_ptr<NumIdleCoresAnswerMessage> m(static_cast<NumIdleCoresAnswerMessage *>(msg.release()));

@@ -9,18 +9,18 @@
  * @brief TBD
  */
 
-#include "PilotjobManagerDaemon.h"
+#include "PilotJobManagerDaemon.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(pilotjob_manager_daemon, "Log category for Pilotjob Manager Daemon");
+XBT_LOG_NEW_DEFAULT_CATEGORY(pilotjob_manager_daemon, "Log category for PilotJob Manager Daemon");
 
 namespace wrench {
 
-	PilotjobManagerDaemon::PilotjobManagerDaemon(): S4U_DaemonWithMailbox("pilotjob_manager", "pilotjob_manager") {
+	PilotJobManagerDaemon::PilotJobManagerDaemon(): S4U_DaemonWithMailbox("pilotjob_manager", "pilotjob_manager") {
 
 	}
 
 
-	int PilotjobManagerDaemon::main() {
+	int PilotJobManagerDaemon::main() {
 		XBT_INFO("New Multicore Task Executor starting (%s)", this->mailbox_name.c_str());
 
 

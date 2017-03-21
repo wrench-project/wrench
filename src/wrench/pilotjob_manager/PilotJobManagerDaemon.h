@@ -9,21 +9,24 @@
  * @brief TBD
  */
 
-#include "Pilotjob.h"
+#ifndef WRENCH_PILOGJOBMANAGERDAEMON_H
+#define WRENCH_PILOGJOBMANAGERDAEMON_H
+
+
+#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
 
 namespace wrench {
 
-		Pilotjob::Pilotjob() {
-			this->state = SUBMITTED;
-			this->compute_service = nullptr;
-		}
+		class PilotJobManagerDaemon: public S4U_DaemonWithMailbox {
 
-		Pilotjob::State Pilotjob::getState() {
-			return this->state;
-		}
+		public:
+				PilotJobManagerDaemon();
 
-		ComputeService *Pilotjob::getComputeService() {
-			return this->compute_service;
-		}
+		private:
+				int main();
+
+		};
 
 };
+
+#endif //WRENCH_PILOGJOBMANAGERDAEMON_H

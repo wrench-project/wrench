@@ -59,16 +59,16 @@ set(SOURCE_FILES
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.h
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorDaemon.h
-        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.cpp
-        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.h
-        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.cpp
-        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h
-        src/wrench/pilotjob_manager/Pilotjob.cpp
-        src/wrench/pilotjob_manager/Pilotjob.h
-        src/wrench/pilotjob_manager/PilotjobManagerDaemon.cpp
-        src/wrench/pilotjob_manager/PilotjobManagerDaemon.h
-        src/wrench/pilotjob_manager/PilotjobManager.cpp
-        src/wrench/pilotjob_manager/PilotjobManager.h
+        src/wrench/compute_services/multicore_job_executor/MulticoreStandardJobExecutor.cpp
+        src/wrench/compute_services/multicore_job_executor/MulticoreStandardJobExecutor.h
+        src/wrench/compute_services/multicore_job_executor/MulticoreStandardJobExecutorDaemon.cpp
+        src/wrench/compute_services/multicore_job_executor/MulticoreStandardJobExecutorDaemon.h
+        src/wrench/workflow_job/PilotJob.cpp
+        src/wrench/workflow_job/PilotJob.h
+        src/wrench/pilotjob_manager/PilotJobManagerDaemon.cpp
+        src/wrench/pilotjob_manager/PilotJobManagerDaemon.h
+        src/wrench/pilotjob_manager/PilotJobManager.cpp
+        src/wrench/pilotjob_manager/PilotJobManager.h
         src/wrench/simulation/Simulation.cpp
         src/wrench/simulation/Simulation.h
         src/wrench/main.cpp
@@ -80,7 +80,7 @@ set(SOURCE_FILES
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminatorDaemon.h
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminator.cpp
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminator.h
-        )
+        src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutor.cpp src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutor.h)
 
 set(INCLUDE_FILES include/wrench.h)
 

@@ -18,7 +18,7 @@
 
 #include "simgrid_S4U_util/S4U_Simulation.h"
 #include "workflow/Workflow.h"
-#include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
+#include "compute_services/multicore_job_executor/MulticoreStandardJobExecutor.h"
 #include "wms/WMS.h"
 #include "simgrid_MSG_util/MSG_Platform.h"
 
