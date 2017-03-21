@@ -19,28 +19,57 @@
 
 namespace wrench {
 
-	/**
+//	/**
+//	 * @brief Constructor that starts the daemon for the service on a host,
+//	 *        registering it with a WRENCH Simulation. It will start one worker thread
+//	 *        (sequential task executor) per core on the host.
+//	 *
+//	 * @param hostname is the name of the host
+//	 * @param simulation is a pointer to a Simulation
+//	 */
+//		MulticoreStandardJobExecutor::MulticoreStandardJobExecutor(int num_std::string hostname, Simulation *simulation) :
+//						ComputeService("multicore_standard_job_executor", simulation) {
+//
+//			// Set all relevant properties
+//			this->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, "yes");
+//			this->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, "no");
+//
+//			// Create the main daemon
+//			this->daemon = std::unique_ptr<MulticoreStandardJobExecutorDaemon>(
+//							new MulticoreStandardJobExecutorDaemon(this));
+//
+//			// Start the daemon on the same host
+//			this->daemon->start(hostname);
+//
+//		}
+
+		/**
 	 * @brief Constructor that starts the daemon for the service on a host,
 	 *        registering it with a WRENCH Simulation
 	 *
 	 * @param hostname is the name of the host
+	 * @param num_worker_threads is the number of worker threads (i.e., sequential task executors)
 	 * @param simulation is a pointer to a Simulation
 	 */
-	MulticoreStandardJobExecutor::MulticoreStandardJobExecutor(std::string hostname, Simulation *simulation) :
-					ComputeService("multicore_standard_job_executor", simulation) {
+		MulticoreStandardJobExecutor::MulticoreStandardJobExecutor(Simulation *simulation,
+																															 std::string hostname,
+																															 int num_worker_threads,
+																															 double ttl
+																															 ) :
+						ComputeService("multicore_standard_job_executor", simulation) {
 
-		// Set all relevant properties
-		this->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, "yes");
-		this->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, "no");
+			// Set all relevant properties
+			this->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, "yes");
+			this->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, "no");
 
-		// Create the main daemon
-		this->daemon = std::unique_ptr<MulticoreStandardJobExecutorDaemon>(
-						new MulticoreStandardJobExecutorDaemon(this));
+			// Create the main daemon
+			this->daemon = std::unique_ptr<MulticoreStandardJobExecutorDaemon>(
+							new MulticoreStandardJobExecutorDaemon(this, num_worker_threads, ttl));
 
-		// Start the daemon on the same host
-		this->daemon->start(hostname);
+			// Start the daemon on the same host
+			this->daemon->start(hostname);
 
-	}
+		}
 
 	/**
 	 * @brief Stop the service

@@ -31,7 +31,7 @@ namespace wrench {
 		Simulation();
 		void init(int *, char **);
 		void createPlatform(std::string);
-		void createMulticoreTaskExecutor(std::string hostname);
+		void createMulticoreStandardJobExecutor(std::string hostname);
 		void createWMS(int wms_id, int sched_id, Workflow *w, std::string hostname);
 		void launch();
 		void shutdown();

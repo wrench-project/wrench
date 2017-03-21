@@ -26,7 +26,9 @@ namespace wrench {
 	class MulticoreStandardJobExecutor : public ComputeService {
 
 	public:
-		MulticoreStandardJobExecutor(std::string hostname, Simulation *simulation);
+//		MulticoreStandardJobExecutor(std::string hostname, Simulation *simulation);
+//		MulticoreStandardJobExecutor(std::string hostname, int num_worker_threads, Simulation *simulation);
+		MulticoreStandardJobExecutor(Simulation *simulation, std::string hostname, int num_worker_threads = -1, double ttl = -1.0);
 		void stop();
 		int runStandardJob(StandardJob *job);
 		unsigned long numIdleCores();

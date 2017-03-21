@@ -23,25 +23,28 @@
 
 namespace wrench {
 
-	class MulticoreStandardJobExecutorDaemon : public S4U_DaemonWithMailbox {
+		class MulticoreStandardJobExecutorDaemon : public S4U_DaemonWithMailbox {
 
-	public:
-		MulticoreStandardJobExecutorDaemon(ComputeService *cs);
-		bool hasIdleCore();
+		public:
+				MulticoreStandardJobExecutorDaemon(ComputeService *cs, int num_worker_threads=-1, double ttl=-1);
+				bool hasIdleCore();
 
-	private:
-		std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
+		private:
+				int num_worker_threads;
+				double ttl;
 
-		std::set<SequentialTaskExecutor *> idle_sequential_task_executors;
-		std::set<SequentialTaskExecutor *> busy_sequential_task_executors;
-		std::set<StandardJob *> pending_jobs;
-		std::queue<WorkflowTask *> waiting_task_queue;
-		std::set<WorkflowTask *> running_task_set;
+				std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
 
-		int main();
+				std::set<SequentialTaskExecutor *> idle_sequential_task_executors;
+				std::set<SequentialTaskExecutor *> busy_sequential_task_executors;
+				std::set<StandardJob *> pending_jobs;
+				std::queue<WorkflowTask *> waiting_task_queue;
+				std::set<WorkflowTask *> running_task_set;
 
-		ComputeService *compute_service;
-	};
+				int main();
+
+				ComputeService *compute_service;
+		};
 }
 
 

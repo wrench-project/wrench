@@ -62,37 +62,18 @@ namespace wrench {
 		this->s4u_simulation->setupPlatform(filename);
 	}
 
-//	/**
-//	 * @brief Instantiate a sequential task executor on a host
-//	 *
-//	 * @param hostname is the name of the host in the physical platform
-//	 */
-//	void Simulation::createSequentialTaskExecutor(std::string hostname) {
-//
-//		// Create the compute service
-//		std::unique_ptr<ComputeService> executor;
-//		try {
-//			executor = std::unique_ptr<SequentialTaskExecutor>(new SequentialTaskExecutor(hostname));
-//		} catch (WRENCHException e) {
-//			throw e;
-//		}
-//
-//		// Add it to the list of Compute Services
-//		compute_services.push_back(std::move(executor));
-//		return;
-//	}
 
 	/**
-	 * @brief Instantiate a multicore task executor on a host
+	 * @brief Instantiate a multicore standard job executor on a host
 	 *
 	 * @param hostname is the name of the host in the physical platform
 	 */
-	void Simulation::createMulticoreTaskExecutor(std::string hostname) {
+	void Simulation::createMulticoreStandardJobExecutor(std::string hostname) {
 
 		// Create the compute service
 		std::unique_ptr<ComputeService> executor;
 		try {
-			executor = std::unique_ptr<MulticoreStandardJobExecutor>(new MulticoreStandardJobExecutor(hostname, this));
+			executor = std::unique_ptr<MulticoreStandardJobExecutor>(new MulticoreStandardJobExecutor(this, hostname));
 		} catch (WRENCHException e) {
 			throw e;
 		}

@@ -15,6 +15,9 @@
 #include "DaemonTerminatorDaemon.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(daemon_terminator, "Log category for Daemon Terminator");
+
+
 namespace wrench {
 
 		/**
@@ -35,8 +38,11 @@ namespace wrench {
 		 * @return 0 on termination
 		 */
 		int DaemonTerminatorDaemon::main() {
+			XBT_INFO("Daemon terminator started and sleeping for %lf seconds", this->time_to_death);
 			S4U_Simulation::sleep(this->time_to_death);
+			XBT_INFO("Daemon terminator sending termination message to mailbox %s", this->callback_mailbox.c_str());
 			S4U_Mailbox::put(this->callback_mailbox, new StopDaemonMessage());
+			XBT_INFO("Daemon terminator exiting");
 			return 0;
 		}
 

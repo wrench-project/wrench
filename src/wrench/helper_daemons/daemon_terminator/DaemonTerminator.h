@@ -13,6 +13,7 @@
 #ifndef WRENCH_DAEMONTERMINATOR_H
 #define WRENCH_DAEMONTERMINATOR_H
 
+#include "helper_daemons/daemon_terminator/DaemonTerminatorDaemon.h"
 
 #include <string>
 #include <memory>

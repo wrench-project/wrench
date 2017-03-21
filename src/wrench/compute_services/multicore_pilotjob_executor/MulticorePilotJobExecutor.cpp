@@ -38,6 +38,6 @@ namespace wrench {
 			this->daemon->start(hostname);
 
 		}
-		
+
 
 };

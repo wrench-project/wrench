@@ -73,9 +73,9 @@ int main(int argc, char **argv) {
 //	simulation.createSequentialTaskExecutor("Tremblay");
 
 	std::cerr << "Instantiating a  MultiCore Job executor on c-1.me..." << std::endl;
-	simulation.createMulticoreTaskExecutor("c-1.me");
-//	simulation.createMulticoreTaskExecutor("c-2.me");
-//	simulation.createMulticoreTaskExecutor("c-3.me");
+	simulation.createMulticoreStandardJobExecutor("c-1.me");
+//	simulation.createMulticoreStandardJobExecutor("c-2.me");
+//	simulation.createMulticoreStandardJobExecutor("c-3.me");
 
 
 	std::cerr << "Instantiating a WMS on c-0.me..." << std::endl;

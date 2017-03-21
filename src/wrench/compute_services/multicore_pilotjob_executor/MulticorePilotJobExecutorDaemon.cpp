@@ -13,7 +13,7 @@
 #include <simgrid_S4U_util/S4U_Simulation.h>
 #include "MulticorePilotJobExecutorDaemon.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_pilot_job_executor_daemon, "Log category for Multicore Pilot Job Executor Daemon");
+XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_pilot_job_executor, "Log category for Multicore Pilot Job Executor");
 
 
 namespace wrench {

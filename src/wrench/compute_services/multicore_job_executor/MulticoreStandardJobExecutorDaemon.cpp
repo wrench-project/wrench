@@ -10,28 +10,43 @@
  *  MulticoreStandardJobExecutor  Compute Service abstraction.
  */
 
+#include <helper_daemons/daemon_terminator/DaemonTerminator.h>
 #include "compute_services/multicore_job_executor/MulticoreStandardJobExecutorDaemon.h"
 #include "exception/WRENCHException.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_standard_job_executor_daemon, "Log category for Multicore Standard Job Executor Daemon");
+XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_standard_job_executor, "Log category for Multicore Standard Job Executor");
 
 namespace wrench {
+
+//		/**
+//		 * @brief Constructor
+//		 *
+//		 * @param cs is a pointer to the compute service for this daemon
+//		 */
+//		MulticoreStandardJobExecutorDaemon::MulticoreStandardJobExecutorDaemon(
+//						ComputeService *cs) : S4U_DaemonWithMailbox("multicore_standard_job_executor", "multicore_standard_job_executor") {
+//
+//			this->num_worker_threads = -1;  // Will default to the number of cores
+//			this->compute_service = cs;
+//		}
 
 		/**
 		 * @brief Constructor
 		 *
-		 * @param executors is a vector of sequential task executors
 		 * @param cs is a pointer to the compute service for this daemon
+		 * @param num_worker_threads is the number of worker threads (i.e., sequential task executors) - default value -1 means "use one thread per core"
+		 * @param ttl is the time-to-live (in seconds) - default value -1.0 means "run forever"
 		 */
 		MulticoreStandardJobExecutorDaemon::MulticoreStandardJobExecutorDaemon(
-						ComputeService *cs) : S4U_DaemonWithMailbox("multicore_standard_job_executor", "multicore_standard_job_executor") {
+						ComputeService *cs,
+						int num_worker_threads,
+						double ttl) : S4U_DaemonWithMailbox("multicore_standard_job_executor", "multicore_standard_job_executor") {
 
-
-
-			// Set the pointer to the corresponding compute service
 			this->compute_service = cs;
+			this->num_worker_threads = num_worker_threads;
+			this->ttl = ttl;
 		}
 
 		/**
@@ -49,19 +64,22 @@ namespace wrench {
 		 * @return 0 on termination
 		 */
 		int MulticoreStandardJobExecutorDaemon::main() {
-			XBT_INFO("New Multicore Standard Job Executor starting (%s) with %ld cores ",
-							 this->mailbox_name.c_str(), this->idle_sequential_task_executors.size());
 
-			// Start one sequential task executor daemon per core
-			int num_cores = S4U_Simulation::getNumCores(S4U_Simulation::getHostName());
+			/** Start worker threads **/
+			// Figure out the number of worker threads
+			if (this->num_worker_threads == -1) {
+				this->num_worker_threads = S4U_Simulation::getNumCores(S4U_Simulation::getHostName());
+			}
 
-			for (int i = 0; i < num_cores; i++) {
-				// Start a sequential task executor (unregistered to the simulation)
+			XBT_INFO("New Multicore Standard Job Executor starting (%s) with %d worker threads ",
+							 this->mailbox_name.c_str(), this->num_worker_threads);
+
+			// Start the worker threads (i.e., sequential task executor daemons)
+			for (int i = 0; i < this->num_worker_threads; i++) {
 //			XBT_INFO("Starting a task executor on core #%d", i);
 				std::unique_ptr<SequentialTaskExecutor> seq_executor =
 								std::unique_ptr<SequentialTaskExecutor>(
 												new SequentialTaskExecutor(S4U_Simulation::getHostName(), this->mailbox_name));
-				// Add it to the vector of sequential task executors
 				this->sequential_task_executors.push_back(std::move(seq_executor));
 			}
 
@@ -70,16 +88,19 @@ namespace wrench {
 				this->idle_sequential_task_executors.insert(this->sequential_task_executors[i].get());
 			}
 
+			/** Start the terminator if needed **/
+			if (this->ttl  < 0) {
+				DaemonTerminator terminator(S4U_Simulation::getHostName(), this->mailbox_name, this->ttl);
+			}
+
+
 			/** Main loop **/
 			bool keep_going = true;
 			while (keep_going) {
 
 				// Wait for a message
-//				XBT_INFO("Waiting for a message");
 				std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
-				// Process the message
 				switch (message->type) {
-
 
 					case SimulationMessage::STOP_DAEMON: {
 
