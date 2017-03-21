@@ -6,26 +6,21 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief WRENCH::SequentialRandomWMS implements a simple WMS abstraction
+ * @brief wrench::SimpleWMS implements a simple WMS abstraction
  */
 
 #ifndef WRENCH_SIMPLEWMS_H
 #define WRENCH_SIMPLEWMS_H
 
-#include "wms/WMS.h"
-#include "wms/scheduler/Scheduler.h"
-#include "SimpleWMSDaemon.h"
+#include "wms/engine/EngineFactory.h"
+#include "wms/engine/simple_wms/SimpleWMSDaemon.h"
 
 namespace wrench {
 
-	class Simulation;
+	class SimpleWMS : public EngineTmpl<1, SimpleWMS, SimpleWMSDaemon> {
 
-	class SimpleWMS : public WMS {
 	public:
-		SimpleWMS(Simulation *s, Workflow *w, Scheduler *sc, std::string hostname);
-
-	private:
-		std::unique_ptr<SimpleWMSDaemon> wms_process;
+		SimpleWMS();
 	};
 }
 #endif //WRENCH_SIMPLEWMS_H

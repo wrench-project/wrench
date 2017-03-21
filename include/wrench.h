@@ -14,6 +14,5 @@
 #include "simgrid_MSG_util/MSG_Platform.h"
 #include "simulation/Simulation.h"
 #include "workflow/Workflow.h"
-#include "wms/scheduler/SchedulerFactory.h"
 
 #endif //WRENCH_WRENCH_H

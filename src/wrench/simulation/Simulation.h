@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::Simulation is a top-level class that keeps track of
+ *  @brief wrench::Simulation is a top-level class that keeps track of
  *  the simulation state.
  */
 
@@ -32,14 +32,14 @@ namespace wrench {
 		void init(int *, char **);
 		void createPlatform(std::string);
 		void createMulticoreTaskExecutor(std::string hostname);
-		void createWMS(Workflow *w, Scheduler *s, std::string hostname);
+		void createWMS(int wms_id, int sched_id, Workflow *w, std::string hostname);
 		void launch();
 		void shutdown();
 		std::set<ComputeService *> getComputeServices();
 
 
 	private:
-			friend class ComputeService;
+		friend class ComputeService;
 
 		std::unique_ptr<S4U_Simulation> s4u_simulation;
 
