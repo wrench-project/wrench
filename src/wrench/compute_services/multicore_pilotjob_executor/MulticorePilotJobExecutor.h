@@ -17,6 +17,7 @@
 
 #include <compute_services/ComputeService.h>
 #include <helper_daemons/sequential_task_executor/SequentialTaskExecutor.h>
+#include "MulticorePilotJobExecutorDaemon.h"
 
 namespace wrench {
 
@@ -24,9 +25,6 @@ namespace wrench {
 
 		public:
 				MulticorePilotJobExecutor(std::string hostname, Simulation *simulation);
-				void stop();
-				int runPilotjob(StandardJob *job);
-				unsigned long numIdleCores();
 
 		private:
 				std::unique_ptr<MulticorePilotJobExecutorDaemon> daemon;

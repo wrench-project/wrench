@@ -15,7 +15,7 @@
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_task_executor_daemon, "Log category for Multicore Standard Job Executor Daemon");
+XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_standard_job_executor_daemon, "Log category for Multicore Standard Job Executor Daemon");
 
 namespace wrench {
 
@@ -49,7 +49,7 @@ namespace wrench {
 		 * @return 0 on termination
 		 */
 		int MulticoreStandardJobExecutorDaemon::main() {
-			XBT_INFO("New Multicore Job Executor starting (%s) with %ld cores ",
+			XBT_INFO("New Multicore Standard Job Executor starting (%s) with %ld cores ",
 							 this->mailbox_name.c_str(), this->idle_sequential_task_executors.size());
 
 			// Start one sequential task executor daemon per core
@@ -182,7 +182,7 @@ namespace wrench {
 				}
 			}
 
-			XBT_INFO("Multicore Task Executor Daemon on host %s terminated!", S4U_Simulation::getHostName().c_str());
+			XBT_INFO("Multicore Standard Job Executor Daemon on host %s terminated!", S4U_Simulation::getHostName().c_str());
 			return 0;
 		}
 

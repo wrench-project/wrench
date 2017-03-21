@@ -83,7 +83,7 @@ set(SOURCE_FILES
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminatorDaemon.h
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminator.cpp
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminator.h
-        src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutor.cpp src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutor.h)
+        src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutor.cpp src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutor.h src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutorDaemon.cpp src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutorDaemon.h)
 
 set(INCLUDE_FILES include/wrench.h)
 
