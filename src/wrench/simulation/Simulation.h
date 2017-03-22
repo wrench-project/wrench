@@ -25,33 +25,49 @@
 
 namespace wrench {
 
-	class Simulation {
+		class Simulation {
 
-	public:
-		Simulation();
-		void init(int *, char **);
-		void createPlatform(std::string);
-		void createMulticoreStandardJobExecutor(std::string hostname);
-		void createWMS(int wms_id, int sched_id, Workflow *w, std::string hostname);
-		void launch();
-		void shutdown();
-		std::set<ComputeService *> getComputeServices();
+		public:
+				/** Constructor, initialization, launching, shutting down **/
+				Simulation();
+				void init(int *, char **);
+				void launch();
+				void shutdown();
 
+				/** Platform initialization **/
+				void createPlatform(std::string);
 
-	private:
-		friend class ComputeService;
+				/** ComputeService creations **/
+				void createMulticoreStandardJobExecutor(std::string hostname);
+				void createMulticorePilotJobExecutor(std::string hostname);
+				void createMulticoreStandardAndPilotJobExecutor(std::string hostname);
 
-		std::unique_ptr<S4U_Simulation> s4u_simulation;
+				/** ComputeService discovery **/
+				std::set<ComputeService *> getComputeServices();
 
-		std::vector<std::unique_ptr<WMS>> WMSes;
-
-		std::vector<std::unique_ptr<ComputeService>> running_compute_services;
-		std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
-
-		void mark_compute_service_as_terminated(ComputeService *cs);
+				/** WMS Creation **/
+				void createWMS(int wms_id, int sched_id, Workflow *w, std::string hostname);
 
 
-	};
+		private:
+				friend class ComputeService;
+
+				std::unique_ptr<S4U_Simulation> s4u_simulation;
+
+				std::vector<std::unique_ptr<WMS>> WMSes;
+
+				std::vector<std::unique_ptr<ComputeService>> running_compute_services;
+				std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
+
+				void mark_compute_service_as_terminated(ComputeService *cs);
+
+				// Helper function
+				void createMulticoreJobExecutor(std::string hostname,
+																										std::string supports_standard_jobs,
+																										std::string support_pilot_jobs);
+
+
+				};
 
 };
 

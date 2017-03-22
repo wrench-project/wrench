@@ -41,8 +41,13 @@ namespace wrench {
 				std::set<WorkflowTask *> running_task_set;
 
 				int main();
+
+				// Helper functions
+				void initialize();
 				void terminate_all_worker_threads();
 				void fail_all_current_jobs();
+				void process_task_completion(WorkflowTask *, SequentialTaskExecutor *);
+
 
 				ComputeService *compute_service;
 		};

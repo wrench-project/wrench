@@ -13,9 +13,11 @@
 
 namespace wrench {
 
-		PilotJob::PilotJob() {
+		PilotJob::PilotJob(int num_cores, double duration) {
 			this->state = SUBMITTED;
 			this->compute_service = nullptr;
+			this->num_cores = num_cores;
+			this->duration = duration;
 		}
 
 		PilotJob::State PilotJob::getState() {

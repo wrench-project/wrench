@@ -45,35 +45,8 @@ namespace wrench {
 		 */
 		int MulticoreJobExecutorDaemon::main() {
 
-			/** Start worker threads **/
-			// Figure out the number of worker threads
-			if (this->num_worker_threads == -1) {
-				this->num_worker_threads = S4U_Simulation::getNumCores(S4U_Simulation::getHostName());
-			}
-
-			XBT_INFO("New Multicore Standard Job Executor starting (%s) with %d worker threads ",
-							 this->mailbox_name.c_str(), this->num_worker_threads);
-
-			for (int i = 0; i < this->num_worker_threads; i++) {
-				// XBT_INFO("Starting a task executor on core #%d", i);
-				std::unique_ptr<SequentialTaskExecutor> seq_executor =
-								std::unique_ptr<SequentialTaskExecutor>(
-												new SequentialTaskExecutor(S4U_Simulation::getHostName(), this->mailbox_name));
-				this->sequential_task_executors.push_back(std::move(seq_executor));
-			}
-
-
-			// Initialize the set of idle executors (cores)
-			for (int i = 0; i < this->sequential_task_executors.size(); i++) {
-				this->idle_sequential_task_executors.insert(this->sequential_task_executors[i].get());
-			}
-
-
-			/** Start the terminator if needed **/
-			if (this->ttl  > 0) {
-				DaemonTerminator terminator(S4U_Simulation::getHostName(), this->mailbox_name, this->ttl);
-			}
-
+			/** Initialize all state **/
+			initialize();
 
 			/** Main loop **/
 			bool keep_going = true;
@@ -93,7 +66,7 @@ namespace wrench {
 
 					case SimulationMessage::RUN_STANDARD_JOB: {
 						std::unique_ptr<RunStandardJobMessage> m(static_cast<RunStandardJobMessage *>(message.release()));
-						StandardJob *job = (StandardJob *)(m->job);
+						StandardJob *job = m->job;
 						XBT_INFO("Asked to run a job with %ld tasks", job->tasks.size());
 						// Add all its tasks to the wait queue
 						for (auto t : job->tasks) {
@@ -104,33 +77,15 @@ namespace wrench {
 
 					case SimulationMessage::RUN_PILOT_JOB: {
 						std::unique_ptr<RunPilotJobMessage> m(static_cast<RunPilotJobMessage *>(message.release()));
-						PilotJob *job = (PilotJob *)(m->job);
+						PilotJob *job = m->job;
+						XBT_INFO("Asked to run a pilot job with %d cores for %lf seconds", job->num_cores, job->duration);
+						throw WRENCHException("PILOT JOB SUPPORT NOT YET IMPLEMENTED");
+						break;
 					}
 
 					case SimulationMessage::TASK_DONE: {
 						std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
-
-						StandardJob *job = (StandardJob *)(m->task->job);
-						XBT_INFO("One of my cores completed task %s", m->task->id.c_str());
-
-						// Remove the task from the running task queue
-						this->running_task_set.erase(m->task);
-
-						// Put that core's executor back into the pull of idle cores
-						SequentialTaskExecutor *executor = m->task_executor;
-						this->busy_sequential_task_executors.erase(executor);
-						this->idle_sequential_task_executors.insert(executor);
-
-						// Increase the "completed tasks" count of the job
-						job->num_completed_tasks++;
-
-						// Send the callback to the originator if necessary and remove the job from
-						// the list of pending jobs
-						if (job->num_completed_tasks == job->tasks.size()) {
-							this->pending_jobs.erase(job);
-							S4U_Mailbox::put(job->pop_callback_mailbox(),
-															 new StandardJobDoneMessage(job, this->compute_service));
-						}
+						process_task_completion(m->task, m->task_executor);
 						break;
 					}
 
@@ -146,6 +101,7 @@ namespace wrench {
 						throw WRENCHException("Unknown message type: " + std::to_string(message->type));
 					}
 				}
+
 
 				// Run tasks while possible
 				while ((waiting_task_queue.size() > 0) && (idle_sequential_task_executors.size() > 0)) {
@@ -165,6 +121,7 @@ namespace wrench {
 					// Put the task in the running task set
 					this->running_task_set.insert(to_run);
 				}
+
 			}
 
 			XBT_INFO("Multicore Standard Job Executor Daemon on host %s terminated!", S4U_Simulation::getHostName().c_str());
@@ -199,5 +156,59 @@ namespace wrench {
 
 			/* PILOT JOBS */
 			// TODO
+		}
+
+		void MulticoreJobExecutorDaemon::initialize() {
+			/** Start worker threads **/
+			// Figure out the number of worker threads
+			if (this->num_worker_threads == -1) {
+				this->num_worker_threads = S4U_Simulation::getNumCores(S4U_Simulation::getHostName());
+			}
+
+			XBT_INFO("New Multicore Standard Job Executor starting (%s) with %d worker threads ",
+							 this->mailbox_name.c_str(), this->num_worker_threads);
+
+			for (int i = 0; i < this->num_worker_threads; i++) {
+				// XBT_INFO("Starting a task executor on core #%d", i);
+				std::unique_ptr<SequentialTaskExecutor> seq_executor =
+								std::unique_ptr<SequentialTaskExecutor>(
+												new SequentialTaskExecutor(S4U_Simulation::getHostName(), this->mailbox_name));
+				this->sequential_task_executors.push_back(std::move(seq_executor));
+			}
+
+
+			// Initialize the set of idle executors (cores)
+			for (int i = 0; i < this->sequential_task_executors.size(); i++) {
+				this->idle_sequential_task_executors.insert(this->sequential_task_executors[i].get());
+			}
+
+
+			/** Start the terminator if needed **/
+			if (this->ttl  > 0) {
+				DaemonTerminator terminator(S4U_Simulation::getHostName(), this->mailbox_name, this->ttl);
+			}
+		}
+
+		void MulticoreJobExecutorDaemon::process_task_completion(WorkflowTask *task, SequentialTaskExecutor *executor) {
+			StandardJob *job = (StandardJob *)(task->job);
+			XBT_INFO("One of my cores completed task %s", task->id.c_str());
+
+			// Remove the task from the running task queue
+			this->running_task_set.erase(task);
+
+			// Put that core's executor back into the pull of idle cores
+			this->busy_sequential_task_executors.erase(executor);
+			this->idle_sequential_task_executors.insert(executor);
+
+			// Increase the "completed tasks" count of the job
+			job->num_completed_tasks++;
+
+			// Send the callback to the originator if necessary and remove the job from
+			// the list of pending jobs
+			if (job->num_completed_tasks == job->tasks.size()) {
+				this->pending_jobs.erase(job);
+				S4U_Mailbox::put(job->pop_callback_mailbox(),
+												 new StandardJobDoneMessage(job, this->compute_service));
+			}
 		}
 };

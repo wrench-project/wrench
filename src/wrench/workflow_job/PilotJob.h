@@ -27,7 +27,10 @@ namespace wrench {
 						EXPIRING
 				};
 
-				PilotJob();
+				int num_cores;
+				double duration;
+
+				PilotJob(int, double);
 				PilotJob::State getState();
 				ComputeService *getComputeService();
 				void stop();
