@@ -59,6 +59,8 @@ namespace wrench {
 
 
 		protected:
+				friend class Simulation;
+
 				ComputeService::State state;
 				std::string service_name;
 				Simulation *simulation;  // pointer to the simulation object

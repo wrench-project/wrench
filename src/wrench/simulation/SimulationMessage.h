@@ -29,6 +29,10 @@ namespace wrench {
 						RUN_STANDARD_JOB,
 						STANDARD_JOB_DONE,
 						STANDARD_JOB_FAILED,
+						RUN_PILOT_JOB,
+						PILOT_JOB_STARTED,
+						PILOT_JOB_TERMINATED,
+						PILOT_JOB_FAILED,
 						RUN_TASK,
 						TASK_DONE,
 						NUM_IDLE_CORES_REQUEST,
@@ -41,50 +45,72 @@ namespace wrench {
 				double size;
 		};
 
-		// Derived struct
+		/** DAEMON STOPPING **/
 		struct StopDaemonMessage: public SimulationMessage {
 				StopDaemonMessage();
 		};
 
-		// Derived struct
-		struct RunJobMessage: public SimulationMessage {
-				RunJobMessage(WorkflowJob*);
-				WorkflowJob *job;
+		/** STANDARD JOBS */
+		struct RunStandardJobMessage: public SimulationMessage {
+				RunStandardJobMessage(StandardJob*);
+				StandardJob *job;
 		};
 
-		// Derived struct
-		struct JobDoneMessage: public SimulationMessage {
-				JobDoneMessage(WorkflowJob *, ComputeService*);
-				WorkflowJob *job;
+		struct StandardJobDoneMessage: public SimulationMessage {
+				StandardJobDoneMessage(StandardJob *, ComputeService*);
+				StandardJob *job;
 				ComputeService *compute_service;
 		};
 
-		// Derived struct
-		struct JobFailedMessage: public SimulationMessage {
-				JobFailedMessage(WorkflowJob *, ComputeService*);
-				WorkflowJob *job;
+		struct StandardJobFailedMessage: public SimulationMessage {
+				StandardJobFailedMessage(StandardJob *, ComputeService*);
+				StandardJob *job;
 				ComputeService *compute_service;
 		};
 
-		// Derived struct
+		/** PILOT JOBS */
+		struct RunPilotJobMessage: public SimulationMessage {
+				RunPilotJobMessage(PilotJob*);
+				PilotJob *job;
+		};
+
+		struct PilotJobStartedMessage: public SimulationMessage {
+				PilotJobStartedMessage(PilotJob *, ComputeService*);
+				PilotJob *job;
+				ComputeService *compute_service;
+		};
+
+		struct PilotJobTerminatedMessage: public SimulationMessage {
+				PilotJobTerminatedMessage(PilotJob *, ComputeService*);
+				PilotJob *job;
+				ComputeService *compute_service;
+		};
+
+		struct PilotJobFailedMessage: public SimulationMessage {
+				PilotJobFailedMessage(PilotJob *, ComputeService*);
+				PilotJob *job;
+				ComputeService *compute_service;
+		};
+
+		/** TASKS **/
+
 		struct RunTaskMessage: public SimulationMessage {
 				RunTaskMessage(WorkflowTask*);
 				WorkflowTask *task;
 		};
 
-		// Derived struct
 		struct TaskDoneMessage: public SimulationMessage {
 				TaskDoneMessage(WorkflowTask *, SequentialTaskExecutor *);
 				WorkflowTask *task;
 				SequentialTaskExecutor *task_executor;
 		};
 
-		// Derived struct
+		/** NUM IDLE CORES QUERIES **/
+
 		struct NumIdleCoresRequestMessage: public SimulationMessage {
 				NumIdleCoresRequestMessage();
 		};
 
-		// Derived struct
 		struct NumIdleCoresAnswerMessage: public SimulationMessage {
 				NumIdleCoresAnswerMessage(unsigned long);
 				unsigned long num_idle_cores;

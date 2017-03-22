@@ -33,7 +33,7 @@ namespace wrench {
 			switch (message->type) {
 
 				case SimulationMessage::STANDARD_JOB_DONE: {
-					std::unique_ptr<JobDoneMessage> m(static_cast<JobDoneMessage *>(message.release()));
+					std::unique_ptr<StandardJobDoneMessage> m(static_cast<StandardJobDoneMessage *>(message.release()));
 					event->type = WorkflowExecutionEvent::STANDARD_JOB_COMPLETION;
 					event->job = m->job;
 					event->compute_service = m->compute_service;
@@ -41,7 +41,7 @@ namespace wrench {
 				}
 
 				case SimulationMessage::STANDARD_JOB_FAILED: {
-					std::unique_ptr<JobFailedMessage> m(static_cast<JobFailedMessage *>(message.release()));
+					std::unique_ptr<StandardJobFailedMessage> m(static_cast<StandardJobFailedMessage *>(message.release()));
 					event->type = WorkflowExecutionEvent::STANDARD_JOB_FAILURE;
 					event->job = m->job;
 					event->compute_service = m->compute_service;

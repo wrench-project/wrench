@@ -87,7 +87,7 @@ namespace wrench {
 		 * @return
 		 */
 		int ComputeService::runPilotJob(PilotJob *job) {
-			throw WRENCHException("The compute service does not implement runPilogjob(PilotJob *)");
+			throw WRENCHException("The compute service does not implement runPilotJob(PilotJob *)");
 		}
 
 		/**

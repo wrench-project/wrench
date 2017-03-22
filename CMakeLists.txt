@@ -62,10 +62,10 @@ set(SOURCE_FILES
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.h
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorDaemon.h
-        src/wrench/compute_services/multicore_job_executor/MulticoreStandardJobExecutor.cpp
-        src/wrench/compute_services/multicore_job_executor/MulticoreStandardJobExecutor.h
-        src/wrench/compute_services/multicore_job_executor/MulticoreStandardJobExecutorDaemon.cpp
-        src/wrench/compute_services/multicore_job_executor/MulticoreStandardJobExecutorDaemon.h
+        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.cpp
+        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.h
+        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.cpp
+        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h
         src/wrench/workflow_job/PilotJob.cpp
         src/wrench/workflow_job/PilotJob.h
         src/wrench/pilotjob_manager/PilotJobManagerDaemon.cpp
@@ -83,10 +83,6 @@ set(SOURCE_FILES
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminatorDaemon.h
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminator.cpp
         src/wrench/helper_daemons/daemon_terminator/DaemonTerminator.h
-        src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutorDaemon.cpp
-        src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutorDaemon.h
-        src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutor.cpp
-        src/wrench/compute_services/multicore_pilotjob_executor/MulticorePilotJobExecutor.h
         )
 
 set(INCLUDE_FILES include/wrench.h)

@@ -19,24 +19,27 @@
 #include "helper_daemons/sequential_task_executor/SequentialTaskExecutor.h"
 #include "simulation/SimulationMessage.h"
 #include "simulation/Simulation.h"
-#include "compute_services/multicore_job_executor/MulticoreStandardJobExecutorDaemon.h"
+#include "compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h"
 
 namespace wrench {
 
-	class MulticoreStandardJobExecutor : public ComputeService {
+		class MulticoreJobExecutor : public ComputeService {
 
-	public:
-//		MulticoreStandardJobExecutor(std::string hostname, Simulation *simulation);
-//		MulticoreStandardJobExecutor(std::string hostname, int num_worker_threads, Simulation *simulation);
-		MulticoreStandardJobExecutor(Simulation *simulation, std::string hostname, int num_worker_threads = -1, double ttl = -1.0);
-		void stop();
-		int runStandardJob(StandardJob *job);
-		unsigned long numIdleCores();
+		public:
+				/** Construct/Start, Stop **/
+				MulticoreJobExecutor(Simulation *simulation, std::string hostname, int num_worker_threads = -1, double ttl = -1.0);
+				void stop();
 
-	private:
-		std::unique_ptr<MulticoreStandardJobExecutorDaemon> daemon;
-		std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
-	};
+				/** Run jobs **/
+				int runStandardJob(StandardJob *job);
+				int runPilotJob(PilotJob *job);
+
+				/** Get information **/
+				unsigned long numIdleCores();
+
+		private:
+				std::unique_ptr<MulticoreJobExecutorDaemon> daemon;
+		};
 };
 
 

@@ -13,12 +13,13 @@
 #define WRENCH_PILOTJOB_H
 
 
+#include "WorkflowJob.h"
 
 namespace wrench {
 
 		class ComputeService;
 
-		class PilotJob {
+		class PilotJob : public WorkflowJob {
 		public:
 				enum State {
 						SUBMITTED,

@@ -1,17 +1,12 @@
 
-[DONE] Implement an ExecutionEvent class
-
-[DONE] Make sure a Multicore Executor sends back "TASK_FAILED" message if it's stopped in the
-  middle of running tasks
-
-[DONE] Create a Job class
-
----------------------------------------------------------------------
+------------------------------------
 
 
 - Create a map of properties for ComputeService
     map<enum, string>
     getProperty()
+
+- Figure out how to abstract compute services without too much code duplication
 
 - Prototype PilotJob
 

@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief wrench::MulticoreStandardJobExecutorDaemon implements the daemon for
+ *  @brief wrench::MulticoreJobExecutorDaemon implements the daemon for
  *  the MulticoreStandardJobExecutor Compute Service abstraction.
  *
  */
@@ -23,11 +23,10 @@
 
 namespace wrench {
 
-		class MulticoreStandardJobExecutorDaemon : public S4U_DaemonWithMailbox {
+		class MulticoreJobExecutorDaemon : public S4U_DaemonWithMailbox {
 
 		public:
-				MulticoreStandardJobExecutorDaemon(ComputeService *cs, int num_worker_threads=-1, double ttl=-1);
-				bool hasIdleCore();
+				MulticoreJobExecutorDaemon(ComputeService *cs, int num_worker_threads=-1, double ttl=-1);
 
 		private:
 				int num_worker_threads;
@@ -42,6 +41,8 @@ namespace wrench {
 				std::set<WorkflowTask *> running_task_set;
 
 				int main();
+				void terminate_all_worker_threads();
+				void fail_all_current_jobs();
 
 				ComputeService *compute_service;
 		};
