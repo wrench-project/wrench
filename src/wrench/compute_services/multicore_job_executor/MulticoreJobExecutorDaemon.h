@@ -29,26 +29,47 @@ namespace wrench {
 				MulticoreJobExecutorDaemon(ComputeService *cs, int num_worker_threads=-1, double ttl=-1);
 
 		private:
-				int num_worker_threads;
-				double ttl;
 
+				// Fixed values
+				int num_worker_threads; // total threads to run tasks from standard jobs
+				double ttl;							// time-to-live
+
+				int num_available_worker_threads; // number of worker threads that can currently be
+				                                  // used to run tasks from standard jobs
+
+				// Vector of worker threads
 				std::vector<std::unique_ptr<SequentialTaskExecutor>> sequential_task_executors;
 
+				// Vector of idle worker threads available to run tasks from standard jobs
 				std::set<SequentialTaskExecutor *> idle_sequential_task_executors;
+				// Vector of worker threads currencly running tasks from standard jobs
 				std::set<SequentialTaskExecutor *> busy_sequential_task_executors;
-				std::set<StandardJob *> pending_jobs;
-				std::queue<WorkflowTask *> waiting_task_queue;
-				std::set<WorkflowTask *> running_task_set;
+
+				// Queue of pending jobs (standard or pilot) that haven't began executing
+				std::queue<WorkflowJob *> pending_jobs;
+
+				// Set of currently running jobs
+				std::set<WorkflowJob *> running_jobs;
+
+				// Queue of standard job tasks waiting for execution
+				std::queue<WorkflowTask *> pending_tasks;
+
+				// Set of currently running standard job tasks
+				std::set<WorkflowTask *> running_tasks;
 
 				int main();
 
-				// Helper functions
+				// Helper functions to make main() a bit more palatable
 				void initialize();
-				void terminate_all_worker_threads();
-				void fail_all_current_jobs();
-				void process_task_completion(WorkflowTask *, SequentialTaskExecutor *);
+				void terminateAllWorkerThreads();
+				void failCurrentjobs();
+				void processTaskCompletion(WorkflowTask *, SequentialTaskExecutor *);
+				bool processNextMessage();
+				bool dispatchNextPendingTask();
+				bool dispatchNextPendingJob();
 
 
+				// Pointer to the ComputeService container
 				ComputeService *compute_service;
 		};
 }

@@ -36,6 +36,8 @@ namespace wrench {
 			this->compute_service = cs;
 			this->num_worker_threads = num_worker_threads;
 			this->ttl = ttl;
+
+			this->num_available_worker_threads = this->num_worker_threads;
 		}
 
 		/**
@@ -49,78 +51,13 @@ namespace wrench {
 			initialize();
 
 			/** Main loop **/
-			bool keep_going = true;
-			while (keep_going) {
+			while (this->processNextMessage()) {
 
-				// Wait for a message
-				std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
-				switch (message->type) {
+				/** Dispatch currently pending tasks until no longer possible **/
+				while (this->dispatchNextPendingTask());
 
-					case SimulationMessage::STOP_DAEMON: {
-						XBT_INFO("Asked to terminate");
-						this->terminate_all_worker_threads();
-						this->fail_all_current_jobs();
-						keep_going = false;
-						break;
-					}
-
-					case SimulationMessage::RUN_STANDARD_JOB: {
-						std::unique_ptr<RunStandardJobMessage> m(static_cast<RunStandardJobMessage *>(message.release()));
-						StandardJob *job = m->job;
-						XBT_INFO("Asked to run a job with %ld tasks", job->tasks.size());
-						// Add all its tasks to the wait queue
-						for (auto t : job->tasks) {
-							this->waiting_task_queue.push(t);
-						}
-						break;
-					}
-
-					case SimulationMessage::RUN_PILOT_JOB: {
-						std::unique_ptr<RunPilotJobMessage> m(static_cast<RunPilotJobMessage *>(message.release()));
-						PilotJob *job = m->job;
-						XBT_INFO("Asked to run a pilot job with %d cores for %lf seconds", job->num_cores, job->duration);
-						throw WRENCHException("PILOT JOB SUPPORT NOT YET IMPLEMENTED");
-						break;
-					}
-
-					case SimulationMessage::TASK_DONE: {
-						std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
-						process_task_completion(m->task, m->task_executor);
-						break;
-					}
-
-					case SimulationMessage::NUM_IDLE_CORES_REQUEST: {
-						std::unique_ptr<NumIdleCoresRequestMessage> m(static_cast<NumIdleCoresRequestMessage *>(message.release()));
-						NumIdleCoresAnswerMessage *msg = new NumIdleCoresAnswerMessage(this->idle_sequential_task_executors.size());
-						S4U_Mailbox::put(this->mailbox_name+"_answers", msg);
-						break;
-					}
-
-					default: {
-						XBT_INFO("MESSAGE TYPE = %d", message->type);
-						throw WRENCHException("Unknown message type: " + std::to_string(message->type));
-					}
-				}
-
-
-				// Run tasks while possible
-				while ((waiting_task_queue.size() > 0) && (idle_sequential_task_executors.size() > 0)) {
-					// Get the task to run the first task on the first idle core
-					WorkflowTask *to_run = waiting_task_queue.front();
-					waiting_task_queue.pop();
-
-					// Get an idle sequential task executor and mark it as busy
-					SequentialTaskExecutor *executor = *(this->idle_sequential_task_executors.begin());
-					this->idle_sequential_task_executors.erase(executor);
-					this->busy_sequential_task_executors.insert(executor);
-
-					// Start the task on the sequential task executor
-					XBT_INFO("Running task %s on one of my cores", to_run->id.c_str());
-					executor->runTask(to_run);
-
-					// Put the task in the running task set
-					this->running_task_set.insert(to_run);
-				}
+				/** Dispatch jobs (and their tasks in the case of standard jobs) if possible) **/
+				while (this->dispatchNextPendingJob());
 
 			}
 
@@ -128,8 +65,146 @@ namespace wrench {
 			return 0;
 		}
 
+		/**
+		 * @brief Dispatch one pending job, if possible
+		 * @return true if a job was dispatched, false otherwise
+		 */
+		bool MulticoreJobExecutorDaemon::dispatchNextPendingJob() {
 
-		void MulticoreJobExecutorDaemon::terminate_all_worker_threads() {
+			/** While some idle core, then see if they can be used **/
+			if ((this->busy_sequential_task_executors.size() < this->num_available_worker_threads)) {
+
+				/** Look at pending jobs **/
+				if (this->pending_jobs.size() > 0) {
+
+					WorkflowJob *next_job = this->pending_jobs.front();
+					switch (next_job->type) {
+						case WorkflowJob::STANDARD: {
+
+							// Put the job in the running queue
+							StandardJob *standard_job = (StandardJob *) next_job;
+							this->pending_jobs.pop();
+							this->running_jobs.insert(standard_job);
+
+							// Enqueue all its tasks in the task wait queue
+							for (auto t : standard_job->tasks) {
+								this->pending_tasks.push(t);
+							}
+
+							// Try to dispatch its tasks if possible
+							while (this->dispatchNextPendingTask());
+							return true;
+						}
+						case WorkflowJob::PILOT: {
+							PilotJob *pilot_job = (PilotJob *) next_job;
+							if (this->num_available_worker_threads - this->busy_sequential_task_executors.size() >
+									pilot_job->num_cores) {
+								// TODO
+								throw WRENCHException("SHOULD BE STARTING A PILOT JOB RIGHT NOW!!");
+								// Start the compute service
+								// Reduce the number of avialable worker threads
+								return true;
+							}
+							break;
+						}
+					}
+				}
+			}
+			return false;
+		}
+
+		/**
+		 * @brief Dispatch one pending tasks to available worker threads (i.e., sequential task executors), if possible
+		 * @return true if a task was dispatched, false otherwise
+		 */
+		bool MulticoreJobExecutorDaemon::dispatchNextPendingTask() {
+			/** Dispatch tasks of currently running standard jobs to idle available worker threads **/
+			if ((pending_tasks.size() > 0) &&
+						 (this->busy_sequential_task_executors.size() < this->num_available_worker_threads)) {
+
+				// Get the first task out of the task wait queue
+				WorkflowTask *to_run = pending_tasks.front();
+				pending_tasks.pop();
+
+				// Get the first idle sequential task executor and mark it as busy
+				SequentialTaskExecutor *executor = *(this->idle_sequential_task_executors.begin());
+				this->idle_sequential_task_executors.erase(executor);
+				this->busy_sequential_task_executors.insert(executor);
+
+				// Start the task on the sequential task executor
+				XBT_INFO("Running task %s on one of my worker threads", to_run->id.c_str());
+				executor->runTask(to_run);
+
+				// Put the task in the running task set
+				this->running_tasks.insert(to_run);
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+
+		/**
+		 * @brief Wait for and react to any incoming message
+		 * @return false if the daemon should terminate, true otherwise
+		 */
+		bool MulticoreJobExecutorDaemon::processNextMessage() {
+			// Wait for a message
+			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+			switch (message->type) {
+
+				case SimulationMessage::STOP_DAEMON: {
+					XBT_INFO("Asked to terminate");
+					this->terminateAllWorkerThreads();
+					this->failCurrentjobs();
+					return false;
+				}
+
+				case SimulationMessage::RUN_STANDARD_JOB: {
+					std::unique_ptr<RunStandardJobMessage> m(static_cast<RunStandardJobMessage *>(message.release()));
+					StandardJob *job = m->job;
+					XBT_INFO("Asked to run a standard job with %ld tasks", job->tasks.size());
+					this->pending_jobs.push(job);
+					return true;
+				}
+
+				case SimulationMessage::RUN_PILOT_JOB: {
+					std::unique_ptr<RunPilotJobMessage> m(static_cast<RunPilotJobMessage *>(message.release()));
+					PilotJob *job = m->job;
+					XBT_INFO("Asked to run a pilot job with %d cores for %lf seconds", job->num_cores, job->duration);
+					this->pending_jobs.push(job);
+					return true;
+				}
+
+				case SimulationMessage::TASK_DONE: {
+					std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
+					processTaskCompletion(m->task, m->task_executor);
+					return true;
+				}
+
+				case SimulationMessage::PILOT_JOB_TERMINATED: {
+					std::unique_ptr<PilotJobTerminatedMessage> m(static_cast<PilotJobTerminatedMessage *>(message.release()));
+					throw WRENCHException("PILOT JOB TERMINATION HANDLING NOT IMPLEMENTED YET");
+					return true;
+				}
+
+				case SimulationMessage::NUM_IDLE_CORES_REQUEST: {
+					std::unique_ptr<NumIdleCoresRequestMessage> m(static_cast<NumIdleCoresRequestMessage *>(message.release()));
+					NumIdleCoresAnswerMessage *msg = new NumIdleCoresAnswerMessage(this->idle_sequential_task_executors.size());
+					S4U_Mailbox::put(this->mailbox_name+"_answers", msg);
+					return true;
+				}
+
+				default: {
+					throw WRENCHException("Unknown message type: " + std::to_string(message->type));
+				}
+			}
+		}
+
+		/**
+		 * @brief Terminate (nicely or brutally) all worker threads (i.e., sequential task executors)
+		 */
+		void MulticoreJobExecutorDaemon::terminateAllWorkerThreads() {
 			// Kill all running sequential executors
 			for (auto executor : this->busy_sequential_task_executors) {
 				XBT_INFO("Killing a sequential task executor");
@@ -142,22 +217,38 @@ namespace wrench {
 			}
 		}
 
-		void MulticoreJobExecutorDaemon::fail_all_current_jobs() {
+		/**
+		 * @brief Declare all current jobs as failed (liekly because the daemon is being terminated)
+		 */
+		void MulticoreJobExecutorDaemon::failCurrentjobs() {
 
-			/* STANDARD JOBS */
-			// Update all task states and send appropriate "job failed" messages
-			for (auto failed_job : this->pending_jobs) {
-				for (auto failed_task: failed_job->tasks) {
-					failed_task->state = WorkflowTask::READY;
+			while (!this->pending_jobs.empty()) {
+				WorkflowJob *workflow_job = this->pending_jobs.front();
+				this->pending_jobs.pop();
+				switch (workflow_job->type) {
+
+					case WorkflowJob::STANDARD: {
+						StandardJob *job = (StandardJob *)workflow_job;
+						// Set all tasks back to the READY state
+						for (auto failed_task: ((StandardJob *)job)->tasks) {
+							failed_task->state = WorkflowTask::READY;
+						}
+						// Send back a job failed message
+						S4U_Mailbox::put(job->pop_callback_mailbox(),
+														 new StandardJobFailedMessage(job, this->compute_service));
+						break;
+					}
+					case WorkflowJob::PILOT: {
+						throw WRENCHException("PILOT JOB FAIL NOT IMPLEMENTED YET");
+						break;
+					}
 				}
-				S4U_Mailbox::put(failed_job->pop_callback_mailbox(),
-												 new StandardJobFailedMessage(failed_job, this->compute_service));
 			}
-
-			/* PILOT JOBS */
-			// TODO
 		}
 
+		/**
+		 * @brief Initialize all state for the daemon
+		 */
 		void MulticoreJobExecutorDaemon::initialize() {
 			/** Start worker threads **/
 			// Figure out the number of worker threads
@@ -189,12 +280,18 @@ namespace wrench {
 			}
 		}
 
-		void MulticoreJobExecutorDaemon::process_task_completion(WorkflowTask *task, SequentialTaskExecutor *executor) {
+		/**
+		 * @brief Process a task completion
+		 *
+		 * @param task is the WorkflowTask that has completed
+		 * @param executor is a pointer to the worker thread (sequential task executor) that has completed it
+		 */
+		void MulticoreJobExecutorDaemon::processTaskCompletion(WorkflowTask *task, SequentialTaskExecutor *executor) {
 			StandardJob *job = (StandardJob *)(task->job);
 			XBT_INFO("One of my cores completed task %s", task->id.c_str());
 
 			// Remove the task from the running task queue
-			this->running_task_set.erase(task);
+			this->running_tasks.erase(task);
 
 			// Put that core's executor back into the pull of idle cores
 			this->busy_sequential_task_executors.erase(executor);
@@ -206,7 +303,7 @@ namespace wrench {
 			// Send the callback to the originator if necessary and remove the job from
 			// the list of pending jobs
 			if (job->num_completed_tasks == job->tasks.size()) {
-				this->pending_jobs.erase(job);
+				this->running_jobs.erase(job);
 				S4U_Mailbox::put(job->pop_callback_mailbox(),
 												 new StandardJobDoneMessage(job, this->compute_service));
 			}

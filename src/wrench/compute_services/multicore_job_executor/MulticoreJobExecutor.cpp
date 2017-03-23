@@ -31,8 +31,7 @@ namespace wrench {
 		MulticoreJobExecutor::MulticoreJobExecutor(Simulation *simulation,
 																							 std::string hostname,
 																							 int num_worker_threads,
-																							 double ttl
-		) :
+																							 double ttl) :
 						ComputeService("multicore_job_executor", simulation) {
 
 			// Set all relevant properties
@@ -83,12 +82,12 @@ namespace wrench {
 		};
 
 		/**
-	 * @brief Have the service execute a pilot job
-	 *
-	 * @param task is a pointer the pilot job
-	 * @param callback_mailbox is the name of a mailbox to which a "pilot job started" callback will be sent
-	 * @return 0 on success
-	 */
+		 * @brief Have the service execute a pilot job
+		 *
+		 * @param task is a pointer the pilot job
+		 * @param callback_mailbox is the name of a mailbox to which a "pilot job started" callback will be sent
+		 * @return 0 on success
+		 */
 		int MulticoreJobExecutor::runPilotJob(PilotJob *job) {
 
 			if (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) != "yes") {

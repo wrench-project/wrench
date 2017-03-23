@@ -6,7 +6,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief TBD
+ * @brief wrench::WorkflowExecutionEvent implements several events that
+ * are relevant to the execution of a WMS, which are accessed via some
+ * Workflow.getNextEvent() method.
  */
 
 
