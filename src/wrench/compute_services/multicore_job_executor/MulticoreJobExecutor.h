@@ -23,7 +23,7 @@
 namespace wrench {
 
 		class Simulation;
-
+		
 		class MulticoreJobExecutor : public ComputeService {
 
 		public:
