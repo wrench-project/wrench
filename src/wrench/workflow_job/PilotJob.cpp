@@ -28,4 +28,16 @@ namespace wrench {
 			return this->compute_service;
 		}
 
+		/***********************************************************/
+		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
+		/***********************************************************/
+
+		/*! \cond PRIVATE */
+
+		void PilotJob::setComputeService(ComputeService* cs) {
+			this->compute_service = cs;
+		}
+		/*! \endcond */
+
+
 };

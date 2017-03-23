@@ -16,9 +16,13 @@
 #include <string>
 #include <compute_services/ComputeService.h>
 #include <helper_daemons/sequential_task_executor/SequentialTaskExecutor.h>
-#include "workflow_job/WorkflowJob.h"
 
 namespace wrench {
+
+		class ComputeService;
+		class WorkflowJob;
+		class StandardJob;
+		class PilotJob;
 
 		// Base struct
 		struct SimulationMessage {

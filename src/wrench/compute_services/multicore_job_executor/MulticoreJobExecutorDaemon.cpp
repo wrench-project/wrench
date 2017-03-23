@@ -11,10 +11,14 @@
  */
 
 #include <helper_daemons/daemon_terminator/DaemonTerminator.h>
+#include <workflow_job/PilotJob.h>
+#include <workflow_job/StandardJob.h>
+#include <simulation/Simulation.h>
 #include "compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h"
 #include "exception/WRENCHException.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
+#include "MulticoreJobExecutor.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_standard_job_executor, "Log category for Multicore Standard Job Executor");
 
@@ -82,12 +86,11 @@ namespace wrench {
 						case WorkflowJob::STANDARD: {
 
 							// Put the job in the running queue
-							StandardJob *standard_job = (StandardJob *) next_job;
 							this->pending_jobs.pop();
-							this->running_jobs.insert(standard_job);
+							this->running_jobs.insert(next_job);
 
 							// Enqueue all its tasks in the task wait queue
-							for (auto t : standard_job->tasks) {
+							for (auto t : ((StandardJob *)next_job)->tasks) {
 								this->pending_tasks.push(t);
 							}
 
@@ -96,13 +99,18 @@ namespace wrench {
 							return true;
 						}
 						case WorkflowJob::PILOT: {
-							PilotJob *pilot_job = (PilotJob *) next_job;
 							if (this->num_available_worker_threads - this->busy_sequential_task_executors.size() >
-									pilot_job->num_cores) {
-								// TODO
-								throw WRENCHException("SHOULD BE STARTING A PILOT JOB RIGHT NOW!!");
-								// Start the compute service
-								// Reduce the number of avialable worker threads
+											((PilotJob *)next_job)->num_cores) {
+
+								// Create and launch a compute service for the pilot job
+								((PilotJob *)next_job)->setComputeService(Simulation::createUnregisteredMulticoreJobExecutor(
+												S4U_Simulation::getHostName(), "yes", "no"));
+
+								// Reduce the number of available worker threads
+								this->num_available_worker_threads -= ((PilotJob *)next_job)->num_cores;
+
+								// TODO: Send some callback to somebody to let them know!
+								XBT_INFO("TO BE IMPLEMENTED: LET PEOPLE KNOW THAT THE PILOT JOB HAS STARTED!");
 								return true;
 							}
 							break;
@@ -120,7 +128,7 @@ namespace wrench {
 		bool MulticoreJobExecutorDaemon::dispatchNextPendingTask() {
 			/** Dispatch tasks of currently running standard jobs to idle available worker threads **/
 			if ((pending_tasks.size() > 0) &&
-						 (this->busy_sequential_task_executors.size() < this->num_available_worker_threads)) {
+					(this->busy_sequential_task_executors.size() < this->num_available_worker_threads)) {
 
 				// Get the first task out of the task wait queue
 				WorkflowTask *to_run = pending_tasks.front();
@@ -132,7 +140,7 @@ namespace wrench {
 				this->busy_sequential_task_executors.insert(executor);
 
 				// Start the task on the sequential task executor
-				XBT_INFO("Running task %s on one of my worker threads", to_run->id.c_str());
+				XBT_INFO("Running task %s on one of my worker threads", to_run->getId().c_str());
 				executor->runTask(to_run);
 
 				// Put the task in the running task set
@@ -162,17 +170,15 @@ namespace wrench {
 
 				case SimulationMessage::RUN_STANDARD_JOB: {
 					std::unique_ptr<RunStandardJobMessage> m(static_cast<RunStandardJobMessage *>(message.release()));
-					StandardJob *job = m->job;
-					XBT_INFO("Asked to run a standard job with %ld tasks", job->tasks.size());
-					this->pending_jobs.push(job);
+					XBT_INFO("Asked to run a standard job with %ld tasks", m->job->tasks.size());
+					this->pending_jobs.push(m->job);
 					return true;
 				}
 
 				case SimulationMessage::RUN_PILOT_JOB: {
 					std::unique_ptr<RunPilotJobMessage> m(static_cast<RunPilotJobMessage *>(message.release()));
-					PilotJob *job = m->job;
-					XBT_INFO("Asked to run a pilot job with %d cores for %lf seconds", job->num_cores, job->duration);
-					this->pending_jobs.push(job);
+					XBT_INFO("Asked to run a pilot job with %d cores for %lf seconds", m->job->num_cores, m->job->duration);
+					this->pending_jobs.push(m->job);
 					return true;
 				}
 

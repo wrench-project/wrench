@@ -14,14 +14,14 @@
 #define SIMULATION_COMPUTESERVICE_H
 
 
-#include <workflow_job/WorkflowJob.h>
-#include <workflow_job/StandardJob.h>
-#include <workflow_job/PilotJob.h>
-#include "workflow/WorkflowTask.h"
+#include <map>
 
 namespace wrench {
 
 		class Simulation;
+		class WorkflowJob;
+		class StandardJob;
+		class PilotJob;
 
 		class ComputeService {
 

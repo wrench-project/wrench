@@ -86,24 +86,7 @@ namespace wrench {
 			this->createMulticoreJobExecutor(hostname, "yes", "yes");
 		}
 
-		void Simulation::createMulticoreJobExecutor(std::string hostname,
-																								std::string supports_standard_jobs,
-																								std::string support_pilot_jobs) {
 
-			// Create the compute service
-			std::unique_ptr<ComputeService> executor;
-			try {
-				executor = std::unique_ptr<MulticoreJobExecutor>(new MulticoreJobExecutor(this, hostname));
-				executor->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, supports_standard_jobs);
-				executor->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, support_pilot_jobs);
-			} catch (WRENCHException e) {
-				throw e;
-			}
-
-			// Add it to the list of Compute Services
-			running_compute_services.push_back(std::move(executor));
-			return;
-		}
 
 		/**
 		 * @brief Instantiate a WMS on a host
@@ -150,6 +133,39 @@ namespace wrench {
 			}
 		}
 
+		/***********************************************************/
+		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
+		/***********************************************************/
+
+		/*! \cond PRIVATE */
+
+		/**
+		 * @brief Method to create an unregistered executor
+		 *
+		 * @param hostname  is the hostname
+		 * @param supports_standard_jobs is "yes" or "no"
+		 * @param support_pilot_jobs is "yes" or "no"
+		 */
+		MulticoreJobExecutor *Simulation::createUnregisteredMulticoreJobExecutor(std::string hostname,
+																								std::string supports_standard_jobs,
+																								std::string support_pilot_jobs) {
+
+			// Create the compute service
+			MulticoreJobExecutor *executor;
+			try {
+				executor = new MulticoreJobExecutor(nullptr, hostname);
+				executor->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, supports_standard_jobs);
+				executor->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, support_pilot_jobs);
+			} catch (WRENCHException e) {
+				throw e;
+			}
+
+			return executor;
+		}
+
+
+
+
 		/**
 		 * @brief Remove a compute service from the list of known compute services
 		 *
@@ -168,4 +184,31 @@ namespace wrench {
 			return;
 		}
 
+		/**
+		 * @brief Helper method
+		 * @param hostname  is the host on which to start the executor
+		 * @param supports_standard_jobs is "yes" or "no"
+		 * @param support_pilot_jobs is "yes" or "no"
+		 */
+		void Simulation::createMulticoreJobExecutor(std::string hostname,
+																								std::string supports_standard_jobs,
+																								std::string support_pilot_jobs) {
+
+			// Create the compute service
+			std::unique_ptr<ComputeService> executor;
+			try {
+				executor = std::unique_ptr<MulticoreJobExecutor>(new MulticoreJobExecutor(this, hostname));
+				executor->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, supports_standard_jobs);
+				executor->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, support_pilot_jobs);
+			} catch (WRENCHException e) {
+				throw e;
+			}
+
+			// Add it to the list of Compute Services
+			running_compute_services.push_back(std::move(executor));
+			return;
+		}
+
+
+		/*! \endcond */
 };

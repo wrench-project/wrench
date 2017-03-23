@@ -18,13 +18,14 @@
 
 namespace wrench {
 
+
 		WorkflowExecutionEvent::WorkflowExecutionEvent() {
 			this->type = WorkflowExecutionEvent::UNDEFINED;
 			this->job = nullptr;
 			this->compute_service = nullptr;
 		}
 
-		std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::get_next_execution_event(std::string mailbox) {
+		std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
 
 			// Get the message on the mailbox
 			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(mailbox);
@@ -37,7 +38,7 @@ namespace wrench {
 				case SimulationMessage::STANDARD_JOB_DONE: {
 					std::unique_ptr<StandardJobDoneMessage> m(static_cast<StandardJobDoneMessage *>(message.release()));
 					event->type = WorkflowExecutionEvent::STANDARD_JOB_COMPLETION;
-					event->job = m->job;
+					event->job = (WorkflowJob *) m->job;
 					event->compute_service = m->compute_service;
 					return event;
 				}
@@ -45,7 +46,7 @@ namespace wrench {
 				case SimulationMessage::STANDARD_JOB_FAILED: {
 					std::unique_ptr<StandardJobFailedMessage> m(static_cast<StandardJobFailedMessage *>(message.release()));
 					event->type = WorkflowExecutionEvent::STANDARD_JOB_FAILURE;
-					event->job = m->job;
+					event->job = (WorkflowJob *)m->job;
 					event->compute_service = m->compute_service;
 					return event;
 				}

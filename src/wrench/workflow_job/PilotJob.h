@@ -13,6 +13,7 @@
 #define WRENCH_PILOTJOB_H
 
 
+#include <compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h>
 #include "WorkflowJob.h"
 
 namespace wrench {
@@ -35,7 +36,10 @@ namespace wrench {
 				ComputeService *getComputeService();
 				void stop();
 
+				void setComputeService(ComputeService*);
+
 		private:
+
 				State state;
 				ComputeService *compute_service; // Associated compute service
 		};

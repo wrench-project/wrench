@@ -15,12 +15,14 @@
 
 #include <string>
 #include <vector>
+#include <compute_services/multicore_job_executor/MulticoreJobExecutor.h>
 
 #include "simgrid_S4U_util/S4U_Simulation.h"
-#include "workflow/Workflow.h"
-#include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
-#include "wms/WMS.h"
 #include "simgrid_MSG_util/MSG_Platform.h"
+
+
+#include "workflow/Workflow.h"
+#include "wms/WMS.h"
 
 
 namespace wrench {
@@ -38,9 +40,13 @@ namespace wrench {
 				void createPlatform(std::string);
 
 				/** ComputeService creations **/
-				void createMulticoreStandardJobExecutor(std::string hostname);
-				void createMulticorePilotJobExecutor(std::string hostname);
-				void createMulticoreStandardAndPilotJobExecutor(std::string hostname);
+				void createMulticoreStandardJobExecutor(std::string);
+				void createMulticorePilotJobExecutor(std::string);
+				void createMulticoreStandardAndPilotJobExecutor(std::string);
+
+				// Internal methods (excluded from documentation)
+				static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(std::string , std::string, std::string);
+				void mark_compute_service_as_terminated(ComputeService *cs);
 
 				/** ComputeService discovery **/
 				std::set<ComputeService *> getComputeServices();
@@ -49,8 +55,8 @@ namespace wrench {
 				void createWMS(int wms_id, int sched_id, Workflow *w, std::string hostname);
 
 
+
 		private:
-				friend class ComputeService;
 
 				std::unique_ptr<S4U_Simulation> s4u_simulation;
 
@@ -59,13 +65,11 @@ namespace wrench {
 				std::vector<std::unique_ptr<ComputeService>> running_compute_services;
 				std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
 
-				void mark_compute_service_as_terminated(ComputeService *cs);
 
 				// Helper function
 				void createMulticoreJobExecutor(std::string hostname,
-																										std::string supports_standard_jobs,
-																										std::string support_pilot_jobs);
-
+																				std::string supports_standard_jobs,
+																				std::string support_pilot_jobs);
 
 				};
 

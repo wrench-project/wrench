@@ -24,65 +24,65 @@ using namespace lemon;
 
 namespace wrench {
 
-	class Workflow {
+		class Workflow {
 
-	/**************/
-	/**  PUBLIC  **/
-	/**************/
+				/**************/
+				/**  PUBLIC  **/
+				/**************/
 
-	public:
-		Workflow();
+		public:
+				Workflow();
 
-		WorkflowTask *addTask(std::string, double, int);
-		WorkflowTask *getWorkflowTaskByID(const std::string);
+				WorkflowTask *addTask(std::string, double, int);
+				WorkflowTask *getWorkflowTaskByID(const std::string);
 
-		WorkflowFile *addFile(const std::string, double);
-		WorkflowFile *getWorkflowFileByID(const std::string);
+				WorkflowFile *addFile(const std::string, double);
+				WorkflowFile *getWorkflowFileByID(const std::string);
 
-		void addControlDependency(WorkflowTask *, WorkflowTask *);
-		//void addDataDependency(WorkflowTask *, WorkflowTask *, WorkflowFile *);
+				void addControlDependency(WorkflowTask *, WorkflowTask *);
+				//void addDataDependency(WorkflowTask *, WorkflowTask *, WorkflowFile *);
 
-		void loadFromDAX(const std::string filename);
+				void loadFromDAX(const std::string filename);
 
-		/** Get information from the workflow **/
-		// TODO: Make these efficient - Right now they are really naively implemented
-		unsigned long getNumberOfTasks();
-		bool isDone();
-		std::vector<WorkflowTask *> getReadyTasks();
+				/** Get information from the workflow **/
+				// TODO: Make these efficient - Right now they are really naively implemented
+				unsigned long getNumberOfTasks();
+				bool isDone();
+				std::vector<WorkflowTask *> getReadyTasks();
 
-		/** misc **/
-		void exportToEPS(std::string);
+				/** misc **/
+				void exportToEPS(std::string);
 
-	/***************/
-	/**  PRIVATE  **/
-	/***************/
+				/** Method to wait the next event **/
+				// Internal (excluded from documentation)
+				std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
 
-	friend class WorkflowTask;
-	friend class SimpleWMSDaemon;
-	friend class StandardJob;
+				/** Method to get the callback mailbox associated with the workflow **/
+				// Internal (excluded from documentation)
+				std::string getCallbackMailbox();
 
-	private:
 
-		std::unique_ptr<ListDigraph> DAG;  // Lemon DiGraph
-		std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
+				/** Update task state **/
+				// Internal (excluded from documentation)
+				void updateTaskState (WorkflowTask *task, WorkflowTask::State state);
 
-		std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
-		std::map<std::string, std::unique_ptr<WorkflowFile>> files;
+				/***************/
+				/**  PRIVATE  **/
+				/***************/
 
-		bool pathExists(WorkflowTask *, WorkflowTask *);
+		private:
 
-		std::string callback_mailbox;
+				std::unique_ptr<ListDigraph> DAG;  // Lemon DiGraph
+				std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
 
-		/** Update task state **/
-		void update_task_state(WorkflowTask *task, WorkflowTask::State state);
+				std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
+				std::map<std::string, std::unique_ptr<WorkflowFile>> files;
 
-		/** Method to get the callback mailbox associated with the workflow **/
-		std::string getCallbackMailbox();
+				bool pathExists(WorkflowTask *, WorkflowTask *);
 
-		/** Method to wait the next event **/
-		std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
+				std::string callback_mailbox;
 
-	};
+		};
 
 };
 

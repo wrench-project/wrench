@@ -137,7 +137,7 @@ namespace wrench {
 	 * @param task
 	 */
 	void WorkflowTask::setReady() {
-		this->workflow->update_task_state(this, WorkflowTask::READY);
+		this->workflow->updateTaskState(this, WorkflowTask::READY);
 	}
 
 	/**
@@ -145,7 +145,7 @@ namespace wrench {
 	 * @param task
 	 */
 	void WorkflowTask::setRunning() {
-		this->workflow->update_task_state(this, WorkflowTask::RUNNING);
+		this->workflow->updateTaskState(this, WorkflowTask::RUNNING);
 	}
 
 	/**
@@ -153,7 +153,7 @@ namespace wrench {
 	 * @param task
 	 */
 	void WorkflowTask::setCompleted() {
-		this->workflow->update_task_state(this, WorkflowTask::COMPLETED);
+		this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
 	}
 
 

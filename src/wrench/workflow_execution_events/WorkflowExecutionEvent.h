@@ -38,13 +38,10 @@ namespace wrench {
 				ComputeService *compute_service;
 
 		private:
-
-				friend class Workflow;
-
-
 				WorkflowExecutionEvent();
 
-				static std::unique_ptr<WorkflowExecutionEvent> get_next_execution_event(std::string);
+				friend class Workflow;
+				static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
 
 		};
 

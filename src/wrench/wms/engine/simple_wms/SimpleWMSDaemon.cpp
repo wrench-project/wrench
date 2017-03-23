@@ -16,6 +16,8 @@
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/engine/simple_wms/SimpleWMSDaemon.h"
 #include "simulation/Simulation.h"
+#include "workflow_job/StandardJob.h"
+#include "workflow_job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms_daemon, "Log category for Simple WMS Daemon");
 

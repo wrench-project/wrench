@@ -23,6 +23,8 @@
 
 namespace wrench {
 
+		class ComputeService;
+		
 		class MulticoreJobExecutorDaemon : public S4U_DaemonWithMailbox {
 
 		public:
