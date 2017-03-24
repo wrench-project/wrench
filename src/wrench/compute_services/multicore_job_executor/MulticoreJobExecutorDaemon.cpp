@@ -122,7 +122,7 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Dispatch one pending tasks to available worker threads (i.e., sequential task executors), if possible
+		 * @brief Dispatch one pending task to available worker threads (i.e., sequential task executors), if possible
 		 * @return true if a task was dispatched, false otherwise
 		 */
 		bool MulticoreJobExecutorDaemon::dispatchNextPendingTask() {
@@ -146,6 +146,7 @@ namespace wrench {
 				// Put the task in the running task set
 				this->running_tasks.insert(to_run);
 				return true;
+
 			} else {
 				return false;
 			}
