@@ -1,7 +1,11 @@
 
 ------------------------------------
 
-- Prototype PilotJob
+- Right now, the "killbox" stuff inside the stop() method of compute services is not great
+	- But we need an ack to make sure memory doesn't get freed before a daemon has
+          completely shutdown
+
+- Implement PilotJob
 
 
 ---------------------------------------------------------------------
