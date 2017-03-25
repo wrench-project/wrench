@@ -15,10 +15,12 @@
 #include <string>
 #include <map>
 
+
 namespace wrench {
 
-		class WorkflowTask;
+
 		class Workflow;
+		class WorkflowTask;
 
 		class WorkflowFile {
 

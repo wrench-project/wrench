@@ -30,6 +30,7 @@ namespace wrench {
 				// Message type enum
 				enum Type {
 						STOP_DAEMON,
+						DAEMON_STOPPED,
 						RUN_STANDARD_JOB,
 						STANDARD_JOB_DONE,
 						STANDARD_JOB_FAILED,
@@ -52,6 +53,10 @@ namespace wrench {
 		/** DAEMON STOPPING **/
 		struct StopDaemonMessage: public SimulationMessage {
 				StopDaemonMessage();
+		};
+
+		struct DaemonStoppedMessage: public SimulationMessage {
+				DaemonStoppedMessage();
 		};
 
 		/** STANDARD JOBS */

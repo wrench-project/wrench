@@ -22,23 +22,29 @@ namespace wrench {
 
 		class StandardJob : public WorkflowJob {
 
-
 		public:
-				StandardJob(std::vector<WorkflowTask*> tasks);
-				StandardJob(WorkflowTask *task);
+				enum State {
+						NOT_SUBMITTED,
+						PENDING,
+						RUNNING,
+						COMPLETED,
+						FAILED,
+				};
 
-				std::vector<WorkflowTask *> tasks;
-
-				// Callback mailbox management
-				std::string pop_callback_mailbox();
-				void push_callback_mailbox(std::string);
 				int num_completed_tasks;
+
+				unsigned long getNumTasks();
+				std::vector<WorkflowTask*> getTasks();
+
 
 
 		private:
-				std::stack<std::string> callback_mailbox_stack;		// Stack of callback mailboxes
-				Workflow *workflow;
+				friend class JobManager;
+				friend class JobManagerDaemon;
 
+				StandardJob(std::vector<WorkflowTask*> tasks);
+				std::vector<WorkflowTask *> tasks;
+				State state;
 
 		};
 

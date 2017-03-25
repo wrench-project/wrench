@@ -107,8 +107,7 @@ namespace wrench {
 		 * @return a unique number
 		 */
 		int MSG_DaemonWithMailbox::getNewUniqueNumber() {
-			static int number = 0;
-			return (number++);
+			static unsigned long sequence_number = 0;
+			return (sequence_number++);
 		}
-
 };

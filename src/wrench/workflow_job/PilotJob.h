@@ -21,24 +21,31 @@ namespace wrench {
 		class ComputeService;
 
 		class PilotJob : public WorkflowJob {
+
 		public:
 				enum State {
-						SUBMITTED,
+						NOT_SUBMITTED,
+						PENDING,
 						RUNNING,
-						EXPIRING
+						EXPIRED,
+						FAILED
 				};
 
 				int num_cores;
 				double duration;
 
-				PilotJob(int, double);
-				PilotJob::State getState();
-				ComputeService *getComputeService();
-				void stop();
-
+				// Should be excluded from documentation
 				void setComputeService(ComputeService*);
 
 		private:
+
+				friend class JobManager;
+				friend class JobManagerDaemon;
+
+				PilotJob(Workflow *workflow, int, double);
+				PilotJob::State getState();
+				ComputeService *getComputeService();
+				void stop();
 
 				State state;
 				ComputeService *compute_service; // Associated compute service

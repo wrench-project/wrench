@@ -24,6 +24,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_standard_job_executor, "Log category for 
 
 namespace wrench {
 
+		MulticoreJobExecutorDaemon::~MulticoreJobExecutorDaemon() {
+			XBT_INFO("IN DESTRUCTOR on MulticoreHJobExecutoDaemon!!!");
+		}
 
 		/**
 		 * @brief Constructor
@@ -82,7 +85,7 @@ namespace wrench {
 				if (this->pending_jobs.size() > 0) {
 
 					WorkflowJob *next_job = this->pending_jobs.front();
-					switch (next_job->type) {
+					switch (next_job->getType()) {
 						case WorkflowJob::STANDARD: {
 
 							// Put the job in the running queue
@@ -90,7 +93,7 @@ namespace wrench {
 							this->running_jobs.insert(next_job);
 
 							// Enqueue all its tasks in the task wait queue
-							for (auto t : ((StandardJob *)next_job)->tasks) {
+							for (auto t : ((StandardJob *)next_job)->getTasks()) {
 								this->pending_tasks.push(t);
 							}
 
@@ -157,20 +160,23 @@ namespace wrench {
 		 * @return false if the daemon should terminate, true otherwise
 		 */
 		bool MulticoreJobExecutorDaemon::processNextMessage() {
+
 			// Wait for a message
 			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
 			switch (message->type) {
 
 				case SimulationMessage::STOP_DAEMON: {
-					XBT_INFO("Asked to terminate");
+
 					this->terminateAllWorkerThreads();
 					this->failCurrentjobs();
+					S4U_Mailbox::put("killbox", new DaemonStoppedMessage());
 					return false;
 				}
 
 				case SimulationMessage::RUN_STANDARD_JOB: {
 					std::unique_ptr<RunStandardJobMessage> m(static_cast<RunStandardJobMessage *>(message.release()));
-					XBT_INFO("Asked to run a standard job with %ld tasks", m->job->tasks.size());
+					XBT_INFO("Asked to run a standard job %ld", (unsigned long)(m->job));
+					XBT_INFO("Asked to run a standard job with %ld tasks", m->job->getNumTasks());
 					this->pending_jobs.push(m->job);
 					return true;
 				}
@@ -231,16 +237,16 @@ namespace wrench {
 			while (!this->pending_jobs.empty()) {
 				WorkflowJob *workflow_job = this->pending_jobs.front();
 				this->pending_jobs.pop();
-				switch (workflow_job->type) {
+				switch (workflow_job->getType()) {
 
 					case WorkflowJob::STANDARD: {
 						StandardJob *job = (StandardJob *)workflow_job;
 						// Set all tasks back to the READY state
-						for (auto failed_task: ((StandardJob *)job)->tasks) {
+						for (auto failed_task: ((StandardJob *)job)->getTasks()) {
 							failed_task->state = WorkflowTask::READY;
 						}
 						// Send back a job failed message
-						S4U_Mailbox::put(job->pop_callback_mailbox(),
+						S4U_Mailbox::put(job->popCallbackMailbox(),
 														 new StandardJobFailedMessage(job, this->compute_service));
 						break;
 					}
@@ -308,9 +314,9 @@ namespace wrench {
 
 			// Send the callback to the originator if necessary and remove the job from
 			// the list of pending jobs
-			if (job->num_completed_tasks == job->tasks.size()) {
+			if (job->num_completed_tasks == job->getNumTasks()) {
 				this->running_jobs.erase(job);
-				S4U_Mailbox::put(job->pop_callback_mailbox(),
+				S4U_Mailbox::put(job->popCallbackMailbox(),
 												 new StandardJobDoneMessage(job, this->compute_service));
 			}
 		}

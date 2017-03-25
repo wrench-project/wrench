@@ -23,17 +23,17 @@
 namespace wrench {
 
 		class Simulation;
-		
+
 		class MulticoreJobExecutor : public ComputeService {
 
 		public:
-				/** Construct/Start, Stop **/
+				/** Construct/Start, Destructor/Stop **/
 				MulticoreJobExecutor(Simulation *simulation, std::string hostname, int num_worker_threads = -1, double ttl = -1.0);
-				void stop();
+					void stop();
 
 				/** Run jobs **/
-				int runStandardJob(StandardJob *job);
-				int runPilotJob(PilotJob *job);
+				void runStandardJob(StandardJob *job);
+				void runPilotJob(PilotJob *job);
 
 				/** Get information **/
 				unsigned long numIdleCores();

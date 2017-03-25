@@ -17,13 +17,17 @@
 
 namespace wrench {
 
-		class PilotJobManagerDaemon: public S4U_DaemonWithMailbox {
+		class JobManager;
+
+		class JobManagerDaemon: public S4U_DaemonWithMailbox {
 
 		public:
-				PilotJobManagerDaemon();
+				JobManagerDaemon(JobManager *);
 
 		private:
 				int main();
+
+				JobManager *job_manager;
 
 		};
 

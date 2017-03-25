@@ -19,8 +19,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
 namespace wrench {
 
 		std::string S4U_Mailbox::generateUniqueMailboxName(std::string prefix) {
-			static int unique_int = 0;
-			return prefix + "_" + std::to_string(unique_int++);
+			static unsigned long sequence_number = 0;
+			return prefix + "_" + std::to_string(sequence_number++);
 		}
 
 		/**
@@ -30,10 +30,9 @@ namespace wrench {
 		 * @return a unique pointer to the message
 		 */
 		std::unique_ptr<SimulationMessage> S4U_Mailbox::get(std::string mailbox_name) {
-
 //			XBT_INFO("GET from %s", mailbox_name.c_str());
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
-		  SimulationMessage *msg = static_cast<SimulationMessage*>(simgrid::s4u::this_actor::recv(mailbox));
+			SimulationMessage *msg = static_cast<SimulationMessage*>(simgrid::s4u::this_actor::recv(mailbox));
 			if (msg == NULL) {
 				throw WRENCHException("Mailbox::get(): NULL message in task");
 			}
@@ -54,6 +53,5 @@ namespace wrench {
 
 			return;
 		}
-
 
 };

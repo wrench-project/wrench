@@ -1,13 +1,6 @@
 
 ------------------------------------
 
-
-- Create a map of properties for ComputeService
-    map<enum, string>
-    getProperty()
-
-- Figure out how to abstract compute services without too much code duplication
-
 - Prototype PilotJob
 
 

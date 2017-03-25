@@ -14,7 +14,12 @@
 #define WRENCH_WORKFLOWJOB_H
 
 
+#include <string>
+#include <stack>
+
 namespace wrench {
+
+		class Workflow;
 
 		class WorkflowJob {
 		public:
@@ -23,7 +28,26 @@ namespace wrench {
 						PILOT
 				};
 
+
+				Type getType();
+				std::string getTypeAsString();
+				std::string getName();
+
+
+				// Should be excluded from documentation
+				std::string popCallbackMailbox();
+				void pushCallbackMailbox(std::string);
+
+
+		protected:
+
+				std::stack<std::string> callback_mailbox_stack;		// Stack of callback mailboxes
+				Workflow *workflow;
 				Type type;
+				std::string name;
+				unsigned long getNewUniqueNumber();
+
+
 
 		};
 

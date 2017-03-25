@@ -35,45 +35,27 @@ namespace wrench {
 			}
 			this->num_completed_tasks = 0;
 			this->workflow = this->tasks[0]->workflow;
-		}
-		/**
-		 * Constructor given a single task
-		 * @param task
-		 */
-		StandardJob::StandardJob(WorkflowTask *task) {
-			this->type = WorkflowJob::STANDARD;
 
-			if (task->getState() != WorkflowTask::READY) {
-				throw WRENCHException("All tasks in a StandardJob must be READY");
-			}
-			this->tasks.push_back(task);
-			task->job = this;
-			this->num_completed_tasks = 0;
-			this->workflow = this->tasks[0]->workflow;
+			this->state = StandardJob::State::NOT_SUBMITTED;
+			this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
 
 		}
 
+
 		/**
-		 * @brief Gets the "next" callback mailbox (returns the
-		 *         workflow mailbox if the mailbox stack is empty)
-		 * @return the next callback mailbox
+		 * @brief get the number of tasks in the job
+		 * @return the number of tasks
 		 */
-		std::string StandardJob::pop_callback_mailbox() {
-			if (this->callback_mailbox_stack.size() == 0) {
-				return this->workflow->getCallbackMailbox();
-			} else {
-				std::string mailbox = this->callback_mailbox_stack.top();
-				this->callback_mailbox_stack.pop();
-				return mailbox;
-			}
+		unsigned long StandardJob::getNumTasks() {
+			return this->tasks.size();
 		}
 
 		/**
-		 * @brief pushes a callback mailbox
-		 * @param mailbox is the mailbox name
+		 * @brief Get the workflow tasks in the job
+		 * @return a vector of tasks
 		 */
-		void StandardJob::push_callback_mailbox(std::string mailbox) {
-			this->callback_mailbox_stack.push(mailbox);
+		std::vector<WorkflowTask*> StandardJob::getTasks() {
+			return this->tasks;
 		}
 
 		/**
@@ -91,6 +73,7 @@ namespace wrench {
 		WorkflowJob *WorkflowTask::getWorkflowJob() {
 			return this->job;
 		}
+
 
 
 };

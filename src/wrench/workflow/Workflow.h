@@ -17,10 +17,14 @@
 #include <map>
 #include <workflow_execution_events/WorkflowExecutionEvent.h>
 
-#include "WorkflowTask.h"
+class WorkflowTask;
 #include "WorkflowFile.h"
 
+#include "WorkflowTask.h"
+
+
 using namespace lemon;
+
 
 namespace wrench {
 

@@ -19,7 +19,6 @@
 
 namespace wrench {
 
-
 		/**
 	 * @brief Constructor that starts the daemon for the service on a host,
 	 *        registering it with a WRENCH Simulation
@@ -47,12 +46,21 @@ namespace wrench {
 
 		}
 
+
 		/**
 		 * @brief Stop the service
 		 */
 		void MulticoreJobExecutor::stop() {
-			// Send a termination message to the daemon's mailbox
-			S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
+			if (this->daemon != nullptr) {
+				// Send a termination message to the daemon's mailbox
+				S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
+				// Wait for the ack
+				std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get("killbox");
+				if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
+					throw WRENCHException("Wrong message type received while expecting DAEMON_STOPPED");
+				}
+				this->daemon = nullptr;
+			}
 
 			// Call the generic stopping method, which does some cleanup
 			// and bookkeeping
@@ -64,9 +72,8 @@ namespace wrench {
 		 *
 		 * @param job is a pointer a standard job
 		 * @param callback_mailbox is the name of a mailbox to which a "job done" callback will be sent
-		 * @return 0 on success
 		 */
-		int MulticoreJobExecutor::runStandardJob(StandardJob *job) {
+		void MulticoreJobExecutor::runStandardJob(StandardJob *job) {
 
 			if (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) != "yes") {
 				throw WRENCHException("Implementation error: this compute service should have the SUPPORTS_STANDARD_JOBS property set to 'yes'");
@@ -78,7 +85,6 @@ namespace wrench {
 
 			// Synchronously send a "run a task" message to the daemon's mailbox
 			S4U_Mailbox::put(this->daemon->mailbox_name, new RunStandardJobMessage(job));
-			return 0;
 		};
 
 		/**
@@ -86,9 +92,8 @@ namespace wrench {
 		 *
 		 * @param task is a pointer the pilot job
 		 * @param callback_mailbox is the name of a mailbox to which a "pilot job started" callback will be sent
-		 * @return 0 on success
 		 */
-		int MulticoreJobExecutor::runPilotJob(PilotJob *job) {
+		void MulticoreJobExecutor::runPilotJob(PilotJob *job) {
 
 			if (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) != "yes") {
 				throw WRENCHException("Implementation error: this compute service should have the SUPPORTS_PILOT_JOBS property set to 'yes'");
@@ -100,7 +105,6 @@ namespace wrench {
 
 			// Synchronously send a "run a task" message to the daemon's mailbox
 			S4U_Mailbox::put(this->daemon->mailbox_name, new RunPilotJobMessage(job));
-			return 0;
 		};
 
 

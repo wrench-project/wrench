@@ -73,22 +73,26 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Run a standard job
+		 * @brief Run a job
 		 * @param the job
-		 * @return
 		 */
-		int ComputeService::runStandardJob(StandardJob *job) {
-			throw WRENCHException("The compute service does not implement runStandardJob(StandardJob *)");
+		void ComputeService::runJob(WorkflowJob *job) {
+			std::cerr << "XXXX " << (unsigned long)job << std::endl;
+
+			switch(job->getType()) {
+				case WorkflowJob::STANDARD: {
+					this->runStandardJob((StandardJob *)job);
+					break;
+				}
+				case WorkflowJob::PILOT: {
+					this->runPilotJob((PilotJob *)job);
+					break;
+				}
+			}
+
 		}
 
-		/**
-		 * @brif Run a pilot job
-		 * @param the job
-		 * @return
-		 */
-		int ComputeService::runPilotJob(PilotJob *job) {
-			throw WRENCHException("The compute service does not implement runPilotJob(PilotJob *)");
-		}
+
 
 		/**
 		 * @brief Check whether a property is set
@@ -121,5 +125,50 @@ namespace wrench {
 			this->property_list[property] = value;
 		}
 
+		/**
+		 * @brief Check whether the service is able to run a job
+		 * @param job is a pointer to a workflow job
+		 * @return true is able, false otherwise
+		 */
+		bool ComputeService::canRunJob(WorkflowJob *job) {
+			bool can_run = true;
 
+			// Check if the job type works
+			switch (job->getType()) {
+				case WorkflowJob::STANDARD: {
+					can_run = can_run &&  (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes");
+				}
+				case WorkflowJob::PILOT: {
+					can_run = can_run &&  (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) == "yes");
+				}
+			}
+
+			return can_run;
+		}
+
+		/***********************************************************/
+		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
+		/***********************************************************/
+
+		/*! \cond PRIVATE */
+
+		/**
+		 * @brief Run a standard job
+		 * @param the job
+		 * @return
+		 */
+		void ComputeService::runStandardJob(StandardJob *job) {
+			throw WRENCHException("The compute service does not implement runStandardJob(StandardJob *)");
+		}
+
+		/**
+		 * @brief Run a pilot job
+		 * @param the job
+		 * @return
+		 */
+		void ComputeService::runPilotJob(PilotJob *job) {
+			throw WRENCHException("The compute service does not implement runPilotJob(PilotJob *)");
+		}
+
+		/*! \endcod */
 };

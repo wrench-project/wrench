@@ -61,13 +61,16 @@ namespace wrench {
 				/**  PRIVATE  **/
 				/***************/
 
+		private:
+
 				friend class StandardJob;
 				friend class Workflow;
+
+				// These friend clauses are bad
 				friend class MulticoreJobExecutorDaemon;
 				friend class SequentialTaskExecutorDaemon;
 				friend class RandomScheduler;
 
-		private:
 
 				std::string id;										// Task ID
 				double flops;											// Number of flops

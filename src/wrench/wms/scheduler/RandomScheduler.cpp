@@ -15,6 +15,7 @@
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/scheduler/RandomScheduler.h"
+#include "job_manager/JobManager.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(random_scheduler, "Log category for Random Scheduler");
 
@@ -32,7 +33,8 @@ namespace wrench {
 		 * @param compute_services is a vector of available compute resources
 		 * @param callback_mailbox is the name of the mailbox
 		 */
-		void RandomScheduler::runTasks(std::vector<WorkflowTask *> ready_tasks,
+		void RandomScheduler::runTasks(JobManager *job_manager,
+																	 std::vector<WorkflowTask *> ready_tasks,
 																	 std::set<ComputeService *> &compute_services) {
 
 //			XBT_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
@@ -44,7 +46,7 @@ namespace wrench {
 					unsigned long cs_num_idle_cores = cs->numIdleCores();
 					if (cs_num_idle_cores > 0) {
 						XBT_INFO("Submitting task %s for execution", ready_tasks[i]->getId().c_str());
-						StandardJob *job = new StandardJob(ready_tasks[i]);
+						StandardJob *job = job_manager->createStandardJob(ready_tasks[i]);
 						cs->runStandardJob(job);
 						successfully_scheduled = true;
 						break;

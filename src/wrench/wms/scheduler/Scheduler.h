@@ -15,8 +15,10 @@
 #include "workflow/WorkflowTask.h"
 #include "compute_services/ComputeService.h"
 #include <set>
+#include <job_manager/JobManager.h>
 
 namespace wrench {
+
 
 	class Scheduler {
 
@@ -30,11 +32,12 @@ namespace wrench {
 		/**
 		 * Schedule and run a set of ready tasks in available compute resources
 		 *
+		 * @param job_manager is a pointer to a job manager
 		 * @param ready_tasks is a vector of ready tasks
 		 * @param compute_services is a vector of available compute resources
-		 * @param callback_mailbox is the name of the mailbox
 		 */
-		virtual void runTasks(std::vector<WorkflowTask *> ready_tasks,
+		virtual void runTasks(JobManager *job_manager,
+													std::vector<WorkflowTask *> ready_tasks,
 		                      std::set<ComputeService *> &compute_services) = 0;
 	};
 

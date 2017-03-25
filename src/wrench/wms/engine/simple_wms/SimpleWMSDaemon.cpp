@@ -10,7 +10,8 @@
  */
 
 #include <iostream>
-#include <simgrid/msg.h>
+#include <memory>
+
 #include <exception/WRENCHException.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
@@ -18,6 +19,7 @@
 #include "simulation/Simulation.h"
 #include "workflow_job/StandardJob.h"
 #include "workflow_job/PilotJob.h"
+#include "job_manager/JobManager.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms_daemon, "Log category for Simple WMS Daemon");
 
@@ -26,11 +28,12 @@ namespace wrench {
 	/**
 	 * @brief Constructor
 	 *
-	 * @param s
-	 * @param w
-	 * @param sc
+	 * @param simulation is a pointer to a Simulation object
+	 * @param workflow is a pointer to a Workflow object
+	 * @param scheduler is a pointer to a Scheduler object
 	 */
-	SimpleWMSDaemon::SimpleWMSDaemon(Simulation *s, Workflow *w, Scheduler *sc) : EngineDaemon(s, w, sc) {}
+	SimpleWMSDaemon::SimpleWMSDaemon(Simulation *simulation, Workflow *workflow, Scheduler *scheduler) :
+					EngineDaemon(simulation, workflow, scheduler) {}
 
 	/**
 	 * @brief main method of the WMS daemon
@@ -41,6 +44,9 @@ namespace wrench {
 		XBT_INFO("Starting on host %s listening on mailbox %s", S4U_Simulation::getHostName().c_str(),
 		         this->mailbox_name.c_str());
 		XBT_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
+
+		// Create a job manager
+		std::unique_ptr<JobManager> job_manager= std::unique_ptr<JobManager>(new JobManager(this->workflow));
 
 		while (true) {
 
@@ -55,7 +61,7 @@ namespace wrench {
 			}
 
 			// Run ready tasks with defined scheduler implementation
-			this->scheduler->runTasks(ready_tasks, compute_services);
+			this->scheduler->runTasks(job_manager.get(), ready_tasks, compute_services);
 
 			// Wait for a workflow execution event
 			std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
@@ -63,7 +69,7 @@ namespace wrench {
 			switch (event->type) {
 				case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
 					StandardJob *job = (StandardJob *) (event->job);
-					XBT_INFO("Notified that a %ld-task job has completed", job->tasks.size());
+					XBT_INFO("Notified that a %ld-task job has completed", job->getNumTasks());
 					break;
 				}
 				case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {

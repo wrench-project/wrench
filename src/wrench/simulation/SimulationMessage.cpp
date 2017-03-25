@@ -25,6 +25,11 @@ namespace wrench {
 		StopDaemonMessage::StopDaemonMessage(): SimulationMessage(STOP_DAEMON, 1024.00) {
 		}
 
+		/** DAEMON_STOPPED MESSAGE **/
+		// TODO: Make the "1024" below configurable somehow
+		DaemonStoppedMessage::DaemonStoppedMessage(): SimulationMessage(DAEMON_STOPPED, 1024.00) {
+		}
+
 		/** RUN_JOB MESSAGE **/
 		// TODO: Make the "1024" below configurable somehow
 		RunStandardJobMessage::RunStandardJobMessage(StandardJob *job): SimulationMessage(RUN_STANDARD_JOB, 1024.0) {

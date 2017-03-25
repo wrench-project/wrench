@@ -42,13 +42,17 @@ namespace wrench {
 				ComputeService(std::string);
 
 				/** Job execution **/
-				virtual int runStandardJob(StandardJob *job);
-				virtual int runPilotJob(PilotJob *job);
+				void runJob(WorkflowJob *job);
+
+				// Should be excluded from documentation
+				virtual void runStandardJob(StandardJob *job);
+				virtual void runPilotJob(PilotJob *job);
 
 				/** Information getting **/
 				virtual unsigned long numIdleCores() = 0;
 				std::string getName();
 				ComputeService::State getState();
+				bool canRunJob(WorkflowJob*);
 
 				/** Stopping **/
 				virtual void stop();

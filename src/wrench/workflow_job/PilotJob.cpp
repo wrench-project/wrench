@@ -13,11 +13,14 @@
 
 namespace wrench {
 
-		PilotJob::PilotJob(int num_cores, double duration) {
-			this->state = SUBMITTED;
+		PilotJob::PilotJob(Workflow *workflow, int num_cores, double duration) {
+			this->state = PilotJob::State::NOT_SUBMITTED;
 			this->compute_service = nullptr;
+			this->workflow = workflow;
 			this->num_cores = num_cores;
 			this->duration = duration;
+			this->name = "pilot_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
+
 		}
 
 		PilotJob::State PilotJob::getState() {
