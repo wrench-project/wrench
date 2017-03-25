@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::ComputeService is a mostly abstract implementation of a compute service.
+ *  @brief wrench::ComputeService is a mostly abstract implementation of a compute service.
  */
 
 #include <exception/WRENCHException.h>
@@ -32,16 +32,15 @@ namespace wrench {
 		}
 
 		/**
-			 * @brief Constructor
-			 *
-			 * @param service_name is the name of the compute service
-			 */
+		 * @brief Constructor
+		 *
+		 * @param service_name is the name of the compute service
+		 */
 		ComputeService::ComputeService(std::string service_name) {
 			this->service_name = service_name;
 			this->simulation = nullptr;
 			this->state = ComputeService::UP;
 		}
-
 
 		/**
 		 * @brief Stop the compute service - must be called by the stop()
@@ -58,7 +57,7 @@ namespace wrench {
 
 		/**
 		 * @brief Get the name of the compute service
-		 * @return the  name
+		 * @return the compute service name
 		 */
 		std::string ComputeService::getName() {
 			return this->service_name;
@@ -73,44 +72,40 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Run a job
-		 * @param the job
+		 * @brief Run a standard job
+		 * @param job the job
 		 */
 		void ComputeService::runJob(WorkflowJob *job) {
-			std::cerr << "XXXX " << (unsigned long)job << std::endl;
 
-			switch(job->getType()) {
+			switch (job->getType()) {
 				case WorkflowJob::STANDARD: {
-					this->runStandardJob((StandardJob *)job);
+					this->runStandardJob((StandardJob *) job);
 					break;
 				}
 				case WorkflowJob::PILOT: {
-					this->runPilotJob((PilotJob *)job);
+					this->runPilotJob((PilotJob *) job);
 					break;
 				}
 			}
-
 		}
-
-
 
 		/**
 		 * @brief Check whether a property is set
 		 * @param property_name
 		 * @return true or false
 		 */
-		bool ComputeService::hasProperty(ComputeService::Property property) {
-			return (this->property_list.find(property) != this->property_list.end());
+		bool ComputeService::hasProperty(ComputeService::Property property_name) {
+			return (this->property_list.find(property_name) != this->property_list.end());
 		}
 
 		/**
 		 * @brief Return a property value
-		 * @param the property_name
+		 * @param property_name the property_name
 		 * @return a property value, or nullptr if the property does not exist
 		 */
-		std::string ComputeService::getProperty(ComputeService::Property property) {
-			if (this->property_list.find(property) != this->property_list.end()) {
-				return this->property_list[property];
+		std::string ComputeService::getProperty(ComputeService::Property property_name) {
+			if (hasProperty(property_name)) {
+				return this->property_list[property_name];
 			} else {
 				return nullptr;
 			}
@@ -118,11 +113,11 @@ namespace wrench {
 
 		/**
 		 * @brief Set a property value
-		 * @param property is the property
-		 * @param value is the value
+		 * @param property_name is the property name
+		 * @param value is the property value
 		 */
-		void ComputeService::setProperty(ComputeService::Property property, std::string value) {
-			this->property_list[property] = value;
+		void ComputeService::setProperty(ComputeService::Property property_name, std::string value) {
+			this->property_list[property_name] = value;
 		}
 
 		/**

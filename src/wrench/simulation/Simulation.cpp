@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::Simulation is a top-level class that keeps track of
+ *  @brief wrench::Simulation is a top-level class that keeps track of
  *  the simulation state.
  */
 
@@ -58,7 +58,6 @@ namespace wrench {
 			this->s4u_simulation->setupPlatform(filename);
 		}
 
-
 		/**
 		 * @brief Instantiate a multicore standard job executor on a host
 		 *
@@ -86,8 +85,6 @@ namespace wrench {
 			this->createMulticoreJobExecutor(hostname, "yes", "yes");
 		}
 
-
-
 		/**
 		 * @brief Instantiate a WMS on a host
 		 *
@@ -97,7 +94,6 @@ namespace wrench {
 		 * @param hostname is the name of the host on which to start the WMS
 		 */
 		void Simulation::createWMS(int wms_id, int sched_id, Workflow *w, std::string hostname) {
-
 			// Obtaining scheduler
 			Scheduler *scheduler = SchedulerFactory::getInstance()->Create(sched_id);
 
@@ -107,7 +103,6 @@ namespace wrench {
 
 			// Add it to the list of WMSes
 			WMSes.push_back(std::move(wms));
-			return;
 		}
 
 		/**
@@ -117,8 +112,8 @@ namespace wrench {
 		 */
 		std::set<ComputeService *> Simulation::getComputeServices() {
 			std::set<ComputeService *> set = {};
-			for (int i = 0; i < this->running_compute_services.size(); i++) {
-				set.insert(this->running_compute_services[i].get());
+			for (auto it = this->running_compute_services.begin(); it != this->running_compute_services.end(); it++) {
+				set.insert((*it).get());
 			}
 			return set;
 		}

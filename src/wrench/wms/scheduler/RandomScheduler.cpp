@@ -56,7 +56,5 @@ namespace wrench {
 					break;
 				}
 			}
-//			XBT_INFO("Done with scheduling for now");
-
 		}
-}
+};

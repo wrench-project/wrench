@@ -5,6 +5,8 @@
 	- But we need an ack to make sure memory doesn't get freed before a daemon has
           completely shutdown
 
+- Do the killbos for the JobManager...
+
 - Implement PilotJob
 
 

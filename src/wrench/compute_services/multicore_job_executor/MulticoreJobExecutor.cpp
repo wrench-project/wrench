@@ -20,13 +20,14 @@
 namespace wrench {
 
 		/**
-	 * @brief Constructor that starts the daemon for the service on a host,
-	 *        registering it with a WRENCH Simulation
-	 *
-	 * @param hostname is the name of the host
-	 * @param num_worker_threads is the number of worker threads (i.e., sequential task executors)
-	 * @param simulation is a pointer to a Simulation
-	 */
+		 * @brief Constructor that starts the daemon for the service on a host,
+		 *        registering it with a WRENCH Simulation
+		 *
+		 * @param simulation is a pointer to a Simulation
+		 * @param hostname is the name of the host
+		 * @param num_worker_threads is the number of worker threads (i.e., sequential task executors)
+		 * @param ttl
+		 */
 		MulticoreJobExecutor::MulticoreJobExecutor(Simulation *simulation,
 																							 std::string hostname,
 																							 int num_worker_threads,
@@ -43,7 +44,6 @@ namespace wrench {
 
 			// Start the daemon on the same host
 			this->daemon->start(hostname);
-
 		}
 
 
@@ -61,11 +61,8 @@ namespace wrench {
 				}
 				this->daemon = nullptr;
 			}
-
-			// Call the generic stopping method, which does some cleanup
-			// and bookkeeping
-			ComputeService::stop();
 		}
+
 
 		/**
 		 * @brief Have the service execute a standard job

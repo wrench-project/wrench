@@ -29,7 +29,6 @@ namespace wrench {
 
 		public:
 				MulticoreJobExecutorDaemon(ComputeService *cs, int num_worker_threads=-1, double ttl=-1);
-				~MulticoreJobExecutorDaemon();
 
 		private:
 
