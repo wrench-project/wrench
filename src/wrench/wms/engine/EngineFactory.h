@@ -23,17 +23,17 @@ namespace wrench {
 		typedef std::unique_ptr<WMS> (*t_pfFactory)();
 
 		static EngineFactory *getInstance();
-		uint16_t Register(uint16_t wms_id, t_pfFactory factoryMethod);
-		std::unique_ptr<WMS> Create(uint16_t wms_id);
+		std::string Register(std::string wms_id, t_pfFactory factory_method);
+		std::unique_ptr<WMS> Create(std::string wms_id);
 
-		std::map<uint16_t, t_pfFactory> s_list;
+		std::map<std::string, t_pfFactory> s_list;
 
 	private:
 		EngineFactory();
 	};
 
-	template<int TYPE, typename IMPL, typename DAEMON>
-	const uint16_t EngineTmpl<TYPE, IMPL, DAEMON>::WMS_ID = EngineFactory::getInstance()->Register(
+	template<const char *TYPE, typename IMPL, typename DAEMON>
+	const std::string EngineTmpl<TYPE, IMPL, DAEMON>::WMS_ID = EngineFactory::getInstance()->Register(
 			EngineTmpl<TYPE, IMPL, DAEMON>::_WMS_ID, &EngineTmpl<TYPE, IMPL, DAEMON>::Create);
 }
 

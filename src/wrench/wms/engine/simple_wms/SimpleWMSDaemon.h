@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::SimpleWMSDaemon implements the daemon for a simple WMS abstraction
+ *  @brief wrench::SimpleWMSDaemon implements the daemon for a simple WMS abstraction
  */
 
 #ifndef WRENCH_SIMPLEWMSDAEMON_H
@@ -21,7 +21,7 @@ namespace wrench {
 	class SimpleWMSDaemon : public EngineDaemon {
 
 	public:
-		SimpleWMSDaemon(Simulation *, Workflow *w, Scheduler *s);
+		SimpleWMSDaemon(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler);
 
 	private:
 		int main();

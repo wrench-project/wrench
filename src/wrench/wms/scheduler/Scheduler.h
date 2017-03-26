@@ -24,7 +24,7 @@ namespace wrench {
 
 	protected:
 		Scheduler() {};
-		uint16_t sched_type;
+		std::string sched_type;
 
 	public:
 		virtual ~Scheduler() {};
@@ -37,7 +37,7 @@ namespace wrench {
 		 * @param compute_services is a vector of available compute resources
 		 */
 		virtual void runTasks(JobManager *job_manager,
-													std::vector<WorkflowTask *> ready_tasks,
+		                      std::vector<WorkflowTask *> ready_tasks,
 		                      std::set<ComputeService *> &compute_services) = 0;
 	};
 

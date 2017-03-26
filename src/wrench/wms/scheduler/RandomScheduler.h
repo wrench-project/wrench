@@ -18,12 +18,14 @@ namespace wrench {
 
 	class JobManager;
 
-	class RandomScheduler : public SchedulerTmpl<1, RandomScheduler> {
+	const char scheduler_name[] = "RandomScheduler";
+
+	class RandomScheduler : public SchedulerTmpl<scheduler_name, RandomScheduler> {
 
 	public:
 		RandomScheduler();
 
-		virtual void runTasks(JobManager *job_manager, std::vector<WorkflowTask *> ready_tasks,
+		void runTasks(JobManager *job_manager, std::vector<WorkflowTask *> ready_tasks,
 		                      std::set<ComputeService *> &compute_services);
 	};
 }

@@ -6,7 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief Factory class for schedulers.
+ * @brief wrench::SchedulerFactory is a factory class for schedulers.
  */
 
 #include "wms/scheduler/SchedulerFactory.h"
@@ -18,12 +18,12 @@ namespace wrench {
 		return &fact;
 	}
 
-	uint16_t SchedulerFactory::Register(uint16_t sched_id, t_pfFactory factoryMethod) {
-		s_list[sched_id] = factoryMethod;
+	std::string SchedulerFactory::Register(std::string sched_id, t_pfFactory factory_method) {
+		s_list[sched_id] = factory_method;
 		return sched_id;
 	}
 
-	Scheduler *SchedulerFactory::Create(uint16_t sched_id) {
+	std::unique_ptr<Scheduler> SchedulerFactory::Create(std::string sched_id) {
 		return s_list[sched_id]();
 	}
 
