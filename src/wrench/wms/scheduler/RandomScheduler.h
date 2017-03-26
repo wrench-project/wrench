@@ -18,7 +18,7 @@ namespace wrench {
 
 	class JobManager;
 
-	const char scheduler_name[] = "RandomScheduler";
+	constexpr char scheduler_name[] = "RandomScheduler";
 
 	class RandomScheduler : public SchedulerTmpl<scheduler_name, RandomScheduler> {
 
