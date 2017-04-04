@@ -22,6 +22,7 @@ matrix:
             - boost-latest
           packages:
             - g++-5
+            - gcc-5
             - cmake
             - cmake-data
             - doxygen
@@ -38,6 +39,7 @@ matrix:
             - boost-latest
           packages:
             - g++-6
+            - gcc-6
             - cmake
             - cmake-data
             - doxygen
