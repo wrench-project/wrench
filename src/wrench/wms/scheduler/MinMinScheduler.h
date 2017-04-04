@@ -18,7 +18,7 @@ namespace wrench {
 
 	class JobManager;
 
-	constexpr char scheduler_name[] = "MinMinScheduler";
+	extern const char scheduler_name[] = "MinMinScheduler";
 
 	class MinMinScheduler : public SchedulerTmpl<scheduler_name, MinMinScheduler> {
 

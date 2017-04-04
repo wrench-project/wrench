@@ -86,7 +86,7 @@ namespace wrench {
 	 *
 	 * @return the number of flops
 	 */
-	double WorkflowTask::getFlops() {
+	double WorkflowTask::getFlops() const {
 		return this->flops;
 	}
 

@@ -11,7 +11,6 @@
  */
 
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
-#include "wms/engine/simple_wms/SimpleWMS.h"
 #include "simulation/Simulation.h"
 #include "exception/WRENCHException.h"
 #include "wms/engine/EngineFactory.h"
