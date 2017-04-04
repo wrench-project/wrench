@@ -27,7 +27,7 @@ matrix:
             - cmake-data
             - doxygen
             - libboost-all-dev
-      env: GCC_VERSION=5 CC_X=gcc-5 CXX_Xg++-5 CPP=11
+      env: GCC_VERSION=5 CC_X=gcc-5 CXX_X=g++-5 CPP=11
     - os: linux
       compiler: gcc
       dist: trusty
@@ -44,7 +44,7 @@ matrix:
             - cmake-data
             - doxygen
             - libboost-all-dev
-      env: GCC_VERSION=6 CC_X=gcc-6 CXX_Xg++-6 CPP=11
+      env: GCC_VERSION=6 CC_X=gcc-6 CXX_X=g++-6 CPP=11
     - os: linux
       compiler: clang
       dist: trusty
