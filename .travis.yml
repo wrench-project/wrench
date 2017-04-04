@@ -27,7 +27,7 @@ matrix:
             - cmake-data
             - doxygen
             - libboost-all-dev
-      env: GCC_VERSION=5 CPP=11
+      env: GCC_VERSION=5 CC_X=gcc-5 CXX_Xg++-5 CPP=11
     - os: linux
       compiler: gcc
       dist: trusty
@@ -44,7 +44,7 @@ matrix:
             - cmake-data
             - doxygen
             - libboost-all-dev
-      env: GCC_VERSION=6 CPP=11
+      env: GCC_VERSION=6 CC_X=gcc-6 CXX_Xg++-6 CPP=11
     - os: linux
       compiler: clang
       dist: trusty
@@ -61,7 +61,7 @@ matrix:
             - cmake-data
             - doxygen
             - libboost-all-dev
-      env: COMPILER=clang++-3.6
+      env: CC_X=clang-3.6 CXX_X=clang++-3.6
     - os: linux
       compiler: clang
       dist: trusty
@@ -78,7 +78,7 @@ matrix:
             - cmake-data
             - doxygen
             - libboost-all-dev
-      env: COMPILER=clang++-3.7
+      env: CC_X=clang-3.7 CXX_X=clang++-3.7
 
 before_script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update          ; fi
