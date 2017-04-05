@@ -19,15 +19,18 @@ namespace wrench {
 
 	class WMS {
 
-	public:
-		virtual ~WMS() {};
-		virtual void configure(Simulation *s, Workflow *w, Scheduler *sc, std::string hostname) = 0;
-
 	protected:
 		WMS() {};
-		uint16_t wms_type;
-	};
+		std::string wms_type;
 
+	public:
+		virtual ~WMS() {};
+
+		virtual void configure(Simulation *simulation,
+		                       Workflow *workflow,
+		                       std::unique_ptr<Scheduler> scheduler,
+		                       std::string hostname) = 0;
+	};
 };
 
 

@@ -20,20 +20,20 @@ namespace wrench {
 	class SchedulerFactory {
 
 	public:
-		typedef Scheduler *(*t_pfFactory)();
+		typedef std::unique_ptr<Scheduler> (*t_pfFactory)();
 
 		static SchedulerFactory *getInstance();
-		uint16_t Register(uint16_t sched_id, t_pfFactory factoryMethod);
-		Scheduler *Create(uint16_t sched_id);
+		std::string Register(std::string sched_id, t_pfFactory factory_method);
+		std::unique_ptr<Scheduler> Create(std::string sched_id);
 
-		std::map<uint16_t, t_pfFactory> s_list;
+		std::map<std::string, t_pfFactory> s_list;
 
 	private:
 		SchedulerFactory();
 	};
 
-	template<int TYPE, typename IMPL>
-	const uint16_t SchedulerTmpl<TYPE, IMPL>::SCHED_ID = SchedulerFactory::getInstance()->Register(
+	template<const char *TYPE, typename IMPL>
+	const std::string SchedulerTmpl<TYPE, IMPL>::SCHED_ID = SchedulerFactory::getInstance()->Register(
 			SchedulerTmpl<TYPE, IMPL>::_SCHED_ID, &SchedulerTmpl<TYPE, IMPL>::Create);
 }
 

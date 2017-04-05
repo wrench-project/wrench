@@ -37,7 +37,7 @@ namespace wrench {
 		 */
 		void RandomScheduler::scheduleTasks(JobManager *job_manager,
 																	 std::vector<WorkflowTask *> ready_tasks,
-																	 Simulation *simulation) {
+																				const std::set<ComputeService *> &compute_services) {
 
 
 			// TODO: Refactor to avoid code duplication
@@ -63,7 +63,6 @@ namespace wrench {
 				}
 				XBT_INFO("Couldn't submit tasks to a pilot job... trying a standard job");
 				// Second: attempt to run the task on a compute resource
-				std::set<ComputeService *> compute_services = simulation->getComputeServices();
 				for (auto cs : compute_services) {
 					if ((cs->isUp()) && (cs->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes") &&  (cs->numIdleCores() > 0) ){
 						XBT_INFO("Submitting task %s for execution as a standard job", ready_tasks[i]->getId().c_str());

@@ -43,7 +43,7 @@ namespace wrench {
 
 				/* Getters */
 				std::string getId();
-				double getFlops();
+				double getFlops() const;
 				int getNumberOfChildren();
 				int getNumberOfParents();
 				WorkflowTask::State getState();

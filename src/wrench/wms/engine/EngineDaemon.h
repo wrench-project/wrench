@@ -24,20 +24,18 @@ namespace wrench {
 		/**
 		 * @brief Constructor
 		 *
-		 * @param s is a pointer to the simulation
-		 * @param w is a pointer to the workflow to execute
-		 * @param sc is a pointer to a scheduler
+		 * @param simulation is a pointer to the simulation
+		 * @param workflow is a pointer to the workflow to execute
+		 * @param scheduler is a pointer to a scheduler
 		 */
-		EngineDaemon(Simulation *s, Workflow *w, Scheduler *sc) : S4U_DaemonWithMailbox("simple_wms", "simple_wms") {
-			this->simulation = s;
-			this->workflow = w;
-			this->scheduler = sc;
-		}
+		EngineDaemon(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler)
+				: simulation(simulation), workflow(workflow), scheduler(std::move(scheduler)),
+				  S4U_DaemonWithMailbox("simple_wms", "simple_wms") {}
 
 	protected:
 		Simulation *simulation;
 		Workflow *workflow;
-		Scheduler *scheduler;
+		std::unique_ptr<Scheduler> scheduler;
 	};
 }
 

@@ -56,6 +56,10 @@ set(SOURCE_FILES
         src/wrench/wms/scheduler/SchedulerFactory.cpp
         src/wrench/wms/scheduler/RandomScheduler.h
         src/wrench/wms/scheduler/RandomScheduler.cpp
+        src/wrench/wms/scheduler/MinMinScheduler.h
+        src/wrench/wms/scheduler/MinMinScheduler.cpp
+        src/wrench/wms/scheduler/MaxMinScheduler.h
+        src/wrench/wms/scheduler/MaxMinScheduler.cpp
         src/wrench/compute_services/ComputeService.cpp
         src/wrench/compute_services/ComputeService.h
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.cpp

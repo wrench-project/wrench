@@ -19,12 +19,11 @@
 
 namespace wrench {
 
-
 		class Scheduler {
 
 		protected:
 				Scheduler() {};
-				uint16_t sched_type;
+				std::string sched_type;
 
 		public:
 				virtual ~Scheduler() {};
@@ -34,11 +33,11 @@ namespace wrench {
 				 *
 				 * @param job_manager is a pointer to a job manager instance
 				 * @param ready_tasks is a vector of ready tasks
-				 * @param simulation is a pointer to a simulation instance
+				 * @param simulation is  a vector of available compute services
 				 */
 				virtual void scheduleTasks(JobManager *job_manager,
 																	 std::vector<WorkflowTask *> ready_tasks,
-																	 Simulation *simulation) = 0;
+																	 const std::set<ComputeService *> &compute_services) = 0;
 
 				/**
 				 * @brief Submits pilot jobs
@@ -51,6 +50,7 @@ namespace wrench {
 																			 Workflow *workflow,
 																			 Simulation *simulation) = 0;
 		};
+
 
 }
 

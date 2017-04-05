@@ -18,12 +18,12 @@ namespace wrench {
 		return &fact;
 	}
 
-	uint16_t EngineFactory::Register(uint16_t wms_id, t_pfFactory factoryMethod) {
-		s_list[wms_id] = factoryMethod;
+	std::string EngineFactory::Register(std::string wms_id, t_pfFactory factory_method) {
+		s_list[wms_id] = factory_method;
 		return wms_id;
 	}
 
-	std::unique_ptr<WMS> EngineFactory::Create(uint16_t wms_id) {
+	std::unique_ptr<WMS> EngineFactory::Create(std::string wms_id) {
 		return s_list[wms_id]();
 	}
 

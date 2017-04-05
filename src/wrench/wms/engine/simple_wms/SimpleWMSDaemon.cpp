@@ -32,8 +32,8 @@ namespace wrench {
 	 * @param workflow is a pointer to a Workflow object
 	 * @param scheduler is a pointer to a Scheduler object
 	 */
-	SimpleWMSDaemon::SimpleWMSDaemon(Simulation *simulation, Workflow *workflow, Scheduler *scheduler) :
-					EngineDaemon(simulation, workflow, scheduler) {}
+	SimpleWMSDaemon::SimpleWMSDaemon(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler) :
+			EngineDaemon(simulation, workflow, std::move(scheduler)) {}
 
 	/**
 	 * @brief main method of the WMS daemon
@@ -46,7 +46,7 @@ namespace wrench {
 		XBT_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
 		// Create a job manager
-		std::unique_ptr<JobManager> job_manager= std::unique_ptr<JobManager>(new JobManager(this->workflow));
+		std::unique_ptr<JobManager> job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
 
 		while (true) {
 
@@ -69,7 +69,7 @@ namespace wrench {
 
 			// Run ready tasks with defined scheduler implementation
 			XBT_INFO("Scheduling tasks...");
-			this->scheduler->scheduleTasks(job_manager.get(), ready_tasks, this->simulation);
+			this->scheduler->scheduleTasks(job_manager.get(), ready_tasks, this->simulation->getComputeServices());
 
 			// Wait for a workflow execution event
 			XBT_INFO("Getting next workflow execution event");

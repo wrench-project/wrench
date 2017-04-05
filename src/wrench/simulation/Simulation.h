@@ -27,7 +27,7 @@
 
 namespace wrench {
 
-		class Simulation {
+	class Simulation {
 
 		public:
 				/** Constructor, initialization, launching, shutting down **/
@@ -36,43 +36,43 @@ namespace wrench {
 				void launch();
 				void shutdownAllComputeServices();
 
-				/** Platform initialization **/
-				void createPlatform(std::string);
+		/** Platform initialization **/
+		void createPlatform(std::string);
 
-				/** ComputeService creations **/
-				void createMulticoreStandardJobExecutor(std::string);
-				void createMulticorePilotJobExecutor(std::string);
-				void createMulticoreStandardAndPilotJobExecutor(std::string);
+		/** ComputeService creations **/
+		void createMulticoreStandardJobExecutor(std::string);
+		void createMulticorePilotJobExecutor(std::string);
+		void createMulticoreStandardAndPilotJobExecutor(std::string);
 
 				// Internal methods (excluded from documentation)
 				static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(
 								std::string , std::string, std::string, int num_cores, double ttl, PilotJob *pj, std::string suffix);
 				void mark_compute_service_as_terminated(ComputeService *cs);
 
-				/** ComputeService discovery **/
-				std::set<ComputeService *> getComputeServices();
 
-				/** WMS Creation **/
-				void createWMS(int wms_id, int sched_id, Workflow *w, std::string hostname);
+		/** ComputeService discovery **/
+		std::set<ComputeService *> getComputeServices();
 
-
-
-		private:
-
-				std::unique_ptr<S4U_Simulation> s4u_simulation;
-
-				std::vector<std::unique_ptr<WMS>> WMSes;
-
-				std::vector<std::unique_ptr<ComputeService>> running_compute_services;
-				std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
+		/** WMS Creation **/
+		void createWMS(std::string wms_id, std::string sched_id, Workflow *w, std::string hostname);
 
 
-				// Helper function
-				void createMulticoreJobExecutor(std::string hostname,
-																				std::string supports_standard_jobs,
-																				std::string support_pilot_jobs);
+	private:
 
-				};
+		std::unique_ptr<S4U_Simulation> s4u_simulation;
+
+		std::vector<std::unique_ptr<WMS>> WMSes;
+
+		std::vector<std::unique_ptr<ComputeService>> running_compute_services;
+		std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
+
+
+		// Helper function
+		void createMulticoreJobExecutor(std::string hostname,
+		                                std::string supports_standard_jobs,
+		                                std::string support_pilot_jobs);
+
+	};
 
 };
 

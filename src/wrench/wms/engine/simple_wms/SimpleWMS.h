@@ -17,7 +17,9 @@
 
 namespace wrench {
 
-	class SimpleWMS : public EngineTmpl<1, SimpleWMS, SimpleWMSDaemon> {
+	extern const char simplewms_name[] = "SimpleWMS";
+
+	class SimpleWMS : public EngineTmpl<simplewms_name, SimpleWMS, SimpleWMSDaemon> {
 
 	public:
 		SimpleWMS();
