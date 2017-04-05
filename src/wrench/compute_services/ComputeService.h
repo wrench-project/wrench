@@ -49,7 +49,8 @@ namespace wrench {
 				virtual void runPilotJob(PilotJob *job);
 
 				/** Information getting **/
-				virtual unsigned long numIdleCores() = 0;
+				virtual unsigned long getNumIdleCores() = 0;
+				virtual double  getTTL() = 0;
 				std::string getName();
 				bool isUp();
 				bool canRunJob(WorkflowJob*);

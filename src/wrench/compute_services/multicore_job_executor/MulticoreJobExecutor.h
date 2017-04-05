@@ -36,7 +36,8 @@ namespace wrench {
 				void runPilotJob(PilotJob *job);
 
 				/** Get information **/
-				unsigned long numIdleCores();
+				unsigned long getNumIdleCores();
+				double getTTL();
 
 		private:
 				std::unique_ptr<MulticoreJobExecutorDaemon> daemon;

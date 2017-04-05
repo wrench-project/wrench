@@ -103,6 +103,7 @@ namespace wrench {
 
 					// Remove the job from the "running" list
 					this->job_manager->running_pilot_jobs.erase(job);
+					XBT_INFO("THERE ARE NOW %ld running pilot jobs", this->job_manager->running_pilot_jobs.size());
 
 					// Forward the notification to the source
 					XBT_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());

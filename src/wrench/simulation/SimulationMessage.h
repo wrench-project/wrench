@@ -42,6 +42,8 @@ namespace wrench {
 						TASK_DONE,
 						NUM_IDLE_CORES_REQUEST,
 						NUM_IDLE_CORES_ANSWER,
+						TTL_REQUEST,
+						TTL_ANSWER
 				};
 
 				SimulationMessage(Type t, double s);
@@ -124,6 +126,17 @@ namespace wrench {
 		struct NumIdleCoresAnswerMessage: public SimulationMessage {
 				NumIdleCoresAnswerMessage(unsigned long);
 				unsigned long num_idle_cores;
+		};
+
+		/** TTL QUERIES **/
+
+		struct TTLRequestMessage: public SimulationMessage {
+				TTLRequestMessage();
+		};
+
+		struct TTLAnswerMessage: public SimulationMessage {
+				TTLAnswerMessage(double);
+				double ttl;
 		};
 
 };

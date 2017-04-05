@@ -69,6 +69,7 @@ namespace wrench {
 				void terminateAllPilotJobs();
 				void failCurrentStandardJobs();
 				void processTaskCompletion(WorkflowTask *, SequentialTaskExecutor *);
+				void processPilotJobCompletion(PilotJob *job);
 				bool processNextMessage(double timeout);
 				bool dispatchNextPendingTask();
 				bool dispatchNextPendingJob();

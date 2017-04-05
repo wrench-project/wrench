@@ -48,8 +48,11 @@ namespace wrench {
 		// Create a job manager
 		std::unique_ptr<JobManager> job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
 
+		int num_completed_tasks = 0;
+
 		while (true) {
 
+			XBT_INFO("####################### %d", num_completed_tasks);
 			// Take care of previously posted iput() that should be cleared
 			S4U_Mailbox::clear_dputs();
 
@@ -79,6 +82,7 @@ namespace wrench {
 				case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
 					StandardJob *job = (StandardJob *) (event->job);
 					XBT_INFO("Notified that a %ld-task job has completed", job->getNumTasks());
+					num_completed_tasks += job->getNumTasks();
 					break;
 				}
 				case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
@@ -97,6 +101,7 @@ namespace wrench {
 					throw WRENCHException("Unknown workflow execution event type");
 				}
 			}
+
 
 			if (workflow->isDone()) {
 				break;

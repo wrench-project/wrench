@@ -50,7 +50,7 @@ namespace wrench {
 				std::set<PilotJob*> running_pilot_jobs = job_manager->getRunningPilotJobs();
 				for (auto pj : running_pilot_jobs) {
 					ComputeService *cs = pj->getComputeService();
-					if (cs->isUp() && (cs->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes") && (cs->numIdleCores() > 0) ){
+					if (cs->isUp() && (cs->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes") && (cs->getNumIdleCores() > 0) ){
 						XBT_INFO("Submitting task %s for execution to a pilot job", ready_tasks[i]->getId().c_str());
 						WorkflowJob *job = (WorkflowJob *)job_manager->createStandardJob(ready_tasks[i]);
 						job_manager->submitJob(job, cs);
@@ -64,7 +64,7 @@ namespace wrench {
 				XBT_INFO("Couldn't submit tasks to a pilot job... trying a standard job");
 				// Second: attempt to run the task on a compute resource
 				for (auto cs : compute_services) {
-					if ((cs->isUp()) && (cs->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes") &&  (cs->numIdleCores() > 0) ){
+					if ((cs->isUp()) && (cs->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes") &&  (cs->getNumIdleCores() > 0) ){
 						XBT_INFO("Submitting task %s for execution as a standard job", ready_tasks[i]->getId().c_str());
 						WorkflowJob *job = (WorkflowJob *)job_manager->createStandardJob(ready_tasks[i]);
 						job_manager->submitJob(job, cs);
@@ -92,8 +92,7 @@ namespace wrench {
 																						const std::set<ComputeService *> &compute_services) {
 
 			// If there is always a pilot job in the system, do nothing
-			if ((job_manager->getRunningPilotJobs().size() > 0) ||
-					(job_manager->getRunningPilotJobs().size() > 0)) {
+			if ((job_manager->getRunningPilotJobs().size() > 0)) {
 				XBT_INFO("There is already a pilot job in the system...");
 				return;
 			}

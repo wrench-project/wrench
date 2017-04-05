@@ -117,9 +117,9 @@ namespace wrench {
 		/**
 		 * @brief Finds out how many idle cores the  service has
 		 *
-		 * @return
+		 * @return the number of currently idle cores
 		 */
-		unsigned long MulticoreJobExecutor::numIdleCores() {
+		unsigned long MulticoreJobExecutor::getNumIdleCores() {
 
 			if (this->state == ComputeService::DOWN) {
 				throw WRENCHException("Compute Service is down");
@@ -130,4 +130,22 @@ namespace wrench {
 			std::unique_ptr<NumIdleCoresAnswerMessage> m(static_cast<NumIdleCoresAnswerMessage *>(msg.release()));
 			return m->num_idle_cores;
 		}
+
+		/**
+		 * @brief Finds out the TTL
+		 *
+		 * @return the TTL in seconds
+		 */
+		double MulticoreJobExecutor::getTTL() {
+
+			if (this->state == ComputeService::DOWN) {
+				throw WRENCHException("Compute Service is down");
+			}
+
+			S4U_Mailbox::dput(this->daemon->mailbox_name, new TTLRequestMessage());
+			std::unique_ptr<SimulationMessage> msg= S4U_Mailbox::get(this->daemon->mailbox_name + "_answers");
+			std::unique_ptr<TTLAnswerMessage> m(static_cast<TTLAnswerMessage *>(msg.release()));
+			return m->ttl;
+		}
+
 }

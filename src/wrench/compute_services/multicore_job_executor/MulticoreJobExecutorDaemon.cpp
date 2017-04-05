@@ -116,7 +116,7 @@ namespace wrench {
 							PilotJob *job = (PilotJob *)next_job;
 							XBT_INFO("Looking at dispatching pilot job %s with callbackmailbox %s",
 											 job->getName().c_str(),
-												job->getCallbackMailbox().c_str());
+											 job->getCallbackMailbox().c_str());
 							if (this->num_available_worker_threads - this->busy_sequential_task_executors.size() >
 									job->num_cores) {
 
@@ -143,6 +143,9 @@ namespace wrench {
 								// there will be another callback upon termination.
 								S4U_Mailbox::put(job->getCallbackMailbox(),
 																 new PilotJobStartedMessage(job, this->compute_service));
+
+								// Push my own mailbox onto the pilot job!
+								job->pushCallbackMailbox(this->mailbox_name);
 								return true;
 							}
 							break;
@@ -244,7 +247,7 @@ namespace wrench {
 
 				case SimulationMessage::PILOT_JOB_EXPIRED: {
 					std::unique_ptr<PilotJobExpiredMessage> m(static_cast<PilotJobExpiredMessage *>(message.release()));
-					throw WRENCHException("PILOT JOB TERMINATION HANDLING NOT IMPLEMENTED YET");
+					processPilotJobCompletion(m->job);
 					return true;
 				}
 
@@ -397,15 +400,41 @@ namespace wrench {
 
 			XBT_INFO("Terminate all worker threads");
 			this->terminateAllWorkerThreads();
+
 			XBT_INFO("Failing current standard jobs");
 			this->failCurrentStandardJobs();
+
 			XBT_INFO("terminate all pilot jobs");
 			this->terminateAllPilotJobs();
+
+			// Am I myself a pilot job?
 			if (this->containing_pilot_job) {
-				XBT_INFO("Letting the job manager that the pilot job has ended on mailbox %s", this->containing_pilot_job->getCallbackMailbox().c_str());
+
+				XBT_INFO("Letting the level above that the pilot job has ended on mailbox %s", this->containing_pilot_job->getCallbackMailbox().c_str());
 				S4U_Mailbox::put(this->containing_pilot_job->popCallbackMailbox(),
-												new PilotJobExpiredMessage(this->containing_pilot_job, this->compute_service));
+												 new PilotJobExpiredMessage(this->containing_pilot_job, this->compute_service));
+
 			}
+		}
+
+		/**
+		 * @brief Process a pilot job completion
+		 *
+		 * @param job
+		 */
+		void MulticoreJobExecutorDaemon::processPilotJobCompletion(PilotJob *job) {
+
+			// Remove the job from the running list
+			this->running_jobs.erase(job);
+
+			// Update the number of available cores
+			this->num_available_worker_threads += job->num_cores;
+
+			// Forward the notification
+			S4U_Mailbox::put(job->popCallbackMailbox(),
+											 new PilotJobExpiredMessage(job, this->compute_service));
+
+			return;
 		}
 
 

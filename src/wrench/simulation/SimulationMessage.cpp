@@ -35,6 +35,8 @@ namespace wrench {
 				case TASK_DONE:return "TASK_DONE";
 				case NUM_IDLE_CORES_REQUEST:return "NUM_IDLE_CORES_REQUEST";
 				case NUM_IDLE_CORES_ANSWER:return "NUM_IDLE_CORES_ANSWER";
+				case TTL_REQUEST:return "TTL_REQUEST";
+				case TTL_ANSWER:return "TTL_ANSWER";
 				default: return "UNKNOWN MESSAGE TYPE";
 			}
 
@@ -119,6 +121,17 @@ namespace wrench {
 		// TODO: Make the "1024" below configurable somehow
 		NumIdleCoresAnswerMessage::NumIdleCoresAnswerMessage(unsigned long num) : SimulationMessage(NUM_IDLE_CORES_ANSWER, 1024.0) {
 			this->num_idle_cores = num;
+		}
+
+		/** TTL_REQUEST MESSAGE **/
+		// TODO: Make the "1024" below configurable somehow
+		TTLRequestMessage::TTLRequestMessage() : SimulationMessage(TTL_REQUEST, 1024.0) {
+		}
+
+		/** TTL_ANSWER MESSAGE **/
+		// TODO: Make the "1024" below configurable somehow
+		TTLAnswerMessage::TTLAnswerMessage(double  ttl) : SimulationMessage(TTL_ANSWER, 1024.0) {
+			this->ttl = ttl;
 		}
 
 };
