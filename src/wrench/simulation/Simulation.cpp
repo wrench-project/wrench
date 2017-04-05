@@ -24,7 +24,8 @@ namespace wrench {
 		 */
 		Simulation::Simulation() {
 			// Customize the logging format
-			xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
+//			xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
+			xbt_log_control_set("root.fmt:[%d][%h:%t]%e%m%n");
 
 			// Create the S4U simulation wrapper
 			this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
@@ -121,7 +122,7 @@ namespace wrench {
 		/**
 		 * @brief Shutdown all running compute services on the platform
 		 */
-		void Simulation::shutdown() {
+		void Simulation::shutdownAllComputeServices() {
 
 			for (int i = 0; i < this->running_compute_services.size(); i++) {
 				this->running_compute_services[i]->stop();
@@ -140,15 +141,22 @@ namespace wrench {
 		 * @param hostname  is the hostname
 		 * @param supports_standard_jobs is "yes" or "no"
 		 * @param support_pilot_jobs is "yes" or "no"
+		 * @num_cores is the number of cores
+		 * @ttl is the time-to-live of the executor
+		 * @suffix is a suffix to be appended to the process name (useful for debugging)
 		 */
 		MulticoreJobExecutor *Simulation::createUnregisteredMulticoreJobExecutor(std::string hostname,
 																								std::string supports_standard_jobs,
-																								std::string support_pilot_jobs) {
+																								std::string support_pilot_jobs,
+																								int num_cores,
+																								double ttl,
+																							 PilotJob *pj,
+																								std::string suffix) {
 
 			// Create the compute service
 			MulticoreJobExecutor *executor;
 			try {
-				executor = new MulticoreJobExecutor(nullptr, hostname);
+				executor = new MulticoreJobExecutor(nullptr, hostname, num_cores, ttl, pj, suffix);
 				executor->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, supports_standard_jobs);
 				executor->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, support_pilot_jobs);
 			} catch (WRENCHException e) {

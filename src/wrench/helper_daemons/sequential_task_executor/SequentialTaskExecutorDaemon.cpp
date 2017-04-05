@@ -60,7 +60,7 @@ namespace wrench {
 					std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage *>(message.release()));
 
 					// Run the task
-					XBT_INFO("Executing task %s", m->task->getId().c_str());
+					XBT_INFO("Executing task %s (%lf flops)", m->task->getId().c_str(), m->task->getFlops());
 					m->task->setRunning();
 					S4U_Simulation::compute(m->task->flops);
 

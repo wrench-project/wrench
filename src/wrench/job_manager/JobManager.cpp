@@ -48,6 +48,14 @@ namespace wrench {
 			this->jobs.clear();
 		}
 
+
+		/**
+		 * @brig Kill the job manager (brutally)
+		 */
+		void JobManager::kill() {
+			this->daemon->kill_actor();
+		}
+
 		/**
 		 * @brief Stop the job manager
 		 */
@@ -56,9 +64,8 @@ namespace wrench {
 				S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
 				this->daemon = nullptr;
 			}
+
 		}
-
-
 
 		/**
 		 * @brief Create a standard job
@@ -110,27 +117,30 @@ namespace wrench {
 
 			// Check that this is valid submission
 			if (!compute_service->canRunJob(job)) {
-				throw WRENCHException("Compute service " + compute_service->getName() + " does not support " + job->getTypeAsString());
+				throw WRENCHException("Compute service " + compute_service->getName() +
+															" does not support " + job->getTypeAsString() + " jobs");
 			}
 
 			// Push back the mailbox of the manager,
 			// so that it will get the initial callback
 			job->pushCallbackMailbox(this->daemon->mailbox_name);
 
-			// Update the job state
+			// Update the job state and insert it into the pending list
 			switch(job->getType()) {
 				case WorkflowJob::STANDARD: {
 					((StandardJob *)job)->state = StandardJob::PENDING;
+					for (auto t : ((StandardJob *)job)->tasks) {
+						t->setState(WorkflowTask::State::PENDING);
+					}
+					this->pending_standard_jobs.insert((StandardJob*)job);
 					break;
 				}
 				case WorkflowJob::PILOT: {
 					((PilotJob *)job)->state = PilotJob::PENDING;
+					this->pending_pilot_jobs.insert((PilotJob*)job);
 					break;
 				}
 			}
-
-			// Put the job in the "pending" list
-			this->pending_jobs.insert(job);
 
 			// Submit the job to the service
 			compute_service->runJob(job);
@@ -142,7 +152,11 @@ namespace wrench {
 		}
 
 		std::set<PilotJob *> JobManager::getRunningPilotJobs() {
-			throw WRENCHException("getRunningPilotJobs() not implemented yet");
+			return this->running_pilot_jobs;
+		}
+
+		std::set<PilotJob *> JobManager::getPendingPilotJobs() {
+			return this->pending_pilot_jobs;
 		}
 
 		void JobManager::forgetJob(WorkflowJob *) {

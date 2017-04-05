@@ -13,6 +13,7 @@
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <exception/WRENCHException.h>
 #include <workflow_job/StandardJob.h>
+#include <workflow_job/PilotJob.h>
 #include "JobManagerDaemon.h"
 #include "JobManager.h"
 
@@ -26,11 +27,13 @@ namespace wrench {
 
 
 	int JobManagerDaemon::main() {
-		XBT_INFO("New Multicore Task Executor starting (%s)", this->mailbox_name.c_str());
+		XBT_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
 		bool keep_going = true;
 		while (keep_going) {
 			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+
+			XBT_INFO("Job Manager got a %s message", message->toString().c_str());
 			switch (message->type) {
 
 				case SimulationMessage::STOP_DAEMON: {
@@ -47,14 +50,66 @@ namespace wrench {
 					job->state = StandardJob::State::COMPLETED;
 
 					// move the job from the "pending" list to the "completed" list
-					this->job_manager->pending_jobs.erase(job);
-					this->job_manager->completed_jobs.insert(job);
+					this->job_manager->pending_standard_jobs.erase(job);
+					this->job_manager->completed_standard_jobs.insert(job);
 
 					// Forward the notification along the notification chain
 					S4U_Mailbox::put(job->popCallbackMailbox(),
 													 new StandardJobDoneMessage(job, m->compute_service));
 					break;
+				}
 
+				case SimulationMessage::STANDARD_JOB_FAILED: {
+					std::unique_ptr<StandardJobFailedMessage> m(static_cast<StandardJobFailedMessage *>(message.release()));
+
+					// update job state
+					StandardJob *job = m->job;
+					job->state = StandardJob::State::FAILED;
+
+					// remove the job from the "pending" list
+					this->job_manager->pending_standard_jobs.erase(job);
+
+					// Forward the notification along the notification chain
+					S4U_Mailbox::put(job->popCallbackMailbox(),
+													 new StandardJobFailedMessage(job, m->compute_service));
+					break;
+				}
+
+				case SimulationMessage::PILOT_JOB_STARTED: {
+					std::unique_ptr<PilotJobStartedMessage> m(static_cast<PilotJobStartedMessage *>(message.release()));
+
+					// update job state
+					PilotJob *job = m->job;
+					job->state = PilotJob::State::RUNNING;
+
+					// move the job from the "pending" list to the "running" list
+					this->job_manager->pending_pilot_jobs.erase(job);
+					this->job_manager->running_pilot_jobs.insert(job);
+
+					// Forward the notification to the source
+					XBT_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+					S4U_Mailbox::put(job->getOriginCallbackMailbox(),
+														new PilotJobStartedMessage(job, m->compute_service));
+
+					break;
+				}
+
+				case SimulationMessage::PILOT_JOB_EXPIRED: {
+					std::unique_ptr<PilotJobExpiredMessage> m(static_cast<PilotJobExpiredMessage *>(message.release()));
+
+					// update job state
+					PilotJob *job = m->job;
+					job->state = PilotJob::State::EXPIRED;
+
+					// Remove the job from the "running" list
+					this->job_manager->running_pilot_jobs.erase(job);
+
+					// Forward the notification to the source
+					XBT_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+					S4U_Mailbox::put(job->getOriginCallbackMailbox(),
+													 new PilotJobExpiredMessage(job, m->compute_service));
+
+					break;
 				}
 
 				default: {

@@ -34,7 +34,7 @@ namespace wrench {
 				Simulation();
 				void init(int *, char **);
 				void launch();
-				void shutdown();
+				void shutdownAllComputeServices();
 
 				/** Platform initialization **/
 				void createPlatform(std::string);
@@ -45,7 +45,8 @@ namespace wrench {
 				void createMulticoreStandardAndPilotJobExecutor(std::string);
 
 				// Internal methods (excluded from documentation)
-				static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(std::string , std::string, std::string);
+				static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(
+								std::string , std::string, std::string, int num_cores, double ttl, PilotJob *pj, std::string suffix);
 				void mark_compute_service_as_terminated(ComputeService *cs);
 
 				/** ComputeService discovery **/

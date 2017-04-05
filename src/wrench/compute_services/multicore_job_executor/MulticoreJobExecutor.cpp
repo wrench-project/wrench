@@ -17,6 +17,9 @@
 #include "exception/WRENCHException.h"
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_job_executor, "Log category for Multicore Job Executor");
+
+
 namespace wrench {
 
 		/**
@@ -31,7 +34,9 @@ namespace wrench {
 		MulticoreJobExecutor::MulticoreJobExecutor(Simulation *simulation,
 																							 std::string hostname,
 																							 int num_worker_threads,
-																							 double ttl) :
+																							 double ttl,
+																							 PilotJob *pj,
+		                                           std::string suffix) :
 						ComputeService("multicore_job_executor", simulation) {
 
 			// Set all relevant properties
@@ -40,7 +45,7 @@ namespace wrench {
 
 			// Create the main daemon
 			this->daemon = std::unique_ptr<MulticoreJobExecutorDaemon>(
-							new MulticoreJobExecutorDaemon(this, num_worker_threads, ttl));
+							new MulticoreJobExecutorDaemon(this, num_worker_threads, ttl, pj, suffix));
 
 			// Start the daemon on the same host
 			this->daemon->start(hostname);
@@ -51,11 +56,15 @@ namespace wrench {
 		 * @brief Stop the service
 		 */
 		void MulticoreJobExecutor::stop() {
+
+			this->state = ComputeService::DOWN;
+
 			if (this->daemon != nullptr) {
+				XBT_INFO("Telling daemon listening on (%s) to terminate", this->daemon->mailbox_name.c_str());
 				// Send a termination message to the daemon's mailbox
 				S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
 				// Wait for the ack
-				std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get("killbox");
+				std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->daemon->mailbox_name + "_kill");
 				if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
 					throw WRENCHException("Wrong message type received while expecting DAEMON_STOPPED");
 				}
@@ -81,7 +90,7 @@ namespace wrench {
 			}
 
 			// Synchronously send a "run a task" message to the daemon's mailbox
-			S4U_Mailbox::put(this->daemon->mailbox_name, new RunStandardJobMessage(job));
+			S4U_Mailbox::dput(this->daemon->mailbox_name, new RunStandardJobMessage(job));
 		};
 
 		/**
@@ -100,8 +109,8 @@ namespace wrench {
 				throw WRENCHException("Trying to run a job on a compute service that's terminated");
 			}
 
-			// Synchronously send a "run a task" message to the daemon's mailbox
-			S4U_Mailbox::put(this->daemon->mailbox_name, new RunPilotJobMessage(job));
+			//  send a "run a task" message to the daemon's mailbox
+			S4U_Mailbox::dput(this->daemon->mailbox_name, new RunPilotJobMessage(job));
 		};
 
 
@@ -111,7 +120,12 @@ namespace wrench {
 		 * @return
 		 */
 		unsigned long MulticoreJobExecutor::numIdleCores() {
-			S4U_Mailbox::put(this->daemon->mailbox_name, new NumIdleCoresRequestMessage());
+
+			if (this->state == ComputeService::DOWN) {
+				throw WRENCHException("Compute Service is down");
+			}
+
+			S4U_Mailbox::dput(this->daemon->mailbox_name, new NumIdleCoresRequestMessage());
 			std::unique_ptr<SimulationMessage> msg= S4U_Mailbox::get(this->daemon->mailbox_name + "_answers");
 			std::unique_ptr<NumIdleCoresAnswerMessage> m(static_cast<NumIdleCoresAnswerMessage *>(msg.release()));
 			return m->num_idle_cores;

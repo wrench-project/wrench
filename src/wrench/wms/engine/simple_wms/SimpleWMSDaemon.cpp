@@ -50,6 +50,9 @@ namespace wrench {
 
 		while (true) {
 
+			// Take care of previously posted iput() that should be cleared
+			S4U_Mailbox::clear_dputs();
+
 			// Get the ready tasks
 			std::vector<WorkflowTask *> ready_tasks = this->workflow->getReadyTasks();
 
@@ -60,10 +63,16 @@ namespace wrench {
 				break;
 			}
 
+			// Submit pilot jobs
+			XBT_INFO("Scheduling pilot jobs...");
+			this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, this->simulation);
+
 			// Run ready tasks with defined scheduler implementation
-			this->scheduler->runTasks(job_manager.get(), ready_tasks, compute_services);
+			XBT_INFO("Scheduling tasks...");
+			this->scheduler->scheduleTasks(job_manager.get(), ready_tasks, this->simulation);
 
 			// Wait for a workflow execution event
+			XBT_INFO("Getting next workflow execution event");
 			std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
 
 			switch (event->type) {
@@ -73,7 +82,15 @@ namespace wrench {
 					break;
 				}
 				case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-					XBT_INFO("Notified that as job has failed (it's back in the ready state)");
+					XBT_INFO("Notified that a standard job has failed (it's back in the ready state)");
+					break;
+				}
+				case WorkflowExecutionEvent::PILOT_JOB_START: {
+					XBT_INFO("Notified that a pilot job has started!");
+					break;
+				}
+				case WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
+					XBT_INFO("Notified that a pilot job has expired!");
 					break;
 				}
 				default: {
@@ -86,14 +103,24 @@ namespace wrench {
 			}
 		}
 
+		S4U_Mailbox::clear_dputs();
+
 		if (workflow->isDone()) {
 			XBT_INFO("Workflow execution is complete!");
 		} else {
 			XBT_INFO("Workflow execution is incomplete, but there are no more compute services...");
 		}
 
+
 		XBT_INFO("Simple WMS Daemon is shutting down all Compute Services");
-		this->simulation->shutdown();
+		this->simulation->shutdownAllComputeServices();
+
+		// This is brutal, but it's because that stupid job manager is currently
+		// handling pilot job tersmination acks (due to the above shutdown), and
+		// thus is stuck waiting for the WMS to receive them. But we're done. So,
+		// for now, let's just kill it.
+		XBT_INFO("Killing the job manager");
+		job_manager->kill();
 
 		XBT_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
 

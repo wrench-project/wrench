@@ -28,7 +28,7 @@ namespace wrench {
 
 		public:
 				/** Construct/Start, Destructor/Stop **/
-				MulticoreJobExecutor(Simulation *simulation, std::string hostname, int num_worker_threads = -1, double ttl = -1.0);
+				MulticoreJobExecutor(Simulation *simulation, std::string hostname, int num_worker_threads = -1, double ttl = -1.0, PilotJob *pj = nullptr, std::string suffix="");
 					void stop();
 
 				/** Run jobs **/

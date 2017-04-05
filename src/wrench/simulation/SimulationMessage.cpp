@@ -20,6 +20,26 @@ namespace wrench {
 			size = s;
 		}
 
+		std::string SimulationMessage::toString() {
+			switch(this->type) {
+				case STOP_DAEMON: return "STOP_DAEMON";
+				case DAEMON_STOPPED: return "DAEMON_STOPPED";
+				case RUN_STANDARD_JOB: return "RUN_STANDARD_JOB";
+				case STANDARD_JOB_DONE: return "STANDARD_JOB_DONE";
+				case STANDARD_JOB_FAILED:return "STANDARD_JOB_FAILED";
+				case RUN_PILOT_JOB:return "RUN_PILOT_JOB";
+				case PILOT_JOB_STARTED:return "PILOT_JOB_STARTED";
+				case PILOT_JOB_EXPIRED:return "PILOT_JOB_EXPIRED";
+				case PILOT_JOB_FAILED:return "PILOT_JOB_FAILED";
+				case RUN_TASK:return "RUN_TASK";
+				case TASK_DONE:return "TASK_DONE";
+				case NUM_IDLE_CORES_REQUEST:return "NUM_IDLE_CORES_REQUEST";
+				case NUM_IDLE_CORES_ANSWER:return "NUM_IDLE_CORES_ANSWER";
+				default: return "UNKNOWN MESSAGE TYPE";
+			}
+
+		}
+
 		/** STOP_DAEMON MESSAGE **/
 		// TODO: Make the "1024" below configurable somehow
 		StopDaemonMessage::StopDaemonMessage(): SimulationMessage(STOP_DAEMON, 1024.00) {
@@ -65,7 +85,7 @@ namespace wrench {
 
 		/** PILOT_JOB_TERMINATED **/
 		// TODO: Make the "1024" below configurable somehow
-		PilotJobTerminatedMessage::PilotJobTerminatedMessage(PilotJob *job, ComputeService *cs): SimulationMessage(PILOT_JOB_TERMINATED, 1024.0) {
+		PilotJobExpiredMessage::PilotJobExpiredMessage(PilotJob *job, ComputeService *cs): SimulationMessage(PILOT_JOB_EXPIRED, 1024.0) {
 			this->job = job;
 			this->compute_service = cs;
 		}

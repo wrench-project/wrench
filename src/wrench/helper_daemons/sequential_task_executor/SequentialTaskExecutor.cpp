@@ -31,27 +31,28 @@ namespace wrench {
 			this->daemon->start(this->hostname);
 		}
 
-	/**
-	 * @brief Terminate the sequential task executor
-	 */
-	void SequentialTaskExecutor::stop() {
-		// Send a termination message to the daemon's mailbox
-		S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
-	}
 		/**
-	 * @brief Kills the sequential task executor
-	 */
+		 * @brief Terminate the sequential task executor
+		 */
+		void SequentialTaskExecutor::stop() {
+			// Send a termination message to the daemon's mailbox
+			S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
+		}
+
+		/**
+	 	 * @brief Kills the sequential task executor
+	   */
 		void SequentialTaskExecutor::kill() {
 			this->daemon->kill_actor();
 		}
 
-	/**
-	 * @brief Have the sequential job executor execute a standard job
-	 *
-	 * @param job is a pointer to the job
-	 *
-	 * @return 0 on success
-	 */
+		/**
+		 * @brief Have the sequential job executor execute a standard job
+		 *
+		 * @param job is a pointer to the job
+		 *
+		 * @return 0 on success
+		 */
 		int SequentialTaskExecutor::runTask(WorkflowTask *task) {
 			// Send a "run a task" message to the daemon's mailbox
 			S4U_Mailbox::put(this->daemon->mailbox_name, new RunTaskMessage(task));

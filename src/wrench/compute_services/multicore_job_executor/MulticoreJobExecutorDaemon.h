@@ -28,13 +28,14 @@ namespace wrench {
 		class MulticoreJobExecutorDaemon : public S4U_DaemonWithMailbox {
 
 		public:
-				MulticoreJobExecutorDaemon(ComputeService *cs, int num_worker_threads=-1, double ttl=-1);
+				MulticoreJobExecutorDaemon(ComputeService *cs, int num_worker_threads=-1, double ttl=-1, PilotJob *pj = nullptr, std::string suffix="");
 
 		private:
 
-				// Fixed values
 				int num_worker_threads; // total threads to run tasks from standard jobs
+				bool has_ttl;
 				double ttl;							// time-to-live
+				PilotJob *containing_pilot_job;
 
 				int num_available_worker_threads; // number of worker threads that can currently be
 				                                  // used to run tasks from standard jobs
@@ -50,7 +51,7 @@ namespace wrench {
 				// Queue of pending jobs (standard or pilot) that haven't began executing
 				std::queue<WorkflowJob *> pending_jobs;
 
-				// Set of currently running jobs
+				// Set of currently running (standard or pilot) jobs
 				std::set<WorkflowJob *> running_jobs;
 
 				// Queue of standard job tasks waiting for execution
@@ -63,16 +64,18 @@ namespace wrench {
 
 				// Helper functions to make main() a bit more palatable
 				void initialize();
+				void terminate();
 				void terminateAllWorkerThreads();
-				void failCurrentjobs();
+				void terminateAllPilotJobs();
+				void failCurrentStandardJobs();
 				void processTaskCompletion(WorkflowTask *, SequentialTaskExecutor *);
-				bool processNextMessage();
+				bool processNextMessage(double timeout);
 				bool dispatchNextPendingTask();
 				bool dispatchNextPendingJob();
 
-
 				// Pointer to the ComputeService container
 				ComputeService *compute_service;
+
 		};
 }
 

@@ -29,7 +29,9 @@ namespace wrench {
 				enum EventType {
 						UNDEFINED,
 						STANDARD_JOB_COMPLETION,
-						STANDARD_JOB_FAILURE
+						STANDARD_JOB_FAILURE,
+						PILOT_JOB_START,
+						PILOT_JOB_EXPIRATION,
 				};
 
 

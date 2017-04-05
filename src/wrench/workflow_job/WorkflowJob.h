@@ -37,6 +37,8 @@ namespace wrench {
 				// Should be excluded from documentation
 				std::string popCallbackMailbox();
 				void pushCallbackMailbox(std::string);
+				std::string getCallbackMailbox();
+				std::string getOriginCallbackMailbox();
 
 
 		protected:

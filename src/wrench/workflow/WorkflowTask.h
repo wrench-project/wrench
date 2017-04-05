@@ -35,6 +35,7 @@ namespace wrench {
 				enum State {
 						NOT_READY,
 						READY,
+						PENDING,
 						RUNNING,
 						COMPLETED,
 						FAILED
@@ -64,6 +65,7 @@ namespace wrench {
 		private:
 
 				friend class StandardJob;
+				friend class JobManager;
 				friend class Workflow;
 
 				// These friend clauses are bad

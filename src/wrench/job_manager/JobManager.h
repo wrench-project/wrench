@@ -29,8 +29,9 @@ namespace wrench {
 				JobManager(Workflow *);
 				~JobManager();
 
-				/** Stop **/
+				/** Stop / Kill **/
 				void stop();
+				void kill();
 
 				/** Job creation **/
 				StandardJob *createStandardJob(std::vector<WorkflowTask *>);
@@ -47,6 +48,7 @@ namespace wrench {
 				void forgetJob(WorkflowJob *);
 
 				/** Information **/
+				std::set<PilotJob*> getPendingPilotJobs();
 				std::set<PilotJob*> getRunningPilotJobs();
 
 			private:
@@ -54,10 +56,16 @@ namespace wrench {
 
 				Workflow *workflow;
 				std::unique_ptr<JobManagerDaemon> daemon;
+
 				std::map<std::string, std::unique_ptr<WorkflowJob>> jobs;
-				std::set<WorkflowJob*> pending_jobs;
-				std::set<WorkflowJob*> running_jobs;
-				std::set<WorkflowJob*> completed_jobs;
+
+				std::set<StandardJob*> pending_standard_jobs;
+				std::set<StandardJob*> running_standard_jobs;
+				std::set<StandardJob*> completed_standard_jobs;
+				std::set<PilotJob*> pending_pilot_jobs;
+				std::set<PilotJob*> running_pilot_jobs;
+				std::set<PilotJob*> completed_pilot_jobs;
+
 
 		};
 

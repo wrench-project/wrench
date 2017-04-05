@@ -37,14 +37,13 @@ namespace wrench {
 		this->actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
 		                                               simgrid::s4u::Host::by_name(hostname),
 		                                               S4U_DaemonWithMailboxActor(this));
+		simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
+		mailbox->setReceiver(this->actor);
+
 	}
 
 	/**
-	 * @brief Kill the actor. Warning, this will only kill is next times it places
-	 *        a simcall. This means that if it's in the middle of computing, it will
-	 *        finish the task, thus using (simulated) CPU resources. This is sort of like
-	 *        a process that can only be killed when it stops computing... will be fixed in
-	 *        S4U at some time.
+	 * @brief Kill the actor.
 	 */
 	void S4U_DaemonWithMailbox::kill_actor() {
 		this->actor->kill();

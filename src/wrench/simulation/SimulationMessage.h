@@ -36,7 +36,7 @@ namespace wrench {
 						STANDARD_JOB_FAILED,
 						RUN_PILOT_JOB,
 						PILOT_JOB_STARTED,
-						PILOT_JOB_TERMINATED,
+						PILOT_JOB_EXPIRED,
 						PILOT_JOB_FAILED,
 						RUN_TASK,
 						TASK_DONE,
@@ -45,6 +45,7 @@ namespace wrench {
 				};
 
 				SimulationMessage(Type t, double s);
+				std::string toString();
 
 				Type type;
 				double size;
@@ -89,8 +90,8 @@ namespace wrench {
 				ComputeService *compute_service;
 		};
 
-		struct PilotJobTerminatedMessage: public SimulationMessage {
-				PilotJobTerminatedMessage(PilotJob *, ComputeService*);
+		struct PilotJobExpiredMessage: public SimulationMessage {
+				PilotJobExpiredMessage(PilotJob *, ComputeService*);
 				PilotJob *job;
 				ComputeService *compute_service;
 		};

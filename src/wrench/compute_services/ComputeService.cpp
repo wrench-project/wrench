@@ -67,8 +67,8 @@ namespace wrench {
 		 * @brief Get the state of the compute service
 		 * @return the state
 		 */
-		ComputeService::State ComputeService::getState() {
-			return this->state;
+		bool ComputeService::isUp() {
+			return (this->state == ComputeService::UP);
 		}
 
 		/**
@@ -76,6 +76,10 @@ namespace wrench {
 		 * @param job the job
 		 */
 		void ComputeService::runJob(WorkflowJob *job) {
+
+			if (this->state == ComputeService::DOWN) {
+				throw new WRENCHException("Compute Service is Down");
+			}
 
 			switch (job->getType()) {
 				case WorkflowJob::STANDARD: {
@@ -132,9 +136,11 @@ namespace wrench {
 			switch (job->getType()) {
 				case WorkflowJob::STANDARD: {
 					can_run = can_run &&  (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes");
+					break;
 				}
 				case WorkflowJob::PILOT: {
 					can_run = can_run &&  (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) == "yes");
+					break;
 				}
 			}
 
@@ -165,5 +171,13 @@ namespace wrench {
 			throw WRENCHException("The compute service does not implement runPilotJob(PilotJob *)");
 		}
 
+		/**
+		 * @brief set the state of the compute service to DOWN
+		 */
+		void ComputeService::setStateToDown() {
+			this->state = ComputeService::DOWN;
+		}
+
 		/*! \endcod */
+
 };

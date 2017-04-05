@@ -51,8 +51,11 @@ namespace wrench {
 				/** Information getting **/
 				virtual unsigned long numIdleCores() = 0;
 				std::string getName();
-				ComputeService::State getState();
+				bool isUp();
 				bool canRunJob(WorkflowJob*);
+
+				// Should be excluded from documentation
+				void setStateToDown();
 
 				/** Stopping **/
 				virtual void stop();

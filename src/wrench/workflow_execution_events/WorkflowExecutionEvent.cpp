@@ -51,6 +51,22 @@ namespace wrench {
 					return event;
 				}
 
+				case SimulationMessage::PILOT_JOB_STARTED: {
+					std::unique_ptr<PilotJobStartedMessage> m(static_cast<PilotJobStartedMessage *>(message.release()));
+					event->type = WorkflowExecutionEvent::PILOT_JOB_START;
+					event->job = (WorkflowJob *)m->job;
+					event->compute_service = m->compute_service;
+					return event;
+				}
+
+				case SimulationMessage::PILOT_JOB_EXPIRED: {
+					std::unique_ptr<PilotJobExpiredMessage> m(static_cast<PilotJobExpiredMessage *>(message.release()));
+					event->type = WorkflowExecutionEvent::PILOT_JOB_EXPIRATION;
+					event->job = (WorkflowJob *)m->job;
+					event->compute_service = m->compute_service;
+					return event;
+				}
+
 				default: {
 					throw WRENCHException("Non-handled message type when generating execution event");
 				}

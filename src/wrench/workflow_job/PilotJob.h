@@ -34,8 +34,11 @@ namespace wrench {
 				int num_cores;
 				double duration;
 
+				ComputeService *getComputeService();
+
 				// Should be excluded from documentation
 				void setComputeService(ComputeService*);
+
 
 		private:
 
@@ -44,7 +47,6 @@ namespace wrench {
 
 				PilotJob(Workflow *workflow, int, double);
 				PilotJob::State getState();
-				ComputeService *getComputeService();
 				void stop();
 
 				State state;

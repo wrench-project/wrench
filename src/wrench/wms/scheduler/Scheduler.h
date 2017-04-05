@@ -20,26 +20,37 @@
 namespace wrench {
 
 
-	class Scheduler {
+		class Scheduler {
 
-	protected:
-		Scheduler() {};
-		uint16_t sched_type;
+		protected:
+				Scheduler() {};
+				uint16_t sched_type;
 
-	public:
-		virtual ~Scheduler() {};
+		public:
+				virtual ~Scheduler() {};
 
-		/**
-		 * Schedule and run a set of ready tasks in available compute resources
-		 *
-		 * @param job_manager is a pointer to a job manager
-		 * @param ready_tasks is a vector of ready tasks
-		 * @param compute_services is a vector of available compute resources
-		 */
-		virtual void runTasks(JobManager *job_manager,
-													std::vector<WorkflowTask *> ready_tasks,
-		                      std::set<ComputeService *> &compute_services) = 0;
-	};
+				/**
+				 * @brief Schedule and run a set of ready tasks in available compute resources
+				 *
+				 * @param job_manager is a pointer to a job manager instance
+				 * @param ready_tasks is a vector of ready tasks
+				 * @param simulation is a pointer to a simulation instance
+				 */
+				virtual void scheduleTasks(JobManager *job_manager,
+																	 std::vector<WorkflowTask *> ready_tasks,
+																	 Simulation *simulation) = 0;
+
+				/**
+				 * @brief Submits pilot jobs
+				 *
+				 * @param job_manager is a pointer to a job manager instance
+				 * @param workflow is a pointer to a workflow instance
+				 * @param simulation is a pointer to a simulation instance
+				 */
+				virtual void schedulePilotJobs(JobManager *job_manager,
+																			 Workflow *workflow,
+																			 Simulation *simulation) = 0;
+		};
 
 }
 

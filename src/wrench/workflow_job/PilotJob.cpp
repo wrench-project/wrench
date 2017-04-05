@@ -14,6 +14,8 @@
 namespace wrench {
 
 		PilotJob::PilotJob(Workflow *workflow, int num_cores, double duration) {
+			this->type = WorkflowJob::PILOT;
+
 			this->state = PilotJob::State::NOT_SUBMITTED;
 			this->compute_service = nullptr;
 			this->workflow = workflow;

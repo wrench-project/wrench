@@ -57,7 +57,30 @@ namespace wrench {
 
 		/**
 		 * @brief Gets the "next" callback mailbox (returns the
-		 *         workflow mailbox if the mailbox stack is empty)
+		 *         origin (i.e., workflow) mailbox if the mailbox stack is empty)
+		 * @return the next callback mailbox
+		 */
+		std::string WorkflowJob::getCallbackMailbox() {
+			if (this->callback_mailbox_stack.size() == 0) {
+				return this->workflow->getCallbackMailbox();
+			} else {
+				return this->callback_mailbox_stack.top();
+			}
+		}
+
+		/**
+		 * @brief Gets the "origin" callback mailbox
+		 * @return the next callback mailbox
+		 */
+		std::string WorkflowJob::getOriginCallbackMailbox() {
+				return this->workflow->getCallbackMailbox();
+		}
+
+
+		/**
+		 * @brief Gets the "next" callback mailbox (returns the
+		 *         workflow mailbox if the mailbox stack is empty), and
+		 *         pops it
 		 * @return the next callback mailbox
 		 */
 		std::string WorkflowJob::popCallbackMailbox() {

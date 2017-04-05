@@ -3,11 +3,13 @@
 
 - Right now, the "killbox" stuff inside the stop() method of compute services is not great
 	- But we need an ack to make sure memory doesn't get freed before a daemon has
-          completely shutdown
+          completely shutdownAllComputeServices
 
-- Do the killbos for the JobManager...
+PilotJob:
+	- Remaining bug to fix: when a pilot job terminates it should notify the
+          containing ComputeService AS WELL AS THE JOB MANAGER
 
-- Implement PilotJob
+
 
 
 ---------------------------------------------------------------------
