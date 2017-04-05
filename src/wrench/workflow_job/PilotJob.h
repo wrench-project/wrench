@@ -31,9 +31,6 @@ namespace wrench {
 						FAILED
 				};
 
-				int num_cores;
-				double duration;
-
 				ComputeService *getComputeService();
 
 				// Should be excluded from documentation

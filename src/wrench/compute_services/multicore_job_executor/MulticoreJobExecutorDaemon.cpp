@@ -118,21 +118,21 @@ namespace wrench {
 											 job->getName().c_str(),
 											 job->getCallbackMailbox().c_str());
 							if (this->num_available_worker_threads - this->busy_sequential_task_executors.size() >
-									job->num_cores) {
+									job->getNumCores()) {
 
 								// Create and launch a compute service
 								ComputeService *cs =
 												Simulation::createUnregisteredMulticoreJobExecutor(S4U_Simulation::getHostName(),
 																																					 "yes", "no",
-																																					 job->num_cores,
-																																					 job->duration,
+																																					 job->getNumCores(),
+																																					 job->getDuration(),
 																																					 job,
 																																					 "_pilot");
 								// Create and launch a compute service for the pilot job
 								job->setComputeService(cs);
 
 								// Reduce the number of available worker threads
-								this->num_available_worker_threads -= job->num_cores;
+								this->num_available_worker_threads -= job->getNumCores();
 
 								// Put the job in the runnint queue
 								this->pending_jobs.pop();
@@ -215,7 +215,7 @@ namespace wrench {
 				return false;
 			}
 
-			XBT_INFO("GOT A [%s] message", message->toString().c_str());
+			XBT_INFO("Got a [%s] message", message->toString().c_str());
 
 			switch (message->type) {
 
@@ -234,7 +234,7 @@ namespace wrench {
 
 				case SimulationMessage::RUN_PILOT_JOB: {
 					std::unique_ptr<RunPilotJobMessage> m(static_cast<RunPilotJobMessage *>(message.release()));
-					XBT_INFO("Asked to run a pilot job with %d cores for %lf seconds", m->job->num_cores, m->job->duration);
+					XBT_INFO("Asked to run a pilot job with %d cores for %lf seconds", m->job->getNumCores(), m->job->getDuration());
 					this->pending_jobs.push(m->job);
 					return true;
 				}
@@ -254,6 +254,13 @@ namespace wrench {
 				case SimulationMessage::NUM_IDLE_CORES_REQUEST: {
 					std::unique_ptr<NumIdleCoresRequestMessage> m(static_cast<NumIdleCoresRequestMessage *>(message.release()));
 					NumIdleCoresAnswerMessage *msg = new NumIdleCoresAnswerMessage(this->idle_sequential_task_executors.size());
+					S4U_Mailbox::put(this->mailbox_name+"_answers", msg);
+					return true;
+				}
+
+				case SimulationMessage::TTL_REQUEST: {
+					std::unique_ptr<TTLRequestMessage> m(static_cast<TTLRequestMessage *>(message.release()));
+					TTLAnswerMessage *msg = new TTLAnswerMessage(this->ttl);
 					S4U_Mailbox::put(this->mailbox_name+"_answers", msg);
 					return true;
 				}
@@ -428,7 +435,7 @@ namespace wrench {
 			this->running_jobs.erase(job);
 
 			// Update the number of available cores
-			this->num_available_worker_threads += job->num_cores;
+			this->num_available_worker_threads += job->getNumCores();
 
 			// Forward the notification
 			S4U_Mailbox::put(job->popCallbackMailbox(),

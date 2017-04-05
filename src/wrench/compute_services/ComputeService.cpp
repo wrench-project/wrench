@@ -13,6 +13,8 @@
 #include "ComputeService.h"
 #include "simulation/Simulation.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(compute_service, "Log category for Compute Service");
+
 
 namespace wrench {
 
@@ -126,25 +128,53 @@ namespace wrench {
 
 		/**
 		 * @brief Check whether the service is able to run a job
+		 *
 		 * @param job is a pointer to a workflow job
 		 * @return true is able, false otherwise
 		 */
-		bool ComputeService::canRunJob(WorkflowJob *job) {
+		bool ComputeService::canRunJob(WorkflowJob::Type job_type,
+																	 unsigned long min_num_cores,
+																	 double duration) {
 			bool can_run = true;
 
+			// If the service isn't up, forget it
+			if (this->state != ComputeService::UP) {
+//				XBT_INFO("SERVICE IS NOT UP!");
+				return false;
+			}
+
 			// Check if the job type works
-			switch (job->getType()) {
+			switch (job_type) {
 				case WorkflowJob::STANDARD: {
-					can_run = can_run &&  (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes");
+					if (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) != "yes") {
+//						XBT_INFO("SERVICE DOESNT SUPPORT STANDARD JOBS");
+						return false;
+					}
 					break;
 				}
 				case WorkflowJob::PILOT: {
-					can_run = can_run &&  (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) == "yes");
+					if (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) != "yes") {
+//						XBT_INFO("SERVICE DOESNT SUPPORT PILOT JOBS");
+						return false;
+					}
 					break;
 				}
 			}
 
-			return can_run;
+			// Check that the number of cores is ok (does a communication with the daemons)
+			if (this->getNumIdleCores() < min_num_cores) {
+//				XBT_INFO("SERVICE DOESNT HAVE ENOUGH CORES");
+				return false;
+			}
+
+			// Check that the TTL is ok (does a communication with the daemons)
+			double ttl = this->getTTL();
+			if ((ttl > 0) && (ttl < duration)) {
+//				XBT_INFO("THE TTL IS A DEAL BREAKER");
+				return false;
+			}
+
+			return true;
 		}
 
 		/***********************************************************/

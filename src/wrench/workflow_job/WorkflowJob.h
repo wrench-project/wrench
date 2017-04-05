@@ -33,6 +33,8 @@ namespace wrench {
 				std::string getTypeAsString();
 				std::string getName();
 
+				unsigned int getNumCores();
+				double getDuration();
 
 				// Should be excluded from documentation
 				std::string popCallbackMailbox();
@@ -47,6 +49,8 @@ namespace wrench {
 				Workflow *workflow;
 				Type type;
 				std::string name;
+				double duration;
+				unsigned long num_cores;
 				unsigned long getNewUniqueNumber();
 
 

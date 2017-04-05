@@ -73,6 +73,7 @@ namespace wrench {
 		*/
 		void MaxMinScheduler::schedulePilotJobs(JobManager *job_manager,
 																						Workflow *workflow,
+																						double pilot_job_duration,
 																						const std::set<ComputeService *> &compute_services) {
 			XBT_INFO("Max-Min Scheduler doesn't do anything with pilot jobs");
 

@@ -68,7 +68,12 @@ namespace wrench {
 
 			// Submit pilot jobs
 			XBT_INFO("Scheduling pilot jobs...");
-			this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, this->simulation->getComputeServices());
+			double pilot_job_duration = 600.00; // bogus default
+			if (ready_tasks.size() > 0) {
+				// Heuristic: ask for something that can run  1.5 times the next ready tasks..
+				pilot_job_duration = 1.5 * ready_tasks[0]->getFlops();
+			}
+			this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, pilot_job_duration, this->simulation->getComputeServices());
 
 			// Run ready tasks with defined scheduler implementation
 			XBT_INFO("Scheduling tasks...");

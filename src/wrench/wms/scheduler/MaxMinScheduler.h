@@ -16,26 +16,27 @@
 
 namespace wrench {
 
-	class JobManager;
+		class JobManager;
 
-	extern const char maxmin_name[] = "MaxMinScheduler";
+		extern const char maxmin_name[] = "MaxMinScheduler";
 
-	class MaxMinScheduler : public SchedulerTmpl<maxmin_name, MaxMinScheduler> {
+		class MaxMinScheduler : public SchedulerTmpl<maxmin_name, MaxMinScheduler> {
 
-	public:
-		MaxMinScheduler();
+		public:
+				MaxMinScheduler();
 
-		void scheduleTasks(JobManager *job_manager, std::vector<WorkflowTask *> ready_tasks,
-		              const std::set<ComputeService *> &compute_services);
-			void schedulePilotJobs(JobManager *job_manager,
-																							Workflow *workflow,
-																							const std::set<ComputeService *> &compute_services);
+				void scheduleTasks(JobManager *job_manager, std::vector<WorkflowTask *> ready_tasks,
+													 const std::set<ComputeService *> &compute_services);
+				void schedulePilotJobs(JobManager *job_manager,
+															 Workflow *workflow,
+															 double pilot_job_duration,
+															 const std::set<ComputeService *> &compute_services);
 
-		struct MaxMinComparator {
-			bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
+				struct MaxMinComparator {
+						bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
+				};
+
 		};
-
-	};
 }
 
 #endif //WRENCH_MAXMINSCHEDULER_H

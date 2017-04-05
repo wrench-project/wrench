@@ -23,6 +23,8 @@ namespace wrench {
 		 */
 		StandardJob::StandardJob(std::vector<WorkflowTask*> tasks) {
 			this->type = WorkflowJob::STANDARD;
+			this->num_cores = 1;
+			this->duration = 0.0;
 
 			for (auto t : tasks) {
 				if (t->getState() != WorkflowTask::READY) {
@@ -32,6 +34,7 @@ namespace wrench {
 			for (auto t : tasks) {
 				this->tasks.push_back(t);
 				t->job = this;
+				this->duration += t->getFlops();
 			}
 			this->num_completed_tasks = 0;
 			this->workflow = this->tasks[0]->workflow;

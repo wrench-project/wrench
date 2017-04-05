@@ -116,7 +116,7 @@ namespace wrench {
 		void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service) {
 
 			// Check that this is valid submission
-			if (!compute_service->canRunJob(job)) {
+			if (!compute_service->canRunJob(job->getType(), job->getNumCores(), job->getDuration())) {
 				throw WRENCHException("Compute service " + compute_service->getName() +
 															" does not support " + job->getTypeAsString() + " jobs");
 			}

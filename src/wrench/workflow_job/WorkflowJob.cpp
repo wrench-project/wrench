@@ -49,6 +49,22 @@ namespace wrench {
 			return this->name;
 		}
 
+		/**
+		 * @brief get the number of cores required by the job
+		 * @return  the number of cores
+		 */
+		unsigned int WorkflowJob::getNumCores() {
+			return this->num_cores;
+		}
+
+		/**
+		 * @brief get the duration of the job
+		 * @return the duration in seconds
+		 */
+		double WorkflowJob::getDuration() {
+			return this->duration;
+		}
+
 		/***********************************************************/
 		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
 		/***********************************************************/

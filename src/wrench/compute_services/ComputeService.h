@@ -15,6 +15,7 @@
 
 
 #include <map>
+#include <workflow_job/WorkflowJob.h>
 
 namespace wrench {
 
@@ -53,7 +54,7 @@ namespace wrench {
 				virtual double  getTTL() = 0;
 				std::string getName();
 				bool isUp();
-				bool canRunJob(WorkflowJob*);
+				bool canRunJob(WorkflowJob::Type job_type, unsigned long min_num_cores, double duration);
 
 				// Should be excluded from documentation
 				void setStateToDown();

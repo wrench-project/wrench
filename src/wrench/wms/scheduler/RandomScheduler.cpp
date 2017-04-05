@@ -36,7 +36,7 @@ namespace wrench {
 		 * @param simualtion us a pointer to a simulation instance
 		 */
 		void RandomScheduler::scheduleTasks(JobManager *job_manager,
-																	 std::vector<WorkflowTask *> ready_tasks,
+																				std::vector<WorkflowTask *> ready_tasks,
 																				const std::set<ComputeService *> &compute_services) {
 
 
@@ -46,32 +46,50 @@ namespace wrench {
 			for (int i = 0; i < ready_tasks.size(); i++) {
 				bool successfully_scheduled = false;
 
+
 				// First: attempt to run the task on a running pilot job
+				XBT_INFO("Trying to submit task '%s' to a pilot job...", ready_tasks[i]->getId().c_str());
+
 				std::set<PilotJob*> running_pilot_jobs = job_manager->getRunningPilotJobs();
 				for (auto pj : running_pilot_jobs) {
 					ComputeService *cs = pj->getComputeService();
-					if (cs->isUp() && (cs->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes") && (cs->getNumIdleCores() > 0) ){
-						XBT_INFO("Submitting task %s for execution to a pilot job", ready_tasks[i]->getId().c_str());
-						WorkflowJob *job = (WorkflowJob *)job_manager->createStandardJob(ready_tasks[i]);
-						job_manager->submitJob(job, cs);
-						successfully_scheduled = true;
-						break;
+
+					if (!cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->flops)) {
+						XBT_INFO("$$$$$$ SERVICE %s doesn't work out", cs->getName().c_str());
+						continue;
 					}
+
+					// We can submit!
+					XBT_INFO("Submitting task %s for execution to a pilot job", ready_tasks[i]->getId().c_str());
+					WorkflowJob *job = (WorkflowJob *)job_manager->createStandardJob(ready_tasks[i]);
+					job_manager->submitJob(job, cs);
+					successfully_scheduled = true;
+					break;
 				}
+
 				if (successfully_scheduled) {
 					continue;
 				}
-				XBT_INFO("Couldn't submit tasks to a pilot job... trying a standard job");
+
+
+
+
 				// Second: attempt to run the task on a compute resource
+				XBT_INFO("Trying to submit task '%s' to a standard compute service...", ready_tasks[i]->getId().c_str());
+
 				for (auto cs : compute_services) {
-					if ((cs->isUp()) && (cs->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) == "yes") &&  (cs->getNumIdleCores() > 0) ){
-						XBT_INFO("Submitting task %s for execution as a standard job", ready_tasks[i]->getId().c_str());
-						WorkflowJob *job = (WorkflowJob *)job_manager->createStandardJob(ready_tasks[i]);
-						job_manager->submitJob(job, cs);
-						successfully_scheduled = true;
-						break;
-					}
+
+					if (!cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->flops)) continue;
+
+					// We can submit!
+
+					XBT_INFO("Submitting task %s for execution as a standard job", ready_tasks[i]->getId().c_str());
+					WorkflowJob *job = (WorkflowJob *)job_manager->createStandardJob(ready_tasks[i]);
+					job_manager->submitJob(job, cs);
+					successfully_scheduled = true;
+					break;
 				}
+
 				if (!successfully_scheduled) {
 					break;
 				}
@@ -88,7 +106,8 @@ namespace wrench {
 		 * @param simulation is a pointer to a simulation instance
 		 */
 		void RandomScheduler::schedulePilotJobs(JobManager *job_manager,
-																					Workflow *workflow,
+																						Workflow *workflow,
+																						double pilot_job_duration,
 																						const std::set<ComputeService *> &compute_services) {
 
 			// If there is always a pilot job in the system, do nothing
@@ -110,9 +129,10 @@ namespace wrench {
 				return;
 			}
 
-			// Submit a pilot job (1 core, 600 seconds)
+			// Submit a pilot job
+
 			XBT_INFO("Submitting a pilot job (1 core, 600 seconds)");
-			WorkflowJob *job = (WorkflowJob *)job_manager->createPilotJob(workflow, 1, 600.00);
+			WorkflowJob *job = (WorkflowJob *)job_manager->createPilotJob(workflow, 1, pilot_job_duration);
 			job_manager->submitJob(job, target_service);
 
 		}
