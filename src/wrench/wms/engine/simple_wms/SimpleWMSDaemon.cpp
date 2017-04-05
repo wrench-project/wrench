@@ -65,7 +65,7 @@ namespace wrench {
 
 			// Submit pilot jobs
 			XBT_INFO("Scheduling pilot jobs...");
-			this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, this->simulation);
+			this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, this->simulation->getComputeServices());
 
 			// Run ready tasks with defined scheduler implementation
 			XBT_INFO("Scheduling tasks...");

@@ -48,7 +48,7 @@ namespace wrench {
 				 */
 				virtual void schedulePilotJobs(JobManager *job_manager,
 																			 Workflow *workflow,
-																			 Simulation *simulation) = 0;
+																			 const std::set<ComputeService *> &compute_services) = 0;
 		};
 
 

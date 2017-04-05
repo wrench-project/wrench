@@ -25,13 +25,13 @@ namespace wrench {
 		public:
 				RandomScheduler();
 
-				virtual void scheduleTasks(JobManager *job_manager,
+				 void scheduleTasks(JobManager *job_manager,
 																	 std::vector<WorkflowTask *> ready_tasks,
 																	 const std::set<ComputeService *> &compute_services);
 
-				virtual void schedulePilotJobs(JobManager *job_manager,
+				 void schedulePilotJobs(JobManager *job_manager,
 																			 Workflow *workflow,
-																			 Simulation *simulation);
+																const std::set<ComputeService *> &compute_services);
 		};
 	};
 

@@ -27,6 +27,9 @@ namespace wrench {
 
 		void scheduleTasks(JobManager *job_manager, std::vector<WorkflowTask *> ready_tasks,
 		             const std::set<ComputeService *> &compute_services);
+			void schedulePilotJobs(JobManager *job_manager,
+																		 Workflow *workflow,
+																		 const std::set<ComputeService *> &compute_services);
 
 		struct MinMinComparator {
 			bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);

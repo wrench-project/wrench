@@ -61,7 +61,19 @@ namespace wrench {
 				break;
 			}
 		}
-
-
 	}
-}
+
+		/**
+		* @brief Submits pilot jobs
+		*
+		* @param job_manager is a pointer to a job manager instance
+		* @param workflow is a pointer to a workflow instance
+		* @param compute_services is a set of compute services
+		*/
+		void MinMinScheduler::schedulePilotJobs(JobManager *job_manager,
+																						Workflow *workflow,
+																						const std::set<ComputeService *> &compute_services) {
+			XBT_INFO("Min-Min Scheduler doesn't do anything with pilot jobs");
+			return;
+		}
+};

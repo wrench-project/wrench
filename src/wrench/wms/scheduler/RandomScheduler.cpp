@@ -89,7 +89,7 @@ namespace wrench {
 		 */
 		void RandomScheduler::schedulePilotJobs(JobManager *job_manager,
 																					Workflow *workflow,
-																					Simulation *simulation) {
+																						const std::set<ComputeService *> &compute_services) {
 
 			// If there is always a pilot job in the system, do nothing
 			if ((job_manager->getRunningPilotJobs().size() > 0) ||
@@ -99,7 +99,6 @@ namespace wrench {
 			}
 
 			// Submit a pilot job to the first compute service that can support it
-			std::set<ComputeService*> compute_services = simulation->getComputeServices();
 			ComputeService *target_service = nullptr;
 			for (auto cs : compute_services) {
 				if (cs->isUp() && (cs->getProperty(ComputeService::Property::SUPPORTS_PILOT_JOBS) == "yes")) {
