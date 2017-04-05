@@ -18,6 +18,8 @@ PilotJob:
 
 - Deal with failure traces...
 
+- Flops != seconds  for tasks!!
+
 -----------------------------------------------------------------------
 
 
