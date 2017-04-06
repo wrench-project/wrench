@@ -13,7 +13,6 @@
 #define WRENCH_PILOTJOB_H
 
 
-#include <compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h>
 #include "WorkflowJob.h"
 
 namespace wrench {
@@ -40,11 +39,9 @@ namespace wrench {
 		private:
 
 				friend class JobManager;
-				friend class JobManagerDaemon;
 
-				PilotJob(Workflow *workflow, int, double);
+				PilotJob(Workflow *workflow, unsigned long, double);
 				PilotJob::State getState();
-				void stop();
 
 				State state;
 				ComputeService *compute_service; // Associated compute service

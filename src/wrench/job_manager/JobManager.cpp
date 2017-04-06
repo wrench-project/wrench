@@ -30,7 +30,7 @@ namespace wrench {
 		 * @param workflow is a pointer to the Workflow whose jobs are to be managed
 		 */
 		JobManager::JobManager(Workflow *workflow) :
-						S4U_DaemonWithMailbox("job_manager", "job_maanager") {
+						S4U_DaemonWithMailbox("job_manager", "job_m:anager") {
 
 			this->workflow = workflow;
 

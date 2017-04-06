@@ -80,7 +80,6 @@ namespace wrench {
 			this->scheduler->scheduleTasks(job_manager.get(), ready_tasks, this->simulation->getComputeServices());
 
 			// Wait for a workflow execution event
-			XBT_INFO("Getting next workflow execution event");
 			std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
 
 			switch (event->type) {

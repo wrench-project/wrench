@@ -50,8 +50,6 @@ set(SOURCE_FILES
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.h
         src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.cpp
         src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.h
-        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.cpp
-        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h
         src/wrench/workflow_job/PilotJob.cpp
         src/wrench/workflow_job/PilotJob.h
         src/wrench/job_manager/JobManager.cpp

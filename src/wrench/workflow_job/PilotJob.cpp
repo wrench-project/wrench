@@ -13,7 +13,7 @@
 
 namespace wrench {
 
-		PilotJob::PilotJob(Workflow *workflow, int num_cores, double duration) {
+		PilotJob::PilotJob(Workflow *workflow, unsigned long num_cores, double duration) {
 			this->type = WorkflowJob::PILOT;
 
 			this->state = PilotJob::State::NOT_SUBMITTED;

@@ -69,7 +69,7 @@ namespace wrench {
 				friend class Workflow;
 
 				// These friend clauses are bad
-				friend class MulticoreJobExecutorDaemon;
+				friend class MulticoreJobExecutor;
 				friend class SequentialTaskExecutor;
 				friend class RandomScheduler;
 
