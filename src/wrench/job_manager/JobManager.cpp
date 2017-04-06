@@ -6,8 +6,8 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief PilotJobManager implements a simple facility for managing pilot
- *        jobs submitted by a WMS to pilot-job-enabled compute services.
+ * @brief JobManager implements a simple facility for managing
+ *        jobs (standard and pilot) submitted by a WMS to compute services.
  */
 
 #include <string>
@@ -16,9 +16,11 @@
 #include "exception/WRENCHException.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 #include "JobManager.h"
-#include "JobManagerDaemon.h"
 #include "workflow_job/StandardJob.h"
 #include "workflow_job/PilotJob.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
+
 
 namespace wrench {
 
@@ -27,17 +29,14 @@ namespace wrench {
 		 *
 		 * @param workflow is a pointer to the Workflow whose jobs are to be managed
 		 */
-		JobManager::JobManager(Workflow *workflow) {
+		JobManager::JobManager(Workflow *workflow) :
+						S4U_DaemonWithMailbox("job_manager", "job_manager") {
 
 			this->workflow = workflow;
 
-			// Create the  daemon
-			this->daemon = std::unique_ptr<JobManagerDaemon>(
-							new JobManagerDaemon(this));
-
 			// Start the daemon
 			std::string localhost = S4U_Simulation::getHostName();
-			this->daemon->start(localhost);
+			this->start(localhost);
 		}
 
 		/**
@@ -53,18 +52,14 @@ namespace wrench {
 		 * @brig Kill the job manager (brutally)
 		 */
 		void JobManager::kill() {
-			this->daemon->kill_actor();
+			this->kill_actor();
 		}
 
 		/**
 		 * @brief Stop the job manager
 		 */
 		void JobManager::stop() {
-			if (this->daemon != nullptr) {
-				S4U_Mailbox::put(this->daemon->mailbox_name, new StopDaemonMessage());
-				this->daemon = nullptr;
-			}
-
+				S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage());
 		}
 
 		/**
@@ -123,7 +118,7 @@ namespace wrench {
 
 			// Push back the mailbox of the manager,
 			// so that it will get the initial callback
-			job->pushCallbackMailbox(this->daemon->mailbox_name);
+			job->pushCallbackMailbox(this->mailbox_name);
 
 			// Update the job state and insert it into the pending list
 			switch(job->getType()) {
@@ -161,6 +156,108 @@ namespace wrench {
 
 		void JobManager::forgetJob(WorkflowJob *) {
 			throw WRENCHException("forgetJob() not implemented yet");
+		}
+
+
+		int JobManager::main() {
+			XBT_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
+
+			bool keep_going = true;
+			while (keep_going) {
+				std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+
+				// Clear finished asynchronous dput()
+				S4U_Mailbox::clear_dputs();
+
+				XBT_INFO("Job Manager got a %s message", message->toString().c_str());
+				switch (message->type) {
+
+					case SimulationMessage::STOP_DAEMON: {
+						// There should be any need to clean any state up
+						keep_going = false;
+						break;
+					}
+
+					case SimulationMessage::STANDARD_JOB_DONE: {
+						std::unique_ptr<StandardJobDoneMessage> m(static_cast<StandardJobDoneMessage *>(message.release()));
+
+						// update job state
+						StandardJob *job = m->job;
+						job->state = StandardJob::State::COMPLETED;
+
+						// move the job from the "pending" list to the "completed" list
+						this->pending_standard_jobs.erase(job);
+						this->completed_standard_jobs.insert(job);
+
+						// Forward the notification along the notification chain
+						S4U_Mailbox::dput(job->popCallbackMailbox(),
+															new StandardJobDoneMessage(job, m->compute_service));
+						break;
+					}
+
+					case SimulationMessage::STANDARD_JOB_FAILED: {
+						std::unique_ptr<StandardJobFailedMessage> m(static_cast<StandardJobFailedMessage *>(message.release()));
+
+						// update job state
+						StandardJob *job = m->job;
+						job->state = StandardJob::State::FAILED;
+
+						// remove the job from the "pending" list
+						this->pending_standard_jobs.erase(job);
+
+						// Forward the notification along the notification chain
+						S4U_Mailbox::dput(job->popCallbackMailbox(),
+															new StandardJobFailedMessage(job, m->compute_service));
+						break;
+					}
+
+					case SimulationMessage::PILOT_JOB_STARTED: {
+						std::unique_ptr<PilotJobStartedMessage> m(static_cast<PilotJobStartedMessage *>(message.release()));
+
+						// update job state
+						PilotJob *job = m->job;
+						job->state = PilotJob::State::RUNNING;
+
+						// move the job from the "pending" list to the "running" list
+						this->pending_pilot_jobs.erase(job);
+						this->running_pilot_jobs.insert(job);
+
+						// Forward the notification to the source
+						XBT_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+						S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
+															new PilotJobStartedMessage(job, m->compute_service));
+
+						break;
+					}
+
+					case SimulationMessage::PILOT_JOB_EXPIRED: {
+						std::unique_ptr<PilotJobExpiredMessage> m(static_cast<PilotJobExpiredMessage *>(message.release()));
+
+						// update job state
+						PilotJob *job = m->job;
+						job->state = PilotJob::State::EXPIRED;
+
+						// Remove the job from the "running" list
+						this->running_pilot_jobs.erase(job);
+						XBT_INFO("THERE ARE NOW %ld running pilot jobs", this->running_pilot_jobs.size());
+
+						// Forward the notification to the source
+						XBT_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+						S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
+															new PilotJobExpiredMessage(job, m->compute_service));
+
+						break;
+					}
+
+					default: {
+						throw WRENCHException("Invalid message type " + std::to_string(message->type));
+					}
+				}
+
+			}
+
+			XBT_INFO("New Multicore Task Executor terminating");
+			return 0;
 		}
 
 

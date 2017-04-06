@@ -54,8 +54,6 @@ set(SOURCE_FILES
         src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.h
         src/wrench/workflow_job/PilotJob.cpp
         src/wrench/workflow_job/PilotJob.h
-        src/wrench/job_manager/JobManagerDaemon.cpp
-        src/wrench/job_manager/JobManagerDaemon.h
         src/wrench/job_manager/JobManager.cpp
         src/wrench/job_manager/JobManager.h
         src/wrench/simulation/Simulation.cpp

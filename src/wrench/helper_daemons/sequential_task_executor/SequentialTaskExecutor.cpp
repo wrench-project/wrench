@@ -25,7 +25,7 @@ namespace wrench {
 	 * @param hostname is the name of the host
 	 */
 		SequentialTaskExecutor::SequentialTaskExecutor(std::string hostname, std::string callback_mailbox) :
-						S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor"){
+						S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
 
 				this->hostname = hostname;
 			this->callback_mailbox = callback_mailbox;

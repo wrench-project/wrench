@@ -17,14 +17,15 @@
 #include <vector>
 #include <set>
 #include <workflow/Workflow.h>
+#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
+
 
 namespace wrench {
 
 		class PilotJob;
-		class JobManagerDaemon;
 		class ComputeService;
 
-		class JobManager {
+		class JobManager : public S4U_DaemonWithMailbox {
 			public:
 				JobManager(Workflow *);
 				~JobManager();
@@ -52,10 +53,10 @@ namespace wrench {
 				std::set<PilotJob*> getRunningPilotJobs();
 
 			private:
-				friend class JobManagerDaemon;
+
+				int main();
 
 				Workflow *workflow;
-				std::unique_ptr<JobManagerDaemon> daemon;
 
 				std::map<std::string, std::unique_ptr<WorkflowJob>> jobs;
 
