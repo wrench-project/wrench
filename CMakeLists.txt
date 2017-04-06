@@ -48,8 +48,6 @@ set(SOURCE_FILES
         src/wrench/compute_services/ComputeService.h
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.cpp
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.h
-        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorDaemon.cpp
-        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorDaemon.h
         src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.cpp
         src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.h
         src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutorDaemon.cpp

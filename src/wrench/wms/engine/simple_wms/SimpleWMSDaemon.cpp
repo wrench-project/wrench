@@ -129,6 +129,8 @@ namespace wrench {
 		// handling pilot job tersmination acks (due to the above shutdown), and
 		// thus is stuck waiting for the WMS to receive them. But we're done. So,
 		// for now, let's just kill it.
+		// Perhaps this should be called in the destructor of the JobManager?
+		// So that when the unique_ptr goes out of scope, the daemon dies...
 		XBT_INFO("Killing the job manager");
 		job_manager->kill();
 

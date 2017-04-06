@@ -70,7 +70,7 @@ namespace wrench {
 
 				// These friend clauses are bad
 				friend class MulticoreJobExecutorDaemon;
-				friend class SequentialTaskExecutorDaemon;
+				friend class SequentialTaskExecutor;
 				friend class RandomScheduler;
 
 

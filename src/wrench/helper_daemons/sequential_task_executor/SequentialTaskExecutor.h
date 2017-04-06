@@ -14,14 +14,14 @@
 #define SIMULATION_SEQUENTIALTASKEXECUTOR_H
 
 #include "workflow/WorkflowTask.h"
-#include "SequentialTaskExecutorDaemon.h"
 
 #include <memory>
+#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
 
 
 namespace wrench {
 		
-	class SequentialTaskExecutor {
+	class SequentialTaskExecutor : public S4U_DaemonWithMailbox {
 
 	public:
 		SequentialTaskExecutor(std::string hostname, std::string callback_mailbox);
@@ -30,9 +30,9 @@ namespace wrench {
 		int runTask(WorkflowTask *task);
 
 	private:
-		std::string hostname;
-		std::unique_ptr<SequentialTaskExecutorDaemon> daemon;
-
+			int main();
+			std::string callback_mailbox;
+			std::string hostname;
 	};
 };
 
