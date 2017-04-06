@@ -30,7 +30,7 @@ namespace wrench {
 		 * @param workflow is a pointer to the Workflow whose jobs are to be managed
 		 */
 		JobManager::JobManager(Workflow *workflow) :
-						S4U_DaemonWithMailbox("job_manager", "job_manager") {
+						S4U_DaemonWithMailbox("job_manager", "job_maanager") {
 
 			this->workflow = workflow;
 
@@ -49,7 +49,7 @@ namespace wrench {
 
 
 		/**
-		 * @brig Kill the job manager (brutally)
+		 * @brief Kill the job manager (brutally)
 		 */
 		void JobManager::kill() {
 			this->kill_actor();
@@ -142,23 +142,49 @@ namespace wrench {
 
 		}
 
+		/**
+		 * @brief Cancel a pilot job that hasn't expired yet
+		 * @param job is the pilot job
+		 */
 		void JobManager::cancelPilotJob(PilotJob *job) {
 			throw WRENCHException("cancelPilotJob() not implemented yet");
 		}
 
+		/**
+		 * @brief Get the list of currently running pilot jobs
+		 * @return a set of jobs
+		 */
 		std::set<PilotJob *> JobManager::getRunningPilotJobs() {
 			return this->running_pilot_jobs;
 		}
 
+		/**
+		 * @brief Get the list of currently pending pilot jobs
+		 * @return  a set of jobs
+		 */
 		std::set<PilotJob *> JobManager::getPendingPilotJobs() {
 			return this->pending_pilot_jobs;
 		}
 
+		/**
+		 * @brief Forget a job (to free memory, typically once the job is completed)
+		 *
+		 */
 		void JobManager::forgetJob(WorkflowJob *) {
 			throw WRENCHException("forgetJob() not implemented yet");
 		}
 
 
+		/***********************************************************/
+		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
+		/***********************************************************/
+
+		/*! \cond PRIVATE */
+
+		/**
+		 * @brief Main method of the job manager daemon
+		 * @return 0 in success
+		 */
 		int JobManager::main() {
 			XBT_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
@@ -259,6 +285,8 @@ namespace wrench {
 			XBT_INFO("New Multicore Task Executor terminating");
 			return 0;
 		}
+
+		/*! \endcond */
 
 
 };
