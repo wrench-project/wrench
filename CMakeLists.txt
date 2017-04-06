@@ -11,20 +11,6 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationMessage.h
         src/wrench/workflow_execution_events/WorkflowExecutionEvent.cpp
         src/wrench/workflow_execution_events/WorkflowExecutionEvent.h
-        src/wrench/simgrid_MSG_util/MSG_Mailbox.cpp
-        src/wrench/simgrid_MSG_util/MSG_Mailbox.h
-        src/wrench/simgrid_MSG_util/MSG_Computation.cpp
-        src/wrench/simgrid_MSG_util/MSG_Computation.h
-        src/wrench/simgrid_MSG_util/MSG_Host.cpp
-        src/wrench/simgrid_MSG_util/MSG_Host.h
-        src/wrench/simgrid_MSG_util/MSG_Environment.cpp
-        src/wrench/simgrid_MSG_util/MSG_Environment.h
-        src/wrench/simgrid_MSG_util/MSG_Clock.cpp
-        src/wrench/simgrid_MSG_util/MSG_Clock.h
-        src/wrench/simgrid_MSG_util/MSG_Simulation.cpp
-        src/wrench/simgrid_MSG_util/MSG_Simulation.h
-        src/wrench/simgrid_MSG_util/MSG_DaemonWithMailbox.cpp
-        src/wrench/simgrid_MSG_util/MSG_DaemonWithMailbox.h
         src/wrench/simgrid_S4U_util/S4U_DaemonWithMailbox.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonWithMailbox.h
         src/wrench/simgrid_S4U_util/S4U_DaemonWithMailboxActor.cpp
@@ -39,8 +25,6 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowTask.cpp
         src/wrench/workflow/WorkflowFile.h
         src/wrench/workflow/WorkflowFile.cpp
-        src/wrench/simgrid_MSG_util/MSG_Platform.cpp
-        src/wrench/simgrid_MSG_util/MSG_Platform.h
         src/wrench/wms/WMS.h
         src/wrench/wms/engine/EngineDaemon.h
         src/wrench/wms/engine/EngineTmpl.h

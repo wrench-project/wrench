@@ -11,7 +11,6 @@
 #ifndef WRENCH_WRENCH_H
 #define WRENCH_WRENCH_H
 
-#include "simgrid_MSG_util/MSG_Platform.h"
 #include "simulation/Simulation.h"
 #include "workflow/Workflow.h"
 

@@ -33,6 +33,9 @@ namespace wrench {
 		while (keep_going) {
 			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
 
+			// Clear finished asynchronous dput()
+			S4U_Mailbox::clear_dputs();
+
 			XBT_INFO("Job Manager got a %s message", message->toString().c_str());
 			switch (message->type) {
 
@@ -54,7 +57,7 @@ namespace wrench {
 					this->job_manager->completed_standard_jobs.insert(job);
 
 					// Forward the notification along the notification chain
-					S4U_Mailbox::put(job->popCallbackMailbox(),
+					S4U_Mailbox::dput(job->popCallbackMailbox(),
 													 new StandardJobDoneMessage(job, m->compute_service));
 					break;
 				}
@@ -70,7 +73,7 @@ namespace wrench {
 					this->job_manager->pending_standard_jobs.erase(job);
 
 					// Forward the notification along the notification chain
-					S4U_Mailbox::put(job->popCallbackMailbox(),
+					S4U_Mailbox::dput(job->popCallbackMailbox(),
 													 new StandardJobFailedMessage(job, m->compute_service));
 					break;
 				}
@@ -88,7 +91,7 @@ namespace wrench {
 
 					// Forward the notification to the source
 					XBT_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-					S4U_Mailbox::put(job->getOriginCallbackMailbox(),
+					S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
 														new PilotJobStartedMessage(job, m->compute_service));
 
 					break;
@@ -107,7 +110,7 @@ namespace wrench {
 
 					// Forward the notification to the source
 					XBT_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-					S4U_Mailbox::put(job->getOriginCallbackMailbox(),
+					S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
 													 new PilotJobExpiredMessage(job, m->compute_service));
 
 					break;
