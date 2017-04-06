@@ -69,6 +69,9 @@ namespace wrench {
 			/** Main loop **/
 			while (this->processNextMessage((this->has_ttl ? death_date - S4U_Simulation::getClock() : -1.0))) {
 
+				// Clear pending asynchronous puts that are done
+				S4U_Mailbox::clear_dputs();
+
 				/** Dispatch currently pending tasks until no longer possible **/
 				while (this->dispatchNextPendingTask());
 
@@ -141,7 +144,7 @@ namespace wrench {
 								// Send the "Pilot job has started" callback
 								// Note the getCallbackMailbox instead of the popCallbackMailbox, because
 								// there will be another callback upon termination.
-								S4U_Mailbox::put(job->getCallbackMailbox(),
+								S4U_Mailbox::dput(job->getCallbackMailbox(),
 																 new PilotJobStartedMessage(job, this->compute_service));
 
 								// Push my own mailbox onto the pilot job!
@@ -254,14 +257,14 @@ namespace wrench {
 				case SimulationMessage::NUM_IDLE_CORES_REQUEST: {
 					std::unique_ptr<NumIdleCoresRequestMessage> m(static_cast<NumIdleCoresRequestMessage *>(message.release()));
 					NumIdleCoresAnswerMessage *msg = new NumIdleCoresAnswerMessage(this->idle_sequential_task_executors.size());
-					S4U_Mailbox::put(this->mailbox_name+"_answers", msg);
+					S4U_Mailbox::dput(this->mailbox_name+"_answers", msg);
 					return true;
 				}
 
 				case SimulationMessage::TTL_REQUEST: {
 					std::unique_ptr<TTLRequestMessage> m(static_cast<TTLRequestMessage *>(message.release()));
 					TTLAnswerMessage *msg = new TTLAnswerMessage(this->ttl);
-					S4U_Mailbox::put(this->mailbox_name+"_answers", msg);
+					S4U_Mailbox::dput(this->mailbox_name+"_answers", msg);
 					return true;
 				}
 
@@ -318,7 +321,7 @@ namespace wrench {
 						failed_task->state = WorkflowTask::READY;
 					}
 					// Send back a job failed message
-					S4U_Mailbox::put(job->popCallbackMailbox(),
+					S4U_Mailbox::dput(job->popCallbackMailbox(),
 													 new StandardJobFailedMessage(job, this->compute_service));
 				}
 			}
@@ -333,7 +336,7 @@ namespace wrench {
 						failed_task->state = WorkflowTask::READY;
 					}
 					// Send back a job failed message
-					S4U_Mailbox::put(job->popCallbackMailbox(),
+					S4U_Mailbox::dput(job->popCallbackMailbox(),
 													 new StandardJobFailedMessage(job, this->compute_service));
 				}
 			}
@@ -393,7 +396,7 @@ namespace wrench {
 			// the list of pending jobs
 			if (job->num_completed_tasks == job->getNumTasks()) {
 				this->running_jobs.erase(job);
-				S4U_Mailbox::put(job->popCallbackMailbox(),
+				S4U_Mailbox::dput(job->popCallbackMailbox(),
 												 new StandardJobDoneMessage(job, this->compute_service));
 			}
 		}
@@ -418,7 +421,7 @@ namespace wrench {
 			if (this->containing_pilot_job) {
 
 				XBT_INFO("Letting the level above that the pilot job has ended on mailbox %s", this->containing_pilot_job->getCallbackMailbox().c_str());
-				S4U_Mailbox::put(this->containing_pilot_job->popCallbackMailbox(),
+				S4U_Mailbox::dput(this->containing_pilot_job->popCallbackMailbox(),
 												 new PilotJobExpiredMessage(this->containing_pilot_job, this->compute_service));
 
 			}
@@ -438,11 +441,10 @@ namespace wrench {
 			this->num_available_worker_threads += job->getNumCores();
 
 			// Forward the notification
-			S4U_Mailbox::put(job->popCallbackMailbox(),
+			S4U_Mailbox::dput(job->popCallbackMailbox(),
 											 new PilotJobExpiredMessage(job, this->compute_service));
 
 			return;
 		}
-
 
 };

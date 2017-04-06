@@ -48,8 +48,7 @@ namespace wrench {
 			bool successfully_scheduled = false;
 			for (auto cs : compute_services) {
 
-				unsigned long cs_num_idle_cores = cs->getNumIdleCores();
-				if (cs_num_idle_cores > 0) {
+				if (cs->canRunJob(WorkflowJob::STANDARD, 1, (*it).getFlops())) {
 					XBT_INFO("Submitting task %s for execution", (*it).getId().c_str());
 					StandardJob *job = job_manager->createStandardJob(it);
 					cs->runStandardJob(job);

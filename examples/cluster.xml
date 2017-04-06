@@ -5,7 +5,7 @@
         <host id="SubmitNode" speed="1f"/>
 
         <cluster id="my_cluster" prefix="c-" suffix=".me" radical="0-9"
-                 speed="1f" bw="125MBps" lat="100us" core="5"
+                 speed="1f" bw="125MBps" lat="100us" core="7"
                  bb_bw="125MBps" bb_lat="100us"/>
     </AS>
 </platform>

@@ -17,6 +17,7 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
 
+
 namespace wrench {
 
 		// A data structure to keep track of pending asynchronous put() operations
@@ -47,7 +48,7 @@ namespace wrench {
 			if (msg == NULL) {
 				throw WRENCHException("Mailbox::get(): NULL message received");
 			}
-			XBT_DEBUG("GOT from %s", mailbox_name.c_str());
+			XBT_DEBUG("GOT a '%s' message from %s", msg->toString().c_str(), mailbox_name.c_str());
 			return std::unique_ptr<SimulationMessage>(msg);
 		}
 
@@ -77,7 +78,7 @@ namespace wrench {
 
 			SimulationMessage *msg = static_cast<SimulationMessage*>(data);
 
-			XBT_DEBUG("GOT WITH TIMEOUT FROM MAILBOX %s", mailbox_name.c_str());
+			XBT_DEBUG("GOT a '%s' message from %s", msg->toString().c_str(), mailbox_name.c_str());
 
 			return std::unique_ptr<SimulationMessage>(msg);
 		}
@@ -133,7 +134,7 @@ namespace wrench {
 //				XBT_INFO("Getting the state of a previous communication! (%s)", simgrid::s4u::Actor::self()->name().c_str());
 				e_s4u_activity_state_t state = (*it)->getState();
 				if (state == finished) {
-//					XBT_INFO("The communication is finished.... remove it from the pending list [TODO: delete memory???]");
+//					XBT_INFO("The communication is finished.... remove it from the pending list [TODO: delete memory??? call test()???]");
 					set.erase(*it);
 				} else {
 //					XBT_INFO("State = %d (finished = %d)", state, finished);
