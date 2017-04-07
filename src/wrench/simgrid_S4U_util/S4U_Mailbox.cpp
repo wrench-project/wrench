@@ -14,6 +14,7 @@
 #include "S4U_Mailbox.h"
 #include <simgrid/s4u.hpp>
 #include <xbt/ex.hpp>
+#include <logging/ColorLogging.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
 
@@ -42,13 +43,13 @@ namespace wrench {
 		 * @return a unique pointer to the message
 		 */
 		std::unique_ptr<SimulationMessage> S4U_Mailbox::get(std::string mailbox_name) {
-			XBT_DEBUG("IN GET from %s", mailbox_name.c_str());
+			WRENCH_DEBUG("IN GET from %s", mailbox_name.c_str());
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 			SimulationMessage *msg = static_cast<SimulationMessage*>(simgrid::s4u::this_actor::recv(mailbox));
 			if (msg == NULL) {
 				throw WRENCHException("Mailbox::get(): NULL message received");
 			}
-			XBT_DEBUG("GOT a '%s' message from %s", msg->toString().c_str(), mailbox_name.c_str());
+			WRENCH_DEBUG("GOT a '%s' message from %s", msg->toString().c_str(), mailbox_name.c_str());
 			return std::unique_ptr<SimulationMessage>(msg);
 		}
 
@@ -60,7 +61,7 @@ namespace wrench {
 		 * @return a unique pointer to the message, nullptr on timeout
 		 */
 		std::unique_ptr<SimulationMessage> S4U_Mailbox::get(std::string mailbox_name, double timeout) {
-			XBT_DEBUG("IN GET WITH TIMEOUT (%lf) FROM MAILBOX %s", timeout, mailbox_name.c_str());
+			WRENCH_DEBUG("IN GET WITH TIMEOUT (%lf) FROM MAILBOX %s", timeout, mailbox_name.c_str());
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 			void *data = nullptr;
 			try {
@@ -78,7 +79,7 @@ namespace wrench {
 
 			SimulationMessage *msg = static_cast<SimulationMessage*>(data);
 
-			XBT_DEBUG("GOT a '%s' message from %s", msg->toString().c_str(), mailbox_name.c_str());
+			WRENCH_DEBUG("GOT a '%s' message from %s", msg->toString().c_str(), mailbox_name.c_str());
 
 			return std::unique_ptr<SimulationMessage>(msg);
 		}
@@ -91,7 +92,7 @@ namespace wrench {
 		 * @param m is the message
 		 */
 		void S4U_Mailbox::put(std::string mailbox_name, SimulationMessage *msg) {
-			XBT_DEBUG("PUTTING to %s a %s message", mailbox_name.c_str(), msg->toString().c_str());
+			WRENCH_DEBUG("PUTTING to %s a %s message", mailbox_name.c_str(), msg->toString().c_str());
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 			simgrid::s4u::this_actor::send(mailbox, msg, (size_t)msg->size);
 
@@ -106,7 +107,7 @@ namespace wrench {
 		 */
 		void S4U_Mailbox::dput(std::string mailbox_name, SimulationMessage *msg) {
 
-			XBT_DEBUG("DPUTTING to %s a %s message", mailbox_name.c_str(), msg->toString().c_str());
+			WRENCH_DEBUG("DPUTTING to %s a %s message", mailbox_name.c_str(), msg->toString().c_str());
 
 
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);

@@ -12,6 +12,7 @@
  */
 
 #include <simulation/Simulation.h>
+#include <logging/ColorLogging.h>
 #include "MulticoreJobExecutor.h"
 #include "workflow/WorkflowTask.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
@@ -33,7 +34,7 @@ namespace wrench {
 
 			this->state = ComputeService::DOWN;
 
-				XBT_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
+				WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
 				// Send a termination message to the daemon's mailbox
 				S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage());
 				// Wait for the ack
@@ -164,18 +165,19 @@ namespace wrench {
 		 */
 		int MulticoreJobExecutor::main() {
 
+			ColorLogging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
 			/** Initialize all state **/
 			initialize();
 
 			double death_date = -1.0;
 			if (this->has_ttl) {
 				death_date = S4U_Simulation::getClock() + this->ttl;
-				XBT_INFO("Will be terminating at date %lf", death_date);
+				WRENCH_INFO("Will be terminating at date %lf", death_date);
 			}
 
 
 			if (this->containing_pilot_job) {
-				XBT_INFO("MY CONTAINING PILOT JOB HAS CALLBACK MAILBOX '%s'", this->containing_pilot_job->getCallbackMailbox().c_str());
+				WRENCH_INFO("MY CONTAINING PILOT JOB HAS CALLBACK MAILBOX '%s'", this->containing_pilot_job->getCallbackMailbox().c_str());
 			}
 
 			/** Main loop **/
@@ -192,7 +194,7 @@ namespace wrench {
 
 			}
 
-			XBT_INFO("Multicore Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
+			WRENCH_INFO("Multicore Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
 			return 0;
 		}
 
@@ -229,11 +231,16 @@ namespace wrench {
 						}
 						case WorkflowJob::PILOT: {
 							PilotJob *job = (PilotJob *)next_job;
-							XBT_INFO("Looking at dispatching pilot job %s with callbackmailbox %s",
+							WRENCH_INFO("Looking at dispatching pilot job %s with callbackmailbox %s",
 											 job->getName().c_str(),
 											 job->getCallbackMailbox().c_str());
-							if (this->num_available_worker_threads - this->busy_sequential_task_executors.size() >
+
+							if (this->num_available_worker_threads - this->busy_sequential_task_executors.size() >=
 									job->getNumCores()) {
+
+								// Immediately the number of available worker threads
+								this->num_available_worker_threads -= job->getNumCores();
+								WRENCH_INFO("Setting my number of available cores to %d", this->num_available_worker_threads);
 
 								// Create and launch a compute service
 								ComputeService *cs =
@@ -246,8 +253,7 @@ namespace wrench {
 								// Create and launch a compute service for the pilot job
 								job->setComputeService(cs);
 
-								// Reduce the number of available worker threads
-								this->num_available_worker_threads -= job->getNumCores();
+
 
 								// Put the job in the runnint queue
 								this->pending_jobs.pop();
@@ -290,7 +296,7 @@ namespace wrench {
 				this->busy_sequential_task_executors.insert(executor);
 
 				// Start the task on the sequential task executor
-				XBT_INFO("Running task %s on one of my worker threads", to_run->getId().c_str());
+				WRENCH_INFO("Running task %s on one of my worker threads", to_run->getId().c_str());
 				executor->runTask(to_run);
 
 				// Put the task in the running task set
@@ -324,12 +330,12 @@ namespace wrench {
 
 			// timeout
 			if (message == nullptr) {
-				XBT_INFO("Time out - must die.. !!");
+				WRENCH_INFO("Time out - must die.. !!");
 				this->terminate();
 				return false;
 			}
 
-			XBT_INFO("Got a [%s] message", message->toString().c_str());
+			WRENCH_INFO("Got a [%s] message", message->toString().c_str());
 
 			switch (message->type) {
 
@@ -341,14 +347,14 @@ namespace wrench {
 
 				case SimulationMessage::RUN_STANDARD_JOB: {
 					std::unique_ptr<RunStandardJobMessage> m(static_cast<RunStandardJobMessage *>(message.release()));
-					XBT_INFO("Asked to run a standard job with %ld tasks", m->job->getNumTasks());
+					WRENCH_INFO("Asked to run a standard job with %ld tasks", m->job->getNumTasks());
 					this->pending_jobs.push(m->job);
 					return true;
 				}
 
 				case SimulationMessage::RUN_PILOT_JOB: {
 					std::unique_ptr<RunPilotJobMessage> m(static_cast<RunPilotJobMessage *>(message.release()));
-					XBT_INFO("Asked to run a pilot job with %d cores for %lf seconds", m->job->getNumCores(), m->job->getDuration());
+					WRENCH_INFO("Asked to run a pilot job with %d cores for %lf seconds", m->job->getNumCores(), m->job->getDuration());
 					this->pending_jobs.push(m->job);
 					return true;
 				}
@@ -367,7 +373,7 @@ namespace wrench {
 
 				case SimulationMessage::NUM_IDLE_CORES_REQUEST: {
 					std::unique_ptr<NumIdleCoresRequestMessage> m(static_cast<NumIdleCoresRequestMessage *>(message.release()));
-					NumIdleCoresAnswerMessage *msg = new NumIdleCoresAnswerMessage(this->idle_sequential_task_executors.size());
+					NumIdleCoresAnswerMessage *msg = new NumIdleCoresAnswerMessage(this->num_available_worker_threads);
 					S4U_Mailbox::dput(this->mailbox_name+"_answers", msg);
 					return true;
 				}
@@ -404,13 +410,13 @@ namespace wrench {
 		void MulticoreJobExecutor::terminateAllWorkerThreads() {
 			// Kill all running sequential executors
 			for (auto executor : this->busy_sequential_task_executors) {
-				XBT_INFO("Brutally killing a busy sequential task executor");
+				WRENCH_INFO("Brutally killing a busy sequential task executor");
 				executor->kill();
 			}
 
 			// Cleanly terminate all idle sequential executors
 			for (auto executor : this->idle_sequential_task_executors) {
-				XBT_INFO("Cleanly stopping an idle sequential task executor");
+				WRENCH_INFO("Cleanly stopping an idle sequential task executor");
 				executor->stop();
 			}
 		}
@@ -420,10 +426,10 @@ namespace wrench {
 		 */
 		void MulticoreJobExecutor::failCurrentStandardJobs() {
 
-			XBT_INFO("There are %ld pending jobs", this->pending_jobs.size());
+			WRENCH_INFO("There are %ld pending jobs", this->pending_jobs.size());
 			while (!this->pending_jobs.empty()) {
 				WorkflowJob *workflow_job = this->pending_jobs.front();
-				XBT_INFO("Failing job %s", workflow_job->getName().c_str());
+				WRENCH_INFO("Failing job %s", workflow_job->getName().c_str());
 				this->pending_jobs.pop();
 				if (workflow_job->getType() == WorkflowJob::STANDARD) {
 					StandardJob *job = (StandardJob *)workflow_job;
@@ -437,9 +443,9 @@ namespace wrench {
 				}
 			}
 
-			XBT_INFO("There are %ld running jobs", this->running_jobs.size());
+			WRENCH_INFO("There are %ld running jobs", this->running_jobs.size());
 			for (auto workflow_job : this->running_jobs) {
-				XBT_INFO("Failing job %s", workflow_job->getName().c_str());
+				WRENCH_INFO("Failing job %s", workflow_job->getName().c_str());
 				if (workflow_job->getType() == WorkflowJob::STANDARD) {
 					StandardJob *job = (StandardJob *)workflow_job;
 					// Set all tasks back to the READY state
@@ -467,11 +473,11 @@ namespace wrench {
 
 			this->num_available_worker_threads = num_worker_threads;
 
-			XBT_INFO("New Multicore Job Executor starting (%s) with %d worker threads ",
+			WRENCH_INFO("New Multicore Job Executor starting (%s) with %d worker threads ",
 							 this->mailbox_name.c_str(), this->num_worker_threads);
 
 			for (int i = 0; i < this->num_worker_threads; i++) {
-				 XBT_INFO("Starting a task executor on core #%d", i);
+				 WRENCH_INFO("Starting a task executor on core #%d", i);
 				std::unique_ptr<SequentialTaskExecutor> seq_executor =
 								std::unique_ptr<SequentialTaskExecutor>(
 												new SequentialTaskExecutor(S4U_Simulation::getHostName(), this->mailbox_name));
@@ -494,7 +500,7 @@ namespace wrench {
  */
 		void MulticoreJobExecutor::processTaskCompletion(WorkflowTask *task, SequentialTaskExecutor *executor) {
 			StandardJob *job = (StandardJob *)(task->job);
-			XBT_INFO("One of my cores completed task %s", task->id.c_str());
+			WRENCH_INFO("One of my cores completed task %s", task->id.c_str());
 
 			// Remove the task from the running task queue
 			this->running_tasks.erase(task);
@@ -522,19 +528,19 @@ namespace wrench {
 
 			this->setStateToDown();
 
-			XBT_INFO("Terminate all worker threads");
+			WRENCH_INFO("Terminate all worker threads");
 			this->terminateAllWorkerThreads();
 
-			XBT_INFO("Failing current standard jobs");
+			WRENCH_INFO("Failing current standard jobs");
 			this->failCurrentStandardJobs();
 
-			XBT_INFO("Terminate all pilot jobs");
+			WRENCH_INFO("Terminate all pilot jobs");
 			this->terminateAllPilotJobs();
 
 			// Am I myself a pilot job?
 			if (this->containing_pilot_job) {
 
-				XBT_INFO("Letting the level above that the pilot job has ended on mailbox %s", this->containing_pilot_job->getCallbackMailbox().c_str());
+				WRENCH_INFO("Letting the level above that the pilot job has ended on mailbox %s", this->containing_pilot_job->getCallbackMailbox().c_str());
 				S4U_Mailbox::dput(this->containing_pilot_job->popCallbackMailbox(),
 													new PilotJobExpiredMessage(this->containing_pilot_job, this));
 

@@ -119,7 +119,7 @@ namespace wrench {
 
 		/** NUM_IDLE_CORES_ANSWER MESSAGE **/
 		// TODO: Make the "1024" below configurable somehow
-		NumIdleCoresAnswerMessage::NumIdleCoresAnswerMessage(unsigned long num) : SimulationMessage(NUM_IDLE_CORES_ANSWER, 1024.0) {
+		NumIdleCoresAnswerMessage::NumIdleCoresAnswerMessage(unsigned int num) : SimulationMessage(NUM_IDLE_CORES_ANSWER, 1024.0) {
 			this->num_idle_cores = num;
 		}
 

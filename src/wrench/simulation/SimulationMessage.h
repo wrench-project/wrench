@@ -124,8 +124,8 @@ namespace wrench {
 		};
 
 		struct NumIdleCoresAnswerMessage: public SimulationMessage {
-				NumIdleCoresAnswerMessage(unsigned long);
-				unsigned long num_idle_cores;
+				NumIdleCoresAnswerMessage(unsigned int);
+				unsigned int num_idle_cores;
 		};
 
 		/** TTL QUERIES **/

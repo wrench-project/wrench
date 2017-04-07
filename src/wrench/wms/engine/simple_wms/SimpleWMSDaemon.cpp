@@ -13,6 +13,7 @@
 #include <memory>
 
 #include <exception/WRENCHException.h>
+#include <logging/ColorLogging.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/engine/simple_wms/SimpleWMSDaemon.h"
@@ -41,18 +42,18 @@ namespace wrench {
 	 * @return 0 on completion
 	 */
 	int SimpleWMSDaemon::main() {
-		XBT_INFO("Starting on host %s listening on mailbox %s", S4U_Simulation::getHostName().c_str(),
+
+		ColorLogging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
+
+		WRENCH_INFO("Starting on host %s listening on mailbox %s", S4U_Simulation::getHostName().c_str(),
 		         this->mailbox_name.c_str());
-		XBT_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
+		WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
 		// Create a job manager
 		std::unique_ptr<JobManager> job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
 
-		int num_completed_tasks = 0;
-
 		while (true) {
 
-			XBT_INFO("####################### %d", num_completed_tasks);
 			// Take care of previously posted iput() that should be cleared
 			S4U_Mailbox::clear_dputs();
 
@@ -62,12 +63,12 @@ namespace wrench {
 			// Get the available compute services
 			std::set<ComputeService *> compute_services = this->simulation->getComputeServices();
 			if (compute_services.size() == 0) {
-				XBT_INFO("Aborting - No compute services available!");
+				WRENCH_INFO("Aborting - No compute services available!");
 				break;
 			}
 
 			// Submit pilot jobs
-			XBT_INFO("Scheduling pilot jobs...");
+			WRENCH_INFO("Scheduling pilot jobs...");
 			double pilot_job_duration = 600.00; // bogus default
 			if (ready_tasks.size() > 0) {
 				// Heuristic: ask for something that can run  1.5 times the next ready tasks..
@@ -76,7 +77,7 @@ namespace wrench {
 			this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, pilot_job_duration, this->simulation->getComputeServices());
 
 			// Run ready tasks with defined scheduler implementation
-			XBT_INFO("Scheduling tasks...");
+			WRENCH_INFO("Scheduling tasks...");
 			this->scheduler->scheduleTasks(job_manager.get(), ready_tasks, this->simulation->getComputeServices());
 
 			// Wait for a workflow execution event
@@ -85,27 +86,25 @@ namespace wrench {
 			switch (event->type) {
 				case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
 					StandardJob *job = (StandardJob *) (event->job);
-					XBT_INFO("Notified that a %ld-task job has completed", job->getNumTasks());
-					num_completed_tasks += job->getNumTasks();
+					WRENCH_INFO("Notified that a %ld-task job has completed", job->getNumTasks());
 					break;
 				}
 				case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-					XBT_INFO("Notified that a standard job has failed (it's back in the ready state)");
+					WRENCH_INFO("Notified that a standard job has failed (it's back in the ready state)");
 					break;
 				}
 				case WorkflowExecutionEvent::PILOT_JOB_START: {
-					XBT_INFO("Notified that a pilot job has started!");
+					WRENCH_INFO("Notified that a pilot job has started!");
 					break;
 				}
 				case WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-					XBT_INFO("Notified that a pilot job has expired!");
+					WRENCH_INFO("Notified that a pilot job has expired!");
 					break;
 				}
 				default: {
 					throw WRENCHException("Unknown workflow execution event type");
 				}
 			}
-
 
 			if (workflow->isDone()) {
 				break;
@@ -115,13 +114,13 @@ namespace wrench {
 		S4U_Mailbox::clear_dputs();
 
 		if (workflow->isDone()) {
-			XBT_INFO("Workflow execution is complete!");
+			WRENCH_INFO("Workflow execution is complete!");
 		} else {
-			XBT_INFO("Workflow execution is incomplete, but there are no more compute services...");
+			WRENCH_INFO("Workflow execution is incomplete, but there are no more compute services...");
 		}
 
 
-		XBT_INFO("Simple WMS Daemon is shutting down all Compute Services");
+		WRENCH_INFO("Simple WMS Daemon is shutting down all Compute Services");
 		this->simulation->shutdownAllComputeServices();
 
 		// This is brutal, but it's because that stupid job manager is currently
@@ -130,10 +129,10 @@ namespace wrench {
 		// for now, let's just kill it.
 		// Perhaps this should be called in the destructor of the JobManager?
 		// So that when the unique_ptr goes out of scope, the daemon dies...
-		XBT_INFO("Killing the job manager");
+		WRENCH_INFO("Killing the job manager");
 		job_manager->kill();
 
-		XBT_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
+		WRENCH_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
 
 		return 0;
 	}

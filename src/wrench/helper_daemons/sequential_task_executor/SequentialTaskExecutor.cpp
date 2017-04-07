@@ -11,6 +11,7 @@
  */
 
 #include <simgrid_S4U_util/S4U_Simulation.h>
+#include <logging/ColorLogging.h>
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "exception/WRENCHException.h"
 #include "SequentialTaskExecutor.h"
@@ -27,7 +28,7 @@ namespace wrench {
 		SequentialTaskExecutor::SequentialTaskExecutor(std::string hostname, std::string callback_mailbox) :
 						S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
 
-				this->hostname = hostname;
+			this->hostname = hostname;
 			this->callback_mailbox = callback_mailbox;
 
 			// Start my daemon on the host
@@ -70,7 +71,9 @@ namespace wrench {
 	 */
 		int SequentialTaskExecutor::main() {
 
-			XBT_INFO("New Sequential Task Executor starting (%s) ", this->mailbox_name.c_str());
+			ColorLogging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_BLUE);
+
+			WRENCH_INFO("New Sequential Task Executor starting (%s) ", this->mailbox_name.c_str());
 
 			bool keep_going = true;
 			while (keep_going) {
@@ -89,7 +92,7 @@ namespace wrench {
 						std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage *>(message.release()));
 
 						// Run the task
-						XBT_INFO("Executing task %s (%lf flops)", m->task->getId().c_str(), m->task->getFlops());
+						WRENCH_INFO("Executing task %s (%lf flops)", m->task->getId().c_str(), m->task->getFlops());
 						m->task->setRunning();
 						S4U_Simulation::compute(m->task->flops);
 
@@ -98,7 +101,7 @@ namespace wrench {
 						m->task->setCompleted();
 
 						// Send the callback
-						XBT_INFO("Notifying mailbox %s that task %s has finished",
+						WRENCH_INFO("Notifying mailbox %s that task %s has finished",
 										 this->callback_mailbox.c_str(),
 										 m->task->id.c_str());
 						S4U_Mailbox::dput(this->callback_mailbox,
@@ -113,7 +116,8 @@ namespace wrench {
 				}
 			}
 
-			XBT_INFO("Sequential Task Executor Daemon on host %s terminated!", S4U_Simulation::getHostName().c_str());
+			WRENCH_INFO("Sequential Task Executor Daemon on host %s terminated!", S4U_Simulation::getHostName().c_str());
+
 			return 0;
 		}
 

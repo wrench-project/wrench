@@ -12,6 +12,7 @@
 #include <xbt.h>
 #include <set>
 #include <workflow_job/StandardJob.h>
+#include <logging/ColorLogging.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/scheduler/MaxMinScheduler.h"
@@ -49,7 +50,7 @@ namespace wrench {
 			for (auto cs : compute_services) {
 
 				if (cs->canRunJob(WorkflowJob::STANDARD, 1, (*it).getFlops())) {
-					XBT_INFO("Submitting task %s for execution", (*it).getId().c_str());
+					WRENCH_INFO("Submitting task %s for execution", (*it).getId().c_str());
 					StandardJob *job = job_manager->createStandardJob(it);
 					cs->runStandardJob(job);
 					successfully_scheduled = true;
@@ -74,7 +75,7 @@ namespace wrench {
 																						Workflow *workflow,
 																						double pilot_job_duration,
 																						const std::set<ComputeService *> &compute_services) {
-			XBT_INFO("Max-Min Scheduler doesn't do anything with pilot jobs");
+			WRENCH_INFO("Max-Min Scheduler doesn't do anything with pilot jobs");
 
 			return;
 		}

@@ -10,6 +10,7 @@
  */
 
 #include <exception/WRENCHException.h>
+#include <logging/ColorLogging.h>
 #include "ComputeService.h"
 #include "simulation/Simulation.h"
 
@@ -139,7 +140,6 @@ namespace wrench {
 
 			// If the service isn't up, forget it
 			if (this->state != ComputeService::UP) {
-//				XBT_INFO("SERVICE IS NOT UP!");
 				return false;
 			}
 
@@ -147,14 +147,12 @@ namespace wrench {
 			switch (job_type) {
 				case WorkflowJob::STANDARD: {
 					if (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) != "yes") {
-//						XBT_INFO("SERVICE DOESNT SUPPORT STANDARD JOBS");
 						return false;
 					}
 					break;
 				}
 				case WorkflowJob::PILOT: {
 					if (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) != "yes") {
-//						XBT_INFO("SERVICE DOESNT SUPPORT PILOT JOBS");
 						return false;
 					}
 					break;
@@ -162,18 +160,19 @@ namespace wrench {
 			}
 
 			// Check that the number of cores is ok (does a communication with the daemons)
-			if (this->getNumIdleCores() < min_num_cores) {
-//				XBT_INFO("SERVICE DOESNT HAVE ENOUGH CORES");
+			unsigned long num_idle_cores = this->getNumIdleCores();
+			WRENCH_INFO("The compute service says it has %ld idle cores", num_idle_cores);
+			if (num_idle_cores < min_num_cores) {
 				return false;
 			}
 
 			// Check that the TTL is ok (does a communication with the daemons)
 			double ttl = this->getTTL();
 			if ((ttl > 0) && (ttl < duration)) {
-//				XBT_INFO("THE TTL IS A DEAL BREAKER");
 				return false;
 			}
 
+			// Everything checks out
 			return true;
 		}
 

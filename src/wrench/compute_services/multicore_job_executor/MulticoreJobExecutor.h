@@ -27,10 +27,11 @@ namespace wrench {
 		class MulticoreJobExecutor : public ComputeService, public S4U_DaemonWithMailbox {
 
 		public:
-				/** Construct/Start, Destructor/Stop **/
+				/** Constructor **/
+				// Should be excluded from the documentation
 				MulticoreJobExecutor(Simulation *simulation, std::string hostname, int num_worker_threads = -1, double ttl = -1.0, PilotJob *pj = nullptr, std::string suffix="");
 
-
+				/** Stop the service **/
 				void stop();
 
 				/** Run jobs **/
@@ -43,12 +44,12 @@ namespace wrench {
 
 		private:
 
-				int num_worker_threads; // total threads to run tasks from standard jobs
+				unsigned int num_worker_threads; // total threads to run tasks from standard jobs
 				bool has_ttl;
 				double ttl;							// time-to-live
 				PilotJob *containing_pilot_job;
 
-				int num_available_worker_threads; // number of worker threads that can currently be
+				unsigned int num_available_worker_threads; // number of worker threads that can currently be
 				// used to run tasks from standard jobs
 
 				// Vector of worker threads

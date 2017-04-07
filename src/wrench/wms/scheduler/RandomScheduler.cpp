@@ -12,6 +12,7 @@
 #include <xbt.h>
 #include <set>
 #include <workflow_job/StandardJob.h>
+#include <logging/ColorLogging.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/scheduler/RandomScheduler.h"
@@ -42,25 +43,24 @@ namespace wrench {
 
 			// TODO: Refactor to avoid code duplication
 
-			XBT_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
+			WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
 			for (int i = 0; i < ready_tasks.size(); i++) {
 				bool successfully_scheduled = false;
 
 
 				// First: attempt to run the task on a running pilot job
-				XBT_INFO("Trying to submit task '%s' to a pilot job...", ready_tasks[i]->getId().c_str());
+				WRENCH_INFO("Trying to submit task '%s' to a pilot job...", ready_tasks[i]->getId().c_str());
 
 				std::set<PilotJob*> running_pilot_jobs = job_manager->getRunningPilotJobs();
 				for (auto pj : running_pilot_jobs) {
 					ComputeService *cs = pj->getComputeService();
 
 					if (!cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->flops)) {
-						XBT_INFO("$$$$$$ SERVICE %s doesn't work out", cs->getName().c_str());
 						continue;
 					}
 
 					// We can submit!
-					XBT_INFO("Submitting task %s for execution to a pilot job", ready_tasks[i]->getId().c_str());
+					WRENCH_INFO("Submitting task %s for execution to a pilot job", ready_tasks[i]->getId().c_str());
 					WorkflowJob *job = (WorkflowJob *)job_manager->createStandardJob(ready_tasks[i]);
 					job_manager->submitJob(job, cs);
 					successfully_scheduled = true;
@@ -69,21 +69,31 @@ namespace wrench {
 
 				if (successfully_scheduled) {
 					continue;
+				} else {
+					WRENCH_INFO("no dice!");
 				}
 
 
 
 
 				// Second: attempt to run the task on a compute resource
-				XBT_INFO("Trying to submit task '%s' to a standard compute service...", ready_tasks[i]->getId().c_str());
+				WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", ready_tasks[i]->getId().c_str());
 
 				for (auto cs : compute_services) {
 
-					if (!cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->flops)) continue;
+					WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
+					bool can_run_job = cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->flops);
+					if (can_run_job) {
+						WRENCH_INFO("Compute service %s says it can run this standard job!", cs->getName().c_str());
+					} else {
+						WRENCH_INFO("Compute service %s says it CANNOT run this standard job :(", cs->getName().c_str());
+					}
+
+					if (!can_run_job) continue;
 
 					// We can submit!
 
-					XBT_INFO("Submitting task %s for execution as a standard job", ready_tasks[i]->getId().c_str());
+					WRENCH_INFO("Submitting task %s for execution as a standard job", ready_tasks[i]->getId().c_str());
 					WorkflowJob *job = (WorkflowJob *)job_manager->createStandardJob(ready_tasks[i]);
 					job_manager->submitJob(job, cs);
 					successfully_scheduled = true;
@@ -91,11 +101,13 @@ namespace wrench {
 				}
 
 				if (!successfully_scheduled) {
+					WRENCH_INFO("no dice");
 					break;
+				} else {
 				}
 
 			}
-			XBT_INFO("Done with scheduling tasks as standard jobs");
+			WRENCH_INFO("Done with scheduling tasks as standard jobs");
 		}
 
 		/**
@@ -112,7 +124,7 @@ namespace wrench {
 
 			// If there is always a pilot job in the system, do nothing
 			if ((job_manager->getRunningPilotJobs().size() > 0)) {
-				XBT_INFO("There is already a pilot job in the system...");
+				WRENCH_INFO("There is already a pilot job in the system...");
 				return;
 			}
 
@@ -125,13 +137,13 @@ namespace wrench {
 				}
 			}
 			if (target_service == nullptr) {
-				XBT_INFO("No compute service supports pilot jobs");
+				WRENCH_INFO("No compute service supports pilot jobs");
 				return;
 			}
 
 			// Submit a pilot job
 
-			XBT_INFO("Submitting a pilot job (1 core, 600 seconds)");
+			WRENCH_INFO("Submitting a pilot job (1 core, %lf seconds)", pilot_job_duration);
 			WorkflowJob *job = (WorkflowJob *)job_manager->createPilotJob(workflow, 1, pilot_job_duration);
 			job_manager->submitJob(job, target_service);
 

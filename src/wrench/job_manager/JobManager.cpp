@@ -11,6 +11,7 @@
  */
 
 #include <string>
+#include <logging/ColorLogging.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "exception/WRENCHException.h"
@@ -30,7 +31,7 @@ namespace wrench {
 		 * @param workflow is a pointer to the Workflow whose jobs are to be managed
 		 */
 		JobManager::JobManager(Workflow *workflow) :
-						S4U_DaemonWithMailbox("job_manager", "job_m:anager") {
+						S4U_DaemonWithMailbox("job_manager", "job_manager") {
 
 			this->workflow = workflow;
 
@@ -186,7 +187,10 @@ namespace wrench {
 		 * @return 0 in success
 		 */
 		int JobManager::main() {
-			XBT_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
+
+			ColorLogging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
+
+			WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
 			bool keep_going = true;
 			while (keep_going) {
@@ -195,11 +199,11 @@ namespace wrench {
 				// Clear finished asynchronous dput()
 				S4U_Mailbox::clear_dputs();
 
-				XBT_INFO("Job Manager got a %s message", message->toString().c_str());
+				WRENCH_INFO("Job Manager got a %s message", message->toString().c_str());
 				switch (message->type) {
 
 					case SimulationMessage::STOP_DAEMON: {
-						// There should be any need to clean any state up
+						// There shouldn't be any need to clean any state up
 						keep_going = false;
 						break;
 					}
@@ -249,7 +253,7 @@ namespace wrench {
 						this->running_pilot_jobs.insert(job);
 
 						// Forward the notification to the source
-						XBT_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+						WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
 						S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
 															new PilotJobStartedMessage(job, m->compute_service));
 
@@ -265,10 +269,10 @@ namespace wrench {
 
 						// Remove the job from the "running" list
 						this->running_pilot_jobs.erase(job);
-						XBT_INFO("THERE ARE NOW %ld running pilot jobs", this->running_pilot_jobs.size());
+						WRENCH_INFO("THERE ARE NOW %ld running pilot jobs", this->running_pilot_jobs.size());
 
 						// Forward the notification to the source
-						XBT_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+						WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
 						S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
 															new PilotJobExpiredMessage(job, m->compute_service));
 
@@ -282,7 +286,7 @@ namespace wrench {
 
 			}
 
-			XBT_INFO("New Multicore Task Executor terminating");
+			WRENCH_INFO("New Multicore Task Executor terminating");
 			return 0;
 		}
 
