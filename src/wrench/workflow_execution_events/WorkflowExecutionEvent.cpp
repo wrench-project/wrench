@@ -18,12 +18,11 @@
 
 namespace wrench {
 
+		/***********************************************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/***********************************************************/
 
-		WorkflowExecutionEvent::WorkflowExecutionEvent() {
-			this->type = WorkflowExecutionEvent::UNDEFINED;
-			this->job = nullptr;
-			this->compute_service = nullptr;
-		}
+		/*! \cond DEVELOPER */
 
 		std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
 
@@ -71,6 +70,23 @@ namespace wrench {
 					throw WRENCHException("Non-handled message type when generating execution event");
 				}
 			}
-
 		}
+
+		/*! \endcond */
+
+		/***********************************************************/
+		/**	INTERNAL METHODS BELOW **/
+		/***********************************************************/
+
+		/*! \cond INTERNAL */
+
+
+		WorkflowExecutionEvent::WorkflowExecutionEvent() {
+			this->type = WorkflowExecutionEvent::UNDEFINED;
+			this->job = nullptr;
+			this->compute_service = nullptr;
+		}
+
+		/*! \endcond */
+
 };

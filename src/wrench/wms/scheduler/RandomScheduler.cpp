@@ -24,6 +24,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(random_scheduler, "Log category for Random Schedule
 
 namespace wrench {
 
+
 		/**
 		 * Default constructor
 		 */
@@ -143,8 +144,6 @@ namespace wrench {
 			}
 
 			// Submit a pilot job
-			WRENCH_INFO("==> %lf", flops);
-			WRENCH_INFO("==> %lf", target_service->getCoreFlopRate());
 			double pilot_job_duration = flops / target_service->getCoreFlopRate();
 			WRENCH_INFO("Submitting a pilot job (1 core, %lf seconds)", pilot_job_duration);
 

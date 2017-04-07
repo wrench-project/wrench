@@ -13,6 +13,12 @@
 
 namespace wrench {
 
+		/***********************************************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/***********************************************************/
+
+		/*! \cond DEVELOPER */
+
 		PilotJob::PilotJob(Workflow *workflow, unsigned long num_cores, double duration) {
 			this->type = WorkflowJob::PILOT;
 
@@ -33,11 +39,13 @@ namespace wrench {
 			return this->compute_service;
 		}
 
+		/*! \endcond */
+
 		/***********************************************************/
-		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
+		/**	INTERNAL METHODS BELOW **/
 		/***********************************************************/
 
-		/*! \cond PRIVATE */
+		/*! \cond INTERNAL */
 
 		void PilotJob::setComputeService(ComputeService* cs) {
 			this->compute_service = cs;

@@ -23,41 +23,6 @@
 
 namespace wrench {
 
-		/******************************/
-		/**      PRIVATE METHODS     **/
-		/******************************/
-
-		/**
-		 * @brief Determine whether one source is an ancestor of a destination task
-		 *
-		 * @param src is a pointer to the source task
-		 * @param dst is a pointer to the destination task
-		 * @return true if there is a path from src to dst
-		 */
-		bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
-			Bfs<ListDigraph> bfs(*DAG);
-
-
-			bool reached = bfs.run(src->DAG_node, dst->DAG_node);
-			return reached;
-		}
-
-
-		/******************************/
-		/**      PUBLIC METHODS      **/
-		/******************************/
-
-		/**
-		 * @brief  Constructor
-		 */
-		Workflow::Workflow() {
-			DAG = std::unique_ptr<ListDigraph>(new ListDigraph());
-			DAG_node_map = std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>>(
-							new ListDigraph::NodeMap<WorkflowTask *>(*DAG));
-			this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
-		};
-
-
 		/**
 		 * @brief Create and add a new task to the workflow
 		 *
@@ -180,43 +145,6 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Get a vector of the ready tasks (very inefficiently
-		 *        implemented right now)
-		 * @return vector of pointers to workflow tasks
-		 */
-		std::vector<WorkflowTask *> Workflow::getReadyTasks() {
-
-			std::vector<WorkflowTask *> task_list;
-
-			std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
-			for (it = this->tasks.begin(); it != this->tasks.end(); it++) {
-				WorkflowTask *task = it->second.get();
-				if (task->getState() == WorkflowTask::READY) {
-					task_list.push_back(task);
-				}
-			}
-			return task_list;
-		}
-
-		/**
-		 * @brief Check whether all tasks are complete
-		 *
-		 * @return true or false
-		 */
-		bool Workflow::isDone() {
-			std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
-			for (it = this->tasks.begin(); it != this->tasks.end(); it++) {
-				WorkflowTask *task = it->second.get();
-				// std::cerr << "==> " << task->id << " " << task->state << std::endl;
-				if (task->getState() != WorkflowTask::COMPLETED) {
-					return false;
-				}
-			}
-			return true;
-		}
-
-
-		/**
 		 * @brief Create a workflow based on a DAX file
 		 *
 		 * @param filename is the path to the file
@@ -273,12 +201,88 @@ namespace wrench {
 		}
 
 
+		/***********************************************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/***********************************************************/
+
+		/*! \cond DEVELOPER */
+
+		/**
+		 * @brief Determine whether one source is an ancestor of a destination task
+		 *
+		 * @param src is a pointer to the source task
+		 * @param dst is a pointer to the destination task
+		 * @return true if there is a path from src to dst
+		 */
+		bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
+			Bfs<ListDigraph> bfs(*DAG);
+
+
+			bool reached = bfs.run(src->DAG_node, dst->DAG_node);
+			return reached;
+		}
+
+
+
+
+		/**
+		 * @brief  Constructor
+		 */
+		Workflow::Workflow() {
+			DAG = std::unique_ptr<ListDigraph>(new ListDigraph());
+			DAG_node_map = std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>>(
+							new ListDigraph::NodeMap<WorkflowTask *>(*DAG));
+			this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
+		};
+
+
+
+
+		/**
+		 * @brief Get a vector of the ready tasks (very inefficiently
+		 *        implemented right now)
+		 * @return vector of pointers to workflow tasks
+		 */
+		std::vector<WorkflowTask *> Workflow::getReadyTasks() {
+
+			std::vector<WorkflowTask *> task_list;
+
+			std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
+			for (it = this->tasks.begin(); it != this->tasks.end(); it++) {
+				WorkflowTask *task = it->second.get();
+				if (task->getState() == WorkflowTask::READY) {
+					task_list.push_back(task);
+				}
+			}
+			return task_list;
+		}
+
+		/**
+		 * @brief Check whether all tasks are complete
+		 *
+		 * @return true or false
+		 */
+		bool Workflow::isDone() {
+			std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
+			for (it = this->tasks.begin(); it != this->tasks.end(); it++) {
+				WorkflowTask *task = it->second.get();
+				// std::cerr << "==> " << task->id << " " << task->state << std::endl;
+				if (task->getState() != WorkflowTask::COMPLETED) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+
+		/*! \endcond */
+
 
 		/***********************************************************/
-		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
+		/**	INTERNAL METHODS BELOW **/
 		/***********************************************************/
 
-		/*! \cond PRIVATE */
+		/*! \cond INTERNAL */
 
 		/**
 		 * @brief Wait for a task completion
@@ -358,7 +362,6 @@ namespace wrench {
 				}
 			}
 		}
-
 
 		/*! \endcond */
 };

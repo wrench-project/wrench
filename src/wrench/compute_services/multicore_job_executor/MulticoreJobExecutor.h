@@ -28,7 +28,6 @@ namespace wrench {
 
 		public:
 				/** Constructor **/
-				// Should be excluded from the documentation
 				MulticoreJobExecutor(Simulation *simulation, std::string hostname,  int num_worker_threads = -1, double ttl = -1.0, PilotJob *pj = nullptr, std::string suffix="");
 
 				/** Stop the service **/
@@ -47,7 +46,6 @@ namespace wrench {
 
 				std::string hostname;
 				int num_worker_threads; // total threads to run tasks from standard jobs
-				bool has_death_date;
 				double ttl;
 				bool has_ttl;
 				double death_date;

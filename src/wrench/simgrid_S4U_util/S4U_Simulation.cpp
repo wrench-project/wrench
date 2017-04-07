@@ -14,6 +14,12 @@
 
 namespace wrench {
 
+		/*****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond INTERNAL */
+
 		/**
 		 * @brief Initialize the Simgrid simulation
 		 *
@@ -84,4 +90,7 @@ namespace wrench {
 		 void S4U_Simulation::sleep(double duration) {
 			return simgrid::s4u::this_actor::sleep_for(duration);
 		}
+
+		/*! \endcond  */
+
 };

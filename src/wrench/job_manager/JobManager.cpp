@@ -25,8 +25,14 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 
 namespace wrench {
 
+		/*****************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond DEVELOPER */
+
 		/**
-		 * @brief Constructor, which starts the daemon
+		 * @brief Constructor, which starts a job manager daemon
 		 *
 		 * @param workflow is a pointer to the Workflow whose jobs are to be managed
 		 */
@@ -44,8 +50,7 @@ namespace wrench {
 		 * @brief Destructor
 		 */
 		JobManager::~JobManager() {
-			this->stop();
-			this->jobs.clear();
+			this->kill();
 		}
 
 
@@ -54,6 +59,7 @@ namespace wrench {
 		 */
 		void JobManager::kill() {
 			this->kill_actor();
+			this->jobs.clear();
 		}
 
 		/**
@@ -175,12 +181,14 @@ namespace wrench {
 			throw WRENCHException("forgetJob() not implemented yet");
 		}
 
+		/*! \endcond */
 
-		/***********************************************************/
-		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
-		/***********************************************************/
 
-		/*! \cond PRIVATE */
+		/****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/****************************/
+
+		/*! \cond INTERNAL */
 
 		/**
 		 * @brief Main method of the job manager daemon

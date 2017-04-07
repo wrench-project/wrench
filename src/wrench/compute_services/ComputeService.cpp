@@ -19,31 +19,14 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(compute_service, "Log category for Compute Service"
 
 namespace wrench {
 
-		/**
-		 * @brief Constructor, which links back the ComputeService
-		 *        to a Simulation (i.e.g, "registering" the ComputeService).
-		 *        This means that the Simulation can provide access to
-		 *        the ComputeService when queried.
-		 *
-		 * @param service_name is the name of the compute service
-		 * @param simulation is a pointer to a WRENCH simulation
-		 */
-		ComputeService::ComputeService(std::string service_name, Simulation *simulation) {
-			this->service_name = service_name;
-			this->simulation = simulation;
-			this->state = ComputeService::UP;
-		}
 
-		/**
-		 * @brief Constructor
-		 *
-		 * @param service_name is the name of the compute service
-		 */
-		ComputeService::ComputeService(std::string service_name) {
-			this->service_name = service_name;
-			this->simulation = nullptr;
-			this->state = ComputeService::UP;
-		}
+
+		/*****************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond DEVELOPER */
+
 
 		/**
 		 * @brief Stop the compute service - must be called by the stop()
@@ -97,37 +80,6 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Check whether a property is set
-		 * @param property_name
-		 * @return true or false
-		 */
-		bool ComputeService::hasProperty(ComputeService::Property property_name) {
-			return (this->property_list.find(property_name) != this->property_list.end());
-		}
-
-		/**
-		 * @brief Return a property value
-		 * @param property_name the property_name
-		 * @return a property value, or nullptr if the property does not exist
-		 */
-		std::string ComputeService::getProperty(ComputeService::Property property_name) {
-			if (hasProperty(property_name)) {
-				return this->property_list[property_name];
-			} else {
-				return nullptr;
-			}
-		}
-
-		/**
-		 * @brief Set a property value
-		 * @param property_name is the property name
-		 * @param value is the property value
-		 */
-		void ComputeService::setProperty(ComputeService::Property property_name, std::string value) {
-			this->property_list[property_name] = value;
-		}
-
-		/**
 		 * @brief Check whether the service is able to run a job
 		 *
 		 * @param job is a pointer to a workflow job
@@ -177,11 +129,71 @@ namespace wrench {
 			return true;
 		}
 
-		/***********************************************************/
-		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
-		/***********************************************************/
+		/*! \endcond */
 
-		/*! \cond PRIVATE */
+
+		/****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/****************************/
+
+		/*! \cond INTERNAL */
+
+		/**
+		 * @brief Constructor, which links back the ComputeService
+		 *        to a Simulation (i.e.g, "registering" the ComputeService).
+		 *        This means that the Simulation can provide access to
+		 *        the ComputeService when queried.
+		 *
+		 * @param service_name is the name of the compute service
+		 * @param simulation is a pointer to a WRENCH simulation
+		 */
+		ComputeService::ComputeService(std::string service_name, Simulation *simulation) {
+			this->service_name = service_name;
+			this->simulation = simulation;
+			this->state = ComputeService::UP;
+		}
+
+		/**
+		 * @brief Constructor
+		 *
+		 * @param service_name is the name of the compute service
+		 */
+		ComputeService::ComputeService(std::string service_name) {
+			this->service_name = service_name;
+			this->simulation = nullptr;
+			this->state = ComputeService::UP;
+		}
+
+		/**
+		 * @brief Check whether a property is set
+		 * @param property_name
+		 * @return true or false
+		 */
+		bool ComputeService::hasProperty(ComputeService::Property property_name) {
+			return (this->property_list.find(property_name) != this->property_list.end());
+		}
+
+		/**
+		 * @brief Return a property value
+		 * @param property_name the property_name
+		 * @return a property value, or nullptr if the property does not exist
+		 */
+		std::string ComputeService::getProperty(ComputeService::Property property_name) {
+			if (hasProperty(property_name)) {
+				return this->property_list[property_name];
+			} else {
+				return nullptr;
+			}
+		}
+
+		/**
+		 * @brief Set a property value
+		 * @param property_name is the property name
+		 * @param value is the property value
+		 */
+		void ComputeService::setProperty(ComputeService::Property property_name, std::string value) {
+			this->property_list[property_name] = value;
+		}
 
 		/**
 		 * @brief Run a standard job
@@ -208,6 +220,6 @@ namespace wrench {
 			this->state = ComputeService::DOWN;
 		}
 
-		/*! \endcod */
+		/*! \endcond */
 
 };

@@ -13,5 +13,13 @@
 
 namespace wrench {
 
-	SimpleWMS::SimpleWMS() {};
+		/****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/****************************/
+
+		/*! \cond INTERNAL */
+
+		SimpleWMS::SimpleWMS() {};
+
+		/*! \endcond */
 }

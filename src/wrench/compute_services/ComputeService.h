@@ -44,8 +44,6 @@ namespace wrench {
 
 				/** Job execution **/
 				void runJob(WorkflowJob *job);
-
-				// Should be excluded from documentation
 				virtual void runStandardJob(StandardJob *job);
 				virtual void runPilotJob(PilotJob *job);
 
@@ -56,8 +54,6 @@ namespace wrench {
 				std::string getName();
 				bool isUp();
 				bool canRunJob(WorkflowJob::Type job_type, unsigned long min_num_cores, double duration);
-
-				// Should be excluded from documentation
 				void setStateToDown();
 
 				/** Stopping **/

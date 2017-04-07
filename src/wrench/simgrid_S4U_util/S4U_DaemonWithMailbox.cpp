@@ -18,7 +18,13 @@
 
 namespace wrench {
 
-	/**
+		/*****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond INTERNAL */
+
+		/**
 	 * @brief Constructor
 	 *
 	 * @param process_name is the name of the simulated process/actor
@@ -48,5 +54,7 @@ namespace wrench {
 	void S4U_DaemonWithMailbox::kill_actor() {
 		this->actor->kill();
 	}
+
+		/*! \endcond */
 
 };

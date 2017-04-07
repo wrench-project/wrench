@@ -20,6 +20,12 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(sequential_task_executor, "Log category for Sequent
 
 namespace wrench {
 
+		/*****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond DEVELOPER */
+
 		/**
 	 * @brief Constructor, which starts the daemon for the service on a host
 	 *
@@ -120,5 +126,8 @@ namespace wrench {
 
 			return 0;
 		}
+
+		/*! \endcond  */
+
 
 }

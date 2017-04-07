@@ -18,6 +18,12 @@
 
 namespace wrench {
 
+		/***********************************************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/***********************************************************/
+
+		/*! \cond DEVELOPER */
+
 		/**
 		 * @brief Get the job type
 		 * @return the type
@@ -53,7 +59,7 @@ namespace wrench {
 		 * @brief get the number of cores required by the job
 		 * @return  the number of cores
 		 */
-		unsigned int WorkflowJob::getNumCores() {
+		int WorkflowJob::getNumCores() {
 			return this->num_cores;
 		}
 
@@ -65,11 +71,13 @@ namespace wrench {
 			return this->duration;
 		}
 
+		/*! \endcond */
+
 		/***********************************************************/
-		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
+		/**	INTERNAL  METHODS BELOW **/
 		/***********************************************************/
 
-		/*! \cond PRIVATE */
+		/*! \cond INTERNAL */
 
 		/**
 		 * @brief Gets the "next" callback mailbox (returns the
@@ -89,7 +97,7 @@ namespace wrench {
 		 * @return the next callback mailbox
 		 */
 		std::string WorkflowJob::getOriginCallbackMailbox() {
-				return this->workflow->getCallbackMailbox();
+			return this->workflow->getCallbackMailbox();
 		}
 
 

@@ -14,11 +14,18 @@
 
 namespace wrench {
 
+		/****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/****************************/
+
+		/*! \cond INTERNAL */
+
 		/** Base Simgrid Message **/
 		SimulationMessage::SimulationMessage(Type  t, double s) {
 			type = t;
 			size = s;
 		}
+
 
 		std::string SimulationMessage::toString() {
 			switch(this->type) {
@@ -133,5 +140,7 @@ namespace wrench {
 		TTLAnswerMessage::TTLAnswerMessage(double  ttl) : SimulationMessage(TTL_ANSWER, 1024.0) {
 			this->ttl = ttl;
 		}
+
+		/*! \endcond */
 
 };

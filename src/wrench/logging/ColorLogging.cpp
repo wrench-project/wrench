@@ -18,6 +18,29 @@ namespace wrench {
 
 		std::map<simgrid::s4u::ActorPtr , std::string> ColorLogging::colormap;
 
+		/*****************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond DEVELOPER */
+
+		/**
+		 * @brief Set the color of log messages printed to the terminal
+		 * @param color is WRENCH_LOGGING_COLOR_RED, WRENCH_LOGGING_COLOR_GREEN, etc.
+		 */
+		void ColorLogging::setThisProcessLoggingColor(std::string color) {
+			ColorLogging::colormap[simgrid::s4u::Actor::self()] = color;
+		}
+
+		/*! \endcond */
+
+
+		/*****************************/
+		/**	INTERVAL METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond INTERNAL */
+
 
 		void ColorLogging::beginThisProcessColor() {
 					// Comment this line out to do no colors
@@ -28,12 +51,6 @@ namespace wrench {
 			std::cerr << "\033[0m";
 		}
 
-		static void endThisProcessColor();
-
-		void ColorLogging::setThisProcessLoggingColor(std::string color) {
-			ColorLogging::colormap[simgrid::s4u::Actor::self()] = color;
-		}
-
 		std::string ColorLogging::getThisProcessLoggingColor() {
 			if (ColorLogging::colormap.find(simgrid::s4u::Actor::self()) != ColorLogging::colormap.end()) {
 				return ColorLogging::colormap[simgrid::s4u::Actor::self()];
@@ -41,5 +58,7 @@ namespace wrench {
 				return "";
 			}
 		}
+
+		/*! \endcond */
 
 };

@@ -25,6 +25,13 @@ namespace wrench {
 		// what will have to be waited on at some point
 		std::map<simgrid::s4u::ActorPtr , std::set<simgrid::s4u::Comm*>> S4U_Mailbox::dputs;
 
+		/*****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond INTERNAL */
+
+
 		/**
 		 * @brief A method to generate a unique mailbox name give a prefix (this method
 		 *        simply appends an increasing sequence number to the prefix)
@@ -144,4 +151,5 @@ namespace wrench {
 			return;
 		}
 
+		/*! \endcond */
 };

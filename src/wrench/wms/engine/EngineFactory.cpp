@@ -13,19 +13,27 @@
 
 namespace wrench {
 
-	EngineFactory *EngineFactory::getInstance() {
-		static EngineFactory fact;
-		return &fact;
-	}
+		/****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/****************************/
 
-	std::string EngineFactory::Register(std::string wms_id, t_pfFactory factory_method) {
-		s_list[wms_id] = factory_method;
-		return wms_id;
-	}
+		/*! \cond INTERNAL */
 
-	std::unique_ptr<WMS> EngineFactory::Create(std::string wms_id) {
-		return s_list[wms_id]();
-	}
+		EngineFactory *EngineFactory::getInstance() {
+			static EngineFactory fact;
+			return &fact;
+		}
 
-	EngineFactory::EngineFactory() {}
+		std::string EngineFactory::Register(std::string wms_id, t_pfFactory factory_method) {
+			s_list[wms_id] = factory_method;
+			return wms_id;
+		}
+
+		std::unique_ptr<WMS> EngineFactory::Create(std::string wms_id) {
+			return s_list[wms_id]();
+		}
+
+		EngineFactory::EngineFactory() {}
+
+		/*! \endcond */
 }

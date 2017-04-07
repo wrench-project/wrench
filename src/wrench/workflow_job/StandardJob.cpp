@@ -17,6 +17,13 @@
 
 namespace wrench {
 
+		/***********************************************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/***********************************************************/
+
+		/*! \cond DEVELOPER */
+
+
 		/**
 		 * @brief Constructor given a vector of tasks
 		 * @param tasks is the vector of tasks
@@ -76,6 +83,8 @@ namespace wrench {
 		WorkflowJob *WorkflowTask::getWorkflowJob() {
 			return this->job;
 		}
+
+		/*! \endcond */
 
 
 

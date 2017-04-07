@@ -105,6 +105,12 @@ namespace wrench {
 			WMSes.push_back(std::move(wms));
 		}
 
+		/*****************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond DEVELOPER */
+
 		/**
 		 * @brief Obtain the list of compute services
 		 *
@@ -128,11 +134,13 @@ namespace wrench {
 			}
 		}
 
-		/***********************************************************/
-		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
-		/***********************************************************/
+		/*! \endcond */
 
-		/*! \cond PRIVATE */
+		/****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/****************************/
+
+		/*! \cond INTERNAL */
 
 		/**
 		 * @brief Method to create an unregistered executor

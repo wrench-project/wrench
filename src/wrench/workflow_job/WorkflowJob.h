@@ -33,7 +33,7 @@ namespace wrench {
 				std::string getTypeAsString();
 				std::string getName();
 
-				unsigned int getNumCores();
+				int getNumCores();
 				double getDuration();
 
 				// Should be excluded from documentation

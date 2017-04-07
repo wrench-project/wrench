@@ -27,6 +27,12 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_job_executor, "Log category for Multicore
 
 namespace wrench {
 
+		/*****************************/
+		/**	DEVELOPER METHODS BELOW **/
+		/*****************************/
+
+		/*! \cond DEVELOPER */
+
 		/**
 		 * @brief Stop the service
 		 */
@@ -133,12 +139,13 @@ namespace wrench {
 			return simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0);
 		}
 
-		/***********************************************************/
-		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
-		/***********************************************************/
+		/*! \endcond */
 
-		/*! \cond PRIVATE */
+		/****************************/
+		/**	INTERNAL METHODS BELOW **/
+		/****************************/
 
+		/*! \cond INTERNAL */
 
 		/**
 		 * @brief Constructor that starts the daemon for the service on a host,
