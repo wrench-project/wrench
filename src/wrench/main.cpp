@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 //	std::cerr.flush();
 //	std::cerr.flush();
 //	std::cerr.flush();
-//	std::cerr << "Number of childern of root task: " << workflow.getReadyTasks()[0]->getNumberOfChildren() << std::endl;
+//	std::cerr << "Number of children of root task: " << workflow.getReadyTasks()[0]->getNumberOfChildren() << std::endl;
 
 //	return 0;
 
@@ -73,16 +73,16 @@ int main(int argc, char **argv) {
 //	simulation.createSequentialTaskExecutor("Tremblay");
 
 	std::cerr << "Instantiating a  MultiCore Job executor on c-1.me..." << std::endl;
-	simulation.createMulticoreStandardAndPilotJobExecutor("c-1.me");
-//	simulation.createMulticorePilotJobExecutor("c-1.me");
+//	simulation.createMulticoreStandardAndPilotJobExecutor("c-1.me");
+	simulation.createMulticorePilotJobExecutor("c-1.me");
 //	simulation.createMulticoreStandardJobExecutor("c-2.me");
 //	simulation.createMulticoreStandardJobExecutor("c-2.me");
 //	simulation.createMulticoreStandardJobExecutor("c-3.me");
 
 
 	std::cerr << "Instantiating a WMS on c-0.me..." << std::endl;
-//	simulation.createWMS("SimpleWMS", "RandomScheduler", &workflow, "c-0.me");
-	simulation.createWMS("SimpleWMS", "MinMinScheduler", &workflow, "c-0.me");
+	simulation.createWMS("SimpleWMS", "RandomScheduler", &workflow, "c-0.me");
+//	simulation.createWMS("SimpleWMS", "MinMinScheduler", &workflow, "c-0.me");
 //	simulation.createWMS("SimpleWMS", "MaxMinScheduler", &workflow, "c-0.me");
 
 	std::cerr << "Launching the Simulation..." << std::endl;

@@ -115,11 +115,12 @@ namespace wrench {
 		 *
 		 * @param job_manager is a pointer to a job manager instance
 		 * @param workflow is a pointer to a workflow instance
-		 * @param simulation is a pointer to a simulation instance
+		 * @param flops the number of flops that the pilot job should be able to do before terminating
+		 * @param compute_services is a set of compute services
 		 */
 		void RandomScheduler::schedulePilotJobs(JobManager *job_manager,
 																						Workflow *workflow,
-																						double pilot_job_duration,
+																						double flops,
 																						const std::set<ComputeService *> &compute_services) {
 
 			// If there is always a pilot job in the system, do nothing
@@ -142,8 +143,11 @@ namespace wrench {
 			}
 
 			// Submit a pilot job
-
+			WRENCH_INFO("==> %lf", flops);
+			WRENCH_INFO("==> %lf", target_service->getCoreFlopRate());
+			double pilot_job_duration = flops / target_service->getCoreFlopRate();
 			WRENCH_INFO("Submitting a pilot job (1 core, %lf seconds)", pilot_job_duration);
+
 			WorkflowJob *job = (WorkflowJob *)job_manager->createPilotJob(workflow, 1, pilot_job_duration);
 			job_manager->submitJob(job, target_service);
 

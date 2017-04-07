@@ -135,7 +135,7 @@ namespace wrench {
 		 */
 		bool ComputeService::canRunJob(WorkflowJob::Type job_type,
 																	 unsigned long min_num_cores,
-																	 double duration) {
+																	 double flops) {
 			bool can_run = true;
 
 			// If the service isn't up, forget it
@@ -168,6 +168,7 @@ namespace wrench {
 
 			// Check that the TTL is ok (does a communication with the daemons)
 			double ttl = this->getTTL();
+			double duration = flops / this->getCoreFlopRate();
 			if ((ttl > 0) && (ttl < duration)) {
 				return false;
 			}

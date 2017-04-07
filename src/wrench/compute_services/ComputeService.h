@@ -52,6 +52,7 @@ namespace wrench {
 				/** Information getting **/
 				virtual unsigned long getNumIdleCores() = 0;
 				virtual double  getTTL() = 0;
+				virtual double  getCoreFlopRate() = 0;
 				std::string getName();
 				bool isUp();
 				bool canRunJob(WorkflowJob::Type job_type, unsigned long min_num_cores, double duration);

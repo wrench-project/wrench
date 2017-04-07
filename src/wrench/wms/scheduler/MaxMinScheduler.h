@@ -29,7 +29,7 @@ namespace wrench {
 													 const std::set<ComputeService *> &compute_services);
 				void schedulePilotJobs(JobManager *job_manager,
 															 Workflow *workflow,
-															 double pilot_job_duration,
+															 double flops,
 															 const std::set<ComputeService *> &compute_services);
 
 				struct MaxMinComparator {

@@ -29,7 +29,7 @@ namespace wrench {
 		public:
 				/** Constructor **/
 				// Should be excluded from the documentation
-				MulticoreJobExecutor(Simulation *simulation, std::string hostname, int num_worker_threads = -1, double ttl = -1.0, PilotJob *pj = nullptr, std::string suffix="");
+				MulticoreJobExecutor(Simulation *simulation, std::string hostname,  int num_worker_threads = -1, double ttl = -1.0, PilotJob *pj = nullptr, std::string suffix="");
 
 				/** Stop the service **/
 				void stop();
@@ -41,12 +41,16 @@ namespace wrench {
 				/** Get information **/
 				unsigned long getNumIdleCores();
 				double getTTL();
+				double getCoreFlopRate();
 
 		private:
 
-				unsigned int num_worker_threads; // total threads to run tasks from standard jobs
+				std::string hostname;
+				int num_worker_threads; // total threads to run tasks from standard jobs
+				bool has_death_date;
+				double ttl;
 				bool has_ttl;
-				double ttl;							// time-to-live
+				double death_date;
 				PilotJob *containing_pilot_job;
 
 				unsigned int num_available_worker_threads; // number of worker threads that can currently be

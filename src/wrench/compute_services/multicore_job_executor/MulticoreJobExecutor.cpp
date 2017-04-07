@@ -120,6 +120,19 @@ namespace wrench {
 			return m->ttl;
 		}
 
+		/**
+		 * @brief Finds out the flop rate of the cores
+		 *
+		 * @return the clock rate in Flops/sec
+		 */
+		double MulticoreJobExecutor::getCoreFlopRate() {
+
+			if (this->state == ComputeService::DOWN) {
+				throw WRENCHException("Compute Service is down");
+			}
+			return simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0);
+		}
+
 		/***********************************************************/
 		/**	UNDOCUMENTED PUBLIC/PRIVATE  METHODS AFTER THIS POINT **/
 		/***********************************************************/
@@ -148,9 +161,10 @@ namespace wrench {
 			this->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, "yes");
 			this->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, "no");
 
+			this->hostname = hostname;
 			this->num_worker_threads = num_worker_threads;
 			this->ttl = ttl;
-			this->has_ttl = (this->ttl > 0);
+			this->has_ttl = (ttl >= 0);
 			this->containing_pilot_job = pj;
 
 			// Start the daemon on the same host
@@ -169,10 +183,10 @@ namespace wrench {
 			/** Initialize all state **/
 			initialize();
 
-			double death_date = -1.0;
+			this->death_date = -1.0;
 			if (this->has_ttl) {
-				death_date = S4U_Simulation::getClock() + this->ttl;
-				WRENCH_INFO("Will be terminating at date %lf", death_date);
+				this->death_date = S4U_Simulation::getClock() + this->ttl;
+				WRENCH_INFO("Will be terminating at date %lf", this->death_date);
 			}
 
 
@@ -181,7 +195,7 @@ namespace wrench {
 			}
 
 			/** Main loop **/
-			while (this->processNextMessage((this->has_ttl ? death_date - S4U_Simulation::getClock() : -1.0))) {
+			while (this->processNextMessage((this->has_ttl ? this->death_date - S4U_Simulation::getClock() : -1.0))) {
 
 				// Clear pending asynchronous puts that are done
 				S4U_Mailbox::clear_dputs();
@@ -380,7 +394,7 @@ namespace wrench {
 
 				case SimulationMessage::TTL_REQUEST: {
 					std::unique_ptr<TTLRequestMessage> m(static_cast<TTLRequestMessage *>(message.release()));
-					TTLAnswerMessage *msg = new TTLAnswerMessage(this->ttl);
+					TTLAnswerMessage *msg = new TTLAnswerMessage(this->death_date - S4U_Simulation::getClock());
 					S4U_Mailbox::dput(this->mailbox_name+"_answers", msg);
 					return true;
 				}
