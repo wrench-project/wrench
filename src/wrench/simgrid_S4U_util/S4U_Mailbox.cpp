@@ -31,7 +31,6 @@ namespace wrench {
 
 		/*! \cond INTERNAL */
 
-
 		/**
 		 * @brief A method to generate a unique mailbox name give a prefix (this method
 		 *        simply appends an increasing sequence number to the prefix)
@@ -115,7 +114,6 @@ namespace wrench {
 		void S4U_Mailbox::dput(std::string mailbox_name, SimulationMessage *msg) {
 
 			WRENCH_DEBUG("DPUTTING to %s a %s message", mailbox_name.c_str(), msg->toString().c_str());
-
 
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 			simgrid::s4u::Comm &comm = simgrid::s4u::this_actor::isend(mailbox, msg, (int)msg->size);

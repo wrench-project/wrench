@@ -18,8 +18,6 @@ PilotJob:
 
 - Deal with failure traces...
 
-- Flops != seconds  for tasks!!
-
 - Should ComputeService->runJob() do the "can run" check?
 
 -----------------------------------------------------------------------

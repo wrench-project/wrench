@@ -217,13 +217,9 @@ namespace wrench {
 		bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
 			Bfs<ListDigraph> bfs(*DAG);
 
-
 			bool reached = bfs.run(src->DAG_node, dst->DAG_node);
 			return reached;
 		}
-
-
-
 
 		/**
 		 * @brief  Constructor
@@ -234,9 +230,6 @@ namespace wrench {
 							new ListDigraph::NodeMap<WorkflowTask *>(*DAG));
 			this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
 		};
-
-
-
 
 		/**
 		 * @brief Get a vector of the ready tasks (very inefficiently

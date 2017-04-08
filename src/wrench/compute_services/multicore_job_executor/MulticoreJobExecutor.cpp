@@ -91,6 +91,19 @@ namespace wrench {
 			S4U_Mailbox::dput(this->mailbox_name, new RunPilotJobMessage(job));
 		};
 
+		/**
+		 * @brief Finds out how many  cores the  service has
+		 *
+		 * @return the number of cores
+		 */
+		unsigned long MulticoreJobExecutor::getNumCores() {
+
+			if (this->state == ComputeService::DOWN) {
+				throw WRENCHException("Compute Service is down");
+			}
+
+			return (unsigned long)S4U_Simulation::getNumCores(this->hostname);
+		}
 
 		/**
 		 * @brief Finds out how many idle cores the  service has

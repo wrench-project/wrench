@@ -48,21 +48,22 @@ namespace wrench {
 				virtual void runPilotJob(PilotJob *job);
 
 				/** Information getting **/
-				virtual unsigned long getNumIdleCores() = 0;
-				virtual double  getTTL() = 0;
-				virtual double  getCoreFlopRate() = 0;
 				std::string getName();
 				bool isUp();
+				virtual double  getCoreFlopRate() = 0;
+				virtual unsigned long getNumCores() = 0;
+				virtual unsigned long getNumIdleCores() = 0;
+				virtual double  getTTL() = 0;
+
 				bool canRunJob(WorkflowJob::Type job_type, unsigned long min_num_cores, double duration);
-				void setStateToDown();
 
 				/** Stopping **/
+				void setStateToDown();
 				virtual void stop();
 
 				/** Getting properties **/
 				bool hasProperty(ComputeService::Property);
 				std::string getProperty(ComputeService::Property);
-
 
 		protected:
 				friend class Simulation;

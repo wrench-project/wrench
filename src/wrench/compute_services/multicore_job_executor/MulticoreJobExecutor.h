@@ -38,6 +38,7 @@ namespace wrench {
 				void runPilotJob(PilotJob *job);
 
 				/** Get information **/
+				unsigned long getNumCores();
 				unsigned long getNumIdleCores();
 				double getTTL();
 				double getCoreFlopRate();

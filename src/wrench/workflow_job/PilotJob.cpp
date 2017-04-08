@@ -47,6 +47,10 @@ namespace wrench {
 
 		/*! \cond INTERNAL */
 
+		/**
+		 * @brief
+		 * @param cs
+		 */
 		void PilotJob::setComputeService(ComputeService* cs) {
 			this->compute_service = cs;
 		}

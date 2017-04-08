@@ -30,10 +30,6 @@ namespace wrench {
 
 		class Workflow {
 
-				/**************/
-				/**  PUBLIC  **/
-				/**************/
-
 		public:
 				Workflow();
 
@@ -65,14 +61,9 @@ namespace wrench {
 				// Internal (excluded from documentation)
 				std::string getCallbackMailbox();
 
-
 				/** Update task state **/
 				// Internal (excluded from documentation)
 				void updateTaskState (WorkflowTask *task, WorkflowTask::State state);
-
-				/***************/
-				/**  PRIVATE  **/
-				/***************/
 
 		private:
 
