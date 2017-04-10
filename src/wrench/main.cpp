@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
 
 	std::cerr << "Instantiating a  MultiCore Job executor on c-1.me..." << std::endl;
 //	simulation.createMulticoreStandardAndPilotJobExecutor("c-1.me");
-	simulation.createMulticorePilotJobExecutor("c-1.me");
+	simulation.createMulticorePilotJobExecutor("c-1.me", {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "42"}});
 //	simulation.createMulticoreStandardJobExecutor("c-2.me");
 //	simulation.createMulticoreStandardJobExecutor("c-2.me");
 //	simulation.createMulticoreStandardJobExecutor("c-3.me");

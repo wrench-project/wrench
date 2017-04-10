@@ -56,7 +56,7 @@ namespace wrench {
 
 		/** DAEMON STOPPING **/
 		struct StopDaemonMessage: public SimulationMessage {
-				StopDaemonMessage();
+				StopDaemonMessage(double payload);
 		};
 
 		struct DaemonStoppedMessage: public SimulationMessage {

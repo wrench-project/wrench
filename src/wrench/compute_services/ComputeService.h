@@ -33,11 +33,6 @@ namespace wrench {
 						DOWN,
 				};
 
-				enum Property {
-						SUPPORTS_STANDARD_JOBS,
-						SUPPORTS_PILOT_JOBS,
-				};
-
 				/** Constructors **/
 				ComputeService(std::string, Simulation *simulation);
 				ComputeService(std::string);
@@ -61,9 +56,13 @@ namespace wrench {
 				void setStateToDown();
 				virtual void stop();
 
-				/** Getting properties **/
-				bool hasProperty(ComputeService::Property);
-				std::string getProperty(ComputeService::Property);
+				/** Job types properties **/
+
+				void setSupportStandardJobs(bool v);
+				void setSupportPilotJobs(bool v);
+				bool supportsStandardJobs();
+				bool supportsPilotJobs();
+
 
 		protected:
 				friend class Simulation;
@@ -71,9 +70,10 @@ namespace wrench {
 				ComputeService::State state;
 				std::string service_name;
 				Simulation *simulation;  // pointer to the simulation object
-				std::map<ComputeService::Property, std::string> property_list;
 
-				void setProperty(ComputeService::Property, std::string value);
+		private:
+				bool supports_standard_jobs;
+				bool supports_pilot_jobs;
 		};
 };
 

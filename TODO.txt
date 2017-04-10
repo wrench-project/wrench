@@ -5,20 +5,17 @@
 	- But we need an ack to make sure memory doesn't get freed before a daemon has
           completely shutdownAllComputeServices
 
-PilotJob:
-	- Remaining bug to fix: when a pilot job terminates it should notify the
-          containing ComputeService AS WELL AS THE JOB MANAGER
-
-
 
 
 ---------------------------------------------------------------------
 
+- Deal with configuration of various delays for ComputeServices
+	- Pass an Array of poperties key-value pairs to createComputeService?
+	        simulation->createComputeService(hostname, {{"s1","v1"}, {"s2", "v2"}})
+
 - Deal with error handling via nice exceptions, etc.
 
 - Deal with failure traces...
-
-- Should ComputeService->runJob() do the "can run" check?
 
 -----------------------------------------------------------------------
 

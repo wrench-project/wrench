@@ -98,13 +98,13 @@ namespace wrench {
 			// Check if the job type works
 			switch (job_type) {
 				case WorkflowJob::STANDARD: {
-					if (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) != "yes") {
+					if (!this->supportsStandardJobs()) {
 						return false;
 					}
 					break;
 				}
 				case WorkflowJob::PILOT: {
-					if (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) != "yes") {
+					if (!this->supportsPilotJobs()) {
 						return false;
 					}
 					break;
@@ -165,34 +165,35 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Check whether a property is set
-		 * @param property_name
-		 * @return true or false
+		 * @brief Set the "supports standard jobs" property
+		 * @param v is true or false
 		 */
-		bool ComputeService::hasProperty(ComputeService::Property property_name) {
-			return (this->property_list.find(property_name) != this->property_list.end());
+		void ComputeService::setSupportStandardJobs(bool v) {
+			this->supports_standard_jobs = v;
 		}
 
 		/**
-		 * @brief Return a property value
-		 * @param property_name the property_name
-		 * @return a property value, or nullptr if the property does not exist
+		 * @brief Set the "supports pilot jobs" property
+		 * @param v is true or false
 		 */
-		std::string ComputeService::getProperty(ComputeService::Property property_name) {
-			if (hasProperty(property_name)) {
-				return this->property_list[property_name];
-			} else {
-				return nullptr;
-			}
+		void ComputeService::setSupportPilotJobs(bool v) {
+			this->supports_pilot_jobs = v;
 		}
 
 		/**
-		 * @brief Set a property value
-		 * @param property_name is the property name
-		 * @param value is the property value
+		 * @brief Get the "supports standard jobs" property
+		 * @return
 		 */
-		void ComputeService::setProperty(ComputeService::Property property_name, std::string value) {
-			this->property_list[property_name] = value;
+		bool ComputeService::supportsStandardJobs() {
+			return this->supports_standard_jobs;
+		}
+
+		/**
+		 * @brief Get the "supports pilot jobs" property
+		 * @return
+		 */
+		bool ComputeService::supportsPilotJobs() {
+			return this->supports_pilot_jobs;
 		}
 
 		/**

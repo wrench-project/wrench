@@ -28,7 +28,21 @@ namespace wrench {
 		class MulticoreJobExecutor : public ComputeService, public S4U_DaemonWithMailbox {
 
 		public:
-				MulticoreJobExecutor(Simulation *simulation, std::string hostname,  int num_worker_threads = -1, double ttl = -1.0, PilotJob *pj = nullptr, std::string suffix="");
+				enum Property {
+					STOP_DAEMON_MESSAGE_PAYLOAD,
+				};
+
+		private:
+
+				std::map<MulticoreJobExecutor::Property, std::string> default_property_values =
+								{{MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"},
+								};
+
+		public:
+				MulticoreJobExecutor(Simulation *simulation, std::string hostname,
+														 std::map<MulticoreJobExecutor::Property, std::string> = {},
+														 int num_worker_threads = -1, double ttl = -1.0,
+														 PilotJob *pj = nullptr, std::string suffix="");
 
 				// Stopping the service
 				void stop();
@@ -43,7 +57,12 @@ namespace wrench {
 				double getTTL();
 				double getCoreFlopRate();
 
+				// Setting/Getting property
+				void setProperty(MulticoreJobExecutor::Property, std::string);
+				std::string getProperty(MulticoreJobExecutor::Property);
 		private:
+
+				std::map<MulticoreJobExecutor::Property, std::string> property_list;
 
 				std::string hostname;
 				int num_worker_threads; // total threads to run tasks from standard jobs

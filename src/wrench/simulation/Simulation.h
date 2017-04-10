@@ -39,13 +39,13 @@ namespace wrench {
 		void createPlatform(std::string);
 
 		/** ComputeService creations **/
-		void createMulticoreStandardJobExecutor(std::string);
-		void createMulticorePilotJobExecutor(std::string);
-		void createMulticoreStandardAndPilotJobExecutor(std::string);
+		void createMulticoreStandardJobExecutor(std::string, std::map<MulticoreJobExecutor::Property , std::string> = {});
+		void createMulticorePilotJobExecutor(std::string, std::map<MulticoreJobExecutor::Property , std::string>  = {});
+		void createMulticoreStandardAndPilotJobExecutor(std::string, std::map<MulticoreJobExecutor::Property , std::string> = {});
 
 				// Internal methods (excluded from documentation)
 				static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(
-								std::string , std::string, std::string, int num_cores, double ttl, PilotJob *pj, std::string suffix);
+								std::string , bool, bool, std::map<MulticoreJobExecutor::Property , std::string> plist, int num_cores, double ttl, PilotJob *pj, std::string suffix);
 				void mark_compute_service_as_terminated(ComputeService *cs);
 
 
@@ -68,8 +68,9 @@ namespace wrench {
 
 		// Helper function
 		void createMulticoreJobExecutor(std::string hostname,
-		                                std::string supports_standard_jobs,
-		                                std::string support_pilot_jobs);
+																		bool supports_standard_jobs,
+		                                bool support_pilot_jobs,
+																		std::map<MulticoreJobExecutor::Property, std::string>);
 
 	};
 

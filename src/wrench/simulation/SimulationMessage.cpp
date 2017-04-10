@@ -51,8 +51,7 @@ namespace wrench {
 		}
 
 		/** STOP_DAEMON MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		StopDaemonMessage::StopDaemonMessage(): SimulationMessage(STOP_DAEMON, 1024.00) {
+		StopDaemonMessage::StopDaemonMessage(double payload): SimulationMessage(STOP_DAEMON, payload) {
 		}
 
 		/** DAEMON_STOPPED MESSAGE **/

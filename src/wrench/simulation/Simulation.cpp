@@ -10,6 +10,7 @@
  *  the simulation state.
  */
 
+#include <logging/ColorLogging.h>
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 #include "simulation/Simulation.h"
 #include "exception/WRENCHException.h"
@@ -63,8 +64,9 @@ namespace wrench {
 		 *
 		 * @param hostname is the name of the host in the physical platform
 		 */
-		void Simulation::createMulticoreStandardJobExecutor(std::string hostname) {
-			this->createMulticoreJobExecutor(hostname, "yes", "no");
+		void Simulation::createMulticoreStandardJobExecutor(std::string hostname,
+																												std::map<MulticoreJobExecutor::Property , std::string> plist) {
+			this->createMulticoreJobExecutor(hostname, true, false, plist);
 		}
 
 		/**
@@ -72,8 +74,9 @@ namespace wrench {
 		 *
 		 * @param hostname is the name of the host in the physical platform
 		 */
-		void Simulation::createMulticorePilotJobExecutor(std::string hostname) {
-			this->createMulticoreJobExecutor(hostname, "no", "yes");
+		void Simulation::createMulticorePilotJobExecutor(std::string hostname,
+																										 std::map<MulticoreJobExecutor::Property , std::string> plist) {
+			this->createMulticoreJobExecutor(hostname, false, true, plist);
 		}
 
 		/**
@@ -81,8 +84,9 @@ namespace wrench {
 		 *
 		 * @param hostname is the name of the host in the physical platform
 		 */
-		void Simulation::createMulticoreStandardAndPilotJobExecutor(std::string hostname) {
-			this->createMulticoreJobExecutor(hostname, "yes", "yes");
+		void Simulation::createMulticoreStandardAndPilotJobExecutor(std::string hostname,
+																																std::map<MulticoreJobExecutor::Property , std::string> plist) {
+			this->createMulticoreJobExecutor(hostname, true, true, plist);
 		}
 
 		/**
@@ -146,15 +150,17 @@ namespace wrench {
 		 * @brief Method to create an unregistered executor
 		 *
 		 * @param hostname  is the hostname
-		 * @param supports_standard_jobs is "yes" or "no"
-		 * @param support_pilot_jobs is "yes" or "no"
+		 * @param supports_standard_jobs is true/false
+		 * @param support_pilot_jobs is true/false
+		 * @param plist is a property list
 		 * @num_cores is the number of cores
 		 * @ttl is the time-to-live of the executor
 		 * @suffix is a suffix to be appended to the process name (useful for debugging)
 		 */
 		MulticoreJobExecutor *Simulation::createUnregisteredMulticoreJobExecutor(std::string hostname,
-																																						 std::string supports_standard_jobs,
-																																						 std::string support_pilot_jobs,
+																																						 bool supports_standard_jobs,
+																																						 bool supports_pilot_jobs,
+																																						 std::map<MulticoreJobExecutor::Property , std::string> plist,
 																																						 int num_cores,
 																																						 double ttl,
 																																						 PilotJob *pj,
@@ -163,9 +169,9 @@ namespace wrench {
 			// Create the compute service
 			MulticoreJobExecutor *executor;
 			try {
-				executor = new MulticoreJobExecutor(nullptr, hostname, num_cores, ttl, pj, suffix);
-				executor->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, supports_standard_jobs);
-				executor->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, support_pilot_jobs);
+				executor = new MulticoreJobExecutor(nullptr, hostname, plist, num_cores, ttl, pj, suffix);
+				executor->setSupportStandardJobs(supports_standard_jobs);
+				executor->setSupportPilotJobs(supports_pilot_jobs);
 			} catch (WRENCHException e) {
 				throw e;
 			}
@@ -194,25 +200,32 @@ namespace wrench {
 		/**
 		 * @brief Helper method
 		 * @param hostname  is the host on which to start the executor
-		 * @param supports_standard_jobs is "yes" or "no"
-		 * @param support_pilot_jobs is "yes" or "no"
+		 * @param supports_standard_jobs is true if the executor supports standard jobs
+		 * @param support_pilot_jobs is true if the executor supports pilot jobs
 		 */
 		void Simulation::createMulticoreJobExecutor(std::string hostname,
-																								std::string supports_standard_jobs,
-																								std::string support_pilot_jobs) {
+																								bool supports_standard_jobs,
+																								bool support_pilot_jobs,
+																								std::map<MulticoreJobExecutor::Property , std::string> plist) {
 
 			// Create the compute service
-			std::unique_ptr<ComputeService> executor;
+			MulticoreJobExecutor *executor;
 			try {
-				executor = std::unique_ptr<MulticoreJobExecutor>(new MulticoreJobExecutor(this, hostname));
-				executor->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, supports_standard_jobs);
-				executor->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, support_pilot_jobs);
+				executor = new MulticoreJobExecutor(this, hostname);
+				executor->setSupportStandardJobs(supports_standard_jobs);
+				executor->setSupportPilotJobs(support_pilot_jobs);
 			} catch (WRENCHException e) {
 				throw e;
 			}
 
-			// Add it to the list of Compute Services
-			running_compute_services.push_back(std::move(executor));
+			// Set its properties
+			for (auto p : plist) {
+				executor->setProperty(p.first, p.second);
+			}
+
+			// Add a unique ptr to the list of Compute Services
+			std::unique_ptr<ComputeService> ptr = std::unique_ptr<ComputeService>(executor);
+			running_compute_services.push_back(std::move(ptr));
 			return;
 		}
 

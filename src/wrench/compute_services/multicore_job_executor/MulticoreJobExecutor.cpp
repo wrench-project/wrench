@@ -35,7 +35,9 @@ namespace wrench {
 
 			WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
 			// Send a termination message to the daemon's mailbox
-			S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage());
+			S4U_Mailbox::put(this->mailbox_name,
+											 new StopDaemonMessage(
+															 atof(this->getProperty(MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD).c_str())));
 			// Wait for the ack
 			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name + "_kill");
 			if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
@@ -137,6 +139,23 @@ namespace wrench {
 			return simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0);
 		}
 
+		/**
+		 * @brief Set a property of the Multicore Job Executor
+		 * @param property is the property
+		 * @param value is the property value
+		 */
+		void MulticoreJobExecutor::setProperty(MulticoreJobExecutor::Property property, std::string value) {
+			this->property_list[property] = value;
+		}
+
+		/**
+		 * @brief Get a property of the Multicore Job Executor
+		 * @param property is the property
+		 * @return the property value as a string
+		 */
+		std::string MulticoreJobExecutor::getProperty(MulticoreJobExecutor::Property property) {
+			return this->property_list[property];
+		}
 
 		/*! \endcond */
 
@@ -150,18 +169,27 @@ namespace wrench {
 		 * @param hostname is the name of the host
 		 * @param num_worker_threads is the number of worker threads (i.e., sequential task executors)
 		 * @param ttl
+		 * @param pj is a containing pilot job (nullptr if none)
+		 * @param suffix a string suffix to append to the process name
 		 */
 		MulticoreJobExecutor::MulticoreJobExecutor(Simulation *simulation,
 																							 std::string hostname,
+																							 std::map<MulticoreJobExecutor::Property, std::string> plist,
 																							 int num_worker_threads,
 																							 double ttl,
 																							 PilotJob *pj,
 																							 std::string suffix) :
 						ComputeService("multicore_job_executor", simulation), S4U_DaemonWithMailbox("multicore_job_executor" + suffix, "multicore_job_executor" + suffix) {
 
-			// Set all relevant properties
-			this->setProperty(ComputeService::SUPPORTS_STANDARD_JOBS, "yes");
-			this->setProperty(ComputeService::SUPPORTS_PILOT_JOBS, "no");
+			// Set default properties
+			for (auto p : this->default_property_values) {
+				this->setProperty(p.first, p.second);
+			}
+
+			// Set specified properties
+			for (auto p : plist) {
+				this->setProperty(p.first, p.second);
+			}
 
 			this->hostname = hostname;
 			this->num_worker_threads = num_worker_threads;
@@ -182,6 +210,7 @@ namespace wrench {
 		int MulticoreJobExecutor::main() {
 
 			ColorLogging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
+
 			/** Initialize all state **/
 			initialize();
 
@@ -192,9 +221,9 @@ namespace wrench {
 			}
 
 
-			if (this->containing_pilot_job) {
-				WRENCH_INFO("MY CONTAINING PILOT JOB HAS CALLBACK MAILBOX '%s'", this->containing_pilot_job->getCallbackMailbox().c_str());
-			}
+//			if (this->containing_pilot_job) {
+//				WRENCH_INFO("MY CONTAINING PILOT JOB HAS CALLBACK MAILBOX '%s'", this->containing_pilot_job->getCallbackMailbox().c_str());
+//			}
 
 			/** Main loop **/
 			while (this->processNextMessage((this->has_ttl ? this->death_date - S4U_Simulation::getClock() : -1.0))) {
@@ -261,14 +290,17 @@ namespace wrench {
 								this->num_available_worker_threads -= job->getNumCores();
 								WRENCH_INFO("Setting my number of available cores to %d", this->num_available_worker_threads);
 
-								// Create and launch a compute service
+								// Create and launch a compute service (same properties as mine)
 								ComputeService *cs =
 												Simulation::createUnregisteredMulticoreJobExecutor(S4U_Simulation::getHostName(),
-																																					 "yes", "no",
+																																					 true, false,
+																																					 this->property_list,
 																																					 job->getNumCores(),
 																																					 job->getDuration(),
 																																					 job,
 																																					 "_pilot");
+
+
 								// Create and launch a compute service for the pilot job
 								job->setComputeService(cs);
 
@@ -367,7 +399,7 @@ namespace wrench {
 				case SimulationMessage::RUN_STANDARD_JOB: {
 					std::unique_ptr<RunStandardJobMessage> m(static_cast<RunStandardJobMessage *>(message.release()));
 					WRENCH_INFO("Asked to run a standard job with %ld tasks", m->job->getNumTasks());
-					if (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) != "yes") {
+					if (!this->supportsStandardJobs()) {
 						S4U_Mailbox::dput(m->job->popCallbackMailbox(), new JobTypeNotSupportedMessage(m->job, this));
 					} else {
 						this->pending_jobs.push(m->job);
@@ -378,7 +410,7 @@ namespace wrench {
 				case SimulationMessage::RUN_PILOT_JOB: {
 					std::unique_ptr<RunPilotJobMessage> m(static_cast<RunPilotJobMessage *>(message.release()));
 					WRENCH_INFO("Asked to run a pilot job with %d cores for %lf seconds", m->job->getNumCores(), m->job->getDuration());
-					if (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) != "yes") {
+					if (!this->supportsPilotJobs()) {
 						S4U_Mailbox::dput(m->job->popCallbackMailbox(), new JobTypeNotSupportedMessage(m->job, this));
 					} else {
 						this->pending_jobs.push(m->job);

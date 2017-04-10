@@ -74,9 +74,6 @@ namespace wrench {
 					WRENCH_INFO("no dice!");
 				}
 
-
-
-
 				// Second: attempt to run the task on a compute resource
 				WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", ready_tasks[i]->getId().c_str());
 
@@ -92,7 +89,6 @@ namespace wrench {
 					if (!can_run_job) continue;
 
 					// We can submit!
-
 					WRENCH_INFO("Submitting task %s for execution as a standard job", ready_tasks[i]->getId().c_str());
 					WorkflowJob *job = (WorkflowJob *)job_manager->createStandardJob(ready_tasks[i]);
 					job_manager->submitJob(job, cs);
@@ -132,7 +128,7 @@ namespace wrench {
 			// Submit a pilot job to the first compute service that can support it
 			ComputeService *target_service = nullptr;
 			for (auto cs : compute_services) {
-				if (cs->isUp() && (cs->getProperty(ComputeService::Property::SUPPORTS_PILOT_JOBS) == "yes")) {
+				if (cs->isUp() && cs->supportsPilotJobs()) {
 					target_service = cs;
 					break;
 				}
