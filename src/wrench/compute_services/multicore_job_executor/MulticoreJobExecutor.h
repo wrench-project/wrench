@@ -5,9 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- *  @brief wrench::MulticoreJobExecutor implements a simple
- *  Compute Service abstraction for a multi-core task executor.
  */
 
 #ifndef WRENCH_MULTICORETASKEXECUTOR_H
@@ -24,20 +21,23 @@ namespace wrench {
 
 		class Simulation;
 
+
+		/**  @brief Implementation of a Compute Service abstraction that
+		 *   runs on a multi-core host.
+		 */
 		class MulticoreJobExecutor : public ComputeService, public S4U_DaemonWithMailbox {
 
 		public:
-				/** Constructor **/
 				MulticoreJobExecutor(Simulation *simulation, std::string hostname,  int num_worker_threads = -1, double ttl = -1.0, PilotJob *pj = nullptr, std::string suffix="");
 
-				/** Stop the service **/
+				// Stopping the service
 				void stop();
 
-				/** Run jobs **/
+				// Running jobs
 				void runStandardJob(StandardJob *job);
 				void runPilotJob(PilotJob *job);
 
-				/** Get information **/
+				// Getting information
 				unsigned long getNumCores();
 				unsigned long getNumIdleCores();
 				double getTTL();

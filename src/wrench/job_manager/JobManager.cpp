@@ -117,12 +117,6 @@ namespace wrench {
 		 */
 		void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service) {
 
-			// Check that this is valid submission
-//			if (!compute_service->canRunJob(job->getType(), job->getNumCores(), job->getDuration())) {
-//				throw WRENCHException("Compute service " + compute_service->getName() +
-//															" does not support " + job->getTypeAsString() + " jobs");
-//			}
-
 			// Push back the mailbox of the manager,
 			// so that it will get the initial callback
 			job->pushCallbackMailbox(this->mailbox_name);
@@ -216,6 +210,33 @@ namespace wrench {
 						break;
 					}
 
+					case SimulationMessage::JOB_TYPE_NOT_SUPPORTED: {
+						std::unique_ptr<JobTypeNotSupportedMessage> m(static_cast<JobTypeNotSupportedMessage *>(message.release()));
+
+						// update job state and remove from list
+						if (m->job->getType() == WorkflowJob::STANDARD) {
+							StandardJob *job = (StandardJob *)m->job;
+							job->state = StandardJob::State::NOT_SUBMITTED;
+							this->pending_standard_jobs.erase(job);
+
+							// update the task states
+							for (auto t: job->getTasks()) {
+								t->setState(WorkflowTask::State::READY);
+							}
+						}
+
+						if (m->job->getType() == WorkflowJob::STANDARD) {
+							PilotJob *job = (PilotJob *)m->job;
+							job->state = PilotJob::State::NOT_SUBMITTED;
+							this->pending_pilot_jobs.erase(job);
+						}
+
+						// Forward the notification along the notification chain
+						S4U_Mailbox::dput(m->job->popCallbackMailbox(),
+															new JobTypeNotSupportedMessage(m->job, m->compute_service));
+						break;
+					}
+
 					case SimulationMessage::STANDARD_JOB_DONE: {
 						std::unique_ptr<StandardJobDoneMessage> m(static_cast<StandardJobDoneMessage *>(message.release()));
 
@@ -239,6 +260,11 @@ namespace wrench {
 						// update job state
 						StandardJob *job = m->job;
 						job->state = StandardJob::State::FAILED;
+
+						// update the task states
+						for (auto t: job->getTasks()) {
+							t->setState(WorkflowTask::State::READY);
+						}
 
 						// remove the job from the "pending" list
 						this->pending_standard_jobs.erase(job);

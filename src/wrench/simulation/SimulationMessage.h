@@ -43,7 +43,8 @@ namespace wrench {
 						NUM_IDLE_CORES_REQUEST,
 						NUM_IDLE_CORES_ANSWER,
 						TTL_REQUEST,
-						TTL_ANSWER
+						TTL_ANSWER,
+						JOB_TYPE_NOT_SUPPORTED
 				};
 
 				SimulationMessage(Type t, double s);
@@ -60,6 +61,13 @@ namespace wrench {
 
 		struct DaemonStoppedMessage: public SimulationMessage {
 				DaemonStoppedMessage();
+		};
+
+		/** JOBS */
+		struct JobTypeNotSupportedMessage: public SimulationMessage {
+				JobTypeNotSupportedMessage(WorkflowJob*, ComputeService *);
+				WorkflowJob *job;
+				ComputeService *compute_service;
 		};
 
 		/** STANDARD JOBS */

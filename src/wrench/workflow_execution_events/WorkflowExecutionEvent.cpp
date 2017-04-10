@@ -66,6 +66,14 @@ namespace wrench {
 					return event;
 				}
 
+				case SimulationMessage::JOB_TYPE_NOT_SUPPORTED: {
+					std::unique_ptr<JobTypeNotSupportedMessage> m(static_cast<JobTypeNotSupportedMessage *>(message.release()));
+					event->type = WorkflowExecutionEvent::UNSUPPORTED_JOB_TYPE;
+					event->job = (WorkflowJob *)m->job;
+					event->compute_service = m->compute_service;
+					return event;
+				}
+
 				default: {
 					throw WRENCHException("Non-handled message type when generating execution event");
 				}

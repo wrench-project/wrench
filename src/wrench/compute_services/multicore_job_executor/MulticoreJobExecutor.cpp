@@ -5,10 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- *  @brief wrench::MulticoreJobExecutor implements a simple
- *  Compute Service abstraction for a multi-core task executor.
- *
  */
 
 #include <simulation/Simulation.h>
@@ -27,9 +23,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_job_executor, "Log category for Multicore
 
 namespace wrench {
 
-		/*****************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/*****************************/
 
 		/*! \cond DEVELOPER */
 
@@ -40,15 +33,15 @@ namespace wrench {
 
 			this->state = ComputeService::DOWN;
 
-				WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
-				// Send a termination message to the daemon's mailbox
-				S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage());
-				// Wait for the ack
-				std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name + "_kill");
-				if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
-					throw WRENCHException("Wrong message type received while expecting DAEMON_STOPPED");
-				}
+			WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
+			// Send a termination message to the daemon's mailbox
+			S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage());
+			// Wait for the ack
+			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name + "_kill");
+			if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
+				throw WRENCHException("Wrong message type received while expecting DAEMON_STOPPED");
 			}
+		}
 
 
 		/**
@@ -58,10 +51,6 @@ namespace wrench {
 		 * @param callback_mailbox is the name of a mailbox to which a "job done" callback will be sent
 		 */
 		void MulticoreJobExecutor::runStandardJob(StandardJob *job) {
-
-			if (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) != "yes") {
-				throw WRENCHException("Implementation error: this compute service should have the SUPPORTS_STANDARD_JOBS property set to 'yes'");
-			}
 
 			if (this->state == ComputeService::DOWN) {
 				throw WRENCHException("Trying to run a job on a compute service that's terminated");
@@ -78,10 +67,6 @@ namespace wrench {
 		 * @param callback_mailbox is the name of a mailbox to which a "pilot job started" callback will be sent
 		 */
 		void MulticoreJobExecutor::runPilotJob(PilotJob *job) {
-
-			if (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) != "yes") {
-				throw WRENCHException("Implementation error: this compute service should have the SUPPORTS_PILOT_JOBS property set to 'yes'");
-			}
 
 			if (this->state == ComputeService::DOWN) {
 				throw WRENCHException("Trying to run a job on a compute service that's terminated");
@@ -152,11 +137,8 @@ namespace wrench {
 			return simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0);
 		}
 
-		/*! \endcond */
 
-		/****************************/
-		/**	INTERNAL METHODS BELOW **/
-		/****************************/
+		/*! \endcond */
 
 		/*! \cond INTERNAL */
 
@@ -232,6 +214,9 @@ namespace wrench {
 			return 0;
 		}
 
+		/*! \endcond  */
+
+
 		/**
 		 * @brief Dispatch one pending job, if possible
 		 * @return true if a job was dispatched, false otherwise
@@ -266,8 +251,8 @@ namespace wrench {
 						case WorkflowJob::PILOT: {
 							PilotJob *job = (PilotJob *)next_job;
 							WRENCH_INFO("Looking at dispatching pilot job %s with callbackmailbox %s",
-											 job->getName().c_str(),
-											 job->getCallbackMailbox().c_str());
+													job->getName().c_str(),
+													job->getCallbackMailbox().c_str());
 
 							if (this->num_available_worker_threads - this->busy_sequential_task_executors.size() >=
 									job->getNumCores()) {
@@ -342,7 +327,6 @@ namespace wrench {
 			}
 		}
 
-
 		/**
 		 * @brief Wait for and react to any incoming message
 		 * @return false if the daemon should terminate, true otherwise
@@ -352,6 +336,7 @@ namespace wrench {
 			// Wait for a message
 			std::unique_ptr<SimulationMessage> message;
 
+			// with a timeout?
 			if (this->has_ttl) {
 				if (timeout <= 0) {
 					return false;
@@ -362,7 +347,7 @@ namespace wrench {
 				message = S4U_Mailbox::get(this->mailbox_name);
 			}
 
-			// timeout
+			// was there a timeout?
 			if (message == nullptr) {
 				WRENCH_INFO("Time out - must die.. !!");
 				this->terminate();
@@ -382,14 +367,22 @@ namespace wrench {
 				case SimulationMessage::RUN_STANDARD_JOB: {
 					std::unique_ptr<RunStandardJobMessage> m(static_cast<RunStandardJobMessage *>(message.release()));
 					WRENCH_INFO("Asked to run a standard job with %ld tasks", m->job->getNumTasks());
-					this->pending_jobs.push(m->job);
+					if (this->getProperty(ComputeService::SUPPORTS_STANDARD_JOBS) != "yes") {
+						S4U_Mailbox::dput(m->job->popCallbackMailbox(), new JobTypeNotSupportedMessage(m->job, this));
+					} else {
+						this->pending_jobs.push(m->job);
+					}
 					return true;
 				}
 
 				case SimulationMessage::RUN_PILOT_JOB: {
 					std::unique_ptr<RunPilotJobMessage> m(static_cast<RunPilotJobMessage *>(message.release()));
 					WRENCH_INFO("Asked to run a pilot job with %d cores for %lf seconds", m->job->getNumCores(), m->job->getDuration());
-					this->pending_jobs.push(m->job);
+					if (this->getProperty(ComputeService::SUPPORTS_PILOT_JOBS) != "yes") {
+						S4U_Mailbox::dput(m->job->popCallbackMailbox(), new JobTypeNotSupportedMessage(m->job, this));
+					} else {
+						this->pending_jobs.push(m->job);
+					}
 					return true;
 				}
 
@@ -493,12 +486,12 @@ namespace wrench {
 			}
 		}
 
-/**
- * @brief Initialize all state for the daemon
- */
+		/**
+		 * @brief Initialize all state for the daemon
+		 */
 		void MulticoreJobExecutor::initialize() {
 
-			/** Start worker threads **/
+			/* Start worker threads */
 
 			// Figure out the number of worker threads
 			if (this->num_worker_threads == -1) {
@@ -508,10 +501,10 @@ namespace wrench {
 			this->num_available_worker_threads = num_worker_threads;
 
 			WRENCH_INFO("New Multicore Job Executor starting (%s) with %d worker threads ",
-							 this->mailbox_name.c_str(), this->num_worker_threads);
+									this->mailbox_name.c_str(), this->num_worker_threads);
 
 			for (int i = 0; i < this->num_worker_threads; i++) {
-				 WRENCH_INFO("Starting a task executor on core #%d", i);
+				WRENCH_INFO("Starting a task executor on core #%d", i);
 				std::unique_ptr<SequentialTaskExecutor> seq_executor =
 								std::unique_ptr<SequentialTaskExecutor>(
 												new SequentialTaskExecutor(S4U_Simulation::getHostName(), this->mailbox_name));
@@ -526,12 +519,12 @@ namespace wrench {
 
 		}
 
-/**
- * @brief Process a task completion
- *
- * @param task is the WorkflowTask that has completed
- * @param executor is a pointer to the worker thread (sequential task executor) that has completed it
- */
+		/**
+		 * @brief Process a task completion
+		 *
+		 * @param task is the WorkflowTask that has completed
+		 * @param executor is a pointer to the worker thread (sequential task executor) that has completed it
+		 */
 		void MulticoreJobExecutor::processTaskCompletion(WorkflowTask *task, SequentialTaskExecutor *executor) {
 			StandardJob *job = (StandardJob *)(task->job);
 			WRENCH_INFO("One of my cores completed task %s", task->id.c_str());
@@ -555,9 +548,9 @@ namespace wrench {
 			}
 		}
 
-/**
- * @brief Terminate the daemon, dealing with pending/running jobs
- */
+		/**
+		 * @brief Terminate the daemon, dealing with pending/running jobs
+		 */
 		void MulticoreJobExecutor::terminate() {
 
 			this->setStateToDown();
@@ -601,6 +594,5 @@ namespace wrench {
 			return;
 		}
 
-		/*! \endcond */
 
 };

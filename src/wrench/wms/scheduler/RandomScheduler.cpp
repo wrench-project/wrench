@@ -81,7 +81,6 @@ namespace wrench {
 				WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", ready_tasks[i]->getId().c_str());
 
 				for (auto cs : compute_services) {
-
 					WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
 					bool can_run_job = cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->flops);
 					if (can_run_job) {

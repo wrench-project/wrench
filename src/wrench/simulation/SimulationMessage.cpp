@@ -44,6 +44,7 @@ namespace wrench {
 				case NUM_IDLE_CORES_ANSWER:return "NUM_IDLE_CORES_ANSWER";
 				case TTL_REQUEST:return "TTL_REQUEST";
 				case TTL_ANSWER:return "TTL_ANSWER";
+				case JOB_TYPE_NOT_SUPPORTED: return "JOB_TYPE_NOT_SUPPORTED";
 				default: return "UNKNOWN MESSAGE TYPE";
 			}
 
@@ -57,6 +58,13 @@ namespace wrench {
 		/** DAEMON_STOPPED MESSAGE **/
 		// TODO: Make the "1024" below configurable somehow
 		DaemonStoppedMessage::DaemonStoppedMessage(): SimulationMessage(DAEMON_STOPPED, 1024.00) {
+		}
+
+		/** RUN_JOB MESSAGE **/
+		// TODO: Make the "1024" below configurable somehow
+		JobTypeNotSupportedMessage::JobTypeNotSupportedMessage(WorkflowJob *job, ComputeService *cs): SimulationMessage(JOB_TYPE_NOT_SUPPORTED, 1024.0) {
+			this->job = job;
+			this->compute_service = cs;
 		}
 
 		/** RUN_JOB MESSAGE **/

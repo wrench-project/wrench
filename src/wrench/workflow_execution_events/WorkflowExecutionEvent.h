@@ -28,6 +28,7 @@ namespace wrench {
 		public:
 				enum EventType {
 						UNDEFINED,
+						UNSUPPORTED_JOB_TYPE,
 						STANDARD_JOB_COMPLETION,
 						STANDARD_JOB_FAILURE,
 						PILOT_JOB_START,
