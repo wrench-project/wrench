@@ -9,9 +9,7 @@
 
 ---------------------------------------------------------------------
 
-- Deal with configuration of various delays for ComputeServices
-	- Pass an Array of poperties key-value pairs to createComputeService?
-	        simulation->createComputeService(hostname, {{"s1","v1"}, {"s2", "v2"}})
+- Fix pilot job exception/error with current main.cpp
 
 - Deal with error handling via nice exceptions, etc.
 

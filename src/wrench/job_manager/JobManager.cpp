@@ -233,7 +233,7 @@ namespace wrench {
 
 						// Forward the notification along the notification chain
 						S4U_Mailbox::dput(m->job->popCallbackMailbox(),
-															new JobTypeNotSupportedMessage(m->job, m->compute_service));
+															new JobTypeNotSupportedMessage(m->job, m->compute_service, 0));
 						break;
 					}
 
@@ -250,7 +250,7 @@ namespace wrench {
 
 						// Forward the notification along the notification chain
 						S4U_Mailbox::dput(job->popCallbackMailbox(),
-															new StandardJobDoneMessage(job, m->compute_service));
+															new StandardJobDoneMessage(job, m->compute_service, 0.0));
 						break;
 					}
 
@@ -271,7 +271,7 @@ namespace wrench {
 
 						// Forward the notification along the notification chain
 						S4U_Mailbox::dput(job->popCallbackMailbox(),
-															new StandardJobFailedMessage(job, m->compute_service));
+															new StandardJobFailedMessage(job, m->compute_service, 0.0));
 						break;
 					}
 
@@ -289,7 +289,7 @@ namespace wrench {
 						// Forward the notification to the source
 						WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
 						S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
-															new PilotJobStartedMessage(job, m->compute_service));
+															new PilotJobStartedMessage(job, m->compute_service, 0.0));
 
 						break;
 					}
@@ -308,7 +308,7 @@ namespace wrench {
 						// Forward the notification to the source
 						WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
 						S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
-															new PilotJobExpiredMessage(job, m->compute_service));
+															new PilotJobExpiredMessage(job, m->compute_service, 0.0));
 
 						break;
 					}

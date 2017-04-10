@@ -55,96 +55,81 @@ namespace wrench {
 		}
 
 		/** DAEMON_STOPPED MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		DaemonStoppedMessage::DaemonStoppedMessage(): SimulationMessage(DAEMON_STOPPED, 1024.00) {
+		DaemonStoppedMessage::DaemonStoppedMessage(double payload): SimulationMessage(DAEMON_STOPPED, payload) {
 		}
 
-		/** RUN_JOB MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		JobTypeNotSupportedMessage::JobTypeNotSupportedMessage(WorkflowJob *job, ComputeService *cs): SimulationMessage(JOB_TYPE_NOT_SUPPORTED, 1024.0) {
+		/** JOB_TYPE_NOT_SUPPORTED MESSAGE **/
+		JobTypeNotSupportedMessage::JobTypeNotSupportedMessage(WorkflowJob *job, ComputeService *cs, double payload): SimulationMessage(JOB_TYPE_NOT_SUPPORTED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
-		/** RUN_JOB MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		RunStandardJobMessage::RunStandardJobMessage(StandardJob *job): SimulationMessage(RUN_STANDARD_JOB, 1024.0) {
+		/** RUN_STANDARD_JOB MESSAGE **/
+		RunStandardJobMessage::RunStandardJobMessage(StandardJob *job, double payload): SimulationMessage(RUN_STANDARD_JOB, payload) {
 			this->job = job;
 		}
 
-		/** JOB_DONE MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		StandardJobDoneMessage::StandardJobDoneMessage(StandardJob *job, ComputeService *cs): SimulationMessage(STANDARD_JOB_DONE, 1024.0) {
+		/** STANDARD_JOB_DONE MESSAGE **/
+		StandardJobDoneMessage::StandardJobDoneMessage(StandardJob *job, ComputeService *cs, double payload): SimulationMessage(STANDARD_JOB_DONE, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
-		/** JOB_FAILED MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		StandardJobFailedMessage::StandardJobFailedMessage(StandardJob *job, ComputeService *cs): SimulationMessage(STANDARD_JOB_FAILED, 1024.0) {
+		/** STANDARD_JOB_FAILED MESSAGE **/
+		StandardJobFailedMessage::StandardJobFailedMessage(StandardJob *job, ComputeService *cs, double payload): SimulationMessage(STANDARD_JOB_FAILED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
 		/** RUN_PILOT_JOB **/
-		// TODO: Make the "1024" below configurable somehow
-		RunPilotJobMessage::RunPilotJobMessage(PilotJob *job): SimulationMessage(RUN_PILOT_JOB, 1024.0) {
+		RunPilotJobMessage::RunPilotJobMessage(PilotJob *job, double payload): SimulationMessage(RUN_PILOT_JOB, payload) {
 			this->job = job;
 		}
 
 		/** PILOT_JOB_STARTED **/
-		// TODO: Make the "1024" below configurable somehow
-		PilotJobStartedMessage::PilotJobStartedMessage(PilotJob *job, ComputeService *cs): SimulationMessage(PILOT_JOB_STARTED, 1024.0) {
+		PilotJobStartedMessage::PilotJobStartedMessage(PilotJob *job, ComputeService *cs, double payload): SimulationMessage(PILOT_JOB_STARTED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
 		/** PILOT_JOB_TERMINATED **/
-		// TODO: Make the "1024" below configurable somehow
-		PilotJobExpiredMessage::PilotJobExpiredMessage(PilotJob *job, ComputeService *cs): SimulationMessage(PILOT_JOB_EXPIRED, 1024.0) {
+		PilotJobExpiredMessage::PilotJobExpiredMessage(PilotJob *job, ComputeService *cs, double payload): SimulationMessage(PILOT_JOB_EXPIRED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
 		/** PILOT_JOB_FAILED **/
-		// TODO: Make the "1024" below configurable somehow
-		PilotJobFailedMessage::PilotJobFailedMessage(PilotJob *job, ComputeService *cs): SimulationMessage(PILOT_JOB_FAILED, 1024.0) {
+		PilotJobFailedMessage::PilotJobFailedMessage(PilotJob *job, ComputeService *cs, double payload): SimulationMessage(PILOT_JOB_FAILED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
 		/** RUN_TASK MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		RunTaskMessage::RunTaskMessage(WorkflowTask *task): SimulationMessage(RUN_TASK, 1024.0) {
+		RunTaskMessage::RunTaskMessage(WorkflowTask *task, double payload): SimulationMessage(RUN_TASK, payload) {
 			this->task = task;
 		}
 
 		/** TASK_DONE MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		TaskDoneMessage::TaskDoneMessage(WorkflowTask *task, SequentialTaskExecutor *executor): SimulationMessage(TASK_DONE, 1024.0) {
+		TaskDoneMessage::TaskDoneMessage(WorkflowTask *task, SequentialTaskExecutor *executor, double payload): SimulationMessage(TASK_DONE, payload) {
 			this->task = task;
 			this->task_executor = executor;
 		}
 
 		/** NUM_IDLE_CORES_REQUEST MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		NumIdleCoresRequestMessage::NumIdleCoresRequestMessage() : SimulationMessage(NUM_IDLE_CORES_REQUEST, 1024.0) {
+		NumIdleCoresRequestMessage::NumIdleCoresRequestMessage(double payload) : SimulationMessage(NUM_IDLE_CORES_REQUEST, payload) {
 		}
 
 		/** NUM_IDLE_CORES_ANSWER MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		NumIdleCoresAnswerMessage::NumIdleCoresAnswerMessage(unsigned int num) : SimulationMessage(NUM_IDLE_CORES_ANSWER, 1024.0) {
+		NumIdleCoresAnswerMessage::NumIdleCoresAnswerMessage(unsigned int num, double payload) : SimulationMessage(NUM_IDLE_CORES_ANSWER, payload) {
 			this->num_idle_cores = num;
 		}
 
 		/** TTL_REQUEST MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		TTLRequestMessage::TTLRequestMessage() : SimulationMessage(TTL_REQUEST, 1024.0) {
+		TTLRequestMessage::TTLRequestMessage(double payload) : SimulationMessage(TTL_REQUEST, payload) {
 		}
 
 		/** TTL_ANSWER MESSAGE **/
-		// TODO: Make the "1024" below configurable somehow
-		TTLAnswerMessage::TTLAnswerMessage(double  ttl) : SimulationMessage(TTL_ANSWER, 1024.0) {
+		TTLAnswerMessage::TTLAnswerMessage(double  ttl, double payload) : SimulationMessage(TTL_ANSWER, payload) {
 			this->ttl = ttl;
 		}
 

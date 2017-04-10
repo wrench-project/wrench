@@ -60,67 +60,67 @@ namespace wrench {
 		};
 
 		struct DaemonStoppedMessage: public SimulationMessage {
-				DaemonStoppedMessage();
+				DaemonStoppedMessage(double payload);
 		};
 
 		/** JOBS */
 		struct JobTypeNotSupportedMessage: public SimulationMessage {
-				JobTypeNotSupportedMessage(WorkflowJob*, ComputeService *);
+				JobTypeNotSupportedMessage(WorkflowJob*, ComputeService *, double payload);
 				WorkflowJob *job;
 				ComputeService *compute_service;
 		};
 
 		/** STANDARD JOBS */
 		struct RunStandardJobMessage: public SimulationMessage {
-				RunStandardJobMessage(StandardJob*);
+				RunStandardJobMessage(StandardJob*, double payload);
 				StandardJob *job;
 		};
 
 		struct StandardJobDoneMessage: public SimulationMessage {
-				StandardJobDoneMessage(StandardJob *, ComputeService*);
+				StandardJobDoneMessage(StandardJob *, ComputeService*, double payload);
 				StandardJob *job;
 				ComputeService *compute_service;
 		};
 
 		struct StandardJobFailedMessage: public SimulationMessage {
-				StandardJobFailedMessage(StandardJob *, ComputeService*);
+				StandardJobFailedMessage(StandardJob *, ComputeService*, double payload);
 				StandardJob *job;
 				ComputeService *compute_service;
 		};
 
 		/** PILOT JOBS */
 		struct RunPilotJobMessage: public SimulationMessage {
-				RunPilotJobMessage(PilotJob*);
+				RunPilotJobMessage(PilotJob*, double payload);
 				PilotJob *job;
 		};
 
 		struct PilotJobStartedMessage: public SimulationMessage {
-				PilotJobStartedMessage(PilotJob *, ComputeService*);
+				PilotJobStartedMessage(PilotJob *, ComputeService*, double payload);
 				PilotJob *job;
 				ComputeService *compute_service;
 		};
 
 		struct PilotJobExpiredMessage: public SimulationMessage {
-				PilotJobExpiredMessage(PilotJob *, ComputeService*);
+				PilotJobExpiredMessage(PilotJob *, ComputeService*, double payload);
 				PilotJob *job;
 				ComputeService *compute_service;
 		};
 
 		struct PilotJobFailedMessage: public SimulationMessage {
-				PilotJobFailedMessage(PilotJob *, ComputeService*);
+				PilotJobFailedMessage(PilotJob *, ComputeService*, double payload);
 				PilotJob *job;
 				ComputeService *compute_service;
 		};
 
-		/** TASKS **/
+		/** TASKS (Within a job executor) **/
 
 		struct RunTaskMessage: public SimulationMessage {
-				RunTaskMessage(WorkflowTask*);
+				RunTaskMessage(WorkflowTask*, double payload);
 				WorkflowTask *task;
 		};
 
 		struct TaskDoneMessage: public SimulationMessage {
-				TaskDoneMessage(WorkflowTask *, SequentialTaskExecutor *);
+				TaskDoneMessage(WorkflowTask *, SequentialTaskExecutor *, double payload);
 				WorkflowTask *task;
 				SequentialTaskExecutor *task_executor;
 		};
@@ -128,22 +128,22 @@ namespace wrench {
 		/** NUM IDLE CORES QUERIES **/
 
 		struct NumIdleCoresRequestMessage: public SimulationMessage {
-				NumIdleCoresRequestMessage();
+				NumIdleCoresRequestMessage(double payload);
 		};
 
 		struct NumIdleCoresAnswerMessage: public SimulationMessage {
-				NumIdleCoresAnswerMessage(unsigned int);
+				NumIdleCoresAnswerMessage(unsigned int num, double payload);
 				unsigned int num_idle_cores;
 		};
 
 		/** TTL QUERIES **/
 
 		struct TTLRequestMessage: public SimulationMessage {
-				TTLRequestMessage();
+				TTLRequestMessage(double payload);
 		};
 
 		struct TTLAnswerMessage: public SimulationMessage {
-				TTLAnswerMessage(double);
+				TTLAnswerMessage(double ttl, double payload);
 				double ttl;
 		};
 

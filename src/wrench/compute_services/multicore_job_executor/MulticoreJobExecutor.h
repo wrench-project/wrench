@@ -29,19 +29,46 @@ namespace wrench {
 
 		public:
 				enum Property {
-					STOP_DAEMON_MESSAGE_PAYLOAD,
+						STOP_DAEMON_MESSAGE_PAYLOAD,
+						DAEMON_STOPPED_MESSAGE_PAYLOAD,
+						JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,
+						RUN_STANDARD_JOB_MESSAGE_PAYLOAD,
+						STANDARD_JOB_DONE_MESSAGE_PAYLOAD,
+						STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,
+						RUN_PILOT_JOB_MESSAGE_PAYLOAD,
+						PILOT_JOB_STARTED_MESSAGE_PAYLOAD,
+						PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,
+						PILOT_JOB_FAILED_MESSAGE_PAYLOAD,
+						NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD,
+						NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,
+						TTL_REQUEST_MESSAGE_PAYLOAD,
+						TTL_ANSWER_MESSAGE_PAYLOAD,
 				};
 
 		private:
 
 				std::map<MulticoreJobExecutor::Property, std::string> default_property_values =
 								{{MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::DAEMON_STOPPED_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::RUN_STANDARD_JOB_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::RUN_PILOT_JOB_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::PILOT_JOB_STARTED_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::PILOT_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::TTL_REQUEST_MESSAGE_PAYLOAD, "1024"},
+								 {MulticoreJobExecutor::Property::TTL_ANSWER_MESSAGE_PAYLOAD, "1024"},
+
 								};
 
 		public:
 				MulticoreJobExecutor(Simulation *simulation, std::string hostname,
 														 std::map<MulticoreJobExecutor::Property, std::string> = {},
-														 int num_worker_threads = -1, double ttl = -1.0,
+														 unsigned int num_worker_threads = 0, double ttl = -1.0,
 														 PilotJob *pj = nullptr, std::string suffix="");
 
 				// Stopping the service
@@ -59,13 +86,15 @@ namespace wrench {
 
 				// Setting/Getting property
 				void setProperty(MulticoreJobExecutor::Property, std::string);
-				std::string getProperty(MulticoreJobExecutor::Property);
+				std::string getPropertyString(MulticoreJobExecutor::Property);
+				std::string getPropertyValueAsString(MulticoreJobExecutor::Property);
+				double getPropertyValueAsDouble(MulticoreJobExecutor::Property);
 		private:
 
 				std::map<MulticoreJobExecutor::Property, std::string> property_list;
 
 				std::string hostname;
-				int num_worker_threads; // total threads to run tasks from standard jobs
+				unsigned int num_worker_threads; // total threads to run tasks from standard jobs
 				double ttl;
 				bool has_ttl;
 				double death_date;

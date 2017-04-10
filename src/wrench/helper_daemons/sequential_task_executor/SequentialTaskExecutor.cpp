@@ -65,7 +65,7 @@ namespace wrench {
 		 */
 		int SequentialTaskExecutor::runTask(WorkflowTask *task) {
 			// Send a "run a task" message to the daemon's mailbox
-			S4U_Mailbox::put(this->mailbox_name, new RunTaskMessage(task));
+			S4U_Mailbox::put(this->mailbox_name, new RunTaskMessage(task, 0.0));
 			return 0;
 		};
 
@@ -111,7 +111,7 @@ namespace wrench {
 										 this->callback_mailbox.c_str(),
 										 m->task->id.c_str());
 						S4U_Mailbox::dput(this->callback_mailbox,
-															new TaskDoneMessage(m->task, this));
+															new TaskDoneMessage(m->task, this, 0.0));
 
 						break;
 					}
