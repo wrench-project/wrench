@@ -34,7 +34,7 @@ namespace wrench {
 			this->state = ComputeService::DOWN;
 
 			WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
-			// Send a termination message to the daemon's mailbox
+			// Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
 			S4U_Mailbox::put(this->mailbox_name,
 											 new StopDaemonMessage(
 															 this->getPropertyValueAsDouble(STOP_DAEMON_MESSAGE_PAYLOAD)));
@@ -431,6 +431,7 @@ namespace wrench {
 
 				case SimulationMessage::STOP_DAEMON: {
 					this->terminate();
+					// This is Synchronous
 					S4U_Mailbox::put(this->mailbox_name + "_kill", new DaemonStoppedMessage(this->getPropertyValueAsDouble(DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 					return false;
 				}
@@ -536,7 +537,9 @@ namespace wrench {
 						failed_task->state = WorkflowTask::READY;
 					}
 					// Send back a job failed message
-					S4U_Mailbox::dput(job->popCallbackMailbox(),
+					WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
+					// NOTE: This is synchronous so that the process doesn't fall off the end
+					S4U_Mailbox::put(job->popCallbackMailbox(),
 														new StandardJobFailedMessage(job, this, this->getPropertyValueAsDouble(STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
 				}
 			}
@@ -551,7 +554,9 @@ namespace wrench {
 						failed_task->state = WorkflowTask::READY;
 					}
 					// Send back a job failed message
-					S4U_Mailbox::dput(job->popCallbackMailbox(),
+					WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
+					// NOTE: This is synchronous so that the process doesn't fall off the end
+					S4U_Mailbox::put(job->popCallbackMailbox(),
 														new StandardJobFailedMessage(job, this, this->getPropertyValueAsDouble(STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
 				}
 			}
@@ -639,7 +644,8 @@ namespace wrench {
 			if (this->containing_pilot_job) {
 
 				WRENCH_INFO("Letting the level above that the pilot job has ended on mailbox %s", this->containing_pilot_job->getCallbackMailbox().c_str());
-				S4U_Mailbox::dput(this->containing_pilot_job->popCallbackMailbox(),
+				// NOTE: This is synchronous so that the process doesn't fall off the end
+				S4U_Mailbox::put(this->containing_pilot_job->popCallbackMailbox(),
 													new PilotJobExpiredMessage(this->containing_pilot_job, this, this->getPropertyValueAsDouble(PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
 
 			}
