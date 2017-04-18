@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::EngineDaemon is a template class for WMS engines
  */
 
 #ifndef WRENCH_ENGINEDAEMON_H
@@ -18,6 +16,9 @@
 
 namespace wrench {
 
+		/**
+		 * @brief Abstract implementation of WMS engine
+		 */
 	class EngineDaemon : public S4U_DaemonWithMailbox {
 
 	public:

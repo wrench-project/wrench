@@ -5,14 +5,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::MinMinScheduler implements a Min-Min algorithm
  */
 
 #include <xbt.h>
 #include <set>
 #include <workflow_job/StandardJob.h>
-#include <logging/ColorLogging.h>
+#include <logging/Logging.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/scheduler/MinMinScheduler.h"

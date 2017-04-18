@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- *  @brief WRENCH::WorkflowFile represents a data file used in a WRENCH::Workflow.
  */
 
 #ifndef WRENCH_WORKFLOWFILE_H
@@ -22,6 +20,9 @@ namespace wrench {
 		class Workflow;
 		class WorkflowTask;
 
+		/**
+		 * @brief Abstraction for a data file used in a Workflow
+		 */
 		class WorkflowFile {
 
 				friend class Workflow;

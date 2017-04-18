@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::Scheduler is a mostly abstract implementation of a WMS scheduler
  */
 
 #ifndef WRENCH_SCHEDULER_H
@@ -19,6 +17,9 @@
 
 namespace wrench {
 
+		/**
+		 * @brief A (mostly) abstract implementation of a scheduler
+		 */
 		class Scheduler {
 
 		protected:

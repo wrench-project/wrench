@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::MinMinScheduler implements a Min-Min algorithm
  */
 
 #ifndef WRENCH_MINMINSCHEDULER_H
@@ -20,6 +18,9 @@ namespace wrench {
 
 		extern const char scheduler_name[] = "MinMinScheduler";
 
+		/**
+ 		 * @brief A min-min Scheduler
+ 		 */
 		class MinMinScheduler : public SchedulerTmpl<scheduler_name, MinMinScheduler> {
 
 		public:
@@ -32,6 +33,9 @@ namespace wrench {
 															 double flops,
 															 const std::set<ComputeService *> &compute_services);
 
+				/**
+				 * @brief Helper struct for the MinMinScheduler
+				 */
 				struct MinMinComparator {
 						bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
 				};

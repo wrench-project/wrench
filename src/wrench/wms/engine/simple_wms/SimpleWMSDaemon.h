@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- *  @brief wrench::SimpleWMSDaemon implements the daemon for a simple WMS abstraction
  */
 
 #ifndef WRENCH_SIMPLEWMSDAEMON_H
@@ -18,6 +16,9 @@ namespace wrench {
 
 	class Simulation; // forward ref
 
+		/**
+		 * @brief The daemon for a SimpleWMS
+		 */
 	class SimpleWMSDaemon : public EngineDaemon {
 
 	public:

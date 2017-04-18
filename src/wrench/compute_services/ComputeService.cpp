@@ -5,33 +5,17 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- *  @brief wrench::ComputeService is a mostly abstract implementation of a compute service.
  */
 
 #include <exception/WRENCHException.h>
-#include <logging/ColorLogging.h>
+#include <logging/Logging.h>
 #include "ComputeService.h"
 #include "simulation/Simulation.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(compute_service, "Log category for Compute Service");
 
-
 namespace wrench {
 
-
-
-		/*****************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/*****************************/
-
-		/*! \cond DEVELOPER */
-
-
-		/**
-		 * @brief Stop the compute service - must be called by the stop()
-		 *        method of derived classes
-		 */
 		void ComputeService::stop() {
 			this->state = ComputeService::DOWN;
 			// Notify the simulation that the service is terminated, if that
@@ -41,26 +25,14 @@ namespace wrench {
 			}
 		}
 
-		/**
-		 * @brief Get the name of the compute service
-		 * @return the compute service name
-		 */
 		std::string ComputeService::getName() {
 			return this->service_name;
 		}
 
-		/**
-		 * @brief Get the state of the compute service
-		 * @return the state
-		 */
 		bool ComputeService::isUp() {
 			return (this->state == ComputeService::UP);
 		}
 
-		/**
-		 * @brief Run a standard job
-		 * @param job the job
-		 */
 		void ComputeService::runJob(WorkflowJob *job) {
 
 			if (this->state == ComputeService::DOWN) {
@@ -79,17 +51,9 @@ namespace wrench {
 			}
 		}
 
-		/**
-		 * @brief Check whether the service is able to run a job
-		 *
-		 * @param job is a pointer to a workflow job
-		 * @return true is able, false otherwise
-		 */
 		bool ComputeService::canRunJob(WorkflowJob::Type job_type,
 																	 unsigned long min_num_cores,
 																	 double flops) {
-			bool can_run = true;
-
 			// If the service isn't up, forget it
 			if (this->state != ComputeService::UP) {
 				return false;
@@ -129,98 +93,45 @@ namespace wrench {
 			return true;
 		}
 
-		/*! \endcond */
-
-
-		/****************************/
-		/**	INTERNAL METHODS BELOW **/
-		/****************************/
-
-		/*! \cond INTERNAL */
-
-		/**
-		 * @brief Constructor, which links back the ComputeService
-		 *        to a Simulation (i.e.g, "registering" the ComputeService).
-		 *        This means that the Simulation can provide access to
-		 *        the ComputeService when queried.
-		 *
-		 * @param service_name is the name of the compute service
-		 * @param simulation is a pointer to a WRENCH simulation
-		 */
 		ComputeService::ComputeService(std::string service_name, Simulation *simulation) {
 			this->service_name = service_name;
 			this->simulation = simulation;
 			this->state = ComputeService::UP;
 		}
 
-		/**
-		 * @brief Constructor
-		 *
-		 * @param service_name is the name of the compute service
-		 */
 		ComputeService::ComputeService(std::string service_name) {
 			this->service_name = service_name;
 			this->simulation = nullptr;
 			this->state = ComputeService::UP;
 		}
 
-		/**
-		 * @brief Set the "supports standard jobs" property
-		 * @param v is true or false
-		 */
 		void ComputeService::setSupportStandardJobs(bool v) {
 			this->supports_standard_jobs = v;
 		}
 
-		/**
-		 * @brief Set the "supports pilot jobs" property
-		 * @param v is true or false
-		 */
 		void ComputeService::setSupportPilotJobs(bool v) {
 			this->supports_pilot_jobs = v;
 		}
 
-		/**
-		 * @brief Get the "supports standard jobs" property
-		 * @return
-		 */
 		bool ComputeService::supportsStandardJobs() {
 			return this->supports_standard_jobs;
 		}
 
-		/**
-		 * @brief Get the "supports pilot jobs" property
-		 * @return
-		 */
 		bool ComputeService::supportsPilotJobs() {
 			return this->supports_pilot_jobs;
 		}
 
-		/**
-		 * @brief Run a standard job
-		 * @param the job
-		 * @return
-		 */
 		void ComputeService::runStandardJob(StandardJob *job) {
 			throw WRENCHException("The compute service does not implement runStandardJob(StandardJob *)");
 		}
 
-		/**
-		 * @brief Run a pilot job
-		 * @param the job
-		 * @return
-		 */
+
 		void ComputeService::runPilotJob(PilotJob *job) {
 			throw WRENCHException("The compute service does not implement runPilotJob(PilotJob *)");
 		}
 
-		/**
-		 * @brief set the state of the compute service to DOWN
-		 */
 		void ComputeService::setStateToDown() {
 			this->state = ComputeService::DOWN;
 		}
-
-		/*! \endcond */
 
 };

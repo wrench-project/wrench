@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::EngineTmpl
  */
 
 #ifndef WRENCH_ENGINETMPL_H
@@ -20,7 +18,13 @@ namespace wrench {
 
 	class Simulation; // forward ref
 
-	// Curiously Recurring Template Pattern (CRTP)
+	/**
+	 * @brief WMS engine template
+	 *
+	 */
+  /*
+	 * (Curiously Recurring Template Pattern - CRTP)
+	 */
 	template<const char *TYPE, typename IMPL, typename DAEMON>
 	class EngineTmpl : public WMS {
 

@@ -6,14 +6,13 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief wrench::SimpleWMSDaemon implements the daemon for a simple WMS abstraction
  */
 
 #include <iostream>
 #include <memory>
 
 #include <exception/WRENCHException.h>
-#include <logging/ColorLogging.h>
+#include <logging/Logging.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/engine/simple_wms/SimpleWMSDaemon.h"
@@ -49,7 +48,7 @@ namespace wrench {
 		 */
 		int SimpleWMSDaemon::main() {
 
-			ColorLogging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
+			Logging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
 
 			WRENCH_INFO("Starting on host %s listening on mailbox %s", S4U_Simulation::getHostName().c_str(),
 									this->mailbox_name.c_str());

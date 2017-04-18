@@ -5,10 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::WorkflowExecutionEvent implements several events that
- * are relevant to the execution of a WMS, which are accessed via some
- * Workflow.getNextEvent() method.
  */
 
 
@@ -23,6 +19,10 @@
 namespace wrench {
 
 
+		/**
+		 * @brief A class to represent the various execution events that
+		 * are relevant to the execution of a Workflow.
+		 */
 		class WorkflowExecutionEvent {
 
 		public:

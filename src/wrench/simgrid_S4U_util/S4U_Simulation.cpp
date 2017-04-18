@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief S4U_Simulation is an S4U Wrapper
  */
 
 #include <iostream>

@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief Simple macros for doing color
  */
 
 
@@ -28,10 +27,13 @@ namespace wrench {
 		#define WRENCH_LOGGING_COLOR_CYAN			"\033[1;36m"
 
 		/**	Wrapper macros around XBT_INFO **/
-		#define WRENCH_INFO(...)  ColorLogging::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; ColorLogging::endThisProcessColor()
-		#define WRENCH_DEBUG(...)  ColorLogging::beginThisProcessColor(); XBT_DEBUG(__VA_ARGS__) ; ColorLogging::endThisProcessColor()
+		#define WRENCH_INFO(...)  Logging::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; Logging::endThisProcessColor()
+		#define WRENCH_DEBUG(...)  Logging::beginThisProcessColor(); XBT_DEBUG(__VA_ARGS__) ; Logging::endThisProcessColor()
 
-		class ColorLogging {
+		/**
+		 * @brief Color-enabling wrappers around Simgrid's logging macros.
+		 */
+		class Logging {
 
 		public:
 				static void beginThisProcessColor();

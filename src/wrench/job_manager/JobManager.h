@@ -6,8 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief PilotJobManager implements a simple facility for managing pilot
- *        jobs submitted by a WMS to pilot-job-enabled compute services.
+
  */
 
 
@@ -25,8 +24,12 @@ namespace wrench {
 		class PilotJob;
 		class ComputeService;
 
+		/**
+		 * @brief A  facility for managing pilot
+ 		 *     jobs submitted by a WMS to compute services.
+		 */
 		class JobManager : public S4U_DaemonWithMailbox {
-			public:
+		public:
 				JobManager(Workflow *);
 				~JobManager();
 
@@ -52,7 +55,7 @@ namespace wrench {
 				std::set<PilotJob*> getPendingPilotJobs();
 				std::set<PilotJob*> getRunningPilotJobs();
 
-			private:
+		private:
 
 				int main();
 

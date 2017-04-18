@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::SchedulerTmpl
  */
 
 #ifndef WRENCH_SCHEDULERTMPL_H
@@ -16,21 +14,26 @@
 
 namespace wrench {
 
-	// Curiously Recurring Template Pattern (CRTP)
-	template<const char *TYPE, typename IMPL>
-	class SchedulerTmpl : public Scheduler {
+		/**
+		 * @brief A Scheduler template
+		 */
+		/*
+		 * (Curiously Recurring Template Pattern - CRTP)
+		 */
+		template<const char *TYPE, typename IMPL>
+		class SchedulerTmpl : public Scheduler {
 
-	public:
-		static std::string _SCHED_ID;
-		static std::unique_ptr<Scheduler> Create() { return std::unique_ptr<Scheduler>(new IMPL()); }
-		static const std::string SCHED_ID; // for registration
+		public:
+				static std::string _SCHED_ID;
+				static std::unique_ptr<Scheduler> Create() { return std::unique_ptr<Scheduler>(new IMPL()); }
+				static const std::string SCHED_ID; // for registration
 
-	protected:
-		SchedulerTmpl() { sched_type = SCHED_ID; }
-	};
+		protected:
+				SchedulerTmpl() { sched_type = SCHED_ID; }
+		};
 
-	template<const char *TYPE, typename IMPL>
-	std::string SchedulerTmpl<TYPE, IMPL>::_SCHED_ID = TYPE;
+		template<const char *TYPE, typename IMPL>
+		std::string SchedulerTmpl<TYPE, IMPL>::_SCHED_ID = TYPE;
 
 }
 

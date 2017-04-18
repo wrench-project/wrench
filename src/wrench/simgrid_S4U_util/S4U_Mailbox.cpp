@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief S4U_Mailbox is a S4U wrapper
  */
 
 #include <simulation/SimulationMessage.h>
@@ -14,7 +12,7 @@
 #include "S4U_Mailbox.h"
 #include <simgrid/s4u.hpp>
 #include <xbt/ex.hpp>
-#include <logging/ColorLogging.h>
+#include <logging/Logging.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
 

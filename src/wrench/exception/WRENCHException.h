@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::Exception implements a simple Exception class.
  */
 
 #ifndef WRENCH_EXCEPTION_H
@@ -17,6 +16,9 @@
 
 namespace wrench {
 
+		/**
+		 * @brief A simple Exception class
+		 */
 		class WRENCHException: public std::exception {
 
 		private:
@@ -24,6 +26,10 @@ namespace wrench {
 
 		public:
 
+				/**
+				 * @brief Constructor
+				 * @param string: the exception's string message
+				 */
 				WRENCHException(const std::string string) {
 					message = string;
 				}

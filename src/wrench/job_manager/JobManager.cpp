@@ -6,12 +6,10 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief JobManager implements a simple facility for managing
- *        jobs (standard and pilot) submitted by a WMS to compute services.
  */
 
 #include <string>
-#include <logging/ColorLogging.h>
+#include <logging/Logging.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "exception/WRENCHException.h"
@@ -190,7 +188,7 @@ namespace wrench {
 		 */
 		int JobManager::main() {
 
-			ColorLogging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
+			Logging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
 
 			WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 

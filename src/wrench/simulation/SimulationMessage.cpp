@@ -6,8 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::SimulationMessage and derived classes to encapsulate
- *  control/data messages exchanged by simulated processes
  */
 
 #include "SimulationMessage.h"

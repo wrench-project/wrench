@@ -6,11 +6,9 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief wrench::Simulation is a top-level class that keeps track of
- *  the simulation state.
  */
 
-#include <logging/ColorLogging.h>
+#include <logging/Logging.h>
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 #include "simulation/Simulation.h"
 #include "exception/WRENCHException.h"

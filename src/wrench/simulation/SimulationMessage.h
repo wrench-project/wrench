@@ -6,8 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- *  @brief WRENCH::SimulationMessage and derived classes to encapsulate
- *  control/data messages exchanged by simulated processes
  */
 
 #ifndef WRENCH_SIMGRIDMESSAGES_H
@@ -24,9 +22,12 @@ namespace wrench {
 		class StandardJob;
 		class PilotJob;
 
-		// Base struct
-		struct SimulationMessage {
+		/**
+		 * @brief Generic class that describe a message communicated by simulated processes
+		 */
+		class SimulationMessage {
 
+		public:
 				// Message type enum
 				enum Type {
 						STOP_DAEMON,
@@ -54,95 +55,148 @@ namespace wrench {
 				double size;
 		};
 
-		/** DAEMON STOPPING **/
-		struct StopDaemonMessage: public SimulationMessage {
+		/**
+		 * @brief "STOP_DAEMON" SimulationMessage
+		 */
+		class StopDaemonMessage: public SimulationMessage {
+		public:
 				StopDaemonMessage(double payload);
 		};
 
-		struct DaemonStoppedMessage: public SimulationMessage {
+		/**
+		 * @brief "DAEMON_STOPPED" SimulationMessage
+		 */
+		class DaemonStoppedMessage: public SimulationMessage {
+		public:
 				DaemonStoppedMessage(double payload);
 		};
 
-		/** JOBS */
-		struct JobTypeNotSupportedMessage: public SimulationMessage {
+		/**
+		 * @brief "JOB_TYPE_NOT_SUPPORTED" SimulationMessage
+		 */		class JobTypeNotSupportedMessage: public SimulationMessage {
+		public:
 				JobTypeNotSupportedMessage(WorkflowJob*, ComputeService *, double payload);
 				WorkflowJob *job;
 				ComputeService *compute_service;
 		};
 
-		/** STANDARD JOBS */
-		struct RunStandardJobMessage: public SimulationMessage {
+		/**
+		 * @brief "RUN_STANDARD_JOB" SimulationMessage
+		 */
+		class RunStandardJobMessage: public SimulationMessage {
+		public:
 				RunStandardJobMessage(StandardJob*, double payload);
 				StandardJob *job;
 		};
 
-		struct StandardJobDoneMessage: public SimulationMessage {
+		/**
+		 * @brief "STANDARD_JOB_DONE" SimulationMessage
+		 */
+		class StandardJobDoneMessage: public SimulationMessage {
+		public:
 				StandardJobDoneMessage(StandardJob *, ComputeService*, double payload);
 				StandardJob *job;
 				ComputeService *compute_service;
 		};
 
-		struct StandardJobFailedMessage: public SimulationMessage {
+		/**
+		 * @brief "STANDARD_JOB_FAILED" SimulationMessage
+		 */
+		class StandardJobFailedMessage: public SimulationMessage {
+		public:
 				StandardJobFailedMessage(StandardJob *, ComputeService*, double payload);
 				StandardJob *job;
 				ComputeService *compute_service;
 		};
 
-		/** PILOT JOBS */
-		struct RunPilotJobMessage: public SimulationMessage {
+		/**
+		 * @brief "RUN_PILOT_JOB" SimulationMessage
+		 */
+		class RunPilotJobMessage: public SimulationMessage {
+		public:
 				RunPilotJobMessage(PilotJob*, double payload);
 				PilotJob *job;
 		};
 
-		struct PilotJobStartedMessage: public SimulationMessage {
+		/**
+		 * @brief "PILOT_JOB_STARTED" SimulationMessage
+		 */
+		class PilotJobStartedMessage: public SimulationMessage {
+		public:
 				PilotJobStartedMessage(PilotJob *, ComputeService*, double payload);
 				PilotJob *job;
 				ComputeService *compute_service;
 		};
 
-		struct PilotJobExpiredMessage: public SimulationMessage {
+		/**
+		 * @brief "PILOT_JOB_EXPIRED" SimulationMessage
+		 */
+		class PilotJobExpiredMessage: public SimulationMessage {
+		public:
 				PilotJobExpiredMessage(PilotJob *, ComputeService*, double payload);
 				PilotJob *job;
 				ComputeService *compute_service;
 		};
 
-		struct PilotJobFailedMessage: public SimulationMessage {
+		/**
+		 * @brief "PILOT_JOB_FAILED" SimulationMessage
+		 */
+		class PilotJobFailedMessage: public SimulationMessage {
+		public:
 				PilotJobFailedMessage(PilotJob *, ComputeService*, double payload);
 				PilotJob *job;
 				ComputeService *compute_service;
 		};
 
-		/** TASKS (Within a job executor) **/
-
-		struct RunTaskMessage: public SimulationMessage {
+		/**
+		 * @brief "RUN_TASK" SimulationMessage
+		 */
+		class RunTaskMessage: public SimulationMessage {
+		public:
 				RunTaskMessage(WorkflowTask*, double payload);
 				WorkflowTask *task;
 		};
 
-		struct TaskDoneMessage: public SimulationMessage {
+		/**
+		 * @brief "TASK_DONE" SimulationMessage
+		 */
+		class TaskDoneMessage: public SimulationMessage {
+		public:
 				TaskDoneMessage(WorkflowTask *, SequentialTaskExecutor *, double payload);
 				WorkflowTask *task;
 				SequentialTaskExecutor *task_executor;
 		};
 
-		/** NUM IDLE CORES QUERIES **/
-
-		struct NumIdleCoresRequestMessage: public SimulationMessage {
+		/**
+		 * @brief "NUM_IDLE_CORES_REQUEST" SimulationMessage
+		 */
+		class NumIdleCoresRequestMessage: public SimulationMessage {
+		public:
 				NumIdleCoresRequestMessage(double payload);
 		};
 
-		struct NumIdleCoresAnswerMessage: public SimulationMessage {
+		/**
+		 * @brief "NUM_IDLE_CORES_ANSWER" SimulationMessage
+		 */
+		class NumIdleCoresAnswerMessage: public SimulationMessage {
+		public:
 				NumIdleCoresAnswerMessage(unsigned int num, double payload);
 				unsigned int num_idle_cores;
 		};
 
-		/** TTL QUERIES **/
-
-		struct TTLRequestMessage: public SimulationMessage {
+		/**
+		 * @brief "TTL_REQUEST" SimulationMessage
+		 */
+		class TTLRequestMessage: public SimulationMessage {
+		public:
 				TTLRequestMessage(double payload);
 		};
 
-		struct TTLAnswerMessage: public SimulationMessage {
+		/**
+		 * @brief "TTL_ANSWER" SimulationMessage
+		 */
+		class TTLAnswerMessage: public SimulationMessage {
+		public:
 				TTLAnswerMessage(double ttl, double payload);
 				double ttl;
 		};

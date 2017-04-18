@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::SimpleWMS implements a simple WMS abstraction
  */
 
 #ifndef WRENCH_SIMPLEWMS_H
@@ -17,12 +15,15 @@
 
 namespace wrench {
 
-	extern const char simplewms_name[] = "SimpleWMS";
+		extern const char simplewms_name[] = "SimpleWMS";
 
-	class SimpleWMS : public EngineTmpl<simplewms_name, SimpleWMS, SimpleWMSDaemon> {
+		/**
+		 *  @brief A simple WMS abstraction
+		 */
+		class SimpleWMS : public EngineTmpl<simplewms_name, SimpleWMS, SimpleWMSDaemon> {
 
-	public:
-		SimpleWMS();
-	};
+		public:
+				SimpleWMS();
+		};
 }
 #endif //WRENCH_SIMPLEWMS_H

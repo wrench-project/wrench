@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief S4U_Mailbox is a S4U wrapper
  */
 
 #ifndef WRENCH_S4U_MAILBOX_H
@@ -16,9 +15,11 @@
 #include <simulation/SimulationMessage.h>
 
 namespace wrench {
+
+		/**
+		 * @brief Wrappers around Simgrid's mailbox methods
+		 */
 		class S4U_Mailbox {
-
-
 
 		public:
 				static std::string generateUniqueMailboxName(std::string);

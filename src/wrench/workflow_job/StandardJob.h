@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief A Job that consists of 1 or more READY tasks
  */
 
 
@@ -20,6 +18,9 @@
 
 namespace wrench {
 
+		/**
+		 * @brief A standard (i.e., non-pilot) WorkflowJob
+		 */
 		class StandardJob : public WorkflowJob {
 
 		public:
