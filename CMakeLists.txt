@@ -28,12 +28,9 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowFile.h
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/wms/WMS.h
-        src/wrench/wms/engine/EngineDaemon.h
         src/wrench/wms/engine/EngineTmpl.h
         src/wrench/wms/engine/EngineFactory.h
         src/wrench/wms/engine/EngineFactory.cpp
-        src/wrench/wms/engine/simple_wms/SimpleWMSDaemon.h
-        src/wrench/wms/engine/simple_wms/SimpleWMSDaemon.cpp
         src/wrench/wms/engine/simple_wms/SimpleWMS.h
         src/wrench/wms/engine/simple_wms/SimpleWMS.cpp
         src/wrench/wms/scheduler/Scheduler.h

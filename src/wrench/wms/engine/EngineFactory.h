@@ -33,9 +33,9 @@ namespace wrench {
 		EngineFactory();
 	};
 
-	template<const char *TYPE, typename IMPL, typename DAEMON>
-	const std::string EngineTmpl<TYPE, IMPL, DAEMON>::WMS_ID = EngineFactory::getInstance()->Register(
-			EngineTmpl<TYPE, IMPL, DAEMON>::_WMS_ID, &EngineTmpl<TYPE, IMPL, DAEMON>::Create);
+	template<const char *TYPE, typename IMPL>
+	const std::string EngineTmpl<TYPE, IMPL>::WMS_ID = EngineFactory::getInstance()->Register(
+			EngineTmpl<TYPE, IMPL>::_WMS_ID, &EngineTmpl<TYPE, IMPL>::Create);
 }
 
 #endif //WRENCH_ENGINEFACTORY_H

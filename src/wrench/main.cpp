@@ -81,9 +81,9 @@ int main(int argc, char **argv) {
 
 
 	std::cerr << "Instantiating a WMS on c-0.me..." << std::endl;
-	simulation.createWMS("SimpleWMS", "RandomScheduler", &workflow, "c-0.me");
-//	simulation.createWMS("SimpleWMS", "MinMinScheduler", &workflow, "c-0.me");
-//	simulation.createWMS("SimpleWMS", "MaxMinScheduler", &workflow, "c-0.me");
+	simulation.createWMS("simple_wms", "RandomScheduler", &workflow, "c-0.me");
+//	simulation.createWMS("simple_wms", "MinMinScheduler", &workflow, "c-0.me");
+//	simulation.createWMS("simple_wms", "MaxMinScheduler", &workflow, "c-0.me");
 
 	std::cerr << "Launching the Simulation..." << std::endl;
 	simulation.launch();
