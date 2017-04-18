@@ -57,11 +57,11 @@ namespace wrench {
 
 		private:
 
-			 /**
-	      * @brief Main method of the sequential task executor daemon
-	      *
-	      * @return 0 on termination
-	      */
+				/**
+				 * @brief Main method of the sequential task executor daemon
+				 *
+				 * @return 0 on termination
+				 */
 				int main();
 
 				std::string callback_mailbox;

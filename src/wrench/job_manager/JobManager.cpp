@@ -5,7 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
  */
 
 #include <string>
@@ -23,17 +22,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 
 namespace wrench {
 
-		/*****************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/*****************************/
 
-		/*! \cond DEVELOPER */
-
-		/**
-		 * @brief Constructor, which starts a job manager daemon
-		 *
-		 * @param workflow is a pointer to the Workflow whose jobs are to be managed
-		 */
 		JobManager::JobManager(Workflow *workflow) :
 						S4U_DaemonWithMailbox("job_manager", "job_manager") {
 
@@ -44,35 +33,21 @@ namespace wrench {
 			this->start(localhost);
 		}
 
-		/**
-		 * @brief Destructor
-		 */
 		JobManager::~JobManager() {
 			this->kill();
 		}
 
 
-		/**
-		 * @brief Kill the job manager (brutally)
-		 */
 		void JobManager::kill() {
 			this->kill_actor();
 			this->jobs.clear();
 		}
 
-		/**
-		 * @brief Stop the job manager
-		 */
 		void JobManager::stop() {
-				S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage(0.0));
+			S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage(0.0));
 		}
 
-		/**
-		 * @brief Create a standard job
-		 *
-		 * @param tasks is a vector of workflow task pointers to include in the job
-		 * @return a raw pointer to the job
-		 */
+
 		StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks) {
 			StandardJob *raw_ptr = new StandardJob(tasks);
 			std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);
@@ -81,25 +56,12 @@ namespace wrench {
 			return raw_ptr;
 		}
 
-		/**
-		 * @brief Create a standard job
-		 *
-		 * @param task is a pointer to a workflow task
-		 * @return a raw pointer to the job
-		 */
-		StandardJob *JobManager::createStandardJob(WorkflowTask * task) {
+		StandardJob *JobManager::createStandardJob(WorkflowTask *task) {
 			std::vector<WorkflowTask *> tasks;
 			tasks.push_back(task);
 			return this->createStandardJob(tasks);
 		}
 
-		/**
-		 * @brief Create a pilot job
-		 *
-		 * @param num_cores is the number of cores required by the job
-		 * @param durations is the duration in seconds
-		 * @return a raw pointer to the job
-		 */
 		PilotJob *JobManager::createPilotJob(Workflow *workflow, int num_cores, double duration) {
 			PilotJob *raw_ptr = new PilotJob(workflow, num_cores, duration);
 			std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
@@ -107,12 +69,6 @@ namespace wrench {
 			return raw_ptr;
 		}
 
-		/**
-		 * @brief Submit a job to a compute service
-		 *
-		 * @param job is a pointer to a workflow job
-		 * @param compute_service is a pointer to a compute service
-		 */
 		void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service) {
 
 			// Push back the mailbox of the manager,
@@ -120,18 +76,18 @@ namespace wrench {
 			job->pushCallbackMailbox(this->mailbox_name);
 
 			// Update the job state and insert it into the pending list
-			switch(job->getType()) {
+			switch (job->getType()) {
 				case WorkflowJob::STANDARD: {
-					((StandardJob *)job)->state = StandardJob::PENDING;
-					for (auto t : ((StandardJob *)job)->tasks) {
+					((StandardJob *) job)->state = StandardJob::PENDING;
+					for (auto t : ((StandardJob *) job)->tasks) {
 						t->setState(WorkflowTask::State::PENDING);
 					}
-					this->pending_standard_jobs.insert((StandardJob*)job);
+					this->pending_standard_jobs.insert((StandardJob *) job);
 					break;
 				}
 				case WorkflowJob::PILOT: {
-					((PilotJob *)job)->state = PilotJob::PENDING;
-					this->pending_pilot_jobs.insert((PilotJob*)job);
+					((PilotJob *) job)->state = PilotJob::PENDING;
+					this->pending_pilot_jobs.insert((PilotJob *) job);
 					break;
 				}
 			}
@@ -141,51 +97,27 @@ namespace wrench {
 
 		}
 
-		/**
-		 * @brief Cancel a pilot job that hasn't expired yet
-		 * @param job is the pilot job
-		 */
+
 		void JobManager::cancelPilotJob(PilotJob *job) {
 			throw WRENCHException("cancelPilotJob() not implemented yet");
 		}
 
-		/**
-		 * @brief Get the list of currently running pilot jobs
-		 * @return a set of jobs
-		 */
+
 		std::set<PilotJob *> JobManager::getRunningPilotJobs() {
 			return this->running_pilot_jobs;
 		}
 
-		/**
-		 * @brief Get the list of currently pending pilot jobs
-		 * @return  a set of jobs
-		 */
+
 		std::set<PilotJob *> JobManager::getPendingPilotJobs() {
 			return this->pending_pilot_jobs;
 		}
 
-		/**
-		 * @brief Forget a job (to free memory, typically once the job is completed)
-		 *
-		 */
+
 		void JobManager::forgetJob(WorkflowJob *) {
 			throw WRENCHException("forgetJob() not implemented yet");
 		}
 
-		/*! \endcond */
 
-
-		/****************************/
-		/**	INTERNAL METHODS BELOW **/
-		/****************************/
-
-		/*! \cond INTERNAL */
-
-		/**
-		 * @brief Main method of the job manager daemon
-		 * @return 0 in success
-		 */
 		int JobManager::main() {
 
 			Logging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
@@ -213,7 +145,7 @@ namespace wrench {
 
 						// update job state and remove from list
 						if (m->job->getType() == WorkflowJob::STANDARD) {
-							StandardJob *job = (StandardJob *)m->job;
+							StandardJob *job = (StandardJob *) m->job;
 							job->state = StandardJob::State::NOT_SUBMITTED;
 							this->pending_standard_jobs.erase(job);
 
@@ -224,7 +156,7 @@ namespace wrench {
 						}
 
 						if (m->job->getType() == WorkflowJob::STANDARD) {
-							PilotJob *job = (PilotJob *)m->job;
+							PilotJob *job = (PilotJob *) m->job;
 							job->state = PilotJob::State::NOT_SUBMITTED;
 							this->pending_pilot_jobs.erase(job);
 						}
@@ -321,8 +253,6 @@ namespace wrench {
 			WRENCH_INFO("New Multicore Task Executor terminating");
 			return 0;
 		}
-
-		/*! \endcond */
 
 
 };
