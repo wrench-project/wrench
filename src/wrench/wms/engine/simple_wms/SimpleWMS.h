@@ -13,16 +13,20 @@
 #define WRENCH_SIMPLEWMS_H
 
 #include "wms/engine/EngineFactory.h"
-#include "wms/engine/simple_wms/SimpleWMSDaemon.h"
 
 namespace wrench {
 
-	extern const char simplewms_name[] = "SimpleWMS";
+	extern const char simplewms_name[] = "simple_wms";
 
-	class SimpleWMS : public EngineTmpl<simplewms_name, SimpleWMS, SimpleWMSDaemon> {
+	class Simulation; // forward ref
+
+	class SimpleWMS : public EngineTmpl<simplewms_name, SimpleWMS> {
 
 	public:
 		SimpleWMS();
+
+	private:
+		int main();
 	};
 }
 #endif //WRENCH_SIMPLEWMS_H

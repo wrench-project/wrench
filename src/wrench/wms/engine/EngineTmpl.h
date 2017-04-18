@@ -12,17 +12,16 @@
 #ifndef WRENCH_ENGINETMPL_H
 #define WRENCH_ENGINETMPL_H
 
-#include <job_manager/JobManager.h>
+#include "job_manager/JobManager.h"
 #include "wms/WMS.h"
-#include "wms/engine/EngineDaemon.h"
 
 namespace wrench {
 
 	class Simulation; // forward ref
 
 	// Curiously Recurring Template Pattern (CRTP)
-	template<const char *TYPE, typename IMPL, typename DAEMON>
-	class EngineTmpl : public WMS {
+	template<const char *TYPE, typename IMPL>
+	class EngineTmpl : public WMS, public S4U_DaemonWithMailbox {
 
 	public:
 		static std::string _WMS_ID;
@@ -38,29 +37,28 @@ namespace wrench {
 		 * @param scheduler is a pointer to a scheduler implementation
 		 * @param hostname
 		 */
-		void configure(Simulation *simulation,
-		               Workflow *workflow,
-		               std::unique_ptr<Scheduler> scheduler,
+		void configure(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler,
 		               std::string hostname) {
 
-			// Create the daemon
-			this->wms_process = std::unique_ptr<EngineDaemon>(new DAEMON(simulation, workflow, std::move(scheduler)));
+			this->simulation = simulation;
+			this->workflow = workflow;
+			this->scheduler = std::move(scheduler);
+
 			// Start the daemon
-			this->wms_process->start(hostname);
+			this->start(hostname);
 		}
 
 	protected:
-		EngineTmpl() { wms_type = WMS_ID; }
+		EngineTmpl() : S4U_DaemonWithMailbox(TYPE, TYPE) { wms_type = WMS_ID; }
 
-	private:
+	protected:
 		Simulation *simulation;
 		Workflow *workflow;
 		std::unique_ptr<Scheduler> scheduler;
-		std::unique_ptr<EngineDaemon> wms_process;
 	};
 
-	template<const char *TYPE, typename IMPL, typename DAEMON>
-	std::string EngineTmpl<TYPE, IMPL, DAEMON>::_WMS_ID = TYPE;
+	template<const char *TYPE, typename IMPL>
+	std::string EngineTmpl<TYPE, IMPL>::_WMS_ID = TYPE;
 }
 
 #endif //WRENCH_ENGINETMPL_H
