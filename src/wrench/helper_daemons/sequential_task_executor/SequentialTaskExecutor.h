@@ -17,6 +17,10 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
+
 		/**
 		 *  @brief Implementation of a simple
  		 *  sequential task executor abstraction.
@@ -25,50 +29,26 @@ namespace wrench {
 
 		public:
 
-				/** \cond INTERNAL **/
-
-				/**
-				 * @brief Constructor, which starts the daemon for the service on a host
-				 *
-				 * @param hostname: the name of the host
-				 * @param callback_mailbox: the callback mailbox to which the sequential
-				 *        task executor sends back "task done" or "task failed" messages
-				 */
 				SequentialTaskExecutor(std::string hostname, std::string callback_mailbox);
 
-				/**
-				 * @brief Terminate the sequential task executor
-				 */
 				void stop();
 
-				/**
-				 * @brief Kill the sequential task executor
-				 */
 				void kill();
 
-				/**
-		 		 * @brief Have the sequential task executor a task
-		     *
-		     * @param task: a pointer to the task
-		     *
-		     * @return 0 on success
-		     */
 				int runTask(WorkflowTask *task);
 
 		private:
 
-				/**
-				 * @brief Main method of the sequential task executor daemon
-				 *
-				 * @return 0 on termination
-				 */
 				int main();
 
 				std::string callback_mailbox;
 				std::string hostname;
 
-				/** \endcond */
 		};
+
+		/***********************/
+		/** \endcond INTERNAL  */
+		/***********************/
 };
 
 

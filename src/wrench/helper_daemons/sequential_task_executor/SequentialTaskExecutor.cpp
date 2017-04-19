@@ -17,6 +17,13 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(sequential_task_executor, "Log category for Sequent
 
 namespace wrench {
 
+		/**
+		 * @brief Constructor, which starts the daemon for the service on a host
+		 *
+		 * @param hostname: the name of the host
+		 * @param callback_mailbox: the callback mailbox to which the sequential
+		 *        task executor sends back "task done" or "task failed" messages
+		 */
 		SequentialTaskExecutor::SequentialTaskExecutor(std::string hostname, std::string callback_mailbox) :
 						S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
 
@@ -27,21 +34,39 @@ namespace wrench {
 			this->start(this->hostname);
 		}
 
+		/**
+		 * @brief Terminate the sequential task executor
+		 */
 		void SequentialTaskExecutor::stop() {
 			// Send a termination message to the daemon's mailbox
 			S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage(0.0));
 		}
 
+		/**
+		 * @brief Kill the sequential task executor
+		 */
 		void SequentialTaskExecutor::kill() {
 			this->kill_actor();
 		}
 
+		/**
+		 * @brief Have the sequential task executor a task
+		 *
+		 * @param task: a pointer to the task
+		 *
+		 * @return 0 on success
+		 */
 		int SequentialTaskExecutor::runTask(WorkflowTask *task) {
 			// Send a "run a task" message to the daemon's mailbox
 			S4U_Mailbox::put(this->mailbox_name, new RunTaskMessage(task, 0.0));
 			return 0;
 		};
 
+		/**
+		 * @brief Main method of the sequential task executor daemon
+		 *
+		 * @return 0 on termination
+		 */
 		int SequentialTaskExecutor::main() {
 
 			Logging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_BLUE);
@@ -75,8 +100,8 @@ namespace wrench {
 
 						// Send the callback
 						WRENCH_INFO("Notifying mailbox %s that task %s has finished",
-										 this->callback_mailbox.c_str(),
-										 m->task->id.c_str());
+												this->callback_mailbox.c_str(),
+												m->task->id.c_str());
 						S4U_Mailbox::dput(this->callback_mailbox,
 															new TaskDoneMessage(m->task, this, 0.0));
 
@@ -94,4 +119,4 @@ namespace wrench {
 			return 0;
 		}
 
-}
+};
