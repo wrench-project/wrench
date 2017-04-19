@@ -16,17 +16,11 @@
 
 namespace wrench {
 
-		/*****************************/
-		/**	INTERNAL METHODS BELOW **/
-		/*****************************/
-
-		/*! \cond INTERNAL */
-
-		/**
+	/**
 	 * @brief Constructor
 	 *
-	 * @param process_name is the name of the simulated process/actor
-	 * @param mailbox_prefix is the prefix of the mailbox (to which a unique integer is appended)
+	 * @param process_name: the name of the simulated process/actor
+	 * @param mailbox_prefix: the prefix of the mailbox (to which a unique integer is appended)
 	 */
 	S4U_DaemonWithMailbox::S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix) {
 		this->process_name = process_name;
@@ -35,7 +29,7 @@ namespace wrench {
 
 	/**
 	 * @brief Start the daemon
-	 * @param hostname
+	 * @param hostname: the name of the host on which to start the daemon
 	 */
 	void S4U_DaemonWithMailbox::start(std::string hostname) {
 		this->actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
@@ -47,12 +41,10 @@ namespace wrench {
 	}
 
 	/**
-	 * @brief Kill the actor.
+	 * @brief Kill the daemon/actor.
 	 */
 	void S4U_DaemonWithMailbox::kill_actor() {
 		this->actor->kill();
 	}
-
-		/*! \endcond */
 
 };

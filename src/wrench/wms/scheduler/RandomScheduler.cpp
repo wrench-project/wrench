@@ -24,16 +24,16 @@ namespace wrench {
 
 
 		/**
-		 * Default constructor
+		 * @brief Default constructor
 		 */
 		RandomScheduler::RandomScheduler() {}
 
 		/**
 		 * @brief Schedule and run a set of ready tasks in available compute resources
 		 *
-		 * @param job_manager is a pointer to a job manager instance
-		 * @param ready_tasks is a vector of ready tasks
-		 * @param simualtion us a pointer to a simulation instance
+		 * @param job_manager: a pointer to a JobManager object
+		 * @param ready_tasks: a vector of ready WorkflowTask objects (i.e., ready tasks in the workflow)
+		 * @param compute_services: a set of pointers to ComputeService objects (i.e., compute services available to run jobs)
 		 */
 		void RandomScheduler::scheduleTasks(JobManager *job_manager,
 																				std::vector<WorkflowTask *> ready_tasks,
@@ -105,13 +105,13 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Submit pilot jobs to compute services
-		 *
-		 * @param job_manager is a pointer to a job manager instance
-		 * @param workflow is a pointer to a workflow instance
-		 * @param flops the number of flops that the pilot job should be able to do before terminating
-		 * @param compute_services is a set of compute services
-		 */
+		* @brief Schedule and run pilot jobs
+		*
+		* @param job_manager: a pointer to a JobManager object
+		* @param workflow: a pointer to a Workflow object
+ 	  * @param flops: the number of flops that the PilotJob should be able to do before terminating
+		* @param compute_services: a set of pointers to ComputeSertvice objects (i.e., compute services available to run jobs)
+		*/
 		void RandomScheduler::schedulePilotJobs(JobManager *job_manager,
 																						Workflow *workflow,
 																						double flops,

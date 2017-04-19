@@ -18,8 +18,13 @@ namespace wrench {
 
 		extern const char scheduler_name[] = "MinMinScheduler";
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
+
 		/**
- 		 * @brief A min-min Scheduler
+ 		 * @brief A min-min Scheduler class
  		 */
 		class MinMinScheduler : public SchedulerTmpl<scheduler_name, MinMinScheduler> {
 
@@ -41,6 +46,11 @@ namespace wrench {
 				};
 
 		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
+
 }
 
 #endif //WRENCH_MINMINSCHEDULER_H

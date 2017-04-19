@@ -15,12 +15,6 @@
 
 namespace wrench {
 
-		/***********************************************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond DEVELOPER */
-
 		std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
 
 			// Get the message on the mailbox
@@ -77,21 +71,16 @@ namespace wrench {
 			}
 		}
 
-		/*! \endcond */
-
-		/***********************************************************/
-		/**	INTERNAL METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond INTERNAL */
 
 
+		/**
+		 * @brief Constructor
+		 */
 		WorkflowExecutionEvent::WorkflowExecutionEvent() {
 			this->type = WorkflowExecutionEvent::UNDEFINED;
 			this->job = nullptr;
 			this->compute_service = nullptr;
 		}
 
-		/*! \endcond */
 
 };

@@ -14,18 +14,22 @@
 #include <map>
 
 /* Defined color codes */
-#define WRENCH_LOGGING_COLOR_RED			"\033[1;31m"
-#define WRENCH_LOGGING_COLOR_GREEN		"\033[1;32m"
-#define WRENCH_LOGGING_COLOR_YELLOW		"\033[1;33m"
-#define WRENCH_LOGGING_COLOR_BLUE			"\033[1;34m"
-#define WRENCH_LOGGING_COLOR_MAGENTA	"\033[1;35m"
-#define WRENCH_LOGGING_COLOR_CYAN			"\033[1;36m"
+#define WRENCH_LOGGING_COLOR_RED      "\033[1;31m"
+#define WRENCH_LOGGING_COLOR_GREEN    "\033[1;32m"
+#define WRENCH_LOGGING_COLOR_YELLOW    "\033[1;33m"
+#define WRENCH_LOGGING_COLOR_BLUE      "\033[1;34m"
+#define WRENCH_LOGGING_COLOR_MAGENTA  "\033[1;35m"
+#define WRENCH_LOGGING_COLOR_CYAN      "\033[1;36m"
 
 /* Wrappers around XBT_* macros */
 #define WRENCH_INFO(...)  Logging::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; Logging::endThisProcessColor()
 #define WRENCH_DEBUG(...)  Logging::beginThisProcessColor(); XBT_DEBUG(__VA_ARGS__) ; Logging::endThisProcessColor()
 
 namespace wrench {
+
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
 
 		/**
 		 * @brief Color-enabling wrappers around Simgrid's logging macros.
@@ -34,22 +38,30 @@ namespace wrench {
 
 		public:
 
-				/*! \cond DEVELOPER */
 				static void setThisProcessLoggingColor(std::string color);
-				/*! \endcond */
 
-				/*! \cond INTERNAL */
+				/***********************/
+				/** \cond INTERNAL     */
+				/***********************/
+
 				static void beginThisProcessColor();
-				static void endThisProcessColor();
-				/*! \endcond */
 
+				static void endThisProcessColor();
+
+				/***********************/
+				/** \cond INTERNAL    */
+				/***********************/
 
 		private:
-				static std::map<simgrid::s4u::ActorPtr , std::string> colormap;
+				static std::map<simgrid::s4u::ActorPtr, std::string> colormap;
 
 				static std::string getThisProcessLoggingColor();
 
 		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
 };
 
 

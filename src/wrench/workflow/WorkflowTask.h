@@ -22,15 +22,24 @@
 namespace wrench {
 
 		/**
-		 * @brief Abstraction to represent a task in a Workflow
+		 * @brief class to represent a task in a Workflow
 		 */
 		class WorkflowTask {
 
-				/***************/
-				/**   PUBLIC  **/
-				/***************/
 
 		public:
+
+				std::string getId() const;
+				double getFlops() const;
+				int getNumProcs() const;
+				int getNumberOfChildren();
+				int getNumberOfParents();
+				void addInputFile(WorkflowFile *);
+				void addOutputFile(WorkflowFile *);
+
+				/***********************/
+				/** \cond DEVELOPER    */
+				/***********************/
 
 				/* Task-state enum */
 				enum State {
@@ -42,27 +51,22 @@ namespace wrench {
 						FAILED
 				};
 
-				/* Getters */
-				std::string getId() const;
-				double getFlops() const;
-				int getNumProcs() const;
-				int getNumberOfChildren();
-				int getNumberOfParents();
 				WorkflowTask::State getState();
 
+				/***********************/
+				/** \endcond DEVELOPER */
+				/***********************/
 
-				/* Adding Files */
-				void addInputFile(WorkflowFile *);
-				void addOutputFile(WorkflowFile *);
+				/***********************/
+				/** \cond INTERNAL     */
+				/***********************/
 
-				/* Adding a containing WorkflowJob */
 				void setWorkflowJob(WorkflowJob *);
 				WorkflowJob *getWorkflowJob();
 
-
-				/***************/
-				/**  PRIVATE  **/
-				/***************/
+				/***********************/
+				/** \endcond INTERNAL  */
+				/***********************/
 
 		private:
 

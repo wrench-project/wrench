@@ -22,6 +22,10 @@ namespace wrench {
 		class StandardJob;
 		class PilotJob;
 
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
+
 		/**
 		 * @brief Generic class that describe a message communicated by simulated processes
 		 */
@@ -56,7 +60,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "STOP_DAEMON" SimulationMessage
+		 * @brief "STOP_DAEMON" SimulationMessage class
 		 */
 		class StopDaemonMessage: public SimulationMessage {
 		public:
@@ -64,7 +68,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "DAEMON_STOPPED" SimulationMessage
+		 * @brief "DAEMON_STOPPED" SimulationMessage class
 		 */
 		class DaemonStoppedMessage: public SimulationMessage {
 		public:
@@ -72,8 +76,9 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "JOB_TYPE_NOT_SUPPORTED" SimulationMessage
-		 */		class JobTypeNotSupportedMessage: public SimulationMessage {
+		 * @brief "JOB_TYPE_NOT_SUPPORTED" SimulationMessage class
+		 */
+		class JobTypeNotSupportedMessage: public SimulationMessage {
 		public:
 				JobTypeNotSupportedMessage(WorkflowJob*, ComputeService *, double payload);
 				WorkflowJob *job;
@@ -81,7 +86,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "RUN_STANDARD_JOB" SimulationMessage
+		 * @brief "RUN_STANDARD_JOB" SimulationMessage class
 		 */
 		class RunStandardJobMessage: public SimulationMessage {
 		public:
@@ -90,7 +95,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "STANDARD_JOB_DONE" SimulationMessage
+		 * @brief "STANDARD_JOB_DONE" SimulationMessage class
 		 */
 		class StandardJobDoneMessage: public SimulationMessage {
 		public:
@@ -100,7 +105,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "STANDARD_JOB_FAILED" SimulationMessage
+		 * @brief "STANDARD_JOB_FAILED" SimulationMessage class
 		 */
 		class StandardJobFailedMessage: public SimulationMessage {
 		public:
@@ -110,7 +115,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "RUN_PILOT_JOB" SimulationMessage
+		 * @brief "RUN_PILOT_JOB" SimulationMessage class
 		 */
 		class RunPilotJobMessage: public SimulationMessage {
 		public:
@@ -119,7 +124,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "PILOT_JOB_STARTED" SimulationMessage
+		 * @brief "PILOT_JOB_STARTED" SimulationMessage class
 		 */
 		class PilotJobStartedMessage: public SimulationMessage {
 		public:
@@ -129,7 +134,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "PILOT_JOB_EXPIRED" SimulationMessage
+		 * @brief "PILOT_JOB_EXPIRED" SimulationMessage class
 		 */
 		class PilotJobExpiredMessage: public SimulationMessage {
 		public:
@@ -139,7 +144,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "PILOT_JOB_FAILED" SimulationMessage
+		 * @brief "PILOT_JOB_FAILED" SimulationMessage class
 		 */
 		class PilotJobFailedMessage: public SimulationMessage {
 		public:
@@ -149,7 +154,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "RUN_TASK" SimulationMessage
+		 * @brief "RUN_TASK" SimulationMessage class
 		 */
 		class RunTaskMessage: public SimulationMessage {
 		public:
@@ -158,7 +163,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "TASK_DONE" SimulationMessage
+		 * @brief "TASK_DONE" SimulationMessage class
 		 */
 		class TaskDoneMessage: public SimulationMessage {
 		public:
@@ -168,7 +173,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "NUM_IDLE_CORES_REQUEST" SimulationMessage
+		 * @brief "NUM_IDLE_CORES_REQUEST" SimulationMessage class
 		 */
 		class NumIdleCoresRequestMessage: public SimulationMessage {
 		public:
@@ -176,7 +181,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "NUM_IDLE_CORES_ANSWER" SimulationMessage
+		 * @brief "NUM_IDLE_CORES_ANSWER" SimulationMessage class
 		 */
 		class NumIdleCoresAnswerMessage: public SimulationMessage {
 		public:
@@ -185,7 +190,7 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "TTL_REQUEST" SimulationMessage
+		 * @brief "TTL_REQUEST" SimulationMessage class
 		 */
 		class TTLRequestMessage: public SimulationMessage {
 		public:
@@ -193,13 +198,17 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief "TTL_ANSWER" SimulationMessage
+		 * @brief "TTL_ANSWER" SimulationMessage class
 		 */
 		class TTLAnswerMessage: public SimulationMessage {
 		public:
 				TTLAnswerMessage(double ttl, double payload);
 				double ttl;
 		};
+
+		/***********************/
+		/** \endcond INTERNAL  */
+		/***********************/
 
 };
 

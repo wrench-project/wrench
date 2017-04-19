@@ -15,6 +15,7 @@
 #include <workflow_execution_events/WorkflowExecutionEvent.h>
 
 class WorkflowTask;
+
 #include "WorkflowFile.h"
 
 #include "WorkflowTask.h"
@@ -36,39 +37,50 @@ namespace wrench {
 
 				WorkflowTask *addTask(std::string, double, int);
 				void removeTask(WorkflowTask *task);
+
 				WorkflowTask *getWorkflowTaskByID(const std::string);
 
 				WorkflowFile *addFile(const std::string, double);
+
 				WorkflowFile *getWorkflowFileByID(const std::string);
 
 				void addControlDependency(WorkflowTask *, WorkflowTask *);
-				//void addDataDependency(WorkflowTask *, WorkflowTask *, WorkflowFile *);
 
 				void loadFromDAX(const std::string filename);
 
-				/** Get information from the workflow **/
-				// TODO: Make these efficient - Right now they are really naively implemented
 				unsigned long getNumberOfTasks();
+
+				void exportToEPS(std::string);
+
+				/***********************/
+				/** \cond DEVELOPER    */
+				/***********************/
+
 				bool isDone();
+
 				std::vector<WorkflowTask *> getReadyTasks();
 				std::vector<WorkflowTask *> getTasks();
 				std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
 				std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
 
-				/** misc **/
-				void exportToEPS(std::string);
-
-				/** Method to wait the next event **/
-				// Internal (excluded from documentation)
 				std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
 
-				/** Method to get the callback mailbox associated with the workflow **/
-				// Internal (excluded from documentation)
+				/***********************/
+				/** \endcond DEVELOPER */
+				/***********************/
+
+
+				/***********************/
+				/** \cond INTERNAL     */
+				/***********************/
+
 				std::string getCallbackMailbox();
 
-				/** Update task state **/
-				// Internal (excluded from documentation)
-				void updateTaskState (WorkflowTask *task, WorkflowTask::State state);
+				void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
+
+				/***********************/
+				/** \endcond INTERNAL  */
+				/***********************/
 
 		private:
 

@@ -11,19 +11,37 @@
 
 namespace wrench {
 
-	SchedulerFactory *SchedulerFactory::getInstance() {
-		static SchedulerFactory fact;
-		return &fact;
-	}
+		/**
+		 * @brief Get a pointer to the SchedulerFactory
+		 * @return  a pointer to the SchedulerFactory
+		 */
+		SchedulerFactory *SchedulerFactory::getInstance() {
+			static SchedulerFactory fact;
+			return &fact;
+		}
 
-	std::string SchedulerFactory::Register(std::string sched_id, t_pfFactory factory_method) {
-		s_list[sched_id] = factory_method;
-		return sched_id;
-	}
+		/**
+		 * @brief Register a scheduler ID
+		 * @param sched_id: the scheduler ID
+		 * @param factory_method: the factory method
+		 * @return the ID
+		 */
+		std::string SchedulerFactory::Register(std::string sched_id, t_pfFactory factory_method) {
+			s_list[sched_id] = factory_method;
+			return sched_id;
+		}
 
-	std::unique_ptr<Scheduler> SchedulerFactory::Create(std::string sched_id) {
-		return s_list[sched_id]();
-	}
+		/**
+		 * @brief Create a Scheduler instsance
+		 * @param sched_id: the scheduler ID
+		 * @return a unique pointer to a Scheduler object
+		 */
+		std::unique_ptr<Scheduler> SchedulerFactory::Create(std::string sched_id) {
+			return s_list[sched_id]();
+		}
 
-	SchedulerFactory::SchedulerFactory() {}
+		/**
+		 * @brief Default constructor
+		 */
+		SchedulerFactory::SchedulerFactory() {}
 }

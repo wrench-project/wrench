@@ -10,17 +10,13 @@
 
 #include <string>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <exception/WRENCHException.h>
 
 #include "workflow_job/WorkflowJob.h"
 #include "workflow/Workflow.h"
 
 namespace wrench {
 
-		/***********************************************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond DEVELOPER */
 
 		/**
 		 * @brief Get the job type
@@ -42,6 +38,9 @@ namespace wrench {
 				case PILOT: {
 					return "Pilot";
 				}
+				default: {
+					throw WRENCHException("WorkflowJob type cannot be converted to a string");
+				}
 			}
 		}
 
@@ -54,7 +53,7 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief get the number of cores required by the job
+		 * @brief Get the number of cores required by the job
 		 * @return  the number of cores
 		 */
 		int WorkflowJob::getNumCores() {
@@ -62,23 +61,15 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief get the duration of the job
+		 * @brief Get the duration of the job
 		 * @return the duration in seconds
 		 */
 		double WorkflowJob::getDuration() {
 			return this->duration;
 		}
 
-		/*! \endcond */
-
-		/***********************************************************/
-		/**	INTERNAL  METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond INTERNAL */
-
 		/**
-		 * @brief Gets the "next" callback mailbox (returns the
+		 * @brief Get the "next" callback mailbox (returns the
 		 *         origin (i.e., workflow) mailbox if the mailbox stack is empty)
 		 * @return the next callback mailbox
 		 */
@@ -91,7 +82,7 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Gets the "origin" callback mailbox
+		 * @brief Get the "origin" callback mailbox
 		 * @return the next callback mailbox
 		 */
 		std::string WorkflowJob::getOriginCallbackMailbox() {
@@ -100,7 +91,7 @@ namespace wrench {
 
 
 		/**
-		 * @brief Gets the "next" callback mailbox (returns the
+		 * @brief Get the "next" callback mailbox (returns the
 		 *         workflow mailbox if the mailbox stack is empty), and
 		 *         pops it
 		 * @return the next callback mailbox
@@ -116,16 +107,15 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief pushes a callback mailbox
-		 * @param mailbox is the mailbox name
+		 * @brief Pushes a callback mailbox
+		 * @param mailbox: the mailbox name
 		 */
 		void WorkflowJob::pushCallbackMailbox(std::string mailbox) {
 			this->callback_mailbox_stack.push(mailbox);
 		}
 
-
 		/**
-		 * @brief This method is used to generate a unique number for each newly generated job,
+		 * @brief Generate a unique number (for each newly generated job)
 		 *
 		 * @return a unique number
 		 */
@@ -134,5 +124,4 @@ namespace wrench {
 			return (sequence_number++);
 		}
 
-		/*! \endcond */
 };

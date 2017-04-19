@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #include <iostream>
 
 #include "logging/Logging.h"
@@ -22,11 +21,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 
 namespace wrench {
 
-	/****************************/
-	/**	INTERNAL METHODS BELOW **/
-	/****************************/
-
-	/*! \cond INTERNAL */
 
 	/**
 	 * @brief Constructor
@@ -34,7 +28,7 @@ namespace wrench {
 	SimpleWMS::SimpleWMS() {}
 
 	/**
-	 * @brief main method of the WMS daemon
+	 * @brief main method of the SimpleWMS daemon
 	 *
 	 * @return 0 on completion
 	 */
@@ -50,11 +44,11 @@ namespace wrench {
 		std::unique_ptr<JobManager> job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
 
 		// Perform static optimizations
-		for (auto& opt : this->static_optimizations) {
+		for (auto &opt : this->static_optimizations) {
 			opt.get()->process(this->workflow);
 		}
-
-		WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
+		WRENCH_INFO("About to execute a workflow with %lu tasks after static optimizations",
+		            this->workflow->getNumberOfTasks());
 
 		while (true) {
 
@@ -148,5 +142,4 @@ namespace wrench {
 		return 0;
 	}
 
-	/*! \endcond */
 }

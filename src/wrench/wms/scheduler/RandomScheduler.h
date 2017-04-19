@@ -18,8 +18,12 @@ namespace wrench {
 
 		extern const char random_name[] = "RandomScheduler";
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
 		/**
-		 * @brief a random Scheduler
+		 * @brief A random Scheduler class
 		 */
 		class RandomScheduler : public SchedulerTmpl<random_name, RandomScheduler> {
 
@@ -35,6 +39,10 @@ namespace wrench {
 															 double flops,
 															 const std::set<ComputeService *> &compute_services);
 		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
 };
 
 #endif //WRENCH_RANDOMSCHEDULER_H

@@ -13,17 +13,11 @@
 
 namespace wrench {
 
-		/*****************************/
-		/**	INTERNAL METHODS BELOW **/
-		/*****************************/
-
-		/*! \cond INTERNAL */
-
 		/**
 		 * @brief Initialize the Simgrid simulation
 		 *
-		 * @param argc
-		 * @param argv
+		 * @param argc: the C-style argument counts
+		 * @param argv: the C-style argument list
 		 */
 		void S4U_Simulation::initialize(int *argc, char **argv) {
 			this->engine = new simgrid::s4u::Engine(argc, argv);
@@ -39,7 +33,7 @@ namespace wrench {
 		/**
 		 * @brief Initialize the simulated platform
 		 *
-		 * @param filename is the path to an XML platform file
+		 * @param filename: the path to an XML platform file
 		 */
 		void S4U_Simulation::setupPlatform(std::string filename) {
 			this->engine->loadPlatform(filename.c_str());
@@ -48,7 +42,7 @@ namespace wrench {
 		/**
 		 * @brief Retrieves the hostname on which the calling actor is running
 		 *
-		 * @return the hostname
+		 * @return the hostname as a string
 		 */
 		std::string S4U_Simulation::getHostName() {
 			return simgrid::s4u::Host::current()->name();
@@ -57,7 +51,7 @@ namespace wrench {
 		/**
 		 * @brief Simulates a computation on host on which the calling actor is running
 		 *
-		 * @param flops is the number of flops
+		 * @param flops: the number of flops
 		 */
 		void S4U_Simulation::compute(double flops) {
 			simgrid::s4u::this_actor::execute(flops);
@@ -66,7 +60,7 @@ namespace wrench {
 		/**
 		 * @brief Retrieves the number of cores of a host
 		 *
-		 * @param hostname is the name of the host
+		 * @param hostname: the name of the host
 		 * @return the number of cores of the host
 		 */
 		int S4U_Simulation::getNumCores(std::string hostname) {
@@ -84,12 +78,10 @@ namespace wrench {
 
 		/**
 		 * @brief Simulates a sleep
-		 * @param duration is the number of seconds to sleep
+		 * @param duration: the number of seconds to sleep
 		 */
 		 void S4U_Simulation::sleep(double duration) {
 			return simgrid::s4u::this_actor::sleep_for(duration);
 		}
-
-		/*! \endcond  */
 
 };

@@ -17,6 +17,10 @@ namespace wrench {
 
 		class ComputeService;
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
 		/**
 		 * @brief A pilot WorkflowJob
 		 */
@@ -33,8 +37,16 @@ namespace wrench {
 
 				ComputeService *getComputeService();
 
-				// Should be excluded from documentation
+				/***********************/
+				/** \cond INTERNAL     */
+				/***********************/
+
 				void setComputeService(ComputeService*);
+
+				/***********************/
+				/** \endcond INTERNAL  */
+				/***********************/
+
 
 
 		private:
@@ -47,6 +59,11 @@ namespace wrench {
 				State state;
 				ComputeService *compute_service; // Associated compute service
 		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
+
 
 };
 

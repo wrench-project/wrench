@@ -31,40 +31,47 @@ namespace wrench {
 		class Simulation {
 
 		public:
-				/** Constructor, initialization, launching, shutting down **/
 				Simulation();
 
 				void init(int *, char **);
+				void createPlatform(std::string);
 
 				void launch();
 
-				void shutdownAllComputeServices();
-
-				/** Platform initialization **/
-				void createPlatform(std::string);
-
-				/** ComputeService creations **/
-				void
-				createMulticoreStandardJobExecutor(std::string, std::map<MulticoreJobExecutor::Property, std::string> = {});
+				void createMulticoreStandardJobExecutor(std::string, std::map<MulticoreJobExecutor::Property, std::string> = {});
 
 				void createMulticorePilotJobExecutor(std::string, std::map<MulticoreJobExecutor::Property, std::string>  = {});
 
 				void createMulticoreStandardAndPilotJobExecutor(std::string,
 																												std::map<MulticoreJobExecutor::Property, std::string> = {});
 
-				// Internal methods (excluded from documentation)
+				void createWMS(std::string wms_id, std::string sched_id, Workflow *w, std::string hostname);
+
+				/***********************/
+				/** \cond DEVELOPER    */
+				/***********************/
+
+				void shutdownAllComputeServices();
+
+				std::set<ComputeService *> getComputeServices();
+
+				/***********************/
+				/** \endcond DEVELOPER  */
+				/***********************/
+
+				/***********************/
+				/** \cond INTERNAL     */
+				/***********************/
+
 				static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(
 								std::string, bool, bool, std::map<MulticoreJobExecutor::Property, std::string> plist, int num_cores,
 								double ttl, PilotJob *pj, std::string suffix);
 
 				void mark_compute_service_as_terminated(ComputeService *cs);
 
-
-				/** ComputeService discovery **/
-				std::set<ComputeService *> getComputeServices();
-
-				/** WMS Creation **/
-				void createWMS(std::string wms_id, std::string sched_id, Workflow *w, std::string hostname);
+				/***********************/
+				/** \endcond INTERNAL  */
+				/***********************/
 
 
 		private:
@@ -75,7 +82,6 @@ namespace wrench {
 
 				std::vector<std::unique_ptr<ComputeService>> running_compute_services;
 				std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
-
 
 				// Helper function
 				void createMulticoreJobExecutor(std::string hostname,

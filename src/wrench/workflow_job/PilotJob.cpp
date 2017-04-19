@@ -11,12 +11,12 @@
 
 namespace wrench {
 
-		/***********************************************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond DEVELOPER */
-
+		/**
+		 * @brief Constructor
+		 * @param workflow: a pointer to a Workflow object
+		 * @param num_cores: the number of cores required by the pilot job
+		 * @param duration: duration of the pilot job, in seconds
+		 */
 		PilotJob::PilotJob(Workflow *workflow, unsigned long num_cores, double duration) {
 			this->type = WorkflowJob::PILOT;
 
@@ -29,30 +29,29 @@ namespace wrench {
 
 		}
 
+		/**
+		 * @brief Get the state of the pilot job
+		 * @return the state
+		 */
 		PilotJob::State PilotJob::getState() {
 			return this->state;
 		}
 
+		/**
+		 * @brief Get the compute service on which the pilot job is running
+		 * @return a pointer to a ComputeService object
+		 */
 		ComputeService *PilotJob::getComputeService() {
 			return this->compute_service;
 		}
 
-		/*! \endcond */
-
-		/***********************************************************/
-		/**	INTERNAL METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond INTERNAL */
 
 		/**
-		 * @brief
-		 * @param cs
+		 * @brief Set the compute service on which the pilot job is running
+		 * @param cs: a pointer to a ComputeService object
 		 */
 		void PilotJob::setComputeService(ComputeService* cs) {
 			this->compute_service = cs;
 		}
-		/*! \endcond */
-
 
 };

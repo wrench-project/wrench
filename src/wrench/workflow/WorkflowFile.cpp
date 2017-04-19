@@ -16,6 +16,22 @@
 namespace wrench {
 
 		/**
+		 * @brief Get the file size
+		 * @return  the file size in bytes
+		 */
+		double WorkflowFile::getSize() {
+			return this->size;
+		}
+
+		/**
+		 * @brief Get the file id
+		 * @return
+		 */
+		std::string WorkflowFile::getId() {
+			return this->id;
+		}
+
+		/**
 		 * @brief Constructor
 		 *
 		 * @param string is the file name/id

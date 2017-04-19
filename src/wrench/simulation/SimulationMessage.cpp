@@ -12,11 +12,6 @@
 
 namespace wrench {
 
-		/****************************/
-		/**	INTERNAL METHODS BELOW **/
-		/****************************/
-
-		/*! \cond INTERNAL */
 
 		/** Base Simgrid Message **/
 		SimulationMessage::SimulationMessage(Type  t, double s) {
@@ -48,89 +43,153 @@ namespace wrench {
 
 		}
 
-		/** STOP_DAEMON MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param payload: message size in bytes
+		 */
 		StopDaemonMessage::StopDaemonMessage(double payload): SimulationMessage(STOP_DAEMON, payload) {
 		}
 
-		/** DAEMON_STOPPED MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param payload: message size in bytes
+		 */
 		DaemonStoppedMessage::DaemonStoppedMessage(double payload): SimulationMessage(DAEMON_STOPPED, payload) {
 		}
 
-		/** JOB_TYPE_NOT_SUPPORTED MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param job: pointer to a WorkflowJob
+		 * @param cs: points to a ComputeService
+		 * @param payload: message size in bytes
+		 */
 		JobTypeNotSupportedMessage::JobTypeNotSupportedMessage(WorkflowJob *job, ComputeService *cs, double payload): SimulationMessage(JOB_TYPE_NOT_SUPPORTED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
-		/** RUN_STANDARD_JOB MESSAGE **/
+		/**
+		 * @brief Constructor
+		* @param job: pointer to a StandardJob
+		 * @param payload: message size in bytes
+		 */
 		RunStandardJobMessage::RunStandardJobMessage(StandardJob *job, double payload): SimulationMessage(RUN_STANDARD_JOB, payload) {
 			this->job = job;
 		}
 
-		/** STANDARD_JOB_DONE MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param job: pointer to a StandardJob
+		 * @param cs: points to a ComputeService
+		 * @param payload: message size in bytes
+		 */
 		StandardJobDoneMessage::StandardJobDoneMessage(StandardJob *job, ComputeService *cs, double payload): SimulationMessage(STANDARD_JOB_DONE, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
-		/** STANDARD_JOB_FAILED MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param job: pointer to a StandardJob
+		 * @param cs: points to a ComputeService
+		 * @param payload: message size in bytes
+		 */
 		StandardJobFailedMessage::StandardJobFailedMessage(StandardJob *job, ComputeService *cs, double payload): SimulationMessage(STANDARD_JOB_FAILED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
-		/** RUN_PILOT_JOB **/
+		/**
+		 * @brief Constructor
+		 * @param job: pointer to a PilotJob
+		 * @param payload: message size in bytes
+		 */
 		RunPilotJobMessage::RunPilotJobMessage(PilotJob *job, double payload): SimulationMessage(RUN_PILOT_JOB, payload) {
 			this->job = job;
 		}
 
-		/** PILOT_JOB_STARTED **/
+		/**
+		 * @brief Constructor
+		 * @param job: pointer to a PilotJob
+		 * @param cs: points to a ComputeService
+		 * @param payload: message size in bytes
+		 */
 		PilotJobStartedMessage::PilotJobStartedMessage(PilotJob *job, ComputeService *cs, double payload): SimulationMessage(PILOT_JOB_STARTED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
-		/** PILOT_JOB_TERMINATED **/
+		/**
+		 * @brief Constructor
+		 * @param job: pointer to a PilotJob
+		 * @param cs: points to a ComputeService
+		 * @param payload: message size in bytes
+		 */
 		PilotJobExpiredMessage::PilotJobExpiredMessage(PilotJob *job, ComputeService *cs, double payload): SimulationMessage(PILOT_JOB_EXPIRED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
-		/** PILOT_JOB_FAILED **/
+		/**
+		 * @brief Constructor
+		 * @param job: pointer to a PilotJob
+		 * @param cs: points to a ComputeService
+		 * @param payload: message size in bytes
+		 */
 		PilotJobFailedMessage::PilotJobFailedMessage(PilotJob *job, ComputeService *cs, double payload): SimulationMessage(PILOT_JOB_FAILED, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
 
-		/** RUN_TASK MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param task: pointer to a WorkflowTask
+		 * @param payload: message size in bytes
+		 */
 		RunTaskMessage::RunTaskMessage(WorkflowTask *task, double payload): SimulationMessage(RUN_TASK, payload) {
 			this->task = task;
 		}
 
-		/** TASK_DONE MESSAGE **/
-		TaskDoneMessage::TaskDoneMessage(WorkflowTask *task, SequentialTaskExecutor *executor, double payload): SimulationMessage(TASK_DONE, payload) {
+		/**
+		 * @brief Constructor
+		 * @param task: pointer to a WorkflowTask
+		 * @param executor: pointer to a SequentialTaskExecutor
+		 * @param payload: message size in bytes
+		 */		TaskDoneMessage::TaskDoneMessage(WorkflowTask *task, SequentialTaskExecutor *executor, double payload): SimulationMessage(TASK_DONE, payload) {
 			this->task = task;
 			this->task_executor = executor;
 		}
 
-		/** NUM_IDLE_CORES_REQUEST MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param payload: message size in bytes
+		 */
 		NumIdleCoresRequestMessage::NumIdleCoresRequestMessage(double payload) : SimulationMessage(NUM_IDLE_CORES_REQUEST, payload) {
 		}
 
-		/** NUM_IDLE_CORES_ANSWER MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param num: number of idle cores
+		 * @param payload: message size in bytes
+		 */
 		NumIdleCoresAnswerMessage::NumIdleCoresAnswerMessage(unsigned int num, double payload) : SimulationMessage(NUM_IDLE_CORES_ANSWER, payload) {
 			this->num_idle_cores = num;
 		}
 
-		/** TTL_REQUEST MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param payload: message size in bytes
+		 */
 		TTLRequestMessage::TTLRequestMessage(double payload) : SimulationMessage(TTL_REQUEST, payload) {
 		}
 
-		/** TTL_ANSWER MESSAGE **/
+		/**
+		 * @brief Constructor
+		 * @param num: time-to-live, in seconds
+		 * @param payload: message size in bytes
+		 */
 		TTLAnswerMessage::TTLAnswerMessage(double  ttl, double payload) : SimulationMessage(TTL_ANSWER, payload) {
 			this->ttl = ttl;
 		}
-
-		/*! \endcond */
 
 };

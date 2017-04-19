@@ -11,11 +11,6 @@
 
 namespace wrench {
 
-		/****************************/
-		/**	INTERNAL METHODS BELOW **/
-		/****************************/
-
-		/*! \cond INTERNAL */
 
 		EngineFactory *EngineFactory::getInstance() {
 			static EngineFactory fact;
@@ -33,5 +28,4 @@ namespace wrench {
 
 		EngineFactory::EngineFactory() {}
 
-		/*! \endcond */
 }

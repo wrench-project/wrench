@@ -15,6 +15,10 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
+
 		/**
 		 * @brief A generic "running daemon that listens on a mailbox" abstraction
 		 */
@@ -33,6 +37,10 @@ namespace wrench {
 				simgrid::s4u::ActorPtr actor;
 
 		};
+
+		/***********************/
+		/** \endcond INTERNAL  */
+		/***********************/
 };
 
 

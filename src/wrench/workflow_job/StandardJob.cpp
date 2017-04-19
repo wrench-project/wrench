@@ -15,16 +15,9 @@
 
 namespace wrench {
 
-		/***********************************************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond DEVELOPER */
-
-
 		/**
-		 * @brief Constructor given a vector of tasks
-		 * @param tasks is the vector of tasks
+		 * @brief Constructor
+		 * @param tasks: the vector of WorkflowTasks object that comprise the job
 		 */
 		StandardJob::StandardJob(std::vector<WorkflowTask*> tasks) {
 			this->type = WorkflowJob::STANDARD;
@@ -51,7 +44,7 @@ namespace wrench {
 
 
 		/**
-		 * @brief get the number of tasks in the job
+		 * @brief Get the number of tasks in the job
 		 * @return the number of tasks
 		 */
 		unsigned long StandardJob::getNumTasks() {
@@ -59,8 +52,17 @@ namespace wrench {
 		}
 
 		/**
+		 * @brief Get the number of completed tasks in the job
+		 * @return the number of completed tasks
+		 */
+		unsigned long StandardJob::getNumCompletedTasks() {
+			return this->num_completed_tasks;
+		}
+
+
+		/**
 		 * @brief Get the workflow tasks in the job
-		 * @return a vector of tasks
+		 * @return a vector of pointers to WorkflowTasks objects
 		 */
 		std::vector<WorkflowTask*> StandardJob::getTasks() {
 			return this->tasks;
@@ -68,7 +70,7 @@ namespace wrench {
 
 		/**
 		 * @brief Set the containing job
-		 * @param job is the job
+		 * @param job: the containing job
 		 */
 		void WorkflowTask::setWorkflowJob(WorkflowJob *job) {
 			this->job = job;
@@ -81,9 +83,5 @@ namespace wrench {
 		WorkflowJob *WorkflowTask::getWorkflowJob() {
 			return this->job;
 		}
-
-		/*! \endcond */
-
-
 
 };

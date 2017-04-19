@@ -23,14 +23,14 @@ namespace wrench {
 		/**
 		 * @brief Create and add a new task to the workflow
 		 *
-		 * @param id is a unique string id
-		 * @param execution_time is a reference execution time in second
-		 * @param num_procs is a number of processors
+		 * @param id: a unique string id
+		 * @param flops: number of flops
+		 * @param num_procs: a number of processors
 		 *
 		 * @return a pointer to a WorkflowTask object
 		 */
 		WorkflowTask *Workflow::addTask(const std::string id,
-																		double execution_time,
+																		double flops,
 																		int num_procs = 1) {
 
 			// Check that the task doesn't really exist
@@ -39,7 +39,7 @@ namespace wrench {
 			}
 
 			// Create the WorkflowTask object
-			WorkflowTask *task = new WorkflowTask(id, execution_time, num_procs);
+			WorkflowTask *task = new WorkflowTask(id, flops, num_procs);
 			// Create a DAG node for it
 			task->workflow = this;
 			task->DAG = this->DAG.get();
@@ -66,7 +66,7 @@ namespace wrench {
 		/**
 		 * @brief Find a WorkflowTask object based on its ID
 		 *
-		 * @param id is a string id
+		 * @param id: a string id
 		 *
 		 * @return a pointer to a WorkflowTask object
 		 */
@@ -82,10 +82,8 @@ namespace wrench {
 		 * @brief Create a control dependency between two workflow tasks. Will not
 		 *        do anything if there is already a path between the two tasks.
 		 *
-		 * @param src is the source task
-		 * @param dst is the destination task
-		 *
-		 * @return nothing
+		 * @param src: the source task
+		 * @param dst: the destination task
 		 */
 		void Workflow::addControlDependency(WorkflowTask *src, WorkflowTask *dst) {
 			if (!pathExists(src, dst)) {
@@ -102,8 +100,8 @@ namespace wrench {
 		/**
 		 * @brief Add a new file to the workflow specification
 		 *
-		 * @param id is a unique string id
-		 * @param size is a file size in bytes
+		 * @param id: a unique string id
+		 * @param size: a file size in bytes
 		 *
 		 * @return a pointer to a WorkflowFile object
 		 */
@@ -120,7 +118,7 @@ namespace wrench {
 		/**
 		 * @brief Find a WorkflowFile object based on its ID
 		 *
-		 * @param id is a string id
+		 * @param id: a string id
 		 *
 		 * @return a pointer to a WorkflowFile object, nullptr if not found
 		 */
@@ -135,7 +133,7 @@ namespace wrench {
 		/**
 		 * @brief Output a workflow's dependency graph to EPS
 		 *
-		 * @param eps_filename is a filename to which the EPS content is saved
+		 * @param eps_filename: a filename to which the EPS content is saved
 		 *
 		 */
 		void Workflow::exportToEPS(std::string eps_filename) {
@@ -145,7 +143,7 @@ namespace wrench {
 
 		/**
 		 * @brief Get the number of tasks in the workflow
-		 * @return number of tasks
+		 * @return the number of tasks
 		 */
 		unsigned long Workflow::getNumberOfTasks() {
 			return this->tasks.size();
@@ -155,7 +153,7 @@ namespace wrench {
 		/**
 		 * @brief Create a workflow based on a DAX file
 		 *
-		 * @param filename is the path to the file
+		 * @param filename: the path to the DAX file
 		 */
 		void Workflow::loadFromDAX(const std::string filename) {
 			pugi::xml_document dax_tree;
@@ -209,18 +207,12 @@ namespace wrench {
 		}
 
 
-		/***********************************************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond DEVELOPER */
-
 		/**
 		 * @brief Determine whether one source is an ancestor of a destination task
 		 *
-		 * @param src is a pointer to the source task
-		 * @param dst is a pointer to the destination task
-		 * @return true if there is a path from src to dst
+		 * @param src: a pointer to the source WorkflowTask object
+		 * @param dst: a pointer to the destination WorkflowTask object
+		 * @return true if there is a path from src to dst, false otherwise
 		 */
 		bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
 			Bfs<ListDigraph> bfs(*DAG);
@@ -240,10 +232,10 @@ namespace wrench {
 		};
 
 		/**
-		 * @brief Get a vector of the ready tasks (very inefficiently
-		 *        implemented right now)
-		 * @return vector of pointers to workflow tasks
+		 * @brief Get a vector of the ready tasks
+		 * @return vector of pointers to WorkflowTask objects
 		 */
+		 // TODO: Implement this more efficiently
 		std::vector<WorkflowTask *> Workflow::getReadyTasks() {
 
 			std::vector<WorkflowTask *> task_list;
@@ -299,27 +291,16 @@ namespace wrench {
 			return parents;
 		}
 
-
-		/*! \endcond */
-
-
-		/***********************************************************/
-		/**	INTERNAL METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond INTERNAL */
-
 		/**
-		 * @brief Wait for a task completion
-		 * @return the completed task
+		 * @brief Wait for the next WorkflowExecutionEvent
+		 * @return a unique pointer to a WorkflowExecutionEvent object
 		 */
 		std::unique_ptr<WorkflowExecutionEvent> Workflow::waitForNextExecutionEvent() {
 			return WorkflowExecutionEvent::waitForNextExecutionEvent(this->callback_mailbox);
 		}
 
 		/**
-		 * @brief Get the mailbox name associated to this workflow, i.e.,
-		 *        the mailbox to which "TASK_DONE" messages are sent
+		 * @brief Get the mailbox name associated to this workflow
 		 *
 		 * @return the mailbox name
 		 */
@@ -330,8 +311,8 @@ namespace wrench {
 		/**
 		 * @brief Update the state of a task, and propagate the change
 		 *        to other tasks if necessary.
-		 * @param task is a pointer to the task
-		 * @param state is the new task state
+		 * @param task: a pointer to a WorkflowTask object
+		 * @param state: the new task state
 		 */
 		void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state) {
 
@@ -388,5 +369,4 @@ namespace wrench {
 			}
 		}
 
-		/*! \endcond */
 };

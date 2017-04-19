@@ -14,7 +14,7 @@
 
 namespace wrench {
 
-		std::map<simgrid::s4u::ActorPtr , std::string> Logging::colormap;
+		std::map<simgrid::s4u::ActorPtr, std::string> Logging::colormap;
 
 		/**
 		 * @brief Set the color of log messages printed to the terminal
@@ -56,6 +56,5 @@ namespace wrench {
 				return "";
 			}
 		}
-
 
 };

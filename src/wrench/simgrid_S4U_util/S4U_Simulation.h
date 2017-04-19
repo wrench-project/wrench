@@ -15,24 +15,32 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
+
 		/**
 		 * @brief Wrappers around Simgrid's basic simulation methods
 		 */
-	class S4U_Simulation {
+		class S4U_Simulation {
 
-	public:
-		void initialize(int *argc, char **argv);
-		void setupPlatform(std::string);
-		void runSimulation();
-		static double getClock();
-		static std::string getHostName();
-		static int getNumCores(std::string hostname);
-		static void compute(double);
-		static void sleep(double);
+		public:
+				void initialize(int *argc, char **argv);
+				void setupPlatform(std::string);
+				void runSimulation();
+				static double getClock();
+				static std::string getHostName();
+				static int getNumCores(std::string hostname);
+				static void compute(double);
+				static void sleep(double);
 
-	private:
-		simgrid::s4u::Engine *engine;
-	};
+		private:
+				simgrid::s4u::Engine *engine;
+		};
+
+		/***********************/
+		/** \endcond INTERNAL  */
+		/***********************/
 };
 
 #endif //WRENCH_S4U_SIMULATION_H

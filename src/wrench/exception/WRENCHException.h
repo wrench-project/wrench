@@ -27,6 +27,18 @@ namespace wrench {
 		public:
 
 				/**
+				 * @brief Get the exception's message
+				 * @return The message as a string
+				 */
+				std::string getMessage() {
+					return this->message;
+				}
+
+				/***********************/
+				/** \cond DEVELOPER    */
+				/***********************/
+
+				/**
 				 * @brief Constructor
 				 * @param string: the exception's string message
 				 */
@@ -34,11 +46,23 @@ namespace wrench {
 					message = string;
 				}
 
+				/***********************/
+				/** \endcond DEVELOPER */
+				/***********************/
+
+
+				/***********************/
+				/** \cond INTERNAL     */
+				/***********************/
+
 				virtual const char* what() const throw()
 				{
 					return message.c_str();
 				}
 
+				/***********************/
+				/** \endcond INTERNAL  */
+				/***********************/
 		};
 
 }

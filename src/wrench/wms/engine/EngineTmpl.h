@@ -17,12 +17,12 @@ namespace wrench {
 
 	class Simulation; // forward ref
 
+	/***********************/
+	/** \cond INTERNAL     */
+	/***********************/
 
-  /**
+  	/**
 	 * @brief WMS engine template
-	 *
-	 */
-	/*
 	 * (Curiously Recurring Template Pattern - CRTP)
 	 */
 	template<const char *TYPE, typename IMPL>
@@ -75,6 +75,10 @@ namespace wrench {
 	void EngineTmpl<TYPE, IMPL>::add_static_optimization(std::unique_ptr<StaticOptimization> optimization) {
 		this->static_optimizations.push_back(std::move(optimization));
 	}
+
+	/***********************/
+	/** \cond INTERNAL     */
+	/***********************/
 }
 
 #endif //WRENCH_ENGINETMPL_H

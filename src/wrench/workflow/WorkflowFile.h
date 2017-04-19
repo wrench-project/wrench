@@ -29,10 +29,14 @@ namespace wrench {
 				friend class WorkflowTask;
 
 		public:
+
+				double getSize();
+				std::string getId();
+
+		private:
 				std::string id;
 				double size; // in bytes
 
-		private:
 				void setOutputOf(WorkflowTask *task);
 				WorkflowTask *getOutputOf();
 				void setInputOf(WorkflowTask *task);

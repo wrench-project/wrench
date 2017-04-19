@@ -15,6 +15,10 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
+
 		/**
 		 * @brief A factory class for WMS engines
 		 */
@@ -36,6 +40,10 @@ namespace wrench {
 	template<const char *TYPE, typename IMPL>
 	const std::string EngineTmpl<TYPE, IMPL>::WMS_ID = EngineFactory::getInstance()->Register(
 			EngineTmpl<TYPE, IMPL>::_WMS_ID, &EngineTmpl<TYPE, IMPL>::Create);
+
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
 }
 
 #endif //WRENCH_ENGINEFACTORY_H

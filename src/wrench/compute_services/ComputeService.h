@@ -15,6 +15,10 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond DEVELOPER   **/
+		/***********************/
+
 		/* Forward References */
 
 		class Simulation;
@@ -32,9 +36,7 @@ namespace wrench {
 
 		public:
 
-				/***********************/
-				/** \cond DEVELOPER   **/
-				/***********************/
+
 
 				virtual void stop();
 
@@ -50,18 +52,14 @@ namespace wrench {
 
 				bool supportsPilotJobs();
 
-				double getCoreFlopRate();
+				virtual double getCoreFlopRate();
 
-				unsigned long getNumCores();
+				virtual unsigned long getNumCores();
 
-				unsigned long getNumIdleCores();
+				virtual unsigned long getNumIdleCores();
 
-				double getTTL();
+				virtual double getTTL();
 
-
-				/***********************/
-				/** \endcond DEVELOPER */
-				/***********************/
 
 
 				/***********************/
@@ -103,7 +101,13 @@ namespace wrench {
 				/***********************/
 
 		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
+
 };
+
 
 
 #endif //SIMULATION_COMPUTESERVICE_H

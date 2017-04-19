@@ -17,13 +17,19 @@
 
 namespace wrench {
 
+
 		class Workflow;
+
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
 
 		/**
 		 * @brief Abstraction of a job used for executing tasks in a Workflow
 		 */
 		class WorkflowJob {
 		public:
+
 				enum Type {
 						STANDARD,
 						PILOT
@@ -37,11 +43,18 @@ namespace wrench {
 				int getNumCores();
 				double getDuration();
 
-				// Should be excluded from documentation
+				/***********************/
+				/** \cond INTERNAL     */
+				/***********************/
+
 				std::string popCallbackMailbox();
 				void pushCallbackMailbox(std::string);
 				std::string getCallbackMailbox();
 				std::string getOriginCallbackMailbox();
+
+				/***********************/
+				/** \cond INTERNAL     */
+				/***********************/
 
 
 		protected:
@@ -54,9 +67,11 @@ namespace wrench {
 				unsigned long num_cores;
 				unsigned long getNewUniqueNumber();
 
-
-
 		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
 
 };
 
