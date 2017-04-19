@@ -64,7 +64,7 @@ namespace wrench {
 		 *
 		 * @return the id
 		 */
-		std::string WorkflowTask::getId() {
+		std::string WorkflowTask::getId() const {
 			return this->id;
 		}
 
@@ -75,6 +75,10 @@ namespace wrench {
 		 */
 		double WorkflowTask::getFlops() const {
 			return this->flops;
+		}
+
+		int WorkflowTask::getNumProcs() const {
+			return this->number_of_processors;
 		}
 
 		/**

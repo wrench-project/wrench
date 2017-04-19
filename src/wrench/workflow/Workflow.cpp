@@ -52,6 +52,17 @@ namespace wrench {
 			return task;
 		}
 
+		void Workflow::removeTask(WorkflowTask *task) {
+
+			// check that task exists
+			if (tasks.find(task->id) == tasks.end()) {
+				throw WRENCHException("Task ID does not exist");
+			}
+
+			DAG.get()->erase(task->DAG_node);
+			tasks.erase(tasks.find(task->id));
+		}
+
 		/**
 		 * @brief Find a WorkflowTask object based on its ID
 		 *
@@ -262,6 +273,30 @@ namespace wrench {
 				}
 			}
 			return true;
+		}
+
+		std::vector<WorkflowTask *> Workflow::getTasks() {
+			std::vector<WorkflowTask *> all_tasks;
+			for (auto& it : tasks) {
+				all_tasks.push_back(it.second.get());
+			}
+			return all_tasks;
+		};
+
+		std::vector<WorkflowTask *> Workflow::getTaskChildren(const WorkflowTask *task) {
+			std::vector<WorkflowTask *> children;
+			for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
+				children.push_back((*DAG_node_map)[(*DAG).target(a)]);
+			}
+			return children;
+		}
+
+		std::vector<WorkflowTask *> Workflow::getTaskParents(const WorkflowTask *task) {
+			std::vector<WorkflowTask *> parents;
+			for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
+				parents.push_back((*DAG_node_map)[(*DAG).source(a)]);
+			}
+			return parents;
 		}
 
 

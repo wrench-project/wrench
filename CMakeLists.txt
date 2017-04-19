@@ -29,8 +29,8 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/wms/WMS.h
         src/wrench/wms/optimizations/static/StaticOptimization.h
-        src/wrench/wms/optimizations/static/SimpleTaskClustering.h
-        src/wrench/wms/optimizations/static/SimpleTaskClustering.cpp
+        src/wrench/wms/optimizations/static/SimplePipelineClustering.h
+        src/wrench/wms/optimizations/static/SimplePipelineClustering.cpp
         src/wrench/wms/engine/EngineTmpl.h
         src/wrench/wms/engine/EngineFactory.h
         src/wrench/wms/engine/EngineFactory.cpp

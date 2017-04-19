@@ -17,14 +17,9 @@
 
 namespace wrench {
 
-	class SimpleTaskClustering : public StaticOptimization {
+	class SimplePipelineClustering : public StaticOptimization {
 	public:
-		SimpleTaskClustering(int max_num);
-
 		void process(Workflow *workflow);
-
-	private:
-		int max_num_;
 	};
 }
 

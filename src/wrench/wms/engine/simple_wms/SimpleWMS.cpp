@@ -54,6 +54,8 @@ namespace wrench {
 			opt.get()->process(this->workflow);
 		}
 
+		WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
+
 		while (true) {
 
 			// Take care of previously posted iput() that should be cleared

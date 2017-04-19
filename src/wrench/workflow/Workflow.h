@@ -35,6 +35,7 @@ namespace wrench {
 				Workflow();
 
 				WorkflowTask *addTask(std::string, double, int);
+				void removeTask(WorkflowTask *task);
 				WorkflowTask *getWorkflowTaskByID(const std::string);
 
 				WorkflowFile *addFile(const std::string, double);
@@ -50,6 +51,9 @@ namespace wrench {
 				unsigned long getNumberOfTasks();
 				bool isDone();
 				std::vector<WorkflowTask *> getReadyTasks();
+				std::vector<WorkflowTask *> getTasks();
+				std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
+				std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
 
 				/** misc **/
 				void exportToEPS(std::string);
