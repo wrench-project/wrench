@@ -38,27 +38,38 @@ namespace wrench {
 		 * @param hostname
 		 */
 		void configure(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler,
-		               std::string hostname) {
+		               std::string hostname);
 
-			this->simulation = simulation;
-			this->workflow = workflow;
-			this->scheduler = std::move(scheduler);
-
-			// Start the daemon
-			this->start(hostname);
-		}
+		/**
+		 * @brief Add a static optimization to the list of optimizations
+		 *
+		 * @param optimization is a pointer to a static optimization implementation
+		 */
+		void add_static_optimization(std::unique_ptr<StaticOptimization> optimization);
 
 	protected:
 		EngineTmpl() : S4U_DaemonWithMailbox(TYPE, TYPE) { wms_type = WMS_ID; }
-
-	protected:
-		Simulation *simulation;
-		Workflow *workflow;
-		std::unique_ptr<Scheduler> scheduler;
 	};
 
 	template<const char *TYPE, typename IMPL>
 	std::string EngineTmpl<TYPE, IMPL>::_WMS_ID = TYPE;
+
+	template<const char *TYPE, typename IMPL>
+	void EngineTmpl<TYPE, IMPL>::configure(Simulation *simulation, Workflow *workflow,
+	                                       std::unique_ptr<Scheduler> scheduler, std::string hostname) {
+
+		this->simulation = simulation;
+		this->workflow = workflow;
+		this->scheduler = std::move(scheduler);
+
+		// Start the daemon
+		this->start(hostname);
+	}
+
+	template<const char *TYPE, typename IMPL>
+	void EngineTmpl<TYPE, IMPL>::add_static_optimization(std::unique_ptr<StaticOptimization> optimization) {
+		this->static_optimizations.push_back(std::move(optimization));
+	}
 }
 
 #endif //WRENCH_ENGINETMPL_H

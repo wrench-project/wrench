@@ -51,6 +51,11 @@ namespace wrench {
 		// Create a job manager
 		std::unique_ptr<JobManager> job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
 
+		// Perform static optimizations
+		for (auto& opt : this->static_optimizations) {
+			opt.get()->process(this->workflow);
+		}
+
 		while (true) {
 
 			// Take care of previously posted iput() that should be cleared

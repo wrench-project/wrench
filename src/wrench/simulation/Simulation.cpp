@@ -17,6 +17,8 @@
 #include "wms/engine/EngineFactory.h"
 #include "wms/scheduler/SchedulerFactory.h"
 
+#include "wms/optimizations/static/SimpleTaskClustering.h"
+
 namespace wrench {
 
 		/**
@@ -104,6 +106,9 @@ namespace wrench {
 			// Obtaining and configuring WMS
 			std::unique_ptr<WMS> wms = EngineFactory::getInstance()->Create(wms_id);
 			wms->configure(this, workflow, std::move(scheduler), hostname);
+
+			std::unique_ptr<StaticOptimization> opt(new SimpleTaskClustering(2));
+			wms->add_static_optimization(std::move(opt));
 
 			// Add it to the list of WMSes
 			WMSes.push_back(std::move(wms));

@@ -14,6 +14,7 @@
 
 #include "workflow/Workflow.h"
 #include "wms/scheduler/Scheduler.h"
+#include "wms/optimizations/static/StaticOptimization.h"
 
 namespace wrench {
 
@@ -23,6 +24,11 @@ namespace wrench {
 		WMS() {};
 		std::string wms_type;
 
+		Simulation *simulation;
+		Workflow *workflow;
+		std::unique_ptr<Scheduler> scheduler;
+		std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
+
 	public:
 		virtual ~WMS() {};
 
@@ -30,6 +36,8 @@ namespace wrench {
 		                       Workflow *workflow,
 		                       std::unique_ptr<Scheduler> scheduler,
 		                       std::string hostname) = 0;
+
+		virtual void add_static_optimization(std::unique_ptr<StaticOptimization> optimization) = 0;
 	};
 };
 
