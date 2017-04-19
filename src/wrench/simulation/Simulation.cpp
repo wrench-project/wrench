@@ -18,7 +18,7 @@
 namespace wrench {
 
 		/**
-		 * @brief Default constructor, which creates a simulation
+		 * @brief Default constructor
 		 */
 		Simulation::Simulation() {
 			// Customize the logging format
@@ -31,17 +31,17 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief initializes the simulation
+		 * @brief Initialize the simulation, parsing out WRENCH-specific command-line arguments
 		 *
-		 * @param argc
-		 * @param argv
+		 * @param argc: main()'s argument count
+		 * @param argv: main()'s argument list
 		 */
 		void Simulation::init(int *argc, char **argv) {
 			this->s4u_simulation->initialize(argc, argv);
 		}
 
 		/**
-		 * @brief Launches the simulation
+		 * @brief Launch the simulation
 		 *
 		 */
 		void Simulation::launch() {
@@ -49,9 +49,9 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief instantiate a simulated platform
+		 * @brief Instantiate a simulated platform
 		 *
-		 * @param filename is the path to a SimGrid XML platform description file
+		 * @param filename: the path to a SimGrid XML platform description file
 		 */
 		void Simulation::createPlatform(std::string filename) {
 			this->s4u_simulation->setupPlatform(filename);
@@ -60,7 +60,7 @@ namespace wrench {
 		/**
 		 * @brief Instantiate a multicore standard job executor on a host
 		 *
-		 * @param hostname is the name of the host in the physical platform
+		 * @param hostname: the name of the host in the simulated platform
 		 */
 		void Simulation::createMulticoreStandardJobExecutor(std::string hostname,
 																												std::map<MulticoreJobExecutor::Property , std::string> plist) {
@@ -70,7 +70,7 @@ namespace wrench {
 		/**
 		 * @brief Instantiate a multicore pilot job executor on a host
 		 *
-		 * @param hostname is the name of the host in the physical platform
+		 * @param hostname: the name of the host in the simulated platform
 		 */
 		void Simulation::createMulticorePilotJobExecutor(std::string hostname,
 																										 std::map<MulticoreJobExecutor::Property , std::string> plist) {
@@ -80,7 +80,7 @@ namespace wrench {
 		/**
 		 * @brief Private helper function to instantiate a multicore job executor
 		 *
-		 * @param hostname is the name of the host in the physical platform
+		 * @param hostname: the name of the host in the simulated platform
 		 */
 		void Simulation::createMulticoreStandardAndPilotJobExecutor(std::string hostname,
 																																std::map<MulticoreJobExecutor::Property , std::string> plist) {
@@ -90,10 +90,10 @@ namespace wrench {
 		/**
 		 * @brief Instantiate a WMS on a host
 		 *
-		 * @param wms_id is an ID for a WMS implementation
-		 * @param sched_id is an ID for a scheduler implementation
-		 * @param workflow is a pointer to the workflow that the WMS will execute
-		 * @param hostname is the name of the host on which to start the WMS
+		 * @param wms_id: a string ID for a WMS implementation
+		 * @param sched_id: a string ID for a scheduler implementation
+		 * @param workflow: a pointer to the Workflow that the WMS will execute
+		 * @param hostname: the name of the host in the simulated platform on which to start the WMS
 		 */
 		void Simulation::createWMS(std::string wms_id, std::string sched_id, Workflow *workflow, std::string hostname) {
 			// Obtaining scheduler
@@ -107,16 +107,11 @@ namespace wrench {
 			WMSes.push_back(std::move(wms));
 		}
 
-		/*****************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/*****************************/
-
-		/*! \cond DEVELOPER */
 
 		/**
 		 * @brief Obtain the list of compute services
 		 *
-		 * @return vector of compute services
+		 * @return a vector of compute services
 		 */
 		std::set<ComputeService *> Simulation::getComputeServices() {
 			std::set<ComputeService *> set = {};
@@ -136,24 +131,18 @@ namespace wrench {
 			}
 		}
 
-		/*! \endcond */
 
-		/****************************/
-		/**	INTERNAL METHODS BELOW **/
-		/****************************/
-
-		/*! \cond INTERNAL */
 
 		/**
-		 * @brief Method to create an unregistered executor
+		 * @brief Create an unregistered executor (i.e., that the Simulation instance will not know anything about)
 		 *
-		 * @param hostname  is the hostname
-		 * @param supports_standard_jobs is true/false
-		 * @param support_pilot_jobs is true/false
-		 * @param plist is a property list
-		 * @num_cores is the number of cores
-		 * @ttl is the time-to-live of the executor
-		 * @suffix is a suffix to be appended to the process name (useful for debugging)
+		 * @param hostname: the hostname in the simulated platform
+		 * @param supports_standard_jobs: true if the executor supports StandardJob submissions, false otherwise
+		 * @param support_pilot_jobs: true if the executor supports PilotJob submissions, false otherwise
+		 * @param plist: a property (<string,string>) list
+		 * @param num_cores: the number of cores
+		 * @param ttl: the time-to-live of the executor
+		 * @param suffix: a suffix to be appended to the process name (useful for debugging)
 		 */
 		MulticoreJobExecutor *Simulation::createUnregisteredMulticoreJobExecutor(std::string hostname,
 																																						 bool supports_standard_jobs,
@@ -180,7 +169,7 @@ namespace wrench {
 		/**
 		 * @brief Remove a compute service from the list of known compute services
 		 *
-		 * @param cs is the compute service
+		 * @param cs: a pointer to the compute service
 		 */
 		void Simulation::mark_compute_service_as_terminated(ComputeService *compute_service) {
 			for (int i = 0; i < this->running_compute_services.size(); i++) {
@@ -196,10 +185,10 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Helper method
-		 * @param hostname  is the host on which to start the executor
-		 * @param supports_standard_jobs is true if the executor supports standard jobs
-		 * @param support_pilot_jobs is true if the executor supports pilot jobs
+		 * @brief Helper method to create a MulticoreJobExecutor
+		 * @param hostname: the hostname in the simulated platform
+		 * @param supports_standard_jobs: true if the executor supports StandardJob submissions, false otherwise
+		 * @param support_pilot_jobs: true if the executor supports PilotJob submissions, false otherwise
 		 */
 		void Simulation::createMulticoreJobExecutor(std::string hostname,
 																								bool supports_standard_jobs,
@@ -227,5 +216,4 @@ namespace wrench {
 			return;
 		}
 
-		/*! \endcond */
 };

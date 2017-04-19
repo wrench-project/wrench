@@ -16,6 +16,10 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
+
 		/**
 		 * @brief Wrappers around Simgrid's mailbox methods
 		 */
@@ -34,6 +38,11 @@ namespace wrench {
 				static std::map<simgrid::s4u::ActorPtr , std::set<simgrid::s4u::Comm*>> dputs;
 
 		};
+
+		/***********************/
+		/** \endcond INTERNAL  */
+		/***********************/
+
 };
 
 

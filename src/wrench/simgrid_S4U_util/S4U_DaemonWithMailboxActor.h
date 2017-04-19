@@ -20,6 +20,11 @@
 #include "S4U_DaemonWithMailbox.h"
 
 namespace wrench {
+
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
+
 		/**
 		 * @brief The actor for the S4U_DaemonWithMailbox abstraction
 		 */
@@ -39,6 +44,10 @@ namespace wrench {
 				S4U_DaemonWithMailbox *daemon;
 
 		};
+
+		/***********************/
+		/** \endcond INTERNAL   */
+		/***********************/
 };
 
 
