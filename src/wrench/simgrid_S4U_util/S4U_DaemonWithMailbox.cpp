@@ -6,8 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief S4U_DaemonWithMailbox implements a generic "running daemon that
- *        listens on a mailbox" abstraction
  */
 
 #include "S4U_DaemonWithMailbox.h"

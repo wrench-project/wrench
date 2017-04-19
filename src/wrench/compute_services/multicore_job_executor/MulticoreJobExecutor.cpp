@@ -8,7 +8,7 @@
  */
 
 #include <simulation/Simulation.h>
-#include <logging/ColorLogging.h>
+#include <logging/Logging.h>
 #include "MulticoreJobExecutor.h"
 #include "workflow/WorkflowTask.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
@@ -248,7 +248,7 @@ namespace wrench {
 		 */
 		int MulticoreJobExecutor::main() {
 
-			ColorLogging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
+			Logging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
 
 			/** Initialize all state **/
 			initialize();

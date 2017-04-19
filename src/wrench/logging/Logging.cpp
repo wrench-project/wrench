@@ -6,17 +6,16 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief Simple macros for doing color
  */
 
 #include <string>
 #include <simgrid/s4u/Actor.hpp>
 #include <iostream>
-#include "ColorLogging.h"
+#include "Logging.h"
 
 namespace wrench {
 
-		std::map<simgrid::s4u::ActorPtr , std::string> ColorLogging::colormap;
+		std::map<simgrid::s4u::ActorPtr , std::string> Logging::colormap;
 
 		/*****************************/
 		/**	DEVELOPER METHODS BELOW **/
@@ -28,8 +27,8 @@ namespace wrench {
 		 * @brief Set the color of log messages printed to the terminal
 		 * @param color is WRENCH_LOGGING_COLOR_RED, WRENCH_LOGGING_COLOR_GREEN, etc.
 		 */
-		void ColorLogging::setThisProcessLoggingColor(std::string color) {
-			ColorLogging::colormap[simgrid::s4u::Actor::self()] = color;
+		void Logging::setThisProcessLoggingColor(std::string color) {
+			Logging::colormap[simgrid::s4u::Actor::self()] = color;
 		}
 
 		/*! \endcond */
@@ -42,18 +41,18 @@ namespace wrench {
 		/*! \cond INTERNAL */
 
 
-		void ColorLogging::beginThisProcessColor() {
+		void Logging::beginThisProcessColor() {
 					// Comment this line out to do no colors
-					std::cerr << ColorLogging::getThisProcessLoggingColor();
+					std::cerr << Logging::getThisProcessLoggingColor();
 		}
 
-		void ColorLogging::endThisProcessColor() {
+		void Logging::endThisProcessColor() {
 			std::cerr << "\033[0m";
 		}
 
-		std::string ColorLogging::getThisProcessLoggingColor() {
-			if (ColorLogging::colormap.find(simgrid::s4u::Actor::self()) != ColorLogging::colormap.end()) {
-				return ColorLogging::colormap[simgrid::s4u::Actor::self()];
+		std::string Logging::getThisProcessLoggingColor() {
+			if (Logging::colormap.find(simgrid::s4u::Actor::self()) != Logging::colormap.end()) {
+				return Logging::colormap[simgrid::s4u::Actor::self()];
 			} else {
 				return "";
 			}

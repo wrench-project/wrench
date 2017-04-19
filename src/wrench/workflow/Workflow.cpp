@@ -5,9 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief WRENCH::Workflow provides all basic functionality
- *  to represent/instantiate/manipulate a WRENCH Workflow.
  */
 
 #include <lemon/list_graph.h>

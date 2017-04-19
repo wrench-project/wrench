@@ -6,7 +6,6 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief S4U_Simulation is an S4U Wrapper
  */
 
 #ifndef WRENCH_S4U_SIMULATION_H
@@ -16,6 +15,9 @@
 
 namespace wrench {
 
+		/**
+		 * @brief Wrappers around Simgrid's basic simulation methods
+		 */
 	class S4U_Simulation {
 
 	public:

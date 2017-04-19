@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::MaxMinScheduler implements a Max-Min algorithm
  */
 
 #ifndef WRENCH_MAXMINSCHEDULER_H
@@ -20,6 +18,9 @@ namespace wrench {
 
 		extern const char maxmin_name[] = "MaxMinScheduler";
 
+		/**
+		 * @brief A max-min Scheduler
+		 */
 		class MaxMinScheduler : public SchedulerTmpl<maxmin_name, MaxMinScheduler> {
 
 		public:
@@ -32,6 +33,9 @@ namespace wrench {
 															 double flops,
 															 const std::set<ComputeService *> &compute_services);
 
+				/**
+				 * @brief Helper struct for the MaxMinScheduler
+				 */
 				struct MaxMinComparator {
 						bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
 				};

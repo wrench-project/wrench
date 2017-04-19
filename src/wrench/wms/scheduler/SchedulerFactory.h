@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief Factory class for schedulers.
  */
 
 #ifndef WRENCH_SCHEDULERFACTORY_H
@@ -17,6 +15,9 @@
 
 namespace wrench {
 
+		/**
+		 * @brief Factory class for Scheduler objects
+		 */
 	class SchedulerFactory {
 
 	public:

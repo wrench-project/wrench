@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::WMS is a mostly abstract implementation of a WMS
  */
 
 #ifndef WRENCH_WMS_H
@@ -18,6 +16,9 @@
 
 namespace wrench {
 
+		/**
+		 * @brief Abstract implementation of a Workflow Management System
+		 */
 	class WMS {
 
 	protected:

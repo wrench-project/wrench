@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::RandomScheduler implements a simple random scheduler
  */
 
 #ifndef WRENCH_RANDOMSCHEDULER_H
@@ -20,6 +18,9 @@ namespace wrench {
 
 		extern const char random_name[] = "RandomScheduler";
 
+		/**
+		 * @brief a random Scheduler
+		 */
 		class RandomScheduler : public SchedulerTmpl<random_name, RandomScheduler> {
 
 		public:

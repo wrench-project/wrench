@@ -5,9 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief WRENCH::Workflow provides all basic functionality
- *  to represent/instantiate/manipulate a WRENCH Workflow.
  */
 
 #ifndef WRENCH_WORKFLOW_H
@@ -28,6 +25,10 @@ using namespace lemon;
 
 namespace wrench {
 
+		/**
+		 * @brief A workflow abstraction that provides basic functionality to
+		 * represent/instantiate/manipulate workflows
+		 */
 		class Workflow {
 
 		public:

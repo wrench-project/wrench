@@ -6,8 +6,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * @brief S4U_DaemonWithMailboxDaemon implements the actor for a generic "running daemon that
- *        listens on a mailbox" abstraction
+ *
  */
 
 #ifndef WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
@@ -21,23 +20,25 @@
 #include "S4U_DaemonWithMailbox.h"
 
 namespace wrench {
+		/**
+		 * @brief The actor for the S4U_DaemonWithMailbox abstraction
+		 */
+		class S4U_DaemonWithMailboxActor {
 
-	class S4U_DaemonWithMailboxActor {
+		public:
 
-	public:
+				explicit S4U_DaemonWithMailboxActor(S4U_DaemonWithMailbox *d) {
+					this->daemon = d;
+				}
 
-		explicit S4U_DaemonWithMailboxActor(S4U_DaemonWithMailbox *d) {
-			this->daemon = d;
-		}
+				void operator()() {
+					this->daemon->main();
+				}
 
-		void operator()() {
-			this->daemon->main();
-		}
+		private:
+				S4U_DaemonWithMailbox *daemon;
 
-	private:
-		S4U_DaemonWithMailbox *daemon;
-
-	};
+		};
 };
 
 

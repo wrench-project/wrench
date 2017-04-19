@@ -5,8 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- * @brief wrench::SchedulerFactory is a factory class for schedulers.
  */
 
 #include "wms/scheduler/SchedulerFactory.h"

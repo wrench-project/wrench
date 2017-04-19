@@ -19,8 +19,8 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_Simulation.h
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
         src/wrench/simgrid_S4U_util/S4U_Mailbox.h
-        src/wrench/logging/ColorLogging.h
-        src/wrench/logging/ColorLogging.cpp
+        src/wrench/logging/Logging.h
+        src/wrench/logging/Logging.cpp
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/Workflow.h
         src/wrench/workflow/WorkflowTask.h
