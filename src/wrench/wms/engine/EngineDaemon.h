@@ -16,6 +16,10 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
 		/**
 		 * @brief Abstract implementation of WMS engine
 		 */
@@ -38,6 +42,11 @@ namespace wrench {
 		Workflow *workflow;
 		std::unique_ptr<Scheduler> scheduler;
 	};
+
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
 }
 
 #endif //WRENCH_ENGINEDAEMON_H

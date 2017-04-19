@@ -14,19 +14,27 @@
 
 namespace wrench {
 
-	class Simulation; // forward ref
+		class Simulation; // forward ref
+
+		/***********************/
+		/** \cond INTERNAL    */
+		/***********************/
 
 		/**
-		 * @brief The daemon for a SimpleWMS
+		 * @brief The daemon class for a SimpleWMS
 		 */
-	class SimpleWMSDaemon : public EngineDaemon {
+		class SimpleWMSDaemon : public EngineDaemon {
 
-	public:
-		SimpleWMSDaemon(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler);
+		public:
+				SimpleWMSDaemon(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler);
 
-	private:
-		int main();
-	};
+		private:
+				int main();
+		};
+
+		/***********************/
+		/** \endcond INTERNAL */
+		/***********************/
 }
 
 #endif //WRENCH_SIMPLEWMSDAEMON_H

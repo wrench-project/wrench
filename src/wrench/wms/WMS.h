@@ -15,23 +15,32 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
 		/**
 		 * @brief Abstract implementation of a Workflow Management System
 		 */
-	class WMS {
+		class WMS {
 
-	protected:
-		WMS() {};
-		std::string wms_type;
+		protected:
+				WMS() {};
+				std::string wms_type;
 
-	public:
-		virtual ~WMS() {};
+		public:
+				virtual ~WMS() {};
 
-		virtual void configure(Simulation *simulation,
-		                       Workflow *workflow,
-		                       std::unique_ptr<Scheduler> scheduler,
-		                       std::string hostname) = 0;
-	};
+				virtual void configure(Simulation *simulation,
+															 Workflow *workflow,
+															 std::unique_ptr<Scheduler> scheduler,
+															 std::string hostname) = 0;
+		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
+
 };
 
 

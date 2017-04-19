@@ -17,6 +17,9 @@ namespace wrench {
 
 	class Simulation; // forward ref
 
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
 
   /**
 	 * @brief WMS engine template
@@ -35,12 +38,12 @@ namespace wrench {
 		static std::unique_ptr<WMS> Create() { return std::unique_ptr<WMS>(new IMPL()); }
 
 		/**
-		 * @brief Configure the WMS with a workflow instance and a scheduler implementation
+		 * @brief Configure the WMS engine with a Workflow instance and a Scheduler implementation
 		 *
-		 * @param simulation is a pointer to a simulation object
-		 * @param workflow is a pointer to a workflow to execute
-		 * @param scheduler is a pointer to a scheduler implementation
-		 * @param hostname
+		 * @param simulation: a pointer to a Simulation object
+		 * @param workflow: a pointer to a Workflow to execute
+		 * @param scheduler:  a pointer to a Scheduler implementation
+		 * @param hostname: the name of the host on which to start the WMS engine
 		 */
 		void configure(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler,
 		               std::string hostname) {
@@ -64,6 +67,10 @@ namespace wrench {
 
 	template<const char *TYPE, typename IMPL>
 	std::string EngineTmpl<TYPE, IMPL>::_WMS_ID = TYPE;
+
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
 }
 
 #endif //WRENCH_ENGINETMPL_H

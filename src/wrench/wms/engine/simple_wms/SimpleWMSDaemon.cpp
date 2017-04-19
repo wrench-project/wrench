@@ -25,24 +25,19 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms_daemon, "Log category for Simple WMS Dae
 
 namespace wrench {
 
-		/****************************/
-		/**	INTERNAL METHODS BELOW **/
-		/****************************/
-
-		/*! \cond INTERNAL */
 
 		/**
 		 * @brief Constructor
 		 *
-		 * @param simulation is a pointer to a Simulation object
-		 * @param workflow is a pointer to a Workflow object
-		 * @param scheduler is a pointer to a Scheduler object
+		 * @param simulation: a pointer to a Simulation object
+		 * @param workflow: a pointer to a Workflow object
+		 * @param scheduler: a pointer to a Scheduler object
 		 */
 		SimpleWMSDaemon::SimpleWMSDaemon(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler) :
 						EngineDaemon(simulation, workflow, std::move(scheduler)) {}
 
 		/**
-		 * @brief main method of the WMS daemon
+		 * @brief main method of the SimpleWMS daemon
 		 *
 		 * @return 0 on completion
 		 */
@@ -146,7 +141,5 @@ namespace wrench {
 
 			return 0;
 		}
-
-		/*! \endcond */
 
 };

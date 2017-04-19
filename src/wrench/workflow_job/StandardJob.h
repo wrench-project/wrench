@@ -18,6 +18,10 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
 		/**
 		 * @brief A standard (i.e., non-pilot) WorkflowJob
 		 */
@@ -32,22 +36,29 @@ namespace wrench {
 						FAILED,
 				};
 
-				int num_completed_tasks;
 
-				unsigned long getNumTasks();
 				std::vector<WorkflowTask*> getTasks();
+				unsigned long getNumCompletedTasks();
+				unsigned long getNumTasks();
 
 
 
 		private:
 				friend class JobManager;
 				friend class JobManagerDaemon;
+				friend class MulticoreJobExecutor;
 
 				StandardJob(std::vector<WorkflowTask*> tasks);
 				std::vector<WorkflowTask *> tasks;
 				State state;
+				unsigned long num_completed_tasks;
 
 		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
+
 
 };
 

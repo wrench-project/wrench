@@ -16,13 +16,13 @@ namespace wrench {
 		/**
 		 * @brief Constructor
 		 *
-		 * @param string is the task id
-		 * @param t is the task execution time
-		 * @param n is the number of processors for running the task
+		 * @param string: the task id
+		 * @param flops: the task's number of flops
+		 * @param n: the number of processors for running the task
 		 */
-		WorkflowTask::WorkflowTask(const std::string string, const double t, const int n) {
+		WorkflowTask::WorkflowTask(const std::string string, const double flops, const int n) {
 			this->id = string;
-			this->flops = t;
+			this->flops = flops;
 			this->number_of_processors = n;
 			this->state = WorkflowTask::READY;
 			this->job = nullptr;
@@ -31,7 +31,7 @@ namespace wrench {
 		/**
 		 * @brief Add an input file to the task
 		 *
-		 * @param f is a pointer to the file
+		 * @param f: a pointer to the file
 		 */
 		void WorkflowTask::addInputFile(WorkflowFile *f) {
 			addFileToMap(input_files, f);
@@ -47,7 +47,7 @@ namespace wrench {
 		/**
 		 * @brief Add an output file to the task
 		 *
-		 * @param f is a pointer to the file
+		 * @param f: a pointer to the file
 		 */
 		void WorkflowTask::addOutputFile(WorkflowFile *f) {
 			addFileToMap(output_files, f);
@@ -62,7 +62,7 @@ namespace wrench {
 		/**
 		 * @brief Get the id of the task
 		 *
-		 * @return the id
+		 * @return the id as a string
 		 */
 		std::string WorkflowTask::getId() {
 			return this->id;
@@ -80,7 +80,7 @@ namespace wrench {
 		/**
 		 * @brief Get the number of children of a task
 		 *
-		 * @return number of children
+		 * @return the number of children
 		 */
 		int WorkflowTask::getNumberOfChildren() {
 			int count = 0;
@@ -93,7 +93,7 @@ namespace wrench {
 		/**
 		 * @brief Get the number of parents of a task
 		 *
-		 * @return number of parents
+		 * @return the number of parents
 		 */
 		int WorkflowTask::getNumberOfParents() {
 			int count = 0;
@@ -103,16 +103,11 @@ namespace wrench {
 			return count;
 		}
 
-		/***********************************************************/
-		/**	DEVELOPER METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond DEVELOPER */
 
 		/**
 		 * @brief Get the state of the task
 		 *
-		 * @return task state
+		 * @return the task state
 		 */
 		WorkflowTask::State WorkflowTask::getState() {
 			return state;
@@ -149,13 +144,6 @@ namespace wrench {
 			this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
 		}
 
-		/*! \endcond */
-
-		/***********************************************************/
-		/**	INTERNAL METHODS BELOW **/
-		/***********************************************************/
-
-		/*! \cond INTERNAL */
 
 		/**
 		 * @brief Helper method to add a file to a map if necessary
@@ -168,7 +156,6 @@ namespace wrench {
 			map[f->id] = f;
 		}
 
-		/*! \endcond */
 
 };
 

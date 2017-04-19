@@ -19,6 +19,10 @@
 namespace wrench {
 
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
 		/**
 		 * @brief A class to represent the various execution events that
 		 * are relevant to the execution of a Workflow.
@@ -26,6 +30,7 @@ namespace wrench {
 		class WorkflowExecutionEvent {
 
 		public:
+
 				enum EventType {
 						UNDEFINED,
 						UNSUPPORTED_JOB_TYPE,
@@ -47,6 +52,10 @@ namespace wrench {
 				static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
 
 		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
 
 };
 

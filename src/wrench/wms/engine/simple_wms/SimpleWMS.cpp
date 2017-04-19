@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #include <iostream>
 
 #include "logging/Logging.h"
@@ -22,11 +21,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 
 namespace wrench {
 
-	/****************************/
-	/**	INTERNAL METHODS BELOW **/
-	/****************************/
-
-	/*! \cond INTERNAL */
 
 	/**
 	 * @brief Constructor
@@ -34,7 +28,7 @@ namespace wrench {
 	SimpleWMS::SimpleWMS() {}
 
 	/**
-	 * @brief main method of the WMS daemon
+	 * @brief main method of the SimpleWMS daemon
 	 *
 	 * @return 0 on completion
 	 */
@@ -141,5 +135,4 @@ namespace wrench {
 		return 0;
 	}
 
-	/*! \endcond */
 }

@@ -18,8 +18,12 @@ namespace wrench {
 
 		extern const char maxmin_name[] = "MaxMinScheduler";
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
 		/**
-		 * @brief A max-min Scheduler
+		 * @brief A max-min Scheduler class
 		 */
 		class MaxMinScheduler : public SchedulerTmpl<maxmin_name, MaxMinScheduler> {
 
@@ -41,6 +45,11 @@ namespace wrench {
 				};
 
 		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
+
 }
 
 #endif //WRENCH_MAXMINSCHEDULER_H

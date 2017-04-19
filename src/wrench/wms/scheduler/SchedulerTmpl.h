@@ -14,6 +14,11 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
+
 		/**
 		 * @brief A Scheduler template
 		 */
@@ -34,6 +39,10 @@ namespace wrench {
 
 		template<const char *TYPE, typename IMPL>
 		std::string SchedulerTmpl<TYPE, IMPL>::_SCHED_ID = TYPE;
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
 
 }
 

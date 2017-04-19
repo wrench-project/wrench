@@ -20,7 +20,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(maxmin_scheduler, "Log category for Max-Min Schedul
 namespace wrench {
 
 	/**
-	 * Default constructor
+	 * @brief Default constructor
 	 */
 	MaxMinScheduler::MaxMinScheduler() {}
 
@@ -31,9 +31,9 @@ namespace wrench {
 	/**
 	 * @brief Schedule and run a set of ready tasks in available compute resources
 	 *
-	 * @param job_manager
-	 * @param ready_tasks is a vector of ready tasks
-	 * @param compute_services is a vector of available compute resources
+	 * @param job_manager: a pointer to a JobManager object
+	 * @param ready_tasks: a vector of ready WorkflowTask objects (i.e., ready tasks in the workflow)
+	 * @param compute_services: a set of pointers to ComputeService objects (i.e., compute services available to run jobs)
 	 */
 	void MaxMinScheduler::scheduleTasks(JobManager *job_manager,
 	                               std::vector<WorkflowTask *> ready_tasks,
@@ -63,12 +63,12 @@ namespace wrench {
 	}
 
 		/**
-		* @brief Submits pilot jobs
+		* @brief Schedule and run pilot jobs
 		*
-		* @param job_manager is a pointer to a job manager instance
-		* @param workflow is a pointer to a workflow instance
- 	  * @param flops the number of flops that the pilot job should be able to do before terminating
-		* @param compute_services is a set of compute services
+		* @param job_manager: a pointer to a JobManager object
+		* @param workflow: a pointer to a Workflow object
+ 	  * @param flops: the number of flops that the PilotJob should be able to do before terminating
+		* @param compute_services: a set of pointers to ComputeSertvice objects (i.e., compute services available to run jobs)
 		*/
 		void MaxMinScheduler::schedulePilotJobs(JobManager *job_manager,
 																						Workflow *workflow,

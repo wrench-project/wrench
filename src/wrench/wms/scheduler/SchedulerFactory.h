@@ -15,27 +15,36 @@
 
 namespace wrench {
 
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
+
 		/**
 		 * @brief Factory class for Scheduler objects
 		 */
-	class SchedulerFactory {
+		class SchedulerFactory {
 
-	public:
-		typedef std::unique_ptr<Scheduler> (*t_pfFactory)();
+		public:
+				typedef std::unique_ptr<Scheduler> (*t_pfFactory)();
 
-		static SchedulerFactory *getInstance();
-		std::string Register(std::string sched_id, t_pfFactory factory_method);
-		std::unique_ptr<Scheduler> Create(std::string sched_id);
+				static SchedulerFactory *getInstance();
+				std::string Register(std::string sched_id, t_pfFactory factory_method);
+				std::unique_ptr<Scheduler> Create(std::string sched_id);
 
-		std::map<std::string, t_pfFactory> s_list;
+				std::map<std::string, t_pfFactory> s_list;
 
-	private:
-		SchedulerFactory();
-	};
+		private:
+				SchedulerFactory();
+		};
 
-	template<const char *TYPE, typename IMPL>
-	const std::string SchedulerTmpl<TYPE, IMPL>::SCHED_ID = SchedulerFactory::getInstance()->Register(
-			SchedulerTmpl<TYPE, IMPL>::_SCHED_ID, &SchedulerTmpl<TYPE, IMPL>::Create);
+		template<const char *TYPE, typename IMPL>
+		const std::string SchedulerTmpl<TYPE, IMPL>::SCHED_ID = SchedulerFactory::getInstance()->Register(
+						SchedulerTmpl<TYPE, IMPL>::_SCHED_ID, &SchedulerTmpl<TYPE, IMPL>::Create);
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
+
 }
 
 #endif //WRENCH_SCHEDULERFACTORY_H

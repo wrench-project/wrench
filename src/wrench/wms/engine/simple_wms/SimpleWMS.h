@@ -18,6 +18,10 @@ namespace wrench {
 
 		class Simulation; // forward ref
 
+		/***********************/
+		/** \cond INTERNAL     */
+		/***********************/
+
 		/**
 		 *  @brief A simple WMS abstraction
 		 */
@@ -29,6 +33,10 @@ namespace wrench {
 		private:
 				int main();
 		};
+
+		/***********************/
+		/** \endcond INTERNAL  */
+		/***********************/
 
 }
 #endif //WRENCH_SIMPLEWMS_H
