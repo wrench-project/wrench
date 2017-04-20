@@ -10,7 +10,6 @@
 #include <iostream>
 
 #include "logging/Logging.h"
-#include "exception/WRENCHException.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/engine/simple_wms/SimpleWMS.h"
 #include "simulation/Simulation.h"
@@ -31,6 +30,8 @@ namespace wrench {
 	 * @brief main method of the SimpleWMS daemon
 	 *
 	 * @return 0 on completion
+	 *
+	 * @throw std::runtime_error
 	 */
 	int SimpleWMS::main() {
 
@@ -103,11 +104,11 @@ namespace wrench {
 				case WorkflowExecutionEvent::UNSUPPORTED_JOB_TYPE: {
 					WRENCH_INFO("Notified that job '%s' was submitted to a service that doesn't support its job type",
 					            event->job->getName().c_str());
-					WRENCH_INFO("TASK STATE = %d", ((StandardJob *) (event->job))->getTasks()[0]->getState());
 					break;
 				}
 				default: {
-					throw WRENCHException("Unknown workflow execution event type");
+					throw std::runtime_error("Unknown workflow execution event type '" +
+																					 std::to_string(event->type) +"'");
 				}
 			}
 

@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <exception/WRENCHException.h>
+#include <exceptions/ServiceIsDownException.h>
 #include <logging/Logging.h>
 #include "ComputeService.h"
 #include "simulation/Simulation.h"
@@ -52,7 +52,7 @@ namespace wrench {
 		void ComputeService::runJob(WorkflowJob *job) {
 
 			if (this->state == ComputeService::DOWN) {
-				throw WRENCHException("Compute Service is Down");
+				throw ServiceIsDownException(this->getName());
 			}
 
 			switch (job->getType()) {
@@ -178,19 +178,21 @@ namespace wrench {
 		/**
 		 * @brief Submit a standard job to the compute service (virtual)
 		 * @param job: a pointer to the job
-		 * @return
+		 *
+		 * @throw std::runtime_error
 		 */
 		void ComputeService::runStandardJob(StandardJob *job) {
-			throw WRENCHException("The compute service does not implement runStandardJob(StandardJob *)");
+			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement runStandardJob(StandardJob *)");
 		}
 
 		/**
 		 * @brief Submit a pilot job to the compute service (virtual)
 		 * @param job: a pointer ot the job
-		 * @return
+		 *
+		 * @throw std::runtime_error
 		 */
 		void ComputeService::runPilotJob(PilotJob *job) {
-			throw WRENCHException("The compute service does not implement runPilotJob(PilotJob *)");
+			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement runPilotJob(StandardJob *)");
 		}
 
 		/**
@@ -203,33 +205,41 @@ namespace wrench {
 		/**
 		 * @brief Get the flop/sec rate of one core of the compute service's host
 		 * @return  the flop rate
+		 *
+		 * @throw std::runtime_error
 		 */
 		double ComputeService::getCoreFlopRate() {
-			throw WRENCHException("The compute sertvice does not implement getCoreFlopRate()");
+			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement getCoreFlopRate()");
 		}
 
 		/**
 		 * @brief Get the number of physical cores on the compute service's host
 		 * @return the core count
+		 *
+		 * @throw std::runtime_error
 		 */
 		unsigned long ComputeService::getNumCores() {
-			throw WRENCHException("The compute sertvice does not implement getNumCores()");
+			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement getNumCores()");
 		}
 
 		/**
 		 * @brief Get the number of currently idle cores on the compute service's host
 		 * @return the idle core count
+		 *
+		 * @throw std::runtime_error
 		 */
 		unsigned long ComputeService::getNumIdleCores() {
-			throw WRENCHException("The compute sertvice does not implement getNumIdleCores()");
+			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement getNumIdleCores()");
 		}
 
 		/**
 		 * @brief Get the time-to-live, in seconds, of the compute service
 		 * @return the ttl
+		 *
+		 * @throw std::runtime_error
 		 */
 		double ComputeService::getTTL() {
-			throw WRENCHException("The compute sertvice does not implement getTTL()");
+			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement getTTL()");
 		}
 
 };

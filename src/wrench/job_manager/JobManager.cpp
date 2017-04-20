@@ -11,7 +11,6 @@
 #include <logging/Logging.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "exception/WRENCHException.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 #include "JobManager.h"
 #include "workflow_job/StandardJob.h"
@@ -139,7 +138,7 @@ namespace wrench {
 		 * @param job: a pointer to the PilotJob
 		 */
 		void JobManager::cancelPilotJob(PilotJob *job) {
-			throw WRENCHException("cancelPilotJob() not implemented yet");
+			throw std::runtime_error("cancelPilotJob() not implemented yet");
 		}
 
 		/**
@@ -164,7 +163,7 @@ namespace wrench {
 		 * @param job: a pointer to a WorkflowJob
 		 */
 		void JobManager::forgetJob(WorkflowJob *) {
-			throw WRENCHException("forgetJob() not implemented yet");
+			throw std::runtime_error("forgetJob() not implemented yet");
 		}
 
 
@@ -298,7 +297,7 @@ namespace wrench {
 					}
 
 					default: {
-						throw WRENCHException("Invalid message type " + std::to_string(message->type));
+						throw std::runtime_error("Invalid message type " + std::to_string(message->type));
 					}
 				}
 

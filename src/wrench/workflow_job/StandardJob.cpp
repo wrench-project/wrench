@@ -9,7 +9,6 @@
 
 
 #include <set>
-#include <exception/WRENCHException.h>
 #include "workflow/Workflow.h"
 #include "StandardJob.h"
 
@@ -18,6 +17,8 @@ namespace wrench {
 		/**
 		 * @brief Constructor
 		 * @param tasks: the vector of WorkflowTasks object that comprise the job
+		 *
+		 * @throw std::invalid_argument
 		 */
 		StandardJob::StandardJob(std::vector<WorkflowTask*> tasks) {
 			this->type = WorkflowJob::STANDARD;
@@ -26,7 +27,7 @@ namespace wrench {
 
 			for (auto t : tasks) {
 				if (t->getState() != WorkflowTask::READY) {
-					throw WRENCHException("All tasks in a StandardJob must be READY");
+					throw std::invalid_argument("All tasks used to create a StandardJob must be READY");
 				}
 			}
 			for (auto t : tasks) {

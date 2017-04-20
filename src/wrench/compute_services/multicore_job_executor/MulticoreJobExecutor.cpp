@@ -13,7 +13,7 @@
 #include "workflow/WorkflowTask.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
-#include "exception/WRENCHException.h"
+#include "exceptions/ServiceIsDownException.h"
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 #include "workflow_job/StandardJob.h"
 #include "workflow_job/PilotJob.h"
@@ -28,6 +28,8 @@ namespace wrench {
 
 		/**
 		 * @brief Stop the service
+		 *
+		 * @throw std::runtime_error
 		 */
 		void MulticoreJobExecutor::stop() {
 
@@ -41,7 +43,7 @@ namespace wrench {
 			// Wait for the ack
 			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name + "_kill");
 			if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
-				throw WRENCHException("Wrong message type received while expecting DAEMON_STOPPED");
+				throw std::runtime_error("Wrong message type received while expecting DAEMON_STOPPED");
 			}
 		}
 
@@ -55,7 +57,7 @@ namespace wrench {
 		void MulticoreJobExecutor::runStandardJob(StandardJob *job) {
 
 			if (this->state == ComputeService::DOWN) {
-				throw WRENCHException("Trying to run a job on a compute service that's terminated");
+				throw ServiceIsDownException(this->getName());
 			}
 
 			// Synchronously send a "run a task" message to the daemon's mailbox
@@ -71,7 +73,7 @@ namespace wrench {
 		void MulticoreJobExecutor::runPilotJob(PilotJob *job) {
 
 			if (this->state == ComputeService::DOWN) {
-				throw WRENCHException("Trying to run a job on a compute service that's terminated");
+				throw ServiceIsDownException(this->getName());
 			}
 
 			//  send a "run a task" message to the daemon's mailbox
@@ -86,7 +88,7 @@ namespace wrench {
 		unsigned long MulticoreJobExecutor::getNumCores() {
 
 			if (this->state == ComputeService::DOWN) {
-				throw WRENCHException("Compute Service is down");
+				throw ServiceIsDownException(this->getName());
 			}
 
 			return (unsigned long)S4U_Simulation::getNumCores(this->hostname);
@@ -100,7 +102,7 @@ namespace wrench {
 		unsigned long MulticoreJobExecutor::getNumIdleCores() {
 
 			if (this->state == ComputeService::DOWN) {
-				throw WRENCHException("Compute Service is down");
+				throw ServiceIsDownException(this->getName());
 			}
 
 			S4U_Mailbox::dput(this->mailbox_name, new NumIdleCoresRequestMessage(this->getPropertyValueAsDouble(NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD)));
@@ -117,7 +119,7 @@ namespace wrench {
 		double MulticoreJobExecutor::getTTL() {
 
 			if (this->state == ComputeService::DOWN) {
-				throw WRENCHException("Compute Service is down");
+				throw ServiceIsDownException(this->getName());
 			}
 
 			S4U_Mailbox::dput(this->mailbox_name, new TTLRequestMessage(this->getPropertyValueAsDouble(TTL_REQUEST_MESSAGE_PAYLOAD)));
@@ -134,7 +136,7 @@ namespace wrench {
 		double MulticoreJobExecutor::getCoreFlopRate() {
 
 			if (this->state == ComputeService::DOWN) {
-				throw WRENCHException("Compute Service is down");
+				throw ServiceIsDownException(this->getName());
 			}
 			return simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0);
 		}
@@ -143,6 +145,8 @@ namespace wrench {
 		/**
 		 * @brief Get a property name as a string
 		 * @return the name as a string
+		 *
+		 * @throw std::invalid_argument
 		 */
 		std::string MulticoreJobExecutor::getPropertyString(MulticoreJobExecutor::Property property) {
 			switch(property) {
@@ -161,7 +165,7 @@ namespace wrench {
 				case TTL_REQUEST_MESSAGE_PAYLOAD:  						return "TTL_REQUEST_MESSAGE_PAYLOAD";
 				case TTL_ANSWER_MESSAGE_PAYLOAD:   						return "TTL_ANSWER_MESSAGE_PAYLOAD";
 
-				default: throw new WRENCHException("MulticoreJobExecutor property" + std::to_string(property) + "has no string name");
+				default: throw new std::invalid_argument("MulticoreJobExecutor property" + std::to_string(property) + "has no string name");
 			}
 		}
 
@@ -187,11 +191,13 @@ namespace wrench {
 		 * @brief Get a property of the Multicore Job Executor as a double
 		 * @param property is the property
 		 * @return the property value as a double
+		 *
+		 * @throw std::runtime_error
 		 */
 		double MulticoreJobExecutor::getPropertyValueAsDouble(MulticoreJobExecutor::Property property) {
 			double value;
 			if (sscanf(this->getPropertyValueAsString(property).c_str(),"%lf", &value) != 1) {
-				throw WRENCHException("Invalid " + this->getPropertyString(property) + " property value " + this->getPropertyValueAsString(property));
+				throw std::runtime_error("Invalid " + this->getPropertyString(property) + " property value " + this->getPropertyValueAsString(property));
 			}
 			return value;
 		}
@@ -237,7 +243,11 @@ namespace wrench {
 			this->containing_pilot_job = pj;
 
 			// Start the daemon on the same host
-			this->start(hostname);
+			try {
+				this->start(hostname);
+			} catch (std::invalid_argument e) {
+				throw e;
+			}
 		}
 
 
@@ -400,7 +410,12 @@ namespace wrench {
 
 		/**
 		 * @brief Wait for and react to any incoming message
+		 *
+		 * @param timeout: timeout value in seconds
+		 *
 		 * @return false if the daemon should terminate, true otherwise
+		 *
+		 * @throw std::runtime_error
 		 */
 		bool MulticoreJobExecutor::processNextMessage(double timeout) {
 
@@ -452,9 +467,13 @@ namespace wrench {
 					WRENCH_INFO("Asked to run a pilot job with %d cores for %lf seconds", m->job->getNumCores(), m->job->getDuration());
 					if (!this->supportsPilotJobs()) {
 						S4U_Mailbox::dput(m->job->popCallbackMailbox(), new JobTypeNotSupportedMessage(m->job, this, this->getPropertyValueAsDouble(JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD)));
-					} else {
-						this->pending_jobs.push(m->job);
+						return true;
 					}
+					if (this->getNumCores() < m->job->getNumCores()) {
+						S4U_Mailbox::dput(m->job->popCallbackMailbox(), new NotEnoughCoresMessage(m->job, this, this->getPropertyValueAsDouble(NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
+						return true;
+					}
+					this->pending_jobs.push(m->job);
 					return true;
 				}
 
@@ -485,7 +504,7 @@ namespace wrench {
 				}
 
 				default: {
-					throw WRENCHException("Unknown message type: " + std::to_string(message->type));
+					throw std::runtime_error("Unknown message type: " + std::to_string(message->type));
 				}
 			}
 		}

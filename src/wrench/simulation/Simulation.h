@@ -64,7 +64,7 @@ namespace wrench {
 				/***********************/
 
 				static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(
-								std::string, bool, bool, std::map<MulticoreJobExecutor::Property, std::string> plist, int num_cores,
+								std::string, bool, bool, std::map<MulticoreJobExecutor::Property, std::string> plist, unsigned int num_cores,
 								double ttl, PilotJob *pj, std::string suffix);
 
 				void mark_compute_service_as_terminated(ComputeService *cs);

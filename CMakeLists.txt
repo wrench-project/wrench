@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 11)
 include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
 
 set(SOURCE_FILES
-        src/wrench/exception/WRENCHException.h
+        src/wrench/exceptions/ServiceIsDownException.h
         src/wrench/simulation/SimulationMessage.cpp
         src/wrench/simulation/SimulationMessage.h
         src/wrench/workflow_execution_events/WorkflowExecutionEvent.cpp

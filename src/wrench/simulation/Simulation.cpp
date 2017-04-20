@@ -8,24 +8,47 @@
  *
  */
 
+#include <csignal>
 #include <logging/Logging.h>
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 #include "simulation/Simulation.h"
-#include "exception/WRENCHException.h"
 #include "wms/engine/EngineFactory.h"
 #include "wms/scheduler/SchedulerFactory.h"
 
 #include "wms/optimizations/static/SimplePipelineClustering.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
+
 namespace wrench {
+
+		/* Exception handler to catch SIGBART signals from SimGrid (which should
+		 * probably throw exceptions at some point)
+		 */
+		void signal_handler(int signal)
+		{
+			if (signal == SIGABRT) {
+				std::cerr << "[ ABORTING ]" << std::endl;
+				std::_Exit(EXIT_FAILURE);
+			} else {
+				std::cerr << "Unexpected signal " << signal << " received\n";
+			}
+		}
 
 		/**
 		 * @brief Default constructor
+		 *
 		 */
 		Simulation::Simulation() {
+
 			// Customize the logging format
-//			xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
+			// xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
 			xbt_log_control_set("root.fmt:[%d][%h:%t]%e%m%n");
+
+			// Setup the SIGABRT handler
+			auto previous_handler = std::signal(SIGABRT, signal_handler);
+			if (previous_handler == SIG_ERR) {
+				std::cerr << "SIGABRT handler setup failed... uncaught exceptions will lead to unclean terminations\n";
+			}
 
 			// Create the S4U simulation wrapper
 			this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
@@ -33,12 +56,22 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Initialize the simulation, parsing out WRENCH-specific command-line arguments
+		 * @brief Initialize the simulation, which parses out WRENCH-specific and SimGrid-specific
+		 * command-line arguments, if any
 		 *
 		 * @param argc: main()'s argument count
 		 * @param argv: main()'s argument list
+		 *
+		 * @throw std::invalid_argument
 		 */
 		void Simulation::init(int *argc, char **argv) {
+			if (*argc < 1) {
+				throw std::invalid_argument("Invalid argc argument (must be >= 1)");
+			}
+			if ((argv == nullptr) || (*argv == nullptr)) {
+				throw std::invalid_argument("Invalid argument argv (nullptr)");
+			}
+
 			this->s4u_simulation->initialize(argc, argv);
 		}
 
@@ -63,30 +96,48 @@ namespace wrench {
 		 * @brief Instantiate a multicore standard job executor on a host
 		 *
 		 * @param hostname: the name of the host in the simulated platform
+		 *
+		 * @throw std::invalid_argument
 		 */
 		void Simulation::createMulticoreStandardJobExecutor(std::string hostname,
-																												std::map<MulticoreJobExecutor::Property , std::string> plist) {
-			this->createMulticoreJobExecutor(hostname, true, false, plist);
+																												std::map<MulticoreJobExecutor::Property , std::string> plist){
+			try {
+				this->createMulticoreJobExecutor(hostname, true, false, plist);
+			} catch (std::invalid_argument e) {
+				throw e;
+			}
 		}
 
 		/**
 		 * @brief Instantiate a multicore pilot job executor on a host
 		 *
 		 * @param hostname: the name of the host in the simulated platform
+		 *
+		 * @throw std::invalid_argument
 		 */
 		void Simulation::createMulticorePilotJobExecutor(std::string hostname,
 																										 std::map<MulticoreJobExecutor::Property , std::string> plist) {
-			this->createMulticoreJobExecutor(hostname, false, true, plist);
+			try {
+				this->createMulticoreJobExecutor(hostname, false, true, plist);
+			} catch (std::invalid_argument e) {
+				throw e;
+			}
 		}
 
 		/**
 		 * @brief Private helper function to instantiate a multicore job executor
 		 *
 		 * @param hostname: the name of the host in the simulated platform
+		 *
+		 * @throw std::invalid_argument
 		 */
 		void Simulation::createMulticoreStandardAndPilotJobExecutor(std::string hostname,
 																																std::map<MulticoreJobExecutor::Property , std::string> plist) {
-			this->createMulticoreJobExecutor(hostname, true, true, plist);
+			try {
+				this->createMulticoreJobExecutor(hostname, true, true, plist);
+			} catch (std::invalid_argument e) {
+				throw e;
+			}
 		}
 
 		/**
@@ -138,7 +189,6 @@ namespace wrench {
 		}
 
 
-
 		/**
 		 * @brief Create an unregistered executor (i.e., that the Simulation instance will not know anything about)
 		 *
@@ -149,12 +199,14 @@ namespace wrench {
 		 * @param num_cores: the number of cores
 		 * @param ttl: the time-to-live of the executor
 		 * @param suffix: a suffix to be appended to the process name (useful for debugging)
+		 *
+		 * @throw std::invalid_argument
 		 */
 		MulticoreJobExecutor *Simulation::createUnregisteredMulticoreJobExecutor(std::string hostname,
 																																						 bool supports_standard_jobs,
 																																						 bool supports_pilot_jobs,
 																																						 std::map<MulticoreJobExecutor::Property , std::string> plist,
-																																						 int num_cores,
+																																						 unsigned int num_cores,
 																																						 double ttl,
 																																						 PilotJob *pj,
 																																						 std::string suffix) {
@@ -165,7 +217,7 @@ namespace wrench {
 				executor = new MulticoreJobExecutor(nullptr, hostname, plist, num_cores, ttl, pj, suffix);
 				executor->setSupportStandardJobs(supports_standard_jobs);
 				executor->setSupportPilotJobs(supports_pilot_jobs);
-			} catch (WRENCHException e) {
+			} catch (std::invalid_argument e) {
 				throw e;
 			}
 			return executor;
@@ -195,6 +247,8 @@ namespace wrench {
 		 * @param hostname: the hostname in the simulated platform
 		 * @param supports_standard_jobs: true if the executor supports StandardJob submissions, false otherwise
 		 * @param support_pilot_jobs: true if the executor supports PilotJob submissions, false otherwise
+		 *
+		 * @throw std::invalid_argument
 		 */
 		void Simulation::createMulticoreJobExecutor(std::string hostname,
 																								bool supports_standard_jobs,
@@ -207,7 +261,7 @@ namespace wrench {
 				executor = new MulticoreJobExecutor(this, hostname);
 				executor->setSupportStandardJobs(supports_standard_jobs);
 				executor->setSupportPilotJobs(support_pilot_jobs);
-			} catch (WRENCHException e) {
+			} catch (std::invalid_argument e) {
 				throw e;
 			}
 

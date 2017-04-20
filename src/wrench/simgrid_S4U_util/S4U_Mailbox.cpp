@@ -8,7 +8,6 @@
  */
 
 #include <simulation/SimulationMessage.h>
-#include <exception/WRENCHException.h>
 #include "S4U_Mailbox.h"
 #include <xbt/ex.hpp>
 #include <logging/Logging.h>
@@ -38,13 +37,15 @@ namespace wrench {
 		 *
 		 * @param mailbox: the mailbox name
 		 * @return a unique pointer to the message
+		 *
+		 * @throw std::runtime_error
 		 */
 		std::unique_ptr<SimulationMessage> S4U_Mailbox::get(std::string mailbox_name) {
 			WRENCH_DEBUG("IN GET from %s", mailbox_name.c_str());
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 			SimulationMessage *msg = static_cast<SimulationMessage *>(simgrid::s4u::this_actor::recv(mailbox));
 			if (msg == NULL) {
-				throw WRENCHException("Mailbox::get(): NULL message received");
+				throw std::runtime_error("NULL message received");
 			}
 			WRENCH_DEBUG("GOT a '%s' message from %s", msg->toString().c_str(), mailbox_name.c_str());
 			return std::unique_ptr<SimulationMessage>(msg);
@@ -56,6 +57,8 @@ namespace wrench {
 		 * @param mailbox: the mailbox name
 		 * @param timeout:  a timeout value in seconds
 		 * @return a unique pointer to the message, nullptr on timeout
+		 *
+		 * @throw std::runtime_error
 		 */
 		std::unique_ptr<SimulationMessage> S4U_Mailbox::get(std::string mailbox_name, double timeout) {
 			WRENCH_DEBUG("IN GET WITH TIMEOUT (%lf) FROM MAILBOX %s", timeout, mailbox_name.c_str());
@@ -71,7 +74,7 @@ namespace wrench {
 			}
 
 			if (data == nullptr) {
-				throw WRENCHException("Mailbox::get(): NULL message in task");
+				throw std::runtime_error("NULL message in task");
 			}
 
 			SimulationMessage *msg = static_cast<SimulationMessage *>(data);

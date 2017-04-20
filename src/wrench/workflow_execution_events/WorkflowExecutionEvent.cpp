@@ -10,11 +10,19 @@
 
 
 #include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <exception/WRENCHException.h>
 #include "WorkflowExecutionEvent.h"
 
 namespace wrench {
 
+		/**
+		 * @brief Block the calling process until a WorkflowExecutionEvent is generated
+		 *        based on messages received on a mailbox
+		 *
+		 * @param mailbox: the name of the receiving mailbox
+		 * @return a unique pointer to a WorkflowExecutionEvent object
+		 *
+		 * @throw std::runtime_error
+		 */
 		std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
 
 			// Get the message on the mailbox
@@ -66,7 +74,7 @@ namespace wrench {
 				}
 
 				default: {
-					throw WRENCHException("Non-handled message type when generating execution event");
+					throw std::runtime_error("Non-handled message type when generating execution event");
 				}
 			}
 		}

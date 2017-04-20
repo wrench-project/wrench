@@ -10,7 +10,6 @@
 #include <simgrid_S4U_util/S4U_Simulation.h>
 #include <logging/Logging.h>
 #include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "exception/WRENCHException.h"
 #include "SequentialTaskExecutor.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(sequential_task_executor, "Log category for Sequential Task Executor");
@@ -66,6 +65,8 @@ namespace wrench {
 		 * @brief Main method of the sequential task executor daemon
 		 *
 		 * @return 0 on termination
+		 *
+		 * @throw std::runtime_error
 		 */
 		int SequentialTaskExecutor::main() {
 
@@ -109,7 +110,7 @@ namespace wrench {
 					}
 
 					default: {
-						throw WRENCHException("Unknown message type");
+						throw std::runtime_error("Unknown message type");
 					}
 				}
 			}

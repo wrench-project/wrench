@@ -15,8 +15,6 @@
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 
 #include "workflow/Workflow.h"
-#include "exception/WRENCHException.h"
-
 
 namespace wrench {
 
@@ -28,6 +26,8 @@ namespace wrench {
 		 * @param num_procs: a number of processors
 		 *
 		 * @return a pointer to a WorkflowTask object
+		 *
+		 * @throw std::invalid_argument
 		 */
 		WorkflowTask *Workflow::addTask(const std::string id,
 																		double flops,
@@ -35,7 +35,7 @@ namespace wrench {
 
 			// Check that the task doesn't really exist
 			if (tasks[id]) {
-				throw WRENCHException("Task ID already exists");
+				throw std::invalid_argument("Task ID '"+id+"' already exists");
 			}
 
 			// Create the WorkflowTask object
@@ -52,11 +52,18 @@ namespace wrench {
 			return task;
 		}
 
+		/**
+		 * @brief Remove a task from the workflow
+		 *
+		 * @param task: a pointer to a WorkflowTask object
+		 *
+		 * @throw std::invalid_argument
+		 */
 		void Workflow::removeTask(WorkflowTask *task) {
 
 			// check that task exists
 			if (tasks.find(task->id) == tasks.end()) {
-				throw WRENCHException("Task ID does not exist");
+				throw std::invalid_argument("Task '"+task->id+"' does not exist");
 			}
 
 			DAG.get()->erase(task->DAG_node);
@@ -69,10 +76,12 @@ namespace wrench {
 		 * @param id: a string id
 		 *
 		 * @return a pointer to a WorkflowTask object
+		 *
+		 * @throw std::invalid_argument
 		 */
 		WorkflowTask *Workflow::getWorkflowTaskByID(const std::string id) {
 			if (!tasks[id]) {
-				throw WRENCHException("Unknown WorkflowTask ID " + id);
+				throw std::invalid_argument("Unknown WorkflowTask ID " + id);
 			}
 			return tasks[id].get();
 		}
@@ -82,8 +91,8 @@ namespace wrench {
 		 * @brief Create a control dependency between two workflow tasks. Will not
 		 *        do anything if there is already a path between the two tasks.
 		 *
-		 * @param src: the source task
-		 * @param dst: the destination task
+		 * @param src: the source WorkflowTask object
+		 * @param dst: the destination WorkflowTask object
 		 */
 		void Workflow::addControlDependency(WorkflowTask *src, WorkflowTask *dst) {
 			if (!pathExists(src, dst)) {
@@ -104,9 +113,16 @@ namespace wrench {
 		 * @param size: a file size in bytes
 		 *
 		 * @return a pointer to a WorkflowFile object
+		 *
+		 * @throw std::invalid_argument
 		 */
 		WorkflowFile *Workflow::addFile(const std::string id, double size) {
 			// Create the WorkflowFile object
+			if (files[id]) {
+				throw std::invalid_argument("WorkflowFile with id '" +
+																		id + "' already exists");
+			}
+
 			WorkflowFile *file = new WorkflowFile(id, size);
 			file->workflow = this;
 			// Add if to the set of workflow files
@@ -154,12 +170,14 @@ namespace wrench {
 		 * @brief Create a workflow based on a DAX file
 		 *
 		 * @param filename: the path to the DAX file
+		 *
+		 * @throw std::invalid_argument
 		 */
 		void Workflow::loadFromDAX(const std::string filename) {
 			pugi::xml_document dax_tree;
 
 			if (!dax_tree.load_file(filename.c_str())) {
-				throw WRENCHException("Workflow::loadFromDAX(): Invalid DAX file");
+				throw std::invalid_argument("Invalid DAX file");
 			}
 
 			// Get the root node
@@ -235,7 +253,7 @@ namespace wrench {
 		 * @brief Get a vector of the ready tasks
 		 * @return vector of pointers to WorkflowTask objects
 		 */
-		 // TODO: Implement this more efficiently
+		// TODO: Implement this more efficiently
 		std::vector<WorkflowTask *> Workflow::getReadyTasks() {
 
 			std::vector<WorkflowTask *> task_list;
@@ -313,6 +331,9 @@ namespace wrench {
 		 *        to other tasks if necessary.
 		 * @param task: a pointer to a WorkflowTask object
 		 * @param state: the new task state
+		 *
+		 * @throw std::invalid_argument
+		 * @throw std::runtime_error
 		 */
 		void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state) {
 
@@ -320,8 +341,7 @@ namespace wrench {
 				// Make a task completed, which may cause its children to become ready
 				case WorkflowTask::COMPLETED: {
 					if (task->getState() != WorkflowTask::RUNNING) {
-						throw WRENCHException(
-										"Workflow::updateTaskState(): Cannot set non-running task state to completed");
+						throw std::runtime_error("Cannot set non-running task state to WorkflowTask::COMPLETED");
 					}
 					task->setState(WorkflowTask::COMPLETED);
 					// Go through the children and make them ready if possible
@@ -337,7 +357,7 @@ namespace wrench {
 						return;
 					}
 					if (task->getState() != WorkflowTask::NOT_READY) {
-						throw WRENCHException("Workflow::updateTaskState(): Cannot set non-not_ready task state to ready");
+						throw std::runtime_error("Cannot set the state of a not-ready task to WorkflowTask::READY");
 					}
 					// Go through the parent and check whether they are all completed
 					for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
@@ -364,7 +384,8 @@ namespace wrench {
 					break;
 				}
 				default: {
-					throw WRENCHException("Workflow::updateTaskState(): invalid state");
+					throw std::invalid_argument("Unknown task state '" +
+																			std::to_string(state) + "'");
 				}
 			}
 		}

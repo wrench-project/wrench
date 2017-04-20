@@ -24,17 +24,17 @@ int main(int argc, char **argv) {
 
 //	std::cerr << "Creating a few tasks..." << std::endl;
 //
-//	WRENCH::WorkflowTask *t1 = workflow.addTask("T1", 1.0, 1);
-//	WRENCH::WorkflowTask *t2 = workflow.addTask("T2", 10.0, 1);
-//	WRENCH::WorkflowTask *t3 = workflow.addTask("T3", 10.0, 1);
-//	WRENCH::WorkflowTask *t4 = workflow.addTask("T4", 10.0, 1);
-//	WRENCH::WorkflowTask *t5 = workflow.addTask("T5", 1.0, 1);
+//	wrench::WorkflowTask *t1 = workflow.addTask("T1", 1.0, 1);
+//	wrench::WorkflowTask *t2 = workflow.addTask("T2", 10.0, 1);
+//	wrench::WorkflowTask *t3 = workflow.addTask("T3", 10.0, 1);
+//	wrench::WorkflowTask *t4 = workflow.addTask("T4", 10.0, 1);
+//	wrench::WorkflowTask *t5 = workflow.addTask("T5", 1.0, 1);
 //
 //	std::cerr << "Creating a few  files..." << std::endl;
 //
-//	WRENCH::WorkflowFile *f2 = workflow.addFile("file2", 1000.0);
-//	WRENCH::WorkflowFile *f3 = workflow.addFile("file3", 2000.0);
-//	WRENCH::WorkflowFile *f4 = workflow.addFile("file4", 2000.0);
+//	wrench::WorkflowFile *f2 = workflow.addFile("file2", 1000.0);
+//	wrench::WorkflowFile *f3 = workflow.addFile("file3", 2000.0);
+//	wrench::WorkflowFile *f4 = workflow.addFile("file4", 2000.0);
 //
 //	std::cerr << "Adding data dependencies..." << std::endl;
 //
@@ -66,18 +66,24 @@ int main(int argc, char **argv) {
 
 //	return 0;
 
+
 	std::cerr << "Instantiating SimGrid platform..." << std::endl;
 	simulation.createPlatform(platform_file);
 
 //	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
 //	simulation.createSequentialTaskExecutor("Tremblay");
 
-	std::cerr << "Instantiating a  MultiCore Job executor on c-1.me..." << std::endl;
+	try {
+		std::cerr << "Instantiating a  MultiCore Job executor on c-1.me..." << std::endl;
 //	simulation.createMulticoreStandardAndPilotJobExecutor("c-1.me", {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
 //	simulation.createMulticorePilotJobExecutor("c-1.me", {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
 //	simulation.createMulticoreStandardJobExecutor("c-2.me", {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
-	simulation.createMulticoreStandardJobExecutor("c-2.me");
+		simulation.createMulticoreStandardJobExecutor("c-2.me");
 //	simulation.createMulticoreStandardJobExecutor("c-3.me");
+	} catch (std::invalid_argument e) {
+		std::cerr << "Error: "  << e.what() << std::endl;
+		std::exit(1);
+	}
 
 
 	std::cerr << "Instantiating a WMS on c-0.me..." << std::endl;

@@ -32,9 +32,23 @@ namespace wrench {
 	 * @param hostname: the name of the host on which to start the daemon
 	 */
 	void S4U_DaemonWithMailbox::start(std::string hostname) {
-		this->actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
-		                                               simgrid::s4u::Host::by_name(hostname),
-		                                               S4U_DaemonWithMailboxActor(this));
+
+		// Check that the host exists, and if not throw an exceptions
+		if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
+			throw std::invalid_argument("Unknown host name '" + hostname + "'");
+		}
+
+		// Create the actor
+		try {
+			this->actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
+																										 simgrid::s4u::Host::by_name(hostname),
+																										 S4U_DaemonWithMailboxActor(this));
+		} catch (std::exception e) {
+			// Some internal SimGrid exceptions...
+			std::abort();
+		}
+
+		// Set the mailbox receiver
 		simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
 		mailbox->setReceiver(this->actor);
 

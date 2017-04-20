@@ -49,7 +49,8 @@ namespace wrench {
 						NUM_IDLE_CORES_ANSWER,
 						TTL_REQUEST,
 						TTL_ANSWER,
-						JOB_TYPE_NOT_SUPPORTED
+						JOB_TYPE_NOT_SUPPORTED,
+						NOT_ENOUGH_CORES
 				};
 
 				SimulationMessage(Type t, double s);
@@ -81,6 +82,16 @@ namespace wrench {
 		class JobTypeNotSupportedMessage: public SimulationMessage {
 		public:
 				JobTypeNotSupportedMessage(WorkflowJob*, ComputeService *, double payload);
+				WorkflowJob *job;
+				ComputeService *compute_service;
+		};
+
+		/**
+		 * @brief "NOT_ENOUGH_CORES" SimulationMessage class
+		 */
+		class NotEnoughCoresMessage: public SimulationMessage {
+		public:
+				NotEnoughCoresMessage(WorkflowJob*, ComputeService *, double payload);
 				WorkflowJob *job;
 				ComputeService *compute_service;
 		};

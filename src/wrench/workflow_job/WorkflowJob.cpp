@@ -10,7 +10,6 @@
 
 #include <string>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <exception/WRENCHException.h>
 
 #include "workflow_job/WorkflowJob.h"
 #include "workflow/Workflow.h"
@@ -29,6 +28,8 @@ namespace wrench {
 		/**
 		 * @brief Get the job type name
 		 * @return the name of the type
+		 *
+		 * @throw std::runtime_error
 		 */
 		std::string WorkflowJob::getTypeAsString() {
 			switch(this->type) {
@@ -39,7 +40,8 @@ namespace wrench {
 					return "Pilot";
 				}
 				default: {
-					throw WRENCHException("WorkflowJob type cannot be converted to a string");
+					throw std::runtime_error("WorkflowJob type '" +
+																	 std::to_string(this->type) + "' cannot be converted to a string");
 				}
 			}
 		}

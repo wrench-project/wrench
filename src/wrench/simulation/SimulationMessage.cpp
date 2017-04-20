@@ -38,6 +38,7 @@ namespace wrench {
 				case TTL_REQUEST:return "TTL_REQUEST";
 				case TTL_ANSWER:return "TTL_ANSWER";
 				case JOB_TYPE_NOT_SUPPORTED: return "JOB_TYPE_NOT_SUPPORTED";
+				case NOT_ENOUGH_CORES: return "NOT_ENOUGH_CORES";
 				default: return "UNKNOWN MESSAGE TYPE";
 			}
 
@@ -64,6 +65,17 @@ namespace wrench {
 		 * @param payload: message size in bytes
 		 */
 		JobTypeNotSupportedMessage::JobTypeNotSupportedMessage(WorkflowJob *job, ComputeService *cs, double payload): SimulationMessage(JOB_TYPE_NOT_SUPPORTED, payload) {
+			this->job = job;
+			this->compute_service = cs;
+		}
+
+		/**
+		 * @brief Constructor
+		 * @param job: pointer to a WorkflowJob
+		 * @param cs: points to a ComputeService
+		 * @param payload: message size in bytes
+		 */
+		NotEnoughCoresMessage::NotEnoughCoresMessage(WorkflowJob *job, ComputeService *cs, double payload): SimulationMessage(NOT_ENOUGH_CORES, payload) {
 			this->job = job;
 			this->compute_service = cs;
 		}
