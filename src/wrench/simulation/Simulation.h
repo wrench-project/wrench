@@ -45,7 +45,9 @@ namespace wrench {
 				void createMulticoreStandardAndPilotJobExecutor(std::string,
 																												std::map<MulticoreJobExecutor::Property, std::string> = {});
 
-				void createWMS(std::string wms_id, std::string sched_id, Workflow *w, std::string hostname);
+				void createWMS(std::string, std::string, Workflow *, std::string);
+
+				void add_static_optimization(StaticOptimization*);
 
 				/***********************/
 				/** \cond DEVELOPER    */
@@ -77,8 +79,7 @@ namespace wrench {
 		private:
 
 				std::unique_ptr<S4U_Simulation> s4u_simulation;
-
-				std::vector<std::unique_ptr<WMS>> WMSes;
+				std::unique_ptr<WMS> wms;
 
 				std::vector<std::unique_ptr<ComputeService>> running_compute_services;
 				std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;

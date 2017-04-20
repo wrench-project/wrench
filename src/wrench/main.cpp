@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "wrench.h"
+#include "wms/optimizations/static/SimplePipelineClustering.h"
 
 int main(int argc, char **argv) {
 
@@ -90,6 +91,8 @@ int main(int argc, char **argv) {
 	simulation.createWMS("simple_wms", "RandomScheduler", &workflow, "c-0.me");
 //	simulation.createWMS("simple_wms", "MinMinScheduler", &workflow, "c-0.me");
 //	simulation.createWMS("simple_wms", "MaxMinScheduler", &workflow, "c-0.me");
+
+	simulation.add_static_optimization(new wrench::SimplePipelineClustering());
 
 	std::cerr << "Launching the Simulation..." << std::endl;
 	simulation.launch();

@@ -15,8 +15,6 @@
 #include "wms/engine/EngineFactory.h"
 #include "wms/scheduler/SchedulerFactory.h"
 
-#include "wms/optimizations/static/SimplePipelineClustering.h"
-
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 
 namespace wrench {
@@ -148,22 +146,31 @@ namespace wrench {
 		 * @param workflow: a pointer to the Workflow that the WMS will execute
 		 * @param hostname: the name of the host in the simulated platform on which to start the WMS
 		 */
-		void Simulation::createWMS(std::string wms_id, std::string sched_id, Workflow *workflow, std::string hostname) {
+		void Simulation::createWMS(std::string wms_id, std::string sched_id, Workflow *workflow,
+		                           std::string hostname) {
 			// Obtaining scheduler
 			std::unique_ptr<Scheduler> scheduler = SchedulerFactory::getInstance()->Create(sched_id);
 
 			// Obtaining and configuring WMS
-			std::unique_ptr<WMS> wms = EngineFactory::getInstance()->Create(wms_id);
+			wms = EngineFactory::getInstance()->Create(wms_id);
 			wms->configure(this, workflow, std::move(scheduler), hostname);
-
-			// TODO: make this dynamic
-			std::unique_ptr<StaticOptimization> opt(new SimplePipelineClustering());
-			wms->add_static_optimization(std::move(opt));
-
-			// Add it to the list of WMSes
-			WMSes.push_back(std::move(wms));
 		}
 
+		/**
+		 * @brief Add a static optimization to the WMS. Optimizations are
+		 * executed in the order of insertion
+		 *
+		 * @param optimization: a pointer to a static optimization
+		 *
+		 * @throw std::invalid_argument
+		 */
+		void Simulation::add_static_optimization(StaticOptimization* optimization) {
+			if (optimization == nullptr) {
+				throw std::invalid_argument("Invalid argument optimization (nullptr)");
+			}
+			std::unique_ptr<StaticOptimization> opt(optimization);
+			wms->add_static_optimization(std::move(opt));
+		}
 
 		/**
 		 * @brief Obtain the list of compute services
