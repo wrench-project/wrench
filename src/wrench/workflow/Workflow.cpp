@@ -86,7 +86,6 @@ namespace wrench {
 			return tasks[id].get();
 		}
 
-
 		/**
 		 * @brief Create a control dependency between two workflow tasks. Will not
 		 *        do anything if there is already a path between the two tasks.
@@ -159,6 +158,7 @@ namespace wrench {
 
 		/**
 		 * @brief Get the number of tasks in the workflow
+		 *
 		 * @return the number of tasks
 		 */
 		unsigned long Workflow::getNumberOfTasks() {
@@ -224,12 +224,12 @@ namespace wrench {
 			}
 		}
 
-
 		/**
 		 * @brief Determine whether one source is an ancestor of a destination task
 		 *
 		 * @param src: a pointer to the source WorkflowTask object
 		 * @param dst: a pointer to the destination WorkflowTask object
+		 *
 		 * @return true if there is a path from src to dst, false otherwise
 		 */
 		bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
@@ -251,6 +251,7 @@ namespace wrench {
 
 		/**
 		 * @brief Get a vector of the ready tasks
+		 *
 		 * @return vector of pointers to WorkflowTask objects
 		 */
 		// TODO: Implement this more efficiently
@@ -285,6 +286,11 @@ namespace wrench {
 			return true;
 		}
 
+		/**
+		 * @brief Get a list of all tasks in the workflow
+		 *
+		 * @return a list of pointers to WorkflowTask objects
+		 */
 		std::vector<WorkflowTask *> Workflow::getTasks() {
 			std::vector<WorkflowTask *> all_tasks;
 			for (auto& it : tasks) {
@@ -293,6 +299,13 @@ namespace wrench {
 			return all_tasks;
 		};
 
+		/**
+		 * @brief Get list of children for a task
+		 *
+		 * @param task a pointer to a WorkflowTask object
+		 *
+		 * @return a list of pointers to WorfklowTask objects
+		 */
 		std::vector<WorkflowTask *> Workflow::getTaskChildren(const WorkflowTask *task) {
 			std::vector<WorkflowTask *> children;
 			for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
@@ -301,6 +314,13 @@ namespace wrench {
 			return children;
 		}
 
+		/**
+		 * @brief Get list of parents for a task
+		 *
+		 * @param task a pointer to a WorkflowTask object
+		 *
+		 * @return a list of pointers to WorfklowTask objects
+		 */
 		std::vector<WorkflowTask *> Workflow::getTaskParents(const WorkflowTask *task) {
 			std::vector<WorkflowTask *> parents;
 			for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
@@ -311,6 +331,7 @@ namespace wrench {
 
 		/**
 		 * @brief Wait for the next WorkflowExecutionEvent
+		 *
 		 * @return a unique pointer to a WorkflowExecutionEvent object
 		 */
 		std::unique_ptr<WorkflowExecutionEvent> Workflow::waitForNextExecutionEvent() {
@@ -329,6 +350,7 @@ namespace wrench {
 		/**
 		 * @brief Update the state of a task, and propagate the change
 		 *        to other tasks if necessary.
+		 *
 		 * @param task: a pointer to a WorkflowTask object
 		 * @param state: the new task state
 		 *
@@ -389,5 +411,4 @@ namespace wrench {
 				}
 			}
 		}
-
 };

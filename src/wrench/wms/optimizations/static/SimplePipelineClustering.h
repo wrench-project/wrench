@@ -5,9 +5,6 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
- *  @brief wrench::StaticSimpleClustering implements a simple task
- *  clustering based on the max number of tasks per cluster
  */
 
 #ifndef WRENCH_SIMPLETASKCLUSTERING_H
@@ -17,9 +14,19 @@
 
 namespace wrench {
 
+	/**
+	 *  @brief A simple task clustering algorithm to group tasks in a pipeline
+	 */
 	class SimplePipelineClustering : public StaticOptimization {
 	public:
+		/***********************/
+		/** \cond DEVELOPER    */
+		/***********************/
 		void process(Workflow *workflow);
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
 	};
 }
 

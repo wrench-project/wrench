@@ -15,6 +15,11 @@
 
 namespace wrench {
 
+	/**
+	 * @brief Main function for static optimizations: Group tasks in a pipeline
+	 *
+	 * @param workflow: a pointer to a Workflow object
+	 */
 	void SimplePipelineClustering::process(Workflow *workflow) {
 
 		std::set<std::string> pipelined_tasks;

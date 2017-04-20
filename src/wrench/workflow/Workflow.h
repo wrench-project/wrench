@@ -59,8 +59,11 @@ namespace wrench {
 				bool isDone();
 
 				std::vector<WorkflowTask *> getReadyTasks();
+
 				std::vector<WorkflowTask *> getTasks();
+
 				std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
+
 				std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
 
 				std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
