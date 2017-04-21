@@ -19,8 +19,7 @@ namespace wrench {
 		/**
 		 * @brief Set the color of log messages printed to the terminal
 		 *
-		 * @param color is WRENCH_LOGGING_COLOR_RED, WRENCH_LOGGING_COLOR_GREEN, etc.
-		 * @return void
+		 * @param color: WRENCH_LOGGING_COLOR_RED, WRENCH_LOGGING_COLOR_GREEN, etc.
 		 */
 		void Logging::setThisProcessLoggingColor(std::string color) {
 			Logging::colormap[simgrid::s4u::Actor::self()] = color;
@@ -29,7 +28,6 @@ namespace wrench {
 
 		/**
 		 * @brief Turn on colored output for the current process
-		 * @return void
 		 */
 		void Logging::beginThisProcessColor() {
 			// Comment this line out to do no colors
@@ -38,7 +36,6 @@ namespace wrench {
 
 		/**
 		 * @brief Turn off colored output for the current process
-		 * @return void
 		 */
 		void Logging::endThisProcessColor() {
 			std::cerr << "\033[0m";

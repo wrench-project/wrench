@@ -37,10 +37,10 @@ namespace wrench {
 		/**
 		 * @brief Configure the WMS with a workflow instance and a scheduler implementation
 		 *
-		 * @param simulation is a pointer to a simulation object
-		 * @param workflow is a pointer to a workflow to execute
-		 * @param scheduler is a pointer to a scheduler implementation
-		 * @param hostname
+		 * @param simulation: a pointer to a simulation object
+		 * @param workflow: a pointer to a workflow to execute
+		 * @param scheduler: a pointer to a scheduler implementation
+		 * @param hostname: the name of the host
 		 */
 		void configure(Simulation *simulation, Workflow *workflow, std::unique_ptr<Scheduler> scheduler,
 		               std::string hostname);
@@ -48,7 +48,7 @@ namespace wrench {
 		/**
 		 * @brief Add a static optimization to the list of optimizations
 		 *
-		 * @param optimization is a pointer to a static optimization implementation
+		 * @param optimization: a pointer to a static optimization implementation
 		 */
 		void add_static_optimization(std::unique_ptr<StaticOptimization> optimization);
 

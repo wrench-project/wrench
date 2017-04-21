@@ -34,8 +34,8 @@ namespace wrench {
 		/**
 		 * @brief Constructor
 		 *
-		 * @param string is the file name/id
-		 * @param s is the file size
+		 * @param string: the file name/id
+		 * @param s: the file size
 		 */
 		WorkflowFile::WorkflowFile(const std::string name, double s) {
 			this->id = name;
@@ -47,7 +47,7 @@ namespace wrench {
 		/**
 		 * @brief Define the task that outputs this file
 		 *
-		 * @param task is the task
+		 * @param task: a pointer to a WorkflowTask object
 		 */
 		void WorkflowFile::setOutputOf(WorkflowTask *task) {
 			this->output_of = task;
@@ -66,7 +66,7 @@ namespace wrench {
 		/**
 		 * @brief Add a task that uses this file as input
 		 *
-		 * @param task is the task
+		 * @param task: a pointer to a WorkflowTask object
 		 */
 		void WorkflowFile::setInputOf(WorkflowTask *task) {
 			this->input_of[task->getId()] = task;
@@ -75,7 +75,7 @@ namespace wrench {
 		/**
 		 * @brief Get the set of tasks that use this file as input
 		 *
-		 * @return a map of pointers to WorkflowTask
+		 * @return a map of pointers to WorkflowTask objects
 		 */
 		std::map<std::string, WorkflowTask *> WorkflowFile::getInputOf() {
 			return this->input_of;

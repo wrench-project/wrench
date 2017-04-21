@@ -23,9 +23,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_job_executor, "Log category for Multicore
 
 namespace wrench {
 
-
-		/*! \cond DEVELOPER */
-
 		/**
 		 * @brief Stop the service
 		 *
@@ -53,8 +50,7 @@ namespace wrench {
 		/**
 		 * @brief Have the service execute a standard job
 		 *
-		 * @param job is a pointer a standard job
-		 * @param callback_mailbox is the name of a mailbox to which a "job done" callback will be sent
+		 * @param job: a pointer a StandardJob object
 		 *
 		 * @throw ComputeServiceIsDownException
 		 */
@@ -71,8 +67,8 @@ namespace wrench {
 		/**
 		 * @brief Have the service execute a pilot job
 		 *
-		 * @param task is a pointer the pilot job
-		 * @param callback_mailbox is the name of a mailbox to which a "pilot job started" callback will be sent
+		 * @param task: a pointer the PilotJob object
+		 * @param callback_mailbox: the name of a mailbox to which a "pilot job started" callback will be sent
 		 *
 		 * @throw ComputeServiceIsDownException
 		 */
@@ -185,8 +181,8 @@ namespace wrench {
 
 		/**
 		 * @brief Set a property of the Multicore Job Executor
-		 * @param property is the property
-		 * @param value is the property value
+		 * @param property: the property
+		 * @param value: the property value
 		 */
 		void MulticoreJobExecutor::setProperty(MulticoreJobExecutor::Property property, std::string value) {
 			this->property_list[property] = value;
@@ -194,7 +190,7 @@ namespace wrench {
 
 		/**
 		 * @brief Get a property of the Multicore Job Executor as a string
-		 * @param property is the property
+		 * @param property: the property
 		 * @return the property value as a string
 		 */
 		std::string MulticoreJobExecutor::getPropertyValueAsString(MulticoreJobExecutor::Property property) {
@@ -203,7 +199,7 @@ namespace wrench {
 
 		/**
 		 * @brief Get a property of the Multicore Job Executor as a double
-		 * @param property is the property
+		 * @param property: the property
 		 * @return the property value as a double
 		 *
 		 * @throw std::runtime_error
@@ -216,20 +212,16 @@ namespace wrench {
 			return value;
 		}
 
-		/*! \endcond */
-
-		/*! \cond INTERNAL */
-
 		/**
 		 * @brief Constructor that starts the daemon for the service on a host,
 		 *        registering it with a WRENCH Simulation
 		 *
-		 * @param simulation is a pointer to a Simulation
-		 * @param hostname is the name of the host
-		 * @param num_worker_threads is the number of worker threads (i.e., sequential task executors)
-		 * @param ttl
-		 * @param pj is a containing pilot job (nullptr if none)
-		 * @param suffix a string suffix to append to the process name
+		 * @param simulation: a pointer to a Simulation object
+		 * @param hostname: the name of the host
+		 * @param num_worker_threads: the number of worker threads (i.e., sequential task executors)
+		 * @param ttl: the time-ti-live, in seconds
+		 * @param pj: a containing PilotJob  (nullptr if none)
+		 * @param suffix: a string to append to the process name
 		 */
 		MulticoreJobExecutor::MulticoreJobExecutor(Simulation *simulation,
 																							 std::string hostname,
@@ -306,9 +298,6 @@ namespace wrench {
 			return 0;
 		}
 
-		/*! \endcond  */
-
-
 		/**
 		 * @brief Dispatch one pending job, if possible
 		 * @return true if a job was dispatched, false otherwise
@@ -363,11 +352,8 @@ namespace wrench {
 																																					 job,
 																																					 "_pilot");
 
-
 								// Create and launch a compute service for the pilot job
 								job->setComputeService(cs);
-
-
 
 								// Put the job in the runnint queue
 								this->pending_jobs.pop();
@@ -633,8 +619,8 @@ namespace wrench {
 		/**
 		 * @brief Process a task completion
 		 *
-		 * @param task is the WorkflowTask that has completed
-		 * @param executor is a pointer to the worker thread (sequential task executor) that has completed it
+		 * @param task: the WorkflowTask that has completed
+		 * @param executor: a pointer to the worker thread (SequentialTaskExecutor) that has completed it
 		 */
 		void MulticoreJobExecutor::processTaskCompletion(WorkflowTask *task, SequentialTaskExecutor *executor) {
 			StandardJob *job = (StandardJob *)(task->job);
@@ -689,7 +675,7 @@ namespace wrench {
 		/**
 		 * @brief Process a pilot job completion
 		 *
-		 * @param job
+		 * @param job: pointer to the PilotJob object
 		 */
 		void MulticoreJobExecutor::processPilotJobCompletion(PilotJob *job) {
 
@@ -705,6 +691,5 @@ namespace wrench {
 
 			return;
 		}
-
 
 };

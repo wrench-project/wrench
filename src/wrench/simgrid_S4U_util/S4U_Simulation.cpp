@@ -49,15 +49,6 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Simulates a computation on host on which the calling actor is running
-		 *
-		 * @param flops: the number of flops
-		 */
-		void S4U_Simulation::compute(double flops) {
-			simgrid::s4u::this_actor::execute(flops);
-		}
-
-		/**
 		 * @brief Retrieves the number of cores of a host
 		 *
 		 * @param hostname: the name of the host
@@ -75,6 +66,16 @@ namespace wrench {
 		double S4U_Simulation::getClock() {
 			return simgrid::s4u::Engine::instance()->getClock();
 		}
+
+		/**
+		 * @brief Simulates a computation on host on which the calling actor is running
+		 *
+		 * @param flops: the number of flops
+		 */
+		void S4U_Simulation::compute(double flops) {
+			simgrid::s4u::this_actor::execute(flops);
+		}
+
 
 		/**
 		 * @brief Simulates a sleep

@@ -24,7 +24,9 @@ namespace wrench {
 		/**
 		 * @brief A method to generate a unique mailbox name give a prefix (this method
 		 *        simply appends an increasing sequence number to the prefix)
+		 *
 		 * @param prefix: a prefix for the mailbox name
+		 *
 		 * @return a unique mailbox name as a string
 		 */
 		std::string S4U_Mailbox::generateUniqueMailboxName(std::string prefix) {
@@ -36,6 +38,7 @@ namespace wrench {
 		 * @brief A blocking method to receive a message from a mailbox
 		 *
 		 * @param mailbox: the mailbox name
+		 *
 		 * @return a unique pointer to the message
 		 *
 		 * @throw std::runtime_error
@@ -56,6 +59,7 @@ namespace wrench {
 		 *
 		 * @param mailbox: the mailbox name
 		 * @param timeout:  a timeout value in seconds
+		 *
 		 * @return a unique pointer to the message, nullptr on timeout
 		 *
 		 * @throw std::runtime_error
@@ -125,7 +129,7 @@ namespace wrench {
 			std::set<simgrid::s4u::Comm *> set = S4U_Mailbox::dputs[simgrid::s4u::Actor::self()];
 			std::set<simgrid::s4u::Comm *>::iterator it;
 			for (it = set.begin(); it != set.end(); ++it) {
-				// TODO: This is probably not good right now, but S4U asynchronous communication are
+				// TODO: This is probably not great right now, but S4U asynchronous communication are
 				// in a state of flux, and so this seems to work but for the memory leak
 				// will have to talk to the S4U developers
 

@@ -62,6 +62,7 @@ namespace wrench {
 		 * @brief Create a standard job
 		 *
 		 * @param tasks: a vector of WorkflowTask pointers to include in the StandardJob
+     *
 		 * @return a raw pointer to the StandardJob
 		 */
 		StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks) {
@@ -76,6 +77,7 @@ namespace wrench {
 		 * @brief Create a standard job
 		 *
 		 * @param task: a pointer the single WorkflowTask to include in the StandardJob
+		 *
 		 * @return a raw pointer to the StandardJob
 		 */
 		StandardJob *JobManager::createStandardJob(WorkflowTask *task) {
@@ -89,7 +91,7 @@ namespace wrench {
 		 *
 		 * @param workflow: a pointer to a Workflow
 		 * @param num_cores: the number of cores required by the PilotJob
-		 * @param duration: is the PilotJob duration in seconds
+		 * @param duration: the PilotJob duration in seconds
 		 * @return a raw pointer to the PilotJob
 		 */
 		PilotJob *JobManager::createPilotJob(Workflow *workflow, int num_cores, double duration) {
@@ -102,8 +104,8 @@ namespace wrench {
 		/**
 		 * @brief Submit a job to a compute service
 		 *
-		 * @param job: a pointer to a WorkflowJob
-		 * @param compute_service: is a pointer to a ComputeService
+		 * @param job: a pointer to a WorkflowJob object
+		 * @param compute_service: a pointer to a ComputeService object
 		 */
 		void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service) {
 

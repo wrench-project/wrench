@@ -47,7 +47,7 @@ namespace wrench {
 		/**
 		 * @brief Add an output file to the task
 		 *
-		 * @param f: a pointer to the file
+		 * @param f: a pointer to a WorkflowFile object
 		 */
 		void WorkflowTask::addOutputFile(WorkflowFile *f) {
 			addFileToMap(output_files, f);
@@ -119,6 +119,8 @@ namespace wrench {
 
 		/**
 		 * @brief Set the state of the task
+		 *
+		 * @param state: the task state
 		 */
 		void WorkflowTask::setState(WorkflowTask::State state) {
 			this->state = state;
@@ -126,7 +128,6 @@ namespace wrench {
 
 		/**
 		 * @brief Set the task to the ready state
-		 * @param task
 		 */
 		void WorkflowTask::setReady() {
 			this->workflow->updateTaskState(this, WorkflowTask::READY);
@@ -134,7 +135,6 @@ namespace wrench {
 
 		/**
 		 * @brief Set the task to the running state
-		 * @param task
 		 */
 		void WorkflowTask::setRunning() {
 			this->workflow->updateTaskState(this, WorkflowTask::RUNNING);
@@ -142,7 +142,6 @@ namespace wrench {
 
 		/**
 		 * @brief Set the task to the completed state
-		 * @param task
 		 */
 		void WorkflowTask::setCompleted() {
 			this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
@@ -152,8 +151,8 @@ namespace wrench {
 		/**
 		 * @brief Helper method to add a file to a map if necessary
 		 *
-		 * @param map is the map
-		 * @param f is a pointer to a file
+		 * @param map: the map of workflow files
+		 * @param f: a pointer to a WorkflowFile object
 		 */
 		void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile *> map,
 																		WorkflowFile *f) {
