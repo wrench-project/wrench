@@ -67,6 +67,10 @@ namespace wrench {
 
 								};
 
+				/***********************/
+				/** \cond DEVELOPER    */
+				/***********************/
+
 		public:
 				MulticoreJobExecutor(Simulation *simulation, std::string hostname,
 														 std::map<MulticoreJobExecutor::Property, std::string> = {},
@@ -91,6 +95,12 @@ namespace wrench {
 				std::string getPropertyString(MulticoreJobExecutor::Property);
 				std::string getPropertyValueAsString(MulticoreJobExecutor::Property);
 				double getPropertyValueAsDouble(MulticoreJobExecutor::Property);
+
+				/***********************/
+				/** \endcond DEVELOPER */
+				/***********************/
+
+
 		private:
 
 				std::map<MulticoreJobExecutor::Property, std::string> property_list;
