@@ -13,7 +13,7 @@
 #include "workflow/WorkflowTask.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
-#include "exceptions/ServiceIsDownException.h"
+#include "exceptions/ComputeServiceIsDownException.h"
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 #include "workflow_job/StandardJob.h"
 #include "workflow_job/PilotJob.h"
@@ -55,11 +55,13 @@ namespace wrench {
 		 *
 		 * @param job is a pointer a standard job
 		 * @param callback_mailbox is the name of a mailbox to which a "job done" callback will be sent
+		 *
+		 * @throw ComputeServiceIsDownException
 		 */
 		void MulticoreJobExecutor::runStandardJob(StandardJob *job) {
 
 			if (this->state == ComputeService::DOWN) {
-				throw ServiceIsDownException(this->getName());
+				throw ComputeServiceIsDownException(this->getName());
 			}
 
 			// Synchronously send a "run a task" message to the daemon's mailbox
@@ -71,11 +73,13 @@ namespace wrench {
 		 *
 		 * @param task is a pointer the pilot job
 		 * @param callback_mailbox is the name of a mailbox to which a "pilot job started" callback will be sent
+		 *
+		 * @throw ComputeServiceIsDownException
 		 */
 		void MulticoreJobExecutor::runPilotJob(PilotJob *job) {
 
 			if (this->state == ComputeService::DOWN) {
-				throw ServiceIsDownException(this->getName());
+				throw ComputeServiceIsDownException(this->getName());
 			}
 
 			//  send a "run a task" message to the daemon's mailbox
@@ -86,11 +90,13 @@ namespace wrench {
 		 * @brief Finds out how many  cores the  service has
 		 *
 		 * @return the number of cores
+		 *
+		 * @throw ComputeServiceIsDownException
 		 */
 		unsigned long MulticoreJobExecutor::getNumCores() {
 
 			if (this->state == ComputeService::DOWN) {
-				throw ServiceIsDownException(this->getName());
+				throw ComputeServiceIsDownException(this->getName());
 			}
 
 			return (unsigned long)S4U_Simulation::getNumCores(this->hostname);
@@ -100,11 +106,13 @@ namespace wrench {
 		 * @brief Finds out how many idle cores the  service has
 		 *
 		 * @return the number of currently idle cores
+		 *
+		 * @throw ComputeServiceIsDownException
 		 */
 		unsigned long MulticoreJobExecutor::getNumIdleCores() {
 
 			if (this->state == ComputeService::DOWN) {
-				throw ServiceIsDownException(this->getName());
+				throw ComputeServiceIsDownException(this->getName());
 			}
 
 			S4U_Mailbox::dput(this->mailbox_name, new NumIdleCoresRequestMessage(this->getPropertyValueAsDouble(NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD)));
@@ -117,11 +125,13 @@ namespace wrench {
 		 * @brief Finds out the TTL
 		 *
 		 * @return the TTL in seconds
+		 *
+		 * @throw ComputeServiceIsDownException
 		 */
 		double MulticoreJobExecutor::getTTL() {
 
 			if (this->state == ComputeService::DOWN) {
-				throw ServiceIsDownException(this->getName());
+				throw ComputeServiceIsDownException(this->getName());
 			}
 
 			S4U_Mailbox::dput(this->mailbox_name, new TTLRequestMessage(this->getPropertyValueAsDouble(TTL_REQUEST_MESSAGE_PAYLOAD)));
@@ -134,11 +144,13 @@ namespace wrench {
 		 * @brief Finds out the flop rate of the cores
 		 *
 		 * @return the clock rate in Flops/sec
+		 *
+		 * @throw ComputeServiceIsDownException
 		 */
 		double MulticoreJobExecutor::getCoreFlopRate() {
 
 			if (this->state == ComputeService::DOWN) {
-				throw ServiceIsDownException(this->getName());
+				throw ComputeServiceIsDownException(this->getName());
 			}
 			return simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0);
 		}

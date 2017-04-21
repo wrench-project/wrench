@@ -37,14 +37,14 @@ namespace wrench {
 		}
 
 		/**
-		 * @brief Default destructor
+		 * @brief Destructor, which kills the daemon
 		 */
 		JobManager::~JobManager() {
 			this->kill();
 		}
 
 		/**
-		 * @brief Kill the job manager (brutally)
+		 * @brief Kill the job manager (brutally terminate the damone, clears all jobs)
 		 */
 		void JobManager::kill() {
 			this->kill_actor();
@@ -151,7 +151,7 @@ namespace wrench {
 
 		/**
 		 * @brief Get the list of currently pending PilotJob instances
-		 * @return  a set of PilotJob pointers
+		 * @return a set of PilotJob pointers
 		 */
 		std::set<PilotJob *> JobManager::getPendingPilotJobs() {
 			return this->pending_pilot_jobs;
@@ -306,6 +306,5 @@ namespace wrench {
 			WRENCH_INFO("New Multicore Task Executor terminating");
 			return 0;
 		}
-
 
 };

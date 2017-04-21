@@ -110,6 +110,7 @@ namespace wrench {
 		 * @brief Instantiate a multicore pilot job executor on a host
 		 *
 		 * @param hostname: the name of the host in the simulated platform
+		 * @param plist: a property list to configure non-default property values
 		 *
 		 * @throw std::invalid_argument
 		 */
@@ -126,6 +127,7 @@ namespace wrench {
 		 * @brief Private helper function to instantiate a multicore job executor
 		 *
 		 * @param hostname: the name of the host in the simulated platform
+		 * @param plist: a property list to configure non-default property values
 		 *
 		 * @throw std::invalid_argument
 		 */
@@ -254,6 +256,7 @@ namespace wrench {
 		 * @param hostname: the hostname in the simulated platform
 		 * @param supports_standard_jobs: true if the executor supports StandardJob submissions, false otherwise
 		 * @param support_pilot_jobs: true if the executor supports PilotJob submissions, false otherwise
+		 * @param plist: a property list to configure non-default property values
 		 *
 		 * @throw std::invalid_argument
 		 */

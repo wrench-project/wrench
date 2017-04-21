@@ -64,7 +64,6 @@ namespace wrench {
 								 {MulticoreJobExecutor::Property::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD, "1024"},
 								 {MulticoreJobExecutor::Property::TTL_REQUEST_MESSAGE_PAYLOAD, "1024"},
 								 {MulticoreJobExecutor::Property::TTL_ANSWER_MESSAGE_PAYLOAD, "1024"},
-
 								};
 
 				/***********************/

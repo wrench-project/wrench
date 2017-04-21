@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <exceptions/ServiceIsDownException.h>
+#include <exceptions/ComputeServiceIsDownException.h>
 #include <logging/Logging.h>
 #include "ComputeService.h"
 #include "simulation/Simulation.h"
@@ -48,11 +48,13 @@ namespace wrench {
 		/**
 		 * @brief Submit a job to the compute service
 		 * @param job: a pointer to the job
+		 *
+		 * @throw ComputeServiceIsDownException
 		 */
 		void ComputeService::runJob(WorkflowJob *job) {
 
 			if (this->state == ComputeService::DOWN) {
-				throw ServiceIsDownException(this->getName());
+				throw ComputeServiceIsDownException(this->getName());
 			}
 
 			switch (job->getType()) {
