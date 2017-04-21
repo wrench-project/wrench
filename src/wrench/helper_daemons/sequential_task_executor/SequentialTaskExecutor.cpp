@@ -38,7 +38,7 @@ namespace wrench {
 		 */
 		void SequentialTaskExecutor::stop() {
 			// Send a termination message to the daemon's mailbox
-			S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage(0.0));
+			S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage(nullptr, 0.0));
 		}
 
 		/**

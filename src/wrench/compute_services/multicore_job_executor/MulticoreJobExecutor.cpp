@@ -37,11 +37,13 @@ namespace wrench {
 
 			WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
 			// Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
+			std::string ack_mailbox = this->mailbox_name + "_kill";
 			S4U_Mailbox::put(this->mailbox_name,
 											 new StopDaemonMessage(
+															 ack_mailbox,
 															 this->getPropertyValueAsDouble(STOP_DAEMON_MESSAGE_PAYLOAD)));
 			// Wait for the ack
-			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name + "_kill");
+			std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
 			if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
 				throw std::runtime_error("Wrong message type received while expecting DAEMON_STOPPED");
 			}
@@ -445,9 +447,11 @@ namespace wrench {
 			switch (message->type) {
 
 				case SimulationMessage::STOP_DAEMON: {
+					std::unique_ptr<StopDaemonMessage> m(static_cast<StopDaemonMessage *>(message.release()));
+
 					this->terminate();
 					// This is Synchronous
-					S4U_Mailbox::put(this->mailbox_name + "_kill", new DaemonStoppedMessage(this->getPropertyValueAsDouble(DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+					S4U_Mailbox::put(m->ack_mailbox, new DaemonStoppedMessage(this->getPropertyValueAsDouble(DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 					return false;
 				}
 

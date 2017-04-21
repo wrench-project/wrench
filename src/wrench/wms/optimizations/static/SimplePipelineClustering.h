@@ -14,20 +14,24 @@
 
 namespace wrench {
 
-	/**
-	 *  @brief A simple task clustering algorithm to group tasks in a pipeline
-	 */
-	class SimplePipelineClustering : public StaticOptimization {
-	public:
 		/***********************/
 		/** \cond DEVELOPER    */
 		/***********************/
-		void process(Workflow *workflow);
+
+		/**
+		 *  @brief A simple task clustering algorithm to group tasks in a pipeline
+		 */
+		class SimplePipelineClustering : public StaticOptimization {
+		public:
+
+				void process(Workflow *workflow);
+
+
+		};
 
 		/***********************/
 		/** \endcond DEVELOPER */
 		/***********************/
-	};
 }
 
 #endif //WRENCH_SIMPLETASKCLUSTERING_H

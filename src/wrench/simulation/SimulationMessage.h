@@ -65,7 +65,8 @@ namespace wrench {
 		 */
 		class StopDaemonMessage: public SimulationMessage {
 		public:
-				StopDaemonMessage(double payload);
+				StopDaemonMessage(std::string ack_mailbox, double payload);
+				std::string ack_mailbox;
 		};
 
 		/**

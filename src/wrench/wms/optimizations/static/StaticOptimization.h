@@ -16,10 +16,21 @@
 
 namespace wrench {
 
-	class StaticOptimization {
-	public:
-		virtual void process(Workflow *workflow) = 0;
-	};
+		/***********************/
+		/** \cond DEVELOPER */
+		/***********************/
+
+		/**
+		 *  @brief An abstract static optimizastion classe
+		 */
+		class StaticOptimization {
+		public:
+				virtual void process(Workflow *workflow) = 0;
+		};
+
+		/***********************/
+		/** \endcond DEVELOPER */
+		/***********************/
 }
 
 #endif //WRENCH_STATICOPTIMIZATION_H

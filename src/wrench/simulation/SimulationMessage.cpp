@@ -48,7 +48,9 @@ namespace wrench {
 		 * @brief Constructor
 		 * @param payload: message size in bytes
 		 */
-		StopDaemonMessage::StopDaemonMessage(double payload): SimulationMessage(STOP_DAEMON, payload) {
+		StopDaemonMessage::StopDaemonMessage(std::string ack_mailbox,
+																				 double payload): SimulationMessage(STOP_DAEMON, payload) {
+			this->ack_mailbox = ack_mailbox;
 		}
 
 		/**

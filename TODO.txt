@@ -1,22 +1,18 @@
 
 ------------------------------------
 
-- Right now, the "killbox" stuff inside the stop() method of compute services is not great
-	- But we need an ack to make sure memory doesn't get freed before a daemon has
-          completely shutdownAllComputeServices
-
+BUGS:
 
 
 ---------------------------------------------------------------------
 
-- Fix pilot job exception/error with current main.cpp
-
-- Deal with error handling via nice exceptions, etc.
+NEW FEATURES:
 
 - Deal with failure traces...
 
 -----------------------------------------------------------------------
 
+BETWEEN SOFTWARE ENGINEERING:
 
 - Dealing with removing "friend class" with Visitor pattern:
      https://sourcemaking.com/design_patterns/visitor/cpp/1
