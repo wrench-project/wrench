@@ -97,16 +97,16 @@ namespace wrench {
 						// Run the task
 						WRENCH_INFO("Executing task %s (%lf flops)", m->task->getId().c_str(), m->task->getFlops());
 						m->task->setRunning();
-						S4U_Simulation::compute(m->task->flops);
+						S4U_Simulation::compute(m->task->getFlops());
 
 						// Set the task completion time and state
-						m->task->end_date = S4U_Simulation::getClock();
+						m->task->setEndDate(S4U_Simulation::getClock());
 						m->task->setCompleted();
 
 						// Send the callback
 						WRENCH_INFO("Notifying mailbox %s that task %s has finished",
 												this->callback_mailbox.c_str(),
-												m->task->id.c_str());
+												m->task->getId().c_str());
 						S4U_Mailbox::dput(this->callback_mailbox,
 															new TaskDoneMessage(m->task, this, 0.0));
 

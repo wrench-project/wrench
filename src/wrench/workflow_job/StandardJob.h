@@ -38,6 +38,7 @@ namespace wrench {
 
 
 				std::vector<WorkflowTask*> getTasks();
+				void incrementNumCompletedTasks();
 				unsigned long getNumCompletedTasks();
 				unsigned long getNumTasks();
 
@@ -45,8 +46,6 @@ namespace wrench {
 
 		private:
 				friend class JobManager;
-				friend class JobManagerDaemon;
-				friend class MulticoreJobExecutor;
 
 				StandardJob(std::vector<WorkflowTask*> tasks);
 				std::vector<WorkflowTask *> tasks;

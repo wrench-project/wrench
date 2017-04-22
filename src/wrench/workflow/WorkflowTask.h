@@ -52,14 +52,28 @@ namespace wrench {
 				};
 
 				WorkflowTask::State getState();
+				WorkflowJob *getJob();
+				Workflow *getWorkflow();
 
 				/***********************/
 				/** \endcond           */
 				/***********************/
 
+
+
 				/***********************/
 				/** \cond INTERNAL     */
 				/***********************/
+
+				void setState(WorkflowTask::State);
+				void setReady();
+				void setRunning();
+				void setCompleted();
+
+				void setJob(WorkflowJob *job);
+
+
+				void setEndDate(double date);
 
 				void setWorkflowJob(WorkflowJob *);
 				WorkflowJob *getWorkflowJob();
@@ -71,13 +85,6 @@ namespace wrench {
 		private:
 
 				friend class Workflow;
-
-				// These friend clauses are bad
-				friend class StandardJob;
-				friend class JobManager;
-				friend class MulticoreJobExecutor;
-				friend class SequentialTaskExecutor;
-				friend class RandomScheduler;
 
 				std::string id;										// Task ID
 				double flops;											// Number of flops
@@ -95,13 +102,6 @@ namespace wrench {
 
 				// Private constructor (called by Workflow)
 				WorkflowTask(const std::string id, const double t, const int n);
-
-				// Only WRENCH internals can change a task state
-				void setState(WorkflowTask::State);
-				void setReady();
-				void setRunning();
-				void setCompleted();
-
 
 				// Containing job
 				WorkflowJob *job;

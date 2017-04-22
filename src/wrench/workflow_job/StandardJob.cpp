@@ -32,11 +32,11 @@ namespace wrench {
 			}
 			for (auto t : tasks) {
 				this->tasks.push_back(t);
-				t->job = this;
+				t->setJob(this);
 				this->duration += t->getFlops();
 			}
 			this->num_completed_tasks = 0;
-			this->workflow = this->tasks[0]->workflow;
+			this->workflow = this->tasks[0]->getWorkflow();
 
 			this->state = StandardJob::State::NOT_SUBMITTED;
 			this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
@@ -50,6 +50,13 @@ namespace wrench {
 		 */
 		unsigned long StandardJob::getNumTasks() {
 			return this->tasks.size();
+		}
+
+		/**
+		 * @brief Increment "the number of completed tasks" counter
+		 */
+		void StandardJob::incrementNumCompletedTasks() {
+			this->num_completed_tasks++;
 		}
 
 		/**

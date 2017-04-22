@@ -606,7 +606,7 @@ namespace wrench {
           StandardJob *job = (StandardJob *) workflow_job;
           // Set all tasks back to the READY state
           for (auto failed_task: ((StandardJob *) job)->getTasks()) {
-            failed_task->state = WorkflowTask::READY;
+            failed_task->setReady();
           }
           // Send back a job failed message
           WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
@@ -624,7 +624,7 @@ namespace wrench {
           StandardJob *job = (StandardJob *) workflow_job;
           // Set all tasks back to the READY state
           for (auto failed_task: ((StandardJob *) job)->getTasks()) {
-            failed_task->state = WorkflowTask::READY;
+            failed_task->setReady();
           }
           // Send back a job failed message
           WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
@@ -676,8 +676,8 @@ namespace wrench {
      * @param executor: a pointer to the worker thread (SequentialTaskExecutor) that has completed it
      */
     void MulticoreJobExecutor::processTaskCompletion(WorkflowTask *task, SequentialTaskExecutor *executor) {
-      StandardJob *job = (StandardJob *) (task->job);
-      WRENCH_INFO("One of my cores completed task %s", task->id.c_str());
+      StandardJob *job = (StandardJob *) (task->getJob());
+      WRENCH_INFO("One of my cores completed task %s", task->getId().c_str());
 
       // Remove the task from the running task queue
       this->running_tasks.erase(task);
@@ -687,11 +687,11 @@ namespace wrench {
       this->idle_sequential_task_executors.insert(executor);
 
       // Increase the "completed tasks" count of the job
-      job->num_completed_tasks++;
+      job->incrementNumCompletedTasks();
 
       // Send the callback to the originator if necessary and remove the job from
       // the list of pending jobs
-      if (job->num_completed_tasks == job->getNumTasks()) {
+      if (job->getNumCompletedTasks() == job->getNumTasks()) {
         this->running_jobs.erase(job);
         S4U_Mailbox::dput(job->popCallbackMailbox(),
                           new StandardJobDoneMessage(job, this, this->getPropertyValueAsDouble(

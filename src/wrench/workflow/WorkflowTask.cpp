@@ -118,12 +118,43 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the job that contains the task
+     *
+     * @return the containing job, or nullptr
+     */
+    WorkflowJob *WorkflowTask::getJob() {
+      return this->job;
+    }
+
+    Workflow *WorkflowTask::getWorkflow() {
+      return this->workflow;
+    }
+
+    /**
      * @brief Set the state of the task
      *
      * @param state: the task state
      */
     void WorkflowTask::setState(WorkflowTask::State state) {
       this->state = state;
+    }
+
+    /**
+     * @brief Set the task's containing job
+     *
+     * @param job: the job
+     */
+    void WorkflowTask::setJob(WorkflowJob *job) {
+      this->job = job;
+    }
+
+    /**
+     * @brief Set the task's end date
+     *
+     * @param date: the end date
+     */
+    void WorkflowTask::setEndDate(double date) {
+      this->end_date = date;
     }
 
     /**

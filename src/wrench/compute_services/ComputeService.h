@@ -83,7 +83,6 @@ namespace wrench {
 				void setStateToDown();
 
 		protected:
-				friend class Simulation;
 
 				ComputeService::State state;
 				std::string service_name;

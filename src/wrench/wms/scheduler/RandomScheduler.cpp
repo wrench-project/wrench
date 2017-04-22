@@ -54,7 +54,7 @@ namespace wrench {
 				for (auto pj : running_pilot_jobs) {
 					ComputeService *cs = pj->getComputeService();
 
-					if (!cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->flops)) {
+					if (!cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->getFlops())) {
 						continue;
 					}
 
@@ -77,7 +77,7 @@ namespace wrench {
 
 				for (auto cs : compute_services) {
 					WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
-					bool can_run_job = cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->flops);
+					bool can_run_job = cs->canRunJob(WorkflowJob::STANDARD, 1, ready_tasks[i]->getFlops());
 					if (can_run_job) {
 						WRENCH_INFO("Compute service %s says it can run this standard job!", cs->getName().c_str());
 					} else {
