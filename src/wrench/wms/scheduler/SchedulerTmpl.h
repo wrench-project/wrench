@@ -41,7 +41,7 @@ namespace wrench {
 		std::string SchedulerTmpl<TYPE, IMPL>::_SCHED_ID = TYPE;
 
 		/***********************/
-		/** \endcond DEVELOPER */
+		/** \endcond           */
 		/***********************/
 
 }

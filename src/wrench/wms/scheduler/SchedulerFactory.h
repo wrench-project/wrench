@@ -42,7 +42,7 @@ namespace wrench {
 						SchedulerTmpl<TYPE, IMPL>::_SCHED_ID, &SchedulerTmpl<TYPE, IMPL>::Create);
 
 		/***********************/
-		/** \endcond DEVELOPER */
+		/** \endcond           */
 		/***********************/
 
 }

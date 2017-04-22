@@ -83,12 +83,12 @@ namespace wrench {
 				std::set<PilotJob *> completed_pilot_jobs;
 
 				/***********************/
-				/** \endcond INTERNAL  */
+				/** \endcond           */
 				/***********************/
 		};
 
 		/***********************/
-		/** \endcond DEVELOPER  */
+		/** \endcond            */
 		/***********************/
 
 };

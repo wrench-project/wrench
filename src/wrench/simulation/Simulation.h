@@ -38,12 +38,14 @@ namespace wrench {
 
 				void launch();
 
-				void createMulticoreStandardJobExecutor(std::string, std::map<MulticoreJobExecutor::Property, std::string> = {});
+				void add(std::unique_ptr<MulticoreJobExecutor> executor);
 
-				void createMulticorePilotJobExecutor(std::string, std::map<MulticoreJobExecutor::Property, std::string>  = {});
-
-				void createMulticoreStandardAndPilotJobExecutor(std::string,
-																												std::map<MulticoreJobExecutor::Property, std::string> = {});
+//				void createMulticoreStandardJobExecutor(std::string, std::map<MulticoreJobExecutor::Property, std::string> = {});
+//
+//				void createMulticorePilotJobExecutor(std::string, std::map<MulticoreJobExecutor::Property, std::string>  = {});
+//
+//				void createMulticoreStandardAndPilotJobExecutor(std::string,
+//																												std::map<MulticoreJobExecutor::Property, std::string> = {});
 
 				void createWMS(std::string, std::string, Workflow *, std::string);
 
@@ -58,7 +60,7 @@ namespace wrench {
 				std::set<ComputeService *> getComputeServices();
 
 				/***********************/
-				/** \endcond DEVELOPER  */
+				/** \endcond            */
 				/***********************/
 
 				/***********************/
@@ -72,7 +74,7 @@ namespace wrench {
 				void mark_compute_service_as_terminated(ComputeService *cs);
 
 				/***********************/
-				/** \endcond INTERNAL  */
+				/** \endcond           */
 				/***********************/
 
 

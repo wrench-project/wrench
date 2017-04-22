@@ -60,7 +60,7 @@ namespace wrench {
 		};
 
 		/***********************/
-		/** \endcond DEVELOPER */
+		/** \endcond           */
 		/***********************/
 
 

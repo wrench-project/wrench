@@ -54,7 +54,7 @@ namespace wrench {
 				WorkflowTask::State getState();
 
 				/***********************/
-				/** \endcond DEVELOPER */
+				/** \endcond           */
 				/***********************/
 
 				/***********************/
@@ -65,20 +65,19 @@ namespace wrench {
 				WorkflowJob *getWorkflowJob();
 
 				/***********************/
-				/** \endcond INTERNAL  */
+				/** \endcond           */
 				/***********************/
 
 		private:
 
-				friend class StandardJob;
-				friend class JobManager;
 				friend class Workflow;
 
 				// These friend clauses are bad
+				friend class StandardJob;
+				friend class JobManager;
 				friend class MulticoreJobExecutor;
 				friend class SequentialTaskExecutor;
 				friend class RandomScheduler;
-
 
 				std::string id;										// Task ID
 				double flops;											// Number of flops

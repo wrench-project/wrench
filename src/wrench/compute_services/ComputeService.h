@@ -37,7 +37,6 @@ namespace wrench {
 		public:
 
 
-
 				virtual void stop();
 
 				void runJob(WorkflowJob *job);
@@ -75,8 +74,6 @@ namespace wrench {
 
 				virtual void runPilotJob(PilotJob *job);
 
-				ComputeService(std::string service_name, Simulation *simulation);
-
 				ComputeService(std::string service_name);
 
 				void setSupportStandardJobs(bool v);
@@ -97,13 +94,13 @@ namespace wrench {
 				bool supports_standard_jobs;
 
 				/***********************/
-				/** \endcond INTERNAL **/
+				/** \endcond          **/
 				/***********************/
 
 		};
 
 		/***********************/
-		/** \endcond DEVELOPER */
+		/** \endcond           */
 		/***********************/
 
 };

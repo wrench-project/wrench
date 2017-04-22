@@ -6,22 +6,22 @@
 
 int main(int argc, char **argv) {
 
-	wrench::Simulation simulation;
+  wrench::Simulation simulation;
 
-	simulation.init(&argc, argv);
+  simulation.init(&argc, argv);
 
-	if (argc != 3) {
-		std::cerr << "Usage: " << argv[0] << " <xml platform file> <dax file>" << std::endl;
-		exit(1);
-	}
+  if (argc != 3) {
+    std::cerr << "Usage: " << argv[0] << " <xml platform file> <dax file>" << std::endl;
+    exit(1);
+  }
 
-	char *platform_file = argv[1];
-	char *dax_file = argv[2];
+  char *platform_file = argv[1];
+  char *dax_file = argv[2];
 
 
-	std::cerr << "Creating a bogus workflow..." << std::endl;
+  std::cerr << "Creating a bogus workflow..." << std::endl;
 
-	wrench::Workflow workflow;
+  wrench::Workflow workflow;
 
 //	std::cerr << "Creating a few tasks..." << std::endl;
 //
@@ -54,11 +54,11 @@ int main(int argc, char **argv) {
 //	workflow.addControlDependency(t4, t5);
 
 
-	//workflow.exportToEPS("workflow.eps");
+  //workflow.exportToEPS("workflow.eps");
 
-	workflow.loadFromDAX(dax_file);
-	std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
-	std::cerr.flush();
+  workflow.loadFromDAX(dax_file);
+  std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
+  std::cerr.flush();
 //	std::cerr.flush();
 //	std::cerr.flush();
 //	std::cerr.flush();
@@ -67,36 +67,45 @@ int main(int argc, char **argv) {
 
 //	return 0;
 
-
-	std::cerr << "Instantiating SimGrid platform..." << std::endl;
-	simulation.createPlatform(platform_file);
+  std::cerr << "Instantiating SimGrid platform..." << std::endl;
+  simulation.createPlatform(platform_file);
 
 //	std::cerr << "Instantiating a Sequential Task Executor on Tremblay..." << std::endl;
 //	simulation.createSequentialTaskExecutor("Tremblay");
 
-	try {
-		std::cerr << "Instantiating a  MultiCore Job executor on c-1.me..." << std::endl;
-//	simulation.createMulticoreStandardAndPilotJobExecutor("c-1.me", {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
-//	simulation.createMulticorePilotJobExecutor("c-1.me", {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
-//	simulation.createMulticoreStandardJobExecutor("c-2.me", {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
-		simulation.createMulticoreStandardJobExecutor("c-2.me");
-//	simulation.createMulticoreStandardJobExecutor("c-3.me");
-	} catch (std::invalid_argument e) {
-		std::cerr << "Error: "  << e.what() << std::endl;
-		std::exit(1);
-	}
+  try {
+
+    std::cerr << "Instantiating a  MultiCore Job executor on c-1.me..." << std::endl;
+    simulation.add(
+            std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor("c-1.me", true, false)));
+
+    std::cerr << "Instantiating a  MultiCore Job executor on c-2.me..." << std::endl;
+//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor("c-2.me", true, false, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+
+    std::cerr << "Instantiating a  MultiCore Job executor on c-3.me..." << std::endl;
+//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor("c-3.me", false, true, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+
+    std::cerr << "Instantiating a  MultiCore Job executor on c-4.me..." << std::endl;
+//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor("c-4.me", true, true, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+
+  } catch (std::invalid_argument e) {
+
+    std::cerr << "Error: " << e.what() << std::endl;
+    std::exit(1);
+
+  }
 
 
-	std::cerr << "Instantiating a WMS on c-0.me..." << std::endl;
-	simulation.createWMS("simple_wms", "RandomScheduler", &workflow, "c-0.me");
+  std::cerr << "Instantiating a WMS on c-0.me..." << std::endl;
+  simulation.createWMS("simple_wms", "RandomScheduler", &workflow, "c-0.me");
 //	simulation.createWMS("simple_wms", "MinMinScheduler", &workflow, "c-0.me");
 //	simulation.createWMS("simple_wms", "MaxMinScheduler", &workflow, "c-0.me");
 
-	simulation.add_static_optimization(new wrench::SimplePipelineClustering());
+  simulation.add_static_optimization(new wrench::SimplePipelineClustering());
 
-	std::cerr << "Launching the Simulation..." << std::endl;
-	simulation.launch();
-	std::cerr << "Simulation done!" << std::endl;
+  std::cerr << "Launching the Simulation..." << std::endl;
+  simulation.launch();
+  std::cerr << "Simulation done!" << std::endl;
 
-	return 0;
+  return 0;
 }

@@ -44,7 +44,7 @@ namespace wrench {
 				void setComputeService(ComputeService*);
 
 				/***********************/
-				/** \endcond INTERNAL  */
+				/** \endcond           */
 				/***********************/
 
 
@@ -61,7 +61,7 @@ namespace wrench {
 		};
 
 		/***********************/
-		/** \endcond DEVELOPER */
+		/** \endcond           */
 		/***********************/
 
 

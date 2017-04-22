@@ -69,7 +69,7 @@ namespace wrench {
 				std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
 
 				/***********************/
-				/** \endcond DEVELOPER */
+				/** \endcond           */
 				/***********************/
 
 
@@ -82,7 +82,7 @@ namespace wrench {
 				void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
 
 				/***********************/
-				/** \endcond INTERNAL  */
+				/** \endcond           */
 				/***********************/
 
 		private:

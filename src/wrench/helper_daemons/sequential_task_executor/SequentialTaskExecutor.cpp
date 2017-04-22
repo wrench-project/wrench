@@ -38,7 +38,7 @@ namespace wrench {
 		 */
 		void SequentialTaskExecutor::stop() {
 			// Send a termination message to the daemon's mailbox
-			S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage(nullptr, 0.0));
+			S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage("", 0.0));
 		}
 
 		/**
@@ -83,6 +83,10 @@ namespace wrench {
 				switch (message->type) {
 
 					case SimulationMessage::STOP_DAEMON: {
+						std::unique_ptr<StopDaemonMessage> m(static_cast<StopDaemonMessage *>(message.release()));
+						if (m->ack_mailbox != "") {
+							S4U_Mailbox::put(m->ack_mailbox, new DaemonStoppedMessage(0.0));
+						}
 						keep_going = false;
 						break;
 					}

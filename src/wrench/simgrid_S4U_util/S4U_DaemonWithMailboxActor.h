@@ -46,7 +46,7 @@ namespace wrench {
 		};
 
 		/***********************/
-		/** \endcond INTERNAL   */
+		/** \endcond           */
 		/***********************/
 };
 
