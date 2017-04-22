@@ -33,9 +33,11 @@ namespace wrench {
 				static int getNumCores(std::string hostname);
 				static void compute(double);
 				static void sleep(double);
+				bool isInitialized();
 
 		private:
 				simgrid::s4u::Engine *engine;
+				bool initialized = false;
 		};
 
 		/***********************/

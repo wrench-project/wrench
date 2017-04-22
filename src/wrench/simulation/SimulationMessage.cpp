@@ -9,6 +9,7 @@
  */
 
 #include "SimulationMessage.h"
+#include <xbt/ex.hpp>
 
 namespace wrench {
 

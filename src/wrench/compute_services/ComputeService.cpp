@@ -17,6 +17,14 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(compute_service, "Log category for Compute Service"
 namespace wrench {
 
 		/**
+		 * @brief Sets the simulation the compute service belongs to
+		 * @param simulation: pointer to a Simulation object
+		 */
+		void ComputeService::setSimulation(Simulation *simulation) {
+			this->simulation = simulation;
+		}
+
+		/**
 		 * @brief Stop the compute service - must be called by the stop()
 		 *        method of derived classes
 		 */

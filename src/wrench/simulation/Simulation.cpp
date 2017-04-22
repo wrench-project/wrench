@@ -10,6 +10,7 @@
 
 #include <csignal>
 #include <logging/Logging.h>
+#include <execinfo.h>
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 #include "simulation/Simulation.h"
 #include "wms/engine/EngineFactory.h"
@@ -73,20 +74,33 @@ namespace wrench {
 		}
 
 		/**
+		 * @brief Instantiate a simulated platform
+		 *
+		 * @param filename: the path to a SimGrid XML platform description file
+		 *
+		 * @throw std::runtime_error
+		 */
+		void Simulation::instantiatePlatform(std::string filename) {
+      if (!this->s4u_simulation->isInitialized()) {
+        throw std::runtime_error("Simulation is not initialized");
+      }
+      static bool already_setup = false;
+      if (already_setup) {
+        throw std::runtime_error("Platform already setup");
+      }
+			this->s4u_simulation->setupPlatform(filename);
+      already_setup = true;
+		}
+
+		/**
 		 * @brief Launch the simulation
 		 *
 		 */
 		void Simulation::launch() {
+      if (!this->s4u_simulation->isInitialized()) {
+        throw std::runtime_error("Simulation is not initialized");
+      }
 			this->s4u_simulation->runSimulation();
-		}
-
-		/**
-		 * @brief Instantiate a simulated platform
-		 *
-		 * @param filename: the path to a SimGrid XML platform description file
-		 */
-		void Simulation::instantiatePlatform(std::string filename) {
-			this->s4u_simulation->setupPlatform(filename);
 		}
 
 		/**
@@ -96,7 +110,11 @@ namespace wrench {
 		 *        then transferred to WRENCH
 		 */
 		void Simulation::add(std::unique_ptr<MulticoreJobExecutor> executor) {
-			executor->simulation = this;
+      if (!this->s4u_simulation->isInitialized()) {
+        throw std::runtime_error("Simulation is not initialized");
+      }
+
+			executor->setSimulation(this);
 			// Add a unique ptr to the list of Compute Services
 			running_compute_services.push_back(std::move(executor));
 			return;

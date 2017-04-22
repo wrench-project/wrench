@@ -24,75 +24,70 @@
 
 namespace wrench {
 
-		/**
-		 * @brief A class that keeps track of
-		*  the simulation state.
-		 */
-		class Simulation {
+    /**
+     * @brief A class that keeps track of
+    *  the simulation state.
+     */
+    class Simulation {
 
-		public:
-				Simulation();
+    public:
+        Simulation();
 
-				void init(int *, char **);
-				void instantiatePlatform(std::string);
+        void init(int *, char **);
 
-				void launch();
+        void instantiatePlatform(std::string);
 
-				void add(std::unique_ptr<MulticoreJobExecutor> executor);
+        void launch();
 
-//				void createMulticoreStandardJobExecutor(std::string, std::map<MulticoreJobExecutor::Property, std::string> = {});
-//
-//				void createMulticorePilotJobExecutor(std::string, std::map<MulticoreJobExecutor::Property, std::string>  = {});
-//
-//				void createMulticoreStandardAndPilotJobExecutor(std::string,
-//																												std::map<MulticoreJobExecutor::Property, std::string> = {});
+        void add(std::unique_ptr<MulticoreJobExecutor> executor);
 
-				void createWMS(std::string, std::string, Workflow *, std::string);
+        void createWMS(std::string, std::string, Workflow *, std::string);
 
-				void add_static_optimization(StaticOptimization*);
+        void add_static_optimization(StaticOptimization *);
 
-				/***********************/
-				/** \cond DEVELOPER    */
-				/***********************/
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
 
-				void shutdownAllComputeServices();
+        void shutdownAllComputeServices();
 
-				std::set<ComputeService *> getComputeServices();
+        std::set<ComputeService *> getComputeServices();
 
-				/***********************/
-				/** \endcond            */
-				/***********************/
+        /***********************/
+        /** \endcond            */
+        /***********************/
 
-				/***********************/
-				/** \cond INTERNAL     */
-				/***********************/
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
-				static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(
-								std::string, bool, bool, std::map<MulticoreJobExecutor::Property, std::string> plist, unsigned int num_cores,
-								double ttl, PilotJob *pj, std::string suffix);
+        static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(
+                std::string, bool, bool, std::map<MulticoreJobExecutor::Property, std::string> plist,
+                unsigned int num_cores,
+                double ttl, PilotJob *pj, std::string suffix);
 
-				void mark_compute_service_as_terminated(ComputeService *cs);
+        void mark_compute_service_as_terminated(ComputeService *cs);
 
-				/***********************/
-				/** \endcond           */
-				/***********************/
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
 
-		private:
+    private:
 
-				std::unique_ptr<S4U_Simulation> s4u_simulation;
-				std::unique_ptr<WMS> wms;
+        std::unique_ptr<S4U_Simulation> s4u_simulation;
+        std::unique_ptr<WMS> wms;
 
-				std::vector<std::unique_ptr<ComputeService>> running_compute_services;
-				std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
+        std::vector<std::unique_ptr<ComputeService>> running_compute_services;
+        std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
 
-				// Helper function
-				void createMulticoreJobExecutor(std::string hostname,
-																				bool supports_standard_jobs,
-																				bool support_pilot_jobs,
-																				std::map<MulticoreJobExecutor::Property, std::string>);
+        // Helper function
+        void createMulticoreJobExecutor(std::string hostname,
+                                        bool supports_standard_jobs,
+                                        bool support_pilot_jobs,
+                                        std::map<MulticoreJobExecutor::Property, std::string>);
 
-		};
+    };
 
 };
 

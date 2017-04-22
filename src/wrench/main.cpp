@@ -60,7 +60,6 @@ int main(int argc, char **argv) {
   std::cerr.flush();
 //	std::cerr << "Number of children of root task: " << workflow.getReadyTasks()[0]->getNumberOfChildren() << std::endl;
 
-
   std::cerr << "Instantiating SimGrid platform..." << std::endl;
   simulation.instantiatePlatform(platform_file);
 

@@ -19,43 +19,44 @@
 namespace wrench {
 
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-		/**
-		 * @brief A class to represent the various execution events that
-		 * are relevant to the execution of a Workflow.
-		 */
-		class WorkflowExecutionEvent {
+    /**
+     * @brief A class to represent the various execution events that
+     * are relevant to the execution of a Workflow.
+     */
+    class WorkflowExecutionEvent {
 
-		public:
+    public:
 
-				enum EventType {
-						UNDEFINED,
-						UNSUPPORTED_JOB_TYPE,
-						STANDARD_JOB_COMPLETION,
-						STANDARD_JOB_FAILURE,
-						PILOT_JOB_START,
-						PILOT_JOB_EXPIRATION,
-				};
+        enum EventType {
+            UNDEFINED,
+            UNSUPPORTED_JOB_TYPE,
+            STANDARD_JOB_COMPLETION,
+            STANDARD_JOB_FAILURE,
+            PILOT_JOB_START,
+            PILOT_JOB_EXPIRATION,
+        };
 
 
-				WorkflowExecutionEvent::EventType type;
-				WorkflowJob *job;
-				ComputeService *compute_service;
+        WorkflowExecutionEvent::EventType type;
+        WorkflowJob *job;
+        ComputeService *compute_service;
 
-		private:
-				WorkflowExecutionEvent();
+    private:
+        WorkflowExecutionEvent();
 
-				friend class Workflow;
-				static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
+        friend class Workflow;
 
-		};
+        static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
 
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
 

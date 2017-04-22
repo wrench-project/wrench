@@ -21,17 +21,29 @@ namespace wrench {
 		 */
 		void S4U_Simulation::initialize(int *argc, char **argv) {
 			this->engine = new simgrid::s4u::Engine(argc, argv);
+			this->initialized = true;
+		}
+
+		/**
+		 * @brief Determines whether S4U_Simulation::initialize() has been called
+		 *
+		 * @return true or false
+		 */
+		bool S4U_Simulation::isInitialized() {
+			return this->initialized;
 		}
 
 		/**
 		 * @brief Start the simulation
+		 *
+		 * @throw std::runtime_error
 		 */
 		void S4U_Simulation::runSimulation() {
 			this->engine->run();
 		}
 
 		/**
-		 * @brief Initialize the simulated platform
+		 * @brief Initialize the simulated platform. Must only be called once.
 		 *
 		 * @param filename: the path to an XML platform file
 		 */
