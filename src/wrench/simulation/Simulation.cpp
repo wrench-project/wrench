@@ -22,8 +22,7 @@ namespace wrench {
 		/* Exception handler to catch SIGBART signals from SimGrid (which should
 		 * probably throw exceptions at some point)
 		 */
-		void signal_handler(int signal)
-		{
+		void signal_handler(int signal) {
 			if (signal == SIGABRT) {
 				std::cerr << "[ ABORTING ]" << std::endl;
 				std::_Exit(EXIT_FAILURE);
@@ -86,7 +85,7 @@ namespace wrench {
 		 *
 		 * @param filename: the path to a SimGrid XML platform description file
 		 */
-		void Simulation::createPlatform(std::string filename) {
+		void Simulation::instantiatePlatform(std::string filename) {
 			this->s4u_simulation->setupPlatform(filename);
 		}
 
@@ -97,61 +96,12 @@ namespace wrench {
 		 *        then transferred to WRENCH
 		 */
 		void Simulation::add(std::unique_ptr<MulticoreJobExecutor> executor) {
-      executor->simulation = this;
-      // Add a unique ptr to the list of Compute Services
+			executor->simulation = this;
+			// Add a unique ptr to the list of Compute Services
 			running_compute_services.push_back(std::move(executor));
 			return;
 		}
 
-//		/**
-//		 * @brief Instantiate a multicore standard job executor on a host
-//		 *
-//		 * @param hostname: the name of the host in the simulated platform
-//		 *
-//		 * @throw std::invalid_argument
-//		 */
-//		void Simulation::createMulticoreStandardJobExecutor(std::string hostname,
-//																												std::map<MulticoreJobExecutor::Property , std::string> plist){
-//			try {
-//				this->createMulticoreJobExecutor(hostname, true, false, plist);
-//			} catch (std::invalid_argument e) {
-//				throw e;
-//			}
-//		}
-
-//		/**
-//		 * @brief Instantiate a multicore pilot job executor on a host
-//		 *
-//		 * @param hostname: the name of the host in the simulated platform
-//		 * @param plist: a property list to configure non-default property values
-//		 *
-//		 * @throw std::invalid_argument
-//		 */
-//		void Simulation::createMulticorePilotJobExecutor(std::string hostname,
-//																										 std::map<MulticoreJobExecutor::Property , std::string> plist) {
-//			try {
-//				this->createMulticoreJobExecutor(hostname, false, true, plist);
-//			} catch (std::invalid_argument e) {
-//				throw e;
-//			}
-//		}
-//
-//		/**
-//		 * @brief Private helper function to instantiate a multicore job executor
-//		 *
-//		 * @param hostname: the name of the host in the simulated platform
-//		 * @param plist: a property list to configure non-default property values
-//		 *
-//		 * @throw std::invalid_argument
-//		 */
-//		void Simulation::createMulticoreStandardAndPilotJobExecutor(std::string hostname,
-//																																std::map<MulticoreJobExecutor::Property , std::string> plist) {
-//			try {
-//				this->createMulticoreJobExecutor(hostname, true, true, plist);
-//			} catch (std::invalid_argument e) {
-//				throw e;
-//			}
-//		}
 
 		/**
 		 * @brief Instantiate a WMS on a host
@@ -179,7 +129,7 @@ namespace wrench {
 		 *
 		 * @throw std::invalid_argument
 		 */
-		void Simulation::add_static_optimization(StaticOptimization* optimization) {
+		void Simulation::add_static_optimization(StaticOptimization *optimization) {
 			if (optimization == nullptr) {
 				throw std::invalid_argument("Invalid argument optimization (nullptr)");
 			}
@@ -225,13 +175,13 @@ namespace wrench {
 		 * @throw std::invalid_argument
 		 */
 		MulticoreJobExecutor *Simulation::createUnregisteredMulticoreJobExecutor(std::string hostname,
-																																						 bool supports_standard_jobs,
-																																						 bool supports_pilot_jobs,
-																																						 std::map<MulticoreJobExecutor::Property , std::string> plist,
-																																						 unsigned int num_cores,
-																																						 double ttl,
-																																						 PilotJob *pj,
-																																						 std::string suffix) {
+		                                                                         bool supports_standard_jobs,
+		                                                                         bool supports_pilot_jobs,
+		                                                                         std::map<MulticoreJobExecutor::Property, std::string> plist,
+		                                                                         unsigned int num_cores,
+		                                                                         double ttl,
+		                                                                         PilotJob *pj,
+		                                                                         std::string suffix) {
 
 			// Create the compute service
 			MulticoreJobExecutor *executor;
@@ -263,40 +213,5 @@ namespace wrench {
 			// used as a building block for another higher-level service, which is fine
 			return;
 		}
-
-//		/**
-//		 * @brief Helper method to create a MulticoreJobExecutor
-//		 * @param hostname: the hostname in the simulated platform
-//		 * @param supports_standard_jobs: true if the executor supports StandardJob submissions, false otherwise
-//		 * @param support_pilot_jobs: true if the executor supports PilotJob submissions, false otherwise
-//		 * @param plist: a property list to configure non-default property values
-//		 *
-//		 * @throw std::invalid_argument
-//		 */
-//		void Simulation::createMulticoreJobExecutor(std::string hostname,
-//																								bool supports_standard_jobs,
-//																								bool support_pilot_jobs,
-//																								std::map<MulticoreJobExecutor::Property , std::string> plist) {
-//
-//			// Create the compute service
-//			MulticoreJobExecutor *executor;
-//			try {
-//				executor = new MulticoreJobExecutor(this, hostname);
-//				executor->setSupportStandardJobs(supports_standard_jobs);
-//				executor->setSupportPilotJobs(support_pilot_jobs);
-//			} catch (std::invalid_argument e) {
-//				throw e;
-//			}
-//
-//			// Set its properties
-//			for (auto p : plist) {
-//				executor->setProperty(p.first, p.second);
-//			}
-//
-//			// Add a unique ptr to the list of Compute Services
-//			std::unique_ptr<ComputeService> ptr = std::unique_ptr<ComputeService>(executor);
-//			running_compute_services.push_back(std::move(ptr));
-//			return;
-//		}
 
 };

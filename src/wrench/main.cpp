@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
 
   std::cerr << "Instantiating SimGrid platform..." << std::endl;
-  simulation.createPlatform(platform_file);
+  simulation.instantiatePlatform(platform_file);
 
   try {
 

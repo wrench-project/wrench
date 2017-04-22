@@ -34,7 +34,7 @@ namespace wrench {
 				Simulation();
 
 				void init(int *, char **);
-				void createPlatform(std::string);
+				void instantiatePlatform(std::string);
 
 				void launch();
 
