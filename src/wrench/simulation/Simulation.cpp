@@ -92,7 +92,18 @@ namespace wrench {
       already_setup = true;
 		}
 
-		/**
+    /**
+     * @brief Retrieve the list of names of all the hosts in the platform
+     *
+     * @throw std::runtime_error
+     *
+     * @return a set of hostnames
+     */
+    std::set<std::string> Simulation::getHostnameList() {
+      return this->s4u_simulation->getAllHostnames();
+    }
+
+    /**
 		 * @brief Launch the simulation
 		 *
 		 */

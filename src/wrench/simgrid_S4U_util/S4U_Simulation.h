@@ -34,6 +34,7 @@ namespace wrench {
 				static void compute(double);
 				static void sleep(double);
 				bool isInitialized();
+        std::set<std::string> getAllHostnames();
 
 		private:
 				simgrid::s4u::Engine *engine;

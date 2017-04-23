@@ -60,7 +60,23 @@ namespace wrench {
 			return simgrid::s4u::Host::current()->name();
 		}
 
-		/**
+    /**
+     * @brief Retrives the list of hostnames
+     *
+     * @return a set of hostnames
+     */
+    std::set<std::string> S4U_Simulation::getAllHostnames() {
+      std::vector<simgrid::s4u::Host*> host_list;
+      this->engine->hostList(&host_list);
+      std::set<std::string> hostname_list;
+      for (auto h : host_list) {
+        hostname_list.insert(h->name());
+      }
+      return hostname_list;
+    }
+
+
+    /**
 		 * @brief Retrieves the number of cores of a host
 		 *
 		 * @param hostname: the name of the host

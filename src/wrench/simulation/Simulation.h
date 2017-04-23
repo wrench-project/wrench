@@ -37,6 +37,8 @@ namespace wrench {
 
         void instantiatePlatform(std::string);
 
+        std::set<std::string> getHostnameList();
+
         void launch();
 
         void add(std::unique_ptr<MulticoreJobExecutor> executor);
