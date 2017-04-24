@@ -30,7 +30,7 @@ namespace wrench {
     public:
 
         SequentialTaskExecutor(std::string hostname, std::string callback_mailbox,
-                               double task_startup_overhead);
+                               double task_startup_overhead = 0.0);
 
         void stop();
 
