@@ -84,7 +84,7 @@ namespace wrench {
 
 		protected:
 
-				friend class simulation;
+				friend class Simulation;
 				void setSimulation(Simulation *simulation);
 
 				ComputeService::State state;

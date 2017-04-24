@@ -56,7 +56,6 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-      std::cerr << "DESTRUCT!!" << std::endl;
       this->s4u_simulation->shutdown();
     }
 
@@ -102,9 +101,9 @@ namespace wrench {
     /**
      * @brief Retrieve the list of names of all the hosts in the platform
      *
-     * @throw std::runtime_error
-     *
      * @return a set of hostnames
+     *
+     * @throw std::runtime_error
      */
     std::set<std::string> Simulation::getHostnameList() {
       return this->s4u_simulation->getAllHostnames();
@@ -126,6 +125,8 @@ namespace wrench {
      *
      * @param executor: a unique pointer to a MulticoreJobExecutor object, the ownership of which is
      *        then transferred to WRENCH
+     *
+     * @throw std::invalid_argument
      */
     void Simulation::add(std::unique_ptr<MulticoreJobExecutor> executor) {
       if (!this->s4u_simulation->isInitialized()) {

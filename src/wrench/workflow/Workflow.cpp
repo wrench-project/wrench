@@ -33,6 +33,10 @@ namespace wrench {
                                     double flops,
                                     int num_procs = 1) {
 
+      if ((flops < 0.0) || (num_procs <= 0)) {
+        throw std::invalid_argument("WorkflowTask::adTask(): invalid argument");
+      }
+
       // Check that the task doesn't really exist
       if (tasks[id]) {
         throw std::invalid_argument("Task ID '" + id + "' already exists");
@@ -61,9 +65,13 @@ namespace wrench {
      */
     void Workflow::removeTask(WorkflowTask *task) {
 
+      if (task == nullptr) {
+        throw std::invalid_argument("Workflow::removeTask(): passed a nullptr task");
+      }
+
       // check that task exists
       if (tasks.find(task->id) == tasks.end()) {
-        throw std::invalid_argument("Task '" + task->id + "' does not exist");
+        throw std::invalid_argument("Workflow::removeTask(): Task '" + task->id + "' does not exist");
       }
 
       DAG.get()->erase(task->DAG_node);
@@ -81,7 +89,7 @@ namespace wrench {
      */
     WorkflowTask *Workflow::getWorkflowTaskByID(const std::string id) {
       if (!tasks[id]) {
-        throw std::invalid_argument("Unknown WorkflowTask ID " + id);
+        throw std::invalid_argument("Workflow::getWorkflowTaskByID(): Unknown WorkflowTask ID " + id);
       }
       return tasks[id].get();
     }
@@ -92,8 +100,15 @@ namespace wrench {
      *
      * @param src: the source WorkflowTask object
      * @param dst: the destination WorkflowTask object
+     *
+     * @throw std::invalid_argument
      */
     void Workflow::addControlDependency(WorkflowTask *src, WorkflowTask *dst) {
+
+      if ((src == nullptr) || (dst == nullptr)) {
+        throw std::invalid_argument("Workflow::addControlDependency(): passed a nullptr task");
+      }
+
       if (!pathExists(src, dst)) {
 
         DAG->addArc(src->DAG_node, dst->DAG_node);
@@ -116,6 +131,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     WorkflowFile *Workflow::addFile(const std::string id, double size) {
+
+      if (size < 0) {
+        throw std::invalid_argument("Workflow::addFile(): file size must be >0");
+      }
+
       // Create the WorkflowFile object
       if (files[id]) {
         throw std::invalid_argument("WorkflowFile with id '" +
@@ -289,7 +309,7 @@ namespace wrench {
     /**
      * @brief Get a list of all tasks in the workflow
      *
-     * @return a list of pointers to WorkflowTask objects
+     * @return a vector of pointers to WorkflowTask objects
      */
     std::vector<WorkflowTask *> Workflow::getTasks() {
       std::vector<WorkflowTask *> all_tasks;
@@ -302,11 +322,14 @@ namespace wrench {
     /**
      * @brief Get list of children for a task
      *
-     * @param task a pointer to a WorkflowTask object
+     * @param task: a pointer to a WorkflowTask object
      *
-     * @return a list of pointers to WorfklowTask objects
+     * @return a vector of pointers to WorfklowTask objects
      */
     std::vector<WorkflowTask *> Workflow::getTaskChildren(const WorkflowTask *task) {
+      if (task == nullptr) {
+        throw std::invalid_argument("Workflow::getTaskChildren(): passed a nullptr task");
+      }
       std::vector<WorkflowTask *> children;
       for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
         children.push_back((*DAG_node_map)[(*DAG).target(a)]);
@@ -317,11 +340,14 @@ namespace wrench {
     /**
      * @brief Get list of parents for a task
      *
-     * @param task a pointer to a WorkflowTask object
+     * @param task: a pointer to a WorkflowTask object
      *
-     * @return a list of pointers to WorfklowTask objects
+     * @return a vector of pointers to WorfklowTask objects
      */
     std::vector<WorkflowTask *> Workflow::getTaskParents(const WorkflowTask *task) {
+      if (task == nullptr) {
+        throw std::invalid_argument("Workflow::getTaskParents(): passed a nullptr task");
+      }
       std::vector<WorkflowTask *> parents;
       for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
         parents.push_back((*DAG_node_map)[(*DAG).source(a)]);
@@ -358,6 +384,9 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state) {
+      if (task == nullptr) {
+        throw std::invalid_argument("Workflow::updateTaskState(): passed a nullptr task");
+      }
 
       switch (state) {
         // Make a task completed, which may cause its children to become ready

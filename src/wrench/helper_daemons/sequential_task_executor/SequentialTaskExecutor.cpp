@@ -26,6 +26,9 @@ namespace wrench {
                                                    double task_startup_overhead) :
             S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
 
+      if (task_startup_overhead < 0) {
+          throw std::invalid_argument("SequentialTaskExecutor::SequentialTaskExecutor(): task startup overhead must be >0");
+      }
       this->hostname = hostname;
       this->callback_mailbox = callback_mailbox;
       this->task_start_up_overhead = task_startup_overhead;
@@ -57,6 +60,9 @@ namespace wrench {
      * @return 0 on success
      */
     int SequentialTaskExecutor::runTask(WorkflowTask *task) {
+      if (task == nullptr) {
+        throw std::invalid_argument("SequentialTaskExecutor::runTask(): passed a nullptr task");
+      }
       // Send a "run a task" message to the daemon's mailbox
       S4U_Mailbox::put(this->mailbox_name, new RunTaskMessage(task, 0.0));
       return 0;

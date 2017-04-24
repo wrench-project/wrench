@@ -18,7 +18,7 @@ namespace wrench {
 
 		/**
 		 * @brief Sets the simulation the compute service belongs to
-		 * @param simulation: pointer to a Simulation object
+		 * @param simulation: a pointer to a Simulation object
 		 */
 		void ComputeService::setSimulation(Simulation *simulation) {
 			this->simulation = simulation;

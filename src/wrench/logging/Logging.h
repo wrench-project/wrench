@@ -27,41 +27,41 @@
 
 namespace wrench {
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-		/**
-		 * @brief Color-enabling wrappers around Simgrid's logging macros.
-		 */
-		class Logging {
+    /**
+     * @brief Color-enabling wrappers around Simgrid's logging macros.
+     */
+    class Logging {
 
-		public:
+    public:
 
-				static void setThisProcessLoggingColor(std::string color);
+        static void setThisProcessLoggingColor(std::string color);
 
-				/***********************/
-				/** \cond INTERNAL     */
-				/***********************/
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
-				static void beginThisProcessColor();
+        static void beginThisProcessColor();
 
-				static void endThisProcessColor();
+        static void endThisProcessColor();
 
-				/***********************/
-				/** \cond INTERNAL    */
-				/***********************/
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
 
-		private:
-				static std::map<simgrid::s4u::ActorPtr, std::string> colormap;
+    private:
+        static std::map<simgrid::s4u::ActorPtr, std::string> colormap;
 
-				static std::string getThisProcessLoggingColor();
+        static std::string getThisProcessLoggingColor();
 
-		};
+    };
 
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 };
 
 

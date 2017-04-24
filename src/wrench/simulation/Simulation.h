@@ -76,7 +76,6 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-
     private:
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
@@ -84,12 +83,6 @@ namespace wrench {
 
         std::vector<std::unique_ptr<ComputeService>> running_compute_services;
         std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
-
-        // Helper function
-        void createMulticoreJobExecutor(std::string hostname,
-                                        bool supports_standard_jobs,
-                                        bool support_pilot_jobs,
-                                        std::map<MulticoreJobExecutor::Property, std::string>);
 
     };
 

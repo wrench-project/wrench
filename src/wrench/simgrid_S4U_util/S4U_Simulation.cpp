@@ -13,58 +13,58 @@
 
 namespace wrench {
 
-		/**
-		 * @brief Initialize the Simgrid simulation
-		 *
-		 * @param argc: the C-style argument counts
-		 * @param argv: the C-style argument list
-		 */
-		void S4U_Simulation::initialize(int *argc, char **argv) {
-			this->engine = new simgrid::s4u::Engine(argc, argv);
-			this->initialized = true;
-		}
+    /**
+     * @brief Initialize the Simgrid simulation
+     *
+     * @param argc: the C-style argument counts
+     * @param argv: the C-style argument list
+     */
+    void S4U_Simulation::initialize(int *argc, char **argv) {
+      this->engine = new simgrid::s4u::Engine(argc, argv);
+      this->initialized = true;
+    }
 
-		/**
-		 * @brief Determines whether S4U_Simulation::initialize() has been called
-		 *
-		 * @return true or false
-		 */
-		bool S4U_Simulation::isInitialized() {
-			return this->initialized;
-		}
+    /**
+     * @brief Determines whether S4U_Simulation::initialize() has been called
+     *
+     * @return true or false
+     */
+    bool S4U_Simulation::isInitialized() {
+      return this->initialized;
+    }
 
-		/**
-		 * @brief Start the simulation
-		 *
-		 * @throw std::runtime_error
-		 */
-		void S4U_Simulation::runSimulation() {
-			this->engine->run();
-		}
+    /**
+     * @brief Start the simulation
+     *
+     * @throw std::runtime_error
+     */
+    void S4U_Simulation::runSimulation() {
+      this->engine->run();
+    }
 
-		void S4U_Simulation::shutdown() {
-			if (this->initialized) {
-				this->engine->shutdown();
-			}
-		}
+    void S4U_Simulation::shutdown() {
+      if (this->initialized) {
+        this->engine->shutdown();
+      }
+    }
 
-		/**
-		 * @brief Initialize the simulated platform. Must only be called once.
-		 *
-		 * @param filename: the path to an XML platform file
-		 */
-		void S4U_Simulation::setupPlatform(std::string filename) {
-			this->engine->loadPlatform(filename.c_str());
-		}
+    /**
+     * @brief Initialize the simulated platform. Must only be called once.
+     *
+     * @param filename: the path to an XML platform file
+     */
+    void S4U_Simulation::setupPlatform(std::string filename) {
+      this->engine->loadPlatform(filename.c_str());
+    }
 
-		/**
-		 * @brief Retrieves the hostname on which the calling actor is running
-		 *
-		 * @return the hostname as a string
-		 */
-		std::string S4U_Simulation::getHostName() {
-			return simgrid::s4u::Host::current()->name();
-		}
+    /**
+     * @brief Retrieves the hostname on which the calling actor is running
+     *
+     * @return the hostname as a string
+     */
+    std::string S4U_Simulation::getHostName() {
+      return simgrid::s4u::Host::current()->name();
+    }
 
     /**
      * @brief Retrives the list of hostnames
@@ -72,7 +72,7 @@ namespace wrench {
      * @return a set of hostnames
      */
     std::set<std::string> S4U_Simulation::getAllHostnames() {
-      std::vector<simgrid::s4u::Host*> host_list;
+      std::vector<simgrid::s4u::Host *> host_list;
       this->engine->hostList(&host_list);
       std::set<std::string> hostname_list;
       for (auto h : host_list) {
@@ -88,35 +88,35 @@ namespace wrench {
 		 * @param hostname: the name of the host
 		 * @return the number of cores of the host
 		 */
-		int S4U_Simulation::getNumCores(std::string hostname) {
-			return simgrid::s4u::Host::by_name(hostname)->coreCount();
-		}
+    int S4U_Simulation::getNumCores(std::string hostname) {
+      return simgrid::s4u::Host::by_name(hostname)->coreCount();
+    }
 
-		/**
-		 * @brief Retrieves the current simulation date
-		 *
-		 * @return the simulation clock
-		 */
-		double S4U_Simulation::getClock() {
-			return simgrid::s4u::Engine::instance()->getClock();
-		}
+    /**
+     * @brief Retrieves the current simulation date
+     *
+     * @return the simulation clock
+     */
+    double S4U_Simulation::getClock() {
+      return simgrid::s4u::Engine::instance()->getClock();
+    }
 
-		/**
-		 * @brief Simulates a computation on host on which the calling actor is running
-		 *
-		 * @param flops: the number of flops
-		 */
-		void S4U_Simulation::compute(double flops) {
-			simgrid::s4u::this_actor::execute(flops);
-		}
+    /**
+     * @brief Simulates a computation on host on which the calling actor is running
+     *
+     * @param flops: the number of flops
+     */
+    void S4U_Simulation::compute(double flops) {
+      simgrid::s4u::this_actor::execute(flops);
+    }
 
 
-		/**
-		 * @brief Simulates a sleep
-		 * @param duration: the number of seconds to sleep
-		 */
-		void S4U_Simulation::sleep(double duration) {
-			return simgrid::s4u::this_actor::sleep_for(duration);
-		}
+    /**
+     * @brief Simulates a sleep
+     * @param duration: the number of seconds to sleep
+     */
+    void S4U_Simulation::sleep(double duration) {
+      return simgrid::s4u::this_actor::sleep_for(duration);
+    }
 
 };
