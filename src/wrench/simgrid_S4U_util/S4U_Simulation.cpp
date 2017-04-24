@@ -42,6 +42,12 @@ namespace wrench {
 			this->engine->run();
 		}
 
+		void S4U_Simulation::shutdown() {
+			if (this->initialized) {
+				this->engine->shutdown();
+			}
+		}
+
 		/**
 		 * @brief Initialize the simulated platform. Must only be called once.
 		 *

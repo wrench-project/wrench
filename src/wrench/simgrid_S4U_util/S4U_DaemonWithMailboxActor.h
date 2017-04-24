@@ -21,33 +21,33 @@
 
 namespace wrench {
 
-		/***********************/
-		/** \cond INTERNAL     */
-		/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-		/**
-		 * @brief The actor for the S4U_DaemonWithMailbox abstraction
-		 */
-		class S4U_DaemonWithMailboxActor {
+    /**
+     * @brief The actor for the S4U_DaemonWithMailbox abstraction
+     */
+    class S4U_DaemonWithMailboxActor {
 
-		public:
+    public:
 
-				explicit S4U_DaemonWithMailboxActor(S4U_DaemonWithMailbox *d) {
-					this->daemon = d;
-				}
+        explicit S4U_DaemonWithMailboxActor(S4U_DaemonWithMailbox *d) {
+          this->daemon = d;
+        }
 
-				void operator()() {
-					this->daemon->main();
-				}
+        void operator()() {
+          this->daemon->main();
+        }
 
-		private:
-				S4U_DaemonWithMailbox *daemon;
+    private:
+        S4U_DaemonWithMailbox *daemon;
 
-		};
+    };
 
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 };
 
 

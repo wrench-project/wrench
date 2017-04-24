@@ -17,37 +17,44 @@
 namespace wrench {
 
 
-		class Workflow;
-		class WorkflowTask;
+    class Workflow;
 
-		/**
-		 * @brief Abstraction for a data file used in a Workflow
-		 */
-		class WorkflowFile {
+    class WorkflowTask;
 
-				friend class Workflow;
-				friend class WorkflowTask;
+    /**
+     * @brief Abstraction for a data file used in a Workflow
+     */
+    class WorkflowFile {
 
-		public:
+        friend class Workflow;
 
-				double getSize();
-				std::string getId();
+        friend class WorkflowTask;
 
-		private:
-				std::string id;
-				double size; // in bytes
+    public:
 
-				void setOutputOf(WorkflowTask *task);
-				WorkflowTask *getOutputOf();
-				void setInputOf(WorkflowTask *task);
-				std::map<std::string, WorkflowTask *> getInputOf();
+        double getSize();
 
-				Workflow *workflow; // Containing workflow
-				WorkflowFile(const std::string, double);
-				WorkflowTask *output_of;
-				std::map<std::string, WorkflowTask *> input_of;
+        std::string getId();
 
-		};
+    private:
+        std::string id;
+        double size; // in bytes
+
+        void setOutputOf(WorkflowTask *task);
+
+        WorkflowTask *getOutputOf();
+
+        void setInputOf(WorkflowTask *task);
+
+        std::map<std::string, WorkflowTask *> getInputOf();
+
+        Workflow *workflow; // Containing workflow
+        WorkflowFile(const std::string, double);
+
+        WorkflowTask *output_of;
+        std::map<std::string, WorkflowTask *> input_of;
+
+    };
 
 };
 

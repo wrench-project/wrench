@@ -17,38 +17,39 @@
 
 namespace wrench {
 
-		/***********************/
-		/** \cond INTERNAL     */
-		/***********************/
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-		/**
-		 *  @brief Implementation of a simple
- 		 *  sequential task executor abstraction.
-		 */
-		class SequentialTaskExecutor : public S4U_DaemonWithMailbox {
+    /**
+     *  @brief Implementation of a simple
+      *  sequential task executor abstraction.
+     */
+    class SequentialTaskExecutor : public S4U_DaemonWithMailbox {
 
-		public:
+    public:
 
-				SequentialTaskExecutor(std::string hostname, std::string callback_mailbox);
+        SequentialTaskExecutor(std::string hostname, std::string callback_mailbox,
+                               double task_startup_overhead);
 
-				void stop();
+        void stop();
 
-				void kill();
+        void kill();
 
-				int runTask(WorkflowTask *task);
+        int runTask(WorkflowTask *task);
 
-		private:
+    private:
 
-				int main();
+        int main();
 
-				std::string callback_mailbox;
-				std::string hostname;
+        std::string callback_mailbox;
+        std::string hostname;
+        double task_start_up_overhead;
+    };
 
-		};
-
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 };
 
 

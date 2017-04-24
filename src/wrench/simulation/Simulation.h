@@ -33,6 +33,8 @@ namespace wrench {
     public:
         Simulation();
 
+        ~Simulation();
+
         void init(int *, char **);
 
         void instantiatePlatform(std::string);

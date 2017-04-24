@@ -21,95 +21,107 @@
 
 namespace wrench {
 
-		/**
-		 * @brief class to represent a task in a Workflow
-		 */
-		class WorkflowTask {
+    /**
+     * @brief class to represent a task in a Workflow
+     */
+    class WorkflowTask {
 
 
-		public:
+    public:
 
-				std::string getId() const;
-				double getFlops() const;
-				int getNumProcs() const;
-				int getNumberOfChildren();
-				int getNumberOfParents();
-				void addInputFile(WorkflowFile *);
-				void addOutputFile(WorkflowFile *);
+        std::string getId() const;
 
-				/***********************/
-				/** \cond DEVELOPER    */
-				/***********************/
+        double getFlops() const;
 
-				/* Task-state enum */
-				enum State {
-						NOT_READY,
-						READY,
-						PENDING,
-						RUNNING,
-						COMPLETED,
-						FAILED
-				};
+        int getNumProcs() const;
 
-				WorkflowTask::State getState();
-				WorkflowJob *getJob();
-				Workflow *getWorkflow();
+        int getNumberOfChildren();
 
-				/***********************/
-				/** \endcond           */
-				/***********************/
+        int getNumberOfParents();
 
+        void addInputFile(WorkflowFile *);
 
+        void addOutputFile(WorkflowFile *);
 
-				/***********************/
-				/** \cond INTERNAL     */
-				/***********************/
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
 
-				void setState(WorkflowTask::State);
-				void setReady();
-				void setRunning();
-				void setCompleted();
+        /* Task-state enum */
+        enum State {
+            NOT_READY,
+            READY,
+            PENDING,
+            RUNNING,
+            COMPLETED,
+            FAILED
+        };
 
-				void setJob(WorkflowJob *job);
+        WorkflowTask::State getState();
+
+        WorkflowJob *getJob();
+
+        Workflow *getWorkflow();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
 
-				void setEndDate(double date);
 
-				void setWorkflowJob(WorkflowJob *);
-				WorkflowJob *getWorkflowJob();
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
-				/***********************/
-				/** \endcond           */
-				/***********************/
+        void setState(WorkflowTask::State);
 
-		private:
+        void setReady();
 
-				friend class Workflow;
+        void setRunning();
 
-				std::string id;										// Task ID
-				double flops;											// Number of flops
-				int number_of_processors;        	// currently vague: cores? nodes?
-				double scheduled_date = -1.0;			// Date at which task was scheduled (getter?)
-				double start_date = -1.0;					// Date at which task began execution (getter?)
-				double end_date = -1.0;						// Date at which task finished execution (getter?)
+        void setCompleted();
 
-				State state;
-				Workflow *workflow;    																// Containing workflow
-				lemon::ListDigraph *DAG;    													// Containing workflow
-				lemon::ListDigraph::Node DAG_node;									 	// pointer to the underlying DAG node
-				std::map<std::string, WorkflowFile *> output_files;  	// List of output files
-				std::map<std::string, WorkflowFile *> input_files;   	// List of input files
+        void setJob(WorkflowJob *job);
 
-				// Private constructor (called by Workflow)
-				WorkflowTask(const std::string id, const double t, const int n);
 
-				// Containing job
-				WorkflowJob *job;
+        void setEndDate(double date);
 
-				// Private helper function
-				void addFileToMap(std::map<std::string, WorkflowFile *> map, WorkflowFile *f);
+        void setWorkflowJob(WorkflowJob *);
 
-		};
+        WorkflowJob *getWorkflowJob();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+    private:
+
+        friend class Workflow;
+
+        std::string id;                    // Task ID
+        double flops;                      // Number of flops
+        int number_of_processors;          // currently vague: cores? nodes?
+        double scheduled_date = -1.0;      // Date at which task was scheduled (getter?)
+        double start_date = -1.0;          // Date at which task began execution (getter?)
+        double end_date = -1.0;            // Date at which task finished execution (getter?)
+
+        State state;
+        Workflow *workflow;                                    // Containing workflow
+        lemon::ListDigraph *DAG;                              // Containing workflow
+        lemon::ListDigraph::Node DAG_node;                    // pointer to the underlying DAG node
+        std::map<std::string, WorkflowFile *> output_files;    // List of output files
+        std::map<std::string, WorkflowFile *> input_files;    // List of input files
+
+        // Private constructor (called by Workflow)
+        WorkflowTask(const std::string id, const double t, const int n);
+
+        // Containing job
+        WorkflowJob *job;
+
+        // Private helper function
+        void addFileToMap(std::map<std::string, WorkflowFile *> map, WorkflowFile *f);
+
+    };
 
 };
 

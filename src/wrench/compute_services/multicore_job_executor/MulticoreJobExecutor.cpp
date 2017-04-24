@@ -262,12 +262,12 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     MulticoreJobExecutor::MulticoreJobExecutor(
-                                               std::string hostname,
-                                               std::map<MulticoreJobExecutor::Property, std::string> plist,
-                                               unsigned int num_worker_threads,
-                                               double ttl,
-                                               PilotJob *pj,
-                                               std::string suffix) :
+            std::string hostname,
+            std::map<MulticoreJobExecutor::Property, std::string> plist,
+            unsigned int num_worker_threads,
+            double ttl,
+            PilotJob *pj,
+            std::string suffix) :
             ComputeService("multicore_job_executor"),
             S4U_DaemonWithMailbox("multicore_job_executor" + suffix, "multicore_job_executor" + suffix) {
 
@@ -657,7 +657,9 @@ namespace wrench {
         WRENCH_INFO("Starting a task executor on core #%d", i);
         std::unique_ptr<SequentialTaskExecutor> seq_executor =
                 std::unique_ptr<SequentialTaskExecutor>(
-                        new SequentialTaskExecutor(S4U_Simulation::getHostName(), this->mailbox_name));
+                        new SequentialTaskExecutor(S4U_Simulation::getHostName(), this->mailbox_name,
+                                                   this->getPropertyValueAsDouble(
+                                                           MulticoreJobExecutor::Property::TASK_STARTUP_OVERHEAD)));
         this->sequential_task_executors.push_back(std::move(seq_executor));
       }
 
