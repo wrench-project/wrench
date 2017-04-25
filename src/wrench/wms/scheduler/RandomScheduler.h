@@ -10,39 +10,33 @@
 #ifndef WRENCH_RANDOMSCHEDULER_H
 #define WRENCH_RANDOMSCHEDULER_H
 
-#include "wms/scheduler/SchedulerFactory.h"
+#include "wms/scheduler/Scheduler.h"
 
 namespace wrench {
 
-		class JobManager;
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-		extern const char random_name[] = "RandomScheduler";
+    /**
+     * @brief A random Scheduler class
+     */
+    class RandomScheduler : public Scheduler {
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    public:
+        void scheduleTasks(JobManager *job_manager,
+                           std::vector<WorkflowTask *> ready_tasks,
+                           const std::set<ComputeService *> &compute_services);
 
-		/**
-		 * @brief A random Scheduler class
-		 */
-		class RandomScheduler : public SchedulerTmpl<random_name, RandomScheduler> {
+        void schedulePilotJobs(JobManager *job_manager,
+                               Workflow *workflow,
+                               double flops,
+                               const std::set<ComputeService *> &compute_services);
+    };
 
-		public:
-				RandomScheduler();
-
-				void scheduleTasks(JobManager *job_manager,
-													 std::vector<WorkflowTask *> ready_tasks,
-													 const std::set<ComputeService *> &compute_services);
-
-				void schedulePilotJobs(JobManager *job_manager,
-															 Workflow *workflow,
-															 double flops,
-															 const std::set<ComputeService *> &compute_services);
-		};
-
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 };
 
 #endif //WRENCH_RANDOMSCHEDULER_H

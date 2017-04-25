@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include "wrench.h"
-#include "wms/optimizations/static/SimplePipelineClustering.h"
 
 int main(int argc, char **argv) {
 
@@ -87,11 +86,17 @@ int main(int argc, char **argv) {
 
 
   std::cerr << "Instantiating a WMS on c-0.me..." << std::endl;
-  simulation.createWMS("simple_wms", "RandomScheduler", &workflow, "c-0.me");
-//	simulation.createWMS("simple_wms", "MinMinScheduler", &workflow, "c-0.me");
-//	simulation.createWMS("simple_wms", "MaxMinScheduler", &workflow, "c-0.me");
 
-  simulation.add_static_optimization(new wrench::SimplePipelineClustering());
+  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::RandomScheduler());
+//  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MinMinScheduler());
+//  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MaxMinScheduler());
+  std::unique_ptr<wrench::StaticOptimization> opt(new wrench::SimplePipelineClustering());
+
+  std::unique_ptr<wrench::WMS> wms(new wrench::SimpleWMS(&simulation, &workflow, std::move(scheduler), "c-0.me"));
+  wms.get()->add_static_optimization(std::move(opt));
+
+  simulation.setWMS(std::move(wms));
+
 
   std::cerr << "Launching the Simulation..." << std::endl;
   simulation.launch();

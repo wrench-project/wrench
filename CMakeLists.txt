@@ -28,18 +28,13 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowFile.h
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/wms/WMS.h
+        src/wrench/wms/WMS.cpp
         src/wrench/wms/optimizations/static/StaticOptimization.h
         src/wrench/wms/optimizations/static/SimplePipelineClustering.h
         src/wrench/wms/optimizations/static/SimplePipelineClustering.cpp
-        src/wrench/wms/engine/EngineTmpl.h
-        src/wrench/wms/engine/EngineFactory.h
-        src/wrench/wms/engine/EngineFactory.cpp
-        src/wrench/wms/engine/simple_wms/SimpleWMS.h
-        src/wrench/wms/engine/simple_wms/SimpleWMS.cpp
+        src/wrench/wms/engine/SimpleWMS.h
+        src/wrench/wms/engine/SimpleWMS.cpp
         src/wrench/wms/scheduler/Scheduler.h
-        src/wrench/wms/scheduler/SchedulerTmpl.h
-        src/wrench/wms/scheduler/SchedulerFactory.h
-        src/wrench/wms/scheduler/SchedulerFactory.cpp
         src/wrench/wms/scheduler/RandomScheduler.h
         src/wrench/wms/scheduler/RandomScheduler.cpp
         src/wrench/wms/scheduler/MinMinScheduler.h
@@ -67,6 +62,7 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTimestamp.h)
 
 set(INCLUDE_FILES include/wrench.h)
+set(INCLUDE_DEV_FILES include/wrench-dev.h)
 
 find_library(SIMGRID_LIB NAMES simgrid)
 find_library(PUGIXML_LIB NAMES pugixml)
@@ -77,6 +73,7 @@ add_library(wrench STATIC ${SOURCE_FILES})
 target_link_libraries(wrench ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS wrench DESTINATION lib)
 install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
+install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench-dev)
 
 # TODO: temporary simulation test binary
 add_executable(simulation ${SOURCE_FILES})

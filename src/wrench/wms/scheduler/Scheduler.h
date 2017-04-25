@@ -10,58 +10,54 @@
 #ifndef WRENCH_SCHEDULER_H
 #define WRENCH_SCHEDULER_H
 
-#include "workflow/WorkflowTask.h"
-#include "compute_services/ComputeService.h"
 #include <set>
-#include <job_manager/JobManager.h>
+
+#include "compute_services/ComputeService.h"
+#include "job_manager/JobManager.h"
+#include "workflow/WorkflowTask.h"
 
 namespace wrench {
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    class JobManager;
 
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-		/**
-		 * @brief A (mostly) abstract implementation of a scheduler
-		 */
-		class Scheduler {
+    /**
+     * @brief A (mostly) abstract implementation of a scheduler
+     */
+    class Scheduler {
 
-		protected:
-				Scheduler() {};
-				std::string sched_type;
+    public:
+        /**
+         * @brief Schedule and run a set of ready tasks in available compute resources
+         *
+         * @param job_manager: a pointer to a JobManager object
+         * @param ready_tasks: a vector of ready WorkflowTask objects (i.e., ready tasks in the workflow)
+         * @param compute_services: a set of pointers to ComputeService objects (i.e., compute services available to run jobs)
+         */
+        virtual void scheduleTasks(JobManager *job_manager,
+                                   std::vector<WorkflowTask *> ready_tasks,
+                                   const std::set<ComputeService *> &compute_services) = 0;
 
-		public:
-				virtual ~Scheduler() {};
+        /**
+          * @brief Schedule and run pilot jobs
+          *
+          * @param job_manager: a pointer to a JobManager object
+          * @param workflow: a pointer to a Workflow object
+          * @param flops: the number of flops that the PilotJob should be able to do before terminating
+          * @param compute_services: a set of pointers to ComputeSertvice objects (i.e., compute services available to run jobs)
+          */
+        virtual void schedulePilotJobs(JobManager *job_manager,
+                                       Workflow *workflow,
+                                       double pilot_job_duration,
+                                       const std::set<ComputeService *> &compute_services) = 0;
+    };
 
-				/**
-				 * @brief Schedule and run a set of ready tasks in available compute resources
-				 *
-				 * @param job_manager: a pointer to a JobManager object
-				 * @param ready_tasks: a vector of ready WorkflowTask objects (i.e., ready tasks in the workflow)
-				 * @param compute_services: a set of pointers to ComputeService objects (i.e., compute services available to run jobs)
-				 */
-				virtual void scheduleTasks(JobManager *job_manager,
-																	 std::vector<WorkflowTask *> ready_tasks,
-																	 const std::set<ComputeService *> &compute_services) = 0;
-
-			/**
-				* @brief Schedule and run pilot jobs
-				*
-				* @param job_manager: a pointer to a JobManager object
-				* @param workflow: a pointer to a Workflow object
-				* @param flops: the number of flops that the PilotJob should be able to do before terminating
-				* @param compute_services: a set of pointers to ComputeSertvice objects (i.e., compute services available to run jobs)
-				*/
-				virtual void schedulePilotJobs(JobManager *job_manager,
-																			 Workflow *workflow,
-																			 double pilot_job_duration,
-																			 const std::set<ComputeService *> &compute_services) = 0;
-		};
-
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
 }

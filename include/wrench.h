@@ -14,4 +14,18 @@
 #include "simulation/SimulationTimestamp.h"
 #include "workflow/Workflow.h"
 
+// WMS Implementations
+#include "wms/WMS.h"
+#include "wms/engine/SimpleWMS.h"
+
+// Schedulers
+#include "wms/scheduler/Scheduler.h"
+#include "wms/scheduler/RandomScheduler.h"
+#include "wms/scheduler/MinMinScheduler.h"
+#include "wms/scheduler/MaxMinScheduler.h"
+
+// Static Optimizations
+#include "wms/optimizations/static/StaticOptimization.h"
+#include "wms/optimizations/static/SimplePipelineClustering.h"
+
 #endif //WRENCH_WRENCH_H

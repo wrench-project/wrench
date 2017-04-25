@@ -10,36 +10,34 @@
 #ifndef WRENCH_WMS_H
 #define WRENCH_WMS_H
 
-#include "workflow/Workflow.h"
+#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
 #include "wms/scheduler/Scheduler.h"
 #include "wms/optimizations/static/StaticOptimization.h"
+#include "workflow/Workflow.h"
 
 namespace wrench {
 
-		/**
-		 * @brief Abstract implementation of a Workflow Management System
-		 */
-	class WMS {
+    class Simulation; // forward ref
 
-	protected:
-		WMS() {};
-		std::string wms_type;
+    /**
+     * @brief Abstract implementation of a Workflow Management System
+     */
+    class WMS : public S4U_DaemonWithMailbox {
 
-		Simulation *simulation;
-		Workflow *workflow;
-		std::unique_ptr<Scheduler> scheduler;
-		std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
+    public:
+        void add_static_optimization(std::unique_ptr<StaticOptimization>);
 
-	public:
-		virtual ~WMS() {};
+    protected:
+        WMS(Simulation *, Workflow *, std::unique_ptr<Scheduler>, std::string, std::string);
 
-		virtual void configure(Simulation *simulation,
-		                       Workflow *workflow,
-		                       std::unique_ptr<Scheduler> scheduler,
-		                       std::string hostname) = 0;
+        Simulation *simulation;
+        Workflow *workflow;
+        std::unique_ptr<Scheduler> scheduler;
+        std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
 
-		virtual void add_static_optimization(std::unique_ptr<StaticOptimization> optimization) = 0;
-	};
+    private:
+        virtual int main() = 0;
+    };
 };
 
 

@@ -10,45 +10,38 @@
 #ifndef WRENCH_MAXMINSCHEDULER_H
 #define WRENCH_MAXMINSCHEDULER_H
 
-#include "wms/scheduler/SchedulerFactory.h"
+#include "wms/scheduler/Scheduler.h"
 
 namespace wrench {
 
-		class JobManager;
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-		extern const char maxmin_name[] = "MaxMinScheduler";
+    /**
+     * @brief A max-min Scheduler class
+     */
+    class MaxMinScheduler : public Scheduler {
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    public:
+        void scheduleTasks(JobManager *job_manager,
+                           std::vector<WorkflowTask *> ready_tasks,
+                           const std::set<ComputeService *> &compute_services);
 
-		/**
-		 * @brief A max-min Scheduler class
-		 */
-		class MaxMinScheduler : public SchedulerTmpl<maxmin_name, MaxMinScheduler> {
+        void schedulePilotJobs(JobManager *job_manager,
+                               Workflow *workflow,
+                               double flops,
+                               const std::set<ComputeService *> &compute_services);
 
-		public:
-				MaxMinScheduler();
+        struct MaxMinComparator {
+            bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
+        };
 
-				void scheduleTasks(JobManager *job_manager, std::vector<WorkflowTask *> ready_tasks,
-													 const std::set<ComputeService *> &compute_services);
-				void schedulePilotJobs(JobManager *job_manager,
-															 Workflow *workflow,
-															 double flops,
-															 const std::set<ComputeService *> &compute_services);
+    };
 
-				/**
-				 * @brief Helper struct for the MaxMinScheduler
-				 */
-				struct MaxMinComparator {
-						bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
-				};
-
-		};
-
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 }
 

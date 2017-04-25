@@ -46,9 +46,7 @@ namespace wrench {
 
         void add(std::unique_ptr<MulticoreJobExecutor> executor);
 
-        void createWMS(std::string, std::string, Workflow *, std::string);
-
-        void add_static_optimization(StaticOptimization *);
+        void setWMS(std::unique_ptr<WMS>);
 
         std::map<SimulationTimestamp::Type, std::vector<SimulationTimestamp>> timeStamps;
 

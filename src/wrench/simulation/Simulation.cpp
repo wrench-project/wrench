@@ -9,11 +9,10 @@
  */
 
 #include <csignal>
-#include <logging/TerminalOutput.h>
+
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
+#include "logging/TerminalOutput.h"
 #include "simulation/Simulation.h"
-#include "wms/engine/EngineFactory.h"
-#include "wms/scheduler/SchedulerFactory.h"
 #include "SimulationTimestamp.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
@@ -57,7 +56,7 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-     // this->s4u_simulation->shutdown();
+      // this->s4u_simulation->shutdown();
     }
 
     /**
@@ -78,7 +77,7 @@ namespace wrench {
       }
 
       int i;
-      int skip=0;
+      int skip = 0;
       for (i = 1; i < *argc; i++) {
         if (!strncmp(argv[i], "--wrench-no-color", strlen("--wrench-no-color"))) {
           TerminalOutput::disableColor();
@@ -159,39 +158,13 @@ namespace wrench {
       return;
     }
 
-
     /**
-     * @brief Instantiate a WMS on a host
+     * @brief Set a WMS for the simulation
      *
-     * @param wms_id: a string ID for a WMS implementation
-     * @param sched_id: a string ID for a scheduler implementation
-     * @param workflow: a pointer to the Workflow that the WMS will execute
-     * @param hostname: the name of the host in the simulated platform on which to start the WMS
+     * @param wms: a unique pointer to a WMS instantiation
      */
-    void Simulation::createWMS(std::string wms_id, std::string sched_id, Workflow *workflow,
-                               std::string hostname) {
-      // Obtaining scheduler
-      std::unique_ptr<Scheduler> scheduler = SchedulerFactory::getInstance()->Create(sched_id);
-
-      // Obtaining and configuring WMS
-      wms = EngineFactory::getInstance()->Create(wms_id);
-      wms->configure(this, workflow, std::move(scheduler), hostname);
-    }
-
-    /**
-     * @brief Add a static optimization to the WMS. Optimizations are
-     * executed in the order of insertion
-     *
-     * @param optimization: a pointer to a static optimization
-     *
-     * @throw std::invalid_argument
-     */
-    void Simulation::add_static_optimization(StaticOptimization *optimization) {
-      if (optimization == nullptr) {
-        throw std::invalid_argument("Invalid argument optimization (nullptr)");
-      }
-      std::unique_ptr<StaticOptimization> opt(optimization);
-      wms->add_static_optimization(std::move(opt));
+    void Simulation::setWMS(std::unique_ptr<WMS> wms) {
+      this->wms = std::move(wms);
     }
 
     /**

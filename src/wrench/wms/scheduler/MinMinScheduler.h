@@ -10,46 +10,38 @@
 #ifndef WRENCH_MINMINSCHEDULER_H
 #define WRENCH_MINMINSCHEDULER_H
 
-#include "wms/scheduler/SchedulerFactory.h"
+#include "wms/scheduler/Scheduler.h"
 
 namespace wrench {
 
-		class JobManager;
-
-		extern const char scheduler_name[] = "MinMinScheduler";
-
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
 
-		/**
- 		 * @brief A min-min Scheduler class
- 		 */
-		class MinMinScheduler : public SchedulerTmpl<scheduler_name, MinMinScheduler> {
+    /**
+      * @brief A min-min scheduler class
+      */
+    class MinMinScheduler : public Scheduler {
 
-		public:
-				MinMinScheduler();
+    public:
+        void scheduleTasks(JobManager *job_manager, std::vector<WorkflowTask *> ready_tasks,
+                           const std::set<ComputeService *> &compute_services);
 
-				void scheduleTasks(JobManager *job_manager, std::vector<WorkflowTask *> ready_tasks,
-													 const std::set<ComputeService *> &compute_services);
-				void schedulePilotJobs(JobManager *job_manager,
-															 Workflow *workflow,
-															 double flops,
-															 const std::set<ComputeService *> &compute_services);
+        void schedulePilotJobs(JobManager *job_manager,
+                               Workflow *workflow,
+                               double flops,
+                               const std::set<ComputeService *> &compute_services);
 
-				/**
-				 * @brief Helper struct for the MinMinScheduler
-				 */
-				struct MinMinComparator {
-						bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
-				};
+        struct MinMinComparator {
+            bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
+        };
 
-		};
+    };
 
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 }
 
