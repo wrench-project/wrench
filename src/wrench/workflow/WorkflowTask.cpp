@@ -8,8 +8,12 @@
  */
 
 #include <lemon/list_graph.h>
+#include <xbt.h>
+#include <logging/TerminalOutput.h>
 #include "WorkflowTask.h"
 #include "Workflow.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(workflowTask, "Log category for WorkflowTask");
 
 namespace wrench {
 
@@ -38,6 +42,8 @@ namespace wrench {
 
       f->setInputOf(this);
 
+      WRENCH_DEBUG("Adding file '%s' as input to task %s",
+                   f->getId().c_str(), this->getId().c_str());
       // Perhaps add a control dependency?
       if (f->getOutputOf()) {
         workflow->addControlDependency(f->getOutputOf(), this);
@@ -50,6 +56,9 @@ namespace wrench {
      * @param f: a pointer to a WorkflowFile object
      */
     void WorkflowTask::addOutputFile(WorkflowFile *f) {
+      WRENCH_DEBUG("Adding file '%s' as output t task %s",
+                   f->getId().c_str(), this->getId().c_str());
+
       addFileToMap(output_files, f);
       f->setOutputOf(this);
       // Perhaps add control dependencies?
@@ -114,7 +123,31 @@ namespace wrench {
      * @return the task state
      */
     WorkflowTask::State WorkflowTask::getState() {
-      return state;
+      return this->state;
+    }
+
+    /**
+     * @brief Get the state of the task as a string
+     *
+     * @return the task state as a string
+     */
+    std::string WorkflowTask::stateToString(WorkflowTask::State state) {
+      switch (state) {
+        case NOT_READY:
+          return "NOT READY";
+        case READY:
+          return "READY";
+        case PENDING:
+          return "PENDING";
+        case RUNNING:
+          return "RUNNING";
+        case COMPLETED:
+          return "COMPLETED";
+        case FAILED:
+          return "FAILED";
+        default:
+          return "UNKNOWN STATE";
+      }
     }
 
     /**

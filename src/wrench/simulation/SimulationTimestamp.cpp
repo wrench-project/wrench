@@ -7,11 +7,12 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_WRENCH_H
-#define WRENCH_WRENCH_H
+//
+// Created by Henri Casanova on 4/24/17.
+//
 
-#include "simulation/Simulation.h"
-#include "simulation/SimulationTimestamp.h"
-#include "workflow/Workflow.h"
+#include "SimulationTimestamp.h"
 
-#endif //WRENCH_WRENCH_H
+namespace wrench {
+
+};

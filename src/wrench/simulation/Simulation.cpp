@@ -9,11 +9,12 @@
  */
 
 #include <csignal>
-#include <logging/Logging.h>
+#include <logging/TerminalOutput.h>
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 #include "simulation/Simulation.h"
 #include "wms/engine/EngineFactory.h"
 #include "wms/scheduler/SchedulerFactory.h"
+#include "SimulationTimestamp.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 
@@ -56,7 +57,7 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-      this->s4u_simulation->shutdown();
+     // this->s4u_simulation->shutdown();
     }
 
     /**
@@ -76,7 +77,26 @@ namespace wrench {
         throw std::invalid_argument("Invalid argument argv (nullptr)");
       }
 
+      int i;
+      int skip=0;
+      for (i = 1; i < *argc; i++) {
+        if (!strncmp(argv[i], "--wrench-no-color", strlen("--wrench-no-color"))) {
+          TerminalOutput::disableColor();
+          skip++;
+        }
+        argv[i] = argv[i + skip];
+      }
+      *argc = i - skip;
+
       this->s4u_simulation->initialize(argc, argv);
+    }
+
+    /**
+     * @brief Append a SimulationEvent to the event trace
+     * @param event
+     */
+    void Simulation::newTimestamp(SimulationTimestamp event) {
+      this->timeStamps[event.getType()].push_back(event);
     }
 
     /**

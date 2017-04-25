@@ -8,7 +8,7 @@
  */
 
 #include <string>
-#include <logging/Logging.h>
+#include <logging/TerminalOutput.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
@@ -175,7 +175,7 @@ namespace wrench {
 		 */
 		int JobManager::main() {
 
-			Logging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
+			TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
 
 			WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 

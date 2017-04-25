@@ -19,8 +19,8 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_Simulation.h
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
         src/wrench/simgrid_S4U_util/S4U_Mailbox.h
-        src/wrench/logging/Logging.h
-        src/wrench/logging/Logging.cpp
+        src/wrench/logging/TerminalOutput.h
+        src/wrench/logging/TerminalOutput.cpp
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/Workflow.h
         src/wrench/workflow/WorkflowTask.h
@@ -63,7 +63,8 @@ set(SOURCE_FILES
         src/wrench/workflow_job/WorkflowJob.h
         src/wrench/workflow_job/StandardJob.cpp
         src/wrench/workflow_job/StandardJob.h
-        )
+        src/wrench/simulation/SimulationTimestamp.cpp
+        src/wrench/simulation/SimulationTimestamp.h)
 
 set(INCLUDE_FILES include/wrench.h)
 

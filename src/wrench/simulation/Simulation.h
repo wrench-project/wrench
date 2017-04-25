@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 #include <compute_services/multicore_job_executor/MulticoreJobExecutor.h>
+#include <simulation/SimulationTimestamp.h>
 
 #include "simgrid_S4U_util/S4U_Simulation.h"
 
@@ -49,9 +50,13 @@ namespace wrench {
 
         void add_static_optimization(StaticOptimization *);
 
+        std::map<SimulationTimestamp::Type, std::vector<SimulationTimestamp>> timeStamps;
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
+
+        void newTimestamp(SimulationTimestamp event);
 
         void shutdownAllComputeServices();
 

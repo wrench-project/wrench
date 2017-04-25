@@ -97,5 +97,7 @@ int main(int argc, char **argv) {
   simulation.launch();
   std::cerr << "Simulation done!" << std::endl;
 
+//  std::cerr << simulation.timeStamps[wrench::SimulationTimestamp::Type::TASK_COMPLETION].size() << std::endl;
+
   return 0;
 }

@@ -57,6 +57,8 @@ namespace wrench {
             FAILED
         };
 
+        static std::string stateToString(WorkflowTask::State state);
+
         WorkflowTask::State getState();
 
         WorkflowJob *getJob();
@@ -82,7 +84,6 @@ namespace wrench {
         void setCompleted();
 
         void setJob(WorkflowJob *job);
-
 
         void setEndDate(double date);
 

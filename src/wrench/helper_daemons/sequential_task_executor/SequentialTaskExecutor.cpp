@@ -8,7 +8,7 @@
  */
 
 #include <simgrid_S4U_util/S4U_Simulation.h>
-#include <logging/Logging.h>
+#include <logging/TerminalOutput.h>
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(sequential_task_executor, "Log category for Sequential Task Executor");
@@ -77,7 +77,7 @@ namespace wrench {
      */
     int SequentialTaskExecutor::main() {
 
-      Logging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_BLUE);
+      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_BLUE);
 
       WRENCH_INFO("New Sequential Task Executor starting (%s) ", this->mailbox_name.c_str());
 

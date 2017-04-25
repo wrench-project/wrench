@@ -22,8 +22,8 @@
 #define WRENCH_LOGGING_COLOR_CYAN      "\033[1;36m"
 
 /* Wrappers around XBT_* macros */
-#define WRENCH_INFO(...)  Logging::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; Logging::endThisProcessColor()
-#define WRENCH_DEBUG(...)  Logging::beginThisProcessColor(); XBT_DEBUG(__VA_ARGS__) ; Logging::endThisProcessColor()
+#define WRENCH_INFO(...)  TerminalOutput::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; TerminalOutput::endThisProcessColor()
+#define WRENCH_DEBUG(...)  TerminalOutput::beginThisProcessColor(); XBT_DEBUG(__VA_ARGS__) ; TerminalOutput::endThisProcessColor()
 
 namespace wrench {
 
@@ -34,7 +34,7 @@ namespace wrench {
     /**
      * @brief Color-enabling wrappers around Simgrid's logging macros.
      */
-    class Logging {
+    class TerminalOutput {
 
     public:
 
@@ -48,6 +48,8 @@ namespace wrench {
 
         static void endThisProcessColor();
 
+        static void disableColor();
+
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
@@ -56,6 +58,8 @@ namespace wrench {
         static std::map<simgrid::s4u::ActorPtr, std::string> colormap;
 
         static std::string getThisProcessLoggingColor();
+
+        static bool color_enabled;
 
     };
 

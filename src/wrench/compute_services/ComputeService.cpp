@@ -8,7 +8,7 @@
  */
 
 #include <exceptions/ComputeServiceIsDownException.h>
-#include <logging/Logging.h>
+#include <logging/TerminalOutput.h>
 #include "ComputeService.h"
 #include "simulation/Simulation.h"
 

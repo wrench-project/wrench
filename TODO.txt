@@ -3,16 +3,19 @@
 
 BUGS:
 
+- After static optimizastion, the workflow has been changed, so user will be
+  confused (not the same number of tasks!)
+
 
 ---------------------------------------------------------------------
 
 NEW FEATURES:
 
+- Event Traces:
+   - Define an enum per event type
+   - Define a SimulationOutput object that cn be queried
+
+
 - Deal with failure traces...
 
 -----------------------------------------------------------------------
-
-BETWEEN SOFTWARE ENGINEERING:
-
-- Dealing with removing "friend class" with Visitor pattern:
-     https://sourcemaking.com/design_patterns/visitor/cpp/1

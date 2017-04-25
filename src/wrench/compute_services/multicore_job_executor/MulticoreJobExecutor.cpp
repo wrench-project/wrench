@@ -8,7 +8,7 @@
  */
 
 #include <simulation/Simulation.h>
-#include <logging/Logging.h>
+#include <logging/TerminalOutput.h>
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "exceptions/ComputeServiceIsDownException.h"
 #include "workflow_job/StandardJob.h"
@@ -303,7 +303,7 @@ namespace wrench {
      */
     int MulticoreJobExecutor::main() {
 
-      Logging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
 
       /** Initialize all state **/
       initialize();
@@ -690,6 +690,9 @@ namespace wrench {
 
       // Increase the "completed tasks" count of the job
       job->incrementNumCompletedTasks();
+
+      // Generate a SimulationTimestamp
+      this->simulation->newTimestamp(SimulationTimestamp(SimulationTimestamp::TASK_COMPLETION, task));
 
       // Send the callback to the originator if necessary and remove the job from
       // the list of pending jobs

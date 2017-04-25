@@ -13,8 +13,11 @@
 #include <pugixml.hpp>
 #include <simulation/SimulationMessage.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <logging/TerminalOutput.h>
 
 #include "workflow/Workflow.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(workflow, "Log category for Workflow");
 
 namespace wrench {
 
@@ -111,6 +114,8 @@ namespace wrench {
 
       if (!pathExists(src, dst)) {
 
+        WRENCH_DEBUG("Adding control dependency %s-->%s",
+                     src->getId().c_str(), dst->getId().c_str());
         DAG->addArc(src->DAG_node, dst->DAG_node);
 
         if (src->getState() != WorkflowTask::COMPLETED) {
@@ -173,7 +178,7 @@ namespace wrench {
      */
     void Workflow::exportToEPS(std::string eps_filename) {
       graphToEps(*DAG, eps_filename).run();
-      std::cerr << "Export to EPS broken / not implemented at the moment" << std::endl;
+      WRENCH_INFO("Export to EPS broken / not implemented at the moment");
     }
 
     /**
@@ -227,7 +232,6 @@ namespace wrench {
           double size = std::strtod(uses.attribute("size").value(), NULL);
           std::string link = uses.attribute("link").value();
           // Check whether the file already exists
-          std::cerr.flush();
           WorkflowFile *file = this->getWorkflowFileByID(id);
 
           if (!file) {
@@ -298,7 +302,6 @@ namespace wrench {
       std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
       for (it = this->tasks.begin(); it != this->tasks.end(); it++) {
         WorkflowTask *task = it->second.get();
-        // std::cerr << "==> " << task->id << " " << task->state << std::endl;
         if (task->getState() != WorkflowTask::COMPLETED) {
           return false;
         }
@@ -387,6 +390,11 @@ namespace wrench {
       if (task == nullptr) {
         throw std::invalid_argument("Workflow::updateTaskState(): passed a nullptr task");
       }
+
+      WRENCH_DEBUG("Changing state of task %s form '%s' to '%s'",
+                   task->getId().c_str(),
+                   WorkflowTask::stateToString(task->state).c_str(),
+                   WorkflowTask::stateToString(state).c_str());
 
       switch (state) {
         // Make a task completed, which may cause its children to become ready

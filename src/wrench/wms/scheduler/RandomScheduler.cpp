@@ -10,7 +10,7 @@
 #include <xbt.h>
 #include <set>
 #include <workflow_job/StandardJob.h>
-#include <logging/Logging.h>
+#include <logging/TerminalOutput.h>
 
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/scheduler/RandomScheduler.h"

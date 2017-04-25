@@ -10,7 +10,7 @@
 #include <simulation/SimulationMessage.h>
 #include "S4U_Mailbox.h"
 #include <xbt/ex.hpp>
-#include <logging/Logging.h>
+#include <logging/TerminalOutput.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
 

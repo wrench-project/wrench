@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "logging/Logging.h"
+#include "logging/TerminalOutput.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wms/engine/simple_wms/SimpleWMS.h"
 #include "simulation/Simulation.h"
@@ -35,7 +35,7 @@ namespace wrench {
 	 */
 	int SimpleWMS::main() {
 
-		Logging::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
+		TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
 
 		WRENCH_INFO("Starting on host %s listening on mailbox %s", S4U_Simulation::getHostName().c_str(),
 		            this->mailbox_name.c_str());
