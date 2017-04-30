@@ -74,7 +74,7 @@ add_library(wrench STATIC ${SOURCE_FILES})
 target_link_libraries(wrench ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS wrench DESTINATION lib)
 install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
-install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench-dev)
+install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench)
 
 # TODO: temporary simulation test binary
 add_executable(simulation ${SOURCE_FILES})
