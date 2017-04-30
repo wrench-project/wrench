@@ -25,15 +25,25 @@ namespace wrench {
     class WMS : public S4U_DaemonWithMailbox {
 
     public:
-        void add_static_optimization(std::unique_ptr<StaticOptimization>);
+        void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
     protected:
+        /***********************/
+        /** \cond DEVELOPER */
+        /***********************/
+
         WMS(Simulation *, Workflow *, std::unique_ptr<Scheduler>, std::string, std::string);
+
+        void runStaticOptimizations();
 
         Simulation *simulation;
         Workflow *workflow;
         std::unique_ptr<Scheduler> scheduler;
         std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     private:
         virtual int main() = 0;

@@ -19,16 +19,18 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(maxmin_scheduler, "Log category for Max-Min Schedul
 
 namespace wrench {
 
-
     /**
-     * Compare the number of flops between to WorkflowTask objects
+    * @brief: Compare the number of flops between to WorkflowTask lists
+    *
+    * @param lhs: a pair of a task ID and a list of WorkflowTask objects
+    * @param rhs: a pair of a task ID and a list of WorkflowTask objects
      *
-     * @param lhs: a pointer to a WorkflowTask object
-     * @param rhs: a pointer to another WorkflowTask object
-     * @return whether the number of flops from the left-hand-side WorkflowTask object is larger
-     */
-    bool MaxMinScheduler::MaxMinComparator::operator()(WorkflowTask *&lhs, WorkflowTask *&rhs) {
-      return lhs->getFlops() > rhs->getFlops();
+    * @return whether the number of flops from the left-hand-side WorkflowTask objects is larger
+    */
+    bool MaxMinScheduler::MaxMinComparator::operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
+                                                       std::pair<std::string, std::vector<WorkflowTask *>> &rhs) {
+
+      return getTotalFlops(lhs.second) > getTotalFlops(rhs.second);
     }
 
     /**
@@ -39,47 +41,42 @@ namespace wrench {
      * @param compute_services: a set of pointers to ComputeService objects (i.e., compute services available to run jobs)
      */
     void MaxMinScheduler::scheduleTasks(JobManager *job_manager,
-                                        std::vector<WorkflowTask *> ready_tasks,
+                                        std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                                         const std::set<ComputeService *> &compute_services) {
 
-      std::sort(ready_tasks.begin(), ready_tasks.end(), MaxMinComparator());
+      WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
 
-      for (auto it : ready_tasks) {
+      // Sorting tasks
+      std::vector<std::pair<std::string, std::vector<WorkflowTask *>>> max_vector(ready_tasks.begin(),
+                                                                                  ready_tasks.end());
+      std::sort(max_vector.begin(), max_vector.end(), MaxMinComparator());
 
-        // schedule task to first available compute resource
+      for (auto itc : max_vector) {
         bool successfully_scheduled = false;
-        for (auto cs : compute_services) {
 
-          if (cs->canRunJob(WorkflowJob::STANDARD, 1, (*it).getFlops())) {
-            WRENCH_INFO("Submitting task %s for execution", (*it).getId().c_str());
-            StandardJob *job = job_manager->createStandardJob(it);
-            cs->runStandardJob(job);
+        double total_flops = getTotalFlops((*ready_tasks.begin()).second);
+
+        // TODO: add pilot job support
+
+        // Second: attempt to run the task on a compute resource
+        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", itc.first.c_str());
+
+        for (auto cs : compute_services) {
+          WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
+
+          if (cs->canRunJob(WorkflowJob::STANDARD, 1, total_flops)) {
+            WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
+            WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second);
+            job_manager->submitJob(job, cs);
             successfully_scheduled = true;
             break;
           }
         }
         if (!successfully_scheduled) {
+          WRENCH_INFO("no dice");
           break;
         }
       }
-
-    }
-
-    /**
-    * @brief Schedule and run pilot jobs
-    *
-    * @param job_manager: a pointer to a JobManager object
-    * @param workflow: a pointer to a Workflow object
-     * @param flops: the number of flops that the PilotJob should be able to do before terminating
-    * @param compute_services: a set of pointers to ComputeSertvice objects (i.e., compute services available to run jobs)
-    */
-    void MaxMinScheduler::schedulePilotJobs(JobManager *job_manager,
-                                            Workflow *workflow,
-                                            double flops,
-                                            const std::set<ComputeService *> &compute_services) {
-      WRENCH_INFO("Max-Min Scheduler doesn't do anything with pilot jobs");
-
-      return;
     }
 
 }

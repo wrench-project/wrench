@@ -58,7 +58,7 @@ namespace wrench {
 
 				bool isDone();
 
-				std::vector<WorkflowTask *> getReadyTasks();
+				std::map<std::string, std::vector<WorkflowTask *>> getReadyTasks();
 
 				std::vector<WorkflowTask *> getTasks();
 

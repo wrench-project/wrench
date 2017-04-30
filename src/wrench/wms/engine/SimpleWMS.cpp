@@ -52,11 +52,7 @@ namespace wrench {
       std::unique_ptr<JobManager> job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
 
       // Perform static optimizations
-      for (auto &opt : this->static_optimizations) {
-        opt.get()->process(this->workflow);
-      }
-      WRENCH_INFO("About to execute a workflow with %lu tasks after static optimizations",
-                  this->workflow->getNumberOfTasks());
+      runStaticOptimizations();
 
       while (true) {
 
@@ -64,7 +60,7 @@ namespace wrench {
         S4U_Mailbox::clear_dputs();
 
         // Get the ready tasks
-        std::vector<WorkflowTask *> ready_tasks = this->workflow->getReadyTasks();
+        std::map<std::string, std::vector<WorkflowTask *>> ready_tasks = this->workflow->getReadyTasks();
 
         // Get the available compute services
         std::set<ComputeService *> compute_services = this->simulation->getComputeServices();
@@ -77,8 +73,8 @@ namespace wrench {
         WRENCH_INFO("Scheduling pilot jobs...");
         double flops = 10000.00; // bogus default
         if (ready_tasks.size() > 0) {
-          // Heuristic: ask for something that can run  1.5 times the next ready tasks..
-          flops = 1.5 * ready_tasks[0]->getFlops();
+          // Heuristic: ask for something that can run 1.5 times the next ready tasks..
+          flops = 1.5 * this->scheduler->getTotalFlops((*ready_tasks.begin()).second);
         }
         this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, flops,
                                            this->simulation->getComputeServices());
@@ -137,7 +133,7 @@ namespace wrench {
       this->simulation->shutdownAllComputeServices();
 
       // This is brutal, but it's because that stupid job manager is currently
-      // handling pilot job tersmination acks (due to the above shutdown), and
+      // handling pilot job termination acks (due to the above shutdown), and
       // thus is stuck waiting for the WMS to receive them. But we're done. So,
       // for now, let's just kill it.
       // Perhaps this should be called in the destructor of the JobManager?

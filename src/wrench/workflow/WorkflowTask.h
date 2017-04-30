@@ -35,9 +35,9 @@ namespace wrench {
 
         int getNumProcs() const;
 
-        int getNumberOfChildren();
+        int getNumberOfChildren() const;
 
-        int getNumberOfParents();
+        int getNumberOfParents() const;
 
         void addInputFile(WorkflowFile *);
 
@@ -64,6 +64,10 @@ namespace wrench {
         WorkflowJob *getJob();
 
         Workflow *getWorkflow();
+
+        std::string getClusterId() const;
+
+        void setClusterId(std::string);
 
         /***********************/
         /** \endcond           */
@@ -100,6 +104,7 @@ namespace wrench {
         friend class Workflow;
 
         std::string id;                    // Task ID
+        std::string cluster_id;            // ID for clustered task
         double flops;                      // Number of flops
         int number_of_processors;          // currently vague: cores? nodes?
         double scheduled_date = -1.0;      // Date at which task was scheduled (getter?)

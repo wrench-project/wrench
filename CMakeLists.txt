@@ -35,6 +35,7 @@ set(SOURCE_FILES
         src/wrench/wms/engine/SimpleWMS.h
         src/wrench/wms/engine/SimpleWMS.cpp
         src/wrench/wms/scheduler/Scheduler.h
+        src/wrench/wms/scheduler/Scheduler.cpp
         src/wrench/wms/scheduler/RandomScheduler.h
         src/wrench/wms/scheduler/RandomScheduler.cpp
         src/wrench/wms/scheduler/MinMinScheduler.h

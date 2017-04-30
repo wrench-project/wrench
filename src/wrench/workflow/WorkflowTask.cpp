@@ -20,16 +20,12 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param string: the task id
+     * @param id: the task id
      * @param flops: the task's number of flops
      * @param n: the number of processors for running the task
      */
-    WorkflowTask::WorkflowTask(const std::string string, const double flops, const int n) {
-      this->id = string;
-      this->flops = flops;
-      this->number_of_processors = n;
-      this->state = WorkflowTask::READY;
-      this->job = nullptr;
+    WorkflowTask::WorkflowTask(const std::string id, const double flops, const int n) :
+            id(id), flops(flops), number_of_processors(n), state(WorkflowTask::READY), job(nullptr) {
     }
 
     /**
@@ -95,7 +91,7 @@ namespace wrench {
      *
      * @return the number of children
      */
-    int WorkflowTask::getNumberOfChildren() {
+    int WorkflowTask::getNumberOfChildren() const {
       int count = 0;
       for (ListDigraph::OutArcIt a(*DAG, DAG_node); a != INVALID; ++a) {
         ++count;
@@ -108,7 +104,7 @@ namespace wrench {
      *
      * @return the number of parents
      */
-    int WorkflowTask::getNumberOfParents() {
+    int WorkflowTask::getNumberOfParents() const {
       int count = 0;
       for (ListDigraph::InArcIt a(*DAG, DAG_node); a != INVALID; ++a) {
         ++count;
@@ -182,6 +178,24 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the cluster Id for the task
+     *
+     * @return the cluster id, or an empty string
+     */
+    std::string WorkflowTask::getClusterId() const {
+      return this->cluster_id;
+    }
+
+    /**
+     * Set the cluster id for the task
+     *
+     * @param id: cluster id the task belongs to
+     */
+    void WorkflowTask::setClusterId(std::string id) {
+      this->cluster_id = id;
+    }
+
+    /**
      * @brief Set the task's end date
      *
      * @param date: the end date
@@ -211,7 +225,6 @@ namespace wrench {
       this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
     }
 
-
     /**
      * @brief Helper method to add a file to a map if necessary
      *
@@ -222,8 +235,6 @@ namespace wrench {
                                     WorkflowFile *f) {
       map[f->id] = f;
     }
-
-
 };
 
 

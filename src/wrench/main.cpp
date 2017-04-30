@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
   std::unique_ptr<wrench::StaticOptimization> opt(new wrench::SimplePipelineClustering());
 
   std::unique_ptr<wrench::WMS> wms(new wrench::SimpleWMS(&simulation, &workflow, std::move(scheduler), "c-0.me"));
-  wms.get()->add_static_optimization(std::move(opt));
+  wms.get()->addStaticOptimization(std::move(opt));
 
   simulation.setWMS(std::move(wms));
 
