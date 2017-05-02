@@ -35,6 +35,7 @@ set(SOURCE_FILES
         src/wrench/wms/engine/SimpleWMS.h
         src/wrench/wms/engine/SimpleWMS.cpp
         src/wrench/wms/scheduler/Scheduler.h
+        src/wrench/wms/scheduler/Scheduler.cpp
         src/wrench/wms/scheduler/RandomScheduler.h
         src/wrench/wms/scheduler/RandomScheduler.cpp
         src/wrench/wms/scheduler/MinMinScheduler.h
@@ -73,7 +74,7 @@ add_library(wrench STATIC ${SOURCE_FILES})
 target_link_libraries(wrench ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS wrench DESTINATION lib)
 install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
-install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench-dev)
+install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench)
 
 # TODO: temporary simulation test binary
 add_executable(simulation ${SOURCE_FILES})

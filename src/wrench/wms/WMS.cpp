@@ -36,11 +36,20 @@ namespace wrench {
 
     /**
      * @brief Add a static optimization to the list of optimizations. Optimizations are
-     * executed in the order of insertion
+     * executed in order of insertion
      *
      * @param optimization: a pointer to a static optimization implementation
      */
-    void WMS::add_static_optimization(std::unique_ptr<StaticOptimization> optimization) {
+    void WMS::addStaticOptimization(std::unique_ptr<StaticOptimization> optimization) {
       this->static_optimizations.push_back(std::move(optimization));
+    }
+
+    /**
+     * @brief Perform static optimizations. Optimizations are executed in order of insertion
+     */
+    void WMS::runStaticOptimizations() {
+      for (auto &opt : this->static_optimizations) {
+        opt.get()->process(this->workflow);
+      }
     }
 }

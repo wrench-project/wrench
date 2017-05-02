@@ -25,18 +25,15 @@ namespace wrench {
     class MinMinScheduler : public Scheduler {
 
     public:
-        void scheduleTasks(JobManager *job_manager, std::vector<WorkflowTask *> ready_tasks,
+        void scheduleTasks(JobManager *job_manager,
+                           std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                            const std::set<ComputeService *> &compute_services);
 
-        void schedulePilotJobs(JobManager *job_manager,
-                               Workflow *workflow,
-                               double flops,
-                               const std::set<ComputeService *> &compute_services);
-
+    private:
         struct MinMinComparator {
-            bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
+            bool operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
+                            std::pair<std::string, std::vector<WorkflowTask *>> &rhs);
         };
-
     };
 
     /***********************/

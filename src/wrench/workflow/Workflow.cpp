@@ -279,18 +279,29 @@ namespace wrench {
      * @return vector of pointers to WorkflowTask objects
      */
     // TODO: Implement this more efficiently
-    std::vector<WorkflowTask *> Workflow::getReadyTasks() {
+    std::map<std::string, std::vector<WorkflowTask *>> Workflow::getReadyTasks() {
 
-      std::vector<WorkflowTask *> task_list;
+      std::map<std::string, std::vector<WorkflowTask *>> task_map;
 
-      std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
-      for (it = this->tasks.begin(); it != this->tasks.end(); it++) {
-        WorkflowTask *task = it->second.get();
+      for (auto &it : this->tasks) {
+        WorkflowTask *task = it.second.get();
+
         if (task->getState() == WorkflowTask::READY) {
-          task_list.push_back(task);
+
+          if (task->getClusterId().empty()) {
+            task_map[task->getId()] = {task};
+
+          } else {
+            if (task_map.find(task->getClusterId()) == task_map.end()) {
+              task_map[task->getClusterId()] = {task};
+            } else {
+              // add to clustered task
+              task_map[task->getClusterId()].push_back(task);
+            }
+          }
         }
       }
-      return task_list;
+      return task_map;
     }
 
     /**
@@ -299,9 +310,8 @@ namespace wrench {
      * @return true or false
      */
     bool Workflow::isDone() {
-      std::map<std::string, std::unique_ptr<WorkflowTask>>::iterator it;
-      for (it = this->tasks.begin(); it != this->tasks.end(); it++) {
-        WorkflowTask *task = it->second.get();
+      for (auto &it : this->tasks) {
+        WorkflowTask *task = it.second.get();
         if (task->getState() != WorkflowTask::COMPLETED) {
           return false;
         }
@@ -412,11 +422,13 @@ namespace wrench {
           break;
         }
         case WorkflowTask::READY: {
-          if (task->getState() == WorkflowTask::READY) {
-            return;
-          }
+          // TODO: check whether it is safe to assume this here
+//          if (task->getState() == WorkflowTask::READY) {
+//            return;
+//          }
           if (task->getState() != WorkflowTask::NOT_READY) {
-            throw std::runtime_error("Cannot set the state of a not-ready task to WorkflowTask::READY");
+//            throw std::runtime_error("Cannot set the state of a not-ready task to WorkflowTask::READY");
+            return;
           }
           // Go through the parent and check whether they are all completed
           for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {

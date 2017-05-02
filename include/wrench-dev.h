@@ -12,4 +12,26 @@
 
 #include "wrench.h"
 
+// Compute Services
+#include "compute_services/ComputeService.h"
+#include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
+
+// Exceptions
+#include "exceptions/ComputeServiceIsDownException.h"
+
+// Job Manager
+#include "job_manager/JobManager.h"
+
+// Logging
+#include "logging/TerminalOutput.h"
+
+// Workflow
+#include "workflow/WorkflowTask.h"
+#include "workflow/WorkflowFile.h"
+
+// Workflow Job
+#include "workflow_job/PilotJob.h"
+#include "workflow_job/StandardJob.h"
+#include "workflow_job/WorkflowJob.h"
+
 #endif //WRENCH_WRENCH_DEV_H

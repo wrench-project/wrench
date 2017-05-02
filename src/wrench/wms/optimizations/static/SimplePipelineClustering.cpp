@@ -22,17 +22,16 @@ namespace wrench {
      */
     void SimplePipelineClustering::process(Workflow *workflow) {
 
+      // TODO: Refactor to avoid code duplication
+
+      int id = 1;
       std::set<std::string> pipelined_tasks;
-      std::set<WorkflowTask *> clustered_tasks;
 
       for (auto task : workflow->getTasks()) {
         if (task->getNumberOfChildren() == 1 && task->getNumberOfParents() == 1 &&
             pipelined_tasks.find(task->getId()) == pipelined_tasks.end()) {
 
-          int task_count = 1;
-          std::string task_id = "CLUSTER_" + task->getId();
-          double task_flops = task->getFlops();
-          int task_num_procs = task->getNumProcs();
+          std::string cluster_id = "PIPELINE_CLUSTER_" + std::to_string(id++);
 
           // explore parent
           WorkflowTask *parent = workflow->getTaskParents(task)[0];
@@ -41,11 +40,8 @@ namespace wrench {
                 pipelined_tasks.find(parent->getId()) == pipelined_tasks.end()) {
 
               pipelined_tasks.insert(parent->getId());
-              clustered_tasks.insert(parent);
-              ++task_count;
-              task_id += "_" + parent->getId();
-              task_flops += parent->getFlops();
-              task_num_procs = std::max(task_num_procs, parent->getNumProcs());
+              parent->setClusterId(cluster_id);
+              parent->setState(WorkflowTask::READY);
 
               // next parent
               parent = workflow->getTaskParents(parent)[0];
@@ -62,11 +58,8 @@ namespace wrench {
                 pipelined_tasks.find(child->getId()) == pipelined_tasks.end()) {
 
               pipelined_tasks.insert(child->getId());
-              clustered_tasks.insert(child);
-              ++task_count;
-              task_id += "_" + child->getId();
-              task_flops += child->getFlops();
-              task_num_procs = std::max(task_num_procs, child->getNumProcs());
+              child->setClusterId(cluster_id);
+              child->setState(WorkflowTask::READY);
 
               // next child
               child = workflow->getTaskChildren(child)[0];
@@ -77,19 +70,11 @@ namespace wrench {
           }
 
           // create clustered task
-          if (task_count > 1) {
+          if (!pipelined_tasks.empty()) {
             pipelined_tasks.insert(task->getId());
-            clustered_tasks.insert(task);
-
-            WorkflowTask *clustered_task = workflow->addTask(task_id, task_flops, task_num_procs);
-            workflow->addControlDependency(parent, clustered_task);
-            workflow->addControlDependency(clustered_task, child);
+            task->setClusterId(cluster_id);
           }
         }
-      }
-      // remove clustered tasks
-      for (auto t : clustered_tasks) {
-        workflow->removeTask(t);
       }
     }
 }
