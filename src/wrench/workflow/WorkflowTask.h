@@ -85,7 +85,7 @@ namespace wrench {
 
         void setRunning();
 
-        void setCompleted();
+        void setCompleted();
 
         void setJob(WorkflowJob *job);
 
