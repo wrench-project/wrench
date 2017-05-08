@@ -1,26 +1,54 @@
-
 ------------------------------------
 
 BUGS:
 
-- After static optimizastion, the workflow has been changed, so user will be
-  confused (not the same number of tasks!)
-  SOLUTION:
-    - Static optimizer does not modoify the DAG. Instead, it places tasks
-      in StandardJobs, thus indicating which tasks should be done together
-    - Then later, the WM will submit them together
-    - We need to modify the "isReady()" method!
-
-
 ---------------------------------------------------------------------
 
-NEW FEATURES:
 
-- Event Traces:
-   - Define an enum per event type
-   - Define a SimulationOutput object that cn be queried
+* "BIG" things:
+
+    - Deal with data [TO DESIGN: RAFAEL HENRI]
+        - Mechanisms [HENRI]
+            - Replica Catalog
+            - Data storage service (with dual-host crappy model for now)
+        - Usage [RAFAEL]
+            - How jobs place data requests
+
+    - Plan a first paper [RAFAEL HENRI]
+
+    - WRENCH in ICS632? [RAFAEL HENRI]
+            - PMC?
+
+    - Talk about another proposal? [RAFAEL HENRI]
 
 
-- Deal with failure traces...
+* "EASY" implementation stuff
+
+        - Add tests [GET ONE TEST STARTED: RAFAEL HENRI]
+
+        - Autogeneration of documentation on github
+
+        - Event Traces:
+             - Template the TimeStamp class to afford genericity [HENRI]
+
+        - Dynamic Optimization
+            - Implement a naive one [RAFAEL]
+            - Call it in right before scheduler [RAFAEL]
+
+        - Deal with failure traces:
+            - Henri implemented it, but never really tested [HENRI]
+
+        - WorkflowTask:
+            - add a failure count incremented for each failure [HENRI]
+
+
+* LYON:
+
+    - Storage in S4U
+        - What will it look like?
+        - How to deal with pipelining of network/disk when remote put()/get()?
+               - How does MSG do it?
+
+    - C++ Exceptions from SIMIX?
 
 -----------------------------------------------------------------------
