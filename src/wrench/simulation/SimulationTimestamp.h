@@ -14,48 +14,35 @@
 #include <workflow/WorkflowTask.h>
 #include <simgrid_S4U_util/S4U_Simulation.h>
 
+#include "SimulationTimestampTypes.h"
+
 namespace wrench {
 
-    /**
-     * @brief A class to represent simulation events
-     */
-    struct SimulationTimestamp {
+    template <class T> class SimulationTimestamp {
 
     public:
-        enum Type {
-            UNDEFINED,
-            TASK_COMPLETION,
-        };
 
-        SimulationTimestamp(SimulationTimestamp::Type type) {
-          this->date = S4U_Simulation::getClock();
-          this->type = type;
-        }
-
-        SimulationTimestamp(SimulationTimestamp::Type type, WorkflowTask *task) {
-          this->date = S4U_Simulation::getClock();
-          this->type = type;
-          this->task = task;
+        SimulationTimestamp(T *content) {
+          // TODO: Make content a unique_ptr to make memory mamangement better
+          this->content = content;
         }
 
         double getDate() {
           return this->date;
         }
 
-        SimulationTimestamp::Type getType() {
-          return this->type;
-        }
-
-        WorkflowTask *getTask() {
-          return this->task;
+        T *getContent() {
+          return this->content;
         }
 
     private:
         double date = -1.0;
-        SimulationTimestamp::Type type = SimulationTimestamp::Type::UNDEFINED;
-        WorkflowTask *task = nullptr;
+        T *content;
 
     };
+
+
+
 
 
 

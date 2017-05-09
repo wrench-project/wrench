@@ -3,6 +3,7 @@
 
 #include "wrench.h"
 
+
 int main(int argc, char **argv) {
 
   wrench::Simulation simulation;
@@ -102,7 +103,10 @@ int main(int argc, char **argv) {
   simulation.launch();
   std::cerr << "Simulation done!" << std::endl;
 
-//  std::cerr << simulation.timeStamps[wrench::SimulationTimestamp::Type::TASK_COMPLETION].size() << std::endl;
+  std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
+  trace = simulation.output.getTrace<wrench::SimulationTimestampTaskCompletion>();
+  std::cerr << "Number of entries in TaskCompletion trace: " << trace.size() << std::endl;
+  std::cerr << "Task in first trace entry: " << trace[0]->getContent()->getTask()->getId() << std::endl;
 
   return 0;
 }

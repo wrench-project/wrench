@@ -7,9 +7,11 @@
  * (at your option) any later version.
  */
 
-
-#include "SimulationTimestamp.h"
+#include "SimulationTrace.h"
 
 namespace wrench {
+
+
+
 
 };

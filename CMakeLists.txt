@@ -60,7 +60,12 @@ set(SOURCE_FILES
         src/wrench/workflow_job/StandardJob.cpp
         src/wrench/workflow_job/StandardJob.h
         src/wrench/simulation/SimulationTimestamp.cpp
-        src/wrench/simulation/SimulationTimestamp.h)
+        src/wrench/simulation/SimulationTimestamp.h
+        src/wrench/simulation/SimulationTrace.cpp
+        src/wrench/simulation/SimulationTrace.h
+        src/wrench/simulation/SimulationOutput.cpp
+        src/wrench/simulation/SimulationOutput.h
+        )
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)
@@ -77,6 +82,6 @@ install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
 install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench)
 
 # TODO: temporary simulation test binary
-add_executable(simulation ${SOURCE_FILES})
+add_executable(simulation ${SOURCE_FILES} src/wrench/simulation/SimulationTimestampTypes.h)
 target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS simulation DESTINATION bin)
