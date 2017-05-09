@@ -35,7 +35,7 @@ namespace wrench {
 		public:
 				Workflow();
 
-				WorkflowTask *addTask(std::string, double, int);
+				WorkflowTask *addTask(std::string, double, int num_procs = 1);
 				void removeTask(WorkflowTask *task);
 
 				WorkflowTask *getWorkflowTaskByID(const std::string);

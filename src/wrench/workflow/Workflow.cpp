@@ -34,7 +34,7 @@ namespace wrench {
      */
     WorkflowTask *Workflow::addTask(const std::string id,
                                     double flops,
-                                    int num_procs = 1) {
+                                    int num_procs) {
 
       if ((flops < 0.0) || (num_procs <= 0)) {
         throw std::invalid_argument("WorkflowTask::adTask(): invalid argument");
