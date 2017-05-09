@@ -10,7 +10,7 @@
 #include "gtest/gtest.h"
 #include "workflow/Workflow.h"
 
-TEST(Workflow__Test, WorkflowStructure) {
+TEST(WorkflowTest, WorkflowStructure) {
   wrench::Workflow *workflow = new wrench::Workflow();
   EXPECT_EQ(0, workflow->getNumberOfTasks());
 
@@ -48,7 +48,7 @@ TEST(Workflow__Test, WorkflowStructure) {
   workflow->removeTask(t1);
 }
 
-TEST(Workflow__Test, ControlDependency) {
+TEST(WorkflowTest, ControlDependency) {
   wrench::Workflow *workflow = new wrench::Workflow();
   wrench::WorkflowTask *t1 = workflow->addTask("task-test-01", 1);
 
@@ -58,7 +58,7 @@ TEST(Workflow__Test, ControlDependency) {
   EXPECT_THROW(workflow->addControlDependency(nullptr, t1), std::invalid_argument);
 }
 
-TEST(Workflow__Test, WorkflowTask) {
+TEST(WorkflowTest, WorkflowTask) {
   wrench::Workflow *workflow = new wrench::Workflow();
 
   wrench::WorkflowTask *t1 = workflow->addTask("task-test-01", 1);
