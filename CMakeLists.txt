@@ -61,7 +61,12 @@ set(SOURCE_FILES
         src/wrench/workflow_job/StandardJob.cpp
         src/wrench/workflow_job/StandardJob.h
         src/wrench/simulation/SimulationTimestamp.cpp
-        src/wrench/simulation/SimulationTimestamp.h)
+        src/wrench/simulation/SimulationTimestamp.h
+        src/wrench/simulation/SimulationTrace.cpp
+        src/wrench/simulation/SimulationTrace.h
+        src/wrench/simulation/SimulationOutput.cpp
+        src/wrench/simulation/SimulationOutput.h
+        )
 
 # test files
 set(TEST_FILES
@@ -88,6 +93,6 @@ add_executable(unit_tests ${TEST_FILES})
 target_link_libraries(unit_tests ${GOOGLE_TEST} wrench)
 
 # TODO: temporary simulation test binary
-add_executable(simulation ${SOURCE_FILES})
+add_executable(simulation ${SOURCE_FILES} src/wrench/simulation/SimulationTimestampTypes.h)
 target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS simulation DESTINATION bin)

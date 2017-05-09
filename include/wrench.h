@@ -28,4 +28,9 @@
 #include "wms/optimizations/static/StaticOptimization.h"
 #include "wms/optimizations/static/SimplePipelineClustering.h"
 
+// Simulation Output Analysis
+#include "simulation/SimulationTimestamp.h"
+#include "simulation/SimulationTimestampTypes.h"
+
+
 #endif //WRENCH_WRENCH_H

@@ -94,8 +94,8 @@ namespace wrench {
      * @brief Append a SimulationEvent to the event trace
      * @param event
      */
-    void Simulation::newTimestamp(SimulationTimestamp event) {
-      this->timeStamps[event.getType()].push_back(event);
+    template <class T> void Simulation::newTimestamp(SimulationTimestamp<T> *event) {
+      this->output.addTimestamp(event);
     }
 
     /**

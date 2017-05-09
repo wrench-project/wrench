@@ -21,6 +21,7 @@
 
 #include "workflow/Workflow.h"
 #include "wms/WMS.h"
+#include "SimulationOutput.h"
 
 
 namespace wrench {
@@ -48,13 +49,13 @@ namespace wrench {
 
         void setWMS(std::unique_ptr<WMS>);
 
-        std::map<SimulationTimestamp::Type, std::vector<SimulationTimestamp>> timeStamps;
+        SimulationOutput output;
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        void newTimestamp(SimulationTimestamp event);
+        template <class T> void newTimestamp(SimulationTimestamp<T> *event);
 
         void shutdownAllComputeServices();
 

@@ -8,8 +8,14 @@
  */
 
 
-#include "SimulationTimestamp.h"
+#include "SimulationOutput.h"
 
 namespace wrench {
+
+    SimulationOutput::SimulationOutput() {
+    }
+
+
+
 
 };

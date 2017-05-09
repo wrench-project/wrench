@@ -692,7 +692,7 @@ namespace wrench {
       job->incrementNumCompletedTasks();
 
       // Generate a SimulationTimestamp
-      this->simulation->newTimestamp(SimulationTimestamp(SimulationTimestamp::TASK_COMPLETION, task));
+      this->simulation->output.addTimestamp<SimulationTimestampTaskCompletion>(new SimulationTimestampTaskCompletion(task));
 
       // Send the callback to the originator if necessary and remove the job from
       // the list of pending jobs

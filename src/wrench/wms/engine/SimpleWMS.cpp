@@ -79,6 +79,9 @@ namespace wrench {
         this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, flops,
                                            this->simulation->getComputeServices());
 
+        // Call dynamic
+        // TODO
+
         // Run ready tasks with defined scheduler implementation
         WRENCH_INFO("Scheduling tasks...");
         this->scheduler->scheduleTasks(job_manager.get(), ready_tasks, this->simulation->getComputeServices());
@@ -93,6 +96,8 @@ namespace wrench {
             break;
           }
           case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+            StandardJob *job = (StandardJob *) (event->job);
+            job_manager->forgetJob(job);
             WRENCH_INFO("Notified that a standard job has failed (it's back in the ready state)");
             break;
           }
@@ -118,6 +123,8 @@ namespace wrench {
         if (workflow->isDone()) {
           break;
         }
+
+
       }
 
       S4U_Mailbox::clear_dputs();
