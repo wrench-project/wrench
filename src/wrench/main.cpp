@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
 
   std::string file_registry_service_host = hostname_list[(hostname_list.size() > 2) ? 1 : 0];
 
-  std::cerr << "Instantating a FileRegistryService on " << file_registry_service_host << "..." << std::endl;
+  std::cerr << "Instantiating a FileRegistryService on " << file_registry_service_host << "..." << std::endl;
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(new wrench::FileRegistryService(file_registry_service_host));
   simulation.setFileRegistryService(std::move(file_registry_service));
 

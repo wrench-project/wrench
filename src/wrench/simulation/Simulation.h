@@ -64,6 +64,8 @@ namespace wrench {
 
         std::set<ComputeService *> getComputeServices();
 
+        FileRegistryService *getFileRegistryService();
+
         /***********************/
         /** \endcond            */
         /***********************/

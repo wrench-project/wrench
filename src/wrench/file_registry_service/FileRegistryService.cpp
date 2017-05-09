@@ -10,6 +10,7 @@
 #include <compute_services/multicore_job_executor/MulticoreJobExecutor.h>
 #include <logging/TerminalOutput.h>
 #include <simgrid_S4U_util/S4U_Simulation.h>
+#include <simgrid_S4U_util/S4U_Mailbox.h>
 
 #include "FileRegistryService.h"
 
@@ -107,18 +108,76 @@ namespace wrench {
       return value;
     }
 
+
     /**
-    * @brief Main method of the daemon
-    *
-    * @return 0 on termination
-    */
+     * @brief Stop the service
+     *
+     * @throw std::runtime_error
+     */
+    void FileRegistryService::stop() {
+
+      this->state = FileRegistryService::DOWN;
+
+      WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
+      // Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
+      std::string ack_mailbox = this->mailbox_name + "_kill";
+      S4U_Mailbox::put(this->mailbox_name,
+                       new StopDaemonMessage(
+                               ack_mailbox,
+                               this->getPropertyValueAsDouble(STOP_DAEMON_MESSAGE_PAYLOAD)));
+      // Wait for the ack
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
+      if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
+        throw std::runtime_error("Wrong message type received while expecting DAEMON_STOPPED");
+      }
+    }
+
+    /**
+     * @brief Main method of the daemon
+     *
+     * @return 0 on termination
+     */
     int FileRegistryService::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
 
       WRENCH_INFO("File Registry Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
+      /** Main loop **/
+      while (this->processNextMessage()) {
+
+        // Clear pending asynchronous puts that are done
+        S4U_Mailbox::clear_dputs();
+
+      }
+
       WRENCH_INFO("File Registry Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
+    }
+
+
+    bool FileRegistryService::processNextMessage() {
+
+      // Wait for a message
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+
+
+      WRENCH_INFO("Got a [%s] message", message->toString().c_str());
+
+      switch (message->type) {
+
+        case SimulationMessage::STOP_DAEMON: {
+          std::unique_ptr<StopDaemonMessage> m(static_cast<StopDaemonMessage *>(message.release()));
+
+          // This is Synchronous
+          S4U_Mailbox::put(m->ack_mailbox,
+                           new DaemonStoppedMessage(this->getPropertyValueAsDouble(DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+          return false;
+        }
+
+        default: {
+          throw std::runtime_error("Unknown message type: " + std::to_string(message->type));
+        }
+      }
     }
 };

@@ -62,6 +62,11 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+        enum State {
+            UP,
+            DOWN,
+        };
+
         // Setting/Getting property
         void setProperty(FileRegistryService::Property, std::string);
 
@@ -70,6 +75,8 @@ namespace wrench {
         std::string getPropertyValueAsString(FileRegistryService::Property);
 
         double getPropertyValueAsDouble(FileRegistryService::Property);
+
+        void stop();
 
         /***********************/
         /** \endcond           */
@@ -86,6 +93,10 @@ namespace wrench {
         std::string hostname;
 
         int main();
+
+        FileRegistryService::State state;
+
+        bool processNextMessage();
 
     };
 

@@ -214,7 +214,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a property of the MulticoreJobExecutor as a double
+     * @brief Get a property of the Multicore JobExecutor as a double
      * @param property: the property
      * @return the property value as a double
      *

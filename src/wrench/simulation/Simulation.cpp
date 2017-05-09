@@ -213,6 +213,16 @@ namespace wrench {
 
 
     /**
+     * @brief Retrieves the FileRegistryService
+     * @return a raw pointer to the FileRegistryService instance
+     */
+    FileRegistryService * Simulation::getFileRegistryService() {
+      return this->file_registry_service.get();
+    }
+
+
+
+    /**
      * @brief Create an unregistered executor (i.e., that the Simulation instance will not know anything about)
      *
      * @param hostname: the hostname in the simulated platform
