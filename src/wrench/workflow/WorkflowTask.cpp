@@ -235,6 +235,21 @@ namespace wrench {
                                     WorkflowFile *f) {
       map[f->id] = f;
     }
+
+    /**
+     * @brief Retrieve the number of times a task has failed
+     * @return the failure count
+     */
+    unsigned int WorkflowTask::getFailureCount() {
+      return this->failure_count;
+    }
+
+    /**
+     * @brief Increment the failure count of a task
+     */
+    void WorkflowTask::incrementFailureCount() {
+      this->failure_count++;
+    }
 };
 
 
