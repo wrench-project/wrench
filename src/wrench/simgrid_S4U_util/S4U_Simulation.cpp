@@ -69,14 +69,14 @@ namespace wrench {
     /**
      * @brief Retrives the list of hostnames
      *
-     * @return a set of hostnames
+     * @return a vector of hostnames
      */
-    std::set<std::string> S4U_Simulation::getAllHostnames() {
+    std::vector<std::string> S4U_Simulation::getAllHostnames() {
       std::vector<simgrid::s4u::Host *> host_list;
       this->engine->hostList(&host_list);
-      std::set<std::string> hostname_list;
+      std::vector<std::string> hostname_list;
       for (auto h : host_list) {
-        hostname_list.insert(h->name());
+        hostname_list.push_back(h->name());
       }
       return hostname_list;
     }
