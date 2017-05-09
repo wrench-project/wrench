@@ -106,7 +106,7 @@ install:
   # install googletest
   - wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
   - tar xf release-1.8.0.tar.gz
-  - cd googletest-release-1.8.0/googletest && cmake . && make && sudo make install && cd ..
+  - cd googletest-release-1.8.0/googletest && cmake . && make && sudo make install && cd ../..
 
 script:
   - mkdir build && cd build
