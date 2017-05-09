@@ -11,7 +11,6 @@
 #define WRENCH_SIMULATIONTIMESTAMPTYPES_H
 
 #include <workflow/WorkflowTask.h>
-#include "SimulationTimestamp.h"
 
 namespace wrench {
 
@@ -46,7 +45,7 @@ namespace wrench {
         WorkflowTask *getTask() {
           return this->task;
         }
-        
+
     private:
         WorkflowTask *task;
     };

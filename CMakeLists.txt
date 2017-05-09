@@ -66,6 +66,7 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTrace.h
         src/wrench/simulation/SimulationOutput.cpp
         src/wrench/simulation/SimulationOutput.h
+        src/wrench/simulation/SimulationTimestampTypes.h
         )
 
 # test files
@@ -93,6 +94,6 @@ add_executable(unit_tests ${TEST_FILES})
 target_link_libraries(unit_tests ${GOOGLE_TEST} wrench)
 
 # TODO: temporary simulation test binary
-add_executable(simulation ${SOURCE_FILES} src/wrench/simulation/SimulationTimestampTypes.h)
+add_executable(simulation ${SOURCE_FILES} )
 target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS simulation DESTINATION bin)

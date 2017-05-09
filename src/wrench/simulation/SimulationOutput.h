@@ -13,6 +13,7 @@
 
 
 #include <typeinfo>
+#include <typeindex>
 
 #include "SimulationTimestamp.h"
 #include "SimulationTrace.h"
@@ -24,15 +25,17 @@ namespace wrench {
     public:
 
         /**
-         * @brief Retrieve a simulation trace (which should be filled in with timestamps)
+         * @brief Retrieve a copy of a simulation trace (which should be filled in with timestamps)
          *        once the simulation has completed
          *
          * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          * @return a vector of pointers to SimulationTimestampXXXX objects
          */
         template <class T> std::vector<SimulationTimestamp<T> *> getTrace() {
+          std::type_index type_index = std::type_index(typeid(T));
+
           std::vector<SimulationTimestamp<T> *> non_generic_vector;
-          SimulationTrace<T> *trace = (SimulationTrace<T> *)(this->traces[std::type_index(typeid(T))]);
+          SimulationTrace<T> *trace = (SimulationTrace<T> *)(this->traces[type_index]);
           for (auto ts : trace->getTrace()) {
             non_generic_vector.push_back((SimulationTimestamp<T> *)ts);
           }
