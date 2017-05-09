@@ -91,7 +91,7 @@ install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench)
 
 # generate unit tests
 add_executable(unit_tests ${TEST_FILES})
-target_link_libraries(unit_tests ${GOOGLE_TEST} wrench)
+target_link_libraries(unit_tests ${GOOGLE_TEST} wrench -lpthread -lm)
 
 # TODO: temporary simulation test binary
 add_executable(simulation ${SOURCE_FILES} )
