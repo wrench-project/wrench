@@ -63,20 +63,23 @@ int main(int argc, char **argv) {
   std::cerr << "Instantiating SimGrid platform..." << std::endl;
   simulation.instantiatePlatform(platform_file);
 
+  std::vector<std::string> hostname_list = simulation.getHostnameList();
+
+  std::string exexutor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
   try {
 
-    std::cerr << "Instantiating a  MultiCore Job executor on c-1.me..." << std::endl;
+    std::cerr << "Instantiating a MultiCore Job executor on " << exexutor_host << "..." << std::endl;
     simulation.add(
-            std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor("c-1.me", true, false)));
+            std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(exexutor_host, true, false)));
 
-//    std::cerr << "Instantiating a  MultiCore Job executor on c-2.me..." << std::endl;
-//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor("c-2.me", true, false, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+//    std::cerr << "Instantiating a  MultiCore Job executor on " << executor_host << "..." << std::endl;
+//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(executor_host, true, false, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
-//    std::cerr << "Instantiating a  MultiCore Job executor on c-3.me..." << std::endl;
-//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor("c-3.me", false, true, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+//    std::cerr << "Instantiating a  MultiCore Job executor on " << exexutor_host << "..." << std::endl;
+//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(executor_host, false, true, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
-//    std::cerr << "Instantiating a  MultiCore Job executor on c-4.me..." << std::endl;
-//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor("c-4.me", true, true, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+//    std::cerr << "Instantiating a  MultiCore Job executor on " << exexutor_host << "..." << std::endl;
+//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(executor_host, true, true, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
   } catch (std::invalid_argument e) {
 
@@ -85,15 +88,16 @@ int main(int argc, char **argv) {
 
   }
 
+  std::string wms_host = hostname_list[0];
 
-  std::cerr << "Instantiating a WMS on c-0.me..." << std::endl;
+  std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
 
   std::unique_ptr<wrench::Scheduler> scheduler(new wrench::RandomScheduler());
 //  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MinMinScheduler());
 //  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MaxMinScheduler());
   std::unique_ptr<wrench::StaticOptimization> opt(new wrench::SimplePipelineClustering());
 
-  std::unique_ptr<wrench::WMS> wms(new wrench::SimpleWMS(&simulation, &workflow, std::move(scheduler), "c-0.me"));
+  std::unique_ptr<wrench::WMS> wms(new wrench::SimpleWMS(&simulation, &workflow, std::move(scheduler), wms_host));
   wms.get()->addStaticOptimization(std::move(opt));
 
   simulation.setWMS(std::move(wms));

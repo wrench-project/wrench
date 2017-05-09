@@ -120,11 +120,11 @@ namespace wrench {
     /**
      * @brief Retrieve the list of names of all the hosts in the platform
      *
-     * @return a set of hostnames
+     * @return a vector of hostnames
      *
      * @throw std::runtime_error
      */
-    std::set<std::string> Simulation::getHostnameList() {
+    std::vector<std::string> Simulation::getHostnameList() {
       return this->s4u_simulation->getAllHostnames();
     }
 

@@ -41,7 +41,7 @@ namespace wrench {
 
         void instantiatePlatform(std::string);
 
-        std::set<std::string> getHostnameList();
+        std::vector<std::string> getHostnameList();
 
         void launch();
 

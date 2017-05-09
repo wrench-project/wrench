@@ -34,7 +34,7 @@ namespace wrench {
 				static void compute(double);
 				static void sleep(double);
 				bool isInitialized();
-        std::set<std::string> getAllHostnames();
+        std::vector<std::string> getAllHostnames();
         void shutdown();
 
 		private:

@@ -28,8 +28,7 @@ BUGS:
 
         - Autogeneration of documentation on github
 
-        - Event Traces:
-             - Template the TimeStamp class to afford genericity [HENRI]
+        [DONE] Event Traces: Template the TimeStamp class to afford genericity
 
         - Dynamic Optimization
             - Implement a naive one [RAFAEL]
@@ -40,7 +39,6 @@ BUGS:
 
         - WorkflowTask:
             - add a failure count incremented for each failure [HENRI]
-
 
 * LYON:
 
