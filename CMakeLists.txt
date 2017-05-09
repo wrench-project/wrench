@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
 
+# source files
 set(SOURCE_FILES
         src/wrench/exceptions/ComputeServiceIsDownException.h
         src/wrench/simulation/SimulationMessage.cpp
@@ -62,19 +63,29 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTimestamp.cpp
         src/wrench/simulation/SimulationTimestamp.h)
 
+# test files
+set(TEST_FILES
+        test/main.cpp
+        test/workflow/WorkflowTest.cpp)
+
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)
 
 find_library(SIMGRID_LIB NAMES simgrid)
 find_library(PUGIXML_LIB NAMES pugixml)
 find_library(LEMON_LIB NAMES emon)
+find_library(GOOGLE_TEST NAMES gtest)
 
-#Generate the static library from the sources
+# generate the static library from the sources
 add_library(wrench STATIC ${SOURCE_FILES})
 target_link_libraries(wrench ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS wrench DESTINATION lib)
 install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
 install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench)
+
+# generate unit tests
+add_executable(unit_tests ${TEST_FILES})
+target_link_libraries(unit_tests ${GOOGLE_TEST} wrench)
 
 # TODO: temporary simulation test binary
 add_executable(simulation ${SOURCE_FILES})
