@@ -21,12 +21,32 @@ namespace wrench {
     class SimulationTimestampTaskCompletion {
 
     public:
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
+        /**
+         * @brief Constructor
+         * @param task: a pointer to a WorkflowTask object
+         */
         SimulationTimestampTaskCompletion(WorkflowTask *task) {
           this->task = task;
         }
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /**
+         * @brief Retrieve the task that has completed
+         *
+         * @return a pointer to a WorkflowTask object
+         */
         WorkflowTask *getTask() {
           return this->task;
         }
+        
     private:
         WorkflowTask *task;
     };

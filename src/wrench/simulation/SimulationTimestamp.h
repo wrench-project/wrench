@@ -18,22 +18,49 @@
 
 namespace wrench {
 
+    /**
+     * @brief A templated class to represent a simulation timestamp
+     *
+     * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+     */
     template <class T> class SimulationTimestamp {
 
     public:
 
+        /**
+         * Retrieve the timestamp's date
+         *
+         * @return the date
+         */
+        double getDate() {
+          return this->date;
+        }
+
+        /**
+         * Retrieve the timestamp's content
+         *
+         * @return a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         */
+        T *getContent() {
+          return this->content;
+        }
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
+        /**
+         * @brief Constructor
+         * @param content: a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         */
         SimulationTimestamp(T *content) {
           // TODO: Make content a unique_ptr to make memory mamangement better
           this->content = content;
         }
 
-        double getDate() {
-          return this->date;
-        }
-
-        T *getContent() {
-          return this->content;
-        }
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     private:
         double date = -1.0;

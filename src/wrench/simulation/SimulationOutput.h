@@ -22,17 +22,14 @@ namespace wrench {
     class SimulationOutput {
 
     public:
-        SimulationOutput();
 
-        template <class T> void addTimestamp(T *timestamp) {
-          std::type_index type_index = std::type_index(typeid(T));
-          if (!(this->traces[type_index])) {
-            this->traces[type_index] = new SimulationTrace<T>();
-          }
-          ((SimulationTrace<T> *)(this->traces[type_index]))->addTimestamp(new SimulationTimestamp<T>(timestamp));
-        }
-
-
+        /**
+         * @brief Retrieve a simulation trace (which should be filled in with timestamps)
+         *        once the simulation has completed
+         *
+         * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @return a vector of pointers to SimulationTimestampXXXX objects
+         */
         template <class T> std::vector<SimulationTimestamp<T> *> getTrace() {
           std::vector<SimulationTimestamp<T> *> non_generic_vector;
           SimulationTrace<T> *trace = (SimulationTrace<T> *)(this->traces[std::type_index(typeid(T))]);
@@ -41,6 +38,28 @@ namespace wrench {
           }
           return non_generic_vector;
         }
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
+        /**
+         * @brief Append a simulation timestamp to a simulation trace
+         *
+         * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @param timestamp: a pointer to a SimulationTimestampXXXX object
+         */
+        template <class T> void addTimestamp(T *timestamp) {
+          std::type_index type_index = std::type_index(typeid(T));
+          if (!(this->traces[type_index])) {
+            this->traces[type_index] = new SimulationTrace<T>();
+          }
+          ((SimulationTrace<T> *)(this->traces[type_index]))->addTimestamp(new SimulationTimestamp<T>(timestamp));
+        }
+
+        /***********************/
+        /** \endcond          */
+        /***********************/
 
 
     private:

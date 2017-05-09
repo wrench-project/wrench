@@ -12,10 +12,5 @@
 
 namespace wrench {
 
-    SimulationOutput::SimulationOutput() {
-    }
-
-
-
 
 };
