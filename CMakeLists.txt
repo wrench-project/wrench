@@ -67,7 +67,8 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationOutput.cpp
         src/wrench/simulation/SimulationOutput.h
         src/wrench/simulation/SimulationTimestampTypes.h
-        )
+        src/wrench/file_registry_service/FileRegistryService.cpp
+        src/wrench/file_registry_service/FileRegistryService.h)
 
 # test files
 set(TEST_FILES

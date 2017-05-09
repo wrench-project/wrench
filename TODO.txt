@@ -37,6 +37,9 @@ BUGS:
         [DONE] WorkflowTask:
             - add a failure count incremented for each failure
 
+---------------------------------------------------------------------
+
+
 * LYON:
 
     - Storage in S4U
@@ -49,6 +52,7 @@ BUGS:
             - Or catch some "process failure exception"?
         - Right now there is some uncaught exception in the maestro
 
-    - C++ Exceptions from SIMIX?
+
+    - General question: When will we get C++ Exceptions from SIMIX?
 
 -----------------------------------------------------------------------

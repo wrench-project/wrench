@@ -27,11 +27,14 @@ namespace wrench {
     public:
         void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
-    protected:
+
         /***********************/
         /** \cond DEVELOPER */
         /***********************/
+    public:
+        std::string getHostname();
 
+    protected:
         WMS(Simulation *, Workflow *, std::unique_ptr<Scheduler>, std::string, std::string);
 
         void runStaticOptimizations();
@@ -41,12 +44,14 @@ namespace wrench {
         std::unique_ptr<Scheduler> scheduler;
         std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
 
+
         /***********************/
         /** \endcond           */
         /***********************/
 
     private:
         virtual int main() = 0;
+        std::string hostname;
     };
 };
 

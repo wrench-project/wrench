@@ -133,9 +133,20 @@ namespace wrench {
 		 *
 		 */
     void Simulation::launch() {
+      // Check that the simulation is initialized
       if (!this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation is not initialized");
       }
+      // Check that a WMS is running
+      if (!this->wms) {
+        throw std::runtime_error("A WMS should have been instantiated and passed to the simulation via setWMS()");
+      }
+      // Check that a FileRegistryService is running
+      if  (!this->file_registry_service) {
+        WRENCH_WARN("Starting a default File Registry Service on host %s", this->wms->getHostname().c_str());
+        this->setFileRegistryService(std::unique_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService(this->wms->getHostname())));
+      }
+
       this->s4u_simulation->runSimulation();
     }
 
@@ -161,11 +172,21 @@ namespace wrench {
     /**
      * @brief Set a WMS for the simulation
      *
-     * @param wms: a unique pointer to a WMS instantiation
+     * @param wms: a unique pointer to a WMS object
      */
     void Simulation::setWMS(std::unique_ptr<WMS> wms) {
       this->wms = std::move(wms);
     }
+
+    /**
+     * @brief Set a FileRegistryService for the simulation
+     *
+     * @param file_registry_service: a unique pointer to a FileRegistryService object
+     */
+    void Simulation::setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service) {
+      this->file_registry_service = std::move(file_registry_service);
+    }
+
 
     /**
      * @brief Obtain the list of compute services
