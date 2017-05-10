@@ -12,12 +12,10 @@
 
 #include <map>
 #include <stack>
-
 #include <lemon/list_graph.h>
 
 #include "workflow_job/WorkflowJob.h"
-#include "WorkflowFile.h"
-
+#include "workflow/WorkflowFile.h"
 
 namespace wrench {
 
@@ -26,9 +24,7 @@ namespace wrench {
      */
     class WorkflowTask {
 
-
     public:
-
         std::string getId() const;
 
         double getFlops() const;
@@ -59,11 +55,11 @@ namespace wrench {
 
         static std::string stateToString(WorkflowTask::State state);
 
-        WorkflowTask::State getState();
+        WorkflowTask::State getState() const;
 
-        WorkflowJob *getJob();
+        WorkflowJob *getJob() const;
 
-        Workflow *getWorkflow();
+        Workflow *getWorkflow() const;
 
         std::string getClusterId() const;
 
@@ -100,7 +96,6 @@ namespace wrench {
         /***********************/
 
     private:
-
         friend class Workflow;
 
         std::string id;                    // Task ID
@@ -125,11 +120,10 @@ namespace wrench {
         WorkflowJob *job;
 
         // Private helper function
-        void addFileToMap(std::map<std::string, WorkflowFile *> map, WorkflowFile *f);
-
+        void addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
+                          std::map<std::string, WorkflowFile *> &map_to_check,
+                          WorkflowFile *f);
     };
-
 };
-
 
 #endif //WRENCH_WORKFLOWTASK_H

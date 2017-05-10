@@ -72,7 +72,9 @@ set(SOURCE_FILES
 # test files
 set(TEST_FILES
         test/main.cpp
-        test/workflow/WorkflowTest.cpp)
+        test/workflow/WorkflowTaskTest.cpp
+        test/workflow/WorkflowTest.cpp
+        )
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)
@@ -94,6 +96,6 @@ add_executable(unit_tests ${TEST_FILES})
 target_link_libraries(unit_tests ${GOOGLE_TEST} wrench -lpthread -lm)
 
 # TODO: temporary simulation test binary
-add_executable(simulation ${SOURCE_FILES} )
+add_executable(simulation ${SOURCE_FILES})
 target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS simulation DESTINATION bin)
