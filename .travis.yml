@@ -87,6 +87,8 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install python3 doxygen; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p python3; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
+  # configure coveralls
+  - pip install --user cpp-coveralls
 
 install:
   # install SimGrid
@@ -113,6 +115,9 @@ script:
   - cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..
   - make
   - ./unit_tests
+
+after_success:
+  - coveralls --root .. -E ".*examples.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
 
 notifications:
   email:
