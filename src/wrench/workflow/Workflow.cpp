@@ -11,10 +11,10 @@
 #include <lemon/graph_to_eps.h>
 #include <lemon/bfs.h>
 #include <pugixml.hpp>
-#include <simulation/SimulationMessage.h>
-#include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <logging/TerminalOutput.h>
 
+#include "logging/TerminalOutput.h"
+#include "simulation/SimulationMessage.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "workflow/Workflow.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workflow, "Log category for Workflow");
@@ -137,7 +137,7 @@ namespace wrench {
      */
     WorkflowFile *Workflow::addFile(const std::string id, double size) {
 
-      if (size < 0) {
+      if (size <= 0) {
         throw std::invalid_argument("Workflow::addFile(): file size must be >0");
       }
 
@@ -257,7 +257,7 @@ namespace wrench {
      * @return true if there is a path from src to dst, false otherwise
      */
     bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
-      Bfs<ListDigraph> bfs(*DAG);
+      lemon::Bfs<lemon::ListDigraph> bfs(*DAG);
 
       bool reached = bfs.run(src->DAG_node, dst->DAG_node);
       return reached;
@@ -267,9 +267,9 @@ namespace wrench {
      * @brief  Constructor
      */
     Workflow::Workflow() {
-      DAG = std::unique_ptr<ListDigraph>(new ListDigraph());
-      DAG_node_map = std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>>(
-              new ListDigraph::NodeMap<WorkflowTask *>(*DAG));
+      DAG = std::unique_ptr<lemon::ListDigraph>(new lemon::ListDigraph());
+      DAG_node_map = std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>>(
+              new lemon::ListDigraph::NodeMap<WorkflowTask *>(*DAG));
       this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
     };
 
@@ -344,7 +344,7 @@ namespace wrench {
         throw std::invalid_argument("Workflow::getTaskChildren(): passed a nullptr task");
       }
       std::vector<WorkflowTask *> children;
-      for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
+      for (lemon::ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
         children.push_back((*DAG_node_map)[(*DAG).target(a)]);
       }
       return children;
@@ -362,7 +362,7 @@ namespace wrench {
         throw std::invalid_argument("Workflow::getTaskParents(): passed a nullptr task");
       }
       std::vector<WorkflowTask *> parents;
-      for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
+      for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
         parents.push_back((*DAG_node_map)[(*DAG).source(a)]);
       }
       return parents;
@@ -414,7 +414,7 @@ namespace wrench {
           }
           task->setState(WorkflowTask::COMPLETED);
           // Go through the children and make them ready if possible
-          for (ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
+          for (lemon::ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
             WorkflowTask *child = (*DAG_node_map)[(*DAG).target(a)];
             updateTaskState(child, WorkflowTask::READY);
 
@@ -422,16 +422,14 @@ namespace wrench {
           break;
         }
         case WorkflowTask::READY: {
-          // TODO: check whether it is safe to assume this here
-//          if (task->getState() == WorkflowTask::READY) {
-//            return;
-//          }
-          if (task->getState() != WorkflowTask::NOT_READY) {
-//            throw std::runtime_error("Cannot set the state of a not-ready task to WorkflowTask::READY");
+          if (task->getState() == WorkflowTask::READY) {
             return;
           }
+          if (task->getState() != WorkflowTask::NOT_READY) {
+            throw std::runtime_error("Cannot set the state of a not-ready task to WorkflowTask::READY");
+          }
           // Go through the parent and check whether they are all completed
-          for (ListDigraph::InArcIt a(*DAG, task->DAG_node); a != INVALID; ++a) {
+          for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
             WorkflowTask *parent = (*DAG_node_map)[(*DAG).source(a)];
             if (parent->getState() != WorkflowTask::COMPLETED) {
               // At least one parent is not in the COMPLETED state

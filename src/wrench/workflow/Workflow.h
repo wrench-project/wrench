@@ -12,94 +12,86 @@
 
 #include <lemon/list_graph.h>
 #include <map>
-#include <workflow_execution_events/WorkflowExecutionEvent.h>
+
+#include "workflow_execution_events/WorkflowExecutionEvent.h"
+#include "WorkflowFile.h"
+#include "WorkflowTask.h"
 
 class WorkflowTask;
 
-#include "WorkflowFile.h"
-
-#include "WorkflowTask.h"
-
-
-using namespace lemon;
-
-
 namespace wrench {
 
-		/**
-		 * @brief A workflow abstraction that provides basic functionality to
-		 * represent/instantiate/manipulate workflows
-		 */
-		class Workflow {
+    /**
+     * @brief A workflow abstraction that provides basic functionality to
+     * represent/instantiate/manipulate workflows
+     */
+    class Workflow {
 
-		public:
-				Workflow();
+    public:
+        Workflow();
 
-				WorkflowTask *addTask(std::string, double, int num_procs = 1);
-				void removeTask(WorkflowTask *task);
+        WorkflowTask *addTask(std::string, double, int num_procs = 1);
 
-				WorkflowTask *getWorkflowTaskByID(const std::string);
+        void removeTask(WorkflowTask *task);
 
-				WorkflowFile *addFile(const std::string, double);
+        WorkflowTask *getWorkflowTaskByID(const std::string);
 
-				WorkflowFile *getWorkflowFileByID(const std::string);
+        WorkflowFile *addFile(const std::string, double);
 
-				void addControlDependency(WorkflowTask *, WorkflowTask *);
+        WorkflowFile *getWorkflowFileByID(const std::string);
 
-				void loadFromDAX(const std::string filename);
+        void addControlDependency(WorkflowTask *, WorkflowTask *);
 
-				unsigned long getNumberOfTasks();
+        void loadFromDAX(const std::string filename);
 
-				void exportToEPS(std::string);
+        unsigned long getNumberOfTasks();
 
-				/***********************/
-				/** \cond DEVELOPER    */
-				/***********************/
+        void exportToEPS(std::string);
 
-				bool isDone();
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
 
-				std::map<std::string, std::vector<WorkflowTask *>> getReadyTasks();
+        bool isDone();
 
-				std::vector<WorkflowTask *> getTasks();
+        std::map<std::string, std::vector<WorkflowTask *>> getReadyTasks();
 
-				std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
+        std::vector<WorkflowTask *> getTasks();
 
-				std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
+        std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
 
-				std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
+        std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
 
-				/***********************/
-				/** \endcond           */
-				/***********************/
+        std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
 
-				/***********************/
-				/** \cond INTERNAL     */
-				/***********************/
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
-				std::string getCallbackMailbox();
+        std::string getCallbackMailbox();
 
-				void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
+        void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
 
-				/***********************/
-				/** \endcond           */
-				/***********************/
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
-		private:
+    private:
+        std::unique_ptr<lemon::ListDigraph> DAG;  // Lemon DiGraph
+        std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
 
-				std::unique_ptr<ListDigraph> DAG;  // Lemon DiGraph
-				std::unique_ptr<ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
+        std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
+        std::map<std::string, std::unique_ptr<WorkflowFile>> files;
 
-				std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
-				std::map<std::string, std::unique_ptr<WorkflowFile>> files;
+        bool pathExists(WorkflowTask *, WorkflowTask *);
 
-				bool pathExists(WorkflowTask *, WorkflowTask *);
-
-				std::string callback_mailbox;
-
-		};
-
+        std::string callback_mailbox;
+    };
 };
-
 
 #endif //WRENCH_WORKFLOW_H

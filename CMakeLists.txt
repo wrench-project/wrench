@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.2)
 project(wrench)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 
 include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
 
@@ -77,6 +79,7 @@ set(SOURCE_FILES
 # test files
 set(TEST_FILES
         test/main.cpp
+        test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
@@ -99,6 +102,6 @@ add_executable(unit_tests ${TEST_FILES})
 target_link_libraries(unit_tests ${GOOGLE_TEST} wrench -lpthread -lm)
 
 # TODO: temporary simulation test binary
-add_executable(simulation ${SOURCE_FILES} )
+add_executable(simulation ${SOURCE_FILES})
 target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 install(TARGETS simulation DESTINATION bin)

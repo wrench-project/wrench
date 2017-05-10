@@ -9,9 +9,10 @@
 
 #include <lemon/list_graph.h>
 #include <xbt.h>
-#include <logging/TerminalOutput.h>
-#include "WorkflowTask.h"
-#include "Workflow.h"
+
+#include "logging/TerminalOutput.h"
+#include "workflow/WorkflowTask.h"
+#include "workflow/Workflow.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workflowTask, "Log category for WorkflowTask");
 
@@ -34,7 +35,7 @@ namespace wrench {
      * @param f: a pointer to the file
      */
     void WorkflowTask::addInputFile(WorkflowFile *f) {
-      addFileToMap(input_files, f);
+      addFileToMap(input_files, output_files, f);
 
       f->setInputOf(this);
 
@@ -55,7 +56,7 @@ namespace wrench {
       WRENCH_DEBUG("Adding file '%s' as output t task %s",
                    f->getId().c_str(), this->getId().c_str());
 
-      addFileToMap(output_files, f);
+      addFileToMap(output_files, input_files, f);
       f->setOutputOf(this);
       // Perhaps add control dependencies?
       for (auto const &x : f->getInputOf()) {
@@ -93,7 +94,7 @@ namespace wrench {
      */
     int WorkflowTask::getNumberOfChildren() const {
       int count = 0;
-      for (ListDigraph::OutArcIt a(*DAG, DAG_node); a != INVALID; ++a) {
+      for (lemon::ListDigraph::OutArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
         ++count;
       }
       return count;
@@ -106,7 +107,7 @@ namespace wrench {
      */
     int WorkflowTask::getNumberOfParents() const {
       int count = 0;
-      for (ListDigraph::InArcIt a(*DAG, DAG_node); a != INVALID; ++a) {
+      for (lemon::ListDigraph::InArcIt a(*DAG, DAG_node); a != lemon::INVALID; ++a) {
         ++count;
       }
       return count;
@@ -118,7 +119,7 @@ namespace wrench {
      *
      * @return the task state
      */
-    WorkflowTask::State WorkflowTask::getState() {
+    WorkflowTask::State WorkflowTask::getState() const {
       return this->state;
     }
 
@@ -151,11 +152,11 @@ namespace wrench {
      *
      * @return the containing job, or nullptr
      */
-    WorkflowJob *WorkflowTask::getJob() {
+    WorkflowJob *WorkflowTask::getJob() const {
       return this->job;
     }
 
-    Workflow *WorkflowTask::getWorkflow() {
+    Workflow *WorkflowTask::getWorkflow() const {
       return this->workflow;
     }
 
@@ -228,12 +229,24 @@ namespace wrench {
     /**
      * @brief Helper method to add a file to a map if necessary
      *
-     * @param map: the map of workflow files
+     * @param map_to_insert: the map of workflow files to insert
+     * @param map_to_check: the map of workflow files to check
      * @param f: a pointer to a WorkflowFile object
+     *
+     * @throw std::invalid_argument
      */
-    void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile *> map,
+    void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
+                                    std::map<std::string, WorkflowFile *> &map_to_check,
                                     WorkflowFile *f) {
-      map[f->id] = f;
+
+      if (map_to_check.find(f->id) != map_to_check.end()) {
+        throw std::invalid_argument("File ID '" + f->id + "' is already used as input or output file");
+      }
+
+      if (map_to_insert.find(f->id) != map_to_insert.end()) {
+        throw std::invalid_argument("File ID '" + f->id + "' already exists");
+      }
+      map_to_insert[f->id] = f;
     }
 
     /**

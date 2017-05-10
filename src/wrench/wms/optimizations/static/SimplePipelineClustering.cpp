@@ -41,7 +41,8 @@ namespace wrench {
 
               pipelined_tasks.insert(parent->getId());
               parent->setClusterId(cluster_id);
-              parent->setState(WorkflowTask::READY);
+              std::cout << "CALLING READY" << std::endl;
+              parent->setReady();
 
               // next parent
               parent = workflow->getTaskParents(parent)[0];
@@ -59,7 +60,8 @@ namespace wrench {
 
               pipelined_tasks.insert(child->getId());
               child->setClusterId(cluster_id);
-              child->setState(WorkflowTask::READY);
+              std::cout << "CALLING READY (C)" << std::endl;
+              child->setReady();
 
               // next child
               child = workflow->getTaskChildren(child)[0];
