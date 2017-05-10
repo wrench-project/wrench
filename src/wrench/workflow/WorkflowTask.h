@@ -39,6 +39,8 @@ namespace wrench {
 
         void addOutputFile(WorkflowFile *);
 
+        unsigned int getFailureCount();
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
@@ -91,6 +93,8 @@ namespace wrench {
 
         WorkflowJob *getWorkflowJob();
 
+        void incrementFailureCount();
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -105,6 +109,7 @@ namespace wrench {
         double scheduled_date = -1.0;      // Date at which task was scheduled (getter?)
         double start_date = -1.0;          // Date at which task began execution (getter?)
         double end_date = -1.0;            // Date at which task finished execution (getter?)
+        unsigned int failure_count = 0;    // Number of times the tasks has failed
 
         State state;
         Workflow *workflow;                                    // Containing workflow

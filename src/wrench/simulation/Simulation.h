@@ -15,6 +15,7 @@
 #include <vector>
 #include <compute_services/multicore_job_executor/MulticoreJobExecutor.h>
 #include <simulation/SimulationTimestamp.h>
+#include <file_registry_service/FileRegistryService.h>
 
 #include "simgrid_S4U_util/S4U_Simulation.h"
 
@@ -47,6 +48,8 @@ namespace wrench {
 
         void add(std::unique_ptr<MulticoreJobExecutor> executor);
 
+        void setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service);
+
         void setWMS(std::unique_ptr<WMS>);
 
         SimulationOutput output;
@@ -60,6 +63,8 @@ namespace wrench {
         void shutdownAllComputeServices();
 
         std::set<ComputeService *> getComputeServices();
+
+        FileRegistryService *getFileRegistryService();
 
         /***********************/
         /** \endcond            */
@@ -83,7 +88,9 @@ namespace wrench {
     private:
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
-        std::unique_ptr<WMS> wms;
+
+        std::unique_ptr<WMS> wms = nullptr;
+        std::unique_ptr<FileRegistryService> file_registry_service = nullptr;
 
         std::vector<std::unique_ptr<ComputeService>> running_compute_services;
         std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;

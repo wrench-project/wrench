@@ -196,7 +196,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set a property of the Multicore Job Executor
+     * @brief Set a property of the MulticoreJobExecutor
      * @param property: the property
      * @param value: the property value
      */
@@ -205,7 +205,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a property of the Multicore Job Executor as a string
+     * @brief Get a property of the MulticoreJobExecutor as a string
      * @param property: the property
      * @return the property value as a string
      */
@@ -214,7 +214,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a property of the Multicore Job Executor as a double
+     * @brief Get a property of the Multicore JobExecutor as a double
      * @param property: the property
      * @return the property value as a double
      *
@@ -230,7 +230,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Cnstructor
+     * @brief Constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
      * @param supports_standard_jobs: true if the job executor should support standard jobs

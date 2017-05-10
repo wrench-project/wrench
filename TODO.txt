@@ -24,7 +24,7 @@ BUGS:
 
 * "EASY" implementation stuff
 
-        - Add tests [GET ONE TEST STARTED: RAFAEL HENRI]
+        [DONE] Add tests
 
         - Autogeneration of documentation on github
 
@@ -34,11 +34,11 @@ BUGS:
             - Implement a naive one [RAFAEL]
             - Call it in right before scheduler [RAFAEL]
 
-        - Deal with failure traces:
-            - Henri implemented it, but never really tested [HENRI]
+        [DONE] WorkflowTask:
+            - add a failure count incremented for each failure
 
-        - WorkflowTask:
-            - add a failure count incremented for each failure [HENRI]
+---------------------------------------------------------------------
+
 
 * LYON:
 
@@ -47,6 +47,12 @@ BUGS:
         - How to deal with pipelining of network/disk when remote put()/get()?
                - How does MSG do it?
 
-    - C++ Exceptions from SIMIX?
+    - Failures in S4U
+        - Some way to do a "simcall_process_on_exit()"
+            - Or catch some "process failure exception"?
+        - Right now there is some uncaught exception in the maestro
+
+
+    - General question: When will we get C++ Exceptions from SIMIX?
 
 -----------------------------------------------------------------------

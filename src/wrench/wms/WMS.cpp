@@ -30,8 +30,11 @@ namespace wrench {
             workflow(workflow),
             scheduler(std::move(scheduler)) {
 
+      this->hostname = hostname;
+
       // Start the daemon
-      this->start(hostname);
+      this->start(this->hostname);
+
     }
 
     /**
@@ -52,4 +55,13 @@ namespace wrench {
         opt.get()->process(this->workflow);
       }
     }
-}
+
+    /**
+     * @brief Retrieve the hostname on which the WMS will start / has started
+     * @return the hostname
+     */
+    std::string WMS::getHostname() {
+      return this->hostname;
+    }
+};
+

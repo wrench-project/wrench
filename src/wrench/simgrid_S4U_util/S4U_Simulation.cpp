@@ -107,7 +107,8 @@ namespace wrench {
      * @param flops: the number of flops
      */
     void S4U_Simulation::compute(double flops) {
-      simgrid::s4u::this_actor::execute(flops);
+      e_smx_state_t state = simgrid::s4u::this_actor::execute(flops);
+//      std::cerr << "STATE RETURNED BY COMPUTE = " << state << std::endl;
     }
 
 
