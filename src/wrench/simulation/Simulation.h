@@ -46,7 +46,8 @@ namespace wrench {
 
         void launch();
 
-        void add(std::unique_ptr<MulticoreJobExecutor> executor);
+        void add(std::unique_ptr<ComputeService> executor);
+        void add(std::unique_ptr<StorageService> executor);
 
         void setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service);
 
@@ -62,7 +63,10 @@ namespace wrench {
 
         void shutdownAllComputeServices();
 
+        void shutdownAllStorageServices();
+
         std::set<ComputeService *> getComputeServices();
+        std::set<StorageService *> getStorageServices();
 
         FileRegistryService *getFileRegistryService();
 
@@ -80,6 +84,7 @@ namespace wrench {
                 double ttl, PilotJob *pj, std::string suffix);
 
         void mark_compute_service_as_terminated(ComputeService *cs);
+        void mark_storage_service_as_terminated(StorageService *ss);
 
         /***********************/
         /** \endcond           */
@@ -95,6 +100,8 @@ namespace wrench {
         std::vector<std::unique_ptr<ComputeService>> running_compute_services;
         std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
 
+        std::vector<std::unique_ptr<StorageService>> running_storage_services;
+        std::vector<std::unique_ptr<StorageService>> terminated_storage_services;
     };
 
 };

@@ -151,21 +151,40 @@ namespace wrench {
     }
 
     /**
-     * @brief Adds a MulticoreJobExecutor to the simulation
+     * @brief Adds a ComputeService to the simulation
      *
-     * @param executor: a unique pointer to a MulticoreJobExecutor object, the ownership of which is
+     * @param executor: a unique pointer to a ComputeService object, the ownership of which is
      *        then transferred to WRENCH
      *
      * @throw std::invalid_argument
      */
-    void Simulation::add(std::unique_ptr<MulticoreJobExecutor> executor) {
+    void Simulation::add(std::unique_ptr<ComputeService> service) {
       if (!this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation is not initialized");
       }
 
-      executor->setSimulation(this);
+      service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
-      running_compute_services.push_back(std::move(executor));
+      running_compute_services.push_back(std::move(service));
+      return;
+    }
+
+    /**
+    * @brief Adds a StorageService to the simulation
+    *
+    * @param executor: a unique pointer to a StorageService object, the ownership of which is
+    *        then transferred to WRENCH
+    *
+    * @throw std::invalid_argument
+    */
+    void Simulation::add(std::unique_ptr<StorageService> service) {
+      if (!this->s4u_simulation->isInitialized()) {
+        throw std::runtime_error("Simulation is not initialized");
+      }
+
+      service->setSimulation(this);
+      // Add a unique ptr to the list of Compute Services
+      running_storage_services.push_back(std::move(service));
       return;
     }
 
@@ -191,7 +210,7 @@ namespace wrench {
     /**
      * @brief Obtain the list of compute services
      *
-     * @return a vector of compute services
+     * @return a vector of raw pointers to ComputeSergice objects
      */
     std::set<ComputeService *> Simulation::getComputeServices() {
       std::set<ComputeService *> set = {};
@@ -211,6 +230,28 @@ namespace wrench {
       }
     }
 
+    /**
+    * @brief Obtain the list of storage services
+    *
+    * @return a vector of raw pointers to StorageService objects
+    */
+    std::set<StorageService *> Simulation::getStorageServices() {
+      std::set<StorageService *> set = {};
+      for (auto it = this->running_storage_services.begin(); it != this->running_storage_services.end(); it++) {
+        set.insert((*it).get());
+      }
+      return set;
+    }
+
+    /**
+     * @brief Shutdown all running storage services on the platform
+     */
+    void Simulation::shutdownAllStorageServices() {
+
+      for (int i = 0; i < this->running_storage_services.size(); i++) {
+        this->running_storage_services[i]->stop();
+      }
+    }
 
     /**
      * @brief Retrieves the FileRegistryService
@@ -260,7 +301,7 @@ namespace wrench {
     /**
      * @brief Remove a compute service from the list of known compute services
      *
-     * @param cs: a pointer to the compute service
+     * @param cs: a raw pointer to a ComputeService object
      */
     void Simulation::mark_compute_service_as_terminated(ComputeService *compute_service) {
       for (int i = 0; i < this->running_compute_services.size(); i++) {
@@ -275,4 +316,22 @@ namespace wrench {
       return;
     }
 
+    /**
+    * @brief Remove a storage service from the list of known storage services
+    *
+    * @param ss: a raw pointer to a StorageService object
+    */
+    void Simulation::mark_storage_service_as_terminated(StorageService *storage_service) {
+      for (int i = 0; i < this->running_storage_services.size(); i++) {
+        if (this->running_storage_services[i].get() == storage_service) {
+          this->terminated_storage_services.push_back(std::move(this->running_storage_services[i]));
+          this->running_storage_services.erase(this->running_storage_services.begin() + i);
+          return;
+        }
+      }
+      // If we didn't find the service, this means it was a hidden service that was
+      // used as a building block for another higher-level service, which is fine
+      // (not sure this can ever happen for a StorageService, but whatever)
+      return;
+    }
 };

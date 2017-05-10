@@ -4,6 +4,14 @@ BUGS:
 
 ---------------------------------------------------------------------
 
+SOFTWARE ENGINEERING:
+
+- Create a "Service" base class, so as to avoid code duplication between
+  StorageService,  ComputeService, FileRegistryService, etc.
+    - Properties, however, need to be specific to each derived and twice-derived class...
+
+---------------------------------------------------------------------
+
 
 * "BIG" things:
 

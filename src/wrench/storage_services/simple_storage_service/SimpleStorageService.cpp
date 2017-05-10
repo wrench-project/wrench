@@ -7,29 +7,43 @@
  * (at your option) any later version.
  */
 
-#include <compute_services/multicore_job_executor/MulticoreJobExecutor.h>
-#include <logging/TerminalOutput.h>
-#include <simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench-dev.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
+#include "SimpleStorageService.h"
 
-#include "FileRegistryService.h"
+XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
 
 namespace wrench {
 
 
-    FileRegistryService::FileRegistryService(std::string hostname,
-                                             std::map<FileRegistryService::Property, std::string> plist) :
-            FileRegistryService(hostname, plist, "") {
+    /**
+     * @brief Public constructor
+     * @param hostname: the name of the host on which to start the service
+     * @param capacity: the storage capacity in bytes
+     * @param plist: the optional property list
+     */
+    SimpleStorageService::SimpleStorageService(std::string hostname,
+                                               double capacity,
+                                             std::map<SimpleStorageService::Property, std::string> plist) :
+            SimpleStorageService(hostname, capacity, plist, "") {
 
     }
 
 
-    FileRegistryService::FileRegistryService(
+    /**
+     * @brief Private constructor
+     * @param hostname: the name of the host on which to start the service
+     * @param capacity: the storage capacity in bytes
+     * @param plist: the property list
+     * @param suffix: the suffix (for the service name)
+     */
+    SimpleStorageService::SimpleStorageService(
             std::string hostname,
-            std::map<FileRegistryService::Property, std::string> plist,
+            double capacity,
+            std::map<SimpleStorageService::Property, std::string> plist,
             std::string suffix) :
+            StorageService("simple_storage_service"),
             S4U_DaemonWithMailbox("file_registry_service" + suffix, "file_registry_service" + suffix) {
 
       // Set default properties
@@ -43,6 +57,7 @@ namespace wrench {
       }
 
       this->hostname = hostname;
+      this->capacity = capacity;
 
       // Start the daemon on the same host
       try {
@@ -59,47 +74,43 @@ namespace wrench {
    *
    * @throw std::invalid_argument
    */
-    std::string FileRegistryService::getPropertyString(FileRegistryService::Property property) {
+    std::string SimpleStorageService::getPropertyString(SimpleStorageService::Property property) {
       switch (property) {
         case STOP_DAEMON_MESSAGE_PAYLOAD: return "STOP_DAEMON_MESSAGE_PAYLOAD";
         case DAEMON_STOPPED_MESSAGE_PAYLOAD: return "DAEMON_STOPPED_MESSAGE_PAYLOAD";
-        case REQUEST_MESSAGE_PAYLOAD: return "REQUEST_MESSAGE_PAYLOAD";
-        case ANSWER_MESSAGE_PAYLOAD: return "ANSWER_MESSAGE_PAYLOAD";
-        case REMOVE_ENTRY_PAYLOAD: return "REMOVE_ENTRY_PAYLOAD";
-        case LOOKUP_OVERHEAD:return "LOOKUP_OVERHEAD";
 
         default:
           throw new std::invalid_argument(
-                  "FileRegistryService property" + std::to_string(property) + "has no string name");
+                  "SimpleStorageService property" + std::to_string(property) + "has no string name");
       }
     }
 
     /**
-     * @brief Set a property of the FileRegistryService
+     * @brief Set a property of the SimpleStorageService
      * @param property: the property
      * @param value: the property value
      */
-    void FileRegistryService::setProperty(FileRegistryService::Property property, std::string value) {
+    void SimpleStorageService::setProperty(SimpleStorageService::Property property, std::string value) {
       this->property_list[property] = value;
     }
 
     /**
-     * @brief Get a property of the FileRegistryService as a string
+     * @brief Get a property of the SimpleStorageService as a string
      * @param property: the property
      * @return the property value as a string
      */
-    std::string FileRegistryService::getPropertyValueAsString(FileRegistryService::Property property) {
+    std::string SimpleStorageService::getPropertyValueAsString(SimpleStorageService::Property property) {
       return this->property_list[property];
     }
 
     /**
-     * @brief Get a property of the FileRegistryService as a double
+     * @brief Get a property of the SimpleStorageService as a double
      * @param property: the property
      * @return the property value as a double
      *
      * @throw std::runtime_error
      */
-    double FileRegistryService::getPropertyValueAsDouble(FileRegistryService::Property property) {
+    double SimpleStorageService::getPropertyValueAsDouble(SimpleStorageService::Property property) {
       double value;
       if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
         throw std::runtime_error("Invalid " + this->getPropertyString(property) + " property value " +
@@ -108,62 +119,6 @@ namespace wrench {
       return value;
     }
 
-    /**
-     * @brief Notify the FileRegistryService that a WorkflowFile is available at some StorageService
-     * @param file: a raw pointer to a WorkflowFile
-     * @param ss: a raw pointer to a StorageService
-     *
-     * @throw std::invalid_argument
-     */
-    void FileRegistryService::addEntry(WorkflowFile *file, StorageService *ss) {
-      if ((file == nullptr) || (ss == nullptr)) {
-        throw std::invalid_argument("Invalid input argument");
-      }
-      if (this->entries.find(file) == this->entries.end()) {
-        this->entries[file] = {};
-      }
-      this->entries[file].insert(ss);
-    }
-
-    /**
-     * @brief Remove an entry from a FileRegistryService
-     * @param file: a raw pointer to a WorkflowFile
-     * @param ss: a raw pointer to a StorageService
-     *
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
-    void FileRegistryService::removeEntry(WorkflowFile *file, StorageService *ss) {
-      if ((file == nullptr) || (ss == nullptr)) {
-        throw std::invalid_argument("Invalid input argument");
-      }
-      if (this->entries.find(file) == this->entries.end()) {
-        throw std::runtime_error("Trying to remove entry for non-existent file in FileRegistryService");
-      }
-      if (this->entries[file].find(ss) == this->entries[file].end()) {
-        throw std::runtime_error("Trying to remove non-existing entry in FileRegistryService");
-      }
-      this->entries[file].erase(ss);
-    }
-
-
-    /**
-     * @brief Remove all entries for a particular WorkflowFile in a FileRegistryService
-     *
-     * @param file: a raw pointer to a WorkflowFile
-     *
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
-    void FileRegistryService::removeAllEntries(WorkflowFile *file) {
-      if (file == nullptr) {
-        throw std::invalid_argument("Invalid input argument");
-      }
-      if (this->entries.find(file) == this->entries.end()) {
-        throw std::runtime_error("Trying to remove all entries for non-existent file in FileRegistryService");
-      }
-      this->entries[file].clear();
-    }
 
 
     /**
@@ -171,9 +126,9 @@ namespace wrench {
        *
        * @throw std::runtime_error
        */
-    void FileRegistryService::stop() {
+    void SimpleStorageService::stop() {
 
-      this->state = FileRegistryService::DOWN;
+      this->state = SimpleStorageService::DOWN;
 
       WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
       // Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
@@ -194,11 +149,11 @@ namespace wrench {
      *
      * @return 0 on termination
      */
-    int FileRegistryService::main() {
+    int SimpleStorageService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
 
-      WRENCH_INFO("File Registry Service starting on host %s!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Simple Storage Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
       /** Main loop **/
       while (this->processNextMessage()) {
@@ -208,7 +163,7 @@ namespace wrench {
 
       }
 
-      WRENCH_INFO("File Registry Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Simple Storage Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -217,7 +172,7 @@ namespace wrench {
      * @brief Helper function to process incoming messages
      * @return false if the daemon should terminate after processing this message
      */
-    bool FileRegistryService::processNextMessage() {
+    bool SimpleStorageService::processNextMessage() {
 
       // Wait for a message
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
@@ -242,5 +197,20 @@ namespace wrench {
       }
     }
 
+    /**
+     * @brief Retrieve the storage capacity of the storage service
+     * @return the capacity in bytes
+     */
+    double SimpleStorageService::getCapacity() {
+      return this->capacity;
+    }
+
+    /**
+     * @brief Retrieve the free storage space on the storage service
+     * @return the free space in bytes
+     */
+    double SimpleStorageService::getFreeSpace() {
+      throw std::runtime_error("getFreeSpace() not implemneted yet");
+    }
 
 };
