@@ -2,6 +2,7 @@
 [![GitHub Release][release-badge]][release-link]
 [![License: LGPL v3][license-badge]](LICENSE.md)
 [![Coverage Status][coveralls-badge]][coveralls-link]
+[![Codacy Badge][codacy-badge]][codacy-link]
 
 # WRENCH source repo
 
@@ -28,3 +29,5 @@ And, one of the following:
 [coveralls-link]:  https://coveralls.io/github/wrench-project/wrench?branch=master
 [release-badge]:   https://img.shields.io/github/release/wrench-project/wrench.svg
 [release-link]:    https://github.com/wrench-project/wrench/releases
+[codacy-badge]:    https://img.shields.io/codacy/grade/aef324ea84474fff979a8ff19a4e4681.svg
+[codacy-link]:     https://www.codacy.com/app/rafaelfsilva/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade
