@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.2)
 project(wrench)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 
 include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
 
@@ -57,7 +55,6 @@ set(SOURCE_FILES
         src/wrench/job_manager/JobManager.h
         src/wrench/simulation/Simulation.cpp
         src/wrench/simulation/Simulation.h
-        src/wrench/main.cpp
         src/wrench/workflow_job/WorkflowJob.cpp
         src/wrench/workflow_job/WorkflowJob.h
         src/wrench/workflow_job/StandardJob.cpp
@@ -94,10 +91,12 @@ install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
 install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench)
 
 # generate unit tests
-add_executable(unit_tests ${TEST_FILES})
+add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${TEST_FILES})
 target_link_libraries(unit_tests ${GOOGLE_TEST} wrench -lpthread -lm)
+set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
+set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
 
 # TODO: temporary simulation test binary
-add_executable(simulation ${SOURCE_FILES})
-target_link_libraries(simulation ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
+add_executable(simulation src/wrench/main.cpp)
+target_link_libraries(simulation wrench)
 install(TARGETS simulation DESTINATION bin)

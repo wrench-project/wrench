@@ -89,6 +89,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
   # configure coveralls
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install lcov; else sudo apt-get install lcov; fi
+  - sudo gem install coveralls-lcov
 
 install:
   # install SimGrid
@@ -113,8 +114,9 @@ install:
 script:
   - mkdir build && cd build
   - cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..
-  - make
+  - make all unit_tests
   - ./unit_tests
+  - cd ..
 
 after_success:
   - cd build
