@@ -1,5 +1,6 @@
 
 #include <iostream>
+#include <storage_services/simple_storage_service/SimpleStorageService.h>
 
 #include "wrench.h"
 
@@ -87,6 +88,12 @@ int main(int argc, char **argv) {
     std::exit(1);
 
   }
+
+  std::string storage_host = hostname_list[(hostname_list.size() > 3) ? 2 : 1];
+
+  std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
+  simulation.add(
+          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 10000.0)));
 
   std::string wms_host = hostname_list[0];
 

@@ -139,8 +139,12 @@ namespace wrench {
       WRENCH_INFO("Simple WMS Daemon is shutting down all Compute Services");
       this->simulation->shutdownAllComputeServices();
 
+      WRENCH_INFO("Simple WMS Daemon is shutting down all Data Services");
+      this->simulation->shutdownAllStorageServices();
+
       WRENCH_INFO("Simple WMS Daemon is shutting down the File Registry Service");
       this->simulation->getFileRegistryService()->stop();
+
 
       // This is brutal, but it's because that stupid job manager is currently
       // handling pilot job termination acks (due to the above shutdown), and

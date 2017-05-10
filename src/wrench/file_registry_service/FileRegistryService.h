@@ -13,6 +13,7 @@
 
 
 #include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
+#include <storage_services/StorageService.h>
 
 namespace wrench {
 
@@ -69,11 +70,8 @@ namespace wrench {
 
         // Setting/Getting property
         void setProperty(FileRegistryService::Property, std::string);
-
         std::string getPropertyString(FileRegistryService::Property);
-
         std::string getPropertyValueAsString(FileRegistryService::Property);
-
         double getPropertyValueAsDouble(FileRegistryService::Property);
 
         void stop();
@@ -82,22 +80,31 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
+
+
     private:
 
         FileRegistryService(std::string hostname,
                             std::map<FileRegistryService::Property, std::string> plist,
                             std::string suffix = "");
 
+
+        int main();
+        bool processNextMessage();
+
+
+        void addEntry(WorkflowFile *file, StorageService *ss);
+        void removeEntry(WorkflowFile *file, StorageService *ss);
+        void removeAllEntries(WorkflowFile *file);
+
+
         std::map<FileRegistryService::Property, std::string> property_list;
 
         std::string hostname;
-
-        int main();
-
         FileRegistryService::State state;
 
-        bool processNextMessage();
 
+        std::map<WorkflowFile *, std::set<StorageService *>> entries;
     };
 
 
