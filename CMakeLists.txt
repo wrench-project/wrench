@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.2)
 project(wrench)
 
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 
 include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
 
@@ -74,8 +76,7 @@ set(SOURCE_FILES
 set(TEST_FILES
         test/main.cpp
         test/workflow/WorkflowTaskTest.cpp
-        test/workflow/WorkflowTest.cpp
-        )
+        test/workflow/WorkflowTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)

@@ -88,7 +88,7 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then virtualenv venv -p python3; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source venv/bin/activate; fi
   # configure coveralls
-  - pip install --user cpp-coveralls
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install lcov; else sudo apt-get install lcov; fi
 
 install:
   # install SimGrid
@@ -117,7 +117,11 @@ script:
   - ./unit_tests
 
 after_success:
-  - coveralls --root .. -E ".*examples.*" -E ".*CMakeFiles.*" -E ".*test/.*.cpp.*"
+  - cd build
+  - lcov --directory . --capture --output-file coverage.info
+  - lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info
+  - lcov --list coverage.info
+  - coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
 
 notifications:
   email:
