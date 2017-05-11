@@ -8,7 +8,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <xbt.h>
 
 #include "wms/optimizations/dynamic/SimpleDynamicClusteringForFailures.h"
 

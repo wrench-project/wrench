@@ -101,11 +101,11 @@ install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
 install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench)
 
 # generate unit tests
-file(REMOVE_RECURSE ${PROJECT_BINARY_DIR}/*.gcda)
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${TEST_FILES})
 target_link_libraries(unit_tests ${GOOGLE_TEST} wrench -lpthread -lm)
 set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
 set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
+add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -print0 | xargs -0 rm)
 
 # TODO: temporary simulation test binary
 add_executable(simulation src/wrench/main.cpp)
