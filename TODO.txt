@@ -14,6 +14,10 @@ SOFTWARE ENGINEERING:
   StorageService,  ComputeService, FileRegistryService, etc.
     - Properties, however, need to be specific to each derived and twice-derived class...
 
+- For the WMS, instead of having a bit switch to handle events, instead do a "listener" thing:
+   A single method that says "waitForAndProcessNextEvent", that does the getMessage() and then
+   calls user-provided "take action" methods, which are defined as virtual no-op methods in the base WMS class.
+
 ---------------------------------------------------------------------
 
 
@@ -23,6 +27,7 @@ SOFTWARE ENGINEERING:
         - Mechanisms [HENRI]
             - Replica Catalog
             - Data storage service (with dual-host crappy model for now)
+                    Issue: How to go wait_any() with S4U
         - Usage [RAFAEL]
             - How jobs place data requests
 

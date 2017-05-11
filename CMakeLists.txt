@@ -71,7 +71,9 @@ set(SOURCE_FILES
         src/wrench/storage_services/StorageService.cpp
         src/wrench/storage_services/StorageService.h
         src/wrench/storage_services/simple_storage_service/SimpleStorageService.cpp
-        src/wrench/storage_services/simple_storage_service/SimpleStorageService.h)
+        src/wrench/storage_services/simple_storage_service/SimpleStorageService.h
+        src/wrench/data_movement_manager/DataMovementManager.cpp
+        src/wrench/data_movement_manager/DataMovementManager.h)
 
 # test files
 set(TEST_FILES

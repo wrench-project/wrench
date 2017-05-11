@@ -34,11 +34,20 @@ namespace wrench {
 
         virtual void stop();
 
+        virtual void copyFile(WorkflowFile *file, StorageService *src) = 0;
+
+        virtual void downloadFile(WorkflowFile *file) = 0;
+
+        virtual void uploadFile(WorkflowFile *file) = 0;
+
+        virtual void deleteFile(WorkflowFile *file) = 0;
+
         std::string getName();
 
         bool isUp();
 
         double getCapacity();
+
         double getFreeSpace();
 
         /***********************/
@@ -64,9 +73,12 @@ namespace wrench {
         std::string service_name;
         Simulation *simulation;  // pointer to the simulation object
 
-        void storeFile(WorkflowFile *);
+        void addFileToStorage(WorkflowFile *);
 
-        std::set<WorkflowFile*> stored_files;
+        void removeFileFromStorage(WorkflowFile *);
+
+
+        std::set<WorkflowFile *> stored_files;
         double capacity;
         double occupied_space = 0;
 
@@ -80,8 +92,6 @@ namespace wrench {
     /***********************/
 
 };
-
-
 
 
 #endif //WRENCH_STORAGESERVICE_H
