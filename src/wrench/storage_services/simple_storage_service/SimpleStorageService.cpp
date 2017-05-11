@@ -143,6 +143,25 @@ namespace wrench {
       }
     }
 
+    void SimpleStorageService::copyFile(WorkflowFile *file, StorageService *src) {
+      // Send a request to the daemon
+
+
+    }
+
+    void SimpleStorageService::downloadFile(WorkflowFile *file) {
+
+    }
+
+    void SimpleStorageService::uploadFile(WorkflowFile *file) {
+
+    }
+
+    void SimpleStorageService::deleteFile(WorkflowFile *file) {
+
+    }
+
+
     /**
      * @brief Main method of the daemon
      *
@@ -195,6 +214,4 @@ namespace wrench {
         }
       }
     }
-
-
 };

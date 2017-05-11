@@ -60,6 +60,15 @@ namespace wrench {
 
         double getPropertyValueAsDouble(SimpleStorageService::Property);
 
+        void copyFile(WorkflowFile *file, StorageService *src);
+
+        void downloadFile(WorkflowFile *file);
+
+        void uploadFile(WorkflowFile *file);
+
+        void deleteFile(WorkflowFile *file);
+
+
         /***********************/
         /** \endcond           */
         /***********************/

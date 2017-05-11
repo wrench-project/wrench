@@ -387,7 +387,7 @@ namespace wrench {
       XBT_INFO("Staging file %s (%lf)", file->getId().c_str(), file->getSize());
       // Put the file on the storage service
       try {
-        storage_service->storeFile(file);
+        storage_service->addFileToStorage(file);
       } catch (std::runtime_error e) {
         throw e;
       }

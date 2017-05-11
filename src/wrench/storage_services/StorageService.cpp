@@ -73,18 +73,37 @@ namespace wrench {
     }
 
     /**
-     * @
-     * @param file
+     * @brief Internal method to add a file to the storage in a StorageService
+     *
+     * @param file: a raw pointer to a WorkflowFile object
+     *
+     * @throw std::runtime_error
      */
-    void StorageService::storeFile(WorkflowFile *file) {
+    void StorageService::addFileToStorage(WorkflowFile *file) {
 
       if (file->getSize() > this->getFreeSpace()) {
-        XBT_INFO("FILE IS TOO BIG %lf %lf", file->getSize(), this->getFreeSpace());
         throw std::runtime_error("File exceeds free space capacity on storage service");
       }
       this->stored_files.insert(file);
       this->occupied_space += file->getSize();
-      XBT_INFO("Stored file %s (disk: %.2lf%%)", file->getId().c_str(), 100.0 * this->occupied_space / this->capacity);
+      XBT_INFO("Stored file %s (storage usage: %.2lf%%)", file->getId().c_str(), 100.0 * this->occupied_space / this->capacity);
+    }
+
+    /**
+     * @brief Internal method to delete a file from the storage  in a StorageService
+     *
+     * @param file: a raw pointer to a WorkflowFile object
+     *
+     * @throw std::runtime_error
+     */
+    void StorageService::removeFileFromStorage(WorkflowFile *file) {
+
+      if (this->stored_files.find(file) == this->stored_files.end()) {
+        throw std::runtime_error("Attempting to remove a file that's not on the storage service");
+      }
+      this->stored_files.erase(file);
+      this->occupied_space -= file->getSize();
+      XBT_INFO("Deleted file %s (storage usage: %.2lf%%)", file->getId().c_str(), 100.0 * this->occupied_space / this->capacity);
     }
 
 
