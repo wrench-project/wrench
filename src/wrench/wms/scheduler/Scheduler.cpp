@@ -16,14 +16,14 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(scheduler, "Log category for Scheduler");
 
 namespace wrench {
 
-/**
-    * @brief Schedule and run pilot jobs
-    *
-    * @param job_manager: a pointer to a JobManager object
-    * @param workflow: a pointer to a Workflow object
-    * @param flops: the number of flops that the PilotJob should be able to do before terminating
-    * @param compute_services: a set of pointers to ComputeService objects (i.e., compute services available to run jobs)
-    */
+    /**
+     * @brief Schedule and run pilot jobs
+     *
+     * @param job_manager: a pointer to a JobManager object
+     * @param workflow: a pointer to a Workflow object
+     * @param flops: the number of flops that the PilotJob should be able to do before terminating
+     * @param compute_services: a set of pointers to ComputeService objects (compute services available to run jobs)
+     */
     void Scheduler::schedulePilotJobs(JobManager *job_manager,
                                       Workflow *workflow,
                                       double flops,

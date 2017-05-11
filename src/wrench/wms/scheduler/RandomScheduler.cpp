@@ -26,7 +26,7 @@ namespace wrench {
      *
      * @param job_manager: a pointer to a JobManager object
      * @param ready_tasks: a map of ready WorkflowTask objects (i.e., ready tasks in the workflow)
-     * @param compute_services: a set of pointers to ComputeService objects (i.e., compute services available to run jobs)
+     * @param compute_services: a set of pointers to ComputeService objects (compute services available to run jobs)
      */
     void RandomScheduler::scheduleTasks(JobManager *job_manager,
                                         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
@@ -78,7 +78,7 @@ namespace wrench {
             WRENCH_INFO("Compute service %s says it CANNOT run this standard job :(", cs->getName().c_str());
           }
 
-          if (not can_run_job) continue;
+          if (not can_run_job) { continue; }
 
           // We can submit!
           WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
@@ -96,4 +96,4 @@ namespace wrench {
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }
-};
+}

@@ -17,71 +17,71 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(workflowFile, "Log category for WorkflowFile");
 
 namespace wrench {
 
-		/**
-		 * @brief Get the file size
-		 * @return  the file size in bytes
-		 */
-		double WorkflowFile::getSize() {
-			return this->size;
-		}
+    /**
+     * @brief Get the file size
+     * @return  the file size in bytes
+     */
+    double WorkflowFile::getSize() {
+      return this->size;
+    }
 
-		/**
-		 * @brief Get the file id
-		 * @return
-		 */
-		std::string WorkflowFile::getId() {
-			return this->id;
-		}
+    /**
+     * @brief Get the file id
+     * @return
+     */
+    std::string WorkflowFile::getId() {
+      return this->id;
+    }
 
-		/**
-		 * @brief Constructor
-		 *
-		 * @param string: the file name/id
-		 * @param s: the file size
-		 */
-		WorkflowFile::WorkflowFile(const std::string name, double s) {
-			this->id = name;
-			this->size = s;
-			this->output_of = nullptr;
-			this->input_of = {};
-		};
+    /**
+     * @brief Constructor
+     *
+     * @param string: the file name/id
+     * @param s: the file size
+     */
+    WorkflowFile::WorkflowFile(const std::string name, double s) {
+      this->id = name;
+      this->size = s;
+      this->output_of = nullptr;
+      this->input_of = {};
+    };
 
-		/**
-		 * @brief Define the task that outputs this file
-		 *
-		 * @param task: a pointer to a WorkflowTask object
-		 */
-		void WorkflowFile::setOutputOf(WorkflowTask *task) {
-			this->output_of = task;
-		}
+    /**
+     * @brief Define the task that outputs this file
+     *
+     * @param task: a pointer to a WorkflowTask object
+     */
+    void WorkflowFile::setOutputOf(WorkflowTask *task) {
+      this->output_of = task;
+    }
 
-		/**
-		 * @brief Get the task the outputs this file
-		 *
-		 * @return a pointer to a WorkflowTask
-		 */
-		WorkflowTask *WorkflowFile::getOutputOf() {
-			return this->output_of;
-		}
+    /**
+     * @brief Get the task the outputs this file
+     *
+     * @return a pointer to a WorkflowTask
+     */
+    WorkflowTask *WorkflowFile::getOutputOf() {
+      return this->output_of;
+    }
 
 
-		/**
-		 * @brief Add a task that uses this file as input
-		 *
-		 * @param task: a pointer to a WorkflowTask object
-		 */
-		void WorkflowFile::setInputOf(WorkflowTask *task) {
-			this->input_of[task->getId()] = task;
-		}
+    /**
+     * @brief Add a task that uses this file as input
+     *
+     * @param task: a pointer to a WorkflowTask object
+     */
+    void WorkflowFile::setInputOf(WorkflowTask *task) {
+      this->input_of[task->getId()] = task;
+    }
 
-		/**
-		 * @brief Get the set of tasks that use this file as input
-		 *
-		 * @return a map of pointers to WorkflowTask objects
-		 */
-		std::map<std::string, WorkflowTask *> WorkflowFile::getInputOf() {
-			return this->input_of;
-		};
+    /**
+     * @brief Get the set of tasks that use this file as input
+     *
+     * @return a map of pointers to WorkflowTask objects
+     */
+    std::map<std::string, WorkflowTask *> WorkflowFile::getInputOf() {
+      return this->input_of;
+    };
 
 };
 
