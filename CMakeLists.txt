@@ -83,7 +83,7 @@ set(TEST_FILES
         test/main.cpp
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowTest.cpp
-        test/wms/optimizations/dynamic/FailureDynamicCLusteringTest.cpp)
+        test/wms/optimizations/dynamic/FailureDynamicClusteringTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)

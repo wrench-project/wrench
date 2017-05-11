@@ -71,7 +71,8 @@ int main(int argc, char **argv) {
 
     std::cerr << "Instantiating a MultiCore Job executor on " << exexutor_host << "..." << std::endl;
     simulation.add(
-            std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(exexutor_host, true, false)));
+            std::unique_ptr<wrench::MulticoreJobExecutor>(
+                    new wrench::MulticoreJobExecutor(exexutor_host, true, false)));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << executor_host << "..." << std::endl;
 //		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(executor_host, true, false, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
@@ -93,8 +94,9 @@ int main(int argc, char **argv) {
 
   std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
 
-  wrench::StorageService *storage_service =simulation.add(
-          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 1000000000000.0)));
+  wrench::StorageService *storage_service = simulation.add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(storage_host, 1000000000000.0)));
 
   std::string wms_host = hostname_list[0];
 
@@ -115,7 +117,8 @@ int main(int argc, char **argv) {
   std::string file_registry_service_host = hostname_list[(hostname_list.size() > 2) ? 1 : 0];
 
   std::cerr << "Instantiating a FileRegistryService on " << file_registry_service_host << "..." << std::endl;
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(new wrench::FileRegistryService(file_registry_service_host));
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(file_registry_service_host));
   simulation.setFileRegistryService(std::move(file_registry_service));
 
   std::cerr << "Staging input files..." << std::endl;

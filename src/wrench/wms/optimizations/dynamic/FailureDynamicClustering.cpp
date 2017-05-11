@@ -36,7 +36,6 @@ namespace wrench {
           }
         }
       }
-      unsigned long final_size = workflow->getReadyTasks().size();
 
       if (count > 0) {
         WRENCH_INFO("Ungrouped %d tasks", count);
