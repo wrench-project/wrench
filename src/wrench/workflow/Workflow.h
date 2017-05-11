@@ -43,7 +43,7 @@ namespace wrench {
 
         void addControlDependency(WorkflowTask *, WorkflowTask *);
 
-        void loadFromDAX(const std::string filename);
+        void loadFromDAX(const std::string &filename);
 
         unsigned long getNumberOfTasks();
 

@@ -79,8 +79,8 @@ TEST_F(WorkflowTaskTest, GetSet) {
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
-  wrench::WorkflowFile * f1 = workflow->addFile("file-01", 10);
-  wrench::WorkflowFile * f2 = workflow->addFile("file-02", 100);
+  wrench::WorkflowFile *f1 = workflow->addFile("file-01", 10);
+  wrench::WorkflowFile *f2 = workflow->addFile("file-02", 100);
 
   t1->addInputFile(f1);
   t1->addOutputFile(f2);

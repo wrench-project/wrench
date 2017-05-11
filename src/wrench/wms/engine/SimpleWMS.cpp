@@ -24,14 +24,18 @@ namespace wrench {
      * @brief Create a Simple WMS with a workflow instance and a scheduler implementation
      *
      * @param simulation: a pointer to a simulation object
-		 * @param workflow: a pointer to a workflow to execute
-		 * @param scheduler: a pointer to a scheduler implementation
-		 * @param hostname: the name of the host
+     * @param workflow: a pointer to a workflow to execute
+     * @param scheduler: a pointer to a scheduler implementation
+     * @param hostname: the name of the host
      */
     SimpleWMS::SimpleWMS(Simulation *simulation,
                          Workflow *workflow,
                          std::unique_ptr<Scheduler> scheduler,
-                         std::string hostname) : WMS(simulation, workflow, std::move(scheduler), hostname, "simple") {}
+                         std::string hostname) : WMS(simulation,
+                                                     workflow,
+                                                     std::move(scheduler),
+                                                     hostname,
+                                                     "simple") {}
 
     /**
      * @brief main method of the SimpleWMS daemon
@@ -44,7 +48,8 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
 
-      WRENCH_INFO("Starting on host %s listening on mailbox %s", S4U_Simulation::getHostName().c_str(),
+      WRENCH_INFO("Starting on host %s listening on mailbox %s",
+                  S4U_Simulation::getHostName().c_str(),
                   this->mailbox_name.c_str());
       WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
@@ -79,12 +84,14 @@ namespace wrench {
         this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, flops,
                                            this->simulation->getComputeServices());
 
-        // Call dynamic
-        // TODO
+        // Perform dynamic optimizations
+        runDynamicOptimizations();
 
         // Run ready tasks with defined scheduler implementation
         WRENCH_INFO("Scheduling tasks...");
-        this->scheduler->scheduleTasks(job_manager.get(), ready_tasks, this->simulation->getComputeServices());
+        this->scheduler->scheduleTasks(job_manager.get(),
+                                       ready_tasks,
+                                       this->simulation->getComputeServices());
 
         // Wait for a workflow execution event
         std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
@@ -123,8 +130,6 @@ namespace wrench {
         if (workflow->isDone()) {
           break;
         }
-
-
       }
 
       S4U_Mailbox::clear_dputs();

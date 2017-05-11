@@ -12,6 +12,7 @@
 
 #include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
 #include "wms/scheduler/Scheduler.h"
+#include "wms/optimizations/dynamic/DynamicOptimization.h"
 #include "wms/optimizations/static/StaticOptimization.h"
 #include "workflow/Workflow.h"
 
@@ -27,6 +28,8 @@ namespace wrench {
     public:
         void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
+        void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
+
 
         /***********************/
         /** \cond DEVELOPER */
@@ -40,11 +43,14 @@ namespace wrench {
 
         WMS(Simulation *, Workflow *, std::unique_ptr<Scheduler>, std::string, std::string);
 
+        void runDynamicOptimizations();
+
         void runStaticOptimizations();
 
         Simulation *simulation;
         Workflow *workflow;
         std::unique_ptr<Scheduler> scheduler;
+        std::vector<std::unique_ptr<DynamicOptimization>> dynamic_optimizations;
         std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
 
 
@@ -54,6 +60,7 @@ namespace wrench {
 
     private:
         virtual int main() = 0;
+
         std::string hostname;
     };
 };

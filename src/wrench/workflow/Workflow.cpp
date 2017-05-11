@@ -91,7 +91,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     WorkflowTask *Workflow::getWorkflowTaskByID(const std::string id) {
-      if (!tasks[id]) {
+      if (not tasks[id]) {
         throw std::invalid_argument("Workflow::getWorkflowTaskByID(): Unknown WorkflowTask ID " + id);
       }
       return tasks[id].get();
@@ -112,7 +112,7 @@ namespace wrench {
         throw std::invalid_argument("Workflow::addControlDependency(): passed a nullptr task");
       }
 
-      if (!pathExists(src, dst)) {
+      if (not pathExists(src, dst)) {
 
         WRENCH_DEBUG("Adding control dependency %s-->%s",
                      src->getId().c_str(), dst->getId().c_str());
@@ -163,7 +163,7 @@ namespace wrench {
      * @return a pointer to a WorkflowFile object, nullptr if not found
      */
     WorkflowFile *Workflow::getWorkflowFileByID(const std::string id) {
-      if (!files[id]) {
+      if (not files[id]) {
         return nullptr;
       } else {
         return files[id].get();
@@ -198,10 +198,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Workflow::loadFromDAX(const std::string filename) {
+    void Workflow::loadFromDAX(const std::string &filename) {
       pugi::xml_document dax_tree;
 
-      if (!dax_tree.load_file(filename.c_str())) {
+      if (not dax_tree.load_file(filename.c_str())) {
         throw std::invalid_argument("Invalid DAX file");
       }
 
@@ -234,7 +234,7 @@ namespace wrench {
           // Check whether the file already exists
           WorkflowFile *file = this->getWorkflowFileByID(id);
 
-          if (!file) {
+          if (not file) {
             file = this->addFile(id, size);
           }
           if (link == "input") {

@@ -38,7 +38,7 @@ namespace wrench {
      *
      * @param job_manager: a pointer to a JobManager object
      * @param ready_tasks: a vector of ready WorkflowTask objects (i.e., ready tasks in the workflow)
-     * @param compute_services: a set of pointers to ComputeService objects (i.e., compute services available to run jobs)
+     * @param compute_services: a set of pointers to ComputeService objects (compute services available to run jobs)
      */
     void MinMinScheduler::scheduleTasks(JobManager *job_manager,
                                         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
@@ -72,10 +72,10 @@ namespace wrench {
             break;
           }
         }
-        if (!successfully_scheduled) {
+        if (not successfully_scheduled) {
           WRENCH_INFO("no dice");
           break;
         }
       }
     }
-};
+}
