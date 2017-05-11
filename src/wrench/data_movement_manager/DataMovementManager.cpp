@@ -28,7 +28,6 @@ namespace wrench {
 
       // Start the daemon
       std::string localhost = S4U_Simulation::getHostName();
-      this->hostname = localhost;
       this->start(localhost);
     }
 
@@ -36,10 +35,7 @@ namespace wrench {
      * @brief Destructor, which kills the daemon
      */
     DataMovementManager::~DataMovementManager() {
-      if (!this->killed) {
-        WRENCH_INFO("Killing JobManager %s on %s", this->process_name.c_str(), this->hostname.c_str());
-        this->kill();
-      }
+      this->kill();
     }
 
     /**
@@ -91,8 +87,6 @@ namespace wrench {
 
       }
 
-//      WRENCH_INFO("Data Movement Manager sleeping for a LONG time");
-//      S4U_Simulation::sleep(1000000000);
       WRENCH_INFO("Data Movement Manager terminating");
       return 0;
     }

@@ -46,7 +46,6 @@ namespace wrench {
         std::string hostname;
         double task_start_up_overhead;
 
-        bool killed = false;
     };
 
     /***********************/

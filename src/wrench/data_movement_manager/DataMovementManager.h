@@ -40,9 +40,6 @@ namespace wrench {
         // Relevant workflow
         Workflow *workflow;
 
-        std::string hostname;
-        bool killed = false;
-
         /***********************/
         /** \endcond           */
         /***********************/

@@ -32,9 +32,12 @@ namespace wrench {
 				void start(std::string hostname);
 				virtual int main() = 0;
 				void kill_actor();
+        void setTerminated();
 
 		private:
-				simgrid::s4u::ActorPtr actor;
+        bool terminated;
+				simgrid::s4u::ActorPtr s4u_actor;
+
 
 		};
 

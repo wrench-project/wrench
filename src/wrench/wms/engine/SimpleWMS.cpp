@@ -157,6 +157,7 @@ namespace wrench {
        *** NO NEED TO stop/kill the Managers (will soon be out of scope, and
        *** destructor simply called kill() on their actors.
        ***/
+      
 
       WRENCH_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
 

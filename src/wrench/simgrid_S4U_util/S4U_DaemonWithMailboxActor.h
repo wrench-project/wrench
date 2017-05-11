@@ -38,6 +38,7 @@ namespace wrench {
 
         void operator()() {
           this->daemon->main();
+          this->daemon->setTerminated();
         }
 
     private:

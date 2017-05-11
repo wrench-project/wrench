@@ -72,7 +72,7 @@ SOFTWARE ENGINEERING:
 
     - General question: When will we get C++ Exceptions from SIMIX?
 
-    - S4U: Kill() segfaults if actor has already terminated. Would it be
+    - S4U: Kill() segfaults if s4u_actor has already terminated. Would it be
            possible to have some isAlive() method?  Or have kill() do a no-op if
            already dead?
 

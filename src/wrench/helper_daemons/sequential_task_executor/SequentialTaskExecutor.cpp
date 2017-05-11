@@ -49,10 +49,7 @@ namespace wrench {
      * @brief Kill the sequential task executor
      */
     void SequentialTaskExecutor::kill() {
-      if (!this->killed) {
-        WRENCH_INFO("Killing SequentialTaskExecutor %s on %s", this->process_name.c_str(), this->hostname.c_str());
-        this->kill_actor();
-      }
+      this->kill_actor();
     }
 
     /**
@@ -131,7 +128,6 @@ namespace wrench {
       }
 
       WRENCH_INFO("Sequential Task Executor Daemon on host %s terminated!", S4U_Simulation::getHostName().c_str());
-      this->killed = true;
       return 0;
     }
 

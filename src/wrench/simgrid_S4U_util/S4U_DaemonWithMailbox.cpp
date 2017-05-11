@@ -36,11 +36,11 @@ namespace wrench {
         throw std::invalid_argument("Unknown host name '" + hostname + "'");
       }
 
-      // Create the actor
+      // Create the s4u_actor
       try {
-        this->actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
-                                                       simgrid::s4u::Host::by_name(hostname),
-                                                       S4U_DaemonWithMailboxActor(this));
+        this->s4u_actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
+                                                           simgrid::s4u::Host::by_name(hostname),
+                                                           S4U_DaemonWithMailboxActor(this));
       } catch (std::exception e) {
         // Some internal SimGrid exceptions...
         std::abort();
@@ -48,7 +48,7 @@ namespace wrench {
 
       // Set the mailbox receiver
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
-      mailbox->setReceiver(this->actor);
+      mailbox->setReceiver(this->s4u_actor);
 
     }
 
@@ -56,7 +56,18 @@ namespace wrench {
      * @brief Kill the daemon/actor.
      */
     void S4U_DaemonWithMailbox::kill_actor() {
-      this->actor->kill();
+      if (!(this->terminated)) {
+        this->s4u_actor->kill();
+        this->terminated = true;
+      } else {
+      }
+    }
+
+    /**
+     * @brief Set the terminated status of the daemon/actor
+     */
+    void S4U_DaemonWithMailbox::setTerminated() {
+      this->terminated = true;
     }
 
 };
