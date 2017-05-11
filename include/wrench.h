@@ -28,6 +28,10 @@
 #include "wms/optimizations/static/StaticOptimization.h"
 #include "wms/optimizations/static/SimplePipelineClustering.h"
 
+// Dynamic Optimizations
+#include "wms/optimizations/dynamic/DynamicOptimization.h"
+#include "wms/optimizations/dynamic/SimpleDynamicClusteringForFailures.h"
+
 // Simulation Output Analysis
 #include "simulation/SimulationTimestamp.h"
 #include "simulation/SimulationTimestampTypes.h"

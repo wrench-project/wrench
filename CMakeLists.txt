@@ -34,6 +34,8 @@ set(SOURCE_FILES
         src/wrench/wms/optimizations/static/SimplePipelineClustering.h
         src/wrench/wms/optimizations/static/SimplePipelineClustering.cpp
         src/wrench/wms/optimizations/dynamic/DynamicOptimization.h
+        src/wrench/wms/optimizations/dynamic/SimpleDynamicClusteringForFailures.h
+        src/wrench/wms/optimizations/dynamic/SimpleDynamicClusteringForFailures.cpp
         src/wrench/wms/engine/SimpleWMS.h
         src/wrench/wms/engine/SimpleWMS.cpp
         src/wrench/wms/scheduler/Scheduler.h
@@ -78,7 +80,8 @@ set(SOURCE_FILES
 set(TEST_FILES
         test/main.cpp
         test/workflow/WorkflowTaskTest.cpp
-        test/workflow/WorkflowTest.cpp)
+        test/workflow/WorkflowTest.cpp
+        test/wms/optimizations/dynamic/SimpleDynamicClusteringForFailuresTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)
@@ -96,6 +99,7 @@ install(FILES ${INCLUDE_FILES} DESTINATION include/wrench)
 install(FILES ${INCLUDE_DEV_FILES} DESTINATION include/wrench)
 
 # generate unit tests
+file(REMOVE_RECURSE ${PROJECT_BINARY_DIR}/*.gcda)
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${TEST_FILES})
 target_link_libraries(unit_tests ${GOOGLE_TEST} wrench -lpthread -lm)
 set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")

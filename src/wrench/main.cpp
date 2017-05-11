@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
   std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
 
   wrench::StorageService *storage_service =simulation.add(
-          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 10000000000.0)));
+          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 1000000000000.0)));
 
   std::string wms_host = hostname_list[0];
 
@@ -104,9 +104,11 @@ int main(int argc, char **argv) {
 //  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MinMinScheduler());
 //  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MaxMinScheduler());
   std::unique_ptr<wrench::StaticOptimization> opt(new wrench::SimplePipelineClustering());
+  std::unique_ptr<wrench::DynamicOptimization> dynamic_opt(new wrench::SimpleDynamicClusteringForFailures());
 
   std::unique_ptr<wrench::WMS> wms(new wrench::SimpleWMS(&simulation, &workflow, std::move(scheduler), wms_host));
   wms.get()->addStaticOptimization(std::move(opt));
+  wms.get()->addDynamicOptimization(std::move(dynamic_opt));
 
   simulation.setWMS(std::move(wms));
 
