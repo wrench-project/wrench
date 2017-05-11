@@ -33,6 +33,7 @@ set(SOURCE_FILES
         src/wrench/wms/optimizations/static/StaticOptimization.h
         src/wrench/wms/optimizations/static/SimplePipelineClustering.h
         src/wrench/wms/optimizations/static/SimplePipelineClustering.cpp
+        src/wrench/wms/optimizations/dynamic/DynamicOptimization.h
         src/wrench/wms/engine/SimpleWMS.h
         src/wrench/wms/engine/SimpleWMS.cpp
         src/wrench/wms/scheduler/Scheduler.h

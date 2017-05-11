@@ -48,7 +48,7 @@ namespace wrench {
         for (auto pj : running_pilot_jobs) {
           ComputeService *cs = pj->getComputeService();
 
-          if (!cs->canRunJob(WorkflowJob::STANDARD, 1, total_flops)) {
+          if (not cs->canRunJob(WorkflowJob::STANDARD, 1, total_flops)) {
             continue;
           }
 
@@ -78,7 +78,7 @@ namespace wrench {
             WRENCH_INFO("Compute service %s says it CANNOT run this standard job :(", cs->getName().c_str());
           }
 
-          if (!can_run_job) continue;
+          if (not can_run_job) continue;
 
           // We can submit!
           WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
@@ -88,7 +88,7 @@ namespace wrench {
           break;
         }
 
-        if (!successfully_scheduled) {
+        if (not successfully_scheduled) {
           WRENCH_INFO("no dice");
           break;
         }
