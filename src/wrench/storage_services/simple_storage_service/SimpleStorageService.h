@@ -60,10 +60,6 @@ namespace wrench {
 
         double getPropertyValueAsDouble(SimpleStorageService::Property);
 
-        double getCapacity();
-
-        double getFreeSpace();
-
         /***********************/
         /** \endcond           */
         /***********************/

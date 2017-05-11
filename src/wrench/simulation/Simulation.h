@@ -46,10 +46,15 @@ namespace wrench {
 
         void launch();
 
-        void add(std::unique_ptr<ComputeService> executor);
-        void add(std::unique_ptr<StorageService> executor);
+        ComputeService *add(std::unique_ptr<ComputeService> executor);
+
+        StorageService *add(std::unique_ptr<StorageService> executor);
 
         void setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service);
+
+        void stageFile(WorkflowFile *file, StorageService *storage_service);
+
+        void stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service);
 
         void setWMS(std::unique_ptr<WMS>);
 
@@ -59,13 +64,15 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        template <class T> void newTimestamp(SimulationTimestamp<T> *event);
+        template<class T>
+        void newTimestamp(SimulationTimestamp<T> *event);
 
         void shutdownAllComputeServices();
 
         void shutdownAllStorageServices();
 
         std::set<ComputeService *> getComputeServices();
+
         std::set<StorageService *> getStorageServices();
 
         FileRegistryService *getFileRegistryService();
@@ -84,6 +91,7 @@ namespace wrench {
                 double ttl, PilotJob *pj, std::string suffix);
 
         void mark_compute_service_as_terminated(ComputeService *cs);
+
         void mark_storage_service_as_terminated(StorageService *ss);
 
         /***********************/
@@ -102,6 +110,8 @@ namespace wrench {
 
         std::vector<std::unique_ptr<StorageService>> running_storage_services;
         std::vector<std::unique_ptr<StorageService>> terminated_storage_services;
+
+
     };
 
 };

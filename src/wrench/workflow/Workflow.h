@@ -12,6 +12,7 @@
 
 #include <lemon/list_graph.h>
 #include <map>
+#include <set>
 
 #include "workflow_execution_events/WorkflowExecutionEvent.h"
 #include "WorkflowFile.h"
@@ -47,6 +48,8 @@ namespace wrench {
         unsigned long getNumberOfTasks();
 
         void exportToEPS(std::string);
+
+        std::set<WorkflowFile *>getInputFiles();
 
         /***********************/
         /** \cond DEVELOPER    */

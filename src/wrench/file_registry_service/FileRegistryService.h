@@ -81,8 +81,13 @@ namespace wrench {
         /***********************/
 
 
-
     private:
+
+        friend class Simulation;
+
+        void addEntry(WorkflowFile *file, StorageService *ss);
+        void removeEntry(WorkflowFile *file, StorageService *ss);
+        void removeAllEntries(WorkflowFile *file);
 
         FileRegistryService(std::string hostname,
                             std::map<FileRegistryService::Property, std::string> plist,
@@ -93,9 +98,6 @@ namespace wrench {
         bool processNextMessage();
 
 
-        void addEntry(WorkflowFile *file, StorageService *ss);
-        void removeEntry(WorkflowFile *file, StorageService *ss);
-        void removeAllEntries(WorkflowFile *file);
 
 
         std::map<FileRegistryService::Property, std::string> property_list;

@@ -35,6 +35,9 @@ namespace wrench {
         std::string getHostname();
 
     protected:
+
+        friend class Simulation;
+
         WMS(Simulation *, Workflow *, std::unique_ptr<Scheduler>, std::string, std::string);
 
         void runStaticOptimizations();

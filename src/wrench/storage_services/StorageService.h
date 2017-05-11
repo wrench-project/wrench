@@ -13,6 +13,8 @@
 
 
 #include <string>
+#include <workflow/WorkflowFile.h>
+#include <set>
 
 namespace wrench {
 
@@ -36,9 +38,8 @@ namespace wrench {
 
         bool isUp();
 
-        virtual double getCapacity() = 0;
-
-        virtual double getFreeSpace() = 0;
+        double getCapacity();
+        double getFreeSpace();
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -49,18 +50,25 @@ namespace wrench {
             DOWN,
         };
 
-        StorageService(std::string service_name);
+        StorageService(std::string service_name, double capacity);
 
         void setStateToDown();
 
     protected:
 
         friend class Simulation;
+
         void setSimulation(Simulation *simulation);
 
         StorageService::State state;
         std::string service_name;
         Simulation *simulation;  // pointer to the simulation object
+
+        void storeFile(WorkflowFile *);
+
+        std::set<WorkflowFile*> stored_files;
+        double capacity;
+        double occupied_space = 0;
 
     private:
 

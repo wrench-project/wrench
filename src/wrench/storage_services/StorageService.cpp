@@ -11,6 +11,9 @@
 #include "StorageService.h"
 #include "../simulation/Simulation.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service, "Log category for Storage Service");
+
+
 namespace wrench {
 
     /**
@@ -62,9 +65,43 @@ namespace wrench {
    *
    * @param service_name: the name of the storage service
    */
-    StorageService::StorageService(std::string service_name) {
+    StorageService::StorageService(std::string service_name, double capacity) {
       this->service_name = service_name;
+      this->capacity  = capacity;
       this->simulation = nullptr; // will be filled in via Simulation::add()
       this->state = StorageService::UP;
     }
+
+    /**
+     * @
+     * @param file
+     */
+    void StorageService::storeFile(WorkflowFile *file) {
+
+      if (file->getSize() > this->getFreeSpace()) {
+        XBT_INFO("FILE IS TOO BIG %lf %lf", file->getSize(), this->getFreeSpace());
+        throw std::runtime_error("File exceeds free space capacity on storage service");
+      }
+      this->stored_files.insert(file);
+      this->occupied_space += file->getSize();
+      XBT_INFO("Stored file %s (disk: %.2lf%%)", file->getId().c_str(), 100.0 * this->occupied_space / this->capacity);
+    }
+
+
+    /**
+    * @brief Retrieve the storage capacity of the storage service
+    * @return the capacity in bytes
+    */
+    double StorageService::getCapacity() {
+      return this->capacity;
+    }
+
+    /**
+     * @brief Retrieve the free storage space on the storage service
+     * @return the free space in bytes
+     */
+    double StorageService::getFreeSpace() {
+      return this->capacity - this->occupied_space;
+    }
+
 };

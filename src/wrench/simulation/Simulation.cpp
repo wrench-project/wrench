@@ -13,7 +13,6 @@
 #include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 #include "logging/TerminalOutput.h"
 #include "simulation/Simulation.h"
-#include "SimulationTimestamp.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 
@@ -56,7 +55,7 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-      // this->s4u_simulation->shutdown();
+//       this->s4u_simulation->shutdown();
     }
 
     /**
@@ -94,7 +93,8 @@ namespace wrench {
      * @brief Append a SimulationEvent to the event trace
      * @param event
      */
-    template <class T> void Simulation::newTimestamp(SimulationTimestamp<T> *event) {
+    template<class T>
+    void Simulation::newTimestamp(SimulationTimestamp<T> *event) {
       this->output.addTimestamp(event);
     }
 
@@ -122,7 +122,6 @@ namespace wrench {
      *
      * @return a vector of hostnames
      *
-     * @throw std::runtime_error
      */
     std::vector<std::string> Simulation::getHostnameList() {
       return this->s4u_simulation->getAllHostnames();
@@ -130,6 +129,8 @@ namespace wrench {
 
     /**
 		 * @brief Launch the simulation
+     *
+     * @throw std::runtime_error
 		 *
 		 */
     void Simulation::launch() {
@@ -137,14 +138,36 @@ namespace wrench {
       if (!this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation is not initialized");
       }
+
       // Check that a WMS is running
       if (!this->wms) {
-        throw std::runtime_error("A WMS should have been instantiated and passed to the simulation via setWMS()");
+        throw std::runtime_error("A WMS should have been instantiated and passed to Simulation.setWMS()");
       }
+
+      // Check that at least one ComputeService is running
+      if (this->running_compute_services.size() <= 0) {
+        throw std::runtime_error(
+                "At least one ComputeService should have been instantiated add passed to Simulation.add()");
+      }
+
+      // Check that at least one StorageService is running
+      if (this->running_storage_services.size() <= 0) {
+        throw std::runtime_error(
+                "At least one StorageService should have been instantiated add passed to Simulation.add()");
+      }
+
       // Check that a FileRegistryService is running
-      if  (!this->file_registry_service) {
-        WRENCH_WARN("Starting a default File Registry Service on host %s", this->wms->getHostname().c_str());
-        this->setFileRegistryService(std::unique_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService(this->wms->getHostname())));
+      if (!this->file_registry_service) {
+        throw std::runtime_error(
+                "A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()");
+      }
+
+      // Check that each input file is staged somewhere
+      for (auto f : this->wms->workflow->getInputFiles()) {
+        if (this->file_registry_service->entries.find(f) == this->file_registry_service->entries.end()) {
+          throw std::runtime_error(
+                  "Workflow input file " + f->getId() + " is not staged on any storage service!");
+        }
       }
 
       this->s4u_simulation->runSimulation();
@@ -156,17 +179,20 @@ namespace wrench {
      * @param executor: a unique pointer to a ComputeService object, the ownership of which is
      *        then transferred to WRENCH
      *
-     * @throw std::invalid_argument
+     * @return a raw pointer to the ComputeService object
+     *
+     * @throw std::runtime_error
      */
-    void Simulation::add(std::unique_ptr<ComputeService> service) {
+    ComputeService *Simulation::add(std::unique_ptr<ComputeService> service) {
       if (!this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation is not initialized");
       }
+      ComputeService *raw_ptr = service.get();
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
       running_compute_services.push_back(std::move(service));
-      return;
+      return raw_ptr;
     }
 
     /**
@@ -175,17 +201,21 @@ namespace wrench {
     * @param executor: a unique pointer to a StorageService object, the ownership of which is
     *        then transferred to WRENCH
     *
-    * @throw std::invalid_argument
+    * @return a raw pointer to the StorageService object
+     *
+    * @throw std::runtime_error
     */
-    void Simulation::add(std::unique_ptr<StorageService> service) {
+    StorageService *Simulation::add(std::unique_ptr<StorageService> service) {
       if (!this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation is not initialized");
       }
+      StorageService *raw_ptr = service.get();
+
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
       running_storage_services.push_back(std::move(service));
-      return;
+      return raw_ptr;
     }
 
     /**
@@ -257,10 +287,9 @@ namespace wrench {
      * @brief Retrieves the FileRegistryService
      * @return a raw pointer to the FileRegistryService instance
      */
-    FileRegistryService * Simulation::getFileRegistryService() {
+    FileRegistryService *Simulation::getFileRegistryService() {
       return this->file_registry_service.get();
     }
-
 
 
     /**
@@ -334,4 +363,71 @@ namespace wrench {
       // (not sure this can ever happen for a StorageService, but whatever)
       return;
     }
+
+
+    /**
+     * @brief Stage a copy of a file on a storage service
+     * @param file: a raw pointer to a WorkflowFile object
+     * @param storage_service: a raw pointer to a StorageService object
+     *
+     * @throw std::runtime_error
+     * @throw std::invalid_argument
+     */
+    void Simulation::stageFile(WorkflowFile *file, StorageService *storage_service) {
+      if ((file == nullptr) || (storage_service == nullptr)) {
+        throw std::invalid_argument("Invalid arguments");
+      }
+
+      // Check that a FileRegistryService has been set
+      if (!this->file_registry_service) {
+        throw std::runtime_error(
+                "A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+      }
+
+      XBT_INFO("Staging file %s (%lf)", file->getId().c_str(), file->getSize());
+      // Put the file on the storage service
+      try {
+        storage_service->storeFile(file);
+      } catch (std::runtime_error e) {
+        XBT_INFO("EXCEPTION!!");
+        std::cerr << "WHAT = " << e.what() << std::endl;
+        throw e;
+      }
+
+      // Update the file registry
+      this->file_registry_service->addEntry(file, storage_service);
+
+    }
+
+    /**
+   * @brief Stage a set of a file copies on a storage service
+   * @param files: a set of raw pointers to WorkflowFile objects
+   * @param storage_service: a raw pointer to a StorageService object
+   *
+   * @throw std::runtime_error
+   * @throw std::invalid_argument
+   */
+    void Simulation::stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service) {
+
+      if (storage_service == nullptr) {
+        throw std::invalid_argument("Invalid arguments");
+      }
+
+      // Check that a FileRegistryService has been set
+      if (!this->file_registry_service) {
+        throw std::runtime_error(
+                "A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+      }
+
+      try {
+        for (auto f : files) {
+          this->stageFile(f, storage_service);
+        }
+      } catch (std::runtime_error e) {
+        throw e;
+      } catch (std::invalid_argument e) {
+        throw e;
+      }
+    }
+
 };

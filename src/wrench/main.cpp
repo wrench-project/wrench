@@ -92,8 +92,9 @@ int main(int argc, char **argv) {
   std::string storage_host = hostname_list[(hostname_list.size() > 3) ? 2 : 1];
 
   std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
-  simulation.add(
-          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 10000.0)));
+
+  wrench::StorageService *storage_service =simulation.add(
+          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 10000000000.0)));
 
   std::string wms_host = hostname_list[0];
 
@@ -115,9 +116,22 @@ int main(int argc, char **argv) {
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(new wrench::FileRegistryService(file_registry_service_host));
   simulation.setFileRegistryService(std::move(file_registry_service));
 
+  std::cerr << "Staging input files..." << std::endl;
+  std::set<wrench::WorkflowFile *> input_files = workflow.getInputFiles();
+  try {
+    simulation.stageFiles(input_files, storage_service);
+  } catch (std::runtime_error e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
+    return 0;
+  }
 
   std::cerr << "Launching the Simulation..." << std::endl;
-  simulation.launch();
+  try {
+    simulation.launch();
+  } catch (std::runtime_error e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
+    return 0;
+  }
   std::cerr << "Simulation done!" << std::endl;
 
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;

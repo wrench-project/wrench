@@ -2,6 +2,10 @@
 
 BUGS:
 
+    - There is a SegFault when exiting before simulation.launch() is executed.
+        ("Invalid read of size 8" in smpi_process())
+          Need to find good ways to cleanup stuff in S4U...
+
 ---------------------------------------------------------------------
 
 SOFTWARE ENGINEERING:

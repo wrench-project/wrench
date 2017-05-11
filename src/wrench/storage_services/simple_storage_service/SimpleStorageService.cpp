@@ -43,7 +43,7 @@ namespace wrench {
             double capacity,
             std::map<SimpleStorageService::Property, std::string> plist,
             std::string suffix) :
-            StorageService("simple_storage_service"),
+            StorageService("simple_storage_service", capacity),
             S4U_DaemonWithMailbox("file_registry_service" + suffix, "file_registry_service" + suffix) {
 
       // Set default properties
@@ -57,7 +57,6 @@ namespace wrench {
       }
 
       this->hostname = hostname;
-      this->capacity = capacity;
 
       // Start the daemon on the same host
       try {
@@ -197,20 +196,5 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Retrieve the storage capacity of the storage service
-     * @return the capacity in bytes
-     */
-    double SimpleStorageService::getCapacity() {
-      return this->capacity;
-    }
-
-    /**
-     * @brief Retrieve the free storage space on the storage service
-     * @return the free space in bytes
-     */
-    double SimpleStorageService::getFreeSpace() {
-      throw std::runtime_error("getFreeSpace() not implemneted yet");
-    }
 
 };

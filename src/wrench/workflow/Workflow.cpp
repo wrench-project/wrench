@@ -458,4 +458,20 @@ namespace wrench {
         }
       }
     }
+
+    /**
+     * @brief Retrieve the set of input files for a Workflow
+     *
+     * @return a std::set of raw pointers to WorkflowFile objects
+     */
+    std::set<WorkflowFile *> Workflow::getInputFiles() {
+      std::set<WorkflowFile *> input_files;
+      for (auto const &x : this->files) {
+        if (x.second->output_of == nullptr) {
+          input_files.insert(x.second.get());
+        }
+      }
+      return input_files;
+    }
+
 };
