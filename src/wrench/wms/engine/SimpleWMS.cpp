@@ -8,6 +8,7 @@
  */
 
 #include <iostream>
+#include <data_movement_manager/DataMovementManager.h>
 
 #include "logging/TerminalOutput.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
@@ -55,6 +56,9 @@ namespace wrench {
 
       // Create a job manager
       std::unique_ptr<JobManager> job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
+
+      // Create a data movement manager
+      std::unique_ptr<DataMovementManager> data_movement_manager = std::unique_ptr<DataMovementManager>(new DataMovementManager(this->workflow));
 
       // Perform static optimizations
       runStaticOptimizations();
@@ -140,7 +144,6 @@ namespace wrench {
         WRENCH_INFO("Workflow execution is incomplete, but there are no more compute services...");
       }
 
-
       WRENCH_INFO("Simple WMS Daemon is shutting down all Compute Services");
       this->simulation->shutdownAllComputeServices();
 
@@ -150,15 +153,10 @@ namespace wrench {
       WRENCH_INFO("Simple WMS Daemon is shutting down the File Registry Service");
       this->simulation->getFileRegistryService()->stop();
 
-
-      // This is brutal, but it's because that stupid job manager is currently
-      // handling pilot job termination acks (due to the above shutdown), and
-      // thus is stuck waiting for the WMS to receive them. But we're done. So,
-      // for now, let's just kill it.
-      // Perhaps this should be called in the destructor of the JobManager?
-      // So that when the unique_ptr goes out of scope, the daemon dies...
-      WRENCH_INFO("Killing the job manager");
-      job_manager->kill();
+      /***
+       *** NO NEED TO stop/kill the Managers (will soon be out of scope, and
+       *** destructor simply called kill() on their actors.
+       ***/
 
       WRENCH_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
 

@@ -47,9 +47,9 @@ SOFTWARE ENGINEERING:
 
         [DONE] Event Traces: Template the TimeStamp class to afford genericity
 
-        - Dynamic Optimization
-            - Implement a naive one [RAFAEL]
-            - Call it in right before scheduler [RAFAEL]
+        [DONE] Dynamic Optimization
+            - Implement a naive one
+            - Call it in right before scheduler
 
         [DONE] WorkflowTask:
             - add a failure count incremented for each failure
@@ -71,5 +71,10 @@ SOFTWARE ENGINEERING:
 
 
     - General question: When will we get C++ Exceptions from SIMIX?
+
+    - S4U: Kill() segfaults if actor has already terminated. Would it be
+           possible to have some isAlive() method?  Or have kill() do a no-op if
+           already dead?
+
 
 -----------------------------------------------------------------------

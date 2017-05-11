@@ -45,6 +45,8 @@ namespace wrench {
         std::string callback_mailbox;
         std::string hostname;
         double task_start_up_overhead;
+
+        bool killed = false;
     };
 
     /***********************/

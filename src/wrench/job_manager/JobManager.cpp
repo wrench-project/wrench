@@ -33,6 +33,7 @@ namespace wrench {
 
       // Start the daemon
       std::string localhost = S4U_Simulation::getHostName();
+      this->hostname = localhost;
       this->start(localhost);
     }
 
@@ -40,11 +41,14 @@ namespace wrench {
      * @brief Destructor, which kills the daemon
      */
     JobManager::~JobManager() {
-      this->kill();
+      if (!this->killed) {
+        WRENCH_INFO("Killing JobManager %s on %s", this->process_name.c_str(), this->hostname.c_str());
+        this->kill();
+      }
     }
 
     /**
-     * @brief Kill the job manager (brutally terminate the damone, clears all jobs)
+     * @brief Kill the job manager (brutally terminate the daemon, clears all jobs)
      */
     void JobManager::kill() {
       this->kill_actor();
@@ -306,7 +310,8 @@ namespace wrench {
 
       }
 
-      WRENCH_INFO("New Multicore Task Executor terminating");
+      WRENCH_INFO("Job Manager terminating");
+      this->killed = true;
       return 0;
     }
 

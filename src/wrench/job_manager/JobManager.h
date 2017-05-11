@@ -82,6 +82,9 @@ namespace wrench {
 				std::set<PilotJob *> running_pilot_jobs;
 				std::set<PilotJob *> completed_pilot_jobs;
 
+				bool killed = false;
+				std::string hostname;
+
 				/***********************/
 				/** \endcond           */
 				/***********************/
