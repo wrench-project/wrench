@@ -389,8 +389,6 @@ namespace wrench {
       try {
         storage_service->storeFile(file);
       } catch (std::runtime_error e) {
-        XBT_INFO("EXCEPTION!!");
-        std::cerr << "WHAT = " << e.what() << std::endl;
         throw e;
       }
 
