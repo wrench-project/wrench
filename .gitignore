@@ -31,3 +31,7 @@
 # CLion folders
 cmake-build-debug
 .idea
+
+# Code coverage (testability files)
+*.gcno
+*.gcda

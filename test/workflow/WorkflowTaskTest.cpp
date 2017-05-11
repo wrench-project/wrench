@@ -64,6 +64,7 @@ TEST_F(WorkflowTaskTest, GetSet) {
 
   t1->setReady();
   EXPECT_EQ(t1->getState(), wrench::WorkflowTask::State::READY);
+  EXPECT_EQ(t2->getState(), wrench::WorkflowTask::State::NOT_READY);
 
   ASSERT_THROW(t1->setCompleted(), std::runtime_error);
 
@@ -74,8 +75,13 @@ TEST_F(WorkflowTaskTest, GetSet) {
 
   t1->setCompleted();
   EXPECT_EQ(t1->getState(), wrench::WorkflowTask::State::COMPLETED);
+  EXPECT_EQ(t2->getState(), wrench::WorkflowTask::State::READY);
 
   EXPECT_NO_THROW(t1->setEndDate(1.0));
+
+  EXPECT_EQ(t1->getFailureCount(), 0);
+  t1->incrementFailureCount();
+  EXPECT_EQ(t1->getFailureCount(), 1);
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
