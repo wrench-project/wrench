@@ -30,7 +30,7 @@
 
 // Dynamic Optimizations
 #include "wms/optimizations/dynamic/DynamicOptimization.h"
-#include "wms/optimizations/dynamic/SimpleDynamicClusteringForFailures.h"
+#include "wms/optimizations/dynamic/FailureDynamicClustering.h"
 
 // Simulation Output Analysis
 #include "simulation/SimulationTimestamp.h"

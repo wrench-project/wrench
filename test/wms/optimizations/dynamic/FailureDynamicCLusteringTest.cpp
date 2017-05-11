@@ -9,11 +9,11 @@
 
 #include <gtest/gtest.h>
 
-#include "wms/optimizations/dynamic/SimpleDynamicClusteringForFailures.h"
+#include "wms/optimizations/dynamic/FailureDynamicClustering.h"
 
-class SimpleDynamicClusteringForFailures : public ::testing::Test {
+class FailureDynamicClusteringTest : public ::testing::Test {
 protected:
-    SimpleDynamicClusteringForFailures() {
+    FailureDynamicClusteringTest() {
       workflow = new wrench::Workflow();
 
       // create simple diamond workflow
@@ -36,8 +36,8 @@ protected:
     wrench::WorkflowTask *t1, *t2, *t3, *t4;
 };
 
-TEST_F(SimpleDynamicClusteringForFailures, UngroupFailedTasks) {
-  wrench::DynamicOptimization *opt = new wrench::SimpleDynamicClusteringForFailures();
+TEST_F(FailureDynamicClusteringTest, UngroupFailedTasks) {
+  wrench::DynamicOptimization *opt = new wrench::FailureDynamicClustering();
 
   opt->process(workflow);
 

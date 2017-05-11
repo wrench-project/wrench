@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
 //  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MinMinScheduler());
 //  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MaxMinScheduler());
   std::unique_ptr<wrench::StaticOptimization> opt(new wrench::SimplePipelineClustering());
-  std::unique_ptr<wrench::DynamicOptimization> dynamic_opt(new wrench::SimpleDynamicClusteringForFailures());
+  std::unique_ptr<wrench::DynamicOptimization> dynamic_opt(new wrench::FailureDynamicClustering());
 
   std::unique_ptr<wrench::WMS> wms(new wrench::SimpleWMS(&simulation, &workflow, std::move(scheduler), wms_host));
   wms.get()->addStaticOptimization(std::move(opt));

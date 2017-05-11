@@ -10,10 +10,9 @@
 #include <xbt.h>
 
 #include "logging/TerminalOutput.h"
-#include "wms/optimizations/dynamic/SimpleDynamicClusteringForFailures.h"
+#include "wms/optimizations/dynamic/FailureDynamicClustering.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(simple_dynamic_clustering_for_failures,
-                             "Log category for Simple Dynamic Clustering for Failures");
+XBT_LOG_NEW_DEFAULT_CATEGORY(failure_dynamic_clustering, "Log category for Simple Dynamic Clustering for Failures");
 
 namespace wrench {
 
@@ -22,7 +21,7 @@ namespace wrench {
      *
      * @param workflow: a pointer to a Workflow object
      */
-    void SimpleDynamicClusteringForFailures::process(Workflow *workflow) {
+    void FailureDynamicClustering::process(Workflow *workflow) {
 
       int count = 0;
 

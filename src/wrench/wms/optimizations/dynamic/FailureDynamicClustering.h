@@ -21,7 +21,7 @@ namespace wrench {
     /**
      *  @brief A simple task clustering algorithm to group tasks in a pipeline
      */
-    class SimpleDynamicClusteringForFailures : public DynamicOptimization {
+    class FailureDynamicClustering : public DynamicOptimization {
     public:
         void process(Workflow *workflow);
 

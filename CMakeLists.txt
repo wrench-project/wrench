@@ -34,8 +34,8 @@ set(SOURCE_FILES
         src/wrench/wms/optimizations/static/SimplePipelineClustering.h
         src/wrench/wms/optimizations/static/SimplePipelineClustering.cpp
         src/wrench/wms/optimizations/dynamic/DynamicOptimization.h
-        src/wrench/wms/optimizations/dynamic/SimpleDynamicClusteringForFailures.h
-        src/wrench/wms/optimizations/dynamic/SimpleDynamicClusteringForFailures.cpp
+        src/wrench/wms/optimizations/dynamic/FailureDynamicClustering.h
+        src/wrench/wms/optimizations/dynamic/FailureDynamicClustering.cpp
         src/wrench/wms/engine/SimpleWMS.h
         src/wrench/wms/engine/SimpleWMS.cpp
         src/wrench/wms/scheduler/Scheduler.h
@@ -83,7 +83,7 @@ set(TEST_FILES
         test/main.cpp
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowTest.cpp
-        test/wms/optimizations/dynamic/SimpleDynamicClusteringForFailuresTest.cpp)
+        test/wms/optimizations/dynamic/FailureDynamicCLusteringTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)
@@ -105,7 +105,7 @@ add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${TEST_FILES})
 target_link_libraries(unit_tests ${GOOGLE_TEST} wrench -lpthread -lm)
 set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
 set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
-add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -print0 | xargs -0 rm)
+add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 
 # TODO: temporary simulation test binary
 add_executable(simulation src/wrench/main.cpp)
