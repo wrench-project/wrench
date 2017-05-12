@@ -29,7 +29,7 @@ VERSION=$(<./.version)
 for ITEM in $CMD ; do
 	echo "Generating $ITEM doc..."
 	OUTPUT_DIRECTORY=$(echo $ITEM | tr '[:upper:]' '[:lower:]')
-	DOXYFILE="docs/$VERSION/Doxyfile_$OUTPUT_DIRECTORY"
+	DOXYFILE="./docs/$VERSION/Doxyfile_$OUTPUT_DIRECTORY"
 	SECTIONS=""
 	if [ $ITEM == DEVELOPER ] ; then
 	  SECTIONS="DEVELOPER"
@@ -39,7 +39,7 @@ for ITEM in $CMD ; do
 	fi
 	cat ./Doxyfile.in | sed "s/WRENCH_SECTIONS/$SECTIONS/" | sed "s/WRENCH_OUTPUT_DIRECTORY/\docs\/$VERSION\/$OUTPUT_DIRECTORY/"> $DOXYFILE
 	doxygen $DOXYFILE 1> /dev/null 2> /dev/null
-	mkdir -p docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY
-	cp -R docs/$VERSION/$OUTPUT_DIRECTORY/html/*  docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY
+	mkdir -p ./docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY
+	cp -R ./docs/$VERSION/$OUTPUT_DIRECTORY/html/*  ./docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY
 	echo "$ITEM doc generated at docs/$VERSION/$OUTPUT_DIRECTORY/html/index.html"
 done
