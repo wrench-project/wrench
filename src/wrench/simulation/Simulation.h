@@ -13,15 +13,15 @@
 
 #include <string>
 #include <vector>
-#include <compute_services/multicore_job_executor/MulticoreJobExecutor.h>
+#include <services/compute_services/multicore_job_executor/MulticoreJobExecutor.h>
 #include <simulation/SimulationTimestamp.h>
-#include <file_registry_service/FileRegistryService.h>
+#include <services/file_registry_service/FileRegistryService.h>
 
-#include "simgrid_S4U_util/S4U_Simulation.h"
+#include <simgrid_S4U_util/S4U_Simulation.h>
 
 
-#include "workflow/Workflow.h"
-#include "wms/WMS.h"
+#include <workflow/Workflow.h>
+#include <wms/WMS.h>
 #include "SimulationOutput.h"
 
 

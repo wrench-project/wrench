@@ -12,7 +12,7 @@
 #define WRENCH_SIMGRIDMESSAGES_H
 
 #include <string>
-#include <compute_services/ComputeService.h>
+#include <services/compute_services/ComputeService.h>
 #include <helper_daemons/sequential_task_executor/SequentialTaskExecutor.h>
 
 namespace wrench {

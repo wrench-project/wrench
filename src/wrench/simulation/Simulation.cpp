@@ -10,9 +10,9 @@
 
 #include <csignal>
 
-#include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
-#include "logging/TerminalOutput.h"
-#include "simulation/Simulation.h"
+#include <services/compute_services/multicore_job_executor/MulticoreJobExecutor.h>
+#include <logging/TerminalOutput.h>
+#include <simulation/Simulation.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 

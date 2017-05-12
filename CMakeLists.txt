@@ -46,16 +46,16 @@ set(SOURCE_FILES
         src/wrench/wms/scheduler/MinMinScheduler.cpp
         src/wrench/wms/scheduler/MaxMinScheduler.h
         src/wrench/wms/scheduler/MaxMinScheduler.cpp
-        src/wrench/compute_services/ComputeService.cpp
-        src/wrench/compute_services/ComputeService.h
+        src/wrench/services/compute_services/ComputeService.cpp
+        src/wrench/services/compute_services/ComputeService.h
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.cpp
         src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.h
-        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.cpp
-        src/wrench/compute_services/multicore_job_executor/MulticoreJobExecutor.h
+        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutor.cpp
+        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutor.h
         src/wrench/workflow_job/PilotJob.cpp
         src/wrench/workflow_job/PilotJob.h
-        src/wrench/job_manager/JobManager.cpp
-        src/wrench/job_manager/JobManager.h
+        src/wrench/managers/job_manager/JobManager.cpp
+        src/wrench/managers/job_manager/JobManager.h
         src/wrench/simulation/Simulation.cpp
         src/wrench/simulation/Simulation.h
         src/wrench/workflow_job/WorkflowJob.cpp
@@ -69,14 +69,14 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationOutput.cpp
         src/wrench/simulation/SimulationOutput.h
         src/wrench/simulation/SimulationTimestampTypes.h
-        src/wrench/file_registry_service/FileRegistryService.cpp
-        src/wrench/file_registry_service/FileRegistryService.h
-        src/wrench/storage_services/StorageService.cpp
-        src/wrench/storage_services/StorageService.h
-        src/wrench/storage_services/simple_storage_service/SimpleStorageService.cpp
-        src/wrench/storage_services/simple_storage_service/SimpleStorageService.h
-        src/wrench/data_movement_manager/DataMovementManager.cpp
-        src/wrench/data_movement_manager/DataMovementManager.h)
+        src/wrench/services/file_registry_service/FileRegistryService.cpp
+        src/wrench/services/file_registry_service/FileRegistryService.h
+        src/wrench/services/storage_services/StorageService.cpp
+        src/wrench/services/storage_services/StorageService.h
+        src/wrench/services/storage_services/simple_storage_service/SimpleStorageService.cpp
+        src/wrench/services/storage_services/simple_storage_service/SimpleStorageService.h
+        src/wrench/managers/data_movement_manager/DataMovementManager.cpp
+        src/wrench/managers/data_movement_manager/DataMovementManager.h src/wrench/services/Service.cpp src/wrench/services/Service.h)
 
 # test files
 set(TEST_FILES

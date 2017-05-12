@@ -13,7 +13,7 @@
 
 #include <queue>
 #include "workflow/WorkflowTask.h"
-#include "compute_services/ComputeService.h"
+#include "services/compute_services/ComputeService.h"
 #include "helper_daemons/sequential_task_executor/SequentialTaskExecutor.h"
 #include "simulation/SimulationMessage.h"
 

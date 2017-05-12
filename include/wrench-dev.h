@@ -13,14 +13,17 @@
 #include "wrench.h"
 
 // Compute Services
-#include "compute_services/ComputeService.h"
-#include "compute_services/multicore_job_executor/MulticoreJobExecutor.h"
+#include "services/compute_services/ComputeService.h"
+#include "services/compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 
 // Exceptions
 #include "exceptions/ComputeServiceIsDownException.h"
 
 // Job Manager
-#include "job_manager/JobManager.h"
+#include "managers/job_manager/JobManager.h"
+
+// Data Movement Manager
+#include "managers/data_movement_manager/DataMovementManager.h"
 
 // Logging
 #include "logging/TerminalOutput.h"

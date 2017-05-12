@@ -8,14 +8,14 @@
  */
 
 #include <iostream>
-#include <data_movement_manager/DataMovementManager.h>
+#include <managers/data_movement_manager/DataMovementManager.h>
 
-#include "logging/TerminalOutput.h"
-#include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "wms/engine/SimpleWMS.h"
-#include "simulation/Simulation.h"
-#include "workflow_job/StandardJob.h"
-#include "workflow_job/PilotJob.h"
+#include <logging/TerminalOutput.h>
+#include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <wms/engine/SimpleWMS.h>
+#include <simulation/Simulation.h>
+#include <workflow_job/StandardJob.h>
+#include <workflow_job/PilotJob.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 

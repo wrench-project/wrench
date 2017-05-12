@@ -9,7 +9,7 @@
 
 
 #include "StorageService.h"
-#include "../simulation/Simulation.h"
+#include "simulation/Simulation.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service, "Log category for Storage Service");
 

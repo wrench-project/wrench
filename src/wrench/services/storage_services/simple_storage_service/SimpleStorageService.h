@@ -11,7 +11,7 @@
 #define WRENCH_SIMPLESTORAGESERVICE_H
 
 
-#include <storage_services/StorageService.h>
+#include <services/storage_services/StorageService.h>
 #include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
 
 namespace wrench {

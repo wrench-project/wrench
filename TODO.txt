@@ -3,7 +3,7 @@
 BUGS:
 
     - There is a SegFault when exiting before simulation.launch() is executed.
-        ("Invalid read of size 8" in smpi_process())
+        ("Invalid read of size 8" in simix_process())
           Need to find good ways to cleanup stuff in S4U...
 
 ---------------------------------------------------------------------
@@ -12,7 +12,7 @@ SOFTWARE ENGINEERING:
 
 - Create a "Service" base class, so as to avoid code duplication between
   StorageService,  ComputeService, FileRegistryService, etc.
-    - Properties, however, need to be specific to each derived and twice-derived class...
+    - Properties: cast to int
 
 - For the WMS, instead of having a bit switch to handle events, instead do a "listener" thing:
    A single method that says "waitForAndProcessNextEvent", that does the getMessage() and then
@@ -23,59 +23,74 @@ SOFTWARE ENGINEERING:
 
 * "BIG" things:
 
-    - Deal with data [TO DESIGN: RAFAEL HENRI]
-        - Mechanisms [HENRI]
-            - Replica Catalog
+    - Deal with data
+        - Mechanisms:
+            - File Registry Service
             - Data storage service (with dual-host crappy model for now)
                     Issue: How to go wait_any() with S4U
-        - Usage [RAFAEL]
+        - Usage:
             - How jobs place data requests
 
-    - Plan a first paper [RAFAEL HENRI]
+    - Plan a first paper
         - Workflow makespan prediction
             - Comparison WRENCH / WorkflowSim
                 - Accuracy, Scalablity
                 - Experiments training/eval  for WorkflowSim, WorkflowSim+Calibration, WRENCH, WRENCH+Calibration
 
-    - WRENCH in ICS632? [RAFAEL HENRI]
+    - WRENCH in ICS632?
             - Homework assignment: answer a few experimental questions as a WRENCH user
             - Project: write something in WRENCH
 
-    - Talk about another proposal? [RAFAEL HENRI]
+    - Talk about another proposal?
+            - Main idea: "WRENCH enables WMS research, let's do research"
 
+            - Interesting "Simulation" questions:
+                   - Calibration of simulation is doable (develop generic calibrator)
+                   - Overall tools for instantiating simulations
+                   - Do tons of modeling/instantiation and validate
+                   - Results: We have both the tool and the methodology to do "WMS science"
+                   - Stochastic studies, sensitivity studies, impact of platform parameters...
 
-* "EASY" implementation stuff
+            - WMS Research questions:
 
-        [DONE] Add tests
+                   - Can we identify big problems with current designs?
+                        - Perhaps when exploring upcoming Exascale scenarios
 
-        - Autogeneration of documentation on github
+                   - Explore impact of WMS designs?   (EAGER?)
 
-        [DONE] Event Traces: Template the TimeStamp class to afford genericity
+                   - Distributed WMS that partitions workflows on platforms?
+                        - e.g., clouds?
+                        - e.g., Exascale scenarios?
 
-        [DONE] Dynamic Optimization
-            - Implement a naive one
-            - Call it in right before scheduler
+                   - Streaming vs. DAG, loops?
+                        - Streaming has typical CMS questions inside (duplication)
 
-        [DONE] WorkflowTask:
-            - add a failure count incremented for each failure
+                   - Workflow competition?
+                        - What if everybody uses the same WMS?
+                        - Is it worth deploying multiple kinds of WMS?
+                        - very easy to study with WRENCH
+
+                    - Map Reduce?
 
 ---------------------------------------------------------------------
 
 
 * LYON:
 
-    - Storage in S4U
+    - S4U: wait_any?
+
+    - S4U: Storage
         - What will it look like?
         - How to deal with pipelining of network/disk when remote put()/get()?
                - How does MSG do it?
 
-    - Failures in S4U
+    - S4U: Failures
         - Some way to do a "simcall_process_on_exit()"
             - Or catch some "process failure exception"?
         - Right now there is some uncaught exception in the maestro
 
 
-    - General question: When will we get C++ Exceptions from SIMIX?
+    - S4U: When will we get C++ Exceptions from SIMIX?
 
     - S4U: Kill() segfaults if s4u_actor has already terminated. Would it be
            possible to have some isAlive() method?  Or have kill() do a no-op if

@@ -12,9 +12,9 @@
 
 #include <set>
 
-#include "compute_services/ComputeService.h"
-#include "job_manager/JobManager.h"
-#include "workflow/WorkflowTask.h"
+#include <services/compute_services/ComputeService.h>
+#include <managers/job_manager/JobManager.h>
+#include <workflow/WorkflowTask.h>
 
 namespace wrench {
 

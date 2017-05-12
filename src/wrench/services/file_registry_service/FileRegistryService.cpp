@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <compute_services/multicore_job_executor/MulticoreJobExecutor.h>
+#include <services/compute_services/multicore_job_executor/MulticoreJobExecutor.h>
 #include <logging/TerminalOutput.h>
 #include <simgrid_S4U_util/S4U_Simulation.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>

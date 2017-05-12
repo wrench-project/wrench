@@ -13,7 +13,7 @@
 
 
 #include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
-#include <storage_services/StorageService.h>
+#include <services/storage_services/StorageService.h>
 
 namespace wrench {
 
