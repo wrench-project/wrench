@@ -133,7 +133,9 @@ namespace wrench {
 		 *
 		 * @param service_name: the name of the compute service
 		 */
-		ComputeService::ComputeService(std::string service_name) {
+		ComputeService::ComputeService(std::string service_name_prefix, std::string mailbox_name_prefix) : Service(service_name_prefix,mailbox_name_prefix)
+
+		{
 			this->service_name = service_name;
 			this->simulation = nullptr; // will be filled in via Simulation::add()
 			this->state = ComputeService::UP;

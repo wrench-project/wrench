@@ -25,7 +25,7 @@ namespace wrench {
     /**  @brief Implementation of a Compute Service abstraction that
      *   runs on a multi-core host.
      */
-    class MulticoreJobExecutor : public ComputeService, public S4U_DaemonWithMailbox {
+    class MulticoreJobExecutor : public ComputeService {
 
     public:
         enum Property {

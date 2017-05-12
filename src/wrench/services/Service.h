@@ -14,12 +14,19 @@
 
 #include <string>
 #include <map>
+#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
 
 namespace wrench {
 
-    class Service {
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
+    class Service : public S4U_DaemonWithMailbox {
 
     protected:
+
+        Service(std::string process_name_prefix, std::string mailbox_name_prefix);
 
         // Property stuff
         void setProperty(int, std::string);
@@ -30,6 +37,10 @@ namespace wrench {
         std::map<int, std::string> property_list;
 
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
 

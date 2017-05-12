@@ -16,7 +16,7 @@
 
 namespace wrench {
 
-    class SimpleStorageService : public StorageService, public S4U_DaemonWithMailbox {
+    class SimpleStorageService : public StorageService {
 
     public:
 

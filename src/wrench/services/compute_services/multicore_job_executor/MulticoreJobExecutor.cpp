@@ -191,8 +191,7 @@ namespace wrench {
             double ttl,
             PilotJob *pj,
             std::string suffix) :
-            ComputeService("multicore_job_executor"),
-            S4U_DaemonWithMailbox("multicore_job_executor" + suffix, "multicore_job_executor" + suffix) {
+            ComputeService("multicore_job_executor" + suffix, "multicore_job_executor" + suffix) {
 
       // Set default properties
       for (auto p : this->default_property_values) {

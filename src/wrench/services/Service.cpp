@@ -13,6 +13,17 @@
 namespace wrench {
 
     /**
+     * @brief Constructor that mostly calls the S4U_DaemonWithMailbox() constructor
+     *
+     * @param process_name_prefix: the prefix for the process name
+     * @param mailbox_name_prefix: the prefix for the mailbox name
+     */
+    Service::Service(std::string process_name_prefix, std::string mailbox_name_prefix) : S4U_DaemonWithMailbox(process_name_prefix, mailbox_name_prefix) {
+
+    }
+
+
+    /**
    * @brief Set a property of the Service
    * @param property: the property as an integer
    * @param value: the property value

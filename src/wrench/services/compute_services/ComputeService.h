@@ -75,7 +75,7 @@ namespace wrench {
 
 				virtual void runPilotJob(PilotJob *job);
 
-				ComputeService(std::string service_name);
+				ComputeService(std::string service_name_prefix, std::string mailbox_name_prefix);
 
 				void setSupportStandardJobs(bool v);
 

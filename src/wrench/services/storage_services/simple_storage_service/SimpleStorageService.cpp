@@ -43,8 +43,7 @@ namespace wrench {
             double capacity,
             std::map<SimpleStorageService::Property, std::string> plist,
             std::string suffix) :
-            StorageService("simple_storage_service", capacity),
-            S4U_DaemonWithMailbox("simple_storage_service" + suffix, "simple_storage_service" + suffix) {
+            StorageService("simple_storage_service" + suffix, "simple_storage_service" + suffix, capacity) {
 
       // Set default properties
       for (auto p : this->default_property_values) {

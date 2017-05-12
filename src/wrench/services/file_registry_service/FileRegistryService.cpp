@@ -30,7 +30,7 @@ namespace wrench {
             std::string hostname,
             std::map<FileRegistryService::Property, std::string> plist,
             std::string suffix) :
-            S4U_DaemonWithMailbox("file_registry_service" + suffix, "file_registry_service" + suffix) {
+            Service("file_registry_service" + suffix, "file_registry_service" + suffix) {
 
       // Set default properties
       for (auto p : this->default_property_values) {

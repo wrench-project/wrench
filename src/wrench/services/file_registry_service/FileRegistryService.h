@@ -17,7 +17,7 @@
 
 namespace wrench {
 
-    class FileRegistryService : public Service, public S4U_DaemonWithMailbox {
+    class FileRegistryService : public Service {
 
     public:
 

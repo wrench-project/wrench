@@ -65,7 +65,8 @@ namespace wrench {
    *
    * @param service_name: the name of the storage service
    */
-    StorageService::StorageService(std::string service_name, double capacity) {
+    StorageService::StorageService(std::string service_name_prefix, std::string mailbox_name_prefix, double capacity) :
+          Service(service_name_prefix, mailbox_name_prefix) {
       this->service_name = service_name;
       this->capacity  = capacity;
       this->simulation = nullptr; // will be filled in via Simulation::add()

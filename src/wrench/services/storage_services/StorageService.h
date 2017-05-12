@@ -60,7 +60,7 @@ namespace wrench {
             DOWN,
         };
 
-        StorageService(std::string service_name, double capacity);
+        StorageService(std::string service_name_prefix, std::string mailbox_name_prefix, double capacity);
 
         void setStateToDown();
 
