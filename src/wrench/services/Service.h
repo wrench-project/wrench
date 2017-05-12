@@ -12,9 +12,22 @@
 #define WRENCH_SERVICE_H
 
 
+#include <string>
+#include <map>
+
 namespace wrench {
 
     class Service {
+
+    protected:
+
+        // Property stuff
+        void setProperty(int, std::string);
+        std::string getPropertyValueAsString(int);
+        double getPropertyValueAsDouble(int);
+
+    private:
+        std::map<int, std::string> property_list;
 
     };
 

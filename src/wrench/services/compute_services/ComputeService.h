@@ -12,6 +12,7 @@
 
 #include <map>
 #include <workflow_job/WorkflowJob.h>
+#include <services/Service.h>
 
 namespace wrench {
 
@@ -32,7 +33,7 @@ namespace wrench {
 		/**
 		 * @brief Abstract implementation of a compute service.
 		 */
-		class ComputeService {
+		class ComputeService : public Service {
 
 		public:
 

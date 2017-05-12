@@ -17,7 +17,7 @@
 
 namespace wrench {
 
-    class FileRegistryService : public S4U_DaemonWithMailbox {
+    class FileRegistryService : public Service, public S4U_DaemonWithMailbox {
 
     public:
 
@@ -67,12 +67,6 @@ namespace wrench {
             UP,
             DOWN,
         };
-
-        // Setting/Getting property
-        void setProperty(FileRegistryService::Property, std::string);
-        std::string getPropertyString(FileRegistryService::Property);
-        std::string getPropertyValueAsString(FileRegistryService::Property);
-        double getPropertyValueAsDouble(FileRegistryService::Property);
 
         void stop();
 

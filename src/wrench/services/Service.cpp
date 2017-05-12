@@ -12,4 +12,38 @@
 
 namespace wrench {
 
+    /**
+   * @brief Set a property of the Service
+   * @param property: the property as an integer
+   * @param value: the property value
+   */
+    void Service::setProperty(int property, std::string value) {
+      this->property_list[property] = value;
+    }
+
+    /**
+     * @brief Get a property of the Service as a string
+     * @param property: the property as an integer
+     * @return the property value as a string
+     */
+    std::string Service::getPropertyValueAsString(int property) {
+      return this->property_list[property];
+    }
+
+    /**
+     * @brief Get a property of the Service as a double
+     * @param property: the property
+     * @return the property value as a double
+     *
+     * @throw std::runtime_error
+     */
+    double Service::getPropertyValueAsDouble(int property) {
+      double value;
+      if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
+        throw std::runtime_error("Invalid double property value " +
+                                 this->getPropertyValueAsString(property));
+      }
+      return value;
+    }
+
 };

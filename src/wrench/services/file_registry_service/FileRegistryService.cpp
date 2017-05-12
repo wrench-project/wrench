@@ -53,60 +53,7 @@ namespace wrench {
     }
 
 
-    /**
-   * @brief Get a property name as a string
-   * @return the name as a string
-   *
-   * @throw std::invalid_argument
-   */
-    std::string FileRegistryService::getPropertyString(FileRegistryService::Property property) {
-      switch (property) {
-        case STOP_DAEMON_MESSAGE_PAYLOAD: return "STOP_DAEMON_MESSAGE_PAYLOAD";
-        case DAEMON_STOPPED_MESSAGE_PAYLOAD: return "DAEMON_STOPPED_MESSAGE_PAYLOAD";
-        case REQUEST_MESSAGE_PAYLOAD: return "REQUEST_MESSAGE_PAYLOAD";
-        case ANSWER_MESSAGE_PAYLOAD: return "ANSWER_MESSAGE_PAYLOAD";
-        case REMOVE_ENTRY_PAYLOAD: return "REMOVE_ENTRY_PAYLOAD";
-        case LOOKUP_OVERHEAD:return "LOOKUP_OVERHEAD";
-
-        default:
-          throw new std::invalid_argument(
-                  "FileRegistryService property" + std::to_string(property) + "has no string name");
-      }
-    }
-
-    /**
-     * @brief Set a property of the FileRegistryService
-     * @param property: the property
-     * @param value: the property value
-     */
-    void FileRegistryService::setProperty(FileRegistryService::Property property, std::string value) {
-      this->property_list[property] = value;
-    }
-
-    /**
-     * @brief Get a property of the FileRegistryService as a string
-     * @param property: the property
-     * @return the property value as a string
-     */
-    std::string FileRegistryService::getPropertyValueAsString(FileRegistryService::Property property) {
-      return this->property_list[property];
-    }
-
-    /**
-     * @brief Get a property of the FileRegistryService as a double
-     * @param property: the property
-     * @return the property value as a double
-     *
-     * @throw std::runtime_error
-     */
-    double FileRegistryService::getPropertyValueAsDouble(FileRegistryService::Property property) {
-      double value;
-      if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
-        throw std::runtime_error("Invalid " + this->getPropertyString(property) + " property value " +
-                                 this->getPropertyValueAsString(property));
-      }
-      return value;
-    }
+//
 
     /**
      * @brief Notify the FileRegistryService that a WorkflowFile is available at some StorageService

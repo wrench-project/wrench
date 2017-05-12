@@ -51,15 +51,6 @@ namespace wrench {
         // Stopping the service
         void stop();
 
-        // Setting/Getting property
-        void setProperty(SimpleStorageService::Property, std::string);
-
-        std::string getPropertyString(SimpleStorageService::Property);
-
-        std::string getPropertyValueAsString(SimpleStorageService::Property);
-
-        double getPropertyValueAsDouble(SimpleStorageService::Property);
-
         void copyFile(WorkflowFile *file, StorageService *src);
 
         void downloadFile(WorkflowFile *file);

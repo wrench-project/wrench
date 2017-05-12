@@ -67,57 +67,7 @@ namespace wrench {
     }
 
 
-    /**
-   * @brief Get a property name as a string
-   * @return the name as a string
-   *
-   * @throw std::invalid_argument
-   */
-    std::string SimpleStorageService::getPropertyString(SimpleStorageService::Property property) {
-      switch (property) {
-        case STOP_DAEMON_MESSAGE_PAYLOAD: return "STOP_DAEMON_MESSAGE_PAYLOAD";
-        case DAEMON_STOPPED_MESSAGE_PAYLOAD: return "DAEMON_STOPPED_MESSAGE_PAYLOAD";
-
-        default:
-          throw new std::invalid_argument(
-                  "SimpleStorageService property" + std::to_string(property) + "has no string name");
-      }
-    }
-
-    /**
-     * @brief Set a property of the SimpleStorageService
-     * @param property: the property
-     * @param value: the property value
-     */
-    void SimpleStorageService::setProperty(SimpleStorageService::Property property, std::string value) {
-      this->property_list[property] = value;
-    }
-
-    /**
-     * @brief Get a property of the SimpleStorageService as a string
-     * @param property: the property
-     * @return the property value as a string
-     */
-    std::string SimpleStorageService::getPropertyValueAsString(SimpleStorageService::Property property) {
-      return this->property_list[property];
-    }
-
-    /**
-     * @brief Get a property of the SimpleStorageService as a double
-     * @param property: the property
-     * @return the property value as a double
-     *
-     * @throw std::runtime_error
-     */
-    double SimpleStorageService::getPropertyValueAsDouble(SimpleStorageService::Property property) {
-      double value;
-      if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
-        throw std::runtime_error("Invalid " + this->getPropertyString(property) + " property value " +
-                                 this->getPropertyValueAsString(property));
-      }
-      return value;
-    }
-
+//
 
 
     /**

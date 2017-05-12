@@ -131,14 +131,6 @@ namespace wrench {
 
         double getCoreFlopRate();
 
-        // Setting/Getting property
-        void setProperty(MulticoreJobExecutor::Property, std::string);
-
-        std::string getPropertyString(MulticoreJobExecutor::Property);
-
-        std::string getPropertyValueAsString(MulticoreJobExecutor::Property);
-
-        double getPropertyValueAsDouble(MulticoreJobExecutor::Property);
 
         /***********************/
         /** \endcond           */

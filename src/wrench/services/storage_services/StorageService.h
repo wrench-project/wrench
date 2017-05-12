@@ -15,6 +15,7 @@
 #include <string>
 #include <workflow/WorkflowFile.h>
 #include <set>
+#include <services/Service.h>
 
 namespace wrench {
 
@@ -27,7 +28,7 @@ namespace wrench {
     /**
      * @brief Abstract implementation of a storage service.
      */
-    class StorageService {
+    class StorageService : public Service {
 
     public:
 

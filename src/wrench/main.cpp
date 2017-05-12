@@ -72,7 +72,8 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating a MultiCore Job executor on " << exexutor_host << "..." << std::endl;
     simulation.add(
             std::unique_ptr<wrench::MulticoreJobExecutor>(
-                    new wrench::MulticoreJobExecutor(exexutor_host, true, false)));
+                    new wrench::MulticoreJobExecutor(exexutor_host, true, false,
+                                                     {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << executor_host << "..." << std::endl;
 //		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(executor_host, true, false, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
