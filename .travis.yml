@@ -139,7 +139,7 @@ after_success:
   # generate documentation
   - cd .. && chmod +x generate_documentation.sh
   - doxygen --version
-  - ./generate_documentation.sh --USER --INTERNAL --DEVELOPER
+  - ./generate_documentation.sh --USER --INTERNAL --DEVELOPER --GH
 
 deploy:
   provider: pages
