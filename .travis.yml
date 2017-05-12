@@ -147,6 +147,7 @@ after_success:
   - coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
   # generate documentation
   - cd .. && chmod +x generate_documentation.sh
+  - doxygen --version
   - ./generate_documentation.sh --USER --INTERNAL --DEVELOPER
 
 deploy:
