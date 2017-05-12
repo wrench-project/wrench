@@ -163,7 +163,7 @@ namespace wrench {
      * @return a pointer to a WorkflowFile object, nullptr if not found
      */
     WorkflowFile *Workflow::getWorkflowFileByID(const std::string id) {
-      if (not files[id]) {
+      if (files.find(id) == files.end()) {
         return nullptr;
       } else {
         return files[id].get();

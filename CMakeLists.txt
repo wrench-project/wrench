@@ -81,8 +81,9 @@ set(SOURCE_FILES
 # test files
 set(TEST_FILES
         test/main.cpp
-        test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowTest.cpp
+        test/workflow/WorkflowFileTest.cpp
+        test/workflow/WorkflowTaskTest.cpp
         test/wms/optimizations/dynamic/FailureDynamicClusteringTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
