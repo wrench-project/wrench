@@ -84,7 +84,8 @@ set(TEST_FILES
         test/workflow/WorkflowTest.cpp
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
-        test/wms/optimizations/dynamic/FailureDynamicClusteringTest.cpp)
+        test/wms/optimizations/dynamic/FailureDynamicClusteringTest.cpp
+        test/wms/optimizations/static/SimplePipelineClusteringTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)
