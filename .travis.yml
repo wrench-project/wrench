@@ -11,6 +11,10 @@ matrix:
           packages:
             - python3
             - doxygen
+            - doxygen-doc
+            - doxygen-latex
+            - doxygen-gui
+            - graphviz
     - os: linux
       compiler: gcc
       dist: trusty
@@ -26,6 +30,10 @@ matrix:
             - cmake
             - cmake-data
             - doxygen
+            - doxygen-doc
+            - doxygen-latex
+            - doxygen-gui
+            - graphviz
             - libboost-all-dev
       env: GCC_VERSION=5
     - os: linux
@@ -43,6 +51,10 @@ matrix:
             - cmake
             - cmake-data
             - doxygen
+            - doxygen-doc
+            - doxygen-latex
+            - doxygen-gui
+            - graphviz
             - libboost-all-dev
       env: GCC_VERSION=6
     - os: linux
@@ -60,6 +72,10 @@ matrix:
             - cmake
             - cmake-data
             - doxygen
+            - doxygen-doc
+            - doxygen-latex
+            - doxygen-gui
+            - graphviz
             - libboost-all-dev
       env: CLANG_VERSION=3.6
     - os: linux
@@ -77,6 +93,10 @@ matrix:
             - cmake
             - cmake-data
             - doxygen
+            - doxygen-doc
+            - doxygen-latex
+            - doxygen-gui
+            - graphviz
             - libboost-all-dev
       env: CLANG_VERSION=3.7
 
