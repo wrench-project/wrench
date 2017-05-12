@@ -25,11 +25,12 @@ fi
 
 # WRENCH version
 VERSION=$(<./.version)
+mkdir -p docs/$VERSION
 
 for ITEM in $CMD ; do
 	echo "Generating $ITEM doc..."
 	OUTPUT_DIRECTORY=$(echo $ITEM | tr '[:upper:]' '[:lower:]')
-	DOXYFILE="./docs/$VERSION/Doxyfile_$OUTPUT_DIRECTORY"
+	DOXYFILE="docs/$VERSION/Doxyfile_$ITEM"
 	SECTIONS=""
 	if [ $ITEM == DEVELOPER ] ; then
 	  SECTIONS="DEVELOPER"
