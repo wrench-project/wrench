@@ -1,15 +1,15 @@
 #!/bin/bash
 
-TODO=""
+CMD=""
 
 while test $# -gt 0
 do
     case "$1" in
-        --USER) TODO="$TODO USER"
+        --USER) CMD="$CMD USER"
             ;;
-        --DEVELOPER) TODO="$TODO DEVELOPER"
+        --DEVELOPER) CMD="$CMD DEVELOPER"
             ;;
-        --INTERNAL) TODO="$TODO INTERNAL"
+        --INTERNAL) CMD="$CMD INTERNAL"
             ;;
         *) echo "Usage: $0 [--USER] [--DEVELOPER] [--INTERNAL]"
 	   exit 1
@@ -18,14 +18,18 @@ do
     shift
 done
 
-if [ -z "$TODO" ] ; then
+if [ -z "$CMD" ] ; then
 	echo "Usage: $0 [--USER] [--DEVELOPER] [--INTERNAL]"
 	exit 1
 fi
 
-for ITEM in $TODO ; do
+# WRENCH version
+VERSION=$(<./.version)
+
+for ITEM in $CMD ; do
 	echo "Generating $ITEM doc..."
-	DOXYFILE="/tmp/Doxyfile_$ITEM"
+	OUTPUT_DIRECTORY=$(echo $ITEM | tr '[:upper:]' '[:lower:]')
+	DOXYFILE="docs/$VERSION/Doxyfile_$OUTPUT_DIRECTORY"
 	SECTIONS=""
 	if [ $ITEM == DEVELOPER ] ; then
 	  SECTIONS="DEVELOPER"
@@ -33,8 +37,9 @@ for ITEM in $TODO ; do
 	if [ $ITEM == INTERNAL ]; then
 	  SECTIONS="DEVELOPER INTERNAL"
 	fi
-	OUTPUT_DIRECTORY="wrenchdoc_$ITEM"
-	cat ./Doxyfile.in | sed "s/WRENCH_SECTIONS/$SECTIONS/" | sed "s/WRENCH_OUTPUT_DIRECTORY/\/tmp\/$OUTPUT_DIRECTORY/"> $DOXYFILE
+	cat ./Doxyfile.in | sed "s/WRENCH_SECTIONS/$SECTIONS/" | sed "s/WRENCH_OUTPUT_DIRECTORY/\docs\/$VERSION\/$OUTPUT_DIRECTORY/"> $DOXYFILE
 	doxygen $DOXYFILE 1> /dev/null 2> /dev/null
-	echo "$ITEM doc generated at /tmp/$OUTPUT_DIRECTORY/html/index.html"
+	mkdir -p docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY
+	cp -R docs/$VERSION/$OUTPUT_DIRECTORY/html/*  docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY
+	echo "$ITEM doc generated at docs/$VERSION/$OUTPUT_DIRECTORY/html/index.html"
 done

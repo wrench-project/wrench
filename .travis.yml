@@ -120,10 +120,22 @@ script:
 
 after_success:
   - cd build
+  # coverage analysis
   - lcov --directory . --capture --output-file coverage.info
   - lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info
   - lcov --list coverage.info
   - coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info
+  # generate documentation
+  - chmod +x generate_documentation.sh
+  - ./generate_documentation.sh --USER --INTERNAL --DEVELOPER
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: ./docs/gh-pages
+  on:
+    branch: master
 
 notifications:
   email:
