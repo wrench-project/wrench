@@ -32,9 +32,14 @@ SOFTWARE ENGINEERING:
             - How jobs place data requests
 
     - Plan a first paper [RAFAEL HENRI]
+        - Workflow makespan prediction
+            - Comparison WRENCH / WorkflowSim
+                - Accuracy, Scalablity
+                - Experiments training/eval  for WorkflowSim, WorkflowSim+Calibration, WRENCH, WRENCH+Calibration
 
     - WRENCH in ICS632? [RAFAEL HENRI]
-            - PMC?
+            - Homework assignment: answer a few experimental questions as a WRENCH user
+            - Project: write something in WRENCH
 
     - Talk about another proposal? [RAFAEL HENRI]
 
