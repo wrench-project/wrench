@@ -39,7 +39,8 @@ for ITEM in $CMD ; do
 	  SECTIONS="DEVELOPER INTERNAL"
 	fi
 	cat ./Doxyfile.in | sed "s/WRENCH_SECTIONS/$SECTIONS/" | sed "s/WRENCH_OUTPUT_DIRECTORY/\docs\/$VERSION\/$OUTPUT_DIRECTORY/"> $DOXYFILE
-	doxygen $DOXYFILE 1> /dev/null 2> /dev/null
+#	doxygen $DOXYFILE 1> /dev/null 2> /dev/null
+	doxygen $DOXYFILE
 	mkdir -p ./docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY
 	cp -R ./docs/$VERSION/$OUTPUT_DIRECTORY/html/*  ./docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY
 	echo "$ITEM doc generated at docs/$VERSION/$OUTPUT_DIRECTORY/html/index.html"
