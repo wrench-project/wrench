@@ -10,6 +10,8 @@
 
 #include "SimulationMessage.h"
 
+#include <stdexcept>
+
 namespace wrench {
 
 
