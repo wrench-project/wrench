@@ -12,6 +12,7 @@
 #define WRENCH_MULTICOREJOBEXECUTORPROPERTY_H
 
 #include <services/compute_services/ComputeServiceProperty.h>
+#include <map>
 
 namespace wrench {
 
@@ -27,6 +28,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD);
         /** The overhead to start a task execution, in seconds **/
         DECLARE_PROPERTY_NAME(TASK_STARTUP_OVERHEAD);
+
     };
 
 };
