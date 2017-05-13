@@ -40,19 +40,6 @@ namespace wrench {
         FileRegistryService(std::string hostname,
                             std::map<std::string, std::string> = {});
 
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
-
-        enum State {
-            UP,
-            DOWN,
-        };
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
 
     private:
 
@@ -70,10 +57,7 @@ namespace wrench {
         int main();
         bool processNextMessage();
 
-
         std::string hostname;
-        FileRegistryService::State state;
-
 
         std::map<WorkflowFile *, std::set<StorageService *>> entries;
     };

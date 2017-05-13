@@ -41,10 +41,6 @@ namespace wrench {
 
 				void runJob(WorkflowJob *job);
 
-				std::string getName();
-
-				bool isUp();
-
 				bool canRunJob(WorkflowJob::Type job_type, unsigned long min_num_cores, double duration);
 
 				bool supportsStandardJobs();
@@ -69,7 +65,7 @@ namespace wrench {
 
 				virtual void runPilotJob(PilotJob *job);
 
-				ComputeService(std::string service_name_prefix, std::string mailbox_name_prefix);
+				ComputeService(std::string service_name, std::string mailbox_name_prefix);
 
 				void setSupportStandardJobs(bool v);
 
@@ -82,7 +78,6 @@ namespace wrench {
 				friend class Simulation;
 				void setSimulation(Simulation *simulation);
 
-				std::string service_name;
 				Simulation *simulation;  // pointer to the simulation object
 
 		private:

@@ -42,10 +42,6 @@ namespace wrench {
 
         virtual void deleteFile(WorkflowFile *file) = 0;
 
-        std::string getName();
-
-        bool isUp();
-
         double getCapacity();
 
         double getFreeSpace();
@@ -55,7 +51,7 @@ namespace wrench {
         /***********************/
 
 
-        StorageService(std::string service_name_prefix, std::string mailbox_name_prefix, double capacity);
+        StorageService(std::string service_name, std::string mailbox_name_prefix, double capacity);
 
         void setStateToDown();
 
@@ -65,8 +61,6 @@ namespace wrench {
 
         void setSimulation(Simulation *simulation);
 
-        StorageService::State state;
-        std::string service_name;
         Simulation *simulation;  // pointer to the simulation object
 
         void addFileToStorage(WorkflowFile *);

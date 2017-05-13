@@ -94,4 +94,20 @@ namespace wrench {
       }
     }
 
+    /**
+   * @brief Get the name of the service
+   * @return the compute service name
+   */
+    std::string Service::getName() {
+      return this->name;
+    }
+
+    /**
+    * @brief Find out whether the service is UP
+    * @return true if the service is UP, false otherwise
+    */
+    bool Service::isUp() {
+      return (this->state == Service::UP);
+    }
+
 };

@@ -28,6 +28,8 @@ namespace wrench {
         /***********************/
 
         virtual void stop();
+        std::string getName();
+        bool isUp();
 
         /***********************/
         /** \endcond           */
@@ -55,6 +57,8 @@ namespace wrench {
         };
 
         State state;
+
+        std::string name;
 
     };
 

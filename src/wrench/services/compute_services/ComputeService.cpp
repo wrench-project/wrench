@@ -41,21 +41,6 @@ namespace wrench {
 
 		}
 
-		/**
-		 * @brief Get the name of the compute service
-		 * @return the compute service name
-		 */
-		std::string ComputeService::getName() {
-			return this->service_name;
-		}
-
-		/**
-		* @brief Find out whether the compute service is UP
-		* @return true if the compute service is UP, false otherwise
-		*/
-		bool ComputeService::isUp() {
-			return (this->state == ComputeService::UP);
-		}
 
 		/**
 		 * @brief Submit a job to the compute service
@@ -137,10 +122,9 @@ namespace wrench {
 		 *
 		 * @param service_name: the name of the compute service
 		 */
-		ComputeService::ComputeService(std::string service_name_prefix, std::string mailbox_name_prefix) : Service(service_name_prefix,mailbox_name_prefix)
+		ComputeService::ComputeService(std::string service_name, std::string mailbox_name_prefix) : Service(service_name, mailbox_name_prefix)
 
 		{
-			this->service_name = service_name;
 			this->simulation = nullptr; // will be filled in via Simulation::add()
 			this->state = ComputeService::UP;
 		}

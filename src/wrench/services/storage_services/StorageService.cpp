@@ -40,22 +40,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the name of the compute service
-     * @return the compute service name
-     */
-    std::string StorageService::getName() {
-      return this->service_name;
-    }
-
-    /**
-    * @brief Find out whether the compute service is UP
-    * @return true if the compute service is UP, false otherwise
-    */
-    bool StorageService::isUp() {
-      return (this->state == StorageService::UP);
-    }
-
-    /**
 		 * @brief Set the state of the storage service to DOWN
 		 */
     void StorageService::setStateToDown() {
@@ -67,9 +51,8 @@ namespace wrench {
    *
    * @param service_name: the name of the storage service
    */
-    StorageService::StorageService(std::string service_name_prefix, std::string mailbox_name_prefix, double capacity) :
-          Service(service_name_prefix, mailbox_name_prefix) {
-      this->service_name = service_name;
+    StorageService::StorageService(std::string service_name, std::string mailbox_name_prefix, double capacity) :
+          Service(service_name, mailbox_name_prefix) {
       this->capacity  = capacity;
       this->simulation = nullptr; // will be filled in via Simulation::add()
       this->state = StorageService::UP;
