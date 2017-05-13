@@ -10,8 +10,10 @@
 
 #include <wrench-dev.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <simulation/Simulation.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
+
 
 
 namespace wrench {
@@ -115,6 +117,14 @@ namespace wrench {
 		 */
     void Service::setStateToDown() {
       this->state = Service::DOWN;
+    }
+
+    /**
+     * @brief Set the "simulation pointer"
+     * @param simulation: a raw pointer to a Simulation object
+     */
+    void Service::setSimulation(Simulation *simulation) {
+      this->simulation = simulation;
     }
 
 };

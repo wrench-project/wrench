@@ -67,13 +67,7 @@ namespace wrench {
 
 				ComputeService(std::string service_name, std::string mailbox_name_prefix);
 
-
 		protected:
-
-				friend class Simulation;
-				void setSimulation(Simulation *simulation);
-
-				Simulation *simulation;  // pointer to the simulation object
 
 				bool supports_pilot_jobs;
 				bool supports_standard_jobs;

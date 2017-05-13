@@ -84,7 +84,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        
+
         void mark_compute_service_as_terminated(ComputeService *cs);
 
         void mark_storage_service_as_terminated(StorageService *ss);

@@ -57,14 +57,9 @@ namespace wrench {
 
         friend class Simulation;
 
-        void setSimulation(Simulation *simulation);
-
-        Simulation *simulation;  // pointer to the simulation object
-
         void addFileToStorage(WorkflowFile *);
 
         void removeFileFromStorage(WorkflowFile *);
-
 
         std::set<WorkflowFile *> stored_files;
         double capacity;

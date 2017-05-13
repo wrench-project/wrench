@@ -18,6 +18,7 @@
 
 namespace wrench {
 
+    class Simulation;
 
     class Service : public S4U_DaemonWithMailbox {
 
@@ -48,9 +49,12 @@ namespace wrench {
 
     protected:
 
-    /***********************/
-    /** \cond INTERNAL     */
-    /***********************/
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
+        friend class Simulation;
 
         Service(std::string process_name_prefix, std::string mailbox_name_prefix);
 
@@ -70,10 +74,14 @@ namespace wrench {
         std::string name;
         std::string hostname;
 
+        void setSimulation(Simulation *simulation);
+        Simulation *simulation;
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     };
 };
