@@ -10,7 +10,7 @@
 #ifndef WRENCH_SIMPLEDYNAMICOPTIMIZATION_H
 #define WRENCH_SIMPLEDYNAMICOPTIMIZATION_H
 
-#include "wms/optimizations/dynamic/DynamicOptimization.h"
+#include <wms/optimizations/dynamic/DynamicOptimization.h>
 
 namespace wrench {
 

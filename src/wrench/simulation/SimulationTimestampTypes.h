@@ -10,9 +10,10 @@
 #ifndef WRENCH_SIMULATIONTIMESTAMPTYPES_H
 #define WRENCH_SIMULATIONTIMESTAMPTYPES_H
 
-#include <workflow/WorkflowTask.h>
 
 namespace wrench {
+
+    class WorkflowTask;
 
     /**
     * @brief A class to represent the content of a "task completion" simulation event

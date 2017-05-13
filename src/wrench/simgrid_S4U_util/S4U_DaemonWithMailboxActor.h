@@ -17,13 +17,13 @@
 #include <vector>
 #include <iostream>
 
-#include "S4U_DaemonWithMailbox.h"
-
 namespace wrench {
 
     /***********************/
     /** \cond INTERNAL     */
     /***********************/
+
+    class S4U_DaemonWithMailbox;
 
     /**
      * @brief The actor for the S4U_DaemonWithMailbox abstraction

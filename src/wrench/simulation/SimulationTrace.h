@@ -10,11 +10,13 @@
 #ifndef WRENCH_SIMULATIONTRACE_H
 #define WRENCH_SIMULATIONTRACE_H
 
+#include <vector>
+#include <map>
 
 #include "SimulationTimestamp.h"
 
-
 namespace wrench {
+
 
     class GenericSimulationTrace {
 

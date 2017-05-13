@@ -11,8 +11,9 @@
 #ifndef WRENCH_MULTICOREJOBEXECUTORPROPERTY_H
 #define WRENCH_MULTICOREJOBEXECUTORPROPERTY_H
 
-#include <services/compute_services/ComputeServiceProperty.h>
 #include <map>
+
+#include <services/compute_services/ComputeServiceProperty.h>
 
 namespace wrench {
 

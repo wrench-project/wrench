@@ -12,18 +12,20 @@
 #define WRENCH_SIMGRIDMESSAGES_H
 
 #include <string>
-#include <services/compute_services/ComputeService.h>
-#include <helper_daemons/sequential_task_executor/SequentialTaskExecutor.h>
 
 namespace wrench {
 
-    class ComputeService;
+    class WorkflowTask;
 
     class WorkflowJob;
 
     class StandardJob;
 
     class PilotJob;
+
+    class SequentialTaskExecutor;
+
+    class ComputeService;
 
     /***********************/
     /** \cond INTERNAL     */

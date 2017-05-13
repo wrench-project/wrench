@@ -13,6 +13,9 @@
 #include <services/compute_services/multicore_job_executor/MulticoreJobExecutor.h>
 #include <logging/TerminalOutput.h>
 #include <simulation/Simulation.h>
+#include <services/Service.h>
+#include <services/storage_services/StorageService.h>
+#include <services/file_registry_service/FileRegistryService.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 

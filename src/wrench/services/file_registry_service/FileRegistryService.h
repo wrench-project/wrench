@@ -12,11 +12,14 @@
 #define WRENCH_FILEREGISTRYSERVICE_H
 
 
-#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
-#include <services/storage_services/StorageService.h>
+#include <services/Service.h>
+
 #include "FileRegistryServiceProperty.h"
 
 namespace wrench {
+
+    class WorkflowFile;
+    class StorageService;
 
     class FileRegistryService : public Service {
 

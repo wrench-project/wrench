@@ -12,16 +12,15 @@
 
 
 #include <queue>
-#include "workflow/WorkflowTask.h"
-#include "services/compute_services/ComputeService.h"
-#include "helper_daemons/sequential_task_executor/SequentialTaskExecutor.h"
-#include "simulation/SimulationMessage.h"
+
+#include <services/compute_services/ComputeService.h>
+
+#include <helper_daemons/sequential_task_executor/SequentialTaskExecutor.h>
 #include "MulticoreJobExecutorProperty.h"
 
 namespace wrench {
 
     class Simulation;
-
 
     /**  @brief Implementation of a Compute Service abstraction that
      *   runs on a multi-core host.

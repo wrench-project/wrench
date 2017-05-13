@@ -10,7 +10,7 @@
 #ifndef WRENCH_SIMPLETASKCLUSTERING_H
 #define WRENCH_SIMPLETASKCLUSTERING_H
 
-#include "wms/optimizations/static/StaticOptimization.h"
+#include <wms/optimizations/static/StaticOptimization.h>
 
 namespace wrench {
 

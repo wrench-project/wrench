@@ -12,9 +12,9 @@
 #ifndef WRENCH_STATICOPTIMIZATION_H
 #define WRENCH_STATICOPTIMIZATION_H
 
-#include "workflow/Workflow.h"
-
 namespace wrench {
+
+    class Workflow;
 
     /***********************/
     /** \cond DEVELOPER */

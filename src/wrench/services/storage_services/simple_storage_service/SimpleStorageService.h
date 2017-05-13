@@ -12,7 +12,7 @@
 
 
 #include <services/storage_services/StorageService.h>
-#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
+
 #include "SimpleStorageServiceProperty.h"
 
 namespace wrench {

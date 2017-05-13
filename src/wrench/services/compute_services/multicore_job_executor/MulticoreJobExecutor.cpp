@@ -13,6 +13,7 @@
 #include <logging/TerminalOutput.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simgrid_S4U_util/S4U_Simulation.h>
+#include <simulation/SimulationMessage.h>
 #include "exceptions/ComputeServiceIsDownException.h"
 #include "workflow_job/PilotJob.h"
 

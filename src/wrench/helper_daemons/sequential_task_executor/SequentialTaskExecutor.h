@@ -10,12 +10,13 @@
 #ifndef SIMULATION_SEQUENTIALTASKEXECUTOR_H
 #define SIMULATION_SEQUENTIALTASKEXECUTOR_H
 
-#include "workflow/WorkflowTask.h"
-
 #include <memory>
+
 #include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
 
 namespace wrench {
+
+    class WorkflowTask;
 
     /***********************/
     /** \cond INTERNAL     */

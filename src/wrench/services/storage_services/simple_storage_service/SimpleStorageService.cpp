@@ -10,6 +10,7 @@
 #include <wrench-dev.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include "SimpleStorageService.h"
+#include <simulation/SimulationMessage.h>
 #include "SimpleStorageServiceProperty.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");

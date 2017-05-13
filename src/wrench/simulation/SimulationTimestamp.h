@@ -11,9 +11,6 @@
 #define WRENCH_SIMULATIONTIMESTAMP_H
 
 
-#include <workflow/WorkflowTask.h>
-#include <simgrid_S4U_util/S4U_Simulation.h>
-
 #include "SimulationTimestampTypes.h"
 
 namespace wrench {

@@ -10,8 +10,9 @@
 #ifndef WRENCH_S4U_COLORLOGGING_H
 #define WRENCH_S4U_COLORLOGGING_H
 
-#include <simgrid/s4u/forward.hpp>
 #include <map>
+
+#include <simgrid/s4u/Actor.hpp>
 
 /* Defined color codes */
 #define WRENCH_LOGGING_COLOR_BLACK      "\033[1;30m"

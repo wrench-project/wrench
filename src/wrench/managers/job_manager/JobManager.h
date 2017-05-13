@@ -13,14 +13,16 @@
 
 #include <vector>
 #include <set>
-#include <workflow/Workflow.h>
-#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
 
+#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
 
 namespace wrench {
 
+    class Workflow;
+		class WorkflowTask;
+    class WorkflowJob;
 		class PilotJob;
-
+		class StandardJob;
 		class ComputeService;
 
 		/***********************/

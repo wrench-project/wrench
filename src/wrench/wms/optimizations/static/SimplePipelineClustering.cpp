@@ -10,8 +10,10 @@
  *  clustering based on the max number of tasks per cluster
  */
 
-#include "wms/optimizations/static/SimplePipelineClustering.h"
 #include <set>
+
+#include <wms/optimizations/static/SimplePipelineClustering.h>
+#include <workflow/Workflow.h>
 
 namespace wrench {
 

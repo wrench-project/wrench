@@ -10,9 +10,10 @@
 #ifndef WRENCH_DYNAMICOPTIMIZATION_H
 #define WRENCH_DYNAMICOPTIMIZATION_H
 
-#include "workflow/Workflow.h"
 
 namespace wrench {
+
+    class Workflow;
 
     /***********************/
     /** \cond DEVELOPER */

@@ -7,15 +7,20 @@
  * (at your option) any later version.
  */
 
-#include <simulation/SimulationMessage.h>
-#include "S4U_Mailbox.h"
 #include <xbt/ex.hpp>
+#include <simgrid/s4u/Mailbox.hpp>
+#include <simgrid/s4u/comm.hpp>
+
+#include <simulation/SimulationMessage.h>
 #include <logging/TerminalOutput.h>
+#include "S4U_Mailbox.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
 
 
 namespace wrench {
+
+		class WorkflowTask;
 
 		// A data structure to keep track of pending asynchronous put() operations
 		// what will have to be waited on at some point

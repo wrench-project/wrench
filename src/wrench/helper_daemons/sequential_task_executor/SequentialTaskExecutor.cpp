@@ -10,6 +10,10 @@
 #include <simgrid_S4U_util/S4U_Simulation.h>
 #include <logging/TerminalOutput.h>
 #include "simgrid_S4U_util/S4U_Mailbox.h"
+#include <workflow/WorkflowTask.h>
+#include <simulation/SimulationMessage.h>
+
+#include "SequentialTaskExecutor.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(sequential_task_executor, "Log category for Sequential Task Executor");
 

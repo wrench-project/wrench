@@ -13,8 +13,10 @@
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 #include "JobManager.h"
+#include <simulation/SimulationMessage.h>
 #include "workflow_job/StandardJob.h"
 #include "workflow_job/PilotJob.h"
+#include <services/compute_services/ComputeService.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 

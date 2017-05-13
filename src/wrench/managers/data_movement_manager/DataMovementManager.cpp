@@ -10,6 +10,7 @@
 #include <simgrid_S4U_util/S4U_Simulation.h>
 #include <logging/TerminalOutput.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <simulation/SimulationMessage.h>
 #include "DataMovementManager.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(data_movement_manager, "Log category for Data Movement Manager");

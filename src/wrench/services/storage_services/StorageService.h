@@ -13,8 +13,8 @@
 
 
 #include <string>
-#include <workflow/WorkflowFile.h>
 #include <set>
+
 #include <services/Service.h>
 
 namespace wrench {
@@ -24,6 +24,7 @@ namespace wrench {
     /***********************/
 
     class Simulation;  // Forward ref
+    class WorkflowFile;
 
     /**
      * @brief Abstract implementation of a storage service.

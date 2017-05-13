@@ -28,11 +28,6 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
         
     };
-//
-//    SET_PROPERTY_NAME(FileRegistryServiceProperty, REQUEST_MESSAGE_PAYLOAD);
-//    SET_PROPERTY_NAME(FileRegistryServiceProperty, ANSWER_MESSAGE_PAYLOAD);
-//    SET_PROPERTY_NAME(FileRegistryServiceProperty, REMOVE_ENTRY_PAYLOAD);
-//    SET_PROPERTY_NAME(FileRegistryServiceProperty, LOOKUP_OVERHEAD);
 
 };
 

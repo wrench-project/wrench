@@ -11,6 +11,7 @@
 #define WRENCH_SIM4U_DAEMONWITHMAILBOX_H
 
 #include <string>
+
 #include <simgrid/s4u.hpp>
 
 namespace wrench {

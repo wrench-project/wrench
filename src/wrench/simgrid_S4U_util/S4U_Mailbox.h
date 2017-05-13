@@ -12,13 +12,19 @@
 #define WRENCH_S4U_MAILBOX_H
 
 
-#include <simulation/SimulationMessage.h>
+#include <string>
+#include <map>
+#include <set>
+
+#include <simgrid/s4u/Actor.hpp>
 
 namespace wrench {
 
 		/***********************/
 		/** \cond INTERNAL     */
 		/***********************/
+
+		class SimulationMessage;
 
 		/**
 		 * @brief Wrappers around Simgrid's mailbox methods

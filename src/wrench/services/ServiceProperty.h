@@ -29,9 +29,6 @@ namespace wrench {
 
     };
 
-//    SET_PROPERTY_NAME(ServiceProperty, STOP_DAEMON_MESSAGE_PAYLOAD);
-//    SET_PROPERTY_NAME(ServiceProperty, DAEMON_STOPPED_MESSAGE_PAYLOAD);
-
 };
 
 

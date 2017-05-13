@@ -13,9 +13,10 @@
 
 
 #include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
-#include <workflow/Workflow.h>
 
 namespace wrench {
+
+    class Workflow;
 
     class DataMovementManager : public S4U_DaemonWithMailbox {
 

@@ -13,19 +13,17 @@
 
 #include <string>
 #include <vector>
-#include <services/compute_services/multicore_job_executor/MulticoreJobExecutor.h>
-#include <simulation/SimulationTimestamp.h>
-#include <services/file_registry_service/FileRegistryService.h>
 
+#include <services/file_registry_service/FileRegistryService.h>
+#include <wms/WMS.h>
 #include <simgrid_S4U_util/S4U_Simulation.h>
 
-
-#include <workflow/Workflow.h>
-#include <wms/WMS.h>
 #include "SimulationOutput.h"
 
 
 namespace wrench {
+
+    class StorageService;
 
     /**
      * @brief A class that keeps track of

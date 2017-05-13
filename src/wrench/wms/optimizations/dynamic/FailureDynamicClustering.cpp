@@ -9,8 +9,9 @@
 
 #include <xbt.h>
 
-#include "logging/TerminalOutput.h"
-#include "wms/optimizations/dynamic/FailureDynamicClustering.h"
+#include <logging/TerminalOutput.h>
+#include <wms/optimizations/dynamic/FailureDynamicClustering.h>
+#include <workflow/Workflow.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(failure_dynamic_clustering, "Log category for Simple Dynamic Clustering for Failures");
 

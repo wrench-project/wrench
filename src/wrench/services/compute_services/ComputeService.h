@@ -11,8 +11,9 @@
 #define SIMULATION_COMPUTESERVICE_H
 
 #include <map>
-#include <workflow_job/WorkflowJob.h>
+
 #include <services/Service.h>
+#include <workflow_job/WorkflowJob.h>
 
 namespace wrench {
 
@@ -23,8 +24,6 @@ namespace wrench {
 		/* Forward References */
 
 		class Simulation;
-
-		class WorkflowJob;
 
 		class StandardJob;
 
@@ -83,7 +82,6 @@ namespace wrench {
 		/***********************/
 
 };
-
 
 
 #endif //SIMULATION_COMPUTESERVICE_H
