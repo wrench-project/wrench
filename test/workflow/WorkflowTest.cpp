@@ -83,7 +83,7 @@ TEST_F(WorkflowTest, ControlDependency) {
   EXPECT_THROW(workflow->addControlDependency(nullptr, t1), std::invalid_argument);
 }
 
-TEST_F(WorkflowTest, WorkflowTask) {
+TEST_F(WorkflowTest, WorkflowTaskThrow) {
   // testing invalid task creation
   EXPECT_THROW(workflow->addTask("task-error", -100), std::invalid_argument);
   EXPECT_THROW(workflow->addTask("task-error", 100, -4), std::invalid_argument);
@@ -91,6 +91,22 @@ TEST_F(WorkflowTest, WorkflowTask) {
   // testing whether a task id exists
   EXPECT_THROW(workflow->getWorkflowTaskByID("task-test-00"), std::invalid_argument);
   EXPECT_TRUE(workflow->getWorkflowTaskByID("task-test-01")->getId() == t1->getId());
+
+  // testing whether a task already exists (check via task id)
+  EXPECT_THROW(workflow->addTask("task-test-01", 1), std::invalid_argument);
+  EXPECT_THROW(workflow->addTask("task-test-01", 1, 1), std::invalid_argument);
+  EXPECT_THROW(workflow->addTask("task-test-01", 1, 10), std::invalid_argument);
+  EXPECT_THROW(workflow->addTask("task-test-01", 10000, 1), std::invalid_argument);
+
+  // remove tasks
+  EXPECT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
+  workflow->removeTask(t1);
+  EXPECT_THROW(workflow->removeTask(t1), std::invalid_argument);
+
+  EXPECT_THROW(workflow->getTaskChildren(nullptr), std::invalid_argument);
+  EXPECT_THROW(workflow->getTaskParents(nullptr), std::invalid_argument);
+
+  EXPECT_THROW(workflow->updateTaskState(nullptr, wrench::WorkflowTask::State::FAILED), std::invalid_argument);
 }
 
 TEST_F(WorkflowTest, WorkflowFile) {
@@ -99,6 +115,8 @@ TEST_F(WorkflowTest, WorkflowFile) {
 
   EXPECT_EQ(workflow->getWorkflowFileByID("file-nonexist"), nullptr);
   EXPECT_EQ(workflow->getWorkflowFileByID("file-01")->getId(), "file-01");
+
+  EXPECT_EQ(workflow->getInputFiles().size(), 1);
 }
 
 TEST_F(WorkflowTest, UpdateTaskState) {

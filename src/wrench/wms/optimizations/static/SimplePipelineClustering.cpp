@@ -72,7 +72,7 @@ namespace wrench {
           }
 
           // create clustered task
-          if (!pipelined_tasks.empty()) {
+          if (not pipelined_tasks.empty()) {
             pipelined_tasks.insert(task->getId());
             task->setClusterId(cluster_id);
           }

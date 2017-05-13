@@ -96,6 +96,11 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
 
   ASSERT_THROW(t1->addInputFile(f2), std::invalid_argument);
   ASSERT_THROW(t1->addOutputFile(f1), std::invalid_argument);
+
+  wrench::WorkflowTask* t3 = workflow->addTask("task-03", 50, 2);
+  t3->addInputFile(f2);
+
+  EXPECT_EQ(t3->getNumberOfParents(), 1);
 }
 
 TEST_F(WorkflowTaskTest, StateToString) {
