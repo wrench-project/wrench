@@ -66,13 +66,13 @@ int main(int argc, char **argv) {
 
   std::vector<std::string> hostname_list = simulation.getHostnameList();
 
-  std::string exexutor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
+  std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
   try {
 
-    std::cerr << "Instantiating a MultiCore Job executor on " << exexutor_host << "..." << std::endl;
+    std::cerr << "Instantiating a MultiCore Job executor on " << executor_host << "..." << std::endl;
     simulation.add(
             std::unique_ptr<wrench::MulticoreJobExecutor>(
-                    new wrench::MulticoreJobExecutor(exexutor_host, true, false,
+                    new wrench::MulticoreJobExecutor(executor_host, true, false,
                                                      {{wrench::MulticoreJobExecutorProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << executor_host << "..." << std::endl;

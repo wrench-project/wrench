@@ -92,9 +92,12 @@ namespace wrench {
 
         // Low-level Constructor
         MulticoreJobExecutor(std::string hostname,
-                             std::map<std::string, std::string> = {},
-                             unsigned int num_worker_threads = 0, double ttl = -1.0,
-                             PilotJob *pj = nullptr, std::string suffix = "");
+                             bool supports_standard_jobs,
+                             bool supports_pilot_jobs,
+                             std::map<std::string, std::string>,
+                             unsigned int num_worker_threads,
+                             double ttl,
+                             PilotJob *pj, std::string suffix);
 
         std::string hostname;
         unsigned int num_worker_threads; // total threads to run tasks from standard jobs

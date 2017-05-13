@@ -65,9 +65,7 @@ namespace wrench {
                              std::string suffix);
 
 
-        std::string hostname;
         double capacity;
-
 
         int main();
 

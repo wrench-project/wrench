@@ -57,8 +57,6 @@ namespace wrench {
         int main();
         bool processNextMessage();
 
-        std::string hostname;
-
         std::map<WorkflowFile *, std::set<StorageService *>> entries;
     };
 

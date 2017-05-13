@@ -7,11 +7,13 @@
  * (at your option) any later version.
  */
 
+#include "MulticoreJobExecutor.h"
 #include <simulation/Simulation.h>
+#include <workflow_job/StandardJob.h>
 #include <logging/TerminalOutput.h>
-#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <simgrid_S4U_util/S4U_Simulation.h>
 #include "exceptions/ComputeServiceIsDownException.h"
-#include "workflow_job/StandardJob.h"
 #include "workflow_job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_job_executor, "Log category for Multicore Job Executor");
@@ -28,7 +30,7 @@ namespace wrench {
      */
     void MulticoreJobExecutor::runStandardJob(StandardJob *job) {
 
-      if (this->state == ComputeService::DOWN) {
+      if (this->state == Service::DOWN) {
         throw ComputeServiceIsDownException(this->getName());
       }
 
@@ -47,7 +49,7 @@ namespace wrench {
      */
     void MulticoreJobExecutor::runPilotJob(PilotJob *job) {
 
-      if (this->state == ComputeService::DOWN) {
+      if (this->state == Service::DOWN) {
         throw ComputeServiceIsDownException(this->getName());
       }
 
@@ -65,7 +67,7 @@ namespace wrench {
      */
     unsigned long MulticoreJobExecutor::getNumCores() {
 
-      if (this->state == ComputeService::DOWN) {
+      if (this->state == Service::DOWN) {
         throw ComputeServiceIsDownException(this->getName());
       }
 
@@ -81,7 +83,7 @@ namespace wrench {
      */
     unsigned long MulticoreJobExecutor::getNumIdleCores() {
 
-      if (this->state == ComputeService::DOWN) {
+      if (this->state == Service::DOWN) {
         throw ComputeServiceIsDownException(this->getName());
       }
 
@@ -101,7 +103,7 @@ namespace wrench {
      */
     double MulticoreJobExecutor::getTTL() {
 
-      if (this->state == ComputeService::DOWN) {
+      if (this->state == Service::DOWN) {
         throw ComputeServiceIsDownException(this->getName());
       }
 
@@ -121,7 +123,7 @@ namespace wrench {
      */
     double MulticoreJobExecutor::getCoreFlopRate() {
 
-      if (this->state == ComputeService::DOWN) {
+      if (this->state == Service::DOWN) {
         throw ComputeServiceIsDownException(this->getName());
       }
       return simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0);
@@ -139,11 +141,8 @@ namespace wrench {
     MulticoreJobExecutor::MulticoreJobExecutor(std::string hostname,
                                                bool supports_standard_jobs, bool supports_pilot_jobs,
                                                std::map<std::string, std::string> plist) :
-            MulticoreJobExecutor::MulticoreJobExecutor(hostname, plist, 0, -1, nullptr, "") {
+            MulticoreJobExecutor::MulticoreJobExecutor(hostname, supports_standard_jobs, supports_pilot_jobs, plist, 0, -1, nullptr, "") {
 
-      // Set the supported jobs
-      this->setSupportStandardJobs(supports_standard_jobs);
-      this->setSupportPilotJobs(supports_pilot_jobs);
     }
 
 
@@ -152,6 +151,8 @@ namespace wrench {
      *        registering it with a WRENCH Simulation
      *
      * @param hostname: the name of the host
+     * @param supports_standard_jobs: true if the job executor should support standard jobs
+     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
      * @param plist: a property list
      * @param num_worker_threads: the number of worker threads (i.e., sequential task executors)
      * @param ttl: the time-ti-live, in seconds
@@ -162,6 +163,8 @@ namespace wrench {
      */
     MulticoreJobExecutor::MulticoreJobExecutor(
             std::string hostname,
+            bool supports_standard_jobs,
+            bool supports_pilot_jobs,
             std::map<std::string, std::string> plist,
             unsigned int num_worker_threads,
             double ttl,
@@ -184,6 +187,9 @@ namespace wrench {
       this->ttl = ttl;
       this->has_ttl = (ttl >= 0);
       this->containing_pilot_job = pj;
+
+      this->supports_standard_jobs = supports_standard_jobs;
+      this->supports_pilot_jobs = supports_pilot_jobs;
 
       // Start the daemon on the same host
       try {
@@ -280,14 +286,19 @@ namespace wrench {
                 WRENCH_INFO("Setting my number of available cores to %d", this->num_available_worker_threads);
 
                 // Create and launch a compute service (same properties as mine)
+//                ComputeService *cs =
+//                        Simulation::createUnregisteredMulticoreJobExecutor(S4U_Simulation::getHostName(),
+//                                                                           true, false,
+//                                                                           this->property_list,
+//                                                                           job->getNumCores(),
+//                                                                           job->getDuration(),
+//                                                                           job,
+//                                                                           "_pilot");
+
                 ComputeService *cs =
-                        Simulation::createUnregisteredMulticoreJobExecutor(S4U_Simulation::getHostName(),
-                                                                           true, false,
-                                                                           this->property_list,
-                                                                           job->getNumCores(),
-                                                                           job->getDuration(),
-                                                                           job,
-                                                                           "_pilot");
+                        new MulticoreJobExecutor(S4U_Simulation::getHostName(),
+                                                 true, false, this->property_list,
+                                                 (unsigned int)job->getNumCores(), job->getDuration(), job, "_pilot");
 
                 // Create and launch a compute service for the pilot job
                 job->setComputeService(cs);

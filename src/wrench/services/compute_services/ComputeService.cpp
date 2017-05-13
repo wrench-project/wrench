@@ -129,21 +129,6 @@ namespace wrench {
 			this->state = ComputeService::UP;
 		}
 
-		/**
-		 * @brief Set the "supports standard jobs" property
-		 * @param v: true or false
-		 */
-		void ComputeService::setSupportStandardJobs(bool v) {
-			this->supports_standard_jobs = v;
-		}
-
-		/**
-		 * @brief Set the "supports pilot jobs" property
-		 * @param v: true or false
-		 */
-		void ComputeService::setSupportPilotJobs(bool v) {
-			this->supports_pilot_jobs = v;
-		}
 
 		/**
 		 * @brief Get the "supports standard jobs" property
@@ -179,13 +164,6 @@ namespace wrench {
 		 */
 		void ComputeService::runPilotJob(PilotJob *job) {
 			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement runPilotJob(StandardJob *)");
-		}
-
-		/**
-		 * @brief Set the state of the compute service to DOWN
-		 */
-		void ComputeService::setStateToDown() {
-			this->state = ComputeService::DOWN;
 		}
 
 		/**

@@ -53,8 +53,6 @@ namespace wrench {
 
         StorageService(std::string service_name, std::string mailbox_name_prefix, double capacity);
 
-        void setStateToDown();
-
     protected:
 
         friend class Simulation;

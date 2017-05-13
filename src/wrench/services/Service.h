@@ -35,6 +35,17 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
+        void setStateToDown();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+
     protected:
 
     /***********************/
@@ -47,8 +58,6 @@ namespace wrench {
         void setProperty(std::string, std::string);
         std::string getPropertyValueAsString(std::string);
         double getPropertyValueAsDouble(std::string);
-
-    protected:
         std::map<std::string, std::string> property_list;
 
         enum State {
@@ -59,13 +68,14 @@ namespace wrench {
         State state;
 
         std::string name;
+        std::string hostname;
 
-    };
 
     /***********************/
     /** \endcond           */
     /***********************/
 
+    };
 };
 
 

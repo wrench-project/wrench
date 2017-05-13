@@ -42,8 +42,6 @@ namespace wrench {
         this->setProperty(p.first, p.second);
       }
 
-      this->hostname = hostname;
-
       // Start the daemon on the same host
       try {
         this->start(hostname);

@@ -27,6 +27,7 @@ namespace wrench {
 		public:
 				std::string process_name;
 				std::string mailbox_name;
+				std::string hostname;
 
 				S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix);
 				void start(std::string hostname);

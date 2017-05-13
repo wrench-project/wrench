@@ -67,11 +67,6 @@ namespace wrench {
 
 				ComputeService(std::string service_name, std::string mailbox_name_prefix);
 
-				void setSupportStandardJobs(bool v);
-
-				void setSupportPilotJobs(bool v);
-
-				void setStateToDown();
 
 		protected:
 
@@ -80,7 +75,6 @@ namespace wrench {
 
 				Simulation *simulation;  // pointer to the simulation object
 
-		private:
 				bool supports_pilot_jobs;
 				bool supports_standard_jobs;
 

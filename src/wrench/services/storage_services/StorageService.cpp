@@ -40,13 +40,6 @@ namespace wrench {
     }
 
     /**
-		 * @brief Set the state of the storage service to DOWN
-		 */
-    void StorageService::setStateToDown() {
-      this->state = StorageService::DOWN;
-    }
-
-    /**
    * @brief Constructor
    *
    * @param service_name: the name of the storage service

@@ -50,6 +50,8 @@ namespace wrench {
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
       mailbox->setReceiver(this->s4u_actor);
 
+      this->hostname = hostname;
+
     }
 
     /**

@@ -293,41 +293,6 @@ namespace wrench {
 
 
     /**
-     * @brief Create an unregistered executor (i.e., that the Simulation instance will not know anything about)
-     *
-     * @param hostname: the hostname in the simulated platform
-     * @param supports_standard_jobs: true if the executor supports StandardJob submissions, false otherwise
-     * @param support_pilot_jobs: true if the executor supports PilotJob submissions, false otherwise
-     * @param plist: a property (<string,string>) list
-     * @param num_cores: the number of cores
-     * @param ttl: the time-to-live of the executor
-     * @param suffix: a suffix to be appended to the process name (useful for debugging)
-     *
-     * @throw std::invalid_argument
-     */
-    MulticoreJobExecutor *Simulation::createUnregisteredMulticoreJobExecutor(std::string hostname,
-                                                                             bool supports_standard_jobs,
-                                                                             bool supports_pilot_jobs,
-                                                                             std::map<std::string, std::string> plist,
-                                                                             unsigned int num_cores,
-                                                                             double ttl,
-                                                                             PilotJob *pj,
-                                                                             std::string suffix) {
-
-      // Create the compute service
-      MulticoreJobExecutor *executor;
-      try {
-        executor = new MulticoreJobExecutor(hostname, plist, num_cores, ttl, pj, suffix);
-        executor->setSupportStandardJobs(supports_standard_jobs);
-        executor->setSupportPilotJobs(supports_pilot_jobs);
-      } catch (std::invalid_argument e) {
-        throw e;
-      }
-      return executor;
-    }
-
-
-    /**
      * @brief Remove a compute service from the list of known compute services
      *
      * @param cs: a raw pointer to a ComputeService object
