@@ -20,30 +20,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_job_executor, "Log category for Multicore
 namespace wrench {
 
     /**
-     * @brief Stop the service
-     *
-     * @throw std::runtime_error
-     */
-    void MulticoreJobExecutor::stop() {
-
-      this->state = ComputeService::DOWN;
-
-      WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
-      // Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
-      std::string ack_mailbox = this->mailbox_name + "_kill";
-      S4U_Mailbox::put(this->mailbox_name,
-                       new StopDaemonMessage(
-                               ack_mailbox,
-                               this->getPropertyValueAsDouble(STOP_DAEMON_MESSAGE_PAYLOAD)));
-      // Wait for the ack
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
-      if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
-        throw std::runtime_error("Wrong message type received while expecting DAEMON_STOPPED");
-      }
-    }
-
-
-    /**
      * @brief Have the service execute a standard job
      *
      * @param job: a pointer a StandardJob object
@@ -58,7 +34,7 @@ namespace wrench {
 
       // Synchronously send a "run a task" message to the daemon's mailbox
       S4U_Mailbox::dput(this->mailbox_name, new RunStandardJobMessage(job, this->getPropertyValueAsDouble(
-              RUN_STANDARD_JOB_MESSAGE_PAYLOAD)));
+              MulticoreJobExecutorProperty::RUN_STANDARD_JOB_MESSAGE_PAYLOAD)));
     };
 
     /**
@@ -77,7 +53,7 @@ namespace wrench {
 
       //  send a "run a task" message to the daemon's mailbox
       S4U_Mailbox::dput(this->mailbox_name,
-                        new RunPilotJobMessage(job, this->getPropertyValueAsDouble(RUN_PILOT_JOB_MESSAGE_PAYLOAD)));
+                        new RunPilotJobMessage(job, this->getPropertyValueAsDouble(MulticoreJobExecutorProperty::RUN_PILOT_JOB_MESSAGE_PAYLOAD)));
     };
 
     /**
@@ -110,7 +86,7 @@ namespace wrench {
       }
 
       S4U_Mailbox::dput(this->mailbox_name, new NumIdleCoresRequestMessage(
-              this->getPropertyValueAsDouble(NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD)));
+              this->getPropertyValueAsDouble(MulticoreJobExecutorProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD)));
       std::unique_ptr<SimulationMessage> msg = S4U_Mailbox::get(this->mailbox_name + "_answers");
       std::unique_ptr<NumIdleCoresAnswerMessage> m(static_cast<NumIdleCoresAnswerMessage *>(msg.release()));
       return m->num_idle_cores;
@@ -130,7 +106,7 @@ namespace wrench {
       }
 
       S4U_Mailbox::dput(this->mailbox_name,
-                        new TTLRequestMessage(this->getPropertyValueAsDouble(TTL_REQUEST_MESSAGE_PAYLOAD)));
+                        new TTLRequestMessage(this->getPropertyValueAsDouble(MulticoreJobExecutorProperty::TTL_REQUEST_MESSAGE_PAYLOAD)));
       std::unique_ptr<SimulationMessage> msg = S4U_Mailbox::get(this->mailbox_name + "_answers");
       std::unique_ptr<TTLAnswerMessage> m(static_cast<TTLAnswerMessage *>(msg.release()));
       return m->ttl;
@@ -162,7 +138,7 @@ namespace wrench {
      */
     MulticoreJobExecutor::MulticoreJobExecutor(std::string hostname,
                                                bool supports_standard_jobs, bool supports_pilot_jobs,
-                                               std::map<MulticoreJobExecutor::Property, std::string> plist) :
+                                               std::map<std::string, std::string> plist) :
             MulticoreJobExecutor::MulticoreJobExecutor(hostname, plist, 0, -1, nullptr, "") {
 
       // Set the supported jobs
@@ -186,7 +162,7 @@ namespace wrench {
      */
     MulticoreJobExecutor::MulticoreJobExecutor(
             std::string hostname,
-            std::map<MulticoreJobExecutor::Property, std::string> plist,
+            std::map<std::string, std::string> plist,
             unsigned int num_worker_threads,
             double ttl,
             PilotJob *pj,
@@ -325,7 +301,7 @@ namespace wrench {
                 // there will be another callback upon termination.
                 S4U_Mailbox::dput(job->getCallbackMailbox(),
                                   new PilotJobStartedMessage(job, this, this->getPropertyValueAsDouble(
-                                          PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+                                          MulticoreJobExecutorProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
 
                 // Push my own mailbox onto the pilot job!
                 job->pushCallbackMailbox(this->mailbox_name);
@@ -412,7 +388,7 @@ namespace wrench {
           this->terminate();
           // This is Synchronous
           S4U_Mailbox::put(m->ack_mailbox,
-                           new DaemonStoppedMessage(this->getPropertyValueAsDouble(DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                           new DaemonStoppedMessage(this->getPropertyValueAsDouble(MulticoreJobExecutorProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
           return false;
         }
 
@@ -422,7 +398,7 @@ namespace wrench {
           if (!this->supportsStandardJobs()) {
             S4U_Mailbox::dput(m->job->popCallbackMailbox(), new JobTypeNotSupportedMessage(m->job, this,
                                                                                            this->getPropertyValueAsDouble(
-                                                                                                   JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD)));
+                                                                                                   MulticoreJobExecutorProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD)));
           } else {
             this->pending_jobs.push(m->job);
           }
@@ -436,13 +412,13 @@ namespace wrench {
           if (!this->supportsPilotJobs()) {
             S4U_Mailbox::dput(m->job->popCallbackMailbox(), new JobTypeNotSupportedMessage(m->job, this,
                                                                                            this->getPropertyValueAsDouble(
-                                                                                                   JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD)));
+                                                                                                   MulticoreJobExecutorProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD)));
             return true;
           }
           if (this->getNumCores() < m->job->getNumCores()) {
             S4U_Mailbox::dput(m->job->popCallbackMailbox(), new NotEnoughCoresMessage(m->job, this,
                                                                                       this->getPropertyValueAsDouble(
-                                                                                              NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
+                                                                                              MulticoreJobExecutorProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
             return true;
           }
           this->pending_jobs.push(m->job);
@@ -465,7 +441,7 @@ namespace wrench {
           std::unique_ptr<NumIdleCoresRequestMessage> m(static_cast<NumIdleCoresRequestMessage *>(message.release()));
           NumIdleCoresAnswerMessage *msg = new NumIdleCoresAnswerMessage(this->num_available_worker_threads,
                                                                          this->getPropertyValueAsDouble(
-                                                                                 NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
+                                                                                 MulticoreJobExecutorProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
           S4U_Mailbox::dput(this->mailbox_name + "_answers", msg);
           return true;
         }
@@ -473,7 +449,7 @@ namespace wrench {
         case SimulationMessage::TTL_REQUEST: {
           std::unique_ptr<TTLRequestMessage> m(static_cast<TTLRequestMessage *>(message.release()));
           TTLAnswerMessage *msg = new TTLAnswerMessage(this->death_date - S4U_Simulation::getClock(),
-                                                       this->getPropertyValueAsDouble(TTL_ANSWER_MESSAGE_PAYLOAD));
+                                                       this->getPropertyValueAsDouble(MulticoreJobExecutorProperty::TTL_ANSWER_MESSAGE_PAYLOAD));
           S4U_Mailbox::dput(this->mailbox_name + "_answers", msg);
           return true;
         }
@@ -535,7 +511,7 @@ namespace wrench {
           // NOTE: This is synchronous so that the process doesn't fall off the end
           S4U_Mailbox::put(job->popCallbackMailbox(),
                            new StandardJobFailedMessage(job, this, this->getPropertyValueAsDouble(
-                                   STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                   MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         }
       }
 
@@ -553,7 +529,7 @@ namespace wrench {
           // NOTE: This is synchronous so that the process doesn't fall off the end
           S4U_Mailbox::put(job->popCallbackMailbox(),
                            new StandardJobFailedMessage(job, this, this->getPropertyValueAsDouble(
-                                   STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                   MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         }
       }
     }
@@ -581,7 +557,7 @@ namespace wrench {
                 std::unique_ptr<SequentialTaskExecutor>(
                         new SequentialTaskExecutor(S4U_Simulation::getHostName(), this->mailbox_name,
                                                    this->getPropertyValueAsDouble(
-                                                           MulticoreJobExecutor::Property::TASK_STARTUP_OVERHEAD)));
+                                                           MulticoreJobExecutorProperty::TASK_STARTUP_OVERHEAD)));
         this->sequential_task_executors.push_back(std::move(seq_executor));
       }
 
@@ -622,7 +598,7 @@ namespace wrench {
         this->running_jobs.erase(job);
         S4U_Mailbox::dput(job->popCallbackMailbox(),
                           new StandardJobDoneMessage(job, this, this->getPropertyValueAsDouble(
-                                  STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+                                  MulticoreJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
       }
     }
 
@@ -650,7 +626,7 @@ namespace wrench {
         // NOTE: This is synchronous so that the process doesn't fall off the end
         S4U_Mailbox::put(this->containing_pilot_job->popCallbackMailbox(),
                          new PilotJobExpiredMessage(this->containing_pilot_job, this,
-                                                    this->getPropertyValueAsDouble(PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+                                                    this->getPropertyValueAsDouble(MulticoreJobExecutorProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
 
       }
     }
@@ -671,7 +647,7 @@ namespace wrench {
       // Forward the notification
       S4U_Mailbox::dput(job->popCallbackMailbox(),
                         new PilotJobExpiredMessage(job, this,
-                                                   this->getPropertyValueAsDouble(PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+                                                   this->getPropertyValueAsDouble(MulticoreJobExecutorProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
 
       return;
     }

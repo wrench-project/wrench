@@ -16,6 +16,7 @@
 #include "services/compute_services/ComputeService.h"
 #include "helper_daemons/sequential_task_executor/SequentialTaskExecutor.h"
 #include "simulation/SimulationMessage.h"
+#include "MulticoreJobExecutorProperty.h"
 
 namespace wrench {
 
@@ -28,79 +29,29 @@ namespace wrench {
     class MulticoreJobExecutor : public ComputeService {
 
     public:
-        enum Property {
-            /** The number of bytes in the control message
-             * sent to the daemon to terminate it (default: 1024) **/
-                    STOP_DAEMON_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-            * sent by the daemon to confirm it has terminate (default: 1024) **/
-                    DAEMON_STOPPED_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent by the daemon to state that it does not support
-             * the type of a submitted job (default: 1024) **/
-                    JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent by the daemon to state that it does not have
-             * sufficient cores to run a submitted job (default: 1024) **/
-                    NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent to the daemon to cause it to run a standard job (default: 1024) **/
-                    RUN_STANDARD_JOB_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent by the daemon to state that it has completed a standard job (default: 1024) **/
-                    STANDARD_JOB_DONE_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent by the daemon to state that a running standard job has failed (default: 1024) **/
-                    STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent to the daemon to cause it to run a pilot job (default: 1024) **/
-                    RUN_PILOT_JOB_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent by the daemon to state that a pilot job has started (default: 1024) **/
-                    PILOT_JOB_STARTED_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent by the daemon to state that a pilot job has expired (default: 1024) **/
-                    PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent by the daemon to state that a pilot job has failed (default: 1024) **/
-                    PILOT_JOB_FAILED_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent to the daemon to ask it for its number of idle cores (default: 1024) **/
-                    NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent by the daemon to state how many idle cores it has (default: 1024) **/
-                    NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-             * sent to the daemon to ask it for its time-to-live (default: 1024) **/
-                    TTL_REQUEST_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-            * sent by the daemon to state its time-to-live (default: 1024) **/
-                    TTL_ANSWER_MESSAGE_PAYLOAD,
-            /** The overhead to start a task execution, in seconds (default: 0.0 ) **/
-                    TASK_STARTUP_OVERHEAD,
-        };
+        
 
     private:
 
-        std::map<MulticoreJobExecutor::Property, std::string> default_property_values =
-                {{MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD,            "1024"},
-                 {MulticoreJobExecutor::Property::DAEMON_STOPPED_MESSAGE_PAYLOAD,         "1024"},
-                 {MulticoreJobExecutor::Property::RUN_STANDARD_JOB_MESSAGE_PAYLOAD,       "1024"},
-                 {MulticoreJobExecutor::Property::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, "1024"},
-                 {MulticoreJobExecutor::Property::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,       "1024"},
-                 {MulticoreJobExecutor::Property::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,      "1024"},
-                 {MulticoreJobExecutor::Property::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,    "1024"},
-                 {MulticoreJobExecutor::Property::RUN_PILOT_JOB_MESSAGE_PAYLOAD,          "1024"},
-                 {MulticoreJobExecutor::Property::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,      "1024"},
-                 {MulticoreJobExecutor::Property::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,      "1024"},
-                 {MulticoreJobExecutor::Property::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,       "1024"},
-                 {MulticoreJobExecutor::Property::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {MulticoreJobExecutor::Property::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {MulticoreJobExecutor::Property::TTL_REQUEST_MESSAGE_PAYLOAD,            "1024"},
-                 {MulticoreJobExecutor::Property::TTL_ANSWER_MESSAGE_PAYLOAD,             "1024"},
-                 {MulticoreJobExecutor::Property::TASK_STARTUP_OVERHEAD,                  "0.0"}
+        std::map<std::string, std::string> default_property_values =
+                {
+                 {MulticoreJobExecutorProperty::STOP_DAEMON_MESSAGE_PAYLOAD,            "1024"},
+                 {MulticoreJobExecutorProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,         "1024"},
+                 {MulticoreJobExecutorProperty::RUN_STANDARD_JOB_MESSAGE_PAYLOAD,       "1024"},
+                 {MulticoreJobExecutorProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, "1024"},
+                 {MulticoreJobExecutorProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,       "1024"},
+                 {MulticoreJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,      "1024"},
+                 {MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,    "1024"},
+                 {MulticoreJobExecutorProperty::RUN_PILOT_JOB_MESSAGE_PAYLOAD,          "1024"},
+                 {MulticoreJobExecutorProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,      "1024"},
+                 {MulticoreJobExecutorProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,      "1024"},
+                 {MulticoreJobExecutorProperty::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,       "1024"},
+                 {MulticoreJobExecutorProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                 {MulticoreJobExecutorProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {MulticoreJobExecutorProperty::TTL_REQUEST_MESSAGE_PAYLOAD,            "1024"},
+                 {MulticoreJobExecutorProperty::TTL_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                 {MulticoreJobExecutorProperty::TASK_STARTUP_OVERHEAD,                  "0.0"}
                 };
-
 
     public:
 
@@ -108,14 +59,13 @@ namespace wrench {
         MulticoreJobExecutor(std::string hostname,
                              bool supports_standard_jobs,
                              bool supports_pilot_jobs,
-                             std::map<MulticoreJobExecutor::Property, std::string> = {});
+                             std::map<std::string, std::string> = {});
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        // Stopping the service
-        void stop();
+
 
         // Running jobs
         void runStandardJob(StandardJob *job);
@@ -142,11 +92,9 @@ namespace wrench {
 
         // Low-level Constructor
         MulticoreJobExecutor(std::string hostname,
-                             std::map<MulticoreJobExecutor::Property, std::string> = {},
+                             std::map<std::string, std::string> = {},
                              unsigned int num_worker_threads = 0, double ttl = -1.0,
                              PilotJob *pj = nullptr, std::string suffix = "");
-
-        std::map<MulticoreJobExecutor::Property, std::string> property_list;
 
         std::string hostname;
         unsigned int num_worker_threads; // total threads to run tasks from standard jobs

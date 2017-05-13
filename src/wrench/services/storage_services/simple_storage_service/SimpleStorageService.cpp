@@ -10,6 +10,7 @@
 #include <wrench-dev.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include "SimpleStorageService.h"
+#include "SimpleStorageServiceProperty.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
 
@@ -25,7 +26,7 @@ namespace wrench {
      */
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                double capacity,
-                                             std::map<SimpleStorageService::Property, std::string> plist) :
+                                             std::map<std::string, std::string> plist) :
             SimpleStorageService(hostname, capacity, plist, "") {
 
     }
@@ -41,7 +42,7 @@ namespace wrench {
     SimpleStorageService::SimpleStorageService(
             std::string hostname,
             double capacity,
-            std::map<SimpleStorageService::Property, std::string> plist,
+            std::map<std::string, std::string> plist,
             std::string suffix) :
             StorageService("simple_storage_service" + suffix, "simple_storage_service" + suffix, capacity) {
 
@@ -65,32 +66,6 @@ namespace wrench {
       }
     }
 
-
-//
-
-
-    /**
-       * @brief Stop the service
-       *
-       * @throw std::runtime_error
-       */
-    void SimpleStorageService::stop() {
-
-      this->state = SimpleStorageService::DOWN;
-
-      WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
-      // Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
-      std::string ack_mailbox = this->mailbox_name + "_kill";
-      S4U_Mailbox::put(this->mailbox_name,
-                       new StopDaemonMessage(
-                               ack_mailbox,
-                               this->getPropertyValueAsDouble(STOP_DAEMON_MESSAGE_PAYLOAD)));
-      // Wait for the ack
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
-      if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
-        throw std::runtime_error("Wrong message type received while expecting DAEMON_STOPPED");
-      }
-    }
 
     void SimpleStorageService::copyFile(WorkflowFile *file, StorageService *src) {
       // Send a request to the daemon
@@ -154,7 +129,7 @@ namespace wrench {
 
           // This is Synchronous
           S4U_Mailbox::put(m->ack_mailbox,
-                           new DaemonStoppedMessage(this->getPropertyValueAsDouble(DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                           new DaemonStoppedMessage(this->getPropertyValueAsDouble(SimpleStorageServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
           return false;
         }
 

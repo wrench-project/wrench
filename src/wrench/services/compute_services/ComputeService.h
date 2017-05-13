@@ -37,8 +37,7 @@ namespace wrench {
 
 		public:
 
-
-				virtual void stop();
+				void stop();
 
 				void runJob(WorkflowJob *job);
 
@@ -66,11 +65,6 @@ namespace wrench {
 				/** \cond INTERNAL    **/
 				/***********************/
 
-				enum State {
-						UP,
-						DOWN,
-				};
-
 				virtual void runStandardJob(StandardJob *job);
 
 				virtual void runPilotJob(PilotJob *job);
@@ -88,7 +82,6 @@ namespace wrench {
 				friend class Simulation;
 				void setSimulation(Simulation *simulation);
 
-				ComputeService::State state;
 				std::string service_name;
 				Simulation *simulation;  // pointer to the simulation object
 

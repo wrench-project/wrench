@@ -76,7 +76,16 @@ set(SOURCE_FILES
         src/wrench/services/storage_services/simple_storage_service/SimpleStorageService.cpp
         src/wrench/services/storage_services/simple_storage_service/SimpleStorageService.h
         src/wrench/managers/data_movement_manager/DataMovementManager.cpp
-        src/wrench/managers/data_movement_manager/DataMovementManager.h src/wrench/services/Service.cpp src/wrench/services/Service.h)
+        src/wrench/managers/data_movement_manager/DataMovementManager.h
+        src/wrench/services/Service.cpp
+        src/wrench/services/Service.h
+        src/wrench/services/ServiceProperty.cpp
+        src/wrench/services/compute_services/ComputeServiceProperty.cpp
+        src/wrench/services/storage_services/StorageServiceProperty.cpp
+        src/wrench/services/file_registry_service/FileRegistryServiceProperty.cpp
+        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutorProperty.cpp
+        src/wrench/services/storage_services/simple_storage_service/SimpleStorageServiceProperty.cpp
+        )
 
 # test files
 set(TEST_FILES

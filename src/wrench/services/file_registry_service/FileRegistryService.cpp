@@ -20,7 +20,7 @@ namespace wrench {
 
 
     FileRegistryService::FileRegistryService(std::string hostname,
-                                             std::map<FileRegistryService::Property, std::string> plist) :
+                                             std::map<std::string, std::string> plist) :
             FileRegistryService(hostname, plist, "") {
 
     }
@@ -28,7 +28,7 @@ namespace wrench {
 
     FileRegistryService::FileRegistryService(
             std::string hostname,
-            std::map<FileRegistryService::Property, std::string> plist,
+            std::map<std::string, std::string> plist,
             std::string suffix) :
             Service("file_registry_service" + suffix, "file_registry_service" + suffix) {
 
@@ -114,29 +114,6 @@ namespace wrench {
 
 
     /**
-       * @brief Stop the service
-       *
-       * @throw std::runtime_error
-       */
-    void FileRegistryService::stop() {
-
-      this->state = FileRegistryService::DOWN;
-
-      WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
-      // Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
-      std::string ack_mailbox = this->mailbox_name + "_kill";
-      S4U_Mailbox::put(this->mailbox_name,
-                       new StopDaemonMessage(
-                               ack_mailbox,
-                               this->getPropertyValueAsDouble(STOP_DAEMON_MESSAGE_PAYLOAD)));
-      // Wait for the ack
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
-      if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
-        throw std::runtime_error("Wrong message type received while expecting DAEMON_STOPPED");
-      }
-    }
-
-    /**
      * @brief Main method of the daemon
      *
      * @return 0 on termination
@@ -179,7 +156,7 @@ namespace wrench {
 
           // This is Synchronous
           S4U_Mailbox::put(m->ack_mailbox,
-                           new DaemonStoppedMessage(this->getPropertyValueAsDouble(DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                           new DaemonStoppedMessage(this->getPropertyValueAsDouble(FileRegistryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
           return false;
         }
 

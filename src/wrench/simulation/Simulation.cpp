@@ -308,7 +308,7 @@ namespace wrench {
     MulticoreJobExecutor *Simulation::createUnregisteredMulticoreJobExecutor(std::string hostname,
                                                                              bool supports_standard_jobs,
                                                                              bool supports_pilot_jobs,
-                                                                             std::map<MulticoreJobExecutor::Property, std::string> plist,
+                                                                             std::map<std::string, std::string> plist,
                                                                              unsigned int num_cores,
                                                                              double ttl,
                                                                              PilotJob *pj,

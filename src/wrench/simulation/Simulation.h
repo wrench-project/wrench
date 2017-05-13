@@ -86,7 +86,7 @@ namespace wrench {
         /***********************/
 
         static wrench::MulticoreJobExecutor *createUnregisteredMulticoreJobExecutor(
-                std::string, bool, bool, std::map<MulticoreJobExecutor::Property, std::string> plist,
+                std::string, bool, bool, std::map<std::string, std::string> plist,
                 unsigned int num_cores,
                 double ttl, PilotJob *pj, std::string suffix);
 

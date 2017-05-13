@@ -14,50 +14,31 @@
 
 #include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
 #include <services/storage_services/StorageService.h>
+#include "FileRegistryServiceProperty.h"
 
 namespace wrench {
 
     class FileRegistryService : public Service {
 
     public:
-
-        enum Property {
-            /** The number of bytes in the control message
-            * sent to the daemon to terminate it (default: 1024) **/
-                    STOP_DAEMON_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message
-            * sent by the daemon to confirm it has terminate (default: 1024) **/
-                    DAEMON_STOPPED_MESSAGE_PAYLOAD,
-            /** The number of bytes in a request control message
-             * sent to the daemon to request a list of file locations (default: 1024) **/
-                    REQUEST_MESSAGE_PAYLOAD,
-            /** The number of bytes per file location returned in an answer
-             *   sent by the daemon to answer a file location request (default: 1024) */
-                    ANSWER_MESSAGE_PAYLOAD,
-            /** The number of bytes in the control message sent to the daemon
-             * to cause it to remove an entry (default: 1024) */
-                    REMOVE_ENTRY_PAYLOAD,
-            /** The overhead, in seconds, of looking up entries for a file (default: 0.0s) */
-                    LOOKUP_OVERHEAD,
-        };
-
+        
 
     private:
 
-        std::map<FileRegistryService::Property, std::string> default_property_values =
-                {{FileRegistryService::Property::STOP_DAEMON_MESSAGE_PAYLOAD,    "1024"},
-                 {FileRegistryService::Property::DAEMON_STOPPED_MESSAGE_PAYLOAD, "1024"},
-                 {FileRegistryService::Property::REQUEST_MESSAGE_PAYLOAD,        "1024"},
-                 {FileRegistryService::Property::ANSWER_MESSAGE_PAYLOAD,         "1024"},
-                 {FileRegistryService::Property::REMOVE_ENTRY_PAYLOAD,           "1024"},
-                 {FileRegistryService::Property::LOOKUP_OVERHEAD,                "0.0"},
+        std::map<std::string, std::string> default_property_values =
+                {{FileRegistryServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,    "1024"},
+                 {FileRegistryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD, "1024"},
+                 {FileRegistryServiceProperty::REQUEST_MESSAGE_PAYLOAD,        "1024"},
+                 {FileRegistryServiceProperty::ANSWER_MESSAGE_PAYLOAD,         "1024"},
+                 {FileRegistryServiceProperty::REMOVE_ENTRY_PAYLOAD,           "1024"},
+                 {FileRegistryServiceProperty::LOOKUP_OVERHEAD,                "0.0"},
                 };
 
     public:
 
         // Public Constructor
         FileRegistryService(std::string hostname,
-                            std::map<FileRegistryService::Property, std::string> = {});
+                            std::map<std::string, std::string> = {});
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -67,8 +48,6 @@ namespace wrench {
             UP,
             DOWN,
         };
-
-        void stop();
 
         /***********************/
         /** \endcond           */
@@ -84,17 +63,13 @@ namespace wrench {
         void removeAllEntries(WorkflowFile *file);
 
         FileRegistryService(std::string hostname,
-                            std::map<FileRegistryService::Property, std::string> plist,
+                            std::map<std::string, std::string> plist,
                             std::string suffix = "");
 
 
         int main();
         bool processNextMessage();
 
-
-
-
-        std::map<FileRegistryService::Property, std::string> property_list;
 
         std::string hostname;
         FileRegistryService::State state;

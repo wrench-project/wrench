@@ -18,23 +18,43 @@
 
 namespace wrench {
 
+
+    class Service : public S4U_DaemonWithMailbox {
+
+    public:
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
+        virtual void stop();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+    protected:
+
     /***********************/
     /** \cond INTERNAL     */
     /***********************/
 
-    class Service : public S4U_DaemonWithMailbox {
-
-    protected:
-
         Service(std::string process_name_prefix, std::string mailbox_name_prefix);
 
         // Property stuff
-        void setProperty(int, std::string);
-        std::string getPropertyValueAsString(int);
-        double getPropertyValueAsDouble(int);
+        void setProperty(std::string, std::string);
+        std::string getPropertyValueAsString(std::string);
+        double getPropertyValueAsDouble(std::string);
 
-    private:
-        std::map<int, std::string> property_list;
+    protected:
+        std::map<std::string, std::string> property_list;
+
+        enum State {
+            UP,
+            DOWN,
+        };
+
+        State state;
 
     };
 

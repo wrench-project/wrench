@@ -29,12 +29,16 @@ namespace wrench {
 		 *        method of derived classes
 		 */
 		void ComputeService::stop() {
-			this->state = ComputeService::DOWN;
+
 			// Notify the simulation that the service is terminated, if that
 			// service was registered with the simulation
 			if (this->simulation) {
 				this->simulation->mark_compute_service_as_terminated(this);
 			}
+
+			// Call the super class's method
+			Service::stop();
+
 		}
 
 		/**

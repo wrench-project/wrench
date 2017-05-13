@@ -32,8 +32,7 @@ namespace wrench {
 
     public:
 
-
-        virtual void stop();
+        void stop();
 
         virtual void copyFile(WorkflowFile *file, StorageService *src) = 0;
 
@@ -55,10 +54,6 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        enum State {
-            UP,
-            DOWN,
-        };
 
         StorageService(std::string service_name_prefix, std::string mailbox_name_prefix, double capacity);
 

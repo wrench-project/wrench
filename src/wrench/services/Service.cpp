@@ -8,7 +8,11 @@
  */
 
 
-#include "Service.h"
+#include <wrench-dev.h>
+#include <simgrid_S4U_util/S4U_Mailbox.h>
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
+
 
 namespace wrench {
 
@@ -18,26 +22,32 @@ namespace wrench {
      * @param process_name_prefix: the prefix for the process name
      * @param mailbox_name_prefix: the prefix for the mailbox name
      */
-    Service::Service(std::string process_name_prefix, std::string mailbox_name_prefix) : S4U_DaemonWithMailbox(process_name_prefix, mailbox_name_prefix) {
-
+    Service::Service(std::string process_name_prefix, std::string mailbox_name_prefix) :
+            S4U_DaemonWithMailbox(process_name_prefix, mailbox_name_prefix) {
     }
-
 
     /**
    * @brief Set a property of the Service
-   * @param property: the property as an integer
+   * @param property: the property
    * @param value: the property value
    */
-    void Service::setProperty(int property, std::string value) {
+    void Service::setProperty(std::string property, std::string value) {
+//      std::cerr << "SETTING [" << property << ", " << value << "]" << std::endl;
       this->property_list[property] = value;
     }
 
     /**
      * @brief Get a property of the Service as a string
-     * @param property: the property as an integer
+     * @param property: the property
      * @return the property value as a string
+     *
+     * @throw std::runtime_error
      */
-    std::string Service::getPropertyValueAsString(int property) {
+    std::string Service::getPropertyValueAsString(std::string property) {
+      if (this->property_list.find(property) == this->property_list.end()) {
+        throw std::runtime_error("Cannot find value for property " + property +
+                                 " (perhaps a derived service class does not provide a default value?)");
+      }
       return this->property_list[property];
     }
 
@@ -48,13 +58,40 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    double Service::getPropertyValueAsDouble(int property) {
+    double Service::getPropertyValueAsDouble(std::string property) {
       double value;
       if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
-        throw std::runtime_error("Invalid double property value " +
+        throw std::runtime_error("Invalid double property value " + property + " " +
                                  this->getPropertyValueAsString(property));
       }
       return value;
+    }
+
+
+    /**
+    * @brief Stop the service
+    *
+    * @throw std::runtime_error
+    */
+    void Service::stop() {
+
+      this->state = Service::DOWN;
+
+      WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
+
+      // Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
+      std::string ack_mailbox = this->mailbox_name + "_kill";
+      double value;
+      value = this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD);
+      S4U_Mailbox::put(this->mailbox_name,
+                       new StopDaemonMessage(
+                               ack_mailbox,
+                               this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
+      // Wait for the ack
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
+      if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
+        throw std::runtime_error("Wrong message type received while expecting DAEMON_STOPPED");
+      }
     }
 
 };
