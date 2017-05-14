@@ -9,7 +9,7 @@
 
 #include <xbt/ex.hpp>
 #include <simgrid/s4u/Mailbox.hpp>
-#include <simgrid/s4u/comm.hpp>
+#include <simgrid/s4u/Comm.hpp>
 
 #include <simulation/SimulationMessage.h>
 #include <logging/TerminalOutput.h>
