@@ -9,7 +9,9 @@
 
 #include <gtest/gtest.h>
 
+#include "workflow/Workflow.h"
 #include "wms/optimizations/dynamic/FailureDynamicClustering.h"
+
 
 class FailureDynamicClusteringTest : public ::testing::Test {
 protected:
