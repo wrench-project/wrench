@@ -22,6 +22,8 @@ namespace wrench {
 		/** \cond DEVELOPER    */
 		/***********************/
 
+		class StorageService;
+
 		/**
 		 * @brief A standard (i.e., non-pilot) WorkflowJob
 		 */
@@ -48,9 +50,11 @@ namespace wrench {
 				friend class JobManager;
 
 				StandardJob(std::vector<WorkflowTask*> tasks);
+				StandardJob(std::vector<WorkflowTask*> tasks, std::map<WorkflowFile*, StorageService*> file_locations);
 				std::vector<WorkflowTask *> tasks;
 				State state;
 				unsigned long num_completed_tasks;
+				std::map<WorkflowFile*, StorageService*> file_locations;
 
 		};
 

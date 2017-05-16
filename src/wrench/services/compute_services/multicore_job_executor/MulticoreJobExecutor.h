@@ -22,34 +22,36 @@ namespace wrench {
 
     class Simulation;
 
+    class StorageService;
+
     /**  @brief Implementation of a Compute Service abstraction that
      *   runs on a multi-core host.
      */
     class MulticoreJobExecutor : public ComputeService {
 
     public:
-        
+
 
     private:
 
         std::map<std::string, std::string> default_property_values =
                 {
-                 {MulticoreJobExecutorProperty::STOP_DAEMON_MESSAGE_PAYLOAD,            "1024"},
-                 {MulticoreJobExecutorProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,         "1024"},
-                 {MulticoreJobExecutorProperty::RUN_STANDARD_JOB_MESSAGE_PAYLOAD,       "1024"},
-                 {MulticoreJobExecutorProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, "1024"},
-                 {MulticoreJobExecutorProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,       "1024"},
-                 {MulticoreJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,      "1024"},
-                 {MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,    "1024"},
-                 {MulticoreJobExecutorProperty::RUN_PILOT_JOB_MESSAGE_PAYLOAD,          "1024"},
-                 {MulticoreJobExecutorProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,      "1024"},
-                 {MulticoreJobExecutorProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,      "1024"},
-                 {MulticoreJobExecutorProperty::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,       "1024"},
-                 {MulticoreJobExecutorProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {MulticoreJobExecutorProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {MulticoreJobExecutorProperty::TTL_REQUEST_MESSAGE_PAYLOAD,            "1024"},
-                 {MulticoreJobExecutorProperty::TTL_ANSWER_MESSAGE_PAYLOAD,             "1024"},
-                 {MulticoreJobExecutorProperty::TASK_STARTUP_OVERHEAD,                  "0.0"}
+                        {MulticoreJobExecutorProperty::STOP_DAEMON_MESSAGE_PAYLOAD,            "1024"},
+                        {MulticoreJobExecutorProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,         "1024"},
+                        {MulticoreJobExecutorProperty::RUN_STANDARD_JOB_MESSAGE_PAYLOAD,       "1024"},
+                        {MulticoreJobExecutorProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, "1024"},
+                        {MulticoreJobExecutorProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,       "1024"},
+                        {MulticoreJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,      "1024"},
+                        {MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,    "1024"},
+                        {MulticoreJobExecutorProperty::RUN_PILOT_JOB_MESSAGE_PAYLOAD,          "1024"},
+                        {MulticoreJobExecutorProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,      "1024"},
+                        {MulticoreJobExecutorProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,      "1024"},
+                        {MulticoreJobExecutorProperty::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,       "1024"},
+                        {MulticoreJobExecutorProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                        {MulticoreJobExecutorProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                        {MulticoreJobExecutorProperty::TTL_REQUEST_MESSAGE_PAYLOAD,            "1024"},
+                        {MulticoreJobExecutorProperty::TTL_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                        {MulticoreJobExecutorProperty::TASK_STARTUP_OVERHEAD,                  "0.0"}
                 };
 
     public:
@@ -59,6 +61,15 @@ namespace wrench {
                              bool supports_standard_jobs,
                              bool supports_pilot_jobs,
                              std::map<std::string, std::string> = {});
+
+        // Public Constructor
+        MulticoreJobExecutor(std::string hostname,
+                             bool supports_standard_jobs,
+                             bool supports_pilot_jobs,
+                             StorageService *default_storage_service,
+                             std::map<std::string, std::string> = {});
+
+
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -96,7 +107,8 @@ namespace wrench {
                              std::map<std::string, std::string>,
                              unsigned int num_worker_threads,
                              double ttl,
-                             PilotJob *pj, std::string suffix);
+                             PilotJob *pj, std::string suffix,
+                             StorageService *default_storage_service);
 
         std::string hostname;
         unsigned int num_worker_threads; // total threads to run tasks from standard jobs

@@ -121,10 +121,15 @@ namespace wrench {
 		 * @brief Constructor
 		 *
 		 * @param service_name: the name of the compute service
+		 * @param mailbox_name_prefix: the mailbox name prefix
+		 * @param default_storage_service: a raw pointer to a StorageService object
 		 */
-		ComputeService::ComputeService(std::string service_name, std::string mailbox_name_prefix) : Service(service_name, mailbox_name_prefix)
+		ComputeService::ComputeService(std::string service_name,
+		                               std::string mailbox_name_prefix,
+		                               StorageService *default_storage_service) : Service(service_name, mailbox_name_prefix)
 
 		{
+			this->default_storage_service = default_storage_service;
 			this->simulation = nullptr; // will be filled in via Simulation::add()
 			this->state = ComputeService::UP;
 		}
@@ -206,4 +211,20 @@ namespace wrench {
 			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement getTTL()");
 		}
 
+
+    /**
+     * @brief Set the default StorageService for the ComputeService
+     * @param storage_service: a raw pointer to a StorageService object
+     */
+    void ComputeService::setDefaultStorageService(StorageService *storage_service) {
+      this->default_storage_service = storage_service;
+    }
+
+    /**
+    * @brief Get the default StorageService for the ComputeService
+    * @return a raw pointer to a StorageService object
+    */
+    StorageService *ComputeService::getDefaultStorageService() {
+      return this->default_storage_service;
+    }
 };

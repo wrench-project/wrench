@@ -29,6 +29,8 @@ namespace wrench {
 
 		class PilotJob;
 
+		class StorageService;
+
 		/**
 		 * @brief Abstract implementation of a compute service.
 		 */
@@ -54,6 +56,10 @@ namespace wrench {
 
 				virtual double getTTL();
 
+        void setDefaultStorageService(StorageService *storage_service);
+
+       StorageService *getDefaultStorageService();
+
 
 
 				/***********************/
@@ -64,16 +70,23 @@ namespace wrench {
 
 				virtual void runPilotJob(PilotJob *job);
 
-				ComputeService(std::string service_name, std::string mailbox_name_prefix);
+				ComputeService(std::string service_name,
+				               std::string mailbox_name_prefix,
+											 StorageService *default_storate_service);
 
 		protected:
 
 				bool supports_pilot_jobs;
 				bool supports_standard_jobs;
 
+				StorageService *default_storage_service;
+
 				/***********************/
 				/** \endcond          **/
 				/***********************/
+
+
+
 
 		};
 
