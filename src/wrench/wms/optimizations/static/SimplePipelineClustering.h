@@ -10,7 +10,8 @@
 #ifndef WRENCH_SIMPLETASKCLUSTERING_H
 #define WRENCH_SIMPLETASKCLUSTERING_H
 
-#include <wms/optimizations/static/StaticOptimization.h>
+#include "wms/optimizations/static/StaticOptimization.h"
+#include "workflow/WorkflowTask.h"
 
 namespace wrench {
 
@@ -26,7 +27,8 @@ namespace wrench {
 
         void process(Workflow *workflow);
 
-
+    private:
+        WorkflowTask *getTask(std::vector<WorkflowTask *> tasks);
     };
 
     /***********************/

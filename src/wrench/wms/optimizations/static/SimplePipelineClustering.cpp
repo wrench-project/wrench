@@ -24,30 +24,27 @@ namespace wrench {
      */
     void SimplePipelineClustering::process(Workflow *workflow) {
 
-      // TODO: Refactor to avoid code duplication
-
       int id = 1;
       std::set<std::string> pipelined_tasks;
 
       for (auto task : workflow->getTasks()) {
-        if (task->getNumberOfChildren() == 1 && task->getNumberOfParents() == 1 &&
-            pipelined_tasks.find(task->getId()) == pipelined_tasks.end()) {
+        if (pipelined_tasks.find(task->getId()) == pipelined_tasks.end()
+            && (task->getNumberOfChildren() == 1 || task->getNumberOfParents() == 1)) {
 
           std::string cluster_id = "PIPELINE_CLUSTER_" + std::to_string(id++);
 
           // explore parent
-          WorkflowTask *parent = workflow->getTaskParents(task)[0];
+          WorkflowTask *parent = getTask(workflow->getTaskParents(task));
           while (true) {
-            if (parent->getNumberOfChildren() == 1 && parent->getNumberOfParents() == 1 &&
-                pipelined_tasks.find(parent->getId()) == pipelined_tasks.end()) {
+            if (parent && pipelined_tasks.find(parent->getId()) == pipelined_tasks.end()
+                && parent->getNumberOfChildren() == 1) {
 
               pipelined_tasks.insert(parent->getId());
               parent->setClusterId(cluster_id);
-              std::cout << "CALLING READY" << std::endl;
-              parent->setReady();
+              parent->setState(WorkflowTask::State::READY);
 
               // next parent
-              parent = workflow->getTaskParents(parent)[0];
+              parent = getTask(workflow->getTaskParents(parent));
 
             } else {
               break;
@@ -55,18 +52,17 @@ namespace wrench {
           }
 
           // explore child
-          WorkflowTask *child = workflow->getTaskChildren(task)[0];
+          WorkflowTask *child = getTask(workflow->getTaskChildren(task));
           while (true) {
-            if (child->getNumberOfChildren() == 1 && child->getNumberOfParents() == 1 &&
-                pipelined_tasks.find(child->getId()) == pipelined_tasks.end()) {
+            if (child && pipelined_tasks.find(child->getId()) == pipelined_tasks.end()
+                && child->getNumberOfParents() == 1) {
 
               pipelined_tasks.insert(child->getId());
               child->setClusterId(cluster_id);
-              std::cout << "CALLING READY (C)" << std::endl;
-              child->setReady();
+              child->setState(WorkflowTask::State::READY);
 
               // next child
-              child = workflow->getTaskChildren(child)[0];
+              child = getTask(workflow->getTaskChildren(child));
 
             } else {
               break;
@@ -80,5 +76,19 @@ namespace wrench {
           }
         }
       }
+    }
+
+    /**
+     * @brief Get the first task from a vector of tasks
+     *
+     * @param tasks: a vector of WorkflowTask
+     *
+     * @return The first task of the vector
+     */
+    WorkflowTask *SimplePipelineClustering::getTask(std::vector<WorkflowTask *> tasks) {
+      if (tasks.size() <= 1) {
+        return not tasks.empty() ? tasks[0] : NULL;
+      }
+      return NULL;
     }
 }
