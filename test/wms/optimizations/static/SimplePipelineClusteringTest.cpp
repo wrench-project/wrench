@@ -21,38 +21,32 @@ protected:
 
       // create simple diamond workflow
       t1 = workflow->addTask("task-test-01", 1);
-      t2 = workflow->addTask("task-test-02", 1);
-      t3 = workflow->addTask("task-test-03", 1);
-      t4 = workflow->addTask("task-test-04", 1);
-
-      t2->setClusterId("cluster-01");
-      t3->setClusterId("cluster-01");
+      t2 = workflow->addTask("task-test-02", 10);
+      t3 = workflow->addTask("task-test-03", 100);
+      t4 = workflow->addTask("task-test-04", 1000);
+      t5 = workflow->addTask("task-test-05", 10000);
 
       workflow->addControlDependency(t1, t2);
-      workflow->addControlDependency(t1, t3);
-      workflow->addControlDependency(t2, t4);
+      workflow->addControlDependency(t2, t3);
       workflow->addControlDependency(t3, t4);
+      workflow->addControlDependency(t3, t5);
     }
 
     // data members
     wrench::Workflow *workflow;
-    wrench::WorkflowTask *t1, *t2, *t3, *t4;
+    wrench::WorkflowTask *t1, *t2, *t3, *t4, *t5;
 };
 
 TEST_F(SimplePipelineClusteringTest, GroupTasks) {
   wrench::StaticOptimization *opt = new wrench::SimplePipelineClustering();
 
-  EXPECT_EQ(workflow->getNumberOfTasks(), 4);
+  ASSERT_EQ(workflow->getNumberOfTasks(), 5);
 
   opt->process(workflow);
-
-  EXPECT_EQ(workflow->getReadyTasks().size(), 1);
-
-  t1->setRunning();
-  t1->setCompleted();
 
   std::map<std::string, std::vector<wrench::WorkflowTask *>> map = workflow->getReadyTasks();
   EXPECT_EQ(map.size(), 1);
 
-  EXPECT_EQ(map.begin()->second.size(), 2);
+  EXPECT_EQ(map.begin()->second.size(), 3);
+  EXPECT_EQ(map["PIPELINE_CLUSTER_1"].size(), 3);
 }
