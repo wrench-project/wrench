@@ -8,13 +8,20 @@
  */
 
 #include "MulticoreJobExecutor.h"
+
 #include <simulation/Simulation.h>
 #include <workflow_job/StandardJob.h>
 #include <logging/TerminalOutput.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
-#include "exceptions/ComputeServiceIsDownException.h"
+#include <services/storage_services/StorageService.h>
+#include <helper_daemons/sequential_task_executor/SequentialTaskExecutorMessage.h>
+#include <services/ServiceMessage.h>
+#include <services/compute_services/ComputeServiceMessage.h>
+#include "exceptions/WorkflowExecutionException.h"
 #include "workflow_job/PilotJob.h"
+#include "MulticoreJobExecutorMessage.h"
+
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_job_executor, "Log category for Multicore Job Executor");
 
@@ -22,113 +29,204 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_job_executor, "Log category for Multicore
 namespace wrench {
 
     /**
-     * @brief Have the service execute a standard job
+     * @brief Asynchronously submit a standard job to the compute service
      *
      * @param job: a pointer a StandardJob object
      *
-     * @throw ComputeServiceIsDownException
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     *
      */
-    void MulticoreJobExecutor::runStandardJob(StandardJob *job) {
+    void MulticoreJobExecutor::submitStandardJob(StandardJob *job) {
 
       if (this->state == Service::DOWN) {
-        throw ComputeServiceIsDownException(this->getName());
+        throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      // Synchronously send a "run a task" message to the daemon's mailbox
-      S4U_Mailbox::dput(this->mailbox_name, new RunStandardJobMessage(job, this->getPropertyValueAsDouble(
-              MulticoreJobExecutorProperty::RUN_STANDARD_JOB_MESSAGE_PAYLOAD)));
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+
+      //  send a "run a task" message to the daemon's mailbox
+      S4U_Mailbox::put(this->mailbox_name,
+                       new ComputeServiceSubmitStandardJobRequestMessage(answer_mailbox, job, this->getPropertyValueAsDouble(
+                               MulticoreJobExecutorProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+
+      // Get the answer
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      if (ComputeServiceSubmitStandardJobAnswerMessage *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+        // If no success, throw an exception
+        if (!msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        }
+      } else {
+        throw std::runtime_error(
+                "MulticoreJobExecutor::submitStandardJob(): Received an unexpected [" + message->getName() +
+                "] message!");
+      }
+
     };
 
     /**
-     * @brief Have the service execute a pilot job
+     * @brief Asynchronously submit a pilot job to the compute service
      *
      * @param task: a pointer the PilotJob object
      * @param callback_mailbox: the name of a mailbox to which a "pilot job started" callback will be sent
      *
-     * @throw ComputeServiceIsDownException
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
      */
-    void MulticoreJobExecutor::runPilotJob(PilotJob *job) {
+    void MulticoreJobExecutor::submitPilotJob(PilotJob *job) {
 
       if (this->state == Service::DOWN) {
-        throw ComputeServiceIsDownException(this->getName());
+        throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+
       //  send a "run a task" message to the daemon's mailbox
-      S4U_Mailbox::dput(this->mailbox_name,
-                        new RunPilotJobMessage(job, this->getPropertyValueAsDouble(
-                                MulticoreJobExecutorProperty::RUN_PILOT_JOB_MESSAGE_PAYLOAD)));
+      S4U_Mailbox::put(this->mailbox_name,
+                       new ComputeServiceSubmitPilotJobRequestMessage(answer_mailbox, job, this->getPropertyValueAsDouble(
+                               MulticoreJobExecutorProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+
+      // Get the answer
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      if (ComputeServiceSubmitPilotJobAnswerMessage *msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
+        // If no success, throw an exception
+        if (!msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        }
+
+      } else {
+        throw std::runtime_error(
+                "MulticoreJobExecutor::submitPilotJob(): Received an unexpected [" + message->getName() +
+                "] message!");
+      }
+
     };
 
     /**
-     * @brief Finds out how many  cores the  service has
+     * @brief Synchronously ask the service how many cores it has
      *
      * @return the number of cores
      *
-     * @throw ComputeServiceIsDownException
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
      */
     unsigned long MulticoreJobExecutor::getNumCores() {
 
       if (this->state == Service::DOWN) {
-        throw ComputeServiceIsDownException(this->getName());
+        throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      return (unsigned long) S4U_Simulation::getNumCores(this->hostname);
+      // send a "num cores" message to the daemon's mailbox
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      S4U_Mailbox::put(this->mailbox_name,
+                       new MulticoreJobExecutorNumCoresRequestMessage(answer_mailbox,
+                                                  this->getPropertyValueAsDouble(
+                                                          MulticoreJobExecutorProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD)));
+
+      // get the reply
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      if (MulticoreJobExecutorNumCoresAnswerMessage *msg = dynamic_cast<MulticoreJobExecutorNumCoresAnswerMessage *>(message.get())) {
+        return msg->num_cores;
+      } else {
+        throw std::runtime_error(
+                "MulticoreJobExecutor::getNumCores(): unexpected [" + msg->getName() + "] message");
+      }
+
     }
 
     /**
-     * @brief Finds out how many idle cores the  service has
+     * @brief Synchronously ask the service how many idle cores it has
      *
      * @return the number of currently idle cores
      *
-     * @throw ComputeServiceIsDownException
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
      */
     unsigned long MulticoreJobExecutor::getNumIdleCores() {
 
       if (this->state == Service::DOWN) {
-        throw ComputeServiceIsDownException(this->getName());
+        throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      S4U_Mailbox::dput(this->mailbox_name, new NumIdleCoresRequestMessage(
+      // send a "num idle cores" message to the daemon's mailbox
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+
+      S4U_Mailbox::dput(this->mailbox_name, new MulticoreJobExecutorNumIdleCoresRequestMessage(
+              answer_mailbox,
               this->getPropertyValueAsDouble(MulticoreJobExecutorProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD)));
-      std::unique_ptr<SimulationMessage> msg = S4U_Mailbox::get(this->mailbox_name + "_answers");
-      std::unique_ptr<NumIdleCoresAnswerMessage> m(static_cast<NumIdleCoresAnswerMessage *>(msg.release()));
-      return m->num_idle_cores;
+
+      // Get the reply
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      if (MulticoreJobExecutorNumIdleCoresAnswerMessage *msg = dynamic_cast<MulticoreJobExecutorNumIdleCoresAnswerMessage *>(message.get())) {
+        return msg->num_idle_cores;
+      } else {
+        throw std::runtime_error(
+                "MulticoreJobExecutor::getNumIdleCores(): unexpected [" + msg->getName() + "] message");
+      }
     }
 
     /**
-     * @brief Finds out the TTL
+     * @brief Synchronously ask the service for its TTL
      *
      * @return the TTL in seconds
      *
-     * @throw ComputeServiceIsDownException
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
      */
     double MulticoreJobExecutor::getTTL() {
 
       if (this->state == Service::DOWN) {
-        throw ComputeServiceIsDownException(this->getName());
+        throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
+      // send a "ttl request" message to the daemon's mailbox
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
       S4U_Mailbox::dput(this->mailbox_name,
-                        new TTLRequestMessage(this->getPropertyValueAsDouble(
-                                MulticoreJobExecutorProperty::TTL_REQUEST_MESSAGE_PAYLOAD)));
-      std::unique_ptr<SimulationMessage> msg = S4U_Mailbox::get(this->mailbox_name + "_answers");
-      std::unique_ptr<TTLAnswerMessage> m(static_cast<TTLAnswerMessage *>(msg.release()));
-      return m->ttl;
+                        new MulticoreJobExecutorTTLRequestMessage(
+                                answer_mailbox,
+                                this->getPropertyValueAsDouble(
+                                        MulticoreJobExecutorProperty::TTL_REQUEST_MESSAGE_PAYLOAD)));
+
+      // Get the reply
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      if (MulticoreJobExecutorTTLAnswerMessage *msg = dynamic_cast<MulticoreJobExecutorTTLAnswerMessage *>(message.get())) {
+        return msg->ttl;
+      } else {
+        throw std::runtime_error("MulticoreJobExecutor::getTTL(): unexpected [" + msg->getName() + "] message");
+      }
     }
 
     /**
-     * @brief Finds out the flop rate of the cores
+     * @brief Synchronously ask the service for its per-core flop rate
      *
-     * @return the clock rate in Flops/sec
+     * @return the rate in Flops/sec
      *
-     * @throw ComputeServiceIsDownException
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
      */
     double MulticoreJobExecutor::getCoreFlopRate() {
 
       if (this->state == Service::DOWN) {
-        throw ComputeServiceIsDownException(this->getName());
+        throw WorkflowExecutionException(new ServiceIsDown(this));
       }
-      return simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0);
+
+      // send a "floprate request" message to the daemon's mailbox
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      S4U_Mailbox::dput(this->mailbox_name,
+                        new MulticoreJobExecutorFlopRateRequestMessage(
+                                answer_mailbox,
+                                this->getPropertyValueAsDouble(
+                                        MulticoreJobExecutorProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD)));
+
+      // Get the reply
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      if (MulticoreJobExecutorFlopRateAnswerMessage *msg = dynamic_cast<MulticoreJobExecutorFlopRateAnswerMessage *>(message.get())) {
+        return msg->flop_rate;
+      } else {
+        throw std::runtime_error(
+                "MulticoreJobExecutor::getCoreFLopRate(): unexpected [" + msg->getName() + "] message");
+      }
     }
 
 
@@ -223,8 +321,8 @@ namespace wrench {
       // Start the daemon on the same host
       try {
         this->start(hostname);
-      } catch (std::invalid_argument e) {
-        throw e;
+      } catch (std::invalid_argument &e) {
+        throw &e;
       }
     }
 
@@ -246,11 +344,6 @@ namespace wrench {
         this->death_date = S4U_Simulation::getClock() + this->ttl;
         WRENCH_INFO("Will be terminating at date %lf", this->death_date);
       }
-
-
-//			if (this->containing_pilot_job) {
-//				WRENCH_INFO("MY CONTAINING PILOT JOB HAS CALLBACK MAILBOX '%s'", this->containing_pilot_job->getCallbackMailbox().c_str());
-//			}
 
       /** Main loop **/
       while (this->processNextMessage((this->has_ttl ? this->death_date - S4U_Simulation::getClock() : -1.0))) {
@@ -333,7 +426,7 @@ namespace wrench {
                 // Note the getCallbackMailbox instead of the popCallbackMailbox, because
                 // there will be another callback upon termination.
                 S4U_Mailbox::dput(job->getCallbackMailbox(),
-                                  new PilotJobStartedMessage(job, this, this->getPropertyValueAsDouble(
+                                  new ComputeServicePilotJobStartedMessage(job, this, this->getPropertyValueAsDouble(
                                           MulticoreJobExecutorProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
 
                 // Push my own mailbox onto the pilot job!
@@ -366,9 +459,24 @@ namespace wrench {
         this->idle_sequential_task_executors.erase(executor);
         this->busy_sequential_task_executors.insert(executor);
 
+        // Figure out the task's job
+        StandardJob *job = (StandardJob *) (to_run->getJob());
+
         // Start the task on the sequential task executor
         WRENCH_INFO("Running task %s on one of my worker threads", to_run->getId().c_str());
-        executor->runTask(to_run);
+        std::map<WorkflowFile *, StorageService *> task_file_locations;
+        for (auto f : to_run->getInputFiles()) {
+          if (job->getFileLocations().find(f) != job->getFileLocations().end()) {
+            task_file_locations[f] = job->getFileLocations()[f];
+          }
+        }
+        for (auto f : to_run->getOutputFiles()) {
+          if (job->getFileLocations().find(f) != job->getFileLocations().end()) {
+            task_file_locations[f] = job->getFileLocations()[f];
+          }
+        }
+
+        executor->runTask(to_run, task_file_locations);
 
         // Put the task in the running task set
         this->running_tasks.insert(to_run);
@@ -411,93 +519,119 @@ namespace wrench {
         return false;
       }
 
-      WRENCH_INFO("Got a [%s] message", message->toString().c_str());
+      WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      switch (message->type) {
-
-        case SimulationMessage::STOP_DAEMON: {
-          std::unique_ptr<StopDaemonMessage> m(static_cast<StopDaemonMessage *>(message.release()));
-
-          this->terminate();
-          // This is Synchronous
-          S4U_Mailbox::put(m->ack_mailbox,
-                           new DaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                   MulticoreJobExecutorProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-          return false;
-        }
-
-        case SimulationMessage::RUN_STANDARD_JOB: {
-          std::unique_ptr<RunStandardJobMessage> m(static_cast<RunStandardJobMessage *>(message.release()));
-          WRENCH_INFO("Asked to run a standard job with %ld tasks", m->job->getNumTasks());
-          if (!this->supportsStandardJobs()) {
-            S4U_Mailbox::dput(m->job->popCallbackMailbox(), new JobTypeNotSupportedMessage(m->job, this,
-                                                                                           this->getPropertyValueAsDouble(
-                                                                                                   MulticoreJobExecutorProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD)));
-          } else {
-            this->pending_jobs.push(m->job);
-          }
+      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        this->terminate();
+        // This is Synchronous
+        S4U_Mailbox::put(msg->ack_mailbox,
+                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
+                                 MulticoreJobExecutorProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+        return false;
+      } else if (ComputeServiceSubmitStandardJobRequestMessage *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
+        WRENCH_INFO("Asked to run a standard job with %ld tasks", msg->job->getNumTasks());
+        if (!this->supportsStandardJobs()) {
+          S4U_Mailbox::dput(msg->answer_mailbox,
+                            new ComputeServiceSubmitStandardJobAnswerMessage(msg->job, this,
+                                                               false,
+                                                               new JobTypeNotSupported(msg->job, this),
+                                                               this->getPropertyValueAsDouble(
+                                                                       MulticoreJobExecutorProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
           return true;
         }
 
-        case SimulationMessage::RUN_PILOT_JOB: {
-          std::unique_ptr<RunPilotJobMessage> m(static_cast<RunPilotJobMessage *>(message.release()));
-          WRENCH_INFO("Asked to run a pilot job with %d cores for %lf seconds", m->job->getNumCores(),
-                      m->job->getDuration());
-          if (!this->supportsPilotJobs()) {
-            S4U_Mailbox::dput(m->job->popCallbackMailbox(), new JobTypeNotSupportedMessage(m->job, this,
-                                                                                           this->getPropertyValueAsDouble(
-                                                                                                   MulticoreJobExecutorProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD)));
-            return true;
-          }
-          if (this->getNumCores() < m->job->getNumCores()) {
-            S4U_Mailbox::dput(m->job->popCallbackMailbox(), new NotEnoughCoresMessage(m->job, this,
-                                                                                      this->getPropertyValueAsDouble(
-                                                                                              MulticoreJobExecutorProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
-            return true;
-          }
-          this->pending_jobs.push(m->job);
+        this->pending_jobs.push(msg->job);
+        S4U_Mailbox::dput(msg->answer_mailbox,
+                          new ComputeServiceSubmitStandardJobAnswerMessage(msg->job, this,
+                                                             true,
+                                                             nullptr,
+                                                             this->getPropertyValueAsDouble(
+                                                                     MulticoreJobExecutorProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+        return true;
+      } else if (ComputeServiceSubmitPilotJobRequestMessage *msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
+        WRENCH_INFO("Asked to run a pilot job with %d cores for %lf seconds", msg->job->getNumCores(),
+                    msg->job->getDuration());
+
+        bool success = true;
+        WorkflowExecutionFailureCause *failure_cause = nullptr;
+
+        if (!this->supportsPilotJobs()) {
+          S4U_Mailbox::dput(msg->answer_mailbox,
+                            new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
+                                                            this,
+                                                            false,
+                                                            new JobTypeNotSupported(msg->job, this),
+                                                            this->getPropertyValueAsDouble(
+                                                                    MulticoreJobExecutorProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
           return true;
         }
 
-        case SimulationMessage::TASK_DONE: {
-          std::unique_ptr<TaskDoneMessage> m(static_cast<TaskDoneMessage *>(message.release()));
-          processTaskCompletion(m->task, m->task_executor);
+        if (this->getNumCores() < msg->job->getNumCores()) {
+
+          S4U_Mailbox::dput(msg->answer_mailbox,
+                            new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
+                                                            this,
+                                                            false,
+                                                            new NotEnoughCores(msg->job, this),
+                                                            this->getPropertyValueAsDouble(
+                                                                    MulticoreJobExecutorProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
           return true;
         }
 
-        case SimulationMessage::PILOT_JOB_EXPIRED: {
-          std::unique_ptr<PilotJobExpiredMessage> m(static_cast<PilotJobExpiredMessage *>(message.release()));
-          processPilotJobCompletion(m->job);
-          return true;
-        }
+        // success
+        this->pending_jobs.push(msg->job);
+        S4U_Mailbox::dput(msg->answer_mailbox,
+                          new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
+                                                          this,
+                                                          true,
+                                                          nullptr,
+                                                          this->getPropertyValueAsDouble(
+                                                                  MulticoreJobExecutorProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
 
-        case SimulationMessage::NUM_IDLE_CORES_REQUEST: {
-          std::unique_ptr<NumIdleCoresRequestMessage> m(static_cast<NumIdleCoresRequestMessage *>(message.release()));
-          NumIdleCoresAnswerMessage *msg = new NumIdleCoresAnswerMessage(this->num_available_worker_threads,
-                                                                         this->getPropertyValueAsDouble(
-                                                                                 MulticoreJobExecutorProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
-          S4U_Mailbox::dput(this->mailbox_name + "_answers", msg);
-          return true;
-        }
+        return true;
+      } else if (SequentialTaskExecutorTaskDoneMessage *msg = dynamic_cast<SequentialTaskExecutorTaskDoneMessage *>(message.get())) {
 
-        case SimulationMessage::TTL_REQUEST: {
-          std::unique_ptr<TTLRequestMessage> m(static_cast<TTLRequestMessage *>(message.release()));
-          TTLAnswerMessage *msg = new TTLAnswerMessage(this->death_date - S4U_Simulation::getClock(),
-                                                       this->getPropertyValueAsDouble(
-                                                               MulticoreJobExecutorProperty::TTL_ANSWER_MESSAGE_PAYLOAD));
-          S4U_Mailbox::dput(this->mailbox_name + "_answers", msg);
-          return true;
-        }
-
-        default: {
-          throw std::runtime_error("Unknown message type: " + std::to_string(message->type));
-        }
+        processTaskCompletion(msg->task, msg->task_executor);
+        return true;
+      } else if (SequentialTaskExecutorTaskFailedMessage *msg = dynamic_cast<SequentialTaskExecutorTaskFailedMessage *>(message.get())) {
+        processTaskFailure(msg->task, msg->task_executor, msg->cause);
+        return true;
+      } else if (ComputeServicePilotJobExpiredMessage *msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+        processPilotJobCompletion(msg->job);
+        return true;
+      } else if (MulticoreJobExecutorNumCoresRequestMessage *msg = dynamic_cast<MulticoreJobExecutorNumCoresRequestMessage *>(message.get())) {
+        MulticoreJobExecutorNumCoresAnswerMessage *answer_message = new MulticoreJobExecutorNumCoresAnswerMessage(this->num_worker_threads,
+                                                                          this->getPropertyValueAsDouble(
+                                                                                  MulticoreJobExecutorProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
+        S4U_Mailbox::dput(msg->answer_mailbox, answer_message);
+        return true;
+      } else if (MulticoreJobExecutorNumIdleCoresRequestMessage *msg = dynamic_cast<MulticoreJobExecutorNumIdleCoresRequestMessage *>(message.get())) {
+        MulticoreJobExecutorNumIdleCoresAnswerMessage *answer_message = new MulticoreJobExecutorNumIdleCoresAnswerMessage(this->num_available_worker_threads,
+                                                                                  this->getPropertyValueAsDouble(
+                                                                                          MulticoreJobExecutorProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
+        S4U_Mailbox::dput(msg->answer_mailbox, answer_message);
+        return true;
+      } else if (MulticoreJobExecutorTTLRequestMessage *msg = dynamic_cast<MulticoreJobExecutorTTLRequestMessage *>(message.get())) {
+        MulticoreJobExecutorTTLAnswerMessage *answer_message = new MulticoreJobExecutorTTLAnswerMessage(this->death_date - S4U_Simulation::getClock(),
+                                                                this->getPropertyValueAsDouble(
+                                                                        MulticoreJobExecutorProperty::TTL_ANSWER_MESSAGE_PAYLOAD));
+        S4U_Mailbox::dput(msg->answer_mailbox, answer_message);
+        return true;
+      } else if (MulticoreJobExecutorFlopRateRequestMessage *msg = dynamic_cast<MulticoreJobExecutorFlopRateRequestMessage *>(message.get())) {
+        MulticoreJobExecutorFlopRateAnswerMessage *answer_message = new MulticoreJobExecutorFlopRateAnswerMessage(
+                simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0),
+                this->getPropertyValueAsDouble(
+                        MulticoreJobExecutorProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD));
+        S4U_Mailbox::dput(msg->answer_mailbox, answer_message);
+        return true;
+      } else {
+        throw std::runtime_error("Unexpected [" + message->getName() + "] message");
       }
     }
 
-    /**
-     * @brief Terminate all pilot job compute services
-     */
+/**
+ * @brief Terminate all pilot job compute services
+ */
     void MulticoreJobExecutor::terminateAllPilotJobs() {
       for (auto job : this->running_jobs) {
         if (job->getType() == WorkflowJob::PILOT) {
@@ -508,9 +642,9 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Terminate (nicely or brutally) all worker threads (i.e., sequential task executors)
-     */
+/**
+ * @brief Terminate (nicely or brutally) all worker threads (i.e., sequential task executors)
+ */
     void MulticoreJobExecutor::terminateAllWorkerThreads() {
       // Kill all running sequential executors
       for (auto executor : this->busy_sequential_task_executors) {
@@ -525,10 +659,28 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Declare all current jobs as failed (liekly because the daemon is being terminated)
-     */
-    void MulticoreJobExecutor::failCurrentStandardJobs() {
+    void MulticoreJobExecutor::failStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause) {
+      WRENCH_INFO("Failing job %s", job->getName().c_str());
+      // Set all tasks back to the READY state and wipe out output files
+      for (auto failed_task: job->getTasks()) {
+        failed_task->setReady();
+        StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
+                                    this->default_storage_service);
+
+      }
+
+      // Send back a job failed message
+      WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
+      // NOTE: This is synchronous so that the process doesn't fall off the end
+      S4U_Mailbox::put(job->popCallbackMailbox(),
+                       new ComputeServiceStandardJobFailedMessage(job, this, cause, this->getPropertyValueAsDouble(
+                               MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+    }
+
+/**
+ * @brief Declare all current jobs as failed (likely because the daemon is being terminated)
+ */
+    void MulticoreJobExecutor::failCurrentStandardJobs(WorkflowExecutionFailureCause *cause) {
 
       WRENCH_INFO("There are %ld pending jobs", this->pending_jobs.size());
       while (!this->pending_jobs.empty()) {
@@ -537,16 +689,7 @@ namespace wrench {
         this->pending_jobs.pop();
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           StandardJob *job = (StandardJob *) workflow_job;
-          // Set all tasks back to the READY state
-          for (auto failed_task: ((StandardJob *) job)->getTasks()) {
-            failed_task->setReady();
-          }
-          // Send back a job failed message
-          WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
-          // NOTE: This is synchronous so that the process doesn't fall off the end
-          S4U_Mailbox::put(job->popCallbackMailbox(),
-                           new StandardJobFailedMessage(job, this, this->getPropertyValueAsDouble(
-                                   MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+          this->failStandardJob(job, cause);
         }
       }
 
@@ -555,23 +698,14 @@ namespace wrench {
         WRENCH_INFO("Failing job %s", workflow_job->getName().c_str());
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           StandardJob *job = (StandardJob *) workflow_job;
-          // Set all tasks back to the READY state
-          for (auto failed_task: ((StandardJob *) job)->getTasks()) {
-            failed_task->setReady();
-          }
-          // Send back a job failed message
-          WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
-          // NOTE: This is synchronous so that the process doesn't fall off the end
-          S4U_Mailbox::put(job->popCallbackMailbox(),
-                           new StandardJobFailedMessage(job, this, this->getPropertyValueAsDouble(
-                                   MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+          this->failStandardJob(job, cause);
         }
       }
     }
 
-    /**
-     * @brief Initialize all state for the daemon
-     */
+/**
+ * @brief Initialize all state for the daemon
+ */
     void MulticoreJobExecutor::initialize() {
 
       /* Start worker threads */
@@ -591,6 +725,8 @@ namespace wrench {
         std::unique_ptr<SequentialTaskExecutor> seq_executor =
                 std::unique_ptr<SequentialTaskExecutor>(
                         new SequentialTaskExecutor(S4U_Simulation::getHostName(), this->mailbox_name,
+                                                   this->default_storage_service,
+                                                   this->simulation->getFileRegistryService(),
                                                    this->getPropertyValueAsDouble(
                                                            MulticoreJobExecutorProperty::TASK_STARTUP_OVERHEAD)));
         this->sequential_task_executors.push_back(std::move(seq_executor));
@@ -604,15 +740,17 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief Process a task completion
-     *
-     * @param task: the WorkflowTask that has completed
-     * @param executor: a pointer to the worker thread (SequentialTaskExecutor) that has completed it
-     */
+/**
+ * @brief Process a task completion
+ *
+ * @param task: the WorkflowTask that has completed
+ * @param executor: a pointer to the worker thread (SequentialTaskExecutor) that has completed it
+ */
     void MulticoreJobExecutor::processTaskCompletion(WorkflowTask *task, SequentialTaskExecutor *executor) {
       StandardJob *job = (StandardJob *) (task->getJob());
       WRENCH_INFO("One of my cores completed task %s", task->getId().c_str());
+
+      task->setCompleted();
 
       // Remove the task from the running task queue
       this->running_tasks.erase(task);
@@ -633,14 +771,41 @@ namespace wrench {
       if (job->getNumCompletedTasks() == job->getNumTasks()) {
         this->running_jobs.erase(job);
         S4U_Mailbox::dput(job->popCallbackMailbox(),
-                          new StandardJobDoneMessage(job, this, this->getPropertyValueAsDouble(
+                          new ComputeServiceStandardJobDoneMessage(job, this, this->getPropertyValueAsDouble(
                                   MulticoreJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
       }
     }
 
-    /**
-     * @brief Terminate the daemon, dealing with pending/running jobs
-     */
+/**
+ * @brief Process a task failure
+ *
+ * @param task: the workflow task that has failed
+ * @param executor: the worker thread (SequentialTaskExecutor) on which the failure occurred
+ * @param cause: the cause of the failure
+ */
+    void MulticoreJobExecutor::processTaskFailure(WorkflowTask *task,
+                                                  SequentialTaskExecutor *executor,
+                                                  WorkflowExecutionFailureCause *cause) {
+
+      // Put that core's executor back into the pull of idle cores
+      this->busy_sequential_task_executors.erase(executor);
+      this->idle_sequential_task_executors.insert(executor);
+
+      // Get the job for the task
+      StandardJob *job = (StandardJob *) (task->getJob());
+      WRENCH_INFO("One of my cores has failed to run task %s", task->getId().c_str());
+
+      // Remove the job from the list of running jobs
+      this->running_jobs.erase(job);
+
+      // Fail the job
+      this->failStandardJob(job, cause);
+
+    }
+
+/**
+ * @brief Terminate the daemon, dealing with pending/running jobs
+ */
     void MulticoreJobExecutor::terminate() {
 
       this->setStateToDown();
@@ -649,7 +814,7 @@ namespace wrench {
       this->terminateAllWorkerThreads();
 
       WRENCH_INFO("Failing current standard jobs");
-      this->failCurrentStandardJobs();
+      this->failCurrentStandardJobs(new ServiceIsDown(this));
 
       WRENCH_INFO("Terminate all pilot jobs");
       this->terminateAllPilotJobs();
@@ -661,18 +826,18 @@ namespace wrench {
                     this->containing_pilot_job->getCallbackMailbox().c_str());
         // NOTE: This is synchronous so that the process doesn't fall off the end
         S4U_Mailbox::put(this->containing_pilot_job->popCallbackMailbox(),
-                         new PilotJobExpiredMessage(this->containing_pilot_job, this,
+                         new ComputeServicePilotJobExpiredMessage(this->containing_pilot_job, this,
                                                     this->getPropertyValueAsDouble(
                                                             MulticoreJobExecutorProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
 
       }
     }
 
-    /**
-     * @brief Process a pilot job completion
-     *
-     * @param job: pointer to the PilotJob object
-     */
+/**
+ * @brief Process a pilot job completion
+ *
+ * @param job: pointer to the PilotJob object
+ */
     void MulticoreJobExecutor::processPilotJobCompletion(PilotJob *job) {
 
       // Remove the job from the running list
@@ -683,7 +848,7 @@ namespace wrench {
 
       // Forward the notification
       S4U_Mailbox::dput(job->popCallbackMailbox(),
-                        new PilotJobExpiredMessage(job, this,
+                        new ComputeServicePilotJobExpiredMessage(job, this,
                                                    this->getPropertyValueAsDouble(
                                                            MulticoreJobExecutorProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
 

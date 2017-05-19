@@ -11,6 +11,7 @@
 #include <logging/TerminalOutput.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
+#include <services/ServiceMessage.h>
 #include "DataMovementManager.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(data_movement_manager, "Log category for Data Movement Manager");
@@ -50,9 +51,8 @@ namespace wrench {
      * @brief Stop the manager
      */
     void DataMovementManager::stop() {
-      S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage("", 0.0));
+      S4U_Mailbox::put(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
     }
-
 
 
     /**
@@ -72,23 +72,19 @@ namespace wrench {
         // Clear finished asynchronous dput()
         S4U_Mailbox::clear_dputs();
 
-        WRENCH_INFO("Data Movement Manager got a %s message", message->toString().c_str());
-        switch (message->type) {
+        WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
-          case SimulationMessage::STOP_DAEMON: {
-            // There shouldn't be any need to clean any state up
-            keep_going = false;
-            break;
-          }
-
-          default: {
-            throw std::runtime_error("Invalid message type " + std::to_string(message->type));
-          }
+        if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+          // There shouldn't be any need to clean any state up
+          keep_going = false;
+          break;
+        } else {
+          throw std::runtime_error("Unexpected ["+message->getName() + "] message");
         }
-
       }
 
       WRENCH_INFO("Data Movement Manager terminating");
+
       return 0;
     }
 

@@ -10,10 +10,15 @@
 #include <simgrid_S4U_util/S4U_Simulation.h>
 #include <logging/TerminalOutput.h>
 #include "simgrid_S4U_util/S4U_Mailbox.h"
+#include <services/storage_services/StorageService.h>
 #include <workflow/WorkflowTask.h>
 #include <simulation/SimulationMessage.h>
+#include <services/file_registry_service/FileRegistryService.h>
+#include <exceptions/WorkflowExecutionException.h>
+#include <services/ServiceMessage.h>
 
 #include "SequentialTaskExecutor.h"
+#include "SequentialTaskExecutorMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(sequential_task_executor, "Log category for Sequential Task Executor");
 
@@ -25,17 +30,24 @@ namespace wrench {
      * @param hostname: the name of the host
      * @param callback_mailbox: the callback mailbox to which the sequential
      *        task executor sends back "task done" or "task failed" messages
+     * @param default_storage_service: a raw pointer to the default StorageService (if any)
+     * @param file_registry: a raw pointer to a FileRegistryService object
+     * @param task_startup_overhead: the task startup overhead, in seconds
      */
     SequentialTaskExecutor::SequentialTaskExecutor(std::string hostname, std::string callback_mailbox,
+                                                   StorageService *default_storage_service,
+                                                   FileRegistryService *file_registry,
                                                    double task_startup_overhead) :
             S4U_DaemonWithMailbox("sequential_task_executor", "sequential_task_executor") {
 
       if (task_startup_overhead < 0) {
-          throw std::invalid_argument("SequentialTaskExecutor::SequentialTaskExecutor(): task startup overhead must be >0");
+        throw std::invalid_argument("SequentialTaskExecutor::SequentialTaskExecutor(): task startup overhead must be >0");
       }
       this->hostname = hostname;
       this->callback_mailbox = callback_mailbox;
       this->task_start_up_overhead = task_startup_overhead;
+      this->default_storage_service = default_storage_service;
+      this->file_registry = file_registry;
 
       // Start my daemon on the host
       this->start(this->hostname);
@@ -46,7 +58,7 @@ namespace wrench {
      */
     void SequentialTaskExecutor::stop() {
       // Send a termination message to the daemon's mailbox
-      S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage("", 0.0));
+      S4U_Mailbox::put(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
     }
 
     /**
@@ -63,14 +75,17 @@ namespace wrench {
      *
      * @return 0 on success
      */
-    int SequentialTaskExecutor::runTask(WorkflowTask *task) {
+    int SequentialTaskExecutor::runTask(WorkflowTask *task, std::map<WorkflowFile*, StorageService*> file_locations) {
       if (task == nullptr) {
         throw std::invalid_argument("SequentialTaskExecutor::runTask(): passed a nullptr task");
       }
       // Send a "run a task" message to the daemon's mailbox
-      S4U_Mailbox::put(this->mailbox_name, new RunTaskMessage(task, 0.0));
+      S4U_Mailbox::put(this->mailbox_name, new SequentialTaskExecutorRunTaskMessage(task, file_locations, 0.0));
       return 0;
     };
+
+
+
 
     /**
      * @brief Main method of the sequential task executor daemon
@@ -85,49 +100,65 @@ namespace wrench {
 
       WRENCH_INFO("New Sequential Task Executor starting (%s) ", this->mailbox_name.c_str());
 
-      bool keep_going = true;
-      while (keep_going) {
+      while (true) {
 
         // Wait for a message
         std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
 
-        switch (message->type) {
-
-          case SimulationMessage::STOP_DAEMON: {
-            std::unique_ptr<StopDaemonMessage> m(static_cast<StopDaemonMessage *>(message.release()));
-            if (m->ack_mailbox != "") {
-              S4U_Mailbox::put(m->ack_mailbox, new DaemonStoppedMessage(0.0));
-            }
-            keep_going = false;
-            break;
+        if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
+          if (msg->ack_mailbox != "") {
+            S4U_Mailbox::put(msg->ack_mailbox, new ServiceDaemonStoppedMessage(0.0));
           }
+          break;
 
-          case SimulationMessage::RUN_TASK: {
-            std::unique_ptr<RunTaskMessage> m(static_cast<RunTaskMessage *>(message.release()));
+        } else if (SequentialTaskExecutorRunTaskMessage *msg = dynamic_cast<SequentialTaskExecutorRunTaskMessage*>(message.get())) {
 
-            // Run the task
-            WRENCH_INFO("Executing task %s (%lf flops)", m->task->getId().c_str(), m->task->getFlops());
-            m->task->setRunning();
-            S4U_Simulation::sleep(this->task_start_up_overhead);
-            S4U_Simulation::compute(m->task->getFlops());
+//          // Download  all input files
+//          try {
+//            StorageService::downloadFiles(msg->task->getInputFiles(),
+//                                          msg->file_locations,
+//                                          this->default_storage_service);
+//          } catch (WorkflowExecutionException &e) {
+//
+//            WRENCH_INFO("Notifying mailbox %s that task %s has failed",
+//                        this->callback_mailbox.c_str(),
+//                        msg->task->getId().c_str());
+//            S4U_Mailbox::dput(this->callback_mailbox,
+//                              new SequentialTaskExecutorTaskFailedMessage(msg->task, this, e.getCause(), 0.0));
+//            continue;
+//          }
 
-            // Set the task completion time and state
-            m->task->setEndDate(S4U_Simulation::getClock());
-            m->task->setCompleted();
+          // Run the task
+          WRENCH_INFO("Executing task %s (%lf flops)", msg->task->getId().c_str(), msg->task->getFlops());
+          msg->task->setRunning();
+          S4U_Simulation::sleep(this->task_start_up_overhead);
+          S4U_Simulation::compute(msg->task->getFlops());
 
-            // Send the callback
-            WRENCH_INFO("Notifying mailbox %s that task %s has finished",
-                        this->callback_mailbox.c_str(),
-                        m->task->getId().c_str());
-            S4U_Mailbox::dput(this->callback_mailbox,
-                              new TaskDoneMessage(m->task, this, 0.0));
+//          // Upload all output files
+//          try {
+//            StorageService::uploadFiles(msg->task->getOutputFiles(), msg->file_locations, this->default_storage_service);
+//          } catch (WorkflowExecutionException &e) {
+//            WRENCH_INFO("Notifying mailbox %s that task %s has failed",
+//                        this->callback_mailbox.c_str(),
+//                        msg->task->getId().c_str());
+//            S4U_Mailbox::dput(this->callback_mailbox,
+//                              new SequentialTaskExecutorTaskFailedMessage(msg->task, this, e.getCause(), 0.0));
+//            continue;
+//          }
 
-            break;
-          }
+          // Set the task completion time and state
+          msg->task->setEndDate(S4U_Simulation::getClock());
 
-          default: {
-            throw std::runtime_error("Unknown message type");
-          }
+
+          // Send the callback
+          WRENCH_INFO("Notifying mailbox %s that task %s has finished",
+                      this->callback_mailbox.c_str(),
+                      msg->task->getId().c_str());
+          S4U_Mailbox::dput(this->callback_mailbox,
+                            new SequentialTaskExecutorTaskDoneMessage(msg->task, this, 0.0));
+
+        } else {
+          throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
       }
 

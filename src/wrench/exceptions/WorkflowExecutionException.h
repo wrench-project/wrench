@@ -13,6 +13,7 @@
 
 #include <exception>
 #include <string>
+#include <workflow_execution_events/WorkflowExecutionFailureCause.h>
 
 namespace wrench {
 
@@ -21,13 +22,14 @@ namespace wrench {
 		/***********************/
 
 		/**
-		 * @brief An exception that is thrown when a process attempts
-		 * to interact with a service that is in the DOWN state
+		 * @brief An generic exception that is thrown whenever something
+		 * unexpected (but simulation-valid) occurrs during the simulated
+		 * execution of a WMS
 		 */
-		class ComputeServiceIsDownException: public std::exception {
+		class WorkflowExecutionException: public std::exception {
 
 		private:
-				std::string error_message;
+				WorkflowExecutionFailureCause *cause;
 
 		public:
 
@@ -37,8 +39,17 @@ namespace wrench {
 				 */
 				virtual const char* what() const throw()
 				{
-					return error_message.c_str();
+					return cause->toString().c_str();
 				}
+
+        /**
+         * @brief Get the failure cause
+         * @return the failure cause
+         */
+        WorkflowExecutionFailureCause *getCause() {
+          return this->cause;
+        }
+
 
 				/***********************/
 				/** \cond INTERNAL    */
@@ -48,8 +59,8 @@ namespace wrench {
 				 * @brief Constructor
 				 * @param service_name: the service name
 				 */
-				ComputeServiceIsDownException(const std::string service_name) {
-					this->error_message = "Service '"+ service_name + "' is down";
+				WorkflowExecutionException(WorkflowExecutionFailureCause *cause) {
+					this->cause = cause;
 				}
 
 				/***********************/

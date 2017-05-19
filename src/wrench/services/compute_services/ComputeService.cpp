@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <exceptions/ComputeServiceIsDownException.h>
+#include <exceptions/WorkflowExecutionException.h>
 #include <logging/TerminalOutput.h>
 #include "ComputeService.h"
 #include "simulation/Simulation.h"
@@ -15,14 +15,6 @@
 XBT_LOG_NEW_DEFAULT_CATEGORY(compute_service, "Log category for Compute Service");
 
 namespace wrench {
-
-//		/**
-//		 * @brief Sets the simulation the compute service belongs to
-//		 * @param simulation: a pointer to a Simulation object
-//		 */
-//		void ComputeService::setSimulation(Simulation *simulation) {
-//			this->simulation = simulation;
-//		}
 
 		/**
 		 * @brief Stop the compute service - must be called by the stop()
@@ -51,18 +43,24 @@ namespace wrench {
 		void ComputeService::runJob(WorkflowJob *job) {
 
 			if (this->state == ComputeService::DOWN) {
-				throw ComputeServiceIsDownException(this->getName());
+				throw WorkflowExecutionException(new ServiceIsDown(this));
 			}
 
-			switch (job->getType()) {
-				case WorkflowJob::STANDARD: {
-					this->runStandardJob((StandardJob *) job);
-					break;
+			try {
+				switch (job->getType()) {
+					case WorkflowJob::STANDARD: {
+						this->submitStandardJob((StandardJob *) job);
+						break;
+					}
+					case WorkflowJob::PILOT: {
+						this->submitPilotJob((PilotJob *) job);
+						break;
+					}
 				}
-				case WorkflowJob::PILOT: {
-					this->runPilotJob((PilotJob *) job);
-					break;
-				}
+			} catch (WorkflowExecutionException &e) {
+				throw;
+			} catch (std::runtime_error &e) {
+				throw;
 			}
 		}
 
@@ -99,17 +97,28 @@ namespace wrench {
 			}
 
 			// Check that the number of cores is ok (does a communication with the daemons)
-			unsigned long num_idle_cores = this->getNumIdleCores();
-			WRENCH_INFO("The compute service says it has %ld idle cores", num_idle_cores);
-			if (num_idle_cores < min_num_cores) {
-				return false;
+			try {
+				unsigned long num_idle_cores = this->getNumIdleCores();
+				WRENCH_INFO("The compute service says it has %ld idle cores", num_idle_cores);
+				if (num_idle_cores < min_num_cores) {
+					return false;
+				}
+			} catch (WorkflowExecutionException &e) {
+				throw;
 			}
 
-			// Check that the TTL is ok (does a communication with the daemons)
-			double ttl = this->getTTL();
-			double duration = flops / this->getCoreFlopRate();
-			if ((ttl > 0) && (ttl < duration)) {
-				return false;
+			try {
+				// Check that the TTL is ok (does a communication with the daemons)
+				double ttl = this->getTTL();
+				double duration = flops / this->getCoreFlopRate();
+				if ((ttl > 0) && (ttl < duration)) {
+					return false;
+				}
+			} catch (WorkflowExecutionException &e) {
+				throw;
+			} catch (std::runtime_error &e) {
+				std::cerr << e.what() << std::endl;
+				throw;
 			}
 
 			// Everything checks out
@@ -157,8 +166,8 @@ namespace wrench {
 		 *
 		 * @throw std::runtime_error
 		 */
-		void ComputeService::runStandardJob(StandardJob *job) {
-			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement runStandardJob(StandardJob *)");
+		void ComputeService::submitStandardJob(StandardJob *job) {
+			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement submitStandardJob(StandardJob *)");
 		}
 
 		/**
@@ -167,8 +176,8 @@ namespace wrench {
 		 *
 		 * @throw std::runtime_error
 		 */
-		void ComputeService::runPilotJob(PilotJob *job) {
-			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement runPilotJob(StandardJob *)");
+		void ComputeService::submitPilotJob(PilotJob *job) {
+			throw std::runtime_error("Compute service '"+this->getName()+"' does not implement submitPilotJob(StandardJob *)");
 		}
 
 		/**

@@ -13,6 +13,7 @@
 
 #include <simulation/SimulationMessage.h>
 #include <logging/TerminalOutput.h>
+#include <iostream>
 #include "S4U_Mailbox.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
@@ -55,7 +56,7 @@ namespace wrench {
 			if (msg == NULL) {
 				throw std::runtime_error("NULL message received");
 			}
-			WRENCH_DEBUG("GOT a '%s' message from %s", msg->toString().c_str(), mailbox_name.c_str());
+			WRENCH_DEBUG("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
 			return std::unique_ptr<SimulationMessage>(msg);
 		}
 
@@ -88,7 +89,7 @@ namespace wrench {
 
 			SimulationMessage *msg = static_cast<SimulationMessage *>(data);
 
-			WRENCH_DEBUG("GOT a '%s' message from %s", msg->toString().c_str(), mailbox_name.c_str());
+			WRENCH_DEBUG("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
 
 			return std::unique_ptr<SimulationMessage>(msg);
 		}
@@ -100,9 +101,9 @@ namespace wrench {
 		 * @param m: the SimulationMessage
 		 */
 		void S4U_Mailbox::put(std::string mailbox_name, SimulationMessage *msg) {
-			WRENCH_DEBUG("PUTTING to %s a %s message", mailbox_name.c_str(), msg->toString().c_str());
+			WRENCH_DEBUG("PUTTING to %s a %s message", mailbox_name.c_str(), msg->getName().c_str());
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
-			simgrid::s4u::this_actor::send(mailbox, msg, (size_t) msg->size);
+			simgrid::s4u::this_actor::send(mailbox, msg, (size_t) msg->payload);
 
 			return;
 		}
@@ -115,10 +116,10 @@ namespace wrench {
 		 */
 		void S4U_Mailbox::dput(std::string mailbox_name, SimulationMessage *msg) {
 
-			WRENCH_DEBUG("DPUTTING to %s a %s message", mailbox_name.c_str(), msg->toString().c_str());
+			WRENCH_DEBUG("DPUTTING to %s a %s message", mailbox_name.c_str(), msg->getName().c_str());
 
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
-			simgrid::s4u::Comm &comm = simgrid::s4u::this_actor::isend(mailbox, msg, (int) msg->size);
+			simgrid::s4u::Comm &comm = simgrid::s4u::this_actor::isend(mailbox, msg, (int) msg->payload);
 
 			// Insert the communication into the dputs map, so that it's not lost
 			// and it can be "cleared" later
@@ -148,6 +149,14 @@ namespace wrench {
 				}
 			}
 			return;
+		}
+
+		/**
+		 * @brief Get the private mailbox name of a S4U actor
+		 * @return the mailbox name
+		 */
+		std::string S4U_Mailbox::getPrivateMailboxName() {
+			return "private_mailbox_" + simgrid::s4u::this_actor::name() + "_" + std::to_string(simgrid::s4u::this_actor::pid());
 		}
 
 };

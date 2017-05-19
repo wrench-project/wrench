@@ -38,16 +38,13 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        // Stopping the service
-//        void stop();
-
-        void copyFile(WorkflowFile *file, StorageService *src);
-
-        void downloadFile(WorkflowFile *file);
-
-        void uploadFile(WorkflowFile *file);
-
-        void deleteFile(WorkflowFile *file);
+//        void copyFile(WorkflowFile *file, StorageService *src);
+//
+//        void downloadFile(WorkflowFile *file);
+//
+//        void uploadFile(WorkflowFile *file);
+//
+//        void deleteFile(WorkflowFile *file);
 
 
         /***********************/
@@ -70,6 +67,8 @@ namespace wrench {
         int main();
 
         bool processNextMessage();
+
+        std::string data_upload_mailbox_name;
 
     };
 

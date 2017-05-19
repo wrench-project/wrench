@@ -13,6 +13,7 @@
 #include <map>
 #include <stack>
 #include <lemon/list_graph.h>
+#include <set>
 
 #include "workflow_job/WorkflowJob.h"
 #include "workflow/WorkflowFile.h"
@@ -52,7 +53,7 @@ namespace wrench {
             PENDING,
             RUNNING,
             COMPLETED,
-            FAILED
+//            FAILED
         };
 
         static std::string stateToString(WorkflowTask::State state);
@@ -66,6 +67,9 @@ namespace wrench {
         std::string getClusterId() const;
 
         void setClusterId(std::string);
+
+        std::set<WorkflowFile *> getInputFiles();
+        std::set<WorkflowFile *> getOutputFiles();
 
         /***********************/
         /** \endcond           */
@@ -89,9 +93,6 @@ namespace wrench {
 
         void setEndDate(double date);
 
-        void setWorkflowJob(WorkflowJob *);
-
-        WorkflowJob *getWorkflowJob();
 
         void incrementFailureCount();
 

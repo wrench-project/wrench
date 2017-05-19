@@ -11,10 +11,9 @@
 #include <wrench-dev.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
-#include <simulation/Simulation.h>
+#include "ServiceMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
-
 
 
 namespace wrench {
@@ -72,29 +71,34 @@ namespace wrench {
 
 
     /**
-    * @brief Stop the service
+    * @brief Synchronously stop the service (does nothing if the service is already stopped)
     *
     * @throw std::runtime_error
     */
     void Service::stop() {
 
-      this->state = Service::DOWN;
+      // Do nothing if the service is already down
+      if (this->state == Service::DOWN) {
+        return;
+      }
 
       WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
 
       // Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
-      std::string ack_mailbox = this->mailbox_name + "_kill";
-      double value;
-      value = this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD);
+      std::string ack_mailbox = S4U_Mailbox::getPrivateMailboxName();
       S4U_Mailbox::put(this->mailbox_name,
-                       new StopDaemonMessage(
+                       new ServiceStopDaemonMessage(
                                ack_mailbox,
                                this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
+
       // Wait for the ack
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
-      if (message->type != SimulationMessage::Type::DAEMON_STOPPED) {
-        throw std::runtime_error("Wrong message type received while expecting DAEMON_STOPPED");
+      if (ServiceDaemonStoppedMessage *msg = dynamic_cast<ServiceDaemonStoppedMessage*>(message.get())) {
+        this->state = Service::DOWN;
+      } else  {
+        throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
       }
+
     }
 
     /**
@@ -103,6 +107,14 @@ namespace wrench {
    */
     std::string Service::getName() {
       return this->name;
+    }
+
+    /**
+  * @brief Get the name of the host on which the service is running
+  * @return the hostname
+  */
+    std::string Service::getHostname() {
+      return this->hostname;
     }
 
     /**

@@ -17,6 +17,9 @@
 namespace wrench {
 
     class WorkflowTask;
+    class WorkflowFile;
+    class StorageService;
+    class FileRegistryService;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -31,13 +34,15 @@ namespace wrench {
     public:
 
         SequentialTaskExecutor(std::string hostname, std::string callback_mailbox,
+                               StorageService *default_storage_service,
+                               FileRegistryService *file_registry,
                                double task_startup_overhead = 0.0);
 
         void stop();
 
         void kill();
 
-        int runTask(WorkflowTask *task);
+        int runTask(WorkflowTask *task, std::map<WorkflowFile*, StorageService*> file_locations);
 
     private:
 
@@ -46,6 +51,10 @@ namespace wrench {
         std::string callback_mailbox;
         std::string hostname;
         double task_start_up_overhead;
+        FileRegistryService *file_registry;
+
+        StorageService *default_storage_service;
+
 
     };
 

@@ -140,22 +140,15 @@ namespace wrench {
           return "RUNNING";
         case COMPLETED:
           return "COMPLETED";
-        case FAILED:
-          return "FAILED";
         default:
           return "UNKNOWN STATE";
       }
     }
 
     /**
-     * @brief Get the job that contains the task
-     *
-     * @return the containing job, or nullptr
+     * @brief Get the workflow that contains the task
+     * @return a raw pointer to a Workflow object
      */
-    WorkflowJob *WorkflowTask::getJob() const {
-      return this->job;
-    }
-
     Workflow *WorkflowTask::getWorkflow() const {
       return this->workflow;
     }
@@ -177,6 +170,16 @@ namespace wrench {
     void WorkflowTask::setJob(WorkflowJob *job) {
       this->job = job;
     }
+
+    /**
+     * @brief Get the task's containing job
+     *
+     * @return job: the job
+     */
+    WorkflowJob *WorkflowTask::getJob() const {
+      return this->job;
+    }
+
 
     /**
      * @brief Get the cluster Id for the task
@@ -263,6 +266,35 @@ namespace wrench {
     void WorkflowTask::incrementFailureCount() {
       this->failure_count++;
     }
+
+    /**
+     * @brief Retrieves the set of input WorkflowFile objects for the task
+     * @return a set of raw WorkflowFile pointers
+     */
+    std::set<WorkflowFile *> WorkflowTask::getInputFiles() {
+      std::set<WorkflowFile *> input;
+
+      for (auto f: this->input_files) {
+        input.insert(f.second);
+      }
+      return input;
+    }
+
+    /**
+     * @brief Retrieves the set of output WorkflowFile objects for the task
+     * @return a set of raw WorkflowFile pointers
+     */
+    std::set<WorkflowFile *> WorkflowTask::getOutputFiles() {
+      std::set<WorkflowFile *> output;
+
+      for (auto f: this->output_files) {
+        output.insert(f.second);
+      }
+      return output;
+    }
+
+
+
 };
 
 

@@ -18,49 +18,54 @@
 
 namespace wrench {
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-		class StorageService;
+    class StorageService;
 
-		/**
-		 * @brief A standard (i.e., non-pilot) WorkflowJob
-		 */
-		class StandardJob : public WorkflowJob {
+    /**
+     * @brief A standard (i.e., non-pilot) WorkflowJob
+     */
+    class StandardJob : public WorkflowJob {
 
-		public:
-				enum State {
-						NOT_SUBMITTED,
-						PENDING,
-						RUNNING,
-						COMPLETED,
-						FAILED,
-				};
+    public:
+        enum State {
+            NOT_SUBMITTED,
+            PENDING,
+            RUNNING,
+            COMPLETED,
+            FAILED,
+        };
+
+        std::vector<WorkflowTask *> getTasks();
+
+        void incrementNumCompletedTasks();
+
+        unsigned long getNumCompletedTasks();
+
+        unsigned long getNumTasks();
+
+        std::map<WorkflowFile *, StorageService *> getFileLocations();
 
 
-				std::vector<WorkflowTask*> getTasks();
-				void incrementNumCompletedTasks();
-				unsigned long getNumCompletedTasks();
-				unsigned long getNumTasks();
+    private:
+        friend class JobManager;
 
+        StandardJob(std::vector<WorkflowTask *> tasks);
 
+        StandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations);
 
-		private:
-				friend class JobManager;
+        std::vector<WorkflowTask *> tasks;
+        State state;
+        unsigned long num_completed_tasks;
+        std::map<WorkflowFile *, StorageService *> file_locations;
 
-				StandardJob(std::vector<WorkflowTask*> tasks);
-				StandardJob(std::vector<WorkflowTask*> tasks, std::map<WorkflowFile*, StorageService*> file_locations);
-				std::vector<WorkflowTask *> tasks;
-				State state;
-				unsigned long num_completed_tasks;
-				std::map<WorkflowFile*, StorageService*> file_locations;
+    };
 
-		};
-
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
 };

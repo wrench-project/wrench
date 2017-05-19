@@ -95,20 +95,13 @@ namespace wrench {
       return this->tasks;
     }
 
-    /**
-     * @brief Set the containing job
-     * @param job: the containing job
-     */
-    void WorkflowTask::setWorkflowJob(WorkflowJob *job) {
-      this->job = job;
-    }
 
     /**
-     * @brief Get the containing job
-     * @return the job
+     * @brief Get the file location map for the job
+     *
+     * @return a map
      */
-    WorkflowJob *WorkflowTask::getWorkflowJob() {
-      return this->job;
-    }
-
+    std::map<WorkflowFile*, StorageService*> StandardJob::getFileLocations() {
+      return this->file_locations;
+    };
 };

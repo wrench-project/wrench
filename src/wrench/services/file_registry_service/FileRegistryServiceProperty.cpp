@@ -11,9 +11,15 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(FileRegistryServiceProperty, REQUEST_MESSAGE_PAYLOAD);
-    SET_PROPERTY_NAME(FileRegistryServiceProperty, ANSWER_MESSAGE_PAYLOAD);
-    SET_PROPERTY_NAME(FileRegistryServiceProperty, REMOVE_ENTRY_PAYLOAD);
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD);
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD);
+
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, REMOVE_ENTRY_REQUEST_PAYLOAD);
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, REMOVE_ENTRY_ANSWER_PAYLOAD);
+
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, ADD_ENTRY_REQUEST_PAYLOAD);
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, ADD_ENTRY_ANSWER_PAYLOAD);
+
     SET_PROPERTY_NAME(FileRegistryServiceProperty, LOOKUP_OVERHEAD);
 };
 

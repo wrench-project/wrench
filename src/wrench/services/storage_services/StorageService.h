@@ -16,6 +16,7 @@
 #include <set>
 
 #include <services/Service.h>
+#include <workflow_execution_events/WorkflowExecutionFailureCause.h>
 
 namespace wrench {
 
@@ -23,8 +24,9 @@ namespace wrench {
     /** \cond DEVELOPER   **/
     /***********************/
 
-    class Simulation;  // Forward ref
+    class Simulation;
     class WorkflowFile;
+    class WorkflowExecutionFailureCause;
 
     /**
      * @brief Abstract implementation of a storage service.
@@ -35,24 +37,39 @@ namespace wrench {
 
         void stop();
 
-        virtual void copyFile(WorkflowFile *file, StorageService *src) = 0;
+        virtual double howMuchFreeSpace();
 
-        virtual void downloadFile(WorkflowFile *file) = 0;
+        virtual bool lookupFile(WorkflowFile *file);
 
-        virtual void uploadFile(WorkflowFile *file) = 0;
+        virtual void downloadFile(WorkflowFile *file);
 
-        virtual void deleteFile(WorkflowFile *file) = 0;
+        virtual void deleteFile(WorkflowFile *file);
 
-        double getCapacity();
+        virtual void uploadFile(WorkflowFile *file);
 
-        double getFreeSpace();
+        virtual void copyFile(WorkflowFile *file, StorageService *src);
+
+        static void downloadFiles(std::set<WorkflowFile *> files,
+                                  std::map<WorkflowFile *, StorageService *> file_locations,
+                                  StorageService *default_storage_service);
+
+        static void uploadFiles(std::set<WorkflowFile *> files,
+                                  std::map<WorkflowFile *, StorageService *> file_locations,
+                                  StorageService *default_storage_service);
+
+        static void deleteFiles(std::set<WorkflowFile *>files,
+                                std::map<WorkflowFile *, StorageService *> file_locations,
+                                StorageService *default_storage_service);
+
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
 
-        StorageService(std::string service_name, std::string mailbox_name_prefix, double capacity);
+        StorageService(std::string service_name,
+                       std::string data_mailbox_name_prefix,
+                       double capacity);
 
     protected:
 
@@ -67,6 +84,15 @@ namespace wrench {
         double occupied_space = 0;
 
     private:
+
+        enum Action {
+            DOWNLOAD,
+            UPLOAD,
+        };
+
+        static void uploadOrDownloadFiles(Action action, std::set<WorkflowFile *> files,
+                                  std::map<WorkflowFile *, StorageService *> file_locations,
+                                  StorageService *default_storage_service);
 
 
     };

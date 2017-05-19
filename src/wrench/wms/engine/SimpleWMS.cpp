@@ -16,6 +16,7 @@
 #include <simulation/Simulation.h>
 #include <workflow_job/StandardJob.h>
 #include <workflow_job/PilotJob.h>
+#include <workflow_execution_events/WorkflowExecutionFailureCause.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 
@@ -63,6 +64,8 @@ namespace wrench {
       // Perform static optimizations
       runStaticOptimizations();
 
+      bool abort = false;
+
       while (true) {
 
         // Take care of previously posted iput() that should be cleared
@@ -108,8 +111,11 @@ namespace wrench {
           }
           case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
             StandardJob *job = (StandardJob *) (event->job);
+            WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
+            WRENCH_INFO("Cause: %s", event->cause->toString().c_str());
             job_manager->forgetJob(job);
-            WRENCH_INFO("Notified that a standard job has failed (it's back in the ready state)");
+            WRENCH_INFO("As a SimpleWMS, I abort as soon as there is a failure");
+            abort = true;
             break;
           }
           case WorkflowExecutionEvent::PILOT_JOB_START: {
@@ -131,17 +137,23 @@ namespace wrench {
           }
         }
 
+        if (abort) {
+          break;
+        }
+
         if (workflow->isDone()) {
           break;
         }
+
       }
 
       S4U_Mailbox::clear_dputs();
 
+      WRENCH_INFO("--------------------------------------------------------");
       if (workflow->isDone()) {
         WRENCH_INFO("Workflow execution is complete!");
       } else {
-        WRENCH_INFO("Workflow execution is incomplete, but there are no more compute services...");
+        WRENCH_INFO("Workflow execution is incomplete!");
       }
 
       WRENCH_INFO("Simple WMS Daemon is shutting down all Compute Services");

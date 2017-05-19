@@ -12,6 +12,7 @@
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 
 #include <simulation/SimulationMessage.h>
+#include <services/compute_services/ComputeServiceMessage.h>
 
 #include "WorkflowExecutionEvent.h"
 
@@ -34,51 +35,34 @@ namespace wrench {
       std::unique_ptr<WorkflowExecutionEvent> event =
               std::unique_ptr<WorkflowExecutionEvent>(new WorkflowExecutionEvent());
 
-      switch (message->type) {
-
-        case SimulationMessage::STANDARD_JOB_DONE: {
-          std::unique_ptr<StandardJobDoneMessage> m(static_cast<StandardJobDoneMessage *>(message.release()));
-          event->type = WorkflowExecutionEvent::STANDARD_JOB_COMPLETION;
-          event->job = (WorkflowJob *) m->job;
-          event->compute_service = m->compute_service;
-          return event;
-        }
-
-        case SimulationMessage::STANDARD_JOB_FAILED: {
-          std::unique_ptr<StandardJobFailedMessage> m(static_cast<StandardJobFailedMessage *>(message.release()));
-          event->type = WorkflowExecutionEvent::STANDARD_JOB_FAILURE;
-          event->job = (WorkflowJob *) m->job;
-          event->compute_service = m->compute_service;
-          return event;
-        }
-
-        case SimulationMessage::PILOT_JOB_STARTED: {
-          std::unique_ptr<PilotJobStartedMessage> m(static_cast<PilotJobStartedMessage *>(message.release()));
-          event->type = WorkflowExecutionEvent::PILOT_JOB_START;
-          event->job = (WorkflowJob *) m->job;
-          event->compute_service = m->compute_service;
-          return event;
-        }
-
-        case SimulationMessage::PILOT_JOB_EXPIRED: {
-          std::unique_ptr<PilotJobExpiredMessage> m(static_cast<PilotJobExpiredMessage *>(message.release()));
-          event->type = WorkflowExecutionEvent::PILOT_JOB_EXPIRATION;
-          event->job = (WorkflowJob *) m->job;
-          event->compute_service = m->compute_service;
-          return event;
-        }
-
-        case SimulationMessage::JOB_TYPE_NOT_SUPPORTED: {
-          std::unique_ptr<JobTypeNotSupportedMessage> m(static_cast<JobTypeNotSupportedMessage *>(message.release()));
-          event->type = WorkflowExecutionEvent::UNSUPPORTED_JOB_TYPE;
-          event->job = (WorkflowJob *) m->job;
-          event->compute_service = m->compute_service;
-          return event;
-        }
-
-        default: {
-          throw std::runtime_error("Non-handled message type when generating execution event");
-        }
+      if (ComputeServiceStandardJobDoneMessage *m = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
+        event->type = WorkflowExecutionEvent::STANDARD_JOB_COMPLETION;
+        event->job = (WorkflowJob *) m->job;
+        event->compute_service = m->compute_service;
+        return event;
+      } else if (ComputeServiceStandardJobFailedMessage *m = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
+        event->type = WorkflowExecutionEvent::STANDARD_JOB_FAILURE;
+        event->job = (WorkflowJob *) m->job;
+        event->compute_service = m->compute_service;
+        event->cause = m->cause;
+        return event;
+      } else if (ComputeServicePilotJobStartedMessage * m = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
+        event->type = WorkflowExecutionEvent::PILOT_JOB_START;
+        event->job = (WorkflowJob *) m->job;
+        event->compute_service = m->compute_service;
+        return event;
+      } else if (ComputeServicePilotJobExpiredMessage *m = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+        event->type = WorkflowExecutionEvent::PILOT_JOB_EXPIRATION;
+        event->job = (WorkflowJob *) m->job;
+        event->compute_service = m->compute_service;
+        return event;
+      } else if (ComputeServiceJobTypeNotSupportedMessage *m = dynamic_cast<ComputeServiceJobTypeNotSupportedMessage *>(message.get())) {
+        event->type = WorkflowExecutionEvent::UNSUPPORTED_JOB_TYPE;
+        event->job = m->job;
+        event->compute_service = m->compute_service;
+        return event;
+      } else {
+        throw std::runtime_error("Non-handled message type when generating execution event");
       }
     }
 

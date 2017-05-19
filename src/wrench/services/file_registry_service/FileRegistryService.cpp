@@ -12,6 +12,7 @@
 #include <simgrid_S4U_util/S4U_Simulation.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
+#include <services/ServiceMessage.h>
 
 #include "FileRegistryService.h"
 
@@ -51,8 +52,6 @@ namespace wrench {
       }
     }
 
-
-//
 
     /**
      * @brief Notify the FileRegistryService that a WorkflowFile is available at some StorageService
@@ -146,24 +145,17 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
 
 
-      WRENCH_INFO("Got a [%s] message", message->toString().c_str());
+      WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      switch (message->type) {
-
-        case SimulationMessage::STOP_DAEMON: {
-          std::unique_ptr<StopDaemonMessage> m(static_cast<StopDaemonMessage *>(message.release()));
-
-          // This is Synchronous
-          S4U_Mailbox::put(m->ack_mailbox,
-                           new DaemonStoppedMessage(this->getPropertyValueAsDouble(FileRegistryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-          return false;
-        }
-
-        default: {
-          throw std::runtime_error("Unknown message type: " + std::to_string(message->type));
-        }
+      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        // This is Synchronous
+        S4U_Mailbox::put(msg->ack_mailbox,
+                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(FileRegistryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+        return false;
+      }
+      else  {
+        throw std::runtime_error("Unknown message type: " + std::to_string(message->payload));
       }
     }
-
 
 };

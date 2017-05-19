@@ -39,6 +39,8 @@ namespace wrench {
 				static void dput(std::string mailbox_name, SimulationMessage *msg);
 				static void clear_dputs();
 
+				static std::string getPrivateMailboxName();
+
 
 		private:
 				static std::map<simgrid::s4u::ActorPtr , std::set<simgrid::s4u::Comm*>> dputs;

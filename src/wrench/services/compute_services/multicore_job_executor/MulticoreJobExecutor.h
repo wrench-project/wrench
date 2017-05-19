@@ -24,6 +24,8 @@ namespace wrench {
 
     class StorageService;
 
+    class WorkflowExecutionFailureCause;
+
     /**  @brief Implementation of a Compute Service abstraction that
      *   runs on a multi-core host.
      */
@@ -36,22 +38,26 @@ namespace wrench {
 
         std::map<std::string, std::string> default_property_values =
                 {
-                        {MulticoreJobExecutorProperty::STOP_DAEMON_MESSAGE_PAYLOAD,            "1024"},
-                        {MulticoreJobExecutorProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,         "1024"},
-                        {MulticoreJobExecutorProperty::RUN_STANDARD_JOB_MESSAGE_PAYLOAD,       "1024"},
-                        {MulticoreJobExecutorProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD, "1024"},
-                        {MulticoreJobExecutorProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,       "1024"},
-                        {MulticoreJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,      "1024"},
-                        {MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,    "1024"},
-                        {MulticoreJobExecutorProperty::RUN_PILOT_JOB_MESSAGE_PAYLOAD,          "1024"},
-                        {MulticoreJobExecutorProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,      "1024"},
-                        {MulticoreJobExecutorProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,      "1024"},
-                        {MulticoreJobExecutorProperty::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,       "1024"},
-                        {MulticoreJobExecutorProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                        {MulticoreJobExecutorProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                        {MulticoreJobExecutorProperty::TTL_REQUEST_MESSAGE_PAYLOAD,            "1024"},
-                        {MulticoreJobExecutorProperty::TTL_ANSWER_MESSAGE_PAYLOAD,             "1024"},
-                        {MulticoreJobExecutorProperty::TASK_STARTUP_OVERHEAD,                  "0.0"}
+                        {MulticoreJobExecutorProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
+                        {MulticoreJobExecutorProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,              "1024"},
+                        {MulticoreJobExecutorProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                        {MulticoreJobExecutorProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                        {MulticoreJobExecutorProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,      "1024"},
+                        {MulticoreJobExecutorProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,            "1024"},
+                        {MulticoreJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           "1024"},
+                        {MulticoreJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         "1024"},
+                        {MulticoreJobExecutorProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
+                        {MulticoreJobExecutorProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
+                        {MulticoreJobExecutorProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,           "1024"},
+                        {MulticoreJobExecutorProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
+                        {MulticoreJobExecutorProperty::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,            "1024"},
+                        {MulticoreJobExecutorProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD,      "1024"},
+                        {MulticoreJobExecutorProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,       "1024"},
+                        {MulticoreJobExecutorProperty::TTL_REQUEST_MESSAGE_PAYLOAD,                 "1024"},
+                        {MulticoreJobExecutorProperty::TTL_ANSWER_MESSAGE_PAYLOAD,                  "1024"},
+                        {MulticoreJobExecutorProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                        {MulticoreJobExecutorProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD,            "1024"},
+                        {MulticoreJobExecutorProperty::TASK_STARTUP_OVERHEAD,                       "0.0"}
                 };
 
     public:
@@ -78,9 +84,9 @@ namespace wrench {
 
 
         // Running jobs
-        void runStandardJob(StandardJob *job);
+        void submitStandardJob(StandardJob *job);
 
-        void runPilotJob(PilotJob *job);
+        void submitPilotJob(PilotJob *job);
 
         // Getting information
         unsigned long getNumCores();
@@ -151,9 +157,11 @@ namespace wrench {
 
         void terminateAllPilotJobs();
 
-        void failCurrentStandardJobs();
+        void failCurrentStandardJobs(WorkflowExecutionFailureCause *cause);
 
         void processTaskCompletion(WorkflowTask *, SequentialTaskExecutor *);
+
+        void processTaskFailure(WorkflowTask *, SequentialTaskExecutor *, WorkflowExecutionFailureCause *);
 
         void processPilotJobCompletion(PilotJob *job);
 
@@ -162,6 +170,8 @@ namespace wrench {
         bool dispatchNextPendingTask();
 
         bool dispatchNextPendingJob();
+
+        void failStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
     };
 };
 

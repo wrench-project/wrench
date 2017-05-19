@@ -66,9 +66,9 @@ namespace wrench {
 				/** \cond INTERNAL    **/
 				/***********************/
 
-				virtual void runStandardJob(StandardJob *job);
+				virtual void submitStandardJob(StandardJob *job);
 
-				virtual void runPilotJob(PilotJob *job);
+				virtual void submitPilotJob(PilotJob *job);
 
 				ComputeService(std::string service_name,
 				               std::string mailbox_name_prefix,

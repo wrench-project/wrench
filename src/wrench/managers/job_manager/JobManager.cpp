@@ -17,6 +17,8 @@
 #include "workflow_job/StandardJob.h"
 #include "workflow_job/PilotJob.h"
 #include <services/compute_services/ComputeService.h>
+#include <services/ServiceMessage.h>
+#include <services/compute_services/ComputeServiceMessage.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 
@@ -57,7 +59,7 @@ namespace wrench {
      * @brief Stop the job manager
      */
     void JobManager::stop() {
-      S4U_Mailbox::put(this->mailbox_name, new StopDaemonMessage("", 0.0));
+      S4U_Mailbox::put(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
     }
 
     /**
@@ -166,8 +168,30 @@ namespace wrench {
      *
      * @param job: a pointer to a WorkflowJob
      */
-    void JobManager::forgetJob(WorkflowJob *) {
-      throw std::runtime_error("forgetJob() not implemented yet");
+    void JobManager::forgetJob(WorkflowJob *job) {
+      if (job->getType() == WorkflowJob::STANDARD) {
+        if (this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) {
+          this->pending_standard_jobs.erase((StandardJob *) job);
+        }
+        if (this->running_standard_jobs.find((StandardJob *) job) != this->running_standard_jobs.end()) {
+          this->running_standard_jobs.erase((StandardJob *) job);
+        }
+        if (this->completed_standard_jobs.find((StandardJob *) job) != this->completed_standard_jobs.end()) {
+          this->completed_standard_jobs.erase((StandardJob *) job);
+        }
+      }
+      if (job->getType() == WorkflowJob::PILOT) {
+        if (this->pending_pilot_jobs.find((PilotJob *) job) != this->pending_pilot_jobs.end()) {
+          this->pending_pilot_jobs.erase((PilotJob *) job);
+        }
+        if (this->running_pilot_jobs.find((PilotJob *) job) != this->running_pilot_jobs.end()) {
+          this->running_pilot_jobs.erase((PilotJob *) job);
+        }
+        if (this->completed_pilot_jobs.find((PilotJob *) job) != this->completed_pilot_jobs.end()) {
+          this->completed_pilot_jobs.erase((PilotJob *) job);
+        }
+      }
+
     }
 
 
@@ -188,124 +212,98 @@ namespace wrench {
         // Clear finished asynchronous dput()
         S4U_Mailbox::clear_dputs();
 
-        WRENCH_INFO("Job Manager got a %s message", message->toString().c_str());
-        switch (message->type) {
+        WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 
-          case SimulationMessage::STOP_DAEMON: {
-            // There shouldn't be any need to clean any state up
-            keep_going = false;
-            break;
-          }
+        if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+          // There shouldn't be any need to clean any state up
+          keep_going = false;
+        } else if (ComputeServiceJobTypeNotSupportedMessage *msg = dynamic_cast<ComputeServiceJobTypeNotSupportedMessage *>(message.get())) {
 
-          case SimulationMessage::JOB_TYPE_NOT_SUPPORTED: {
-            std::unique_ptr<JobTypeNotSupportedMessage> m(static_cast<JobTypeNotSupportedMessage *>(message.release()));
-
-            // update job state and remove from list
-            if (m->job->getType() == WorkflowJob::STANDARD) {
-              StandardJob *job = (StandardJob *) m->job;
-              job->state = StandardJob::State::NOT_SUBMITTED;
-              this->pending_standard_jobs.erase(job);
-
-              // update the task states
-              for (auto t: job->getTasks()) {
-                t->setState(WorkflowTask::State::READY);
-              }
-            }
-
-            if (m->job->getType() == WorkflowJob::STANDARD) {
-              PilotJob *job = (PilotJob *) m->job;
-              job->state = PilotJob::State::NOT_SUBMITTED;
-              this->pending_pilot_jobs.erase(job);
-            }
-
-            // Forward the notification along the notification chain
-            S4U_Mailbox::dput(m->job->popCallbackMailbox(),
-                              new JobTypeNotSupportedMessage(m->job, m->compute_service, 0));
-            break;
-          }
-
-          case SimulationMessage::STANDARD_JOB_DONE: {
-            std::unique_ptr<StandardJobDoneMessage> m(static_cast<StandardJobDoneMessage *>(message.release()));
-
-            // update job state
-            StandardJob *job = m->job;
-            job->state = StandardJob::State::COMPLETED;
-
-            // move the job from the "pending" list to the "completed" list
+          // update job state and remove from list
+          if (msg->job->getType() == WorkflowJob::STANDARD) {
+            StandardJob *job = (StandardJob *) msg->job;
+            job->state = StandardJob::State::NOT_SUBMITTED;
             this->pending_standard_jobs.erase(job);
-            this->completed_standard_jobs.insert(job);
-
-            // Forward the notification along the notification chain
-            S4U_Mailbox::dput(job->popCallbackMailbox(),
-                              new StandardJobDoneMessage(job, m->compute_service, 0.0));
-            break;
-          }
-
-          case SimulationMessage::STANDARD_JOB_FAILED: {
-            std::unique_ptr<StandardJobFailedMessage> m(static_cast<StandardJobFailedMessage *>(message.release()));
-
-            // update job state
-            StandardJob *job = m->job;
-            job->state = StandardJob::State::FAILED;
 
             // update the task states
             for (auto t: job->getTasks()) {
-              t->incrementFailureCount();
               t->setState(WorkflowTask::State::READY);
             }
-
-            // remove the job from the "pending" list
-            this->pending_standard_jobs.erase(job);
-
-            // Forward the notification along the notification chain
-            S4U_Mailbox::dput(job->popCallbackMailbox(),
-                              new StandardJobFailedMessage(job, m->compute_service, 0.0));
-            break;
           }
 
-          case SimulationMessage::PILOT_JOB_STARTED: {
-            std::unique_ptr<PilotJobStartedMessage> m(static_cast<PilotJobStartedMessage *>(message.release()));
-
-            // update job state
-            PilotJob *job = m->job;
-            job->state = PilotJob::State::RUNNING;
-
-            // move the job from the "pending" list to the "running" list
+          if (msg->job->getType() == WorkflowJob::STANDARD) {
+            PilotJob *job = (PilotJob *) msg->job;
+            job->state = PilotJob::State::NOT_SUBMITTED;
             this->pending_pilot_jobs.erase(job);
-            this->running_pilot_jobs.insert(job);
-
-            // Forward the notification to the source
-            WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-            S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
-                              new PilotJobStartedMessage(job, m->compute_service, 0.0));
-
-            break;
           }
 
-          case SimulationMessage::PILOT_JOB_EXPIRED: {
-            std::unique_ptr<PilotJobExpiredMessage> m(static_cast<PilotJobExpiredMessage *>(message.release()));
+          // Forward the notification along the notification chain
+          S4U_Mailbox::dput(msg->job->popCallbackMailbox(),
+                            new ComputeServiceJobTypeNotSupportedMessage(msg->job, msg->compute_service, 0));
 
-            // update job state
-            PilotJob *job = m->job;
-            job->state = PilotJob::State::EXPIRED;
+        } else if (ComputeServiceStandardJobDoneMessage *msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
+          // update job state
+          StandardJob *job = msg->job;
+          job->state = StandardJob::State::COMPLETED;
 
-            // Remove the job from the "running" list
-            this->running_pilot_jobs.erase(job);
-            WRENCH_INFO("THERE ARE NOW %ld running pilot jobs", this->running_pilot_jobs.size());
+          // move the job from the "pending" list to the "completed" list
+          this->pending_standard_jobs.erase(job);
+          this->completed_standard_jobs.insert(job);
 
-            // Forward the notification to the source
-            WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-            S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
-                              new PilotJobExpiredMessage(job, m->compute_service, 0.0));
+          // Forward the notification along the notification chain
+          S4U_Mailbox::dput(job->popCallbackMailbox(),
+                            new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
+        } else if (ComputeServiceStandardJobFailedMessage *msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
 
-            break;
+          // update job state
+          StandardJob *job = msg->job;
+          job->state = StandardJob::State::FAILED;
+
+          // update the task states
+          for (auto t: job->getTasks()) {
+            t->incrementFailureCount();
+            t->setState(WorkflowTask::State::READY);
           }
 
-          default: {
-            throw std::runtime_error("Invalid message type " + std::to_string(message->type));
-          }
+          // remove the job from the "pending" list
+          this->pending_standard_jobs.erase(job);
+
+          // Forward the notification along the notification chain
+          S4U_Mailbox::dput(job->popCallbackMailbox(),
+                            new ComputeServiceStandardJobFailedMessage(job, msg->compute_service, msg->cause, 0.0));
+        } else if (ComputeServicePilotJobStartedMessage *msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
+
+          // update job state
+          PilotJob *job = msg->job;
+          job->state = PilotJob::State::RUNNING;
+
+          // move the job from the "pending" list to the "running" list
+          this->pending_pilot_jobs.erase(job);
+          this->running_pilot_jobs.insert(job);
+
+          // Forward the notification to the source
+          WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+          S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
+                            new ComputeServicePilotJobStartedMessage(job, msg->compute_service, 0.0));
+
+        } else if (ComputeServicePilotJobExpiredMessage *msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+
+          // update job state
+          PilotJob *job = msg->job;
+          job->state = PilotJob::State::EXPIRED;
+
+          // Remove the job from the "running" list
+          this->running_pilot_jobs.erase(job);
+          WRENCH_INFO("THERE ARE NOW %ld running pilot jobs", this->running_pilot_jobs.size());
+
+          // Forward the notification to the source
+          WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
+          S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
+                            new ComputeServicePilotJobExpiredMessage(job, msg->compute_service, 0.0));
+
+        } else {
+          throw std::runtime_error("Unexpected [" + message->getName() + "] message");
         }
-
       }
 
       WRENCH_INFO("Job Manager terminating");

@@ -8,20 +8,13 @@
  */
 
 
-#ifndef WRENCH_SIMPLESTORAGESERVICEPROPERTY_H
-#define WRENCH_SIMPLESTORAGESERVICEPROPERTY_H
-
-#include <services/storage_services/StorageServiceProperty.h>
+#include "FileRegistryMessage.h"
 
 namespace wrench {
 
-    class SimpleStorageServiceProperty : public StorageServiceProperty {
-    public:
+    FileRegistryMessage::FileRegistryMessage(std::string name, double payload) :
+      ServiceMessage("FileRegistry::" + name, payload) {
 
-
-    };
+    }
 
 };
-
-
-#endif //WRENCH_SIMPLESTORAGESERVICEPROPERTY_H

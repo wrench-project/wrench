@@ -1,3 +1,20 @@
+DATA STORAGE IMPLEMENTATION:
+
+    - Implement the FileRegistry Service
+    - Make sure that all storage operation updates the registry
+
+
+
+    - SIMPLE STORAGE SERVICE: How to deal with synchrony problem.
+            - File copy: should just trigger it and then there could be an actual notification?
+
+    - Attach a default StorageService to the WMS??
+
+    - Track all task change updates and make sure they're all in the JobManager?
+
+    - Chase memory leaks
+        - Cause/Exception unique_ptr?
+
 ------------------------------------
 
 BUGS:

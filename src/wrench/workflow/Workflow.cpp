@@ -425,7 +425,7 @@ namespace wrench {
           if (task->getState() == WorkflowTask::READY) {
             return;
           }
-          if (task->getState() != WorkflowTask::NOT_READY) {
+          if ((task->getState() != WorkflowTask::NOT_READY) && (task->getState() != WorkflowTask::PENDING)) {
             throw std::runtime_error("Cannot set the state of a not-ready task to WorkflowTask::READY");
           }
           // Go through the parent and check whether they are all completed
@@ -442,10 +442,6 @@ namespace wrench {
         }
         case WorkflowTask::RUNNING: {
           task->setState(WorkflowTask::RUNNING);
-          break;
-        }
-        case WorkflowTask::FAILED: {
-          task->setState(WorkflowTask::FAILED);
           break;
         }
         case WorkflowTask::NOT_READY: {

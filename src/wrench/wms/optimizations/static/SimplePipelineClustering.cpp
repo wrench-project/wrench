@@ -43,7 +43,7 @@ namespace wrench {
 
               pipelined_tasks.insert(parent->getId());
               parent->setClusterId(cluster_id);
-              std::cout << "CALLING READY" << std::endl;
+//              std::cout << "CALLING READY" << std::endl;
               parent->setReady();
 
               // next parent
@@ -62,7 +62,7 @@ namespace wrench {
 
               pipelined_tasks.insert(child->getId());
               child->setClusterId(cluster_id);
-              std::cout << "CALLING READY (C)" << std::endl;
+//              std::cout << "CALLING READY (C)" << std::endl;
               child->setReady();
 
               // next child

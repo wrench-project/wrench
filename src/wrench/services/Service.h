@@ -31,6 +31,7 @@ namespace wrench {
 
         virtual void stop();
         std::string getName();
+        std::string getHostname();
         bool isUp();
 
         /***********************/

@@ -17,7 +17,7 @@
 #include "services/compute_services/multicore_job_executor/MulticoreJobExecutor.h"
 
 // Exceptions
-#include "exceptions/ComputeServiceIsDownException.h"
+#include "exceptions/WorkflowExecutionException.h"
 
 // Job Manager
 #include "managers/job_manager/JobManager.h"

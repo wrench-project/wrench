@@ -13,11 +13,14 @@
 
 
 #include <string>
-#include <workflow/WorkflowTask.h>
-#include <services/compute_services/ComputeService.h>
 
 namespace wrench {
 
+
+    class ComputeService;
+    class WorkflowTask;
+    class WorkflowJob;
+    class WorkflowExecutionFailureCause;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -44,6 +47,7 @@ namespace wrench {
         WorkflowExecutionEvent::EventType type;
         WorkflowJob *job;
         ComputeService *compute_service;
+        WorkflowExecutionFailureCause *cause;
 
     private:
         WorkflowExecutionEvent();

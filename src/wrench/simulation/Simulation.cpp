@@ -356,8 +356,8 @@ namespace wrench {
       // Put the file on the storage service
       try {
         storage_service->addFileToStorage(file);
-      } catch (std::runtime_error e) {
-        throw e;
+      } catch (std::runtime_error &e) {
+        throw;
       }
 
       // Update the file registry
@@ -389,10 +389,10 @@ namespace wrench {
         for (auto f : files) {
           this->stageFile(f, storage_service);
         }
-      } catch (std::runtime_error e) {
-        throw e;
-      } catch (std::invalid_argument e) {
-        throw e;
+      } catch (std::runtime_error &e) {
+        throw;
+      } catch (std::invalid_argument &e) {
+        throw;
       }
     }
 

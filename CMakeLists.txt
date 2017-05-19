@@ -7,7 +7,7 @@ include_directories(src/wrench/ include /usr/include /usr/local/include /opt/loc
 
 # source files
 set(SOURCE_FILES
-        src/wrench/exceptions/ComputeServiceIsDownException.h
+        src/wrench/exceptions/WorkflowExecutionException.h
         src/wrench/simulation/SimulationMessage.cpp
         src/wrench/simulation/SimulationMessage.h
         src/wrench/workflow_execution_events/WorkflowExecutionEvent.cpp
@@ -85,7 +85,20 @@ set(SOURCE_FILES
         src/wrench/services/file_registry_service/FileRegistryServiceProperty.cpp
         src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutorProperty.cpp
         src/wrench/services/storage_services/simple_storage_service/SimpleStorageServiceProperty.cpp
-        )
+        src/wrench/workflow_execution_events/WorkflowExecutionFailureCause.h
+        src/wrench/workflow_execution_events/WorkflowExecutionFailureCause.cpp
+        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorMessage.cpp
+        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorMessage.h
+        src/wrench/services/ServiceMessage.cpp
+        src/wrench/services/ServiceMessage.h
+        src/wrench/services/compute_services/ComputeServiceMessage.cpp
+        src/wrench/services/compute_services/ComputeServiceMessage.h
+        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutorMessage.cpp
+        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutorMessage.h
+        src/wrench/services/storage_services/StorageServiceMessage.cpp
+        src/wrench/services/storage_services/StorageServiceMessage.h
+        src/wrench/services/file_registry_service/FileRegistryMessage.cpp
+        src/wrench/services/file_registry_service/FileRegistryMessage.h)
 
 # test files
 set(TEST_FILES
