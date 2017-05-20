@@ -12,6 +12,7 @@
 
 
 #include <set>
+#include <string>
 
 namespace wrench {
 

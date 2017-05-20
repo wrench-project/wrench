@@ -796,7 +796,7 @@ namespace wrench {
 
       // Get the job for the task
       StandardJob *job = (StandardJob *) (task->getJob());
-      WRENCH_INFO("One of my cores has failed to run task %s: ", task->getId().c_str(), cause->toString().c_str());
+      WRENCH_INFO("One of my cores has failed to run task %s: %s", task->getId().c_str(), cause->toString().c_str());
 
       // Remove the job from the list of running jobs
       this->running_jobs.erase(job);
