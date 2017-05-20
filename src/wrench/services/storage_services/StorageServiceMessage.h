@@ -127,52 +127,52 @@ namespace wrench {
     };
 
     /**
-    * @brief "FILE_UPLOAD_REQUEST" SimulationMessage class
+    * @brief "FILE_WRITE_REQUEST" SimulationMessage class
     */
-    class StorageServiceFileUploadRequestMessage : public StorageServiceMessage {
+    class StorageServiceFileWriteRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileUploadRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
+        StorageServiceFileWriteRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
 
         std::string answer_mailbox;
         WorkflowFile *file;
     };
 
     /**
-     * @brief "FILE_UPLOAD_ANSWER" SimulationMessage class
+     * @brief "FILE_WRITE_ANSWER" SimulationMessage class
      */
-    class StorageServiceFileUploadAnswerMessage : public StorageServiceMessage {
+    class StorageServiceFileWriteAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileUploadAnswerMessage(WorkflowFile *file,
+        StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
                                 StorageService *storage_service,
                                 bool success,
                                 WorkflowExecutionFailureCause *failure_cause,
-                                std::string data_upload_mailbox_name,
+                                std::string data_write_mailbox_name,
                                 double payload);
 
         WorkflowFile *file;
         StorageService *storage_service;
         bool success;
         WorkflowExecutionFailureCause *failure_cause;
-        std::string data_upload_mailbox_name;
+        std::string data_write_mailbox_name;
     };
 
     /**
-     * @brief "FILE_DOWNLOAD_REQUEST" SimulationMessage class
+     * @brief "FILE_READ_REQUEST" SimulationMessage class
      */
-    class StorageServiceFileDownloadRequestMessage : public StorageServiceMessage {
+    class StorageServiceFileReadRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileDownloadRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
+        StorageServiceFileReadRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
 
         std::string answer_mailbox;
         WorkflowFile *file;
     };
 
     /**
-     * @brief "FILE_DOWNLOAD_ANSWER" SimulationMessage class
+     * @brief "FILE_READ_ANSWER" SimulationMessage class
      */
-    class StorageServiceFileDownloadAnswerMessage : public StorageServiceMessage {
+    class StorageServiceFileReadAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileDownloadAnswerMessage(WorkflowFile *file,
+        StorageServiceFileReadAnswerMessage(WorkflowFile *file,
                                   StorageService *storage_service,
                                   bool success,
                                   WorkflowExecutionFailureCause *failure_cause,

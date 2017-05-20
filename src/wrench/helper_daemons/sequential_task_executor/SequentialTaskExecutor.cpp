@@ -114,9 +114,9 @@ namespace wrench {
 
         } else if (SequentialTaskExecutorRunTaskMessage *msg = dynamic_cast<SequentialTaskExecutorRunTaskMessage*>(message.get())) {
 
-          // Download  all input files
+          // Read  all input files
           try {
-            StorageService::downloadFiles(msg->task->getInputFiles(),
+            StorageService::readFiles(msg->task->getInputFiles(),
                                           msg->file_locations,
                                           this->default_storage_service);
           } catch (WorkflowExecutionException &e) {
@@ -135,9 +135,9 @@ namespace wrench {
           S4U_Simulation::sleep(this->task_start_up_overhead);
           S4U_Simulation::compute(msg->task->getFlops());
 
-          // Upload all output files
+          // Write all output files
           try {
-            StorageService::uploadFiles(msg->task->getOutputFiles(), msg->file_locations, this->default_storage_service);
+            StorageService::writeFiles(msg->task->getOutputFiles(), msg->file_locations, this->default_storage_service);
           } catch (WorkflowExecutionException &e) {
             WRENCH_INFO("Notifying mailbox %s that task %s has failed due to output files problems",
                         this->callback_mailbox.c_str(),

@@ -178,9 +178,9 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    StorageServiceFileUploadRequestMessage::StorageServiceFileUploadRequestMessage(std::string answer_mailbox,
+    StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
                                                        WorkflowFile *file,
-                                                       double payload) : StorageServiceMessage("FILE_UPLOAD_REQUEST",
+                                                       double payload) : StorageServiceMessage("FILE_WRITE_REQUEST",
                                                                                            payload + file->getSize()) {
       if ((answer_mailbox == "")) {
         throw std::invalid_argument("Invalid constructor arguments");
@@ -196,13 +196,13 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileUploadAnswerMessage::StorageServiceFileUploadAnswerMessage(WorkflowFile *file,
+    StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
                                                      StorageService *storage_service,
                                                      bool success,
                                                      WorkflowExecutionFailureCause *failure_cause,
-                                                     std::string data_upload_mailbox_name,
+                                                     std::string data_write_mailbox_name,
                                                      double payload) : StorageServiceMessage(
-            "FILE_UPLOAD_ANSWER", payload) {
+            "FILE_WRITE_ANSWER", payload) {
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
@@ -210,7 +210,7 @@ namespace wrench {
       this->storage_service = storage_service;
       this->success = success;
       this->failure_cause = failure_cause;
-      this->data_upload_mailbox_name = data_upload_mailbox_name;
+      this->data_write_mailbox_name = data_write_mailbox_name;
     }
 
     /**
@@ -221,9 +221,9 @@ namespace wrench {
    *
    * @throw std::invalid_argument
    */
-    StorageServiceFileDownloadRequestMessage::StorageServiceFileDownloadRequestMessage(std::string answer_mailbox,
+    StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(std::string answer_mailbox,
                                                            WorkflowFile *file,
-                                                           double payload) : StorageServiceMessage("FILE_DOWNLOAD_REQUEST",
+                                                           double payload) : StorageServiceMessage("FILE_READ_REQUEST",
                                                                                                payload +
                                                                                                file->getSize()) {
       if ((answer_mailbox == "") || (file == nullptr)) {
@@ -240,11 +240,11 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFileDownloadAnswerMessage::StorageServiceFileDownloadAnswerMessage(WorkflowFile *file,
+    StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(WorkflowFile *file,
                                                          StorageService *storage_service,
                                                          bool success,
                                                          WorkflowExecutionFailureCause *failure_cause,
-                                                         double payload) : StorageServiceMessage("FILE_DOWNLOAD_ANSWER",
+                                                         double payload) : StorageServiceMessage("FILE_READ_ANSWER",
                                                                                              payload) {
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument("Invalid constructor arguments");

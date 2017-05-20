@@ -150,14 +150,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Synchronously download a file from the storage service
+     * @brief Synchronously read a file from the storage service
      *
      * @param file: the file
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void StorageService::downloadFile(WorkflowFile *file) {
+    void StorageService::readFile(WorkflowFile *file) {
 
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -166,14 +166,14 @@ namespace wrench {
       // Send a synchronous message to the daemon
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
       S4U_Mailbox::put(this->mailbox_name,
-                       new StorageServiceFileDownloadRequestMessage(answer_mailbox,
+                       new StorageServiceFileReadRequestMessage(answer_mailbox,
                                                       file,
                                                       this->getPropertyValueAsDouble(
-                                                              StorageServiceProperty::FILE_DOWNLOAD_REQUEST_MESSAGE_PAYLOAD)));
+                                                              StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
 
       // Wait for the answer
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
-      if (StorageServiceFileDownloadAnswerMessage *msg = dynamic_cast<StorageServiceFileDownloadAnswerMessage*>(message.get())) {
+      if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage*>(message.get())) {
         // If it's not a success, throw an exception
         if (!msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -184,12 +184,12 @@ namespace wrench {
         if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage*>(file_content_message.get())) {
           // do nothing
         } else {
-          throw std::runtime_error("StorageService::downloadFile(): Received an unexpected ["+
+          throw std::runtime_error("StorageService::readFile(): Received an unexpected ["+
                                    file_content_message->getName() +"] message!");
         }
 
       } else {
-        throw std::runtime_error("StorageService::downloadFile(): Received an unexpected ["+
+        throw std::runtime_error("StorageService::readFile(): Received an unexpected ["+
                                  message->getName() +"] message!");
       }
 
@@ -197,14 +197,14 @@ namespace wrench {
 
 
     /**
-     * @brief Synchronously upload a file to the storage service
+     * @brief Synchronously write a file to the storage service
      *
      * @param file: the file
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void StorageService::uploadFile(WorkflowFile *file) {
+    void StorageService::writeFile(WorkflowFile *file) {
 
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -213,25 +213,25 @@ namespace wrench {
       // Send a synchronous message to the daemon
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
       S4U_Mailbox::put(this->mailbox_name,
-                       new StorageServiceFileUploadRequestMessage(answer_mailbox,
+                       new StorageServiceFileWriteRequestMessage(answer_mailbox,
                                                       file,
                                                       this->getPropertyValueAsDouble(
-                                                              StorageServiceProperty::FILE_UPLOAD_REQUEST_MESSAGE_PAYLOAD)));
+                                                              StorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
 
       // Wait for the answer
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
 
-      if (StorageServiceFileUploadAnswerMessage *msg = dynamic_cast<StorageServiceFileUploadAnswerMessage*>(message.get())) {
+      if (StorageServiceFileWriteAnswerMessage *msg = dynamic_cast<StorageServiceFileWriteAnswerMessage*>(message.get())) {
         // If not a success, throw an exception
         if (!msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
         }
 
         // Otherwise, synchronously send the file up!
-        S4U_Mailbox::put(msg->data_upload_mailbox_name, new StorageServiceFileContentMessage(file));
+        S4U_Mailbox::put(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
 
       } else {
-        throw std::runtime_error("StorageService::uploadFile(): Received an unexpected ["+
+        throw std::runtime_error("StorageService::writeFile(): Received an unexpected ["+
                                  message->getName() +"] message!");
       }
 
@@ -239,8 +239,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Synchronously and sequentially download a set of files from storage services
-    * @param files: the set of files to download
+    * @brief Synchronously and sequentially read a set of files from storage services
+    * @param files: the set of files to read
     * @param file_locations: a map of files to storage services
     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
     * @return nullptr on success, a pointer to a workflow execution failure cause on failure
@@ -248,11 +248,11 @@ namespace wrench {
     * @throw std::runtime_error
     * @throw WorkflowExecutionException
     */
-    void StorageService::downloadFiles(std::set<WorkflowFile *> files,
+    void StorageService::readFiles(std::set<WorkflowFile *> files,
                                        std::map<WorkflowFile *, StorageService *> file_locations,
                                        StorageService *default_storage_service) {
       try {
-        StorageService::uploadOrDownloadFiles(DOWNLOAD, files, file_locations, default_storage_service);
+        StorageService::writeOrReadFiles(READ, files, file_locations, default_storage_service);
       } catch (std::runtime_error &e) {
         throw;
       } catch (WorkflowExecutionException &e) {
@@ -262,7 +262,7 @@ namespace wrench {
 
     /**
    * @brief Synchronously and sequentially uppload a set of files from storage services
-   * @param files: the set of files to upload
+   * @param files: the set of files to write
    * @param file_locations: a map of files to storage services
    * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
    * @return nullptr on success, a pointer to a workflow execution failure cause on failure
@@ -270,11 +270,11 @@ namespace wrench {
    *  @throw std::runtime_error
    * @throw WorkflowExecutionException
    */
-    void StorageService::uploadFiles(std::set<WorkflowFile *> files,
+    void StorageService::writeFiles(std::set<WorkflowFile *> files,
                                      std::map<WorkflowFile *, StorageService *> file_locations,
                                      StorageService *default_storage_service) {
       try {
-        StorageService::uploadOrDownloadFiles(UPLOAD, files, file_locations, default_storage_service);
+        StorageService::writeOrReadFiles(WRITE, files, file_locations, default_storage_service);
       } catch (std::runtime_error &e) {
         throw;
       } catch (WorkflowExecutionException &e) {
@@ -284,10 +284,10 @@ namespace wrench {
 
 
     /**
-     * @brief Synchronously and sequentially upload/download a set of files to/from storage services
+     * @brief Synchronously and sequentially write/read a set of files to/from storage services
      *
-     * @param action: DONWLOAD or UPLOAD
-     * @param files: the set of files to download/upload
+     * @param action: DONWLOAD or WRITE
+     * @param files: the set of files to read/write
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
      * @return nullptr on success, a pointer to a workflow execution failure cause on failure
@@ -295,7 +295,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
      */
-    void StorageService::uploadOrDownloadFiles(Action action,
+    void StorageService::writeOrReadFiles(Action action,
                                                std::set<WorkflowFile *> files,
                                                std::map<WorkflowFile *, StorageService *> file_locations,
                                                StorageService *default_storage_service) {
@@ -310,18 +310,18 @@ namespace wrench {
         if (storage_service == nullptr) {
           throw WorkflowExecutionException(new NoStorageServiceForFile(f));
         }
-        if (action == DOWNLOAD) {
+        if (action == READ) {
           try {
-            storage_service->downloadFile(f);
+            storage_service->readFile(f);
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
             throw;
           }
         } else {
-          // Upload the file
+          // Write the file
           try {
-            storage_service->uploadFile(f);
+            storage_service->writeFile(f);
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -403,9 +403,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Synchronously asks the storage service to download a file from another storage service
+     * @brief Synchronously asks the storage service to read a file from another storage service
      * @param file: the file to copy
-     * @param src: the storage service from which to download the file
+     * @param src: the storage service from which to read the file
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error

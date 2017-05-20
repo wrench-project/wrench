@@ -66,7 +66,7 @@ namespace wrench {
     }
 
     std::string StorageServiceFull::toString() {
-      return "Cannot upload file " + this->file->getId() + " to Storage Service " +
+      return "Cannot write file " + this->file->getId() + " to Storage Service " +
               this->storage_service->getName() + " due to lack of storage space";
     }
 

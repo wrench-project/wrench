@@ -31,10 +31,10 @@ namespace wrench {
                  {SimpleStorageServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,    "1024"},
                  {SimpleStorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD,     "1024"},
                  {SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD,      "1024"},
-                 {SimpleStorageServiceProperty::FILE_UPLOAD_REQUEST_MESSAGE_PAYLOAD,   "1024"},
-                 {SimpleStorageServiceProperty::FILE_UPLOAD_ANSWER_MESSAGE_PAYLOAD,    "1024"},
-                 {SimpleStorageServiceProperty::FILE_DOWNLOAD_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {SimpleStorageServiceProperty::FILE_DOWNLOAD_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {SimpleStorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD,   "1024"},
+                 {SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD,    "1024"},
+                 {SimpleStorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                 {SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD,  "1024"},
                 };
 
     public:
@@ -50,9 +50,9 @@ namespace wrench {
 
 //        void copyFile(WorkflowFile *file, StorageService *src);
 //
-//        void downloadFile(WorkflowFile *file);
+//        void readFile(WorkflowFile *file);
 //
-//        void uploadFile(WorkflowFile *file);
+//        void writeFile(WorkflowFile *file);
 //
 //        void deleteFile(WorkflowFile *file);
 
@@ -78,7 +78,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        std::string data_upload_mailbox_name;
+        std::string data_write_mailbox_name;
 
     };
 

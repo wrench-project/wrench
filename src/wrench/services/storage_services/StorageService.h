@@ -41,19 +41,19 @@ namespace wrench {
 
         virtual bool lookupFile(WorkflowFile *file);
 
-        virtual void downloadFile(WorkflowFile *file);
+        virtual void readFile(WorkflowFile *file);
 
         virtual void deleteFile(WorkflowFile *file);
 
-        virtual void uploadFile(WorkflowFile *file);
+        virtual void writeFile(WorkflowFile *file);
 
         virtual void copyFile(WorkflowFile *file, StorageService *src);
 
-        static void downloadFiles(std::set<WorkflowFile *> files,
+        static void readFiles(std::set<WorkflowFile *> files,
                                   std::map<WorkflowFile *, StorageService *> file_locations,
                                   StorageService *default_storage_service);
 
-        static void uploadFiles(std::set<WorkflowFile *> files,
+        static void writeFiles(std::set<WorkflowFile *> files,
                                   std::map<WorkflowFile *, StorageService *> file_locations,
                                   StorageService *default_storage_service);
 
@@ -86,11 +86,11 @@ namespace wrench {
     private:
 
         enum Action {
-            DOWNLOAD,
-            UPLOAD,
+            READ,
+            WRITE,
         };
 
-        static void uploadOrDownloadFiles(Action action, std::set<WorkflowFile *> files,
+        static void writeOrReadFiles(Action action, std::set<WorkflowFile *> files,
                                   std::map<WorkflowFile *, StorageService *> file_locations,
                                   StorageService *default_storage_service);
 
