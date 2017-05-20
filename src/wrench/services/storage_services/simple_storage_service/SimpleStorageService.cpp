@@ -47,6 +47,8 @@ namespace wrench {
             std::string suffix) :
             StorageService("simple_storage_service" + suffix, "simple_storage_service" + suffix, capacity) {
 
+      this->capacity = capacity;
+
       // Set default properties
       for (auto p : this->default_property_values) {
         this->setProperty(p.first, p.second);
@@ -59,6 +61,7 @@ namespace wrench {
 
       // Set the name of the data mailbox
       this->data_upload_mailbox_name = S4U_Mailbox::generateUniqueMailboxName("simple_storage_service" + suffix + "_data_");
+
 
       // Start the daemon on the same host
       try {
@@ -113,6 +116,7 @@ namespace wrench {
                          new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                  SimpleStorageServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         return false;
+
       } else if (StorageServiceFreeSpaceRequestMessage *msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage*>(message.get())) {
         double free_space = this->capacity - this->occupied_space;
 
@@ -120,6 +124,7 @@ namespace wrench {
                          new StorageServiceFreeSpaceAnswerMessage(free_space, this->getPropertyValueAsDouble(
                                  SimpleStorageServiceProperty::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
         return true;
+
       } else if (StorageServiceFileDeleteRequestMessage *msg = dynamic_cast<StorageServiceFileDeleteRequestMessage*>(message.get())) {
 
         bool success = true;
@@ -140,6 +145,7 @@ namespace wrench {
                                                              SimpleStorageServiceProperty::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
 
         return true;
+
       } else if (StorageServiceFileLookupRequestMessage *msg = dynamic_cast<StorageServiceFileLookupRequestMessage*>(message.get())) {
 
         bool file_found = (this->stored_files.find(msg->file) != this->stored_files.end());
@@ -152,6 +158,7 @@ namespace wrench {
       } else if (StorageServiceFileUploadRequestMessage *msg = dynamic_cast<StorageServiceFileUploadRequestMessage*>(message.get())) {
 
         if (msg->file->getSize() > (this->capacity - this->occupied_space)) {
+          std::cerr << " NO SPACE " << msg->file->getSize() << " " << this->capacity << " " << this->occupied_space << std::endl;
           S4U_Mailbox::put(msg->answer_mailbox,
                            new StorageServiceFileUploadAnswerMessage(msg->file,
                                                        this,

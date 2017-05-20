@@ -26,6 +26,7 @@ namespace wrench {
      */
     Service::Service(std::string process_name_prefix, std::string mailbox_name_prefix) :
             S4U_DaemonWithMailbox(process_name_prefix, mailbox_name_prefix) {
+      this->name = process_name_prefix;
     }
 
     /**
@@ -102,17 +103,9 @@ namespace wrench {
     }
 
     /**
-   * @brief Get the name of the service
-   * @return the compute service name
-   */
-    std::string Service::getName() {
-      return this->name;
-    }
-
-    /**
-  * @brief Get the name of the host on which the service is running
-  * @return the hostname
-  */
+    * @brief Get the name of the host on which the service is running
+    * @return the hostname
+    */
     std::string Service::getHostname() {
       return this->hostname;
     }

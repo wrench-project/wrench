@@ -228,7 +228,6 @@ namespace wrench {
      * @brief Set the task to the completed state
      */
     void WorkflowTask::setCompleted() {
-      std::cerr << "In setComplete()" << std::endl;
       this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
     }
 

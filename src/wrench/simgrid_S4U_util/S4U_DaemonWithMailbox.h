@@ -35,6 +35,7 @@ namespace wrench {
 				virtual int main() = 0;
 				void kill_actor();
         void setTerminated();
+				std::string getName();
 
 		private:
         bool terminated;

@@ -72,4 +72,13 @@ namespace wrench {
       this->terminated = true;
     }
 
+
+    /**
+     * @brief Retrieve the process name
+     * @return the name
+     */
+    std::string S4U_DaemonWithMailbox::getName() {
+      return this->process_name;
+    }
+
 };

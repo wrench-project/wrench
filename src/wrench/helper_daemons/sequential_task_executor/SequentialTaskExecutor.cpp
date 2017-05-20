@@ -47,7 +47,6 @@ namespace wrench {
       this->callback_mailbox = callback_mailbox;
       this->task_start_up_overhead = task_startup_overhead;
       this->default_storage_service = default_storage_service;
-      std::cerr << "IN CONS: << " << (unsigned long)(this->default_storage_service)<< "  " << this->default_storage_service->getName() << std::endl;
       this->file_registry = file_registry;
 
       // Start my daemon on the host
@@ -80,6 +79,7 @@ namespace wrench {
       if (task == nullptr) {
         throw std::invalid_argument("SequentialTaskExecutor::runTask(): passed a nullptr task");
       }
+
       // Send a "run a task" message to the daemon's mailbox
       S4U_Mailbox::put(this->mailbox_name, new SequentialTaskExecutorRunTaskMessage(task, file_locations, 0.0));
       return 0;
@@ -115,19 +115,19 @@ namespace wrench {
         } else if (SequentialTaskExecutorRunTaskMessage *msg = dynamic_cast<SequentialTaskExecutorRunTaskMessage*>(message.get())) {
 
           // Download  all input files
-//          try {
-//            StorageService::downloadFiles(msg->task->getInputFiles(),
-//                                          msg->file_locations,
-//                                          this->default_storage_service);
-//          } catch (WorkflowExecutionException &e) {
-//
-//            WRENCH_INFO("Notifying mailbox %s that task %s has failed",
-//                        this->callback_mailbox.c_str(),
-//                        msg->task->getId().c_str());
-//            S4U_Mailbox::dput(this->callback_mailbox,
-//                              new SequentialTaskExecutorTaskFailedMessage(msg->task, this, e.getCause(), 0.0));
-//            continue;
-//          }
+          try {
+            StorageService::downloadFiles(msg->task->getInputFiles(),
+                                          msg->file_locations,
+                                          this->default_storage_service);
+          } catch (WorkflowExecutionException &e) {
+
+            WRENCH_INFO("Notifying mailbox %s that task %s has failed",
+                        this->callback_mailbox.c_str(),
+                        msg->task->getId().c_str());
+            S4U_Mailbox::dput(this->callback_mailbox,
+                              new SequentialTaskExecutorTaskFailedMessage(msg->task, this, e.getCause(), 0.0));
+            continue;
+          }
 
           // Run the task
           WRENCH_INFO("Executing task %s (%lf flops)", msg->task->getId().c_str(), msg->task->getFlops());
@@ -136,16 +136,16 @@ namespace wrench {
           S4U_Simulation::compute(msg->task->getFlops());
 
           // Upload all output files
-//          try {
-//            StorageService::uploadFiles(msg->task->getOutputFiles(), msg->file_locations, this->default_storage_service);
-//          } catch (WorkflowExecutionException &e) {
-//            WRENCH_INFO("Notifying mailbox %s that task %s has failed due to output files problems",
-//                        this->callback_mailbox.c_str(),
-//                        msg->task->getId().c_str());
-//            S4U_Mailbox::dput(this->callback_mailbox,
-//                              new SequentialTaskExecutorTaskFailedMessage(msg->task, this, e.getCause(), 0.0));
-//            continue;
-//          }
+          try {
+            StorageService::uploadFiles(msg->task->getOutputFiles(), msg->file_locations, this->default_storage_service);
+          } catch (WorkflowExecutionException &e) {
+            WRENCH_INFO("Notifying mailbox %s that task %s has failed due to output files problems",
+                        this->callback_mailbox.c_str(),
+                        msg->task->getId().c_str());
+            S4U_Mailbox::dput(this->callback_mailbox,
+                              new SequentialTaskExecutorTaskFailedMessage(msg->task, this, e.getCause(), 0.0));
+            continue;
+          }
 
           // Set the task completion time and state
           msg->task->setEndDate(S4U_Simulation::getClock());

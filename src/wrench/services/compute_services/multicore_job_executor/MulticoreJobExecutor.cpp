@@ -461,18 +461,19 @@ namespace wrench {
 
         // Figure out the task's job
         StandardJob *job = (StandardJob *) (to_run->getJob());
+        std::map<WorkflowFile *, StorageService *> job_file_locations = job->getFileLocations();
 
         // Start the task on the sequential task executor
         WRENCH_INFO("Running task %s on one of my worker threads", to_run->getId().c_str());
         std::map<WorkflowFile *, StorageService *> task_file_locations;
         for (auto f : to_run->getInputFiles()) {
-          if (job->getFileLocations().find(f) != job->getFileLocations().end()) {
-            task_file_locations[f] = job->getFileLocations()[f];
+          if (job_file_locations.find(f) != job_file_locations.end()) {
+            task_file_locations[f] = job_file_locations[f];
           }
         }
         for (auto f : to_run->getOutputFiles()) {
-          if (job->getFileLocations().find(f) != job->getFileLocations().end()) {
-            task_file_locations[f] = job->getFileLocations()[f];
+          if (job_file_locations.find(f) != job_file_locations.end()) {
+            task_file_locations[f] = job_file_locations[f];
           }
         }
 
@@ -722,6 +723,7 @@ namespace wrench {
 
       WRENCH_INFO("New Multicore Job Executor starting (%s) with %d worker threads ",
                   this->mailbox_name.c_str(), this->num_worker_threads);
+
 
       for (int i = 0; i < this->num_worker_threads; i++) {
         WRENCH_INFO("Starting a task executor on core #%d", i);

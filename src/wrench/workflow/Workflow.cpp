@@ -401,7 +401,7 @@ namespace wrench {
         throw std::invalid_argument("Workflow::updateTaskState(): passed a nullptr task");
       }
 
-      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
+      WRENCH_DEBUG("Changing state of task %s from '%s' to '%s'",
                    task->getId().c_str(),
                    WorkflowTask::stateToString(task->state).c_str(),
                    WorkflowTask::stateToString(state).c_str());
