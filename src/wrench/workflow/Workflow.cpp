@@ -401,7 +401,7 @@ namespace wrench {
         throw std::invalid_argument("Workflow::updateTaskState(): passed a nullptr task");
       }
 
-      WRENCH_DEBUG("Changing state of task %s form '%s' to '%s'",
+      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
                    task->getId().c_str(),
                    WorkflowTask::stateToString(task->state).c_str(),
                    WorkflowTask::stateToString(state).c_str());
@@ -426,7 +426,7 @@ namespace wrench {
             return;
           }
           if ((task->getState() != WorkflowTask::NOT_READY) && (task->getState() != WorkflowTask::PENDING)) {
-            throw std::runtime_error("Cannot set the state of a not-ready task to WorkflowTask::READY");
+            throw std::runtime_error("Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) + " task to WorkflowTask::READY");
           }
           // Go through the parent and check whether they are all completed
           for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {

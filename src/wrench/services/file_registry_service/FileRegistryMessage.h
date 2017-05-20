@@ -16,19 +16,65 @@
 
 namespace wrench {
 
-//    FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "1024"},
-//{FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-//{FileRegistryServiceProperty::REMOVE_ENTRY_REQUEST_PAYLOAD,        "1024"},
-//{FileRegistryServiceProperty::REMOVE_ENTRY_ANSWER_PAYLOAD,         "1024"},
-//{FileRegistryServiceProperty::ADD_ENTRY_REQUEST_PAYLOAD,           "1024"},
-//{FileRegistryServiceProperty::ADD_ENTRY_ANSWER_PAYLOAD,
+    /***********************/
+    /** \cond INTERNAL    **/
+    /***********************/
 
-class FileRegistryMessage : public ServiceMessage {
+    class FileRegistryMessage : public ServiceMessage {
     protected:
         FileRegistryMessage(std::string name, double payload);
 
     };
 
+    class FileRegistryFileLookupRequestMessage: public FileRegistryMessage {
+    public:
+        FileRegistryFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
+
+        std::string answer_mailbox;
+        WorkflowFile *file;
+    };
+
+    class FileRegistryFileLookupAnswerMessage: public FileRegistryMessage {
+    public:
+        FileRegistryFileLookupAnswerMessage(WorkflowFile *file, std::set<StorageService*> locations, double payload);
+
+        WorkflowFile *file;
+        std::set<StorageService*> locations;
+    };
+
+    class FileRegistryRemoveEntryRequestMessage: public FileRegistryMessage {
+    public:
+        FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *storage_service, double payload);
+
+        std::string answer_mailbox;
+        WorkflowFile *file;
+        StorageService *storage_service;
+    };
+
+    class FileRegistryRemoveEntryAnswerMessage: public FileRegistryMessage {
+    public:
+        FileRegistryRemoveEntryAnswerMessage(bool success, double payload);
+
+        bool success;
+    };
+
+    class FileRegistryAddEntryRequestMessage: public FileRegistryMessage {
+    public:
+        FileRegistryAddEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *storage_service, double payload);
+
+        std::string answer_mailbox;
+        WorkflowFile *file;
+        StorageService *storage_service;
+    };
+
+    class FileRegistryAddEntryAnswerMessage: public FileRegistryMessage {
+    public:
+        FileRegistryAddEntryAnswerMessage(double payload);
+    };
+
+    /***********************/
+    /** \endcond          **/
+    /***********************/
 };
 
 

@@ -15,19 +15,32 @@
 #include <services/ServiceMessage.h>
 
 #include "FileRegistryService.h"
+#include "FileRegistryMessage.h"
+#include <services/storage_services/StorageService.h>
+#include <workflow/WorkflowFile.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
 
 namespace wrench {
 
 
+    /**
+     * @brief Constructor
+     * @param hostname: the hostname on which to start the service
+     * @param plist: a property list ({} means "use all defaults")
+     */
     FileRegistryService::FileRegistryService(std::string hostname,
                                              std::map<std::string, std::string> plist) :
             FileRegistryService(hostname, plist, "") {
 
     }
 
-
+    /**
+     * @brief Constructor
+     * @param hostname: the hostname on which to start the service
+     * @param plist: a property list ({} means "use all defaults")
+     * @param suffix: suffix to append to the service name and mailbox
+     */
     FileRegistryService::FileRegistryService(
             std::string hostname,
             std::map<std::string, std::string> plist,
@@ -54,60 +67,95 @@ namespace wrench {
 
 
     /**
-     * @brief Notify the FileRegistryService that a WorkflowFile is available at some StorageService
-     * @param file: a raw pointer to a WorkflowFile
-     * @param ss: a raw pointer to a StorageService
-     *
-     * @throw std::invalid_argument
-     */
-    void FileRegistryService::addEntry(WorkflowFile *file, StorageService *ss) {
-      if ((file == nullptr) || (ss == nullptr)) {
-        throw std::invalid_argument("Invalid input argument");
-      }
-      if (this->entries.find(file) == this->entries.end()) {
-        this->entries[file] = {};
-      }
-      this->entries[file].insert(ss);
-    }
-
-    /**
-     * @brief Remove an entry from a FileRegistryService
-     * @param file: a raw pointer to a WorkflowFile
-     * @param ss: a raw pointer to a StorageService
+     * @brief Lookup an entry
+     * @param file: the file to lookup
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void FileRegistryService::removeEntry(WorkflowFile *file, StorageService *ss) {
-      if ((file == nullptr) || (ss == nullptr)) {
-        throw std::invalid_argument("Invalid input argument");
-      }
-      if (this->entries.find(file) == this->entries.end()) {
-        throw std::runtime_error("Trying to remove entry for non-existent file in FileRegistryService");
-      }
-      if (this->entries[file].find(ss) == this->entries[file].end()) {
-        throw std::runtime_error("Trying to remove non-existing entry in FileRegistryService");
-      }
-      this->entries[file].erase(ss);
-    }
+    std::set<StorageService *> FileRegistryService::lookupEntry(WorkflowFile *file) {
 
-
-    /**
-     * @brief Remove all entries for a particular WorkflowFile in a FileRegistryService
-     *
-     * @param file: a raw pointer to a WorkflowFile
-     *
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
-    void FileRegistryService::removeAllEntries(WorkflowFile *file) {
       if (file == nullptr) {
         throw std::invalid_argument("Invalid input argument");
       }
-      if (this->entries.find(file) == this->entries.end()) {
-        throw std::runtime_error("Trying to remove all entries for non-existent file in FileRegistryService");
+
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+
+      S4U_Mailbox::put(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
+                                                                                    this->getPropertyValueAsDouble(
+                                                                                            FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+
+      if (FileRegistryFileLookupAnswerMessage *msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
+        return msg->locations;
+      } else {
+        throw std::runtime_error("Unexpected [" + message->getName() + "] message");
       }
-      this->entries[file].clear();
+    }
+
+
+    /**
+     * @brief Add an entry
+     * @param file: a file
+     * @param storage_service: a storage_service
+     *
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    void FileRegistryService::addEntry(WorkflowFile *file, StorageService *storage_service) {
+
+      if ((file == nullptr) || (storage_service == nullptr)) {
+        throw std::invalid_argument("Invalid input argument");
+      }
+
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+
+      S4U_Mailbox::put(this->mailbox_name,
+                       new FileRegistryAddEntryRequestMessage(answer_mailbox, file, storage_service,
+                                                              this->getPropertyValueAsDouble(
+                                                                      FileRegistryServiceProperty::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
+
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+
+      if (FileRegistryAddEntryAnswerMessage *msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
+        return;
+      } else {
+        std::runtime_error("Unexpected [" + message->getName() + "] message");
+      }
+    }
+
+    /**
+     * @brief Remove an entry
+     * @param file: a file
+     * @param storage_service: a storage service
+     *
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    void FileRegistryService::removeEntry(WorkflowFile *file, StorageService *storage_service) {
+
+      if ((file == nullptr) || (storage_service == nullptr)) {
+        throw std::invalid_argument("Invalid input argument");
+      }
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+
+      S4U_Mailbox::put(this->mailbox_name,
+                       new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, storage_service,
+                                                                 this->getPropertyValueAsDouble(
+                                                                         FileRegistryServiceProperty::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
+
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+
+      if (FileRegistryRemoveEntryAnswerMessage *msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
+        if (!msg->success) {
+          WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service",
+                      file->getId().c_str(), storage_service->getName().c_str());
+        }
+        return;
+      } else {
+        std::runtime_error("Unexpected [" + message->getName() + "] message");
+      }
     }
 
 
@@ -144,18 +192,79 @@ namespace wrench {
       // Wait for a message
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
 
-
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
       if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         // This is Synchronous
         S4U_Mailbox::put(msg->ack_mailbox,
-                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(FileRegistryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
+                                 FileRegistryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         return false;
-      }
-      else  {
+
+      } else if (FileRegistryFileLookupRequestMessage *msg = dynamic_cast<FileRegistryFileLookupRequestMessage *>(message.get())) {
+        std::set<StorageService *> locations;
+        if (this->entries.find(msg->file) != this->entries.end()) {
+          locations = this->entries[msg->file];
+        }
+        S4U_Mailbox::dput(msg->answer_mailbox,
+                          new FileRegistryFileLookupAnswerMessage(msg->file, locations,
+                                                                  this->getPropertyValueAsDouble(
+                                                                          FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+        return true;
+
+      } else if (FileRegistryAddEntryRequestMessage *msg = dynamic_cast<FileRegistryAddEntryRequestMessage *>(message.get())) {
+        addEntryToDatabase(msg->file, msg->storage_service);
+        S4U_Mailbox::dput(msg->answer_mailbox,
+                          new FileRegistryAddEntryAnswerMessage(this->getPropertyValueAsDouble(
+                                  FileRegistryServiceProperty::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
+        return true;
+
+      } else if (FileRegistryRemoveEntryRequestMessage *msg = dynamic_cast<FileRegistryRemoveEntryRequestMessage *>(message.get())) {
+
+        bool success = removeEntryFromDatabase(msg->file, msg->storage_service);
+        S4U_Mailbox::dput(msg->answer_mailbox,
+                          new FileRegistryRemoveEntryAnswerMessage(success,
+                                                                   this->getPropertyValueAsDouble(
+                                                                           FileRegistryServiceProperty::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
+        return true;
+
+      } else {
         throw std::runtime_error("Unknown message type: " + std::to_string(message->payload));
       }
     }
+
+    /**
+     * Internal method to add an entry to the database
+     * @param file: a file
+     * @param storage_service: a storage_service
+     */
+    void FileRegistryService::addEntryToDatabase(WorkflowFile *file, StorageService *storage_service) {
+      if (this->entries.find(file) != this->entries.end()) {
+        this->entries[file].insert(storage_service);
+      } else {
+        this->entries[file] = {storage_service};
+      }
+    }
+
+    /**
+     * Internal method to remove an entry from the database
+     * @param file: a file
+     * @param storage_service: a storage_service
+     *
+     * @return true if an entry was removed
+     */
+    bool FileRegistryService::removeEntryFromDatabase(WorkflowFile *file, StorageService *storage_service) {
+      if (this->entries.find(file) != this->entries.end()) {
+        if (this->entries[file].find(storage_service) != this->entries[file].end()) {
+          this->entries[file].erase(storage_service);
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+      return true;
+    }
+
 
 };

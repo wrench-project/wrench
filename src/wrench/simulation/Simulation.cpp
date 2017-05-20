@@ -353,7 +353,7 @@ namespace wrench {
       }
 
       XBT_INFO("Staging file %s (%lf)", file->getId().c_str(), file->getSize());
-      // Put the file on the storage service
+      // Put the file on the storage service (not via the service daemon)
       try {
         storage_service->addFileToStorage(file);
       } catch (std::runtime_error &e) {
@@ -361,7 +361,7 @@ namespace wrench {
       }
 
       // Update the file registry
-      this->file_registry_service->addEntry(file, storage_service);
+      this->file_registry_service->addEntryToDatabase(file, storage_service);
 
     }
 

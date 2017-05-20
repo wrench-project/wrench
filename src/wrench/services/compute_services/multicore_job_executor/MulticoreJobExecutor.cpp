@@ -748,7 +748,7 @@ namespace wrench {
  */
     void MulticoreJobExecutor::processTaskCompletion(WorkflowTask *task, SequentialTaskExecutor *executor) {
       StandardJob *job = (StandardJob *) (task->getJob());
-      WRENCH_INFO("One of my cores completed task %s", task->getId().c_str());
+      WRENCH_INFO("One of my cores completed task %s (and its state is: %s", task->getId().c_str(), WorkflowTask::stateToString(task->getState()).c_str());
 
       task->setCompleted();
 

@@ -113,7 +113,7 @@ namespace wrench {
 
         } else if (SequentialTaskExecutorRunTaskMessage *msg = dynamic_cast<SequentialTaskExecutorRunTaskMessage*>(message.get())) {
 
-//          // Download  all input files
+          // Download  all input files
 //          try {
 //            StorageService::downloadFiles(msg->task->getInputFiles(),
 //                                          msg->file_locations,
@@ -134,7 +134,7 @@ namespace wrench {
           S4U_Simulation::sleep(this->task_start_up_overhead);
           S4U_Simulation::compute(msg->task->getFlops());
 
-//          // Upload all output files
+          // Upload all output files
 //          try {
 //            StorageService::uploadFiles(msg->task->getOutputFiles(), msg->file_locations, this->default_storage_service);
 //          } catch (WorkflowExecutionException &e) {

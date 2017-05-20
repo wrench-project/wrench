@@ -24,14 +24,14 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD);
 
         /** The number of bytes in the control message sent to the daemon to cause it to add an entry **/
-        DECLARE_PROPERTY_NAME(ADD_ENTRY_REQUEST_PAYLOAD);
+        DECLARE_PROPERTY_NAME(ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD);
         /** The number of bytes in the control message sent by the daemon to asnwer an entry addition request **/
-        DECLARE_PROPERTY_NAME(ADD_ENTRY_ANSWER_PAYLOAD);
+        DECLARE_PROPERTY_NAME(ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD);
 
         /** The number of bytes in the control message sent to the daemon to cause it to remove an entry **/
-        DECLARE_PROPERTY_NAME(REMOVE_ENTRY_REQUEST_PAYLOAD);
+        DECLARE_PROPERTY_NAME(REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD);
         /** The number of bytes in the control message sent by the daemon to asnwer an entry removal request **/
-        DECLARE_PROPERTY_NAME(REMOVE_ENTRY_ANSWER_PAYLOAD);
+        DECLARE_PROPERTY_NAME(REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD);
 
         /** The overhead, in seconds, of looking up entries for a file **/
         DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
