@@ -664,9 +664,12 @@ namespace wrench {
       // Set all tasks back to the READY state and wipe out output files
       for (auto failed_task: job->getTasks()) {
         failed_task->setReady();
-        StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
-                                    this->default_storage_service);
-
+        try {
+          StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
+                                      this->default_storage_service);
+        } catch (WorkflowExecutionException &e) {
+          WRENCH_WARN("Warning: %s", e.getCause()->toString().c_str());
+        }
       }
 
       // Send back a job failed message
@@ -793,7 +796,7 @@ namespace wrench {
 
       // Get the job for the task
       StandardJob *job = (StandardJob *) (task->getJob());
-      WRENCH_INFO("One of my cores has failed to run task %s", task->getId().c_str());
+      WRENCH_INFO("One of my cores has failed to run task %s: ", task->getId().c_str(), cause->toString().c_str());
 
       // Remove the job from the list of running jobs
       this->running_jobs.erase(job);

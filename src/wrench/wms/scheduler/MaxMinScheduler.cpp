@@ -66,7 +66,7 @@ namespace wrench {
 
           if (cs->canRunJob(WorkflowJob::STANDARD, 1, total_flops)) {
             WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
-            WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second);
+            WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
             job_manager->submitJob(job, cs);
             successfully_scheduled = true;
             break;

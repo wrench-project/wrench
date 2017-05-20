@@ -120,7 +120,7 @@ namespace wrench {
 //                                          this->default_storage_service);
 //          } catch (WorkflowExecutionException &e) {
 //
-//            WRENCH_INFO("Notifying mailbox %s that task %s has failed",
+//            WRENCH_INFO("Notifying mailbox %s that task %s has failed due to input files problems",
 //                        this->callback_mailbox.c_str(),
 //                        msg->task->getId().c_str());
 //            S4U_Mailbox::dput(this->callback_mailbox,
@@ -138,7 +138,7 @@ namespace wrench {
 //          try {
 //            StorageService::uploadFiles(msg->task->getOutputFiles(), msg->file_locations, this->default_storage_service);
 //          } catch (WorkflowExecutionException &e) {
-//            WRENCH_INFO("Notifying mailbox %s that task %s has failed",
+//            WRENCH_INFO("Notifying mailbox %s that task %s has failed due to output files problems",
 //                        this->callback_mailbox.c_str(),
 //                        msg->task->getId().c_str());
 //            S4U_Mailbox::dput(this->callback_mailbox,

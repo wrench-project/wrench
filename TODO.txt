@@ -1,9 +1,7 @@
 DATA STORAGE IMPLEMENTATION:
 
-    - Implement the FileRegistry Service
-    - Make sure that all storage operation updates the registry
-
-
+    QUESTION: WHO UPDATES THE REGISTRY:
+        - I AM GOING TO SAY: THE WMS
 
     - SIMPLE STORAGE SERVICE: How to deal with synchrony problem.
             - File copy: should just trigger it and then there could be an actual notification?
@@ -18,6 +16,11 @@ DATA STORAGE IMPLEMENTATION:
 ------------------------------------
 
 BUGS:
+
+    - With Optimizations, it seems that task state updates are a bit wonky. It seems that
+      tasks that are already in the COMPLETED state (because merged with others) then
+      are put in the READY state (because a predecessor in the merge has completed I assume),
+      which Workflow.updateTaskState() doesn't like...
 
     - There is a SegFault when exiting before simulation.launch() is executed.
         ("Invalid read of size 8" in simix_process())

@@ -20,10 +20,12 @@ namespace wrench {
 
     class Workflow;
 		class WorkflowTask;
+		class WorkflowFile;
     class WorkflowJob;
 		class PilotJob;
 		class StandardJob;
 		class ComputeService;
+		class StorageService;
 
 		/***********************/
 		/** \cond DEVELOPER    */
@@ -46,9 +48,9 @@ namespace wrench {
 
 				void kill();
 
-				StandardJob *createStandardJob(std::vector<WorkflowTask *>);
+				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations);
 
-				StandardJob *createStandardJob(WorkflowTask *);
+				StandardJob *createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, StorageService *> file_locations);
 
 				PilotJob *createPilotJob(Workflow *workflow, int num_cores, double duration);
 

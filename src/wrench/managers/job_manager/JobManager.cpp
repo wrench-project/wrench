@@ -69,8 +69,8 @@ namespace wrench {
      *
      * @return a raw pointer to the StandardJob
      */
-    StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks) {
-      StandardJob *raw_ptr = new StandardJob(tasks);
+    StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations) {
+      StandardJob *raw_ptr = new StandardJob(tasks, file_locations);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);
 
       this->jobs[job->getName()] = std::move(job);
@@ -84,10 +84,10 @@ namespace wrench {
      *
      * @return a raw pointer to the StandardJob
      */
-    StandardJob *JobManager::createStandardJob(WorkflowTask *task) {
+    StandardJob *JobManager::createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, StorageService *> file_locations) {
       std::vector<WorkflowTask *> tasks;
       tasks.push_back(task);
-      return this->createStandardJob(tasks);
+      return this->createStandardJob(tasks, file_locations);
     }
 
     /**

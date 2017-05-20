@@ -53,7 +53,7 @@ namespace wrench {
             PENDING,
             RUNNING,
             COMPLETED,
-//            FAILED
+            FAILED
         };
 
         static std::string stateToString(WorkflowTask::State state);

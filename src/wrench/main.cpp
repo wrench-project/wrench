@@ -66,6 +66,16 @@ int main(int argc, char **argv) {
 
   std::vector<std::string> hostname_list = simulation.getHostnameList();
 
+  std::string storage_host = hostname_list[(hostname_list.size() > 3) ? 2 : 1];
+
+  std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
+
+  wrench::StorageService *storage_service =simulation.add(std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 100000000000000.0)));
+//  wrench::StorageService *storage_service =simulation.add(std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 10.0)));
+
+  std::string wms_host = hostname_list[0];
+
+
   std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
   try {
 
@@ -73,6 +83,7 @@ int main(int argc, char **argv) {
     simulation.add(
             std::unique_ptr<wrench::MulticoreJobExecutor>(
                     new wrench::MulticoreJobExecutor(executor_host, true, false,
+                                                     storage_service,
                                                      {{wrench::MulticoreJobExecutorProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << executor_host << "..." << std::endl;
@@ -90,15 +101,6 @@ int main(int argc, char **argv) {
     std::exit(1);
 
   }
-
-  std::string storage_host = hostname_list[(hostname_list.size() > 3) ? 2 : 1];
-
-  std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
-
-  wrench::StorageService *storage_service =simulation.add(std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 100000000000000.0)));
-//  wrench::StorageService *storage_service =simulation.add(std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 10.0)));
-
-  std::string wms_host = hostname_list[0];
 
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
 
