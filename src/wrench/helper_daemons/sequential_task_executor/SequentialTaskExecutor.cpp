@@ -47,6 +47,7 @@ namespace wrench {
       this->callback_mailbox = callback_mailbox;
       this->task_start_up_overhead = task_startup_overhead;
       this->default_storage_service = default_storage_service;
+      std::cerr << "IN CONS: << " << (unsigned long)(this->default_storage_service)<< "  " << this->default_storage_service->getName() << std::endl;
       this->file_registry = file_registry;
 
       // Start my daemon on the host

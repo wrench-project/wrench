@@ -252,6 +252,7 @@ namespace wrench {
                                        std::map<WorkflowFile *, StorageService *> file_locations,
                                        StorageService *default_storage_service) {
       try {
+        std::cerr << "---> " << default_storage_service->getName() << std::endl;
         StorageService::uploadOrDownloadFiles(DOWNLOAD, files, file_locations, default_storage_service);
       } catch (std::runtime_error &e) {
         throw;

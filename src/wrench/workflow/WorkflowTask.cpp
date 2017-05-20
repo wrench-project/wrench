@@ -140,6 +140,8 @@ namespace wrench {
           return "RUNNING";
         case COMPLETED:
           return "COMPLETED";
+        case FAILED:
+          return "FAILED";
         default:
           return "UNKNOWN STATE";
       }
