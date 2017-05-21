@@ -126,8 +126,14 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
+     * @throw std::invalid_arguments
      */
     bool StorageService::lookupFile(WorkflowFile *file) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::lookupFile(): invalid arguments");
+      }
+
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
@@ -156,8 +162,13 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
+     * @throw std::invalid_arguments
      */
     void StorageService::readFile(WorkflowFile *file) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::readFile(): invalid arguments");
+      }
 
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -205,6 +216,10 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void StorageService::writeFile(WorkflowFile *file) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::writeFile(): invalid arguments");
+      }
 
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -340,8 +355,14 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
+     * @throw std::invalid_argument
      */
     void StorageService::deleteFile(WorkflowFile *file) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::deleteFile(): invalid arguments");
+      }
+
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
@@ -409,8 +430,13 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
+     * @throw std::invalid_argument
      */
     void StorageService::copyFile(WorkflowFile *file, StorageService *src) {
+
+      if ((file == nullptr) || (src == nullptr)) {
+        throw std::invalid_argument("StorageService::copyFile(): invalid arguments");
+      }
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
@@ -434,5 +460,34 @@ namespace wrench {
       }
 
       return;
+    }
+
+    /**
+     * @brief Asynchronously asks the storage service to read a file from another storage service
+     * @param file: the file
+     * @param src: the storage service from which to read the file
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
+     *
+     */
+    void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file, StorageService *src) {
+
+      if ((file == nullptr) || (src == nullptr)) {
+        throw std::invalid_argument("StorageService::initiateFileCopy(): invalid arguments");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      // Send a message to the daemon
+      S4U_Mailbox::put(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
+              answer_mailbox,
+              file,
+              src,
+              this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+      return;
+
     }
 };

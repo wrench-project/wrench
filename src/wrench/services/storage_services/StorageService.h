@@ -25,7 +25,9 @@ namespace wrench {
     /***********************/
 
     class Simulation;
+
     class WorkflowFile;
+
     class WorkflowExecutionFailureCause;
 
     /**
@@ -41,31 +43,33 @@ namespace wrench {
 
         virtual bool lookupFile(WorkflowFile *file);
 
-        virtual void readFile(WorkflowFile *file);
-
         virtual void deleteFile(WorkflowFile *file);
-
-        virtual void writeFile(WorkflowFile *file);
 
         virtual void copyFile(WorkflowFile *file, StorageService *src);
 
-        static void readFiles(std::set<WorkflowFile *> files,
-                                  std::map<WorkflowFile *, StorageService *> file_locations,
-                                  StorageService *default_storage_service);
-
-        static void writeFiles(std::set<WorkflowFile *> files,
-                                  std::map<WorkflowFile *, StorageService *> file_locations,
-                                  StorageService *default_storage_service);
-
-        static void deleteFiles(std::set<WorkflowFile *>files,
-                                std::map<WorkflowFile *, StorageService *> file_locations,
-                                StorageService *default_storage_service);
-
+        virtual void initiateFileCopy(std::string answer_mailbox,
+                                      WorkflowFile *file,
+                                      StorageService *src);
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
+        virtual void readFile(WorkflowFile *file);
+
+        virtual void writeFile(WorkflowFile *file);
+
+        static void readFiles(std::set<WorkflowFile *> files,
+                              std::map<WorkflowFile *, StorageService *> file_locations,
+                              StorageService *default_storage_service);
+
+        static void writeFiles(std::set<WorkflowFile *> files,
+                               std::map<WorkflowFile *, StorageService *> file_locations,
+                               StorageService *default_storage_service);
+
+        static void deleteFiles(std::set<WorkflowFile *> files,
+                                std::map<WorkflowFile *, StorageService *> file_locations,
+                                StorageService *default_storage_service);
 
         StorageService(std::string service_name,
                        std::string data_mailbox_name_prefix,
@@ -91,8 +95,8 @@ namespace wrench {
         };
 
         static void writeOrReadFiles(Action action, std::set<WorkflowFile *> files,
-                                  std::map<WorkflowFile *, StorageService *> file_locations,
-                                  StorageService *default_storage_service);
+                                     std::map<WorkflowFile *, StorageService *> file_locations,
+                                     StorageService *default_storage_service);
 
 
     };

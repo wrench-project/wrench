@@ -88,4 +88,21 @@ namespace wrench {
       return 0;
     }
 
+    /**
+     * @brief Ask the data manager to initiate a file copy
+     * @param file: the file
+     * @param src: the source data storage
+     * @param dst: the destination data storage
+     *
+     * @throw std::invalid_argument
+     */
+    void DataMovementManager::submitFileCopy(WorkflowFile *file,
+                                             StorageService *src,
+                                             StorageService *dst) {
+      if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
+        throw std::invalid_argument("DataMovementManager::initiateFileCopy(): invalid arguments");
+      }
+
+    }
+
 };

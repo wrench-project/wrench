@@ -17,6 +17,8 @@
 namespace wrench {
 
     class Workflow;
+    class WorkflowFile;
+    class StorageService;
 
     class DataMovementManager : public S4U_DaemonWithMailbox {
 
@@ -29,6 +31,8 @@ namespace wrench {
         void stop();
 
         void kill();
+
+        void submitFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst);
 
     private:
 
