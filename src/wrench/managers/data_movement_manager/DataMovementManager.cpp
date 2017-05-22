@@ -12,6 +12,11 @@
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
 #include <services/ServiceMessage.h>
+#include <services/storage_services/StorageService.h>
+#include <exceptions/WorkflowExecutionException.h>
+#include <services/storage_services/StorageServiceMessage.h>
+#include <workflow/WorkflowFile.h>
+#include <workflow/Workflow.h>
 #include "DataMovementManager.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(data_movement_manager, "Log category for Data Movement Manager");
@@ -54,6 +59,29 @@ namespace wrench {
       S4U_Mailbox::put(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
     }
 
+    /**
+     * @brief Ask the data manager to initiate a file copy
+     * @param file: the file
+     * @param src: the source data storage
+     * @param dst: the destination data storage
+     *
+     * @throw std::invalid_argument
+     * @throw WorkflowExecutionException
+     */
+    void DataMovementManager::submitFileCopy(WorkflowFile *file,
+                                             StorageService *src,
+                                             StorageService *dst) {
+      if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
+        throw std::invalid_argument("DataMovementManager::initiateFileCopy(): invalid arguments");
+      }
+
+      try {
+        dst->initiateFileCopy(this->mailbox_name, file, src);
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      }
+
+    }
 
     /**
      * @brief Main method of the daemon that implements the DataMovementManager
@@ -66,21 +94,12 @@ namespace wrench {
       WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox_name.c_str());
 
       bool keep_going = true;
-      while (keep_going) {
-        std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+
+      while (processNextMessage()) {
 
         // Clear finished asynchronous dput()
         S4U_Mailbox::clear_dputs();
 
-        WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
-
-        if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-          // There shouldn't be any need to clean any state up
-          keep_going = false;
-          break;
-        } else {
-          throw std::runtime_error("Unexpected ["+message->getName() + "] message");
-        }
       }
 
       WRENCH_INFO("Data Movement Manager terminating");
@@ -89,20 +108,35 @@ namespace wrench {
     }
 
     /**
-     * @brief Ask the data manager to initiate a file copy
-     * @param file: the file
-     * @param src: the source data storage
-     * @param dst: the destination data storage
+     * @brief Process the next message
+     * @return true if the daemon should continue, false otherwise
      *
-     * @throw std::invalid_argument
+     * @throw std::runtime_error
      */
-    void DataMovementManager::submitFileCopy(WorkflowFile *file,
-                                             StorageService *src,
-                                             StorageService *dst) {
-      if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
-        throw std::invalid_argument("DataMovementManager::initiateFileCopy(): invalid arguments");
+    bool DataMovementManager::processNextMessage() {
+
+      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+
+      WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
+
+      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        // There shouldn't be any need to clean any state up
+        return false;
+
+      } else if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
+
+        // Forward it back
+        S4U_Mailbox::dput(msg->file->getWorkflow()->getCallbackMailbox(),
+                          new StorageServiceFileCopyAnswerMessage(msg->file,
+                                                                  msg->storage_service, msg->success,
+                                                                  msg->failure_cause, 0));
+
+      } else {
+        throw std::runtime_error("Unexpected [" + message->getName() + "] message");
       }
 
+      return false;
     }
+
 
 };

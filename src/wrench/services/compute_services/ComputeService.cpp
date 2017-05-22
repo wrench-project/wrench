@@ -38,7 +38,7 @@ namespace wrench {
 		 * @brief Submit a job to the compute service
 		 * @param job: a pointer to the job
 		 *
-		 * @throw ComputeServiceIsDownException
+		 * @throw WorkflowExecutionException
 		 */
 		void ComputeService::runJob(WorkflowJob *job) {
 

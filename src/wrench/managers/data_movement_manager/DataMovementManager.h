@@ -36,18 +36,14 @@ namespace wrench {
 
     private:
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
 
         int main();
 
         // Relevant workflow
         Workflow *workflow;
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+        bool processNextMessage();
+
     };
 
     /***********************/

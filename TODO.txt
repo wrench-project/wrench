@@ -1,10 +1,16 @@
 DATA STORAGE IMPLEMENTATION:
 
-    QUESTION: WHO UPDATES THE REGISTRY:
-        - I AM GOING TO SAY: THE WMS
+    - WAY for a job to do data movement b4 and after tasks?
+        - file copies to do
+        - vector of tasks + file map to get stuff from
+        - file copies to do
+
+    - WHO UPDATES THE REGISTRY?
+        - When the WMS does a file copy
+        - When a job produces an output file???
+        - Could be all done in the DataMovement Manager and in the
 
     - SIMPLE STORAGE SERVICE: How to deal with synchrony problem.
-            - File copy: should just trigger it and then there could be an actual notification?
 
     - Attach a default StorageService to the WMS??
 

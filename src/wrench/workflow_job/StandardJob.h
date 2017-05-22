@@ -13,7 +13,6 @@
 
 
 #include <vector>
-#include <workflow/WorkflowTask.h>
 #include "WorkflowJob.h"
 
 namespace wrench {
@@ -23,6 +22,8 @@ namespace wrench {
     /***********************/
 
     class StorageService;
+    class WorkflowFile;
+    class WorkflowTask;
 
     /**
      * @brief A standard (i.e., non-pilot) WorkflowJob
@@ -52,14 +53,23 @@ namespace wrench {
     private:
         friend class JobManager;
 
-        StandardJob(std::vector<WorkflowTask *> tasks);
+        StandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations,
+                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
+                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies);
 
-        StandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations);
-
-        std::vector<WorkflowTask *> tasks;
         State state;
+
+        // Pre- file copies
+        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
+
+        // Tasks to run
+        std::vector<WorkflowTask *> tasks;
         unsigned long num_completed_tasks;
         std::map<WorkflowFile *, StorageService *> file_locations;
+
+        // Post- file copies
+        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
+
 
     };
 

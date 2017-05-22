@@ -112,7 +112,7 @@ namespace wrench {
           case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
             StandardJob *job = (StandardJob *) (event->job);
             WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
-            WRENCH_INFO("Cause: %s", event->cause->toString().c_str());
+            WRENCH_INFO("Cause: %s", event->failure_cause->toString().c_str());
             job_manager->forgetJob(job);
             WRENCH_INFO("As a SimpleWMS, I abort as soon as there is a failure");
             abort = true;
