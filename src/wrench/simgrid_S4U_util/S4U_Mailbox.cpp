@@ -75,7 +75,6 @@ namespace wrench {
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 			void *data = nullptr;
 			try {
-//				simgrid::s4u::Comm &comm = simgrid::s4u::Comm::recv_async(mailbox, &data);
 				simgrid::s4u::CommPtr comm = simgrid::s4u::this_actor::irecv(mailbox, &data);
 				comm->wait(timeout);
 			} catch (xbt_ex &e) {
@@ -121,7 +120,6 @@ namespace wrench {
 
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       simgrid::s4u::CommPtr comm = simgrid::s4u::Comm::send_async(mailbox, msg, (int)msg->payload);
-//			simgrid::s4u::Comm &comm = simgrid::s4u::this_actor::isend(mailbox, msg, (int) msg->payload);
 
 			// Insert the communication into the dputs map, so that it's not lost
 			// and it can be "cleared" later

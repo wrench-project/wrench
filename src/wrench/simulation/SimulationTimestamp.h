@@ -51,7 +51,7 @@ namespace wrench {
          * @param content: a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          */
         SimulationTimestamp(T *content) {
-          // TODO: Make content a unique_ptr to make memory mamangement better
+          // TODO: Make content a unique_ptr to make memory management better
           this->content = content;
         }
 

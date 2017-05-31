@@ -20,6 +20,7 @@ namespace wrench {
     class WorkflowFile;
     class WorkflowTask;
     class StorageService;
+    class StandardJob;
 
     class WorkerThread : public S4U_DaemonWithMailbox {
 
@@ -33,10 +34,12 @@ namespace wrench {
 
         void kill();
 
-        void doWork(std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                   std::vector<WorkflowTask *> tasks,
-                   std::map<WorkflowFile*, StorageService*> file_locations,
-                   std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies);
+        void doWork(StandardJob *job,
+                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
+                    std::vector<WorkflowTask *> tasks,
+                    std::map<WorkflowFile*, StorageService*> file_locations,
+                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+                    std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
 
     private:
 

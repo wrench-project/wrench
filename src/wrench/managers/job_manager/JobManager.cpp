@@ -83,12 +83,13 @@ namespace wrench {
     StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
                                                std::map<WorkflowFile *, StorageService *> file_locations,
                                                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies) {
+                                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+                                               std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
       if (tasks.size() < 1) {
         throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
       }
 
-      StandardJob *raw_ptr = new StandardJob(tasks, file_locations, pre_file_copies, post_file_copies);
+      StandardJob *raw_ptr = new StandardJob(tasks, file_locations, pre_file_copies, post_file_copies, cleanup_file_deletions);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);
 
       this->jobs[job->getName()] = std::move(job);
@@ -112,7 +113,7 @@ namespace wrench {
         throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
       }
 
-      return this->createStandardJob(tasks, file_locations, {}, {});
+      return this->createStandardJob(tasks, file_locations, {}, {}, {});
     }
 
     /**
@@ -122,7 +123,7 @@ namespace wrench {
      *
      * @return a raw pointer to the StandardJob
      *
-     * @throw std::invalig_argument
+     * @throw std::invalid_argument
      */
     StandardJob *JobManager::createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, StorageService *> file_locations) {
 

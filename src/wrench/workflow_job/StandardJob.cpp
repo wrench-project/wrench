@@ -28,12 +28,16 @@ namespace wrench {
      * @param post_file_copies: a set of tuples that specify which file copy operations should be completed
      *                         after task executions end
      *
+     * @param cleanup_file_deletions: a set of tuples that specify which file copies should be removed from which
+     *                         storage service. This will happen regardless of whether the job succeeds or fails
+     *
      * @throw std::invalid_argument
      */
     StandardJob::StandardJob(std::vector<WorkflowTask *> tasks,
                              std::map<WorkflowFile *, StorageService *> file_locations,
                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies) {
+                             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+                             std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
 
       this->type = WorkflowJob::STANDARD;
       this->num_cores = 1;
@@ -56,6 +60,9 @@ namespace wrench {
       this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
 
       this->file_locations = file_locations;
+      this->pre_file_copies = pre_file_copies;
+      this->post_file_copies = post_file_copies;
+      this->cleanup_file_deletions = cleanup_file_deletions;
 
     };
 

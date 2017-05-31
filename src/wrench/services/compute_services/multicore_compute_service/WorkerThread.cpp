@@ -65,23 +65,27 @@ namespace wrench {
     }
 
     /**
-     * @brief Aysnchronously have the worker thread do some work
+     * @brief Asynchronously have the worker thread do some work
      *
+     * @param job: the standard workflow job on behalf of which the work is done
      * @param pre_file_copies: a set of file copy actions to perform first
      * @param tasks: a set of tasks to execute in sequence
      * @param file_locations: locations where tasks should read/write files
      * @param post_file_copies: a set of file copy actions to perform last
+     * @param cleanup_file_deletions: a set of file deletions to perform regardless of completion or failure
      *
      * @return
      */
-    void WorkerThread::doWork(std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
+    void WorkerThread::doWork(StandardJob *job,
+                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                               std::vector<WorkflowTask *> tasks,
                               std::map<WorkflowFile *, StorageService *> file_locations,
-                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies) {
+                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+                              std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
 
       // Send a "do work" message to the daemon's mailbox
       S4U_Mailbox::put(this->mailbox_name,
-                       new WorkerThreadDoWorkRequestMessage(pre_file_copies, tasks, file_locations, post_file_copies,
+                       new WorkerThreadDoWorkRequestMessage(job, pre_file_copies, tasks, file_locations, post_file_copies, cleanup_file_deletions,
                                                             0.0));
 
       return;
@@ -113,35 +117,62 @@ namespace wrench {
 
         } else if (WorkerThreadDoWorkRequestMessage *msg = dynamic_cast<WorkerThreadDoWorkRequestMessage *>(message.get())) {
 
+          SimulationMessage *msg_to_send_back = nullptr;
+          bool success;
+
           try {
             performWork(msg->pre_file_copies, msg->tasks, msg->file_locations, msg->post_file_copies);
-          } catch (WorkflowExecutionException &e) {
-            // Send the callback
-            WRENCH_INFO("Notifying mailbox %s that work has failed",
-                        this->callback_mailbox.c_str());
 
-            S4U_Mailbox::dput(this->callback_mailbox,
-                              new WorkerThreadWorkFailedMessage(
+            // build "success!" message
+            success = true;
+            msg_to_send_back = new WorkerThreadWorkDoneMessage(
+                    msg->job,
+                    this,
+                    msg->pre_file_copies,
+                    msg->tasks,
+                    msg->file_locations,
+                    msg->post_file_copies,
+                    msg->cleanup_file_deletions,
+                    0.0);
+
+          } catch (WorkflowExecutionException &e) {
+            // build "failed!" message
+            success = false;
+            msg_to_send_back = new WorkerThreadWorkFailedMessage(
+                                      msg->job,
                                       this,
                                       msg->pre_file_copies,
                                       msg->tasks,
                                       msg->file_locations,
                                       msg->post_file_copies,
+                                      msg->cleanup_file_deletions,
                                       e.getCause(),
-                                      0.0));
+                                      0.0);
           }
 
+          // Do the cleanup
+          for (auto cleanup : msg->cleanup_file_deletions) {
+            WorkflowFile *file = std::get<0>(cleanup);
+            StorageService *storage_service = std::get<1>(cleanup);
+            try {
+              storage_service->deleteFile(file);
+            } catch (WorkflowExecutionException &e) {
+              // Ignore exceptions since files may not be created, etc.. 
+            }
+          }
+
+
           // Send the callback
-          WRENCH_INFO("Notifying mailbox %s that work has completed",
-                      this->callback_mailbox.c_str());
-          S4U_Mailbox::dput(this->callback_mailbox,
-                            new WorkerThreadWorkDoneMessage(
-                                    this,
-                                    msg->pre_file_copies,
-                                    msg->tasks,
-                                    msg->file_locations,
-                                    msg->post_file_copies,
-                                    0.0));
+          if (success) {
+            WRENCH_INFO("Notifying mailbox %s that work has completed",
+                        this->callback_mailbox.c_str());
+          } else {
+            WRENCH_INFO("Notifying mailbox %s that work has failed",
+                        this->callback_mailbox.c_str());
+          }
+
+          S4U_Mailbox::dput(this->callback_mailbox, msg_to_send_back);
+
 
         } else {
           throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -171,8 +202,7 @@ namespace wrench {
       S4U_Simulation::sleep(this->start_up_overhead);
 
       /** Perform all pre file copies operations */
-      // TODO: This is sequential right now, but probably it should be
-      // TODO: concurrent in some fashion
+      // TODO: This is sequential right now, but probably it should be concurrent in some fashion
       for (auto file_copy : pre_file_copies) {
         WorkflowFile *file = std::get<0>(file_copy);
         StorageService *src = std::get<1>(file_copy);
@@ -214,8 +244,7 @@ namespace wrench {
       }
 
       /** Perform all post file copies operations */
-      // TODO: This is sequential right now, but probably it should be
-      // TODO: concurrent in some fashion
+      // TODO: This is sequential right now, but probably it should be concurrent in some fashion
       for (auto file_copy : post_file_copies) {
         WorkflowFile *file = std::get<0>(file_copy);
         StorageService *src = std::get<1>(file_copy);

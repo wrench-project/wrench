@@ -167,7 +167,8 @@ namespace wrench {
         void processWorkFailure(WorkerThread *worker_thread, std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                                 std::vector<WorkflowTask *> tasks,
                                 std::map<WorkflowFile *, StorageService *> file_locations,
-                                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies, WorkflowExecutionFailureCause *);
+                                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+                                WorkflowExecutionFailureCause *);
 
         void processPilotJobCompletion(PilotJob *job);
 

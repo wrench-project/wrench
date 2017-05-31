@@ -480,7 +480,7 @@ namespace wrench {
           }
         }
 
-        worker_thread->doWork({}, {to_run}, task_file_locations, {});
+        worker_thread->doWork(job, {}, {to_run}, task_file_locations, {}, {});
 
         // Put the task in the running task set
         this->running_tasks.insert(to_run);
@@ -738,9 +738,9 @@ namespace wrench {
         std::unique_ptr<WorkerThread> seq_executor =
                 std::unique_ptr<WorkerThread>(
                         new WorkerThread(S4U_Simulation::getHostName(), this->mailbox_name,
-                                                   this->default_storage_service,
-                                                   this->getPropertyValueAsDouble(
-                                                           MulticoreComputeServiceProperty::TASK_STARTUP_OVERHEAD)));
+                                         this->default_storage_service,
+                                         this->getPropertyValueAsDouble(
+                                                 MulticoreComputeServiceProperty::TASK_STARTUP_OVERHEAD)));
         this->worker_threads.push_back(std::move(seq_executor));
       }
 
@@ -766,38 +766,45 @@ namespace wrench {
                                                         std::map<WorkflowFile *, StorageService *> file_locations,
                                                         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies) {
 
-      // TODO: Make it work for the general case - Right now it mimics the old "Only a Task" behavior
-
-      WorkflowTask *task = tasks[0];
-
-
-      StandardJob *job = (StandardJob *) (task->getJob());
-      WRENCH_INFO("One of my worker threads completed task %s (and its state is: %s)", task->getId().c_str(),
-                  WorkflowTask::stateToString(task->getState()).c_str());
-
-
-      // Remove the task from the running task queue
-      this->running_tasks.erase(task);
-
-      // Put that core's executor back into the pull of idle cores
+      // Put the worker thread back into the pull of idle worker threads
       this->busy_worker_threads.erase(worker_thread);
       this->idle_worker_threads.insert(worker_thread);
 
-      // Increase the "completed tasks" count of the job
-      job->incrementNumCompletedTasks();
 
-      // Generate a SimulationTimestamp
-      this->simulation->output.addTimestamp<SimulationTimestampTaskCompletion>(
-              new SimulationTimestampTaskCompletion(task));
+      /** Process task completions **/
 
-      // Send the callback to the originator if necessary and remove the job from
-      // the list of pending jobs
-      if (job->getNumCompletedTasks() == job->getNumTasks()) {
-        this->running_jobs.erase(job);
-        S4U_Mailbox::dput(job->popCallbackMailbox(),
-                          new ComputeServiceStandardJobDoneMessage(job, this, this->getPropertyValueAsDouble(
-                                  MulticoreComputeServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+      for (auto task : tasks) {
+
+        StandardJob *job = (StandardJob *) (task->getJob());
+        WRENCH_INFO("One of my worker threads completed task %s (and its state is: %s)", task->getId().c_str(),
+                    WorkflowTask::stateToString(task->getState()).c_str());
+
+        // Remove the task from the running task queue
+        if (this->running_tasks.find(task) == this->running_tasks.end()) {
+          throw std::runtime_error(
+                  "MulticoreComputeService::processWorkCompletion(): just completed task should be in the running task queue");
+        }
+        this->running_tasks.erase(task);
+
+        // Increase the "completed tasks" count of the job
+        job->incrementNumCompletedTasks();
+
+        // Generate a SimulationTimestamp
+        this->simulation->output.addTimestamp<SimulationTimestampTaskCompletion>(
+                new SimulationTimestampTaskCompletion(task));
+
+        // Send the callback to the originator if necessary and remove the job from
+        // the list of pending jobs
+        if (job->getNumCompletedTasks() == job->getNumTasks()) {
+          this->running_jobs.erase(job);
+          S4U_Mailbox::dput(job->popCallbackMailbox(),
+                            new ComputeServiceStandardJobDoneMessage(job, this, this->getPropertyValueAsDouble(
+                                    MulticoreComputeServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+        }
       }
+
+      /** Do nothing for the pre_file_copies or post_file_copies **/
+      return;
     }
 
 
@@ -811,35 +818,37 @@ namespace wrench {
      * @param cause: the cause of the failure
      */
     void MulticoreComputeService::processWorkFailure(WorkerThread *worker_thread,
-                                                        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                                                        std::vector<WorkflowTask *> tasks,
-                                                        std::map<WorkflowFile *, StorageService *> file_locations,
-                                                        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-                                                    WorkflowExecutionFailureCause *cause) {
+                                                     std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
+                                                     std::vector<WorkflowTask *> tasks,
+                                                     std::map<WorkflowFile *, StorageService *> file_locations,
+                                                     std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+                                                     WorkflowExecutionFailureCause *cause) {
+
+        // Put that worker thread back into the pull of idle worker threads
+        this->busy_worker_threads.erase(worker_thread);
+        this->idle_worker_threads.insert(worker_thread);
 
       // TODO: Make it work for the general case - Right now it mimics the old "Only a Task" behavior
 
-      WorkflowTask *task = tasks[0];
 
-      // Put that core's executor back into the pull of idle cores
-      this->busy_worker_threads.erase(worker_thread);
-      this->idle_worker_threads.insert(worker_thread);
+        WorkflowTask *task = tasks[0];
 
-      // Get the job for the task
-      StandardJob *job = (StandardJob *) (task->getJob());
-      WRENCH_INFO("One of my cores has failed to run task %s: %s", task->getId().c_str(), cause->toString().c_str());
 
-      // Remove the job from the list of running jobs
-      this->running_jobs.erase(job);
+        // Get the job for the task
+        StandardJob *job = (StandardJob * )(task->getJob());
+        WRENCH_INFO("One of my cores has failed to run task %s: %s", task->getId().c_str(), cause->toString().c_str());
 
-      // Fail the job
-      this->failStandardJob(job, cause);
+        // Remove the job from the list of running jobs
+        this->running_jobs.erase(job);
+
+        // Fail the job
+        this->failStandardJob(job, cause);
 
     }
 
-/**
- * @brief Terminate the daemon, dealing with pending/running jobs
- */
+    /**
+     * @brief Terminate the daemon, dealing with pending/running jobs
+     */
     void MulticoreComputeService::terminate() {
 
       this->setStateToDown();

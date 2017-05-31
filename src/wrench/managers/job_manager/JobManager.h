@@ -51,7 +51,8 @@ namespace wrench {
 				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
 				                               std::map<WorkflowFile *, StorageService *> file_locations,
 				                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-				                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies);
+				                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+				                               std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
 
 				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
 				                               std::map<WorkflowFile *,
