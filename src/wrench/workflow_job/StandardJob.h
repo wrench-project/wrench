@@ -59,17 +59,10 @@ namespace wrench {
 
         State state;
 
-        // Pre- file copies
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
-
         // Tasks to run
         std::vector<WorkflowTask *> tasks;
         unsigned long num_completed_tasks;
         std::map<WorkflowFile *, StorageService *> file_locations;
-
-        // Post- file copies
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
-
 
     };
 

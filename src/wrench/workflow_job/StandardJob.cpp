@@ -17,7 +17,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param tasks: the tasks in the job
+     * @param tasks: the tasks in the job, which should all be independent and in the READY state
      * @param file_locations: a map that specifies on which storage service input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
@@ -56,8 +56,6 @@ namespace wrench {
       this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
 
       this->file_locations = file_locations;
-      this->pre_file_copies = pre_file_copies;
-      this->post_file_copies = post_file_copies;
 
     };
 

@@ -81,19 +81,19 @@ int main(int argc, char **argv) {
 
     std::cerr << "Instantiating a MultiCore Job executor on " << executor_host << "..." << std::endl;
     simulation.add(
-            std::unique_ptr<wrench::MulticoreJobExecutor>(
-                    new wrench::MulticoreJobExecutor(executor_host, true, false,
+            std::unique_ptr<wrench::MulticoreComputeService>(
+                    new wrench::MulticoreComputeService(executor_host, true, false,
                                                      storage_service,
-                                                     {{wrench::MulticoreJobExecutorProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+                                                     {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << executor_host << "..." << std::endl;
-//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(executor_host, true, false, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+//		simulation.add(std::unique_ptr<wrench::MulticoreComputeService>(new wrench::MulticoreComputeService(executor_host, true, false, {{wrench::MulticoreComputeService::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << exexutor_host << "..." << std::endl;
-//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(executor_host, false, true, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+//		simulation.add(std::unique_ptr<wrench::MulticoreComputeService>(new wrench::MulticoreComputeService(executor_host, false, true, {{wrench::MulticoreComputeService::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << exexutor_host << "..." << std::endl;
-//		simulation.add(std::unique_ptr<wrench::MulticoreJobExecutor>(new wrench::MulticoreJobExecutor(executor_host, true, true, {{wrench::MulticoreJobExecutor::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+//		simulation.add(std::unique_ptr<wrench::MulticoreComputeService>(new wrench::MulticoreComputeService(executor_host, true, true, {{wrench::MulticoreComputeService::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
   } catch (std::invalid_argument e) {
 
