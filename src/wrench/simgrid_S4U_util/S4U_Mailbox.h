@@ -16,7 +16,7 @@
 #include <map>
 #include <set>
 
-#include <simgrid/s4u/Actor.hpp>
+#include <simgrid/s4u.hpp>
 
 namespace wrench {
 
@@ -43,7 +43,7 @@ namespace wrench {
 
 
 		private:
-				static std::map<simgrid::s4u::ActorPtr , std::set<simgrid::s4u::Comm*>> dputs;
+				static std::map<simgrid::s4u::ActorPtr , std::set<simgrid::s4u::CommPtr>> dputs;
 
 		};
 
