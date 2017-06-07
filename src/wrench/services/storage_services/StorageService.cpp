@@ -49,7 +49,7 @@ namespace wrench {
       this->stored_files.insert(file);
       this->occupied_space += file->getSize();
       WRENCH_INFO("Stored file %s (storage usage: %.10lf%%)", file->getId().c_str(),
-               100.0 * this->occupied_space / this->capacity);
+                  100.0 * this->occupied_space / this->capacity);
     }
 
     /**
@@ -110,7 +110,7 @@ namespace wrench {
 
       // Wait to the message back
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
-      if (StorageServiceFreeSpaceAnswerMessage *msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage*>(message.get())) {
+      if (StorageServiceFreeSpaceAnswerMessage *msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage *>(message.get())) {
         return msg->free_space;
       } else {
         throw std::runtime_error("StorageService::howMuchFreeSpace(): unexpected [" + msg->getName() + "] message");
@@ -147,7 +147,7 @@ namespace wrench {
 
       // Wait to the message back
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
-      if (StorageServiceFileLookupAnswerMessage *msg = dynamic_cast<StorageServiceFileLookupAnswerMessage*>(message.get())) {
+      if (StorageServiceFileLookupAnswerMessage *msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
         return msg->file_is_available;
       } else {
         throw std::runtime_error("StorageService::lookupFile(): unexpected [" + msg->getName() + "] message");
@@ -178,13 +178,13 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
       S4U_Mailbox::put(this->mailbox_name,
                        new StorageServiceFileReadRequestMessage(answer_mailbox,
-                                                      file,
-                                                      this->getPropertyValueAsDouble(
-                                                              StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+                                                                file,
+                                                                this->getPropertyValueAsDouble(
+                                                                        StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
 
       // Wait for the answer
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
-      if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage*>(message.get())) {
+      if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
         // If it's not a success, throw an exception
         if (!msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -192,16 +192,16 @@ namespace wrench {
 
         // Otherwise, get the file
         std::unique_ptr<SimulationMessage> file_content_message = S4U_Mailbox::get(answer_mailbox);
-        if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage*>(file_content_message.get())) {
+        if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
           // do nothing
         } else {
-          throw std::runtime_error("StorageService::readFile(): Received an unexpected ["+
-                                   file_content_message->getName() +"] message!");
+          throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                   file_content_message->getName() + "] message!");
         }
 
       } else {
-        throw std::runtime_error("StorageService::readFile(): Received an unexpected ["+
-                                 message->getName() +"] message!");
+        throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
+                                 message->getName() + "] message!");
       }
 
     }
@@ -229,14 +229,14 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
       S4U_Mailbox::put(this->mailbox_name,
                        new StorageServiceFileWriteRequestMessage(answer_mailbox,
-                                                      file,
-                                                      this->getPropertyValueAsDouble(
-                                                              StorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+                                                                 file,
+                                                                 this->getPropertyValueAsDouble(
+                                                                         StorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
 
       // Wait for the answer
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
 
-      if (StorageServiceFileWriteAnswerMessage *msg = dynamic_cast<StorageServiceFileWriteAnswerMessage*>(message.get())) {
+      if (StorageServiceFileWriteAnswerMessage *msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
         // If not a success, throw an exception
         if (!msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -246,8 +246,8 @@ namespace wrench {
         S4U_Mailbox::put(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
 
       } else {
-        throw std::runtime_error("StorageService::writeFile(): Received an unexpected ["+
-                                 message->getName() +"] message!");
+        throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
+                                 message->getName() + "] message!");
       }
 
       return;
@@ -264,8 +264,8 @@ namespace wrench {
     * @throw WorkflowExecutionException
     */
     void StorageService::readFiles(std::set<WorkflowFile *> files,
-                                       std::map<WorkflowFile *, StorageService *> file_locations,
-                                       StorageService *default_storage_service) {
+                                   std::map<WorkflowFile *, StorageService *> file_locations,
+                                   StorageService *default_storage_service) {
       try {
         StorageService::writeOrReadFiles(READ, files, file_locations, default_storage_service);
       } catch (std::runtime_error &e) {
@@ -286,8 +286,8 @@ namespace wrench {
    * @throw WorkflowExecutionException
    */
     void StorageService::writeFiles(std::set<WorkflowFile *> files,
-                                     std::map<WorkflowFile *, StorageService *> file_locations,
-                                     StorageService *default_storage_service) {
+                                    std::map<WorkflowFile *, StorageService *> file_locations,
+                                    StorageService *default_storage_service) {
       try {
         StorageService::writeOrReadFiles(WRITE, files, file_locations, default_storage_service);
       } catch (std::runtime_error &e) {
@@ -311,9 +311,9 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void StorageService::writeOrReadFiles(Action action,
-                                               std::set<WorkflowFile *> files,
-                                               std::map<WorkflowFile *, StorageService *> file_locations,
-                                               StorageService *default_storage_service) {
+                                          std::set<WorkflowFile *> files,
+                                          std::map<WorkflowFile *, StorageService *> file_locations,
+                                          StorageService *default_storage_service) {
 
       for (auto f : files) {
 
@@ -377,7 +377,7 @@ namespace wrench {
       // Wait to the message back
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
 
-      if (StorageServiceFileDeleteAnswerMessage *msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage*>(message.get())) {
+      if (StorageServiceFileDeleteAnswerMessage *msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage *>(message.get())) {
         // On failure, throw an exception
         if (!msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -451,7 +451,7 @@ namespace wrench {
 
       // Wait to the message back
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
-      if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage*>(message.get())) {
+      if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (msg->failure_cause) {
           throw WorkflowExecutionException(msg->failure_cause);
         }

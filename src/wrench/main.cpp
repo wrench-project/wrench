@@ -70,7 +70,8 @@ int main(int argc, char **argv) {
 
   std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
 
-  wrench::StorageService *storage_service =simulation.add(std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 10000000000000.0)));
+  wrench::StorageService *storage_service = simulation.add(std::unique_ptr<wrench::SimpleStorageService>(
+          new wrench::SimpleStorageService(storage_host, 10000000000000.0)));
 //  wrench::StorageService *storage_service =simulation.add(std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 10.0)));
 
   std::string wms_host = hostname_list[0];
@@ -83,8 +84,8 @@ int main(int argc, char **argv) {
     simulation.add(
             std::unique_ptr<wrench::MulticoreComputeService>(
                     new wrench::MulticoreComputeService(executor_host, true, false,
-                                                     storage_service,
-                                                     {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+                                                        storage_service,
+                                                        {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << executor_host << "..." << std::endl;
 //		simulation.add(std::unique_ptr<wrench::MulticoreComputeService>(new wrench::MulticoreComputeService(executor_host, true, false, {{wrench::MulticoreComputeService::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
@@ -95,7 +96,7 @@ int main(int argc, char **argv) {
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << exexutor_host << "..." << std::endl;
 //		simulation.add(std::unique_ptr<wrench::MulticoreComputeService>(new wrench::MulticoreComputeService(executor_host, true, true, {{wrench::MulticoreComputeService::Property::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
-  } catch (std::invalid_argument e) {
+  } catch (std::invalid_argument &e) {
 
     std::cerr << "Error: " << e.what() << std::endl;
     std::exit(1);
@@ -127,7 +128,7 @@ int main(int argc, char **argv) {
   std::set<wrench::WorkflowFile *> input_files = workflow.getInputFiles();
   try {
     simulation.stageFiles(input_files, storage_service);
-  } catch (std::runtime_error e) {
+  } catch (std::runtime_error &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
     return 0;
   }
@@ -135,7 +136,7 @@ int main(int argc, char **argv) {
   std::cerr << "Launching the Simulation..." << std::endl;
   try {
     simulation.launch();
-  } catch (std::runtime_error e) {
+  } catch (std::runtime_error &e) {
     std::cerr << "Exception: " << e.what() << std::endl;
     return 0;
   }

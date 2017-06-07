@@ -16,8 +16,6 @@ namespace wrench {
             ComputeServiceMessage("ComputeServiceMessage::" + name, payload) {
     }
 
-
-
     /**
      * @brief Constructor
      * @param job: pointer to a WorkflowJob
@@ -26,16 +24,15 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MulticoreComputeServiceNotEnoughCoresMessage::MulticoreComputeServiceNotEnoughCoresMessage(WorkflowJob *job, ComputeService *cs, double payload)
-            : MulticoreComputeServiceMessage("NOT_ENOUGH_CORES", payload) {
+    MulticoreComputeServiceNotEnoughCoresMessage::MulticoreComputeServiceNotEnoughCoresMessage(WorkflowJob *job,
+                                                                                               ComputeService *cs,
+                                                                                               double payload)
+            : compute_service(cs), MulticoreComputeServiceMessage("NOT_ENOUGH_CORES", payload) {
       if (job == nullptr) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
       this->job = job;
-      this->compute_service = cs;
     }
-
-
 
     /**
     * @brief Constructor
@@ -44,10 +41,11 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    MulticoreComputeServiceNumCoresRequestMessage::MulticoreComputeServiceNumCoresRequestMessage(std::string answer_mailbox, double payload) : MulticoreComputeServiceMessage(
+    MulticoreComputeServiceNumCoresRequestMessage::MulticoreComputeServiceNumCoresRequestMessage(
+            std::string answer_mailbox, double payload) : MulticoreComputeServiceMessage(
             "NUM_CORES_REQUEST",
             payload) {
-      if ((answer_mailbox == "")) {
+      if (answer_mailbox == "") {
         throw std::invalid_argument("Invalid constructor arguments");
       }
       this->answer_mailbox = answer_mailbox;
@@ -60,11 +58,9 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MulticoreComputeServiceNumCoresAnswerMessage::MulticoreComputeServiceNumCoresAnswerMessage(unsigned int num, double payload) : MulticoreComputeServiceMessage(
-            "NUM_CORES_ANSWER", payload) {
-
-      this->num_cores = num;
-    }
+    MulticoreComputeServiceNumCoresAnswerMessage::MulticoreComputeServiceNumCoresAnswerMessage(unsigned int num,
+                                                                                               double payload)
+            : num_cores(num), MulticoreComputeServiceMessage("NUM_CORES_ANSWER", payload) {}
 
     /**
      * @brief Constructor
@@ -73,10 +69,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MulticoreComputeServiceNumIdleCoresRequestMessage::MulticoreComputeServiceNumIdleCoresRequestMessage(std::string answer_mailbox, double payload)
-            : MulticoreComputeServiceMessage("NUM_IDLE_CORES_REQUEST",
-                                             payload) {
-      if ((answer_mailbox == "")) {
+    MulticoreComputeServiceNumIdleCoresRequestMessage::MulticoreComputeServiceNumIdleCoresRequestMessage(
+            std::string answer_mailbox, double payload)
+            : MulticoreComputeServiceMessage("NUM_IDLE_CORES_REQUEST", payload) {
+      if (answer_mailbox == "") {
         throw std::invalid_argument("Invalid constructor arguments");
       }
       this->answer_mailbox = answer_mailbox;
@@ -89,11 +85,9 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MulticoreComputeServiceNumIdleCoresAnswerMessage::MulticoreComputeServiceNumIdleCoresAnswerMessage(unsigned int num, double payload) : MulticoreComputeServiceMessage(
-            "NUM_IDLE_CORES_ANSWER", payload) {
-
-      this->num_idle_cores = num;
-    }
+    MulticoreComputeServiceNumIdleCoresAnswerMessage::MulticoreComputeServiceNumIdleCoresAnswerMessage(unsigned int num,
+                                                                                                       double payload)
+            : num_idle_cores(num), MulticoreComputeServiceMessage("NUM_IDLE_CORES_ANSWER", payload) {}
 
     /**
      * @brief Constructor
@@ -102,9 +96,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MulticoreComputeServiceTTLRequestMessage::MulticoreComputeServiceTTLRequestMessage(std::string answer_mailbox, double payload) : MulticoreComputeServiceMessage("TTL_REQUEST",
-                                                                                                                                                                    payload) {
-      if ((answer_mailbox == "")) {
+    MulticoreComputeServiceTTLRequestMessage::MulticoreComputeServiceTTLRequestMessage(std::string answer_mailbox,
+                                                                                       double payload)
+            : MulticoreComputeServiceMessage("TTL_REQUEST", payload) {
+      if (answer_mailbox == "") {
         throw std::invalid_argument("Invalid constructor arguments");
       }
       this->answer_mailbox = answer_mailbox;
@@ -117,10 +112,8 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MulticoreComputeServiceTTLAnswerMessage::MulticoreComputeServiceTTLAnswerMessage(double ttl, double payload) : MulticoreComputeServiceMessage("TTL_ANSWER", payload) {
-
-      this->ttl = ttl;
-    }
+    MulticoreComputeServiceTTLAnswerMessage::MulticoreComputeServiceTTLAnswerMessage(double ttl, double payload)
+            : ttl(ttl), MulticoreComputeServiceMessage("TTL_ANSWER", payload) {}
 
     /**
     * @brief Constructor
@@ -129,9 +122,10 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    MulticoreComputeServiceFlopRateRequestMessage::MulticoreComputeServiceFlopRateRequestMessage(std::string answer_mailbox, double payload) : MulticoreComputeServiceMessage(
+    MulticoreComputeServiceFlopRateRequestMessage::MulticoreComputeServiceFlopRateRequestMessage(
+            std::string answer_mailbox, double payload) : MulticoreComputeServiceMessage(
             "FLOP_RATE_REQUEST", payload) {
-      if ((answer_mailbox == "")) {
+      if (answer_mailbox == "") {
         throw std::invalid_argument("Invalid constructor arguments");
       }
       this->answer_mailbox = answer_mailbox;
@@ -144,8 +138,9 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MulticoreComputeServiceFlopRateAnswerMessage::MulticoreComputeServiceFlopRateAnswerMessage(double flop_rate, double payload) : MulticoreComputeServiceMessage("FLOP_RATE_ANSWER",
-                                                                                                                                                                  payload) {
+    MulticoreComputeServiceFlopRateAnswerMessage::MulticoreComputeServiceFlopRateAnswerMessage(double flop_rate,
+                                                                                               double payload)
+            : MulticoreComputeServiceMessage("FLOP_RATE_ANSWER", payload) {
       if ((flop_rate < 0.0)) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
@@ -171,15 +166,11 @@ namespace wrench {
             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
             std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions,
             double payload) :
+            job(job), pre_file_copies(pre_file_copies), tasks(tasks), file_locations(file_locations),
+            post_file_copies(post_file_copies), cleanup_file_deletions(cleanup_file_deletions),
+
             MulticoreComputeServiceMessage("WORKER_THREAD_DO_WORK_REQUEST",
-                                           payload) {
-      this->job = job;
-      this->pre_file_copies = pre_file_copies;
-      this->tasks = tasks;
-      this->file_locations = file_locations;
-      this->post_file_copies = post_file_copies;
-      this->cleanup_file_deletions = cleanup_file_deletions;
-    }
+                                           payload) {}
 
 
     /**
@@ -201,17 +192,10 @@ namespace wrench {
             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
             std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions,
             double payload) :
-    MulticoreComputeServiceMessage("WORKER_THREAD_WORK_DONE", payload) {
-      this->job = job;
-      this->worker_thread = worker_thread;
-      this->pre_file_copies = pre_file_copies;
-      this->tasks = tasks;
-      this->file_locations = file_locations;
-      this->post_file_copies = post_file_copies;
-      this->cleanup_file_deletions = cleanup_file_deletions;
-
-
-    }
+            job(job), worker_thread(worker_thread), pre_file_copies(pre_file_copies), tasks(tasks),
+            file_locations(file_locations), post_file_copies(post_file_copies),
+            cleanup_file_deletions(cleanup_file_deletions),
+            MulticoreComputeServiceMessage("WORKER_THREAD_WORK_DONE", payload) {}
 
     /**
      * @brief Constructor
@@ -233,17 +217,10 @@ namespace wrench {
             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
             std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions,
             WorkflowExecutionFailureCause *cause,
-            double payload):
-    MulticoreComputeServiceMessage("WORKER_THREAD_WORK_FAILED", payload) {
-      this->job = job;
-      this->worker_thread = worker_thread;
-      this->pre_file_copies = pre_file_copies;
-      this->tasks = tasks;
-      this->file_locations = file_locations;
-      this->post_file_copies = post_file_copies;
-      this->cleanup_file_deletions = cleanup_file_deletions;
+            double payload) :
+            job(job), worker_thread(worker_thread), pre_file_copies(pre_file_copies), tasks(tasks),
+            file_locations(file_locations), post_file_copies(post_file_copies),
+            cleanup_file_deletions(cleanup_file_deletions), cause(cause),
+            MulticoreComputeServiceMessage("WORKER_THREAD_WORK_FAILED", payload) {}
 
-      this->cause = cause;
-
-    }
 };

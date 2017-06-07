@@ -18,7 +18,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple St
 
 namespace wrench {
 
-
     /**
      * @brief Public constructor
      * @param hostname: the name of the host on which to start the service
@@ -28,10 +27,7 @@ namespace wrench {
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                double capacity,
                                                std::map<std::string, std::string> plist) :
-            SimpleStorageService(hostname, capacity, plist, "") {
-
-    }
-
+            SimpleStorageService(hostname, capacity, plist, "") {}
 
     /**
      * @brief Private constructor
@@ -45,9 +41,8 @@ namespace wrench {
             double capacity,
             std::map<std::string, std::string> plist,
             std::string suffix) :
+            capacity(capacity),
             StorageService("simple_storage_service" + suffix, "simple_storage_service" + suffix, capacity) {
-
-      this->capacity = capacity;
 
       // Set default properties
       for (auto p : this->default_property_values) {
@@ -60,17 +55,16 @@ namespace wrench {
       }
 
       // Set the name of the data mailbox
-      this->data_write_mailbox_name = S4U_Mailbox::generateUniqueMailboxName("simple_storage_service" + suffix + "_data_");
-
+      this->data_write_mailbox_name = S4U_Mailbox::generateUniqueMailboxName(
+              "simple_storage_service" + suffix + "_data_");
 
       // Start the daemon on the same host
       try {
         this->start(hostname);
-      } catch (std::invalid_argument e) {
+      } catch (std::invalid_argument &e) {
         throw e;
       }
     }
-
 
     /**
      * @brief Main method of the daemon
@@ -85,19 +79,16 @@ namespace wrench {
 
       /** Main loop **/
       while (this->processNextMessage()) {
-
         // Clear pending asynchronous puts that are done
         S4U_Mailbox::clear_dputs();
 
         // Clear pending asynchronous puts that are done
         S4U_Mailbox::clear_dputs();
-
       }
 
       WRENCH_INFO("Simple Storage Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
-
 
     /**
      * @brief Helper function to process incoming messages
@@ -111,13 +102,13 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage*>(message.get())) {
+      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         S4U_Mailbox::put(msg->ack_mailbox,
                          new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                  SimpleStorageServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         return false;
 
-      } else if (StorageServiceFreeSpaceRequestMessage *msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage*>(message.get())) {
+      } else if (StorageServiceFreeSpaceRequestMessage *msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message.get())) {
         double free_space = this->capacity - this->occupied_space;
 
         S4U_Mailbox::put(msg->answer_mailbox,
@@ -125,7 +116,7 @@ namespace wrench {
                                  SimpleStorageServiceProperty::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
         return true;
 
-      } else if (StorageServiceFileDeleteRequestMessage *msg = dynamic_cast<StorageServiceFileDeleteRequestMessage*>(message.get())) {
+      } else if (StorageServiceFileDeleteRequestMessage *msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
 
         bool success = true;
         WorkflowExecutionFailureCause *failure_cause = nullptr;
@@ -138,56 +129,59 @@ namespace wrench {
 
         S4U_Mailbox::put(msg->answer_mailbox,
                          new StorageServiceFileDeleteAnswerMessage(msg->file,
-                                                     this,
-                                                     success,
-                                                     failure_cause,
-                                                     this->getPropertyValueAsDouble(
-                                                             SimpleStorageServiceProperty::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
+                                                                   this,
+                                                                   success,
+                                                                   failure_cause,
+                                                                   this->getPropertyValueAsDouble(
+                                                                           SimpleStorageServiceProperty::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
 
         return true;
 
-      } else if (StorageServiceFileLookupRequestMessage *msg = dynamic_cast<StorageServiceFileLookupRequestMessage*>(message.get())) {
+      } else if (StorageServiceFileLookupRequestMessage *msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
 
         bool file_found = (this->stored_files.find(msg->file) != this->stored_files.end());
         S4U_Mailbox::put(msg->answer_mailbox,
-                         new StorageServiceFileLookupAnswerMessage(msg->file, file_found, this->getPropertyValueAsDouble(
-                                 SimpleStorageServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                         new StorageServiceFileLookupAnswerMessage(msg->file, file_found,
+                                                                   this->getPropertyValueAsDouble(
+                                                                           SimpleStorageServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
 
         return true;
 
-      } else if (StorageServiceFileWriteRequestMessage *msg = dynamic_cast<StorageServiceFileWriteRequestMessage*>(message.get())) {
+      } else if (StorageServiceFileWriteRequestMessage *msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
 
         if (msg->file->getSize() > (this->capacity - this->occupied_space)) {
-          std::cerr << " NO SPACE " << msg->file->getSize() << " " << this->capacity << " " << this->occupied_space << std::endl;
+          std::cerr << " NO SPACE " << msg->file->getSize() << " " << this->capacity << " " << this->occupied_space
+                    << std::endl;
           S4U_Mailbox::put(msg->answer_mailbox,
                            new StorageServiceFileWriteAnswerMessage(msg->file,
-                                                       this,
-                                                       false,
-                                                       new StorageServiceFull(msg->file, this),
-                                                       "",
-                                                       this->getPropertyValueAsDouble(
-                                                               SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+                                                                    this,
+                                                                    false,
+                                                                    new StorageServiceFull(msg->file, this),
+                                                                    "",
+                                                                    this->getPropertyValueAsDouble(
+                                                                            SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
         } else {
           this->occupied_space += msg->file->getSize();
           S4U_Mailbox::put(msg->answer_mailbox,
                            new StorageServiceFileWriteAnswerMessage(msg->file,
-                                                       this,
-                                                       true,
-                                                       nullptr,
-                                                       this->data_write_mailbox_name,
-                                                       this->getPropertyValueAsDouble(
-                                                               SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+                                                                    this,
+                                                                    true,
+                                                                    nullptr,
+                                                                    this->data_write_mailbox_name,
+                                                                    this->getPropertyValueAsDouble(
+                                                                            SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
           // TODO: THIS REALLY CANNOT BE SYNCHRONOUS, BUT UNTIL WAIT_FOR_ANY WORKS IT WILL HAVE TO DO
           std::unique_ptr<SimulationMessage> file_content_message = S4U_Mailbox::get(this->data_write_mailbox_name);
-          if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage*>(file_content_message.get())) {
+          if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
             this->addFileToStorage(file_content_msg->file);
           } else {
-            throw std::runtime_error("Unexpected [ "+ msg->getName() + "] message");
+            throw std::runtime_error("Unexpected [ " + msg->getName() + "] message");
           }
         }
         return true;
-      } else if (StorageServiceFileReadRequestMessage * msg= dynamic_cast<StorageServiceFileReadRequestMessage*>(message.get())) {
+
+      } else if (StorageServiceFileReadRequestMessage *msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
         // Figure out whether this succeeds or not
         bool success = true;
         WorkflowExecutionFailureCause *failure_cause = nullptr;
@@ -199,23 +193,25 @@ namespace wrench {
         // Send back the corresponding ack
         S4U_Mailbox::put(msg->answer_mailbox,
                          new StorageServiceFileReadAnswerMessage(msg->file, this, success, failure_cause,
-                                                       this->getPropertyValueAsDouble(
-                                                               SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
+                                                                 this->getPropertyValueAsDouble(
+                                                                         SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
 
         // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
         if (success) {
           S4U_Mailbox::dput(msg->answer_mailbox, new StorageServiceFileContentMessage(msg->file));
         }
-
         return true;
-      } else if (StorageServiceFileCopyRequestMessage *msg = dynamic_cast<StorageServiceFileCopyRequestMessage*>(message.get())) {
+
+      } else if (StorageServiceFileCopyRequestMessage *msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
 
 
         // Figure out whether this succeeds or not
         if (msg->file->getSize() > this->capacity - this->occupied_space) {
           S4U_Mailbox::put(msg->answer_mailbox,
-                           new StorageServiceFileCopyAnswerMessage(msg->file, this, false, new StorageServiceFull(msg->file, this),
-                                                     this->getPropertyValueAsDouble(SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+                           new StorageServiceFileCopyAnswerMessage(msg->file, this, false,
+                                                                   new StorageServiceFull(msg->file, this),
+                                                                   this->getPropertyValueAsDouble(
+                                                                           SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         }
 
         // Get the file from the source
@@ -225,20 +221,21 @@ namespace wrench {
         } catch (WorkflowExecutionException &e) {
           S4U_Mailbox::put(msg->answer_mailbox,
                            new StorageServiceFileCopyAnswerMessage(msg->file, this, false, e.getCause(),
-                                                     this->getPropertyValueAsDouble(SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+                                                                   this->getPropertyValueAsDouble(
+                                                                           SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         }
-
 
         // Send back the corresponding ack
         S4U_Mailbox::put(msg->answer_mailbox,
                          new StorageServiceFileReadAnswerMessage(msg->file, this, true, nullptr,
-                                                       this->getPropertyValueAsDouble(
-                                                               SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+                                                                 this->getPropertyValueAsDouble(
+                                                                         SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
 
         return true;
-      } else  {
+
+      } else {
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");
       }
-
     }
+
 };

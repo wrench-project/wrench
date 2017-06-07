@@ -94,12 +94,11 @@ namespace wrench {
 
       // Wait for the ack
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
-      if (ServiceDaemonStoppedMessage *msg = dynamic_cast<ServiceDaemonStoppedMessage*>(message.get())) {
+      if (ServiceDaemonStoppedMessage *msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
         this->state = Service::DOWN;
-      } else  {
+      } else {
         throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
       }
-
     }
 
     /**
@@ -132,5 +131,4 @@ namespace wrench {
     void Service::setSimulation(Simulation *simulation) {
       this->simulation = simulation;
     }
-
 };
