@@ -11,7 +11,7 @@
 #define WRENCH_SIMULATIONTIMESTAMP_H
 
 
-#include "SimulationTimestampTypes.h"
+#include "simulation/SimulationTimestampTypes.h"
 
 namespace wrench {
 
@@ -20,7 +20,8 @@ namespace wrench {
      *
      * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
      */
-    template <class T> class SimulationTimestamp {
+    template<class T>
+    class SimulationTimestamp {
 
     public:
 
@@ -65,12 +66,6 @@ namespace wrench {
 
     };
 
-
-
-
-
-
 };
-
 
 #endif //WRENCH_SIMULATIONTIMESTAMP_H

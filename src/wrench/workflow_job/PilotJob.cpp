@@ -7,51 +7,44 @@
  * (at your option) any later version.
  */
 
-#include "PilotJob.h"
+#include "workflow_job/PilotJob.h"
 
 namespace wrench {
 
-		/**
-		 * @brief Constructor
-		 * @param workflow: a pointer to a Workflow object
-		 * @param num_cores: the number of cores required by the pilot job
-		 * @param duration: duration of the pilot job, in seconds
-		 */
-		PilotJob::PilotJob(Workflow *workflow, unsigned long num_cores, double duration) {
-			this->type = WorkflowJob::PILOT;
+    /**
+     * @brief Constructor
+     * @param workflow: a pointer to a Workflow object
+     * @param num_cores: the number of cores required by the pilot job
+     * @param duration: duration of the pilot job, in seconds
+     */
+    PilotJob::PilotJob(Workflow *workflow, unsigned long num_cores, double duration) :
+            type(WorkflowJob::PILOT), state(PilotJob::State::NOT_SUBMITTED), compute_service(nullptr),
+            workflow(workflow), num_cores(num_cores), duration(duration) {
+      this->name = "pilot_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
+    }
 
-			this->state = PilotJob::State::NOT_SUBMITTED;
-			this->compute_service = nullptr;
-			this->workflow = workflow;
-			this->num_cores = num_cores;
-			this->duration = duration;
-			this->name = "pilot_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
+    /**
+     * @brief Get the state of the pilot job
+     * @return the state
+     */
+    PilotJob::State PilotJob::getState() {
+      return this->state;
+    }
 
-		}
+    /**
+     * @brief Get the compute service on which the pilot job is running
+     * @return a pointer to a ComputeService object
+     */
+    ComputeService *PilotJob::getComputeService() {
+      return this->compute_service;
+    }
 
-		/**
-		 * @brief Get the state of the pilot job
-		 * @return the state
-		 */
-		PilotJob::State PilotJob::getState() {
-			return this->state;
-		}
-
-		/**
-		 * @brief Get the compute service on which the pilot job is running
-		 * @return a pointer to a ComputeService object
-		 */
-		ComputeService *PilotJob::getComputeService() {
-			return this->compute_service;
-		}
-
-
-		/**
-		 * @brief Set the compute service on which the pilot job is running
-		 * @param cs: a pointer to a ComputeService object
-		 */
-		void PilotJob::setComputeService(ComputeService* cs) {
-			this->compute_service = cs;
-		}
+    /**
+     * @brief Set the compute service on which the pilot job is running
+     * @param cs: a pointer to a ComputeService object
+     */
+    void PilotJob::setComputeService(ComputeService *cs) {
+      this->compute_service = cs;
+    }
 
 };

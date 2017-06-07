@@ -8,22 +8,19 @@
  */
 
 #include "MulticoreComputeService.h"
-
-#include <simulation/Simulation.h>
-#include <workflow_job/StandardJob.h>
-#include <logging/TerminalOutput.h>
-#include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <simulation/SimulationMessage.h>
-#include <services/storage_services/StorageService.h>
-#include <services/ServiceMessage.h>
-#include <services/compute_services/ComputeServiceMessage.h>
 #include "exceptions/WorkflowExecutionException.h"
+#include "logging/TerminalOutput.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "simulation/Simulation.h"
+#include "simulation/SimulationMessage.h"
+#include "services/compute_services/ComputeServiceMessage.h"
+#include "services/storage_services/StorageService.h"
+#include "services/ServiceMessage.h"
 #include "workflow_job/PilotJob.h"
+#include "workflow_job/StandardJob.h"
 #include "MulticoreComputeServiceMessage.h"
 
-
 XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_job_executor, "Log category for Multicore Job Executor");
-
 
 namespace wrench {
 
@@ -54,7 +51,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
       if (ComputeServiceSubmitStandardJobAnswerMessage *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
-        if (!msg->success) {
+        if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
         }
       } else {
@@ -92,7 +89,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
       if (ComputeServiceSubmitPilotJobAnswerMessage *msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
-        if (!msg->success) {
+        if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
         }
 
@@ -101,7 +98,6 @@ namespace wrench {
                 "MulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
-
     };
 
     /**
@@ -133,7 +129,6 @@ namespace wrench {
         throw std::runtime_error(
                 "MulticoreComputeService::getNumCores(): unexpected [" + msg->getName() + "] message");
       }
-
     }
 
     /**
@@ -327,7 +322,6 @@ namespace wrench {
       }
     }
 
-
     /**
      * @brief Main method of the daemon
      *
@@ -353,10 +347,10 @@ namespace wrench {
         S4U_Mailbox::clear_dputs();
 
         /** Dispatch currently pending tasks until no longer possible **/
-        while (this->dispatchNextPendingTask());
+        while (this->dispatchNextPendingTask()) {};
 
         /** Dispatch jobs (and their tasks in the case of standard jobs) if possible) **/
-        while (this->dispatchNextPendingJob());
+        while (this->dispatchNextPendingJob()) {};
 
       }
 
@@ -534,7 +528,7 @@ namespace wrench {
         return false;
       } else if (ComputeServiceSubmitStandardJobRequestMessage *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
         WRENCH_INFO("Asked to run a standard job with %ld tasks", msg->job->getNumTasks());
-        if (!this->supportsStandardJobs()) {
+        if (not this->supportsStandardJobs()) {
           S4U_Mailbox::dput(msg->answer_mailbox,
                             new ComputeServiceSubmitStandardJobAnswerMessage(msg->job, this,
                                                                              false,
@@ -559,7 +553,7 @@ namespace wrench {
         bool success = true;
         WorkflowExecutionFailureCause *failure_cause = nullptr;
 
-        if (!this->supportsPilotJobs()) {
+        if (not this->supportsPilotJobs()) {
           S4U_Mailbox::dput(msg->answer_mailbox,
                             new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
                                                                           this,
@@ -695,7 +689,7 @@ namespace wrench {
     void MulticoreComputeService::failCurrentStandardJobs(WorkflowExecutionFailureCause *cause) {
 
       WRENCH_INFO("There are %ld pending jobs", this->pending_jobs.size());
-      while (!this->pending_jobs.empty()) {
+      while (not this->pending_jobs.empty()) {
         WorkflowJob *workflow_job = this->pending_jobs.front();
         WRENCH_INFO("Failing job %s", workflow_job->getName().c_str());
         this->pending_jobs.pop();
@@ -824,25 +818,25 @@ namespace wrench {
                                                      std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                                                      WorkflowExecutionFailureCause *cause) {
 
-        // Put that worker thread back into the pull of idle worker threads
-        this->busy_worker_threads.erase(worker_thread);
-        this->idle_worker_threads.insert(worker_thread);
+      // Put that worker thread back into the pull of idle worker threads
+      this->busy_worker_threads.erase(worker_thread);
+      this->idle_worker_threads.insert(worker_thread);
 
       // TODO: Make it work for the general case - Right now it mimics the old "Only a Task" behavior
 
 
-        WorkflowTask *task = tasks[0];
+      WorkflowTask *task = tasks[0];
 
 
-        // Get the job for the task
-        StandardJob *job = (StandardJob * )(task->getJob());
-        WRENCH_INFO("One of my cores has failed to run task %s: %s", task->getId().c_str(), cause->toString().c_str());
+      // Get the job for the task
+      StandardJob *job = (StandardJob *) (task->getJob());
+      WRENCH_INFO("One of my cores has failed to run task %s: %s", task->getId().c_str(), cause->toString().c_str());
 
-        // Remove the job from the list of running jobs
-        this->running_jobs.erase(job);
+      // Remove the job from the list of running jobs
+      this->running_jobs.erase(job);
 
-        // Fail the job
-        this->failStandardJob(job, cause);
+      // Fail the job
+      this->failStandardJob(job, cause);
 
     }
 

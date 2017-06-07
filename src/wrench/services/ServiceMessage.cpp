@@ -7,14 +7,17 @@
  * (at your option) any later version.
  */
 
-
-#include "ServiceMessage.h"
+#include "services/ServiceMessage.h"
 
 namespace wrench {
 
+    /**
+     * @brief Constructor
+     * @param name: service name
+     * @param payload: message size in bytes
+     */
     ServiceMessage::ServiceMessage(std::string name, double payload) :
-            SimulationMessage("Service::" + name, payload) {
-    }
+            SimulationMessage("Service::" + name, payload) {}
 
     /**
      * @brief Constructor
@@ -23,10 +26,8 @@ namespace wrench {
      *
      * @throw std::invalid_arguments
      */
-    ServiceStopDaemonMessage::ServiceStopDaemonMessage(std::string ack_mailbox,
-                                         double payload) : ServiceMessage("STOP_DAEMON", payload) {
-      this->ack_mailbox = ack_mailbox;
-    }
+    ServiceStopDaemonMessage::ServiceStopDaemonMessage(std::string ack_mailbox, double payload)
+            : ServiceMessage("STOP_DAEMON", payload), ack_mailbox(ack_mailbox) {}
 
     /**
      * @brief Constructor
@@ -34,6 +35,7 @@ namespace wrench {
      *
      * @throw std::invalid_arguments
      */
-    ServiceDaemonStoppedMessage::ServiceDaemonStoppedMessage(double payload) : ServiceMessage("DAEMON_STOPPED", payload) {
-    }
+    ServiceDaemonStoppedMessage::ServiceDaemonStoppedMessage(double payload)
+            : ServiceMessage("DAEMON_STOPPED", payload) {}
+
 };
