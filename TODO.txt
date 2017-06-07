@@ -17,11 +17,6 @@ DATA STORAGE IMPLEMENTATION:
 
 BUGS:
 
-    - With Optimizations, it seems that task state updates are a bit wonky. It seems that
-      tasks that are already in the COMPLETED state (because merged with others) then
-      are put in the READY state (because a predecessor in the merge has completed I assume),
-      which Workflow.updateTaskState() doesn't like...
-
     - There is a SegFault when exiting before simulation.launch() is executed.
         ("Invalid read of size 8" in simix_process())
           Need to find good ways to cleanup stuff in S4U...

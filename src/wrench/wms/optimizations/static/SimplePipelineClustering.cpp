@@ -41,7 +41,6 @@ namespace wrench {
 
               pipelined_tasks.insert(parent->getId());
               parent->setClusterId(cluster_id);
-              parent->setState(WorkflowTask::State::READY);
 
               // next parent
               parent = getTask(workflow->getTaskParents(parent));
@@ -59,7 +58,6 @@ namespace wrench {
 
               pipelined_tasks.insert(child->getId());
               child->setClusterId(cluster_id);
-              child->setState(WorkflowTask::State::READY);
 
               // next child
               child = getTask(workflow->getTaskChildren(child));

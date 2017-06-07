@@ -294,9 +294,4 @@ namespace wrench {
       }
       return output;
     }
-
-
-
 };
-
-

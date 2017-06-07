@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
   std::unique_ptr<wrench::DynamicOptimization> dynamic_opt(new wrench::FailureDynamicClustering());
 
   std::unique_ptr<wrench::WMS> wms(new wrench::SimpleWMS(&simulation, &workflow, std::move(scheduler), wms_host));
-//  wms.get()->addStaticOptimization(std::move(opt));
+  wms.get()->addStaticOptimization(std::move(opt));
 //  wms.get()->addDynamicOptimization(std::move(dynamic_opt));
 
   simulation.setWMS(std::move(wms));
