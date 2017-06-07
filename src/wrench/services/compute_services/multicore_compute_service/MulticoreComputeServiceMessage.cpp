@@ -9,6 +9,7 @@
 
 
 #include "MulticoreComputeServiceMessage.h"
+#include "WorkerThread.h"
 
 namespace wrench {
 
@@ -155,93 +156,50 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: the job on behalf of which the work is to be done
-     * @param pre_file_copies: the file copy operations to perform first
-     * @param tasks: the tasks to execute in sequence
-     * @param file_locations: the locations where tasks should read/write files
-     * @param post_file_copies: the file copy operations to perform last
-     * @param cleanup_file_deletions: file deletions to perform regardless of success/failure
+     * @param work: the work to be done
      * @param payload: message size in bytes
      */
     WorkerThreadDoWorkRequestMessage::WorkerThreadDoWorkRequestMessage(
-            StandardJob *job,
-            std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-            std::vector<WorkflowTask *> tasks,
-            std::map<WorkflowFile *, StorageService *> file_locations,
-            std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-            std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions,
+            WorkUnit *work,
             double payload) :
             MulticoreComputeServiceMessage("WORKER_THREAD_DO_WORK_REQUEST",
                                            payload) {
-      this->job = job;
-      this->pre_file_copies = pre_file_copies;
-      this->tasks = tasks;
-      this->file_locations = file_locations;
-      this->post_file_copies = post_file_copies;
-      this->cleanup_file_deletions = cleanup_file_deletions;
+      this->work = work;
     }
 
 
     /**
      * @brief Constructor
-     * @param job: the job on behalf of which the work was done
-     * @param worker_thread: the worker thread on which the job was performed
-     * @param pre_file_copies: the file copy operations to perform first
-     * @param tasks: the tasks to execute in sequence
-     * @param file_locations: the locations where tasks should read/write files
-     * @param post_file_copies: the file copy operations to perform last
-     * @param cleanup_file_deletions: file deletions to perform regardless of success/failure
+     * @param worker_thread: the worker thread on which the work was performed
+     * @param work: the work unit that was performed
      * @param payload: message size in bytes
      */
     WorkerThreadWorkDoneMessage::WorkerThreadWorkDoneMessage(
-            StandardJob *job,
             WorkerThread *worker_thread,
-            std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-            std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations,
-            std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-            std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions,
+            WorkUnit *work,
             double payload) :
     MulticoreComputeServiceMessage("WORKER_THREAD_WORK_DONE", payload) {
-      this->job = job;
       this->worker_thread = worker_thread;
-      this->pre_file_copies = pre_file_copies;
-      this->tasks = tasks;
-      this->file_locations = file_locations;
-      this->post_file_copies = post_file_copies;
-      this->cleanup_file_deletions = cleanup_file_deletions;
+      this->work = work;
 
 
     }
 
     /**
      * @brief Constructor
-     * @param job: the job on behalf of which the work was done (failed)
-     * @param worker_thread: the worker thread on which the job was performed
-     * @param pre_file_copies: the file copy operations to perform first
-     * @param tasks: the tasks to execute in sequence
-     * @param file_locations: the locations where tasks should read/write files
-     * @param post_file_copies: the file copy operations to perform last
-     * @param cleanup_file_deletions: file deletions to perform regardless of success/failure
+     * @param worker_thread: the worker thread on which the work was performed
+     * @param work: the work unit that was performed (and failed)
      * @param cause: the cause of the failure
      * @param payload: message size in bytes
      */
     WorkerThreadWorkFailedMessage::WorkerThreadWorkFailedMessage(
-            StandardJob *job,
             WorkerThread *worker_thread,
-            std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-            std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations,
-            std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-            std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions,
+            WorkUnit *work,
             WorkflowExecutionFailureCause *cause,
             double payload):
     MulticoreComputeServiceMessage("WORKER_THREAD_WORK_FAILED", payload) {
-      this->job = job;
       this->worker_thread = worker_thread;
-      this->pre_file_copies = pre_file_copies;
-      this->tasks = tasks;
-      this->file_locations = file_locations;
-      this->post_file_copies = post_file_copies;
-      this->cleanup_file_deletions = cleanup_file_deletions;
+      this->work = work;
 
       this->cause = cause;
 

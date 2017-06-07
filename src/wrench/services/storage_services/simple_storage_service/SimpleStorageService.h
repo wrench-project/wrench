@@ -19,8 +19,6 @@ namespace wrench {
 
     class SimpleStorageService : public StorageService {
 
-    public:
-
     private:
         std::map<std::string, std::string> default_property_values =
                 {{SimpleStorageServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,           "1024"},
@@ -43,6 +41,8 @@ namespace wrench {
         SimpleStorageService(std::string hostname,
                              double capacity,
                              std::map<std::string, std::string> = {});
+
+
 
         /***********************/
         /** \cond DEVELOPER    */

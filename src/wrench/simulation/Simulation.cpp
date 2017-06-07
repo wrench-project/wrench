@@ -71,6 +71,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Simulation::init(int *argc, char **argv) {
+
       if (*argc < 1) {
         throw std::invalid_argument("Invalid argc argument (must be >= 1)");
       }

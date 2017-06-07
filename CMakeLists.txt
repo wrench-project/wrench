@@ -96,7 +96,7 @@ set(SOURCE_FILES
         src/wrench/services/file_registry_service/FileRegistryMessage.cpp
         src/wrench/services/file_registry_service/FileRegistryMessage.h
         src/wrench/services/compute_services/multicore_compute_service/WorkerThread.cpp
-        src/wrench/services/compute_services/multicore_compute_service/WorkerThread.h)
+        src/wrench/services/compute_services/multicore_compute_service/WorkerThread.h src/wrench/services/compute_services/multicore_compute_service/WorkUnit.cpp src/wrench/services/compute_services/multicore_compute_service/WorkUnit.h)
 
 # test files
 set(TEST_FILES
@@ -106,7 +106,7 @@ set(TEST_FILES
         test/workflow/WorkflowTaskTest.cpp
         test/wms/optimizations/dynamic/FailureDynamicClusteringTest.cpp
         test/wms/optimizations/static/SimplePipelineClusteringTest.cpp
-        )
+        test/storage_service/simple_storage_service/StorageServiceTest.cpp test/storage_service/simple_storage_service/StorageServiceTest.h)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)

@@ -110,6 +110,13 @@ SOFTWARE ENGINEERING:
 
     - S4U: wait_any?
 
+    - Exiting before launch prints warning (as expected), but fails with a segfault
+      when SMPI is enabled....
+
+    - How to free memory for an actor that terminates...
+            - When the actor sends a "I am done" message, one cannot free it then...
+            - Or is it all taken care of by SimGrid?
+
     - S4U: Storage
         - What will it look like?
         - How to deal with pipelining of network/disk when remote put()/get()?

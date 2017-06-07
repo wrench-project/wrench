@@ -39,6 +39,8 @@ namespace wrench {
      * @param capacity: the storage capacity in bytes
      * @param plist: the property list
      * @param suffix: the suffix (for the service name)
+     *
+     * @throw std::invalid_argument
      */
     SimpleStorageService::SimpleStorageService(
             std::string hostname,
@@ -46,6 +48,11 @@ namespace wrench {
             std::map<std::string, std::string> plist,
             std::string suffix) :
             StorageService("simple_storage_service" + suffix, "simple_storage_service" + suffix, capacity) {
+
+
+      if (capacity < 0) {
+        throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): invalid argument");
+      }
 
       this->capacity = capacity;
 
@@ -66,8 +73,8 @@ namespace wrench {
       // Start the daemon on the same host
       try {
         this->start(hostname);
-      } catch (std::invalid_argument e) {
-        throw e;
+      } catch (std::invalid_argument &e) {
+        throw;
       }
     }
 

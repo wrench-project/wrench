@@ -14,6 +14,7 @@
 
 #include <services/compute_services/ComputeServiceMessage.h>
 #include <vector>
+#include "WorkerThread.h"
 
 namespace wrench {
 
@@ -127,21 +128,10 @@ namespace wrench {
     class WorkerThreadDoWorkRequestMessage : public MulticoreComputeServiceMessage {
     public:
         WorkerThreadDoWorkRequestMessage(
-                StandardJob *job,
-                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                std::vector<WorkflowTask *> tasks,
-                std::map<WorkflowFile *, StorageService *> file_locations,
-                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-                std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions,
+                WorkUnit *work,
                 double payload);
 
-        StandardJob *job;
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
-        std::vector<WorkflowTask *> tasks;
-        std::map<WorkflowFile *, StorageService *> file_locations;
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
-        std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
-
+        WorkUnit *work;
     };
 
     /**
@@ -150,22 +140,12 @@ namespace wrench {
     class WorkerThreadWorkDoneMessage : public MulticoreComputeServiceMessage {
     public:
         WorkerThreadWorkDoneMessage(
-                StandardJob *job,
                 WorkerThread *worker_thread,
-                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                std::vector<WorkflowTask *> tasks,
-                std::map<WorkflowFile *, StorageService *> file_locations,
-                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-                std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions,
+                WorkUnit *work_unit,
                 double payload);
 
-        StandardJob *job;
         WorkerThread *worker_thread;
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
-        std::vector<WorkflowTask *> tasks;
-        std::map<WorkflowFile *, StorageService *> file_locations;
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
-        std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
+        WorkUnit *work;
 
     };
 
@@ -175,27 +155,16 @@ namespace wrench {
     class WorkerThreadWorkFailedMessage : public MulticoreComputeServiceMessage {
     public:
         WorkerThreadWorkFailedMessage(
-                StandardJob *job,
                 WorkerThread *worker_thread,
-                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                std::vector<WorkflowTask *> tasks,
-                std::map<WorkflowFile *, StorageService *> file_locations,
-                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-                std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions,
+                WorkUnit *work,
                 WorkflowExecutionFailureCause *cause,
                 double payload);
 
-        StandardJob *job;
         WorkerThread *worker_thread;
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
-        std::vector<WorkflowTask *> tasks;
-        std::map<WorkflowFile *, StorageService *> file_locations;
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
-        std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
+        WorkUnit *work;
 
         WorkflowExecutionFailureCause *cause;
     };
-
 
 
     /***********************/

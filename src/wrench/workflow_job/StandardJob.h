@@ -13,6 +13,10 @@
 
 
 #include <vector>
+#include <map>
+#include <set>
+#include <vector>
+
 #include "WorkflowJob.h"
 
 namespace wrench {
@@ -49,6 +53,14 @@ namespace wrench {
 
         std::map<WorkflowFile *, StorageService *> getFileLocations();
 
+        // Tasks to run
+        std::vector<WorkflowTask *> tasks;
+        unsigned long num_completed_tasks;
+        std::map<WorkflowFile *, StorageService *> file_locations;
+
+        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
+        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
+        std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
 
     private:
         friend class JobManager;
@@ -60,14 +72,7 @@ namespace wrench {
 
         State state;
 
-        // Tasks to run
-        std::vector<WorkflowTask *> tasks;
-        unsigned long num_completed_tasks;
-        std::map<WorkflowFile *, StorageService *> file_locations;
 
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
-        std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
-        std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
 
 
     };

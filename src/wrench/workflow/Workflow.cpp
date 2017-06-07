@@ -142,7 +142,7 @@ namespace wrench {
       }
 
       // Create the WorkflowFile object
-      if (files[id]) {
+      if (files.find(id) != files.end()) {
         throw std::invalid_argument("WorkflowFile with id '" +
                                     id + "' already exists");
       }

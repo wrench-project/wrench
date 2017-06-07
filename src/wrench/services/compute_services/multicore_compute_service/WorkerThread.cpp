@@ -17,6 +17,8 @@
 #include "WorkerThread.h"
 #include "MulticoreComputeServiceMessage.h"
 #include <workflow/WorkflowTask.h>
+#include <workflow_job/StandardJob.h>
+#include "WorkUnit.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(worker_thread, "Log category for Worker Thread");
 
@@ -28,11 +30,14 @@ namespace wrench {
      *
      * @param hostname: the name of the host
      * @param callback_mailbox: the callback mailbox to which the worker
-     *        thread can sed "work done" messages
+     *        thread can send "work done" messages
+     * @param work: the work to do
      * @param default_storage_service: the default storage service from which to read/write data (if any)
      * @param startup_overhead: the startup overhead, in seconds
      */
-    WorkerThread::WorkerThread(std::string hostname, std::string callback_mailbox,
+    WorkerThread::WorkerThread(std::string hostname,
+                               std::string callback_mailbox,
+                               WorkUnit *work,
                                StorageService *default_storage_service,
                                double startup_overhead) :
             S4U_DaemonWithMailbox("worker_thread", "worker_thread") {
@@ -42,19 +47,12 @@ namespace wrench {
       }
       this->hostname = hostname;
       this->callback_mailbox = callback_mailbox;
+      this->work = work;
       this->start_up_overhead = startup_overhead;
       this->default_storage_service = default_storage_service;
 
       // Start my daemon on the host
       this->start(this->hostname);
-    }
-
-    /**
-    * @brief Terminate the worker thread
-    */
-    void WorkerThread::stop() {
-      // Send a termination message to the daemon's mailbox
-      S4U_Mailbox::put(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
     }
 
     /**
@@ -64,32 +62,6 @@ namespace wrench {
       this->kill_actor();
     }
 
-    /**
-     * @brief Asynchronously have the worker thread do some work
-     *
-     * @param job: the standard workflow job on behalf of which the work is done
-     * @param pre_file_copies: a set of file copy actions to perform first
-     * @param tasks: a set of tasks to execute in sequence
-     * @param file_locations: locations where tasks should read/write files
-     * @param post_file_copies: a set of file copy actions to perform last
-     * @param cleanup_file_deletions: a set of file deletions to perform regardless of completion or failure
-     *
-     * @return
-     */
-    void WorkerThread::doWork(StandardJob *job,
-                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                              std::vector<WorkflowTask *> tasks,
-                              std::map<WorkflowFile *, StorageService *> file_locations,
-                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-                              std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
-
-      // Send a "do work" message to the daemon's mailbox
-      S4U_Mailbox::put(this->mailbox_name,
-                       new WorkerThreadDoWorkRequestMessage(job, pre_file_copies, tasks, file_locations, post_file_copies, cleanup_file_deletions,
-                                                            0.0));
-
-      return;
-    }
 
     /**
     * @brief Main method of the worker thread daemon
@@ -104,82 +76,54 @@ namespace wrench {
 
       WRENCH_INFO("New Sequential Task Executor starting (%s) ", this->mailbox_name.c_str());
 
-      while (true) {
+      SimulationMessage *msg_to_send_back = nullptr;
+      bool success;
 
-        // Wait for a message
-        std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+      try {
+        performWorkWithoutCleanupFileDeletions(this->work);
 
-        if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-          if (msg->ack_mailbox != "") {
-            S4U_Mailbox::put(msg->ack_mailbox, new ServiceDaemonStoppedMessage(0.0));
-          }
-          break;
+        // build "success!" message
+        success = true;
+        msg_to_send_back = new WorkerThreadWorkDoneMessage(
+                this,
+                this->work,
+                0.0);
 
-        } else if (WorkerThreadDoWorkRequestMessage *msg = dynamic_cast<WorkerThreadDoWorkRequestMessage *>(message.get())) {
+      } catch (WorkflowExecutionException &e) {
+        // build "failed!" message
+        success = false;
+        msg_to_send_back = new WorkerThreadWorkFailedMessage(
+                this,
+                this->work,
+                e.getCause(),
+                0.0);
+      }
 
-          SimulationMessage *msg_to_send_back = nullptr;
-          bool success;
-
-          try {
-            performWork(msg->pre_file_copies, msg->tasks, msg->file_locations, msg->post_file_copies);
-
-            // build "success!" message
-            success = true;
-            msg_to_send_back = new WorkerThreadWorkDoneMessage(
-                    msg->job,
-                    this,
-                    msg->pre_file_copies,
-                    msg->tasks,
-                    msg->file_locations,
-                    msg->post_file_copies,
-                    msg->cleanup_file_deletions,
-                    0.0);
-
-          } catch (WorkflowExecutionException &e) {
-            // build "failed!" message
-            success = false;
-            msg_to_send_back = new WorkerThreadWorkFailedMessage(
-                                      msg->job,
-                                      this,
-                                      msg->pre_file_copies,
-                                      msg->tasks,
-                                      msg->file_locations,
-                                      msg->post_file_copies,
-                                      msg->cleanup_file_deletions,
-                                      e.getCause(),
-                                      0.0);
-          }
-
-          // Do the cleanup
-          for (auto cleanup : msg->cleanup_file_deletions) {
-            WorkflowFile *file = std::get<0>(cleanup);
-            StorageService *storage_service = std::get<1>(cleanup);
-            try {
-              storage_service->deleteFile(file);
-            } catch (WorkflowExecutionException &e) {
-              // Ignore exceptions since files may not be created, etc.. 
-            }
-          }
-
-
-          // Send the callback
-          if (success) {
-            WRENCH_INFO("Notifying mailbox %s that work has completed",
-                        this->callback_mailbox.c_str());
-          } else {
-            WRENCH_INFO("Notifying mailbox %s that work has failed",
-                        this->callback_mailbox.c_str());
-          }
-
-          S4U_Mailbox::dput(this->callback_mailbox, msg_to_send_back);
-
-
-        } else {
-          throw std::runtime_error("Unexpected [" + message->getName() + "] message");
+      // Do the cleanup
+      for (auto cleanup : this->work->job->cleanup_file_deletions) {
+        WorkflowFile *file = std::get<0>(cleanup);
+        StorageService *storage_service = std::get<1>(cleanup);
+        try {
+          storage_service->deleteFile(file);
+        } catch (WorkflowExecutionException &e) {
+          // Ignore exceptions since files may not be created, etc..
         }
       }
 
-      WRENCH_INFO("Worker thread on host %s terminated!", S4U_Simulation::getHostName().c_str());
+
+      // Send the callback
+      if (success) {
+        WRENCH_INFO("Notifying mailbox %s that work has completed",
+                    this->callback_mailbox.c_str());
+      } else {
+        WRENCH_INFO("Notifying mailbox %s that work has failed",
+                    this->callback_mailbox.c_str());
+      }
+
+      S4U_Mailbox::put(this->callback_mailbox, msg_to_send_back);
+
+
+      WRENCH_INFO("Worker thread on host %s terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -187,23 +131,17 @@ namespace wrench {
     /**
      * @brief Simulate work execution
      *
-     * @param pre_file_copies: a set of file copy actions to perform first
-     * @param tasks: a set of tasks to execute in sequence
-     * @param file_locations: locations where tasks should read/write files
-     * @param post_file_copies: a set of file copy actions to perform last
+     * @param work: the work to perform
      */
     void
-    WorkerThread::performWork(std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                              std::vector<WorkflowTask *> tasks,
-                              std::map<WorkflowFile *, StorageService *> file_locations,
-                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies) {
+    WorkerThread::performWorkWithoutCleanupFileDeletions(WorkUnit *work) {
 
       // Simulate the startup overhead
       S4U_Simulation::sleep(this->start_up_overhead);
 
       /** Perform all pre file copies operations */
       // TODO: This is sequential right now, but probably it should be concurrent in some fashion
-      for (auto file_copy : pre_file_copies) {
+      for (auto file_copy : work->pre_file_copies) {
         WorkflowFile *file = std::get<0>(file_copy);
         StorageService *src = std::get<1>(file_copy);
         StorageService *dst = std::get<2>(file_copy);
@@ -215,12 +153,12 @@ namespace wrench {
       }
 
       /** Perform all tasks **/
-      for (auto task : tasks) {
+      for (auto task : work->tasks) {
 
         // Read  all input files
         try {
           StorageService::readFiles(task->getInputFiles(),
-                                    file_locations,
+                                    work->file_locations,
                                     this->default_storage_service);
         } catch (WorkflowExecutionException &e) {
           throw;
@@ -234,7 +172,7 @@ namespace wrench {
 
         // Write all output files
         try {
-          StorageService::writeFiles(task->getOutputFiles(), file_locations, this->default_storage_service);
+          StorageService::writeFiles(task->getOutputFiles(), work->file_locations, this->default_storage_service);
         } catch (WorkflowExecutionException &e) {
           throw;
         }
@@ -245,7 +183,7 @@ namespace wrench {
 
       /** Perform all post file copies operations */
       // TODO: This is sequential right now, but probably it should be concurrent in some fashion
-      for (auto file_copy : post_file_copies) {
+      for (auto file_copy : work->post_file_copies) {
         WorkflowFile *file = std::get<0>(file_copy);
         StorageService *src = std::get<1>(file_copy);
         StorageService *dst = std::get<2>(file_copy);
@@ -257,5 +195,10 @@ namespace wrench {
       }
 
     }
+
+    WorkerThread::~WorkerThread() {
+      WRENCH_INFO("IN DESTRUCTOR OF WORKERTHREAD");
+    }
+
 
 };

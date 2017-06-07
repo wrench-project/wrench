@@ -17,6 +17,7 @@
 #include <services/file_registry_service/FileRegistryService.h>
 #include <wms/WMS.h>
 #include <simgrid_S4U_util/S4U_Simulation.h>
+#include <workflow_job/StandardJob.h>
 
 #include "SimulationOutput.h"
 
@@ -62,12 +63,14 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+
         template<class T>
         void newTimestamp(SimulationTimestamp<T> *event);
 
         void shutdownAllComputeServices();
 
         void shutdownAllStorageServices();
+
 
         std::set<ComputeService *> getComputeServices();
 
@@ -106,6 +109,7 @@ namespace wrench {
 
 
     };
+
 
 };
 

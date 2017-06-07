@@ -117,34 +117,25 @@ namespace wrench {
                              StorageService *default_storage_service);
 
         std::string hostname;
-        unsigned int num_worker_threads; // total threads to run tasks from standard jobs
+        unsigned int max_num_worker_threads; // total threads to run tasks from standard jobs
         double ttl;
         bool has_ttl;
         double death_date;
         PilotJob *containing_pilot_job;
 
-        unsigned int num_available_worker_threads; // number of worker threads that can currently be
-        // used to run tasks from standard jobs
-
         // Vector of worker threads
-        std::vector<std::unique_ptr<WorkerThread>> worker_threads;
+        std::set<WorkerThread*> working_threads;
 
-        // Vector of idle worker threads available to run tasks from standard jobs
-        std::set<WorkerThread *> idle_worker_threads;
-        // Vector of worker threads currently running tasks from standard jobs
-        std::set<WorkerThread *> busy_worker_threads;
-
-        // Queue of pending jobs (standard or pilot) that haven't began executing
+        // Queue of pending jobs (standard or pilot) that haven't begun executing
         std::queue<WorkflowJob *> pending_jobs;
 
         // Set of currently running (standard or pilot) jobs
         std::set<WorkflowJob *> running_jobs;
 
-        // Queue of standard job tasks waiting for execution
-        std::queue<WorkflowTask *> pending_tasks;
-
-        // Set of currently running standard job tasks
-        std::set<WorkflowTask *> running_tasks;
+        std::set<WorkUnit *> non_ready_works;
+        std::deque<WorkUnit *> ready_works;
+        std::set<WorkUnit *> running_works;
+        std::set<WorkUnit *> completed_works;
 
         int main();
 
@@ -153,30 +144,24 @@ namespace wrench {
 
         void terminate();
 
-        void terminateAllWorkerThreads();
-
         void terminateAllPilotJobs();
 
         void failCurrentStandardJobs(WorkflowExecutionFailureCause *cause);
 
-        void processWorkCompletion(WorkerThread *worker_thread, std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                                   std::vector<WorkflowTask *> tasks,
-                                   std::map<WorkflowFile *, StorageService *> file_locations,
-                                   std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies);
+        void processWorkCompletion(WorkerThread *worker_thread, WorkUnit *work);
 
-        void processWorkFailure(WorkerThread *worker_thread, std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                                std::vector<WorkflowTask *> tasks,
-                                std::map<WorkflowFile *, StorageService *> file_locations,
-                                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+        void processWorkFailure(WorkerThread *worker_thread, WorkUnit *work,
                                 WorkflowExecutionFailureCause *);
 
         void processPilotJobCompletion(PilotJob *job);
 
         bool processNextMessage(double timeout);
 
-        bool dispatchNextPendingTask();
+        bool dispatchNextPendingWork();
 
         bool dispatchNextPendingJob();
+
+        void createWorkForNewlyDispatchedJob(StandardJob *job);
 
         void failStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
     };
