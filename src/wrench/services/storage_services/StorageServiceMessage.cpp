@@ -14,13 +14,9 @@
 namespace wrench {
 
     StorageServiceMessage::StorageServiceMessage(std::string name, double payload) :
-      ServiceMessage("StorageService::" + name, payload) {
+            ServiceMessage("StorageService::" + name, payload) {
 
     }
-
-
-
-
 
     /**
     * @brief Constructor
@@ -30,7 +26,8 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     StorageServiceFreeSpaceRequestMessage::StorageServiceFreeSpaceRequestMessage(std::string answer_mailbox,
-                                                     double payload) : StorageServiceMessage("FREE_SPACE_REQUEST", payload) {
+                                                                                 double payload)
+            : StorageServiceMessage("FREE_SPACE_REQUEST", payload) {
       if ((answer_mailbox == "")) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
@@ -44,7 +41,8 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(double free_space, double payload) : StorageServiceMessage(
+    StorageServiceFreeSpaceAnswerMessage::StorageServiceFreeSpaceAnswerMessage(double free_space, double payload)
+            : StorageServiceMessage(
             "FREE_SPACE_ANSWER", payload) {
       if ((free_space < 0.0)) {
         throw std::invalid_argument("Invalid constructor arguments");
@@ -60,9 +58,10 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(std::string answer_mailbox,
-                                                       WorkflowFile *file,
-                                                       double payload) : StorageServiceMessage("FILE_LOOKUP_REQUEST",
-                                                                                           payload) {
+                                                                                   WorkflowFile *file,
+                                                                                   double payload)
+            : StorageServiceMessage("FILE_LOOKUP_REQUEST",
+                                    payload) {
       if ((file == nullptr) || (answer_mailbox == "")) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
@@ -78,8 +77,9 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileLookupAnswerMessage::StorageServiceFileLookupAnswerMessage(WorkflowFile *file,
-                                                     bool file_is_available,
-                                                     double payload) : StorageServiceMessage(
+                                                                                 bool file_is_available,
+                                                                                 double payload)
+            : StorageServiceMessage(
             "FILE_LOOKUP_ANSWER", payload) {
 
       this->file = file;
@@ -94,9 +94,10 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
-                                                       WorkflowFile *file,
-                                                       double payload) : StorageServiceMessage("FILE_DELETE_REQUEST",
-                                                                                           payload) {
+                                                                                   WorkflowFile *file,
+                                                                                   double payload)
+            : StorageServiceMessage("FILE_DELETE_REQUEST",
+                                    payload) {
       if ((answer_mailbox == "")) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
@@ -112,10 +113,10 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
-                                                     StorageService *storage_service,
-                                                     bool success,
-                                                     WorkflowExecutionFailureCause *failure_cause,
-                                                     double payload)
+                                                                                 StorageService *storage_service,
+                                                                                 bool success,
+                                                                                 WorkflowExecutionFailureCause *failure_cause,
+                                                                                 double payload)
             : StorageServiceMessage("FILE_DELETE_ANSWER", payload) {
 
       this->file = file;
@@ -134,9 +135,10 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
-                                                   WorkflowFile *file,
-                                                   StorageService *src,
-                                                   double payload) : StorageServiceMessage("FILE_COPY_REQUEST", payload) {
+                                                                               WorkflowFile *file,
+                                                                               StorageService *src,
+                                                                               double payload) : StorageServiceMessage(
+            "FILE_COPY_REQUEST", payload) {
       if ((answer_mailbox == "") || (file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
@@ -156,10 +158,10 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
-                                                 StorageService *storage_service,
-                                                 bool success,
-                                                 WorkflowExecutionFailureCause *failure_cause,
-                                                 double payload)
+                                                                             StorageService *storage_service,
+                                                                             bool success,
+                                                                             WorkflowExecutionFailureCause *failure_cause,
+                                                                             double payload)
             : StorageServiceMessage("FILE_COPY_ANSWER", payload) {
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument("Invalid constructor arguments");
@@ -179,9 +181,10 @@ namespace wrench {
     * @throw std::invalid_argument
     */
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
-                                                       WorkflowFile *file,
-                                                       double payload) : StorageServiceMessage("FILE_WRITE_REQUEST",
-                                                                                           payload + file->getSize()) {
+                                                                                 WorkflowFile *file,
+                                                                                 double payload)
+            : StorageServiceMessage("FILE_WRITE_REQUEST",
+                                    payload + file->getSize()) {
       if ((answer_mailbox == "")) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
@@ -197,11 +200,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
-                                                     StorageService *storage_service,
-                                                     bool success,
-                                                     WorkflowExecutionFailureCause *failure_cause,
-                                                     std::string data_write_mailbox_name,
-                                                     double payload) : StorageServiceMessage(
+                                                                               StorageService *storage_service,
+                                                                               bool success,
+                                                                               WorkflowExecutionFailureCause *failure_cause,
+                                                                               std::string data_write_mailbox_name,
+                                                                               double payload) : StorageServiceMessage(
             "FILE_WRITE_ANSWER", payload) {
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument("Invalid constructor arguments");
@@ -222,10 +225,11 @@ namespace wrench {
    * @throw std::invalid_argument
    */
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(std::string answer_mailbox,
-                                                           WorkflowFile *file,
-                                                           double payload) : StorageServiceMessage("FILE_READ_REQUEST",
-                                                                                               payload +
-                                                                                               file->getSize()) {
+                                                                               WorkflowFile *file,
+                                                                               double payload) : StorageServiceMessage(
+            "FILE_READ_REQUEST",
+            payload +
+            file->getSize()) {
       if ((answer_mailbox == "") || (file == nullptr)) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
@@ -241,11 +245,12 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(WorkflowFile *file,
-                                                         StorageService *storage_service,
-                                                         bool success,
-                                                         WorkflowExecutionFailureCause *failure_cause,
-                                                         double payload) : StorageServiceMessage("FILE_READ_ANSWER",
-                                                                                             payload) {
+                                                                             StorageService *storage_service,
+                                                                             bool success,
+                                                                             WorkflowExecutionFailureCause *failure_cause,
+                                                                             double payload) : StorageServiceMessage(
+            "FILE_READ_ANSWER",
+            payload) {
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
@@ -260,12 +265,12 @@ namespace wrench {
     * @param file: the workflow data file
     * @param payload: message size in bytes
     */
-    StorageServiceFileContentMessage::StorageServiceFileContentMessage(WorkflowFile *file) : StorageServiceMessage("FILE_CONTENT", file->getSize()) {
+    StorageServiceFileContentMessage::StorageServiceFileContentMessage(WorkflowFile *file) : StorageServiceMessage(
+            "FILE_CONTENT", file->getSize()) {
       if (file == nullptr) {
         throw std::invalid_argument("Invalid constructor arguments");
       }
       this->file = file;
     }
-
 
 };

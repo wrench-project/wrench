@@ -8,22 +8,21 @@
  */
 
 #include <string>
-#include <logging/TerminalOutput.h>
 
+#include "exceptions/WorkflowExecutionException.h"
+#include "logging/TerminalOutput.h"
+#include "managers/job_manager/JobManager.h"
+#include "services/compute_services/ComputeService.h"
+#include "services/ServiceMessage.h"
+#include "services/compute_services/ComputeServiceMessage.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
-#include "JobManager.h"
-#include <simulation/SimulationMessage.h>
+#include "simulation/SimulationMessage.h"
+#include "workflow/WorkflowTask.h"
 #include "workflow_job/StandardJob.h"
 #include "workflow_job/PilotJob.h"
-#include <services/compute_services/ComputeService.h>
-#include <services/ServiceMessage.h>
-#include <services/compute_services/ComputeServiceMessage.h>
-#include <exceptions/WorkflowExecutionException.h>
-#include <workflow/WorkflowTask.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
-
 
 namespace wrench {
 
@@ -64,7 +63,6 @@ namespace wrench {
       S4U_Mailbox::put(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
     }
 
-
     /**
      * @brief Create a standard job
      *
@@ -89,7 +87,8 @@ namespace wrench {
         throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
       }
 
-      StandardJob *raw_ptr = new StandardJob(tasks, file_locations, pre_file_copies, post_file_copies, cleanup_file_deletions);
+      StandardJob *raw_ptr = new StandardJob(tasks, file_locations, pre_file_copies, post_file_copies,
+                                             cleanup_file_deletions);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);
 
       this->jobs[job->getName()] = std::move(job);
@@ -108,7 +107,8 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations) {
+    StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
+                                               std::map<WorkflowFile *, StorageService *> file_locations) {
       if (tasks.size() < 1) {
         throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
       }
@@ -125,9 +125,10 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    StandardJob *JobManager::createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, StorageService *> file_locations) {
+    StandardJob *
+    JobManager::createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, StorageService *> file_locations) {
 
-      if (task ==  nullptr) {
+      if (task == nullptr) {
         throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
       }
 
@@ -256,7 +257,6 @@ namespace wrench {
 
     }
 
-
     /**
      * @brief Main method of the daemon that implements the JobManager
      * @return 0 in success
@@ -371,6 +371,5 @@ namespace wrench {
       WRENCH_INFO("Job Manager terminating");
       return 0;
     }
-
 
 };

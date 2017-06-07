@@ -41,7 +41,7 @@ for ITEM in $CMD ; do
 	if [ $ITEM == INTERNAL ]; then
 	  SECTIONS="DEVELOPER INTERNAL"
 	fi
-	cat ./Doxyfile.in | sed "s/WRENCH_SECTIONS/$SECTIONS/" | sed "s/WRENCH_OUTPUT_DIRECTORY/\docs\/$VERSION\/$OUTPUT_DIRECTORY/"> $DOXYFILE
+	< ./Doxyfile.in sed "s/WRENCH_SECTIONS/$SECTIONS/" | sed "s/WRENCH_OUTPUT_DIRECTORY/\docs\/$VERSION\/$OUTPUT_DIRECTORY/"> $DOXYFILE
 	doxygen $DOXYFILE &> $DOXYFILE.log
 	if [[ ! -z "$GH_DOCS" ]] ; then
 	  mkdir -p ./docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY

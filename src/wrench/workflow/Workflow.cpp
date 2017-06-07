@@ -299,6 +299,11 @@ namespace wrench {
               task_map[task->getClusterId()].push_back(task);
             }
           }
+        } else {
+          if (task_map.find(task->getClusterId()) != task_map.end()) {
+            task->setState(WorkflowTask::State::READY);
+            task_map[task->getClusterId()].push_back(task);
+          }
         }
       }
       return task_map;
@@ -413,11 +418,11 @@ namespace wrench {
             throw std::runtime_error("Cannot set non-running task state to WorkflowTask::COMPLETED");
           }
           task->setState(WorkflowTask::COMPLETED);
+
           // Go through the children and make them ready if possible
           for (lemon::ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
             WorkflowTask *child = (*DAG_node_map)[(*DAG).target(a)];
             updateTaskState(child, WorkflowTask::READY);
-
           }
           break;
         }
@@ -426,7 +431,8 @@ namespace wrench {
             return;
           }
           if ((task->getState() != WorkflowTask::NOT_READY) && (task->getState() != WorkflowTask::PENDING)) {
-            throw std::runtime_error("Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) + " task to WorkflowTask::READY");
+            throw std::runtime_error("Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
+                                     " task to WorkflowTask::READY");
           }
           // Go through the parent and check whether they are all completed
           for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
@@ -469,5 +475,4 @@ namespace wrench {
       }
       return input_files;
     }
-
 };

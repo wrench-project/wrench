@@ -19,6 +19,7 @@
 namespace wrench {
 
     class WorkflowTask;
+
     class WorkerThread;
 
     /***********************/
@@ -40,7 +41,6 @@ namespace wrench {
         WorkflowJob *job;
         ComputeService *compute_service;
     };
-
 
     /**
      * @brief "NUM_CORES_REQUEST" SimulationMessage class
@@ -166,11 +166,9 @@ namespace wrench {
         WorkflowExecutionFailureCause *cause;
     };
 
-
     /***********************/
     /** \endcond           */
     /***********************/
 };
-
 
 #endif //WRENCH_MULTICORECOMPUTESERVICEMESSAGE_H

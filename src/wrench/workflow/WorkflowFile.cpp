@@ -18,6 +18,17 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(workflowFile, "Log category for WorkflowFile");
 namespace wrench {
 
     /**
+     * @brief Constructor
+     *
+     * @param string: the file name/id
+     * @param s: the file size
+     */
+    WorkflowFile::WorkflowFile(const std::string name, double s) :
+            id(name), size(s), output_of(nullptr) {
+      this->input_of = {};
+    };
+
+    /**
      * @brief Get the file size
      * @return  the file size in bytes
      */
@@ -32,19 +43,6 @@ namespace wrench {
     std::string WorkflowFile::getId() {
       return this->id;
     }
-
-    /**
-     * @brief Constructor
-     *
-     * @param string: the file name/id
-     * @param s: the file size
-     */
-    WorkflowFile::WorkflowFile(const std::string name, double s) {
-      this->id = name;
-      this->size = s;
-      this->output_of = nullptr;
-      this->input_of = {};
-    };
 
     /**
      * @brief Define the task that outputs this file
@@ -63,7 +61,6 @@ namespace wrench {
     WorkflowTask *WorkflowFile::getOutputOf() {
       return this->output_of;
     }
-
 
     /**
      * @brief Add a task that uses this file as input
@@ -92,4 +89,3 @@ namespace wrench {
     };
 
 };
-

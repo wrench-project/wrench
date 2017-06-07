@@ -20,10 +20,9 @@ namespace wrench {
      * @param process_name: the name of the simulated process/actor
      * @param mailbox_prefix: the prefix of the mailbox (to which a unique integer is appended)
      */
-    S4U_DaemonWithMailbox::S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix) {
-      this->process_name = process_name;
-      this->mailbox_name = S4U_Mailbox::generateUniqueMailboxName(mailbox_prefix);
-    }
+    S4U_DaemonWithMailbox::S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix)
+            : process_name(process_name),
+              mailbox_name(S4U_Mailbox::generateUniqueMailboxName(mailbox_prefix)) {}
 
     /**
      * @brief Start the daemon
@@ -51,17 +50,15 @@ namespace wrench {
       mailbox->setReceiver(this->s4u_actor);
 
       this->hostname = hostname;
-
     }
 
     /**
      * @brief Kill the daemon/actor.
      */
     void S4U_DaemonWithMailbox::kill_actor() {
-      if (!(this->terminated)) {
+      if (not this->terminated) {
         this->s4u_actor->kill();
         this->terminated = true;
-      } else {
       }
     }
 
@@ -71,7 +68,6 @@ namespace wrench {
     void S4U_DaemonWithMailbox::setTerminated() {
       this->terminated = true;
     }
-
 
     /**
      * @brief Retrieve the process name

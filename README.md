@@ -30,4 +30,4 @@ And, one of the following:
 [release-badge]:   https://img.shields.io/github/release/wrench-project/wrench.svg
 [release-link]:    https://github.com/wrench-project/wrench/releases
 [codacy-badge]:    https://img.shields.io/codacy/grade/aef324ea84474fff979a8ff19a4e4681.svg
-[codacy-link]:     https://www.codacy.com/app/rafaelfsilva/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade
+[codacy-link]:     https://www.codacy.com/app/WRENCH/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade

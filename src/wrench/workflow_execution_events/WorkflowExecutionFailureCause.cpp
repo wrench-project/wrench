@@ -23,11 +23,12 @@ namespace wrench {
       return this->cause;
     }
 
-    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile * file) : WorkflowExecutionFailureCause(NO_STORAGE_SERVICE_FOR_FILE) {
+    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) : WorkflowExecutionFailureCause(
+            NO_STORAGE_SERVICE_FOR_FILE) {
       this->file = file;
     }
 
-    WorkflowFile * NoStorageServiceForFile::getFile() {
+    WorkflowFile *NoStorageServiceForFile::getFile() {
       return this->file;
     }
 
@@ -35,7 +36,8 @@ namespace wrench {
       return "No Storage Service location is specified for file " + this->file->getId();
     }
 
-    FileNotFound::FileNotFound(WorkflowFile *file, StorageService *storage_service) : WorkflowExecutionFailureCause(FILE_NOT_FOUND) {
+    FileNotFound::FileNotFound(WorkflowFile *file, StorageService *storage_service) : WorkflowExecutionFailureCause(
+            FILE_NOT_FOUND) {
       this->file = file;
       this->storage_service = storage_service;
     }
@@ -52,7 +54,8 @@ namespace wrench {
       return "Couldn't find file " + this->file->getId() + " at Storage Service " + this->storage_service->getName();
     }
 
-    StorageServiceFull::StorageServiceFull(WorkflowFile *file, StorageService *storage_service) : WorkflowExecutionFailureCause(STORAGE_SERVICE_FULL) {
+    StorageServiceFull::StorageServiceFull(WorkflowFile *file, StorageService *storage_service)
+            : WorkflowExecutionFailureCause(STORAGE_SERVICE_FULL) {
       this->file = file;
       this->storage_service = storage_service;
     }
@@ -67,7 +70,7 @@ namespace wrench {
 
     std::string StorageServiceFull::toString() {
       return "Cannot write file " + this->file->getId() + " to Storage Service " +
-              this->storage_service->getName() + " due to lack of storage space";
+             this->storage_service->getName() + " due to lack of storage space";
     }
 
     ServiceIsDown::ServiceIsDown(Service *service) : WorkflowExecutionFailureCause(SERVICE_TERMINATED) {
@@ -82,7 +85,8 @@ namespace wrench {
       return "Service " + this->service->getName() + " on host " + this->service->getHostname() + " was terminated ";
     }
 
-    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service) : WorkflowExecutionFailureCause(JOB_TYPE_NOT_SUPPORTED) {
+    JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service)
+            : WorkflowExecutionFailureCause(JOB_TYPE_NOT_SUPPORTED) {
       this->job = job;
       this->compute_service = compute_service;
     }
@@ -100,7 +104,8 @@ namespace wrench {
              this->compute_service->getHostname() + " does not support jobs of type " + this->job->getTypeAsString();
     }
 
-    NotEnoughCores::NotEnoughCores(WorkflowJob *job, ComputeService *compute_service) : WorkflowExecutionFailureCause(NOT_ENOUGH_CORES) {
+    NotEnoughCores::NotEnoughCores(WorkflowJob *job, ComputeService *compute_service) : WorkflowExecutionFailureCause(
+            NOT_ENOUGH_CORES) {
       this->job = job;
       this->compute_service = compute_service;
     }
