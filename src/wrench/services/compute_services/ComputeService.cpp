@@ -135,9 +135,9 @@ namespace wrench {
                                    std::string mailbox_name_prefix,
                                    StorageService *default_storage_service) :
             Service(service_name, mailbox_name_prefix),
-            default_storage_service(default_storage_service),
-            simulation(nullptr), // will be filled in via Simulation::add()
-            state(ComputeService::UP) {
+            default_storage_service(default_storage_service) {
+      this->simulation = nullptr; // will be filled in via Simulation::add()
+      this->state = ComputeService::UP;
     }
 
     /**

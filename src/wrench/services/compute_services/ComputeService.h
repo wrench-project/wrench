@@ -17,82 +17,77 @@
 
 namespace wrench {
 
-		/***********************/
-		/** \cond DEVELOPER   **/
-		/***********************/
+    /***********************/
+    /** \cond DEVELOPER   **/
+    /***********************/
 
-		/* Forward References */
+    /* Forward References */
 
-		class Simulation;
+    class Simulation;
 
-		class StandardJob;
+    class StandardJob;
 
-		class PilotJob;
+    class PilotJob;
 
-		class StorageService;
+    class StorageService;
 
-		/**
-		 * @brief Abstract implementation of a compute service.
-		 */
-		class ComputeService : public Service {
+    /**
+     * @brief Abstract implementation of a compute service.
+     */
+    class ComputeService : public Service {
 
-		public:
+    public:
 
-				void stop();
+        void stop();
 
-				void runJob(WorkflowJob *job);
+        void runJob(WorkflowJob *job);
 
-				bool canRunJob(WorkflowJob::Type job_type, unsigned long min_num_cores, double duration);
+        bool canRunJob(WorkflowJob::Type job_type, unsigned long min_num_cores, double duration);
 
-				bool supportsStandardJobs();
+        bool supportsStandardJobs();
 
-				bool supportsPilotJobs();
+        bool supportsPilotJobs();
 
-				virtual double getCoreFlopRate();
+        virtual double getCoreFlopRate();
 
-				virtual unsigned long getNumCores();
+        virtual unsigned long getNumCores();
 
-				virtual unsigned long getNumIdleCores();
+        virtual unsigned long getNumIdleCores();
 
-				virtual double getTTL();
+        virtual double getTTL();
 
         void setDefaultStorageService(StorageService *storage_service);
 
-       StorageService *getDefaultStorageService();
+        StorageService *getDefaultStorageService();
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
 
+        virtual void submitStandardJob(StandardJob *job);
 
-				/***********************/
-				/** \cond INTERNAL    **/
-				/***********************/
+        virtual void submitPilotJob(PilotJob *job);
 
-				virtual void submitStandardJob(StandardJob *job);
+        ComputeService(std::string service_name,
+                       std::string mailbox_name_prefix,
+                       StorageService *default_storage_service);
 
-				virtual void submitPilotJob(PilotJob *job);
+    protected:
 
-				ComputeService(std::string service_name,
-				               std::string mailbox_name_prefix,
-											 StorageService *default_storage_service);
+        bool supports_pilot_jobs;
+        bool supports_standard_jobs;
 
-		protected:
+        StorageService *default_storage_service;
 
-				bool supports_pilot_jobs;
-				bool supports_standard_jobs;
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
-				StorageService *default_storage_service;
+    };
 
-				/***********************/
-				/** \endcond          **/
-				/***********************/
-
-
-
-
-		};
-
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
 
