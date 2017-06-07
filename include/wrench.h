@@ -15,8 +15,8 @@
 #include "workflow/Workflow.h"
 
 // Services and Service Properties
-#include <services/compute_services/multicore_job_executor/MulticoreJobExecutor.h>
-#include <services/compute_services/multicore_job_executor/MulticoreJobExecutorProperty.h>
+#include <services/compute_services/multicore_compute_service/MulticoreComputeService.h>
+#include <services/compute_services/multicore_compute_service/MulticoreComputeServiceProperty.h>
 #include <services/storage_services/simple_storage_service/SimpleStorageService.h>
 #include <services/storage_services/simple_storage_service/SimpleStorageServiceProperty.h>
 

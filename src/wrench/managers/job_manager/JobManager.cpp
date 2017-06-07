@@ -19,6 +19,8 @@
 #include <services/compute_services/ComputeService.h>
 #include <services/ServiceMessage.h>
 #include <services/compute_services/ComputeServiceMessage.h>
+#include <exceptions/WorkflowExecutionException.h>
+#include <workflow/WorkflowTask.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 
@@ -62,15 +64,32 @@ namespace wrench {
       S4U_Mailbox::put(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
     }
 
+
     /**
      * @brief Create a standard job
      *
-     * @param tasks: a vector of WorkflowTask pointers to include in the StandardJob
+     * @param tasks: a vector of tasks
+     * @param file_locations: a map that specifies on which storage service input/output files should be read/written
+     *         (default storage is used otherwise, provided that the job is submitted to a compute service
+     *          for which that default was specified)
+     * @param pre_file_copies: a set of tuples that specify which file copy operations should be completed
+     *                         before task executions begin
+     * @param post_file_copies: a set of tuples that specify which file copy operations should be completed
+     *                         after task executions end
+     * @return a standard job
      *
-     * @return a raw pointer to the StandardJob
+     * @throw std::invalid_argument
      */
-    StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations) {
-      StandardJob *raw_ptr = new StandardJob(tasks, file_locations);
+    StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
+                                               std::map<WorkflowFile *, StorageService *> file_locations,
+                                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
+                                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+                                               std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
+      if (tasks.size() < 1) {
+        throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
+      }
+
+      StandardJob *raw_ptr = new StandardJob(tasks, file_locations, pre_file_copies, post_file_copies, cleanup_file_deletions);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);
 
       this->jobs[job->getName()] = std::move(job);
@@ -80,11 +99,38 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param task: a pointer the single WorkflowTask to include in the StandardJob
+     * @param tasks: a vector of tasks
+     * @param file_locations: a map that specifies on which storage service input/output files should be read/written
+     *         (default storage is used otherwise, provided that the job is submitted to a compute service
+     *          for which that default was specified)
      *
      * @return a raw pointer to the StandardJob
+     *
+     * @throw std::invalid_argument
+     */
+    StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations) {
+      if (tasks.size() < 1) {
+        throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
+      }
+
+      return this->createStandardJob(tasks, file_locations, {}, {}, {});
+    }
+
+    /**
+     * @brief Create a standard job
+     *
+     * @param task: a task
+     *
+     * @return a raw pointer to the StandardJob
+     *
+     * @throw std::invalid_argument
      */
     StandardJob *JobManager::createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, StorageService *> file_locations) {
+
+      if (task ==  nullptr) {
+        throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
+      }
+
       std::vector<WorkflowTask *> tasks;
       tasks.push_back(task);
       return this->createStandardJob(tasks, file_locations);
@@ -97,8 +143,13 @@ namespace wrench {
      * @param num_cores: the number of cores required by the PilotJob
      * @param duration: the PilotJob duration in seconds
      * @return a raw pointer to the PilotJob
+     *
+     * @throw std::invalid_argument
      */
     PilotJob *JobManager::createPilotJob(Workflow *workflow, int num_cores, double duration) {
+      if ((workflow == nullptr) || (num_cores < 1) || (duration <= 0.0)) {
+        throw std::invalid_argument("JobManager::createPilotJob(): invalid arguments");
+      }
       PilotJob *raw_ptr = new PilotJob(workflow, num_cores, duration);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
       this->jobs[job->getName()] = std::move(job);
@@ -110,8 +161,15 @@ namespace wrench {
      *
      * @param job: a pointer to a WorkflowJob object
      * @param compute_service: a pointer to a ComputeService object
+     *
+     * @throw std::invalid_argument
+     * @throw WorkflowExecutionException
      */
     void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service) {
+
+      if ((job == nullptr) || (compute_service == nullptr)) {
+        throw std::invalid_argument("JobManager::submitJob(): invalid arguments");
+      }
 
       // Push back the mailbox of the manager,
       // so that it will get the initial callback
@@ -135,7 +193,11 @@ namespace wrench {
       }
 
       // Submit the job to the service
-      compute_service->runJob(job);
+      try {
+        compute_service->runJob(job);
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      }
 
     }
 
@@ -309,5 +371,6 @@ namespace wrench {
       WRENCH_INFO("Job Manager terminating");
       return 0;
     }
+
 
 };

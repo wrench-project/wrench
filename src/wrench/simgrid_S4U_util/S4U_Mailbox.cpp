@@ -9,7 +9,7 @@
 
 #include <xbt/ex.hpp>
 #include <simgrid/s4u/Mailbox.hpp>
-#include <simgrid/s4u/Comm.hpp>
+#include <simgrid/s4u.hpp>
 
 #include <simulation/SimulationMessage.h>
 #include <logging/TerminalOutput.h>
@@ -25,7 +25,7 @@ namespace wrench {
 
 		// A data structure to keep track of pending asynchronous put() operations
 		// what will have to be waited on at some point
-		std::map<simgrid::s4u::ActorPtr, std::set<simgrid::s4u::Comm *>> S4U_Mailbox::dputs;
+		std::map<simgrid::s4u::ActorPtr, std::set<simgrid::s4u::CommPtr>> S4U_Mailbox::dputs;
 
 		/**
 		 * @brief A method to generate a unique mailbox name give a prefix (this method
@@ -75,8 +75,8 @@ namespace wrench {
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 			void *data = nullptr;
 			try {
-				simgrid::s4u::Comm &comm = simgrid::s4u::this_actor::irecv(mailbox, &data);
-				comm.wait(timeout);
+				simgrid::s4u::CommPtr comm = simgrid::s4u::this_actor::irecv(mailbox, &data);
+				comm->wait(timeout);
 			} catch (xbt_ex &e) {
 				if (e.category == timeout_error) {
 					return nullptr;
@@ -119,11 +119,11 @@ namespace wrench {
 			WRENCH_DEBUG("DPUTTING to %s a %s message", mailbox_name.c_str(), msg->getName().c_str());
 
 			simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
-			simgrid::s4u::Comm &comm = simgrid::s4u::this_actor::isend(mailbox, msg, (int) msg->payload);
+      simgrid::s4u::CommPtr comm = simgrid::s4u::Comm::send_async(mailbox, msg, (int)msg->payload);
 
 			// Insert the communication into the dputs map, so that it's not lost
 			// and it can be "cleared" later
-			S4U_Mailbox::dputs[simgrid::s4u::Actor::self()].insert(&comm);
+			S4U_Mailbox::dputs[simgrid::s4u::Actor::self()].insert(comm);
 			return;
 		}
 
@@ -132,8 +132,8 @@ namespace wrench {
 		 * to avoid having the above levels deal with asynchronous communication stuff.
 		 */
 		void S4U_Mailbox::clear_dputs() {
-			std::set<simgrid::s4u::Comm *> set = S4U_Mailbox::dputs[simgrid::s4u::Actor::self()];
-			std::set<simgrid::s4u::Comm *>::iterator it;
+			std::set<simgrid::s4u::CommPtr> set = S4U_Mailbox::dputs[simgrid::s4u::Actor::self()];
+			std::set<simgrid::s4u::CommPtr>::iterator it;
 			for (it = set.begin(); it != set.end(); ++it) {
 				// TODO: This is probably not great right now, but S4U asynchronous communication are
 				// in a state of flux, and so this seems to work but for the memory leak

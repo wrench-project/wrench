@@ -412,7 +412,7 @@ namespace wrench {
                    WorkflowTask::stateToString(state).c_str());
 
       switch (state) {
-        // Make a task completed, which may cause its children to become ready
+        // Make a task completed, which may failure_cause its children to become ready
         case WorkflowTask::COMPLETED: {
           if (task->getState() != WorkflowTask::RUNNING) {
             throw std::runtime_error("Cannot set non-running task state to WorkflowTask::COMPLETED");

@@ -14,7 +14,7 @@
 
 // Compute Services
 #include "services/compute_services/ComputeService.h"
-#include "services/compute_services/multicore_job_executor/MulticoreJobExecutor.h"
+#include "services/compute_services/multicore_compute_service/MulticoreComputeService.h"
 
 // Exceptions
 #include "exceptions/WorkflowExecutionException.h"

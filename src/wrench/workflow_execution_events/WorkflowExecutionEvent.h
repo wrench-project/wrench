@@ -17,9 +17,16 @@
 namespace wrench {
 
 
-    class ComputeService;
     class WorkflowTask;
+
+    class WorkflowFile;
+
     class WorkflowJob;
+
+    class ComputeService;
+
+    class StorageService;
+
     class WorkflowExecutionFailureCause;
 
     /***********************/
@@ -41,13 +48,17 @@ namespace wrench {
             STANDARD_JOB_FAILURE,
             PILOT_JOB_START,
             PILOT_JOB_EXPIRATION,
+            FILE_COPY_COMPLETION,
+            FILE_COPY_FAILURE,
         };
 
 
         WorkflowExecutionEvent::EventType type;
-        WorkflowJob *job;
-        ComputeService *compute_service;
-        WorkflowExecutionFailureCause *cause;
+        WorkflowJob *job = nullptr;
+        ComputeService *compute_service = nullptr;
+        WorkflowFile *file = nullptr;
+        StorageService *storage_service = nullptr;
+        WorkflowExecutionFailureCause *failure_cause = nullptr;
 
     private:
         WorkflowExecutionEvent();

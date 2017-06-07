@@ -36,6 +36,16 @@ namespace wrench {
 
         std::string getId();
 
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
+        Workflow *getWorkflow();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
     private:
         std::string id;
         double size; // in bytes

@@ -33,7 +33,6 @@ namespace wrench {
             SERVICE_TERMINATED,
             JOB_TYPE_NOT_SUPPORTED,
             NOT_ENOUGH_CORES
-
         };
 
         WorkflowExecutionFailureCause(Cause cause);

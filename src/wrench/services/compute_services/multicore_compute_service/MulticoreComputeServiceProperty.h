@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_MULTICOREJOBEXECUTORPROPERTY_H
-#define WRENCH_MULTICOREJOBEXECUTORPROPERTY_H
+#ifndef WRENCH_MULTICORECOMPUTESERVICEPROPERTY_H
+#define WRENCH_MULTICORECOMPUTESERVICEPROPERTY_H
 
 #include <map>
 
@@ -17,7 +17,7 @@
 
 namespace wrench {
 
-    class MulticoreJobExecutorProperty : public ComputeServiceProperty {
+    class MulticoreComputeServiceProperty : public ComputeServiceProperty {
 
     public:
 
@@ -43,4 +43,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_MULTICOREJOBEXECUTORPROPERTY_H
+#endif //WRENCH_MULTICORECOMPUTESERVICEPROPERTY_H

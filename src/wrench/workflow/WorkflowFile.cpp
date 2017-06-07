@@ -81,6 +81,14 @@ namespace wrench {
      */
     std::map<std::string, WorkflowTask *> WorkflowFile::getInputOf() {
       return this->input_of;
+    }
+
+    /**
+     * @brief Retrieve the file's workflow
+     * @return the woriflow
+     */
+    Workflow *WorkflowFile::getWorkflow() {
+      return this->workflow;
     };
 
 };

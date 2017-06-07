@@ -14,30 +14,31 @@
 
 namespace wrench {
 
-    /**
-   * @brief Constructor (input/output files will be read/written to/from the default
-   *        StorageService for the ComputeService to which the job will be submitted
-   *
-   * @param tasks: the vector of WorkflowTasks object that comprise the job
-   *
-   * @throw std::invalid_argument
-   */
-    StandardJob::StandardJob(std::vector<WorkflowTask *> tasks) : StandardJob::StandardJob(tasks, {}) {
-
-    }
 
     /**
      * @brief Constructor
-     *
-     * @param tasks: the vector of WorkflowTasks object that comprise the job
-     * @param file_locations: a map that specifies on which StorageService input/output files should be read/written
-     *         (default StorageService is used otherwise, provided that the job is submitted to a ComputeService
+     * @param tasks: the tasks in the job, which should all be independent and in the READY state
+     * @param file_locations: a map that specifies on which storage service input/output files should be read/written
+     *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
+     *
+     * @param pre_file_copies: a set of tuples that specify which file copy operations should be completed
+     *                         before task executions begin
+     *
+     * @param post_file_copies: a set of tuples that specify which file copy operations should be completed
+     *                         after task executions end
+     *
+     * @param cleanup_file_deletions: a set of tuples that specify which file copies should be removed from which
+     *                         storage service. This will happen regardless of whether the job succeeds or fails
      *
      * @throw std::invalid_argument
      */
     StandardJob::StandardJob(std::vector<WorkflowTask *> tasks,
-                             std::map<WorkflowFile *, StorageService *> file_locations) {
+                             std::map<WorkflowFile *, StorageService *> file_locations,
+                             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
+                             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+                             std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
+
       this->type = WorkflowJob::STANDARD;
       this->num_cores = 1;
       this->duration = 0.0;
@@ -59,9 +60,11 @@ namespace wrench {
       this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
 
       this->file_locations = file_locations;
+      this->pre_file_copies = pre_file_copies;
+      this->post_file_copies = post_file_copies;
+      this->cleanup_file_deletions = cleanup_file_deletions;
 
-    }
-
+    };
 
     /**
      * @brief Get the number of tasks in the job
@@ -103,5 +106,6 @@ namespace wrench {
      */
     std::map<WorkflowFile*, StorageService*> StandardJob::getFileLocations() {
       return this->file_locations;
-    };
+    }
+
 };

@@ -10,7 +10,7 @@
 
 #include <csignal>
 
-#include <services/compute_services/multicore_job_executor/MulticoreJobExecutor.h>
+#include <services/compute_services/multicore_compute_service/MulticoreComputeService.h>
 #include <logging/TerminalOutput.h>
 #include <simulation/Simulation.h>
 #include <services/Service.h>

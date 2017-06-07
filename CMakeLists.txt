@@ -48,10 +48,8 @@ set(SOURCE_FILES
         src/wrench/wms/scheduler/MaxMinScheduler.cpp
         src/wrench/services/compute_services/ComputeService.cpp
         src/wrench/services/compute_services/ComputeService.h
-        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.cpp
-        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutor.h
-        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutor.cpp
-        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutor.h
+        src/wrench/services/compute_services/multicore_compute_service/MulticoreComputeService.cpp
+        src/wrench/services/compute_services/multicore_compute_service/MulticoreComputeService.h
         src/wrench/workflow_job/PilotJob.cpp
         src/wrench/workflow_job/PilotJob.h
         src/wrench/managers/job_manager/JobManager.cpp
@@ -83,22 +81,22 @@ set(SOURCE_FILES
         src/wrench/services/compute_services/ComputeServiceProperty.cpp
         src/wrench/services/storage_services/StorageServiceProperty.cpp
         src/wrench/services/file_registry_service/FileRegistryServiceProperty.cpp
-        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutorProperty.cpp
+        src/wrench/services/compute_services/multicore_compute_service/MulticoreComputeServiceProperty.cpp
         src/wrench/services/storage_services/simple_storage_service/SimpleStorageServiceProperty.cpp
         src/wrench/workflow_execution_events/WorkflowExecutionFailureCause.h
         src/wrench/workflow_execution_events/WorkflowExecutionFailureCause.cpp
-        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorMessage.cpp
-        src/wrench/helper_daemons/sequential_task_executor/SequentialTaskExecutorMessage.h
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessage.h
         src/wrench/services/compute_services/ComputeServiceMessage.cpp
         src/wrench/services/compute_services/ComputeServiceMessage.h
-        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutorMessage.cpp
-        src/wrench/services/compute_services/multicore_job_executor/MulticoreJobExecutorMessage.h
+        src/wrench/services/compute_services/multicore_compute_service/MulticoreComputeServiceMessage.cpp
+        src/wrench/services/compute_services/multicore_compute_service/MulticoreComputeServiceMessage.h
         src/wrench/services/storage_services/StorageServiceMessage.cpp
         src/wrench/services/storage_services/StorageServiceMessage.h
         src/wrench/services/file_registry_service/FileRegistryMessage.cpp
-        src/wrench/services/file_registry_service/FileRegistryMessage.h)
+        src/wrench/services/file_registry_service/FileRegistryMessage.h
+        src/wrench/services/compute_services/multicore_compute_service/WorkerThread.cpp
+        src/wrench/services/compute_services/multicore_compute_service/WorkerThread.h)
 
 # test files
 set(TEST_FILES

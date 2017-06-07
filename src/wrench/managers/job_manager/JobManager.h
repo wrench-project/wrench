@@ -18,10 +18,10 @@
 
 namespace wrench {
 
-    class Workflow;
+		class Workflow;
 		class WorkflowTask;
 		class WorkflowFile;
-    class WorkflowJob;
+		class WorkflowJob;
 		class PilotJob;
 		class StandardJob;
 		class ComputeService;
@@ -48,9 +48,19 @@ namespace wrench {
 
 				void kill();
 
-				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations);
+				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
+				                               std::map<WorkflowFile *, StorageService *> file_locations,
+				                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
+				                               std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+				                               std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
 
-				StandardJob *createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, StorageService *> file_locations);
+				StandardJob *createStandardJob(std::vector<WorkflowTask *> tasks,
+				                               std::map<WorkflowFile *,
+								                               StorageService *> file_locations);
+
+				StandardJob *createStandardJob(WorkflowTask *task,
+				                               std::map<WorkflowFile *,
+								                               StorageService *> file_locations);
 
 				PilotJob *createPilotJob(Workflow *workflow, int num_cores, double duration);
 

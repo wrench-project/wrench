@@ -72,7 +72,7 @@ namespace wrench {
 
 				ComputeService(std::string service_name,
 				               std::string mailbox_name_prefix,
-											 StorageService *default_storate_service);
+											 StorageService *default_storage_service);
 
 		protected:
 

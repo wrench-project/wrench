@@ -1,14 +1,28 @@
 DATA STORAGE IMPLEMENTATION:
 
-    QUESTION: WHO UPDATES THE REGISTRY:
-        - I AM GOING TO SAY: THE WMS
+    - WAY for a job to do data movement b4 and after tasks?
+        - file copies to do (or empty)
+        - vector of tasks + file map to get stuff from
+        - file copies to do (or empty)
 
-    - SIMPLE STORAGE SERVICE: How to deal with synchrony problem.
-            - File copy: should just trigger it and then there could be an actual notification?
+   - WHO PERFORMS THE COPIES?
+        - Should be the ComputeService
+            - Otherwise, the WMS can do it via the DataManager using its own strategy... and then passes
+              empty pre-post thingies
+
+
+
+    - WHO UPDATES THE REGISTRY?
+        - When the WMS does a file copy
+        - When a job produces an output file???
+        - Could be all done in the DataMovement Manager and in the
+
+    - SIMPLE STORAGE SERVICE: How to deal with synchrony problem
+        - Wait for Mt to fix the wait_any()
 
     - Attach a default StorageService to the WMS??
 
-    - Track all task change updates and make sure they're all in the JobManager?
+    - Track all task change updates and make sure they're all in the JobManager...
 
     - Chase memory leaks
         - Cause/Exception unique_ptr?
@@ -25,11 +39,8 @@ BUGS:
 
 SOFTWARE ENGINEERING:
 
-- Create a "Service" base class, so as to avoid code duplication between
-  StorageService,  ComputeService, FileRegistryService, etc.
-    - Properties: cast to int
 
-- For the WMS, instead of having a bit switch to handle events, instead do a "listener" thing:
+- For the WMS, instead of having a big switch to handle events, instead do a "listener" thing:
    A single method that says "waitForAndProcessNextEvent", that does the getMessage() and then
    calls user-provided "take action" methods, which are defined as virtual no-op methods in the base WMS class.
 
