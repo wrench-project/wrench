@@ -9,7 +9,7 @@
  */
 
 #include <iostream>
-#include "S4U_Simulation.h"
+#include "simgrid_S4U_util/S4U_Simulation.h"
 
 namespace wrench {
 
@@ -81,13 +81,12 @@ namespace wrench {
       return hostname_list;
     }
 
-
     /**
-		 * @brief Retrieves the number of cores of a host
-		 *
-		 * @param hostname: the name of the host
-		 * @return the number of cores of the host
-		 */
+     * @brief Retrieves the number of cores of a host
+     *
+     * @param hostname: the name of the host
+     * @return the number of cores of the host
+     */
     int S4U_Simulation::getNumCores(std::string hostname) {
       return simgrid::s4u::Host::by_name(hostname)->coreCount();
     }
@@ -110,7 +109,6 @@ namespace wrench {
       e_smx_state_t state = simgrid::s4u::this_actor::execute(flops);
 //      std::cerr << "STATE RETURNED BY COMPUTE = " << state << std::endl;
     }
-
 
     /**
      * @brief Simulates a sleep

@@ -81,7 +81,7 @@ namespace wrench {
       int i;
       int skip = 0;
       for (i = 1; i < *argc; i++) {
-        if (!strncmp(argv[i], "--wrench-no-color", strlen("--wrench-no-color"))) {
+        if (not strncmp(argv[i], "--wrench-no-color", strlen("--wrench-no-color"))) {
           TerminalOutput::disableColor();
           skip++;
         }
@@ -110,7 +110,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::instantiatePlatform(std::string filename) {
-      if (!this->s4u_simulation->isInitialized()) {
+      if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation is not initialized");
       }
       static bool already_setup = false;
@@ -132,7 +132,7 @@ namespace wrench {
     }
 
     /**
-		 * @brief Launch the simulation
+     * @brief Launch the simulation
      *
      * @throw std::runtime_error
 		 */
@@ -160,7 +160,7 @@ namespace wrench {
       }
 
       // Check that a FileRegistryService is running
-      if (!this->file_registry_service) {
+      if (not this->file_registry_service) {
         throw std::runtime_error(
                 "A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()");
       }

@@ -13,19 +13,16 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     *
      * @param workflow: a pointer to a Workflow object
      * @param num_cores: the number of cores required by the pilot job
      * @param duration: duration of the pilot job, in seconds
-     * @param compute_service: the compute service running the pilot job
      */
-    PilotJob::PilotJob(Workflow *workflow, unsigned long num_cores, double duration) {
+    PilotJob::PilotJob(Workflow *workflow, unsigned long num_cores, double duration) :
+            WorkflowJob(WorkflowJob::PILOT, num_cores, duration), state(PilotJob::State::NOT_SUBMITTED) {
 
-      this->type = WorkflowJob::PILOT;
-      this->state = PilotJob::State::NOT_SUBMITTED;
       this->workflow = workflow;
       this->name = "pilot_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
-      this->num_cores = num_cores;
-      this->duration = duration;
     }
 
     /**

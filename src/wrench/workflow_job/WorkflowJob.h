@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #ifndef WRENCH_WORKFLOWJOB_H
 #define WRENCH_WORKFLOWJOB_H
 
@@ -18,61 +17,68 @@
 namespace wrench {
 
 
-		class Workflow;
+    class Workflow;
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-		/**
-		 * @brief Abstraction of a job used for executing tasks in a Workflow
-		 */
-		class WorkflowJob {
-		public:
+    /**
+     * @brief Abstraction of a job used for executing tasks in a Workflow
+     */
+    class WorkflowJob {
+    public:
 
-				enum Type {
-						STANDARD,
-						PILOT
-				};
+        enum Type {
+            STANDARD,
+            PILOT
+        };
 
+        Type getType();
 
-				Type getType();
-				std::string getTypeAsString();
-				std::string getName();
+        std::string getTypeAsString();
 
-				int getNumCores();
-				double getDuration();
+        std::string getName();
 
-				/***********************/
-				/** \cond INTERNAL     */
-				/***********************/
+        int getNumCores();
 
-				std::string popCallbackMailbox();
-				void pushCallbackMailbox(std::string);
-				std::string getCallbackMailbox();
-				std::string getOriginCallbackMailbox();
+        double getDuration();
 
-				/***********************/
-				/** \cond INTERNAL     */
-				/***********************/
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
+        std::string popCallbackMailbox();
 
-		protected:
+        void pushCallbackMailbox(std::string);
 
-				std::stack<std::string> callback_mailbox_stack;		// Stack of callback mailboxes
-				Workflow *workflow;
-				Type type;
-				std::string name;
-				unsigned long getNewUniqueNumber();
+        std::string getCallbackMailbox();
+
+        std::string getOriginCallbackMailbox();
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
+    protected:
+
+        WorkflowJob(Type type, unsigned long num_cores, double duration);
+
+        unsigned long getNewUniqueNumber();
+
+        std::stack<std::string> callback_mailbox_stack;    // Stack of callback mailboxes
+        Workflow *workflow;
+        Type type;
+        std::string name;
 
         double duration;
         unsigned long num_cores;
 
-		};
+    };
 
-		/***********************/
-		/** \endcond           */
-		/***********************/
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
 

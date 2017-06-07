@@ -7,14 +7,14 @@
  * (at your option) any later version.
  */
 
+#include <iostream>
 #include <xbt/ex.hpp>
 #include <simgrid/s4u/Mailbox.hpp>
 #include <simgrid/s4u.hpp>
 
-#include <simulation/SimulationMessage.h>
-#include <logging/TerminalOutput.h>
-#include <iostream>
-#include "S4U_Mailbox.h"
+#include "logging/TerminalOutput.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "simulation/SimulationMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
 
@@ -32,7 +32,6 @@ namespace wrench {
      *        simply appends an increasing sequence number to the prefix)
      *
      * @param prefix: a prefix for the mailbox name
-     *
      * @return a unique mailbox name as a string
      */
     std::string S4U_Mailbox::generateUniqueMailboxName(std::string prefix) {
@@ -44,7 +43,6 @@ namespace wrench {
      * @brief A blocking method to receive a message from a mailbox
      *
      * @param mailbox: the mailbox name
-     *
      * @return a unique pointer to the message
      *
      * @throw std::runtime_error
@@ -65,7 +63,6 @@ namespace wrench {
      *
      * @param mailbox: the mailbox name
      * @param timeout:  a timeout value in seconds
-     *
      * @return a unique pointer to the message, nullptr on timeout
      *
      * @throw std::runtime_error
@@ -139,13 +136,14 @@ namespace wrench {
         // in a state of flux, and so this seems to work but for the memory leak
         // will have to talk to the S4U developers
 
-//				XBT_INFO("Getting the state of a previous communication! (%s)", simgrid::s4u::Actor::self()->name().c_str());
+//        XBT_INFO("Getting the state of a previous communication! (%s)", simgrid::s4u::Actor::self()->name().c_str());
         e_s4u_activity_state_t state = (*it)->getState();
         if (state == finished) {
-//					XBT_INFO("The communication is finished.... remove it from the pending list [TODO: delete memory??? call test()???]");
+//          XBT_INFO(
+//                  "The communication is finished.... remove it from the pending list [TODO: delete memory??? call test()???]");
           set.erase(*it);
         } else {
-//					XBT_INFO("State = %d (finished = %d)", state, finished);
+//          XBT_INFO("State = %d (finished = %d)", state, finished);
         }
       }
       return;
@@ -153,6 +151,7 @@ namespace wrench {
 
     /**
      * @brief Get the private mailbox name of a S4U actor
+     *
      * @return the mailbox name
      */
     std::string S4U_Mailbox::getPrivateMailboxName() {
