@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
                                                              std::unique_ptr<wrench::Scheduler>(
                                                                      new wrench::RandomScheduler()),
                                                              wms_host)));
-//  wms->addStaticOptimization(std::unique_ptr<wrench::StaticOptimization>(new wrench::SimplePipelineClustering()));
+  wms->addStaticOptimization(std::unique_ptr<wrench::StaticOptimization>(new wrench::SimplePipelineClustering()));
 //  wms->addDynamicOptimization(std::unique_ptr<wrench::DynamicOptimization>(new wrench::FailureDynamicClustering()));
 
   std::string file_registry_service_host = hostname_list[(hostname_list.size() > 2) ? 1 : 0];

@@ -45,8 +45,6 @@ namespace wrench {
      */
     int SimpleWMS::main() {
 
-      std::cout << "______________ SET SIM _________" << std::endl;
-
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
 
       WRENCH_INFO("Starting on host %s listening on mailbox %s",
@@ -76,7 +74,6 @@ namespace wrench {
 
         // Get the available compute services
         std::set<ComputeService *> compute_services = this->simulation->getComputeServices();
-        std::cout << "______________ SET SIM __2_______" << std::endl;
 
         if (compute_services.size() == 0) {
           WRENCH_INFO("Aborting - No compute services available!");

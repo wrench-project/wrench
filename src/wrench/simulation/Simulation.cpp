@@ -233,7 +233,7 @@ namespace wrench {
 
       wms->setSimulation(this);
       this->wms = std::move(wms);
-      return wms.get();
+      return this->wms.get();
     }
 
     /**
