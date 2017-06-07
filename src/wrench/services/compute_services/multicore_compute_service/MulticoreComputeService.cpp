@@ -8,7 +8,6 @@
  */
 
 #include "MulticoreComputeService.h"
-<<<<<<< HEAD
 
 #include <simulation/Simulation.h>
 #include <logging/TerminalOutput.h>
@@ -17,16 +16,7 @@
 #include <services/storage_services/StorageService.h>
 #include <services/ServiceMessage.h>
 #include <services/compute_services/ComputeServiceMessage.h>
-=======
->>>>>>> 95bfc6656430262b7f9cfe8357bb4f4ad0d16ec5
 #include "exceptions/WorkflowExecutionException.h"
-#include "logging/TerminalOutput.h"
-#include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "simulation/Simulation.h"
-#include "simulation/SimulationMessage.h"
-#include "services/compute_services/ComputeServiceMessage.h"
-#include "services/storage_services/StorageService.h"
-#include "services/ServiceMessage.h"
 #include "workflow_job/PilotJob.h"
 #include "workflow_job/StandardJob.h"
 #include "MulticoreComputeServiceMessage.h"
@@ -785,13 +775,7 @@ namespace wrench {
                                                      WorkUnit *work,
                                                      WorkflowExecutionFailureCause *cause) {
 
-<<<<<<< HEAD
       StandardJob *job = work->job;
-=======
-      // Put that worker thread back into the pull of idle worker threads
-      this->busy_worker_threads.erase(worker_thread);
-      this->idle_worker_threads.insert(worker_thread);
->>>>>>> 95bfc6656430262b7f9cfe8357bb4f4ad0d16ec5
 
       WRENCH_INFO("A worker thread has failed to do work on behalf of job %s", job->getName().c_str());
 
@@ -803,16 +787,12 @@ namespace wrench {
         }
       }
 
-<<<<<<< HEAD
       // Remove the work from the running work queue
       if (this->running_works.find(work) == this->running_works.end()) {
         throw std::runtime_error(
                 "MulticoreComputeService::processWorkFailure(): just completed work should be in the running work queue");
       }
       this->running_works.erase(work);
-=======
-      WorkflowTask *task = tasks[0];
->>>>>>> 95bfc6656430262b7f9cfe8357bb4f4ad0d16ec5
 
       // Remove all other works for the job in the "not ready" state
       for (auto w : this->non_ready_works) {
@@ -821,7 +801,6 @@ namespace wrench {
         }
       }
 
-<<<<<<< HEAD
       // Remove all other works for the job in the "ready" state
       for (std::deque<WorkUnit*>::iterator it = this->ready_works.begin(); it != this->ready_works.end(); it++)  {
         if ((*it)->job == job) {
@@ -857,15 +836,6 @@ namespace wrench {
       // Remove the job from the list of running jobs
       this->running_jobs.erase(job);
 
-=======
-      // Get the job for the task
-      StandardJob *job = (StandardJob *) (task->getJob());
-      WRENCH_INFO("One of my cores has failed to run task %s: %s", task->getId().c_str(), cause->toString().c_str());
-
-      // Remove the job from the list of running jobs
-      this->running_jobs.erase(job);
-
->>>>>>> 95bfc6656430262b7f9cfe8357bb4f4ad0d16ec5
       // Fail the job
       this->failStandardJob(job, cause);
 

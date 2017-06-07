@@ -56,6 +56,8 @@ namespace wrench {
 				PilotJob(Workflow *workflow, unsigned long, double);
 				PilotJob::State getState();
 
+
+
 				State state;
 				ComputeService *compute_service; // Associated compute service
 		};

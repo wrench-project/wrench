@@ -63,9 +63,10 @@ namespace wrench {
 				Workflow *workflow;
 				Type type;
 				std::string name;
-				double duration;
-				unsigned long num_cores;
 				unsigned long getNewUniqueNumber();
+
+        double duration;
+        unsigned long num_cores;
 
 		};
 

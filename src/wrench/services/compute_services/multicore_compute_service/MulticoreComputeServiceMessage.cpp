@@ -197,5 +197,6 @@ namespace wrench {
       this->work = work;
 
       this->cause = cause;
+    }
 
 };

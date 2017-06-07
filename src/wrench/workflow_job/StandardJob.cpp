@@ -48,6 +48,8 @@ namespace wrench {
           throw std::invalid_argument("All tasks used to create a StandardJob must be READY");
         }
       }
+
+      // TODO: This is just a sequential duration assuming num_cores = 1!!!
       for (auto t : tasks) {
         this->tasks.push_back(t);
         t->setJob(this);
