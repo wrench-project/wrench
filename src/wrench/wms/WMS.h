@@ -18,7 +18,7 @@
 
 namespace wrench {
 
-    class Simulation; // forward ref
+    class Simulation;
 
     /**
      * @brief Abstract implementation of a Workflow Management System
@@ -30,29 +30,46 @@ namespace wrench {
 
         void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
 
+        /***********************/
+        /** \cond DEVELOPER */
+        /***********************/
+
+        std::string getHostname();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+    protected:
 
         /***********************/
         /** \cond DEVELOPER */
         /***********************/
-    public:
-        std::string getHostname();
 
-    protected:
-
-        friend class Simulation;
-
-        WMS(Simulation *, Workflow *, std::unique_ptr<Scheduler>, std::string, std::string);
+        WMS(Workflow *, std::unique_ptr<Scheduler>, std::string, std::string);
 
         void runDynamicOptimizations();
 
         void runStaticOptimizations();
 
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
+        friend class Simulation;
+
         Simulation *simulation;
         Workflow *workflow;
+
         std::unique_ptr<Scheduler> scheduler;
         std::vector<std::unique_ptr<DynamicOptimization>> dynamic_optimizations;
         std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
 
+        void setSimulation(Simulation *simulation);
 
         /***********************/
         /** \endcond           */

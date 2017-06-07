@@ -7,14 +7,13 @@
  * (at your option) any later version.
  */
 
-
-#include "StorageService.h"
+#include "exceptions/WorkflowExecutionException.h"
+#include "logging/TerminalOutput.h"
+#include "services/storage_services/StorageService.h"
+#include "services/storage_services/StorageServiceMessage.h"
+#include "services/storage_services/StorageServiceProperty.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simulation/Simulation.h"
-#include "StorageServiceProperty.h"
-#include "StorageServiceMessage.h"
-#include <logging/TerminalOutput.h>
-#include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <exceptions/WorkflowExecutionException.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service, "Log category for Storage Service");
 
@@ -22,13 +21,15 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(storage_service, "Log category for Storage Service"
 namespace wrench {
 
     /**
-   * @brief Constructor
-   *
-   * @param service_name: the name of the storage service
-   */
+     * @brief Constructor
+     *
+     * @param service_name: the name of the storage service
+     * @param mailbox_name_prefix:
+     * @param capacity:
+     */
     StorageService::StorageService(std::string service_name, std::string mailbox_name_prefix, double capacity) :
-            Service(service_name, mailbox_name_prefix) {
-      this->capacity = capacity;
+            Service(service_name, mailbox_name_prefix), capacity(capacity) {
+
       this->simulation = nullptr; // will be filled in via Simulation::add()
       this->state = StorageService::UP;
     }
@@ -48,7 +49,8 @@ namespace wrench {
       }
 
       if (file->getSize() > (this->capacity - this->occupied_space)) {
-        printf("---> %lf %lf %lf", file->getSize(), this->capacity, this->occupied_space);
+        WRENCH_WARN("File exceeds free space capacity on storage service (file size: %lf, storage free space: %lf)",
+                    file->getSize(), (this->capacity - this->occupied_space));
         throw std::runtime_error("File exceeds free space capacity on storage service");
       }
       this->stored_files.insert(file);
@@ -67,12 +69,12 @@ namespace wrench {
     void StorageService::removeFileFromStorage(WorkflowFile *file) {
 
       if (this->stored_files.find(file) == this->stored_files.end()) {
-        throw std::runtime_error("Attempting to remove a file that's not on the storage service");
+        throw std::runtime_error("Attempting to remove a file that is not on the storage service");
       }
       this->stored_files.erase(file);
       this->occupied_space -= file->getSize();
-      XBT_INFO("Deleted file %s (storage usage: %.2lf%%)", file->getId().c_str(),
-               100.0 * this->occupied_space / this->capacity);
+      WRENCH_INFO("Deleted file %s (storage usage: %.2lf%%)", file->getId().c_str(),
+                  100.0 * this->occupied_space / this->capacity);
     }
 
     /**
@@ -93,7 +95,6 @@ namespace wrench {
     /***************************************************************/
     /****** EVERYTHING BELOW ARE INTERACTIONS WITH THE DAEMON ******/
     /***************************************************************/
-
 
     /**
      * @brief Synchronously asks the storage service for its capacity
@@ -157,7 +158,6 @@ namespace wrench {
       } else {
         throw std::runtime_error("StorageService::lookupFile(): unexpected [" + msg->getName() + "] message");
       }
-
     }
 
     /**
@@ -191,7 +191,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
       if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
         // If it's not a success, throw an exception
-        if (!msg->success) {
+        if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
         }
 
@@ -208,7 +208,6 @@ namespace wrench {
         throw std::runtime_error("StorageService::readFile(): Received an unexpected [" +
                                  message->getName() + "] message!");
       }
-
     }
 
 
@@ -243,7 +242,7 @@ namespace wrench {
 
       if (StorageServiceFileWriteAnswerMessage *msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
         // If not a success, throw an exception
-        if (!msg->success) {
+        if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
         }
 
@@ -254,20 +253,20 @@ namespace wrench {
         throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
                                  message->getName() + "] message!");
       }
-
       return;
     }
 
     /**
-    * @brief Synchronously and sequentially read a set of files from storage services
-    * @param files: the set of files to read
-    * @param file_locations: a map of files to storage services
-    * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
-    * @return nullptr on success, a pointer to a workflow execution failure cause on failure
-    *
-    * @throw std::runtime_error
-    * @throw WorkflowExecutionException
-    */
+     * @brief Synchronously and sequentially read a set of files from storage services
+     *
+     * @param files: the set of files to read
+     * @param file_locations: a map of files to storage services
+     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
+     * @return nullptr on success, a pointer to a workflow execution failure cause on failure
+     *
+     * @throw std::runtime_error
+     * @throw WorkflowExecutionException
+     */
     void StorageService::readFiles(std::set<WorkflowFile *> files,
                                    std::map<WorkflowFile *, StorageService *> file_locations,
                                    StorageService *default_storage_service) {
@@ -281,15 +280,16 @@ namespace wrench {
     }
 
     /**
-   * @brief Synchronously and sequentially uppload a set of files from storage services
-   * @param files: the set of files to write
-   * @param file_locations: a map of files to storage services
-   * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
-   * @return nullptr on success, a pointer to a workflow execution failure cause on failure
-   *
-   *  @throw std::runtime_error
-   * @throw WorkflowExecutionException
-   */
+     * @brief Synchronously and sequentially uppload a set of files from storage services
+     *
+     * @param files: the set of files to write
+     * @param file_locations: a map of files to storage services
+     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
+     * @return nullptr on success, a pointer to a workflow execution failure cause on failure
+     *
+     * @throw std::runtime_error
+     * @throw WorkflowExecutionException
+     */
     void StorageService::writeFiles(std::set<WorkflowFile *> files,
                                     std::map<WorkflowFile *, StorageService *> file_locations,
                                     StorageService *default_storage_service) {
@@ -301,7 +301,6 @@ namespace wrench {
         throw;
       }
     }
-
 
     /**
      * @brief Synchronously and sequentially write/read a set of files to/from storage services
@@ -397,6 +396,7 @@ namespace wrench {
 
     /**
      * @brief Synchronously and sequentially delete a set of files from storage services
+     *
      * @param files: the set of files to delete
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
@@ -430,6 +430,7 @@ namespace wrench {
 
     /**
      * @brief Synchronously asks the storage service to read a file from another storage service
+     *
      * @param file: the file to copy
      * @param src: the storage service from which to read the file
      *
@@ -469,6 +470,7 @@ namespace wrench {
 
     /**
      * @brief Asynchronously asks the storage service to read a file from another storage service
+     *
      * @param file: the file
      * @param src: the storage service from which to read the file
      *

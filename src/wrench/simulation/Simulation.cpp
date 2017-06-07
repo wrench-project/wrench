@@ -10,12 +10,12 @@
 
 #include <csignal>
 
-#include <services/compute_services/multicore_compute_service/MulticoreComputeService.h>
-#include <logging/TerminalOutput.h>
-#include <simulation/Simulation.h>
-#include <services/Service.h>
-#include <services/storage_services/StorageService.h>
-#include <services/file_registry_service/FileRegistryService.h>
+#include "logging/TerminalOutput.h"
+#include "services/Service.h"
+#include "services/compute_services/multicore_compute_service/MulticoreComputeService.h"
+#include "services/file_registry_service/FileRegistryService.h"
+#include "services/storage_services/StorageService.h"
+#include "simulation/Simulation.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 
@@ -35,7 +35,6 @@ namespace wrench {
 
     /**
      * @brief  Constructor
-     *
      */
     Simulation::Simulation() {
 
@@ -95,6 +94,7 @@ namespace wrench {
 
     /**
      * @brief Append a SimulationEvent to the event trace
+     *
      * @param event
      */
     template<class T>
@@ -135,16 +135,15 @@ namespace wrench {
 		 * @brief Launch the simulation
      *
      * @throw std::runtime_error
-		 *
 		 */
     void Simulation::launch() {
       // Check that the simulation is initialized
-      if (!this->s4u_simulation->isInitialized()) {
+      if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation is not initialized");
       }
 
       // Check that a WMS is running
-      if (!this->wms) {
+      if (not this->wms) {
         throw std::runtime_error("A WMS should have been instantiated and passed to Simulation.setWMS()");
       }
 
@@ -182,13 +181,12 @@ namespace wrench {
      *
      * @param executor: a unique pointer to a ComputeService object, the ownership of which is
      *        then transferred to WRENCH
-     *
      * @return a raw pointer to the ComputeService object
      *
      * @throw std::runtime_error
      */
     ComputeService *Simulation::add(std::unique_ptr<ComputeService> service) {
-      if (!this->s4u_simulation->isInitialized()) {
+      if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation is not initialized");
       }
       ComputeService *raw_ptr = service.get();
@@ -204,17 +202,15 @@ namespace wrench {
     *
     * @param executor: a unique pointer to a StorageService object, the ownership of which is
     *        then transferred to WRENCH
-    *
     * @return a raw pointer to the StorageService object
      *
     * @throw std::runtime_error
     */
     StorageService *Simulation::add(std::unique_ptr<StorageService> service) {
-      if (!this->s4u_simulation->isInitialized()) {
+      if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation is not initialized");
       }
       StorageService *raw_ptr = service.get();
-
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
@@ -226,9 +222,18 @@ namespace wrench {
      * @brief Set a WMS for the simulation
      *
      * @param wms: a unique pointer to a WMS object
+     * @return a raw pointer to the WMS object
+     *
+     * @throw std::runtime_error
      */
-    void Simulation::setWMS(std::unique_ptr<WMS> wms) {
+    WMS *Simulation::setWMS(std::unique_ptr<WMS> wms) {
+      if (not this->s4u_simulation->isInitialized()) {
+        throw std::runtime_error("Simulation is not initialized");
+      }
+
+      wms->setSimulation(this);
       this->wms = std::move(wms);
+      return wms.get();
     }
 
     /**
@@ -239,7 +244,6 @@ namespace wrench {
     void Simulation::setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service) {
       this->file_registry_service = std::move(file_registry_service);
     }
-
 
     /**
      * @brief Obtain the list of compute services
@@ -289,12 +293,12 @@ namespace wrench {
 
     /**
      * @brief Retrieves the FileRegistryService
+     *
      * @return a raw pointer to the FileRegistryService instance
      */
     FileRegistryService *Simulation::getFileRegistryService() {
       return this->file_registry_service.get();
     }
-
 
     /**
      * @brief Remove a compute service from the list of known compute services
@@ -333,9 +337,9 @@ namespace wrench {
       return;
     }
 
-
     /**
      * @brief Stage a copy of a file on a storage service
+     *
      * @param file: a raw pointer to a WorkflowFile object
      * @param storage_service: a raw pointer to a StorageService object
      *
@@ -363,11 +367,11 @@ namespace wrench {
 
       // Update the file registry
       this->file_registry_service->addEntryToDatabase(file, storage_service);
-
     }
 
     /**
    * @brief Stage a set of a file copies on a storage service
+     *
    * @param files: a set of raw pointers to WorkflowFile objects
    * @param storage_service: a raw pointer to a StorageService object
    *

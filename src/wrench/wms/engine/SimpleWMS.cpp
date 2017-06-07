@@ -25,16 +25,13 @@ namespace wrench {
     /**
      * @brief Create a Simple WMS with a workflow instance and a scheduler implementation
      *
-     * @param simulation: a pointer to a simulation object
      * @param workflow: a pointer to a workflow to execute
      * @param scheduler: a pointer to a scheduler implementation
      * @param hostname: the name of the host
      */
-    SimpleWMS::SimpleWMS(Simulation *simulation,
-                         Workflow *workflow,
+    SimpleWMS::SimpleWMS(Workflow *workflow,
                          std::unique_ptr<Scheduler> scheduler,
-                         std::string hostname) : WMS(simulation,
-                                                     workflow,
+                         std::string hostname) : WMS(workflow,
                                                      std::move(scheduler),
                                                      hostname,
                                                      "simple") {}
@@ -48,6 +45,8 @@ namespace wrench {
      */
     int SimpleWMS::main() {
 
+      std::cout << "______________ SET SIM _________" << std::endl;
+
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
 
       WRENCH_INFO("Starting on host %s listening on mailbox %s",
@@ -59,7 +58,8 @@ namespace wrench {
       std::unique_ptr<JobManager> job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
 
       // Create a data movement manager
-      std::unique_ptr<DataMovementManager> data_movement_manager = std::unique_ptr<DataMovementManager>(new DataMovementManager(this->workflow));
+      std::unique_ptr<DataMovementManager> data_movement_manager = std::unique_ptr<DataMovementManager>(
+              new DataMovementManager(this->workflow));
 
       // Perform static optimizations
       runStaticOptimizations();
@@ -76,6 +76,8 @@ namespace wrench {
 
         // Get the available compute services
         std::set<ComputeService *> compute_services = this->simulation->getComputeServices();
+        std::cout << "______________ SET SIM __2_______" << std::endl;
+
         if (compute_services.size() == 0) {
           WRENCH_INFO("Aborting - No compute services available!");
           break;
@@ -137,11 +139,7 @@ namespace wrench {
           }
         }
 
-        if (abort) {
-          break;
-        }
-
-        if (workflow->isDone()) {
+        if (abort || workflow->isDone()) {
           break;
         }
 
@@ -169,7 +167,6 @@ namespace wrench {
        *** NO NEED TO stop/kill the Managers (will soon be out of scope, and
        *** destructor simply called kill() on their actors.
        ***/
-
 
       WRENCH_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
 

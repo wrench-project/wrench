@@ -7,11 +7,11 @@
  * (at your option) any later version.
  */
 
-#include <wrench-dev.h>
-#include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <simulation/SimulationMessage.h>
-#include <services/ServiceMessage.h>
-#include <services/storage_services/StorageServiceMessage.h>
+#include "wrench-dev.h"
+#include "services/ServiceMessage.h"
+#include "services/storage_services/StorageServiceMessage.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "simulation/SimulationMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
 
@@ -20,6 +20,7 @@ namespace wrench {
 
     /**
      * @brief Public constructor
+     *
      * @param hostname: the name of the host on which to start the service
      * @param capacity: the storage capacity in bytes
      * @param plist: the optional property list
@@ -31,6 +32,7 @@ namespace wrench {
 
     /**
      * @brief Private constructor
+     *
      * @param hostname: the name of the host on which to start the service
      * @param capacity: the storage capacity in bytes
      * @param plist: the property list
@@ -49,8 +51,6 @@ namespace wrench {
       if (capacity < 0) {
         throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): invalid argument");
       }
-
-      this->capacity = capacity;
 
       // Set default properties
       for (auto p : this->default_property_values) {

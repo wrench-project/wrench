@@ -14,27 +14,22 @@ namespace wrench {
     /**
      * @brief Create a WMS with a workflow instance and a scheduler implementation
      *
-     * @param simulation: a pointer to a simulation object
      * @param workflow: a pointer to a workflow to execute
      * @param scheduler: a pointer to a scheduler implementation
      * @param hostname: the name of the host
      * @param suffix: a string to append to the process name
+     *
+     * @throw std::invalid_argument
      */
-    WMS::WMS(Simulation *simulation,
-             Workflow *workflow,
+    WMS::WMS(Workflow *workflow,
              std::unique_ptr<Scheduler> scheduler,
              std::string hostname,
              std::string suffix) :
             S4U_DaemonWithMailbox("wms_" + suffix, "wms_" + suffix),
-            simulation(simulation),
             workflow(workflow),
             scheduler(std::move(scheduler)) {
 
       this->hostname = hostname;
-
-      // Start the daemon
-      this->start(this->hostname);
-
     }
 
     /**
@@ -76,11 +71,30 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the hostname on which the WMS will start / has started
+     * @brief Set the "simulation pointer"
+     *
+     * @param simulation: a raw pointer to a Simulation object
+     *
+     * @throw std::invalid_argument
+     */
+    void WMS::setSimulation(Simulation *simulation) {
+      this->simulation = simulation;
+
+      // Start the daemon
+      try {
+        this->start(this->hostname);
+      } catch (std::invalid_argument &e) {
+        throw;
+      }
+    }
+
+    /**
+     * @brief Get the name of the host on which the WMS is running
+     *
      * @return the hostname
      */
     std::string WMS::getHostname() {
       return this->hostname;
     }
-};
 
+};
