@@ -34,12 +34,14 @@ namespace wrench {
 				static void compute(double);
 				static void sleep(double);
 				bool isInitialized();
+        bool isPlatformSetup();
         std::vector<std::string> getAllHostnames();
         void shutdown();
 
 		private:
 				simgrid::s4u::Engine *engine;
 				bool initialized = false;
+				bool platform_setup = false;
 		};
 
 		/***********************/

@@ -25,7 +25,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Determines whether S4U_Simulation::initialize() has been called
+     * @brief Returns true if S4U_Simulation::initialize() has been called successfully previously
      *
      * @return true or false
      */
@@ -34,12 +34,24 @@ namespace wrench {
     }
 
     /**
+     * @brief Returns true if S4U_Simulation::setupPlatform() has been called successfully previously
+     * @return true or false
+     */
+    bool S4U_Simulation::isPlatformSetup() {
+      return this->platform_setup;
+    }
+
+    /**
      * @brief Start the simulation
      *
      * @throw std::runtime_error
      */
     void S4U_Simulation::runSimulation() {
-      this->engine->run();
+      if (this->initialized) {
+        this->engine->run();
+      } else {
+        throw std::runtime_error("S4U_Simulation::runSimulation(): Simulation has not been initialized");
+      }
     }
 
     void S4U_Simulation::shutdown() {
@@ -55,6 +67,7 @@ namespace wrench {
      */
     void S4U_Simulation::setupPlatform(std::string filename) {
       this->engine->loadPlatform(filename.c_str());
+      this->platform_setup = true;
     }
 
     /**

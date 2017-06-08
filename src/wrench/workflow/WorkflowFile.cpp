@@ -86,6 +86,15 @@ namespace wrench {
      */
     Workflow *WorkflowFile::getWorkflow() {
       return this->workflow;
+    }
+
+
+    /**
+     * @brief Returns true if the file is the output of some task, false otherwise
+     * @return true or false
+     */
+    bool WorkflowFile::isOuput() {
+      return (this->output_of != nullptr);
     };
 
 };

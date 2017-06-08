@@ -142,6 +142,11 @@ namespace wrench {
         throw std::runtime_error("Simulation is not initialized");
       }
 
+      // Check that a platform has been setup
+      if (not this->s4u_simulation->isPlatformSetup()) {
+        throw std::runtime_error("Simulation platform has not been setup");
+      }
+
       // Check that a WMS is running
       if (not this->wms) {
         throw std::runtime_error("A WMS should have been instantiated and passed to Simulation.setWMS()");
@@ -173,7 +178,11 @@ namespace wrench {
         }
       }
 
-      this->s4u_simulation->runSimulation();
+      try {
+        this->s4u_simulation->runSimulation();
+      } catch (std::runtime_error &e) {
+        throw;
+      }
     }
 
     /**
@@ -354,7 +363,13 @@ namespace wrench {
       // Check that a FileRegistryService has been set
       if (!this->file_registry_service) {
         throw std::runtime_error(
-                "A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+                "Simulation::stageFile(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+      }
+
+      // Check that the file is not the output of anything
+      if (file->isOuput()) {
+        throw std::runtime_error(
+               "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
       }
 
       XBT_INFO("Staging file %s (%lf)", file->getId().c_str(), file->getSize());
