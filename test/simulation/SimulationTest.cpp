@@ -14,19 +14,22 @@
 #include <simulation/Simulation.h>
 #include <stdio.h>
 #include <services/storage_services/simple_storage_service/SimpleStorageService.h>
+#include <wms/WMS.h>
 
-class StorageServiceTest : public ::testing::Test {
+class SimulationTest : public ::testing::Test {
 
 protected:
-    StorageServiceTest() {
+    SimulationTest() {
 
-      // Create a bogus workflow
+      // Create the simplest workflow
       workflow = new wrench::Workflow();
 
-      // Create a few files
-      file1 = workflow->addFile("file1", 1000.0);
-      file2 = workflow->addFile("file2", 2000.0);
-      file3 = workflow->addFile("file3", 2000.0);
+      // Create two files
+      input_file = workflow->addFile("file1", 10000.0);
+      output_file = workflow->addFile("file2", 20000.0);
+
+      // Create one task
+      task = workflow->addTask("task", 3600);
 
       // Create a one-host platform file
       std::string xml = "<?xml version='1.0'?>"
@@ -44,25 +47,46 @@ protected:
 
     std::string platform_file_path = "/tmp/platform.xml";
     wrench::Workflow *workflow;
-    wrench::WorkflowFile *file1;
-    wrench::WorkflowFile *file2;
-    wrench::WorkflowFile *file3;
+    wrench::WorkflowFile *input_file;
+    wrench::WorkflowFile *output_file;
+    wrench::WorkflowTask *task;
 
 };
 
-TEST_F(StorageServiceTest, FileStaging) {
+class TestWMS : public wrench::WMS {
+
+public:
+    TestWMS(wrench::Simulation *simulation, wrench::Workflow *workflow, std::unique_ptr<wrench::Scheduler> scheduler, std::string hostname, std::string suffix) :
+            wrench::WMS(simulation, workflow, std::move(scheduler), hostname, suffix) {}
 
 
-  ASSERT_EQ(1,1);
-  return;
+private:
+    int main() {
+      printf("NOTHING");
+
+      return 0;
+    }
+};
+
+TEST_F(SimulationTest, SimulationSetup) {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
   int argc = 1;
   char **argv = (char **)calloc(1,sizeof(char*));
   argv[0] = strdup("file_staging_test");
+
+
+  ASSERT_THROW(simulation->launch(), std::runtime_error);
+
   simulation->init(&argc, argv);
-  simulation->instantiatePlatform(platform_file_path);
+
+  // Setting up the platform
+  // TODO: This should be about the platform!!!!
+  ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
   // Create a simple storage service
   std::string hostname = simulation->getHostnameList()[0];
@@ -82,7 +106,7 @@ TEST_F(StorageServiceTest, FileStaging) {
                   new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Without a file registry service this should fail
-  ASSERT_THROW(simulation->stageFiles({file1}, storage_service), std::runtime_error);
+  ASSERT_THROW(simulation->stageFiles({input_file}, storage_service), std::runtime_error);
 
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
           new wrench::FileRegistryService(hostname));
@@ -90,12 +114,11 @@ TEST_F(StorageServiceTest, FileStaging) {
 
   simulation->setFileRegistryService(std::move(file_registry_service));
 
-  ASSERT_THROW(simulation->stageFiles({file1}, nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->stageFiles({input_file}, nullptr), std::invalid_argument);
   ASSERT_THROW(simulation->stageFiles({nullptr}, storage_service), std::invalid_argument);
 
-  // Staging f1 on the storage service
-   EXPECT_NO_THROW(simulation->stageFiles({file1}, storage_service));
-
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
 
 
     std::cerr << "Launching the Simulation..." << std::endl;
@@ -106,11 +129,6 @@ TEST_F(StorageServiceTest, FileStaging) {
         return;
     }
     std::cerr << "Simulation done!" << std::endl;
-
-
-
-  // TODO: fix the segfault (just like for main...);
-//   delete simulation;
 
 }
 

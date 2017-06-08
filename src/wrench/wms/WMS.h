@@ -41,7 +41,11 @@ namespace wrench {
 
         friend class Simulation;
 
-        WMS(Simulation *, Workflow *, std::unique_ptr<Scheduler>, std::string, std::string);
+        WMS(Simulation *simulation,
+            Workflow *workflow,
+            std::unique_ptr<Scheduler> scheduler,
+            std::string hostname,
+            std::string suffix);
 
         void runDynamicOptimizations();
 

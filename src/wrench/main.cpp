@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
 
   wrench::StorageService *storage_service = simulation.add(std::unique_ptr<wrench::SimpleStorageService>(
           new wrench::SimpleStorageService(storage_host, 10000000000000.0)));
-//  wrench::StorageService *storage_service = simulation.add(
+//  wrench::StorageService *simulation = simulation.add(
 //          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(storage_host, 10.0)));
 
   std::string wms_host = hostname_list[0];
