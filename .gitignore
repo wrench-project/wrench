@@ -35,3 +35,6 @@ cmake-build-debug
 # Code coverage (testability files)
 *.gcno
 *.gcda
+
+# Documentation
+docs

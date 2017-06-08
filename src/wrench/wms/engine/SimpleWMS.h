@@ -14,7 +14,7 @@
 
 namespace wrench {
 
-    class Simulation; // forward ref
+    class Simulation;
 
     /**
      *  @brief A simple WMS implementation
@@ -22,7 +22,7 @@ namespace wrench {
     class SimpleWMS : public WMS {
 
     public:
-        SimpleWMS(Simulation *, Workflow *, std::unique_ptr<Scheduler>, std::string);
+        SimpleWMS(Workflow *, std::unique_ptr<Scheduler>, std::string);
 
     private:
         int main();

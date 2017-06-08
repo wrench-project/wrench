@@ -17,7 +17,7 @@
 #include <set>
 #include <vector>
 
-#include "WorkflowJob.h"
+#include "workflow_job/WorkflowJob.h"
 
 namespace wrench {
 
@@ -26,7 +26,9 @@ namespace wrench {
     /***********************/
 
     class StorageService;
+
     class WorkflowFile;
+
     class WorkflowTask;
 
     /**
@@ -73,14 +75,11 @@ namespace wrench {
         State state;
 
 
-
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-
 
 };
 

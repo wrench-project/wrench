@@ -11,9 +11,8 @@
 #define WRENCH_SIMPLESTORAGESERVICE_H
 
 
-#include <services/storage_services/StorageService.h>
-
-#include "SimpleStorageServiceProperty.h"
+#include "services/storage_services/StorageService.h"
+#include "services/storage_services/simple_storage_service/SimpleStorageServiceProperty.h"
 
 namespace wrench {
 
@@ -21,18 +20,18 @@ namespace wrench {
 
     private:
         std::map<std::string, std::string> default_property_values =
-                {{SimpleStorageServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,           "1024"},
-                 {SimpleStorageServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,        "1024"},
-                 {SimpleStorageServiceProperty::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD,   "1024"},
-                 {SimpleStorageServiceProperty::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD,    "1024"},
-                 {SimpleStorageServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD,   "1024"},
-                 {SimpleStorageServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,    "1024"},
-                 {SimpleStorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD,     "1024"},
-                 {SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD,      "1024"},
-                 {SimpleStorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD,   "1024"},
-                 {SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD,    "1024"},
-                 {SimpleStorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                {{SimpleStorageServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,         "1024"},
+                 {SimpleStorageServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,      "1024"},
+                 {SimpleStorageServiceProperty::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                 {SimpleStorageServiceProperty::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {SimpleStorageServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                 {SimpleStorageServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {SimpleStorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD,   "1024"},
+                 {SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD,    "1024"},
+                 {SimpleStorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                 {SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD,   "1024"},
+                 {SimpleStorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD,   "1024"},
+                 {SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD,    "1024"},
                 };
 
     public:
@@ -41,7 +40,6 @@ namespace wrench {
         SimpleStorageService(std::string hostname,
                              double capacity,
                              std::map<std::string, std::string> = {});
-
 
 
         /***********************/
@@ -55,7 +53,6 @@ namespace wrench {
 //        void writeFile(WorkflowFile *file);
 //
 //        void deleteFile(WorkflowFile *file);
-
 
         /***********************/
         /** \endcond           */
@@ -71,7 +68,6 @@ namespace wrench {
                              std::map<std::string, std::string>,
                              std::string suffix);
 
-
         double capacity;
 
         int main();
@@ -81,7 +77,6 @@ namespace wrench {
         std::string data_write_mailbox_name;
 
     };
-
 
 };
 

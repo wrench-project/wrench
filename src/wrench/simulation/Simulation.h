@@ -14,12 +14,11 @@
 #include <string>
 #include <vector>
 
-#include <services/file_registry_service/FileRegistryService.h>
-#include <wms/WMS.h>
-#include <simgrid_S4U_util/S4U_Simulation.h>
-#include <workflow_job/StandardJob.h>
-
-#include "SimulationOutput.h"
+#include "services/file_registry_service/FileRegistryService.h"
+#include "simgrid_S4U_util/S4U_Simulation.h"
+#include "simulation/SimulationOutput.h"
+#include "workflow_job/StandardJob.h"
+#include "wms/WMS.h"
 
 
 namespace wrench {
@@ -55,7 +54,7 @@ namespace wrench {
 
         void stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service);
 
-        void setWMS(std::unique_ptr<WMS>);
+        WMS *setWMS(std::unique_ptr<WMS>);
 
         SimulationOutput output;
 
@@ -63,14 +62,12 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-
         template<class T>
         void newTimestamp(SimulationTimestamp<T> *event);
 
         void shutdownAllComputeServices();
 
         void shutdownAllStorageServices();
-
 
         std::set<ComputeService *> getComputeServices();
 
@@ -107,9 +104,7 @@ namespace wrench {
         std::vector<std::unique_ptr<StorageService>> running_storage_services;
         std::vector<std::unique_ptr<StorageService>> terminated_storage_services;
 
-
     };
-
 
 };
 

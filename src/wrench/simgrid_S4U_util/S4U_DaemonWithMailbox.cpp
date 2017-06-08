@@ -8,9 +8,9 @@
  *
  */
 
-#include "S4U_DaemonWithMailbox.h"
-#include "S4U_DaemonWithMailboxActor.h"
-#include "S4U_Mailbox.h"
+#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
+#include "simgrid_S4U_util/S4U_DaemonWithMailboxActor.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
 
 namespace wrench {
 
@@ -26,6 +26,7 @@ namespace wrench {
 
     /**
      * @brief Start the daemon
+     *
      * @param hostname: the name of the host on which to start the daemon
      */
     void S4U_DaemonWithMailbox::start(std::string hostname) {
@@ -40,7 +41,7 @@ namespace wrench {
         this->s4u_actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
                                                            simgrid::s4u::Host::by_name(hostname),
                                                            S4U_DaemonWithMailboxActor(this));
-      } catch (std::exception e) {
+      } catch (std::exception &e) {
         // Some internal SimGrid exceptions...
         std::abort();
       }
@@ -71,6 +72,7 @@ namespace wrench {
 
     /**
      * @brief Retrieve the process name
+     *
      * @return the name
      */
     std::string S4U_DaemonWithMailbox::getName() {

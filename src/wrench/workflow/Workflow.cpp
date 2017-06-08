@@ -301,7 +301,9 @@ namespace wrench {
           }
         } else {
           if (task_map.find(task->getClusterId()) != task_map.end()) {
-            task->setState(WorkflowTask::State::READY);
+            if (task->getState() == WorkflowTask::NOT_READY) {
+              task->setState(WorkflowTask::READY);
+            }
             task_map[task->getClusterId()].push_back(task);
           }
         }
@@ -427,10 +429,12 @@ namespace wrench {
           break;
         }
         case WorkflowTask::READY: {
-          if (task->getState() == WorkflowTask::READY) {
+          if (task->getState() == WorkflowTask::READY ||
+              task->getState() == WorkflowTask::PENDING ||
+              task->getState() == WorkflowTask::COMPLETED) {
             return;
           }
-          if ((task->getState() != WorkflowTask::NOT_READY) && (task->getState() != WorkflowTask::PENDING)) {
+          if (task->getState() != WorkflowTask::NOT_READY && task->getState() != WorkflowTask::FAILED) {
             throw std::runtime_error("Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
                                      " task to WorkflowTask::READY");
           }

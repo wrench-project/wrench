@@ -118,17 +118,14 @@ int main(int argc, char **argv) {
 
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
 
-  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::RandomScheduler());
-//  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MinMinScheduler());
-//  std::unique_ptr<wrench::Scheduler> scheduler(new wrench::MaxMinScheduler());
-  std::unique_ptr<wrench::StaticOptimization> opt(new wrench::SimplePipelineClustering());
-  std::unique_ptr<wrench::DynamicOptimization> dynamic_opt(new wrench::FailureDynamicClustering());
-
-  std::unique_ptr<wrench::WMS> wms(new wrench::SimpleWMS(&simulation, &workflow, std::move(scheduler), wms_host));
-  wms.get()->addStaticOptimization(std::move(opt));
-//  wms.get()->addDynamicOptimization(std::move(dynamic_opt));
-
-  simulation.setWMS(std::move(wms));
+  // WMS Configuration
+  wrench::WMS *wms = simulation.setWMS(
+          std::unique_ptr<wrench::WMS>(new wrench::SimpleWMS(&workflow,
+                                                             std::unique_ptr<wrench::Scheduler>(
+                                                                     new wrench::RandomScheduler()),
+                                                             wms_host)));
+  wms->addStaticOptimization(std::unique_ptr<wrench::StaticOptimization>(new wrench::SimplePipelineClustering()));
+//  wms->addDynamicOptimization(std::unique_ptr<wrench::DynamicOptimization>(new wrench::FailureDynamicClustering()));
 
   std::string file_registry_service_host = hostname_list[(hostname_list.size() > 2) ? 1 : 0];
 

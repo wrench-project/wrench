@@ -11,61 +11,57 @@
 #define WRENCH_PILOTJOB_H
 
 
-#include "WorkflowJob.h"
+#include "workflow_job/WorkflowJob.h"
 
 namespace wrench {
 
-		class ComputeService;
+    class ComputeService;
 
-		/***********************/
-		/** \cond DEVELOPER    */
-		/***********************/
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
-		/**
-		 * @brief A pilot WorkflowJob
-		 */
-		class PilotJob : public WorkflowJob {
+    /**
+     * @brief A pilot WorkflowJob
+     */
+    class PilotJob : public WorkflowJob {
 
-		public:
-				enum State {
-						NOT_SUBMITTED,
-						PENDING,
-						RUNNING,
-						EXPIRED,
-						FAILED
-				};
+    public:
+        enum State {
+            NOT_SUBMITTED,
+            PENDING,
+            RUNNING,
+            EXPIRED,
+            FAILED
+        };
 
-				ComputeService *getComputeService();
+        ComputeService *getComputeService();
 
-				/***********************/
-				/** \cond INTERNAL     */
-				/***********************/
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
 
-				void setComputeService(ComputeService*);
+        void setComputeService(ComputeService *);
 
-				/***********************/
-				/** \endcond           */
-				/***********************/
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
+    private:
 
+        friend class JobManager;
 
-		private:
+        PilotJob(Workflow *workflow, unsigned long, double);
 
-				friend class JobManager;
+        PilotJob::State getState();
 
-				PilotJob(Workflow *workflow, unsigned long, double);
-				PilotJob::State getState();
+        State state;
+        ComputeService *compute_service; // Associated compute service
+    };
 
-
-
-				State state;
-				ComputeService *compute_service; // Associated compute service
-		};
-
-		/***********************/
-		/** \endcond           */
-		/***********************/
-
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
 

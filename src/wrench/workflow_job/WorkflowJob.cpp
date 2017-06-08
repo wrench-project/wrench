@@ -16,7 +16,19 @@
 namespace wrench {
 
     /**
+     * @brief Constructor
+     *
+     * @param type: job type
+     * @param num_cores: the number of cores required by the job
+     * @param duration: duration of the pilot job, in seconds
+     */
+    WorkflowJob::WorkflowJob(Type type, unsigned long num_cores, double duration) : type(type), num_cores(num_cores),
+                                                                                    duration(duration) {}
+
+
+    /**
      * @brief Get the job type
+     *
      * @return the type
      */
     WorkflowJob::Type WorkflowJob::getType() {
@@ -46,6 +58,7 @@ namespace wrench {
 
     /**
      * @brief Get the job's name
+     *
      * @return the name as a string
      */
     std::string WorkflowJob::getName() {
@@ -54,6 +67,7 @@ namespace wrench {
 
     /**
      * @brief Get the number of cores required by the job
+     *
      * @return  the number of cores
      */
     int WorkflowJob::getNumCores() {
@@ -62,6 +76,7 @@ namespace wrench {
 
     /**
      * @brief Get the duration of the job
+     *
      * @return the duration in seconds
      */
     double WorkflowJob::getDuration() {
@@ -71,18 +86,19 @@ namespace wrench {
     /**
      * @brief Get the "next" callback mailbox (returns the
      *         origin (i.e., workflow) mailbox if the mailbox stack is empty)
+     *
      * @return the next callback mailbox
      */
     std::string WorkflowJob::getCallbackMailbox() {
       if (this->callback_mailbox_stack.size() == 0) {
         return this->workflow->getCallbackMailbox();
-      } else {
-        return this->callback_mailbox_stack.top();
       }
+      return this->callback_mailbox_stack.top();
     }
 
     /**
      * @brief Get the "origin" callback mailbox
+     *
      * @return the next callback mailbox
      */
     std::string WorkflowJob::getOriginCallbackMailbox() {
@@ -94,20 +110,21 @@ namespace wrench {
      * @brief Get the "next" callback mailbox (returns the
      *         workflow mailbox if the mailbox stack is empty), and
      *         pops it
+     *
      * @return the next callback mailbox
      */
     std::string WorkflowJob::popCallbackMailbox() {
       if (this->callback_mailbox_stack.size() == 0) {
         return this->workflow->getCallbackMailbox();
-      } else {
-        std::string mailbox = this->callback_mailbox_stack.top();
-        this->callback_mailbox_stack.pop();
-        return mailbox;
       }
+      std::string mailbox = this->callback_mailbox_stack.top();
+      this->callback_mailbox_stack.pop();
+      return mailbox;
     }
 
     /**
      * @brief Pushes a callback mailbox
+     *
      * @param mailbox: the mailbox name
      */
     void WorkflowJob::pushCallbackMailbox(std::string mailbox) {
@@ -123,6 +140,5 @@ namespace wrench {
       static unsigned long sequence_number = 0;
       return (sequence_number++);
     }
-
 
 };
