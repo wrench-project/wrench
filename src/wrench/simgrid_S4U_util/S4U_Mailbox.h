@@ -33,10 +33,10 @@ namespace wrench {
 
 		public:
 				static std::string generateUniqueMailboxName(std::string);
-				static std::unique_ptr<SimulationMessage> get(std::string mailbox);
-				static std::unique_ptr<SimulationMessage> get(std::string mailbox, double timeout);
-				static void put(std::string mailbox, SimulationMessage *m);
-				static void dput(std::string mailbox_name, SimulationMessage *msg);
+				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox);
+				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox, double timeout);
+				static void putMessage(std::string mailbox, SimulationMessage *m);
+				static void dputMessage(std::string mailbox_name, SimulationMessage *msg);
 				static void clear_dputs();
 
 				static std::string getPrivateMailboxName();

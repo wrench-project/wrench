@@ -225,7 +225,7 @@ namespace wrench {
 
         // Go through the children "uses" nodes
         for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
-          // get the "uses" attributes
+          // getMessage the "uses" attributes
           // TODO: There are several attributes that we're ignoring for now...
           std::string id = uses.attribute("file").value();
 

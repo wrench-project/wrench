@@ -17,6 +17,7 @@
 #include <workflow_job/StandardJob.h>
 #include <workflow_job/PilotJob.h>
 #include <workflow_execution_events/WorkflowExecutionFailureCause.h>
+#include <exceptions/WorkflowExecutionException.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 
@@ -100,7 +101,13 @@ namespace wrench {
                                        this->simulation->getComputeServices());
 
         // Wait for a workflow execution event
-        std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+        std::unique_ptr<WorkflowExecutionEvent> event;
+        try {
+          event = workflow->waitForNextExecutionEvent();
+        } catch (WorkflowExecutionException &e) {
+          WRENCH_INFO("Error while getting next execution event (%s)... ignoring and trying again", (e.getCause()->toString().c_str()));
+          continue;
+        }
 
         switch (event->type) {
           case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {

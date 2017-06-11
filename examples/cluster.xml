@@ -1,10 +1,10 @@
 <?xml version='1.0'?>
 <!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
-<platform version="4">
-    <AS id="AS0" routing="Full">
+<platform version="4.1">
+    <zone id="AS0" routing="Full">
 
         <cluster id="my_cluster" prefix="c-" suffix=".me" radical="0-9"
                  speed="3f" bw="125MBps" lat="100us" core="1"
                  bb_bw="125MBps" bb_lat="100us"/>
-    </AS>
+    </zone>
 </platform>

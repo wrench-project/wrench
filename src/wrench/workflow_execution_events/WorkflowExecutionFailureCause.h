@@ -32,7 +32,8 @@ namespace wrench {
             STORAGE_SERVICE_FULL,
             SERVICE_TERMINATED,
             JOB_TYPE_NOT_SUPPORTED,
-            NOT_ENOUGH_CORES
+            NOT_ENOUGH_CORES,
+            NETWORK_ERROR
         };
 
         WorkflowExecutionFailureCause(Cause cause);
@@ -123,6 +124,13 @@ namespace wrench {
         ComputeService *compute_service;
     };
 
+    class NetworkError : public WorkflowExecutionFailureCause {
+    public:
+        NetworkError();
+        std::string toString();
+
+    private:
+    };
 };
 
 

@@ -1760,7 +1760,7 @@ LATEX_EXTRA_FILES      =
 PDF_HYPERLINKS         = YES
 
 # If the USE_PDFLATEX tag is set to YES, doxygen will use pdflatex to generate
-# the PDF file directly from the LaTeX files. Set this option to YES, to get a
+# the PDF file directly from the LaTeX files. Set this option to YES, to getMessage a
 # higher quality PDF documentation.
 # The default value is: YES.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
@@ -1956,7 +1956,7 @@ XML_PROGRAMLISTING     = YES
 
 GENERATE_DOCBOOK       = NO
 
-# The DOCBOOK_OUTPUT tag is used to specify where the Docbook pages will be put.
+# The DOCBOOK_OUTPUT tag is used to specify where the Docbook pages will be putMessage.
 # If a relative path is entered the value of OUTPUT_DIRECTORY will be put in
 # front of it.
 # The default directory is: docbook.
@@ -2200,7 +2200,7 @@ HAVE_DOT               = NO
 # The DOT_NUM_THREADS specifies the number of dot invocations doxygen is allowed
 # to run in parallel. When set to 0 doxygen will base this on the number of
 # processors available in the system. You can set it explicitly to a value
-# larger than 0 to get control over the balance between CPU load and processing
+# larger than 0 to getMessage control over the balance between CPU load and processing
 # speed.
 # Minimum value: 0, maximum value: 32, default value: 0.
 # This tag requires that the tag HAVE_DOT is set to YES.

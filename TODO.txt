@@ -115,7 +115,7 @@ SOFTWARE ENGINEERING:
 
     - S4U: Storage
         - What will it look like?
-        - How to deal with pipelining of network/disk when remote put()/get()?
+        - How to deal with pipelining of network/disk when remote putMessage()/getMessage()?
                - How does MSG do it?
 
     - S4U: Failures
@@ -124,7 +124,7 @@ SOFTWARE ENGINEERING:
         - Right now there is some uncaught exception in the maestro
 
 
-    - S4U: When will we get C++ Exceptions from SIMIX? (signal handler sucks)
+    - S4U: When will we getMessage C++ Exceptions from SIMIX? (signal handler sucks)
         - Related: Actor throwing exception is not caught by launch()...
 
     - S4U: Kill() segfaults if s4u_actor has already terminated. Would it be

@@ -54,9 +54,20 @@ namespace wrench {
 
     /**
      * @brief Stop the manager
+     *
+     * throw WorkflowExecutionException
+     * throw std::runtime_error
      */
     void DataMovementManager::stop() {
-      S4U_Mailbox::put(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("DataMovementManager::stop(): Unknown exception: " + std::string(e.what()));
+        }
+      }
     }
 
     /**
@@ -93,11 +104,9 @@ namespace wrench {
 
       WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox_name.c_str());
 
-      bool keep_going = true;
-
       while (processNextMessage()) {
 
-        // Clear finished asynchronous dput()
+        // Clear finished asynchronous dputMessage()
         S4U_Mailbox::clear_dputs();
 
       }
@@ -115,7 +124,13 @@ namespace wrench {
      */
     bool DataMovementManager::processNextMessage() {
 
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(this->mailbox_name);
+      } catch (std::runtime_error &e) {
+        return true;
+      }
 
       if (message == nullptr) {
         WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
@@ -131,10 +146,14 @@ namespace wrench {
       } else if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
         // Forward it back
-        S4U_Mailbox::dput(msg->file->getWorkflow()->getCallbackMailbox(),
-                          new StorageServiceFileCopyAnswerMessage(msg->file,
-                                                                  msg->storage_service, msg->success,
-                                                                  msg->failure_cause, 0));
+        try {
+          S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
+                                   new StorageServiceFileCopyAnswerMessage(msg->file,
+                                                                           msg->storage_service, msg->success,
+                                                                           msg->failure_cause, 0));
+        } catch  (std::runtime_error &e) {
+          return true;
+        }
 
       } else {
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");

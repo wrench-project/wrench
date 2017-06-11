@@ -101,7 +101,9 @@ namespace wrench {
      * @return the free space in bytes
      *
      * @throw WorkflowExecutionException
+     *
      * @throw std::runtime_error
+     *
      */
     double StorageService::howMuchFreeSpace() {
       if (this->state == DOWN) {
@@ -110,12 +112,30 @@ namespace wrench {
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
-      S4U_Mailbox::put(this->mailbox_name, new StorageServiceFreeSpaceRequestMessage(
-              answer_mailbox,
-              this->getPropertyValueAsDouble(StorageServiceProperty::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFreeSpaceRequestMessage(
+                answer_mailbox,
+                this->getPropertyValueAsDouble(StorageServiceProperty::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::howMuchFreeSpace(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       // Wait to the message back
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      std::unique_ptr<SimulationMessage> message = nullptr;
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::howMuchFreeSpace(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
       if (StorageServiceFreeSpaceAnswerMessage *msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage *>(message.get())) {
         return msg->free_space;
       } else {
@@ -146,13 +166,31 @@ namespace wrench {
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
-      S4U_Mailbox::put(this->mailbox_name, new StorageServiceFileLookupRequestMessage(
-              answer_mailbox,
-              file,
-              this->getPropertyValueAsDouble(StorageServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileLookupRequestMessage(
+                answer_mailbox,
+                file,
+                this->getPropertyValueAsDouble(StorageServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       // Wait to the message back
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      std::unique_ptr<SimulationMessage> message;
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
       if (StorageServiceFileLookupAnswerMessage *msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
         return msg->file_is_available;
       } else {
@@ -181,22 +219,51 @@ namespace wrench {
 
       // Send a synchronous message to the daemon
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
-      S4U_Mailbox::put(this->mailbox_name,
-                       new StorageServiceFileReadRequestMessage(answer_mailbox,
-                                                                file,
-                                                                this->getPropertyValueAsDouble(
-                                                                        StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new StorageServiceFileReadRequestMessage(answer_mailbox,
+                                                                         file,
+                                                                         this->getPropertyValueAsDouble(
+                                                                                 StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       // Wait for the answer
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
       if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
         // If it's not a success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
         }
 
-        // Otherwise, get the file
-        std::unique_ptr<SimulationMessage> file_content_message = S4U_Mailbox::get(answer_mailbox);
+        // Otherwise, retrieve  the file
+        std::unique_ptr<SimulationMessage> file_content_message = nullptr;
+        try {
+          file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
+        } catch (std::runtime_error &e) {
+          if (!strcmp(e.what(), "network_error")) {
+            throw WorkflowExecutionException(new NetworkError());
+          } else {
+            throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
+          }
+        }
+
         if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
           // do nothing
         } else {
@@ -231,14 +298,32 @@ namespace wrench {
 
       // Send a synchronous message to the daemon
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
-      S4U_Mailbox::put(this->mailbox_name,
-                       new StorageServiceFileWriteRequestMessage(answer_mailbox,
-                                                                 file,
-                                                                 this->getPropertyValueAsDouble(
-                                                                         StorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new StorageServiceFileWriteRequestMessage(answer_mailbox,
+                                                                          file,
+                                                                          this->getPropertyValueAsDouble(
+                                                                                  StorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::writeFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       // Wait for the answer
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      std::unique_ptr<SimulationMessage> message;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::writeFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       if (StorageServiceFileWriteAnswerMessage *msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
         // If not a success, throw an exception
@@ -247,7 +332,15 @@ namespace wrench {
         }
 
         // Otherwise, synchronously send the file up!
-        S4U_Mailbox::put(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
+        try {
+          S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
+        } catch (std::runtime_error &e) {
+          if (!strcmp(e.what(), "network_error")) {
+            throw WorkflowExecutionException(new NetworkError());
+          } else {
+            throw std::runtime_error("StorageService::writeFile(): Unknown exception: " + std::string(e.what()));
+          }
+        }
 
       } else {
         throw std::runtime_error("StorageService::writeFile(): Received an unexpected [" +
@@ -375,13 +468,31 @@ namespace wrench {
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
-      S4U_Mailbox::put(this->mailbox_name, new StorageServiceFileDeleteRequestMessage(
-              answer_mailbox,
-              file,
-              this->getPropertyValueAsDouble(StorageServiceProperty::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileDeleteRequestMessage(
+                answer_mailbox,
+                file,
+                this->getPropertyValueAsDouble(StorageServiceProperty::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::deleteFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       // Wait to the message back
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::deleteFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       if (StorageServiceFileDeleteAnswerMessage *msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage *>(message.get())) {
         // On failure, throw an exception
@@ -451,14 +562,33 @@ namespace wrench {
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
-      S4U_Mailbox::put(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
-              answer_mailbox,
-              file,
-              src,
-              this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
+                answer_mailbox,
+                file,
+                src,
+                this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::copyFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       // Wait to the message back
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::copyFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
       if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (msg->failure_cause) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -491,11 +621,20 @@ namespace wrench {
       }
 
       // Send a message to the daemon
-      S4U_Mailbox::put(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
-              answer_mailbox,
-              file,
-              src,
-              this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
+                answer_mailbox,
+                file,
+                src,
+                this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::initiateFileCopy(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
       return;
 
     }

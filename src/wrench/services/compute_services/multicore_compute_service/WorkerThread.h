@@ -39,9 +39,6 @@ namespace wrench {
                      StorageService *default_storage_service,
                      double startup_overhead = 0.0);
 
-        ~WorkerThread();
-
-
         WorkUnit *work;
 
         void kill();

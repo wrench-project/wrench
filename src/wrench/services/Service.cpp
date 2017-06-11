@@ -75,6 +75,7 @@ namespace wrench {
     /**
     * @brief Synchronously stop the service (does nothing if the service is already stopped)
     *
+    * @throw WorkflowExecutionException
     * @throw std::runtime_error
     */
     void Service::stop() {
@@ -88,14 +89,33 @@ namespace wrench {
 
       // Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
       std::string ack_mailbox = S4U_Mailbox::getPrivateMailboxName();
-      S4U_Mailbox::put(this->mailbox_name,
-                       new ServiceStopDaemonMessage(
-                               ack_mailbox,
-                               this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new ServiceStopDaemonMessage(
+                                        ack_mailbox,
+                                        this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("Service::stop(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       // Wait for the ack
 //      WRENCH_INFO("Waiting for the 'I am dead' ack from the daemon");
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(ack_mailbox);
+      }  catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("Service::stop(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
       if (ServiceDaemonStoppedMessage *msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
         this->state = Service::DOWN;
       } else {

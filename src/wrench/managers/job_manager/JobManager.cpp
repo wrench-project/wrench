@@ -58,9 +58,20 @@ namespace wrench {
 
     /**
      * @brief Stop the job manager
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
      */
     void JobManager::stop() {
-      S4U_Mailbox::put(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("DataMovementManager::stop(): Unknown exception: " + std::string(e.what()));
+        }
+      }
     }
 
     /**
@@ -173,7 +184,7 @@ namespace wrench {
       }
 
       // Push back the mailbox of the manager,
-      // so that it will get the initial callback
+      // so that it will getMessage the initial callback
       job->pushCallbackMailbox(this->mailbox_name);
 
       // Update the job state and insert it into the pending list
@@ -269,13 +280,18 @@ namespace wrench {
 
       bool keep_going = true;
       while (keep_going) {
-        std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+        std::unique_ptr<SimulationMessage> message = nullptr;
+        try {
+          message = S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::runtime_error &e) {
+          continue;
+        }
 
         if (message == nullptr) {
           WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
           break;
         }
-        // Clear finished asynchronous dput()
+        // Clear finished asynchronous dputMessage()
         S4U_Mailbox::clear_dputs();
 
         WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
@@ -304,8 +320,12 @@ namespace wrench {
           }
 
           // Forward the notification along the notification chain
-          S4U_Mailbox::dput(msg->job->popCallbackMailbox(),
-                            new ComputeServiceJobTypeNotSupportedMessage(msg->job, msg->compute_service, 0));
+          try {
+            S4U_Mailbox::dputMessage(msg->job->popCallbackMailbox(),
+                                     new ComputeServiceJobTypeNotSupportedMessage(msg->job, msg->compute_service, 0));
+          } catch (std::runtime_error &e) {
+            keep_going = true;
+          }
 
         } else if (ComputeServiceStandardJobDoneMessage *msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
           // update job state
@@ -317,8 +337,12 @@ namespace wrench {
           this->completed_standard_jobs.insert(job);
 
           // Forward the notification along the notification chain
-          S4U_Mailbox::dput(job->popCallbackMailbox(),
-                            new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
+          try {
+            S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
+                                     new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
+          } catch (std::runtime_error &e) {
+            keep_going = true;
+          }
         } else if (ComputeServiceStandardJobFailedMessage *msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
 
           // update job state
@@ -335,8 +359,14 @@ namespace wrench {
           this->pending_standard_jobs.erase(job);
 
           // Forward the notification along the notification chain
-          S4U_Mailbox::dput(job->popCallbackMailbox(),
-                            new ComputeServiceStandardJobFailedMessage(job, msg->compute_service, msg->cause, 0.0));
+          try {
+            S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
+                                     new ComputeServiceStandardJobFailedMessage(job, msg->compute_service, msg->cause,
+                                                                                0.0));
+          } catch (std::runtime_error &e) {
+            keep_going = true;
+          }
+
         } else if (ComputeServicePilotJobStartedMessage *msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
 
           // update job state
@@ -349,8 +379,12 @@ namespace wrench {
 
           // Forward the notification to the source
           WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-          S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
-                            new ComputeServicePilotJobStartedMessage(job, msg->compute_service, 0.0));
+          try {
+            S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+                                     new ComputeServicePilotJobStartedMessage(job, msg->compute_service, 0.0));
+          } catch (std::runtime_error &e) {
+            keep_going = true;
+          }
 
         } else if (ComputeServicePilotJobExpiredMessage *msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
 
@@ -364,8 +398,12 @@ namespace wrench {
 
           // Forward the notification to the source
           WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());
-          S4U_Mailbox::dput(job->getOriginCallbackMailbox(),
-                            new ComputeServicePilotJobExpiredMessage(job, msg->compute_service, 0.0));
+          try {
+            S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+                                     new ComputeServicePilotJobExpiredMessage(job, msg->compute_service, 0.0));
+          } catch (std::runtime_error &e) {
+            keep_going = true;
+          }
 
         } else {
           throw std::runtime_error("Unexpected [" + message->getName() + "] message");

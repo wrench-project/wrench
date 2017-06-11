@@ -122,4 +122,11 @@ namespace wrench {
       return "Compute service " + this->compute_service->getName() + " on host " +
              this->compute_service->getHostname() + " does not have enough cores to support job " + job->getName();
     }
+
+    NetworkError::NetworkError() : WorkflowExecutionFailureCause(NETWORK_ERROR) {
+    }
+
+    std::string NetworkError::toString() {
+       return "Network error (link failure, or communication peer died)";
+    };
 };

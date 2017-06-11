@@ -14,8 +14,13 @@
 #include <simulation/SimulationMessage.h>
 #include <services/compute_services/ComputeServiceMessage.h>
 #include <services/storage_services/StorageServiceMessage.h>
+#include <exceptions/WorkflowExecutionException.h>
+#include <wrench-dev.h>
 
 #include "WorkflowExecutionEvent.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(workflow_execution_event, "Log category for Workflow Execution Event");
+
 
 namespace wrench {
 
@@ -26,12 +31,22 @@ namespace wrench {
      * @param mailbox: the name of the receiving mailbox
      * @return a unique pointer to a WorkflowExecutionEvent object
      *
+     * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
     std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
 
-      // Get the message on the mailbox
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(mailbox);
+      // Get the message from the mailbox
+      std::unique_ptr<SimulationMessage> message = nullptr;
+      try {
+        message = S4U_Mailbox::getMessage(mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("WorkflowExecutionEvent::waitForNextExecutionEvent(): Unknown exception: " + std::string(e.what()));
+        }
+      }
 
       std::unique_ptr<WorkflowExecutionEvent> event =
               std::unique_ptr<WorkflowExecutionEvent>(new WorkflowExecutionEvent());
