@@ -11,6 +11,7 @@
 #define WRENCH_SIMULATIONTIMESTAMP_H
 
 
+#include <simgrid_S4U_util/S4U_Simulation.h>
 #include "simulation/SimulationTimestampTypes.h"
 
 namespace wrench {
@@ -54,6 +55,7 @@ namespace wrench {
         SimulationTimestamp(T *content) {
           // TODO: Make content a unique_ptr to make memory management better
           this->content = content;
+          this->date = S4U_Simulation::getClock();
         }
 
         /***********************/

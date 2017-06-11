@@ -22,7 +22,9 @@ namespace wrench {
      */
     S4U_DaemonWithMailbox::S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix)
             : process_name(process_name),
-              mailbox_name(S4U_Mailbox::generateUniqueMailboxName(mailbox_prefix)) {}
+              mailbox_name(S4U_Mailbox::generateUniqueMailboxName(mailbox_prefix)) {
+      this->terminated = false;
+    }
 
     /**
      * @brief Start the daemon

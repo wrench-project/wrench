@@ -100,8 +100,8 @@ namespace wrench {
      * @param hostname: the name of the host
      * @return the number of cores of the host
      */
-    int S4U_Simulation::getNumCores(std::string hostname) {
-      return simgrid::s4u::Host::by_name(hostname)->coreCount();
+    unsigned int S4U_Simulation::getNumCores(std::string hostname) {
+      return (unsigned int)simgrid::s4u::Host::by_name(hostname)->coreCount();
     }
 
     /**

@@ -332,6 +332,7 @@ namespace wrench {
         if (action == READ) {
           try {
             storage_service->readFile(f);
+            WRENCH_INFO("Read file %s", f->getId().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -341,6 +342,7 @@ namespace wrench {
           // Write the file
           try {
             storage_service->writeFile(f);
+            WRENCH_INFO("Wrote file %s", f->getId().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -386,7 +388,7 @@ namespace wrench {
         if (!msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
         }
-        XBT_INFO("Deleted file %s on storage service %s", file->getId().c_str(), this->getName().c_str());
+        WRENCH_INFO("Deleted file %s on storage service %s", file->getId().c_str(), this->getName().c_str());
       } else {
         throw std::runtime_error("StorageService::deleteFile(): unexpected [" + message->getName() + "] message");
       }
@@ -462,7 +464,7 @@ namespace wrench {
           throw WorkflowExecutionException(msg->failure_cause);
         }
       } else {
-        throw std::runtime_error("StorageService::copyFile(): unexpected [" + msg->getName() + "] message");
+        throw std::runtime_error("StorageService::copyFile(): unexpected [" + message->getName() + "] message");
       }
 
       return;

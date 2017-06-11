@@ -16,6 +16,7 @@
 
 namespace wrench {
 
+    class Simulation;
     class StorageService;
     class WorkflowFile;
     class WorkflowTask;
@@ -32,7 +33,8 @@ namespace wrench {
 
     public:
 
-        WorkerThread(std::string hostname, std::string callback_mailbox,
+        WorkerThread(Simulation *simulation,
+                     std::string hostname, std::string callback_mailbox,
                      WorkUnit *work,
                      StorageService *default_storage_service,
                      double startup_overhead = 0.0);
@@ -46,6 +48,8 @@ namespace wrench {
 
     private:
         int main();
+
+        Simulation *simulation;
 
         void performWorkWithoutCleanupFileDeletions(WorkUnit *work);
         std::string callback_mailbox;

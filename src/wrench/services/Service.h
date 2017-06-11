@@ -42,6 +42,7 @@ namespace wrench {
         /***********************/
 
         void setStateToDown();
+        void setSimulation(Simulation *simulation);
 
         /***********************/
         /** \endcond           */
@@ -75,7 +76,6 @@ namespace wrench {
         std::string name;
         std::string hostname;
 
-        void setSimulation(Simulation *simulation);
         Simulation *simulation;
 
 

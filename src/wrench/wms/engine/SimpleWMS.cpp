@@ -84,8 +84,8 @@ namespace wrench {
         WRENCH_INFO("Scheduling pilot jobs...");
         double flops = 10000.00; // bogus default
         if (ready_tasks.size() > 0) {
-          // Heuristic: ask for something that can run 1.5 times the next ready tasks..
-          flops = 1.5 * this->scheduler->getTotalFlops((*ready_tasks.begin()).second);
+          // Heuristic: ask for something that can run 2 times the next ready tasks..
+          flops = 2 * this->scheduler->getTotalFlops((*ready_tasks.begin()).second);
         }
         this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, flops,
                                            this->simulation->getComputeServices());
@@ -150,6 +150,11 @@ namespace wrench {
       } else {
         WRENCH_INFO("Workflow execution is incomplete!");
       }
+
+//      // kill all processes
+//      // TODO: This could work, but there is a problem with killAll() in S4U
+//      simgrid::s4u::Actor::killAll();
+//      return 0;
 
       WRENCH_INFO("Simple WMS Daemon is shutting down all Compute Services");
       this->simulation->shutdownAllComputeServices();

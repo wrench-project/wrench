@@ -18,7 +18,9 @@
 #include "MulticoreComputeServiceMessage.h"
 #include <workflow/WorkflowTask.h>
 #include <workflow_job/StandardJob.h>
+#include <simulation/SimulationTimestampTypes.h>
 #include "WorkUnit.h"
+#include <simulation/Simulation.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(worker_thread, "Log category for Worker Thread");
 
@@ -28,6 +30,7 @@ namespace wrench {
     /**
      * @brief Constructor, which starts the worker thread on the host
      *
+     * @param simulation: the simulation
      * @param hostname: the name of the host
      * @param callback_mailbox: the callback mailbox to which the worker
      *        thread can send "work done" messages
@@ -35,7 +38,8 @@ namespace wrench {
      * @param default_storage_service: the default storage service from which to read/write data (if any)
      * @param startup_overhead: the startup overhead, in seconds
      */
-    WorkerThread::WorkerThread(std::string hostname,
+    WorkerThread::WorkerThread(Simulation *simulation,
+                               std::string hostname,
                                std::string callback_mailbox,
                                WorkUnit *work,
                                StorageService *default_storage_service,
@@ -45,6 +49,8 @@ namespace wrench {
       if (startup_overhead < 0) {
         throw std::invalid_argument("WorkerThread::WorkerThread(): startup overhead must be >= 0");
       }
+
+      this->simulation = simulation;
       this->hostname = hostname;
       this->callback_mailbox = callback_mailbox;
       this->work = work;
@@ -156,6 +162,7 @@ namespace wrench {
       for (auto task : work->tasks) {
 
         // Read  all input files
+        WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getId().c_str());
         try {
           StorageService::readFiles(task->getInputFiles(),
                                     work->file_locations,
@@ -167,8 +174,11 @@ namespace wrench {
         // Run the task
         WRENCH_INFO("Executing task %s (%lf flops)", task->getId().c_str(), task->getFlops());
         task->setRunning();
+        task->setStartDate(S4U_Simulation::getClock());
+
         S4U_Simulation::compute(task->getFlops());
-        task->setCompleted();
+
+        WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(), task->getId().c_str());
 
         // Write all output files
         try {
@@ -177,8 +187,13 @@ namespace wrench {
           throw;
         }
 
+        task->setCompleted();
+
         task->setEndDate(S4U_Simulation::getClock());
 
+        // Generate a SimulationTimestamp
+        this->simulation->output.addTimestamp<SimulationTimestampTaskCompletion>(
+                new SimulationTimestampTaskCompletion(task));
       }
 
       /** Perform all post file copies operations */

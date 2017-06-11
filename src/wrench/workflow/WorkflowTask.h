@@ -71,6 +71,11 @@ namespace wrench {
         std::set<WorkflowFile *> getInputFiles();
         std::set<WorkflowFile *> getOutputFiles();
 
+        double getStartDate();
+
+        double getEndDate();
+
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -85,11 +90,15 @@ namespace wrench {
 
         void setReady();
 
+        void setFailed();
+
         void setRunning();
 
         void setCompleted();
 
         void setJob(WorkflowJob *job);
+
+        void setStartDate(double date);
 
         void setEndDate(double date);
 
@@ -107,7 +116,6 @@ namespace wrench {
         std::string cluster_id;            // ID for clustered task
         double flops;                      // Number of flops
         int number_of_processors;          // currently vague: cores? nodes?
-        double scheduled_date = -1.0;      // Date at which task was scheduled (getter?)
         double start_date = -1.0;          // Date at which task began execution (getter?)
         double end_date = -1.0;            // Date at which task finished execution (getter?)
         unsigned int failure_count = 0;    // Number of times the tasks has failed

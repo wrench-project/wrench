@@ -12,10 +12,14 @@
 #ifndef WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
 #define WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(S4U_DaemonWithMailboxActor, "S4U_DaemonWithMailboxActor");
+
 #include <xbt.h>
 #include <string>
 #include <vector>
 #include <iostream>
+#include <wrench-dev.h>
+#include "S4U_Mailbox.h"
 
 namespace wrench {
 
@@ -37,7 +41,13 @@ namespace wrench {
         }
 
         void operator()() {
-          this->daemon->main();
+          try {
+            this->daemon->main();
+            WRENCH_INFO("Daemon's main() function has returned");
+            S4U_Mailbox::clear_dputs();
+          } catch (std::exception &e) {
+            throw;
+          }
           this->daemon->setTerminated();
         }
 

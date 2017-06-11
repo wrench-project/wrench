@@ -18,7 +18,6 @@
 #include <services/compute_services/ComputeServiceMessage.h>
 #include "exceptions/WorkflowExecutionException.h"
 #include "workflow_job/PilotJob.h"
-#include "workflow_job/StandardJob.h"
 #include "MulticoreComputeServiceMessage.h"
 #include "WorkUnit.h"
 
@@ -81,11 +80,12 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
 
-      //  send a "run a task" message to the daemon's mailbox
+      //  send a "run a pilot job" message to the daemon's mailbox
       S4U_Mailbox::put(this->mailbox_name,
                        new ComputeServiceSubmitPilotJobRequestMessage(answer_mailbox, job,
                                                                       this->getPropertyValueAsDouble(
                                                                               MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+
 
       // Get the answer
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(answer_mailbox);
@@ -310,7 +310,11 @@ namespace wrench {
       }
 
       this->hostname = hostname;
-      this->max_num_worker_threads = num_worker_threads;
+      if (num_worker_threads > 0) {
+        this->max_num_worker_threads = num_worker_threads;
+      } else {
+        this->max_num_worker_threads = S4U_Simulation::getNumCores(hostname);
+      }
       this->ttl = ttl;
       this->has_ttl = (ttl >= 0);
       this->containing_pilot_job = pj;
@@ -415,6 +419,7 @@ namespace wrench {
                                                     job->getDuration(), job,
                                                     "_pilot",
                                                     this->default_storage_service);
+                cs->setSimulation(this->simulation);
 
                 // Create and launch a compute service for the pilot job
                 job->setComputeService(cs);
@@ -459,14 +464,14 @@ namespace wrench {
         // Create a worker thread!
         WRENCH_INFO("Starting a worker thread to do some work");
 
-        WorkerThread * working_thread =
-
-                        new WorkerThread(S4U_Simulation::getHostName(),
-                                         this->mailbox_name,
-                                         work_to_do,
-                                         this->default_storage_service,
-                                         this->getPropertyValueAsDouble(
-                                                 MulticoreComputeServiceProperty::TASK_STARTUP_OVERHEAD));
+        WorkerThread *working_thread =
+                new WorkerThread(this->simulation,
+                                 S4U_Simulation::getHostName(),
+                                 this->mailbox_name,
+                                 work_to_do,
+                                 this->default_storage_service,
+                                 this->getPropertyValueAsDouble(
+                                         MulticoreComputeServiceProperty::TASK_STARTUP_OVERHEAD));
 
         this->working_threads.insert(working_thread);
         return true;
@@ -490,28 +495,35 @@ namespace wrench {
       // Wait for a message
       std::unique_ptr<SimulationMessage> message;
 
-      // with a timeout?
-      if (this->has_ttl) {
-        if (timeout <= 0) {
+      try {
+        if (this->has_ttl) {
+          if (timeout <= 0) {
+            return false;
+          } else {
+            message = S4U_Mailbox::get(this->mailbox_name, timeout);
+          }
+        } else {
+          message = S4U_Mailbox::get(this->mailbox_name);
+        }
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "timeout")) {
+          WRENCH_INFO("Time out - must die.. !!");
+          this->terminate(true);
           return false;
         } else {
-          message = S4U_Mailbox::get(this->mailbox_name, timeout);
+          throw;
         }
-      } else {
-        message = S4U_Mailbox::get(this->mailbox_name);
       }
 
-      // was there a timeout?
       if (message == nullptr) {
-        WRENCH_INFO("Time out - must die.. !!");
-        this->terminate();
+        WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting");
         return false;
       }
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
       if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-        this->terminate();
+        this->terminate(false);
         // This is Synchronous
         S4U_Mailbox::put(msg->ack_mailbox,
                          new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
@@ -542,8 +554,11 @@ namespace wrench {
         WRENCH_INFO("Asked to run a pilot job with %d cores for %lf seconds", msg->job->getNumCores(),
                     msg->job->getDuration());
 
+        WRENCH_INFO("THE REPLY MAILBOX IS %s", msg->answer_mailbox.c_str());
+
         bool success = true;
         WorkflowExecutionFailureCause *failure_cause = nullptr;
+
 
         if (not this->supportsPilotJobs()) {
           S4U_Mailbox::dput(msg->answer_mailbox,
@@ -556,7 +571,7 @@ namespace wrench {
           return true;
         }
 
-        if (this->getNumCores() < msg->job->getNumCores()) {
+        if (S4U_Simulation::getNumCores(this->hostname) < msg->job->getNumCores()) {
 
           S4U_Mailbox::dput(msg->answer_mailbox,
                             new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
@@ -569,6 +584,7 @@ namespace wrench {
         }
 
         // success
+        WRENCH_INFO("SENDING REPLY TO %s", msg->answer_mailbox.c_str());
         this->pending_jobs.push(msg->job);
         S4U_Mailbox::dput(msg->answer_mailbox,
                           new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
@@ -591,14 +607,14 @@ namespace wrench {
         return true;
       } else if (MulticoreComputeServiceNumCoresRequestMessage *msg = dynamic_cast<MulticoreComputeServiceNumCoresRequestMessage *>(message.get())) {
         MulticoreComputeServiceNumCoresAnswerMessage *answer_message = new MulticoreComputeServiceNumCoresAnswerMessage(
-                this->max_num_worker_threads,
+                S4U_Simulation::getNumCores(this->hostname),
                 this->getPropertyValueAsDouble(
                         MulticoreComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
         S4U_Mailbox::dput(msg->answer_mailbox, answer_message);
         return true;
       } else if (MulticoreComputeServiceNumIdleCoresRequestMessage *msg = dynamic_cast<MulticoreComputeServiceNumIdleCoresRequestMessage *>(message.get())) {
         MulticoreComputeServiceNumIdleCoresAnswerMessage *answer_message = new MulticoreComputeServiceNumIdleCoresAnswerMessage(
-                this->max_num_worker_threads,
+                this->max_num_worker_threads - (unsigned int) this->working_threads.size(),
                 this->getPropertyValueAsDouble(
                         MulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
         S4U_Mailbox::dput(msg->answer_mailbox, answer_message);
@@ -629,20 +645,22 @@ namespace wrench {
       for (auto job : this->running_jobs) {
         if (job->getType() == WorkflowJob::PILOT) {
           PilotJob *pj = (PilotJob *) job;
+          WRENCH_INFO("Terminating pilot job %s", job->getName().c_str());
           pj->getComputeService()->stop();
         }
       }
     }
 
     /**
-     * @brief fail a standard job
+     * @brief fail a pending standard job
      * @param job: the job
      * @param cause: the failure cause
      */
-    void MulticoreComputeService::failStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause) {
+    void MulticoreComputeService::failPendingStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause) {
       WRENCH_INFO("Failing job %s", job->getName().c_str());
       // Set all tasks back to the READY state and wipe out output files
       for (auto failed_task: job->getTasks()) {
+        failed_task->setFailed();
         failed_task->setReady();
         try {
           StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
@@ -660,28 +678,80 @@ namespace wrench {
                                MulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
     }
 
-/**
- * @brief Declare all current jobs as failed (likely because the daemon is being terminated)
- */
-    void MulticoreComputeService::failCurrentStandardJobs(WorkflowExecutionFailureCause *cause) {
+    /**
+  * @brief fail a running standard job
+  * @param job: the job
+  * @param cause: the failure cause
+  */
+    void MulticoreComputeService::failRunningStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause) {
 
-      WRENCH_INFO("There are %ld pending jobs", this->pending_jobs.size());
-      while (not this->pending_jobs.empty()) {
-        WorkflowJob *workflow_job = this->pending_jobs.front();
-        WRENCH_INFO("Failing job %s", workflow_job->getName().c_str());
-        this->pending_jobs.pop();
-        if (workflow_job->getType() == WorkflowJob::STANDARD) {
-          StandardJob *job = (StandardJob *) workflow_job;
-          this->failStandardJob(job, cause);
+      WRENCH_INFO("Failing job %s", job->getName().c_str());
+
+      std::vector<WorkUnit *>works_to_terminate;
+
+      // Brutally terminate all relevant running work
+      for (auto w : this->running_works) {
+        if (w->job == job) {
+          works_to_terminate.push_back(w);
         }
       }
 
-      WRENCH_INFO("There are %ld running jobs", this->running_jobs.size());
+      for (auto w : works_to_terminate) {
+        WorkerThread *worker_thread_to_terminate = nullptr;
+        for (auto wt : this->working_threads) {
+          if (wt->work == w) {
+            worker_thread_to_terminate = wt;
+            break;
+          }
+        }
+        if (worker_thread_to_terminate == nullptr) {
+          throw std::runtime_error("Can't find worker threads for work belonging to job " +  w->job->getName());
+        }
+        WRENCH_INFO("SHOULD NOW KILL WORKER THREAD %s", worker_thread_to_terminate->getName().c_str());
+        WRENCH_INFO("TODO TODO TODO TODO TODO TODO TODO");
+        worker_thread_to_terminate->kill();
+      }
+
+
+
+      // Set all tasks back to the READY state and wipe out output files
+      for (auto failed_task: job->getTasks()) {
+        if (failed_task->getState() != WorkflowTask::COMPLETED) {
+          failed_task->setFailed();
+          failed_task->setReady();
+        }
+      }
+
+      // Send back a job failed message (Not that it can be a partial fail)
+      WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
+      // NOTE: This is synchronous so that the process doesn't fall off the end
+      S4U_Mailbox::put(job->popCallbackMailbox(),
+                       new ComputeServiceStandardJobFailedMessage(job, this, cause, this->getPropertyValueAsDouble(
+                               MulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+    }
+
+
+    /**
+ * @brief Declare all current jobs as failed (likely because the daemon is being terminated
+ * or has timed out (because it's in fact a pilot job))
+ */
+    void MulticoreComputeService::failCurrentStandardJobs(WorkflowExecutionFailureCause *cause) {
+
+      WRENCH_INFO("Failing %ld running jobs", this->running_jobs.size());
       for (auto workflow_job : this->running_jobs) {
-        WRENCH_INFO("Failing job %s", workflow_job->getName().c_str());
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           StandardJob *job = (StandardJob *) workflow_job;
-          this->failStandardJob(job, cause);
+          this->failRunningStandardJob(job, cause);
+        }
+      }
+
+      WRENCH_INFO("Failing %ld pending jobs", this->pending_jobs.size());
+      while (not this->pending_jobs.empty()) {
+        WorkflowJob *workflow_job = this->pending_jobs.front();
+        this->pending_jobs.pop();
+        if (workflow_job->getType() == WorkflowJob::STANDARD) {
+          StandardJob *job = (StandardJob *) workflow_job;
+          this->failPendingStandardJob(job, cause);
         }
       }
     }
@@ -733,9 +803,7 @@ namespace wrench {
         // Increase the "completed tasks" count of the job
         work->job->incrementNumCompletedTasks();
 
-        // Generate a SimulationTimestamp
-        this->simulation->output.addTimestamp<SimulationTimestampTaskCompletion>(
-                new SimulationTimestampTaskCompletion(task));
+
       }
 
       // Send the callback to the originator if the job has completed (i.e., if this
@@ -795,14 +863,21 @@ namespace wrench {
       this->running_works.erase(work);
 
       // Remove all other works for the job in the "not ready" state
+      std::vector<WorkUnit *> to_erase;
+
       for (auto w : this->non_ready_works) {
         if (w->job == job) {
-          this->non_ready_works.erase(w);
+          to_erase.push_back(w);
         }
       }
 
+      for (auto w : to_erase) {
+        this->non_ready_works.erase(w);
+      }
+      to_erase.clear();
+
       // Remove all other works for the job in the "ready" state
-      for (std::deque<WorkUnit*>::iterator it = this->ready_works.begin(); it != this->ready_works.end(); it++)  {
+      for (std::deque<WorkUnit *>::iterator it = this->ready_works.begin(); it != this->ready_works.end(); it++) {
         if ((*it)->job == job) {
           this->ready_works.erase(it);
         }
@@ -829,22 +904,26 @@ namespace wrench {
       // Deal with completed works
       for (auto w : this->completed_works) {
         if (w->job == job) {
-          this->completed_works.erase(w);
+          to_erase.push_back(w);
         }
       }
+      for (auto w : to_erase) {
+        this->non_ready_works.erase(w);
+      }
+      to_erase.clear();
 
       // Remove the job from the list of running jobs
       this->running_jobs.erase(job);
 
       // Fail the job
-      this->failStandardJob(job, cause);
+      this->failPendingStandardJob(job, cause);
 
     }
 
     /**
      * @brief Terminate the daemon, dealing with pending/running jobs
      */
-    void MulticoreComputeService::terminate() {
+    void MulticoreComputeService::terminate(bool notify_pilot_job_submitters) {
 
       this->setStateToDown();
 
@@ -855,9 +934,9 @@ namespace wrench {
       this->terminateAllPilotJobs();
 
       // Am I myself a pilot job?
-      if (this->containing_pilot_job) {
+      if (notify_pilot_job_submitters && this->containing_pilot_job) {
 
-        WRENCH_INFO("Letting the level above that the pilot job has ended on mailbox %s",
+        WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox %s",
                     this->containing_pilot_job->getCallbackMailbox().c_str());
         // NOTE: This is synchronous so that the process doesn't fall off the end
         S4U_Mailbox::put(this->containing_pilot_job->popCallbackMailbox(),

@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
     std::cerr << "Instantiating a MultiCore Job executor on " << executor_host << "..." << std::endl;
     simulation.add(
             std::unique_ptr<wrench::MulticoreComputeService>(
-                    new wrench::MulticoreComputeService(executor_host, true, false,
+                    new wrench::MulticoreComputeService(executor_host, true, true,
                                                         storage_service,
                                                         {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 

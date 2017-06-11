@@ -271,6 +271,10 @@ namespace wrench {
       while (keep_going) {
         std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
 
+        if (message == nullptr) {
+          WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
+          break;
+        }
         // Clear finished asynchronous dput()
         S4U_Mailbox::clear_dputs();
 

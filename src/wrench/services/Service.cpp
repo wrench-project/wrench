@@ -27,6 +27,7 @@ namespace wrench {
     Service::Service(std::string process_name_prefix, std::string mailbox_name_prefix) :
             S4U_DaemonWithMailbox(process_name_prefix, mailbox_name_prefix) {
       this->name = process_name_prefix;
+      this->state = Service::UP;
     }
 
     /**
@@ -93,6 +94,7 @@ namespace wrench {
                                this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
 
       // Wait for the ack
+//      WRENCH_INFO("Waiting for the 'I am dead' ack from the daemon");
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(ack_mailbox);
       if (ServiceDaemonStoppedMessage *msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
         this->state = Service::DOWN;

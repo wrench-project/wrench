@@ -2,7 +2,6 @@
 <!DOCTYPE platform SYSTEM "http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd">
 <platform version="4">
     <AS id="AS0" routing="Full">
-        <host id="SubmitNode" speed="1f"/>
 
         <cluster id="my_cluster" prefix="c-" suffix=".me" radical="0-9"
                  speed="3f" bw="125MBps" lat="100us" core="1"

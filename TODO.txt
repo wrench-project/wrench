@@ -1,16 +1,11 @@
+
+Mailbox class:
+    - Add all exceptions
+    - Throughout the WHOLE CODE handle a  get()/put() failed!! This is going to be cumbersome
+
+-----------------------------------
+
 DATA STORAGE IMPLEMENTATION:
-
-    - WAY for a job to do data movement b4 and after tasks?
-        - file copies to do (or empty)
-        - vector of tasks + file map to get stuff from
-        - file copies to do (or empty)
-
-   - WHO PERFORMS THE COPIES?
-        - Should be the ComputeService
-            - Otherwise, the WMS can do it via the DataManager using its own strategy... and then passes
-              empty pre-post thingies
-
-
 
     - WHO UPDATES THE REGISTRY?
         - When the WMS does a file copy
@@ -103,7 +98,13 @@ SOFTWARE ENGINEERING:
 
 * LYON:
 
-    - S4U: wait_any?
+    - Kill_all()
+        - The processes doing a GET() seem to get a NULL messages
+        - The processes doing a wait() seem to segfault...
+
+    - S4U: wait_any?  bug issued to github
+
+    - Could we have a "get with timeout"?
 
     - Exiting before launch prints warning (as expected), but fails with a segfault
       when SMPI is enabled....
@@ -123,7 +124,8 @@ SOFTWARE ENGINEERING:
         - Right now there is some uncaught exception in the maestro
 
 
-    - S4U: When will we get C++ Exceptions from SIMIX?
+    - S4U: When will we get C++ Exceptions from SIMIX? (signal handler sucks)
+        - Related: Actor throwing exception is not caught by launch()...
 
     - S4U: Kill() segfaults if s4u_actor has already terminated. Would it be
            possible to have some isAlive() method?  Or have kill() do a no-op if

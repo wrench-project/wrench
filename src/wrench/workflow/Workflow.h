@@ -39,6 +39,8 @@ namespace wrench {
 
         WorkflowFile *addFile(const std::string, double);
 
+        WorkflowFile *getFileById(const std::string id);
+
         WorkflowFile *getWorkflowFileByID(const std::string);
 
         void addControlDependency(WorkflowTask *, WorkflowTask *);

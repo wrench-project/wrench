@@ -104,9 +104,24 @@ namespace wrench {
      */
     bool SimpleStorageService::processNextMessage() {
 
-      // Wait for a message
-      std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
+      std::unique_ptr<SimulationMessage> message;
 
+      // Wait for a message
+      try {
+        message = S4U_Mailbox::get(this->mailbox_name);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          WRENCH_INFO("Giving up on this message...");
+          return true;
+        } else {
+          throw std::runtime_error("SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a message.");
+        }
+      }
+
+      if (message == nullptr) {
+        WRENCH_INFO("Got a NULL message. This likely means that we're all done...Aborting!");
+        return false;
+      }
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
@@ -180,7 +195,18 @@ namespace wrench {
                                                                             SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
 
           // TODO: THIS REALLY CANNOT BE SYNCHRONOUS, BUT UNTIL WAIT_FOR_ANY WORKS IT WILL HAVE TO DO
-          std::unique_ptr<SimulationMessage> file_content_message = S4U_Mailbox::get(this->data_write_mailbox_name);
+          std::unique_ptr<SimulationMessage> file_content_message = nullptr;
+          try {
+            file_content_message = S4U_Mailbox::get(this->data_write_mailbox_name);
+          } catch (std::runtime_error &e) {
+            if (!strcmp(e.what(), "network_error")) {
+              WRENCH_INFO("Giving up on this message...");
+              return true;
+            } else {
+              throw std::runtime_error("SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a file content.");
+            }
+          }
+
           if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
             this->addFileToStorage(file_content_msg->file);
           } else {
@@ -235,7 +261,7 @@ namespace wrench {
 
         // Send back the corresponding ack
         S4U_Mailbox::put(msg->answer_mailbox,
-                         new StorageServiceFileReadAnswerMessage(msg->file, this, true, nullptr,
+                         new StorageServiceFileCopyAnswerMessage(msg->file, this, true, nullptr,
                                                                  this->getPropertyValueAsDouble(
                                                                          SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
 

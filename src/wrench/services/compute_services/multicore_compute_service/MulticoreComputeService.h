@@ -53,6 +53,8 @@ namespace wrench {
                         {MulticoreComputeServiceProperty::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,            "1024"},
                         {MulticoreComputeServiceProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD,      "1024"},
                         {MulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,       "1024"},
+                        {MulticoreComputeServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD,      "1024"},
+                        {MulticoreComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD,       "1024"},
                         {MulticoreComputeServiceProperty::TTL_REQUEST_MESSAGE_PAYLOAD,                 "1024"},
                         {MulticoreComputeServiceProperty::TTL_ANSWER_MESSAGE_PAYLOAD,                  "1024"},
                         {MulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD,           "1024"},
@@ -142,7 +144,7 @@ namespace wrench {
         // Helper functions to make main() a bit more palatable
         void initialize();
 
-        void terminate();
+        void terminate(bool notify_pilot_job_submitters);
 
         void terminateAllPilotJobs();
 
@@ -163,7 +165,9 @@ namespace wrench {
 
         void createWorkForNewlyDispatchedJob(StandardJob *job);
 
-        void failStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
+        void failPendingStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
+
+        void failRunningStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
     };
 };
 

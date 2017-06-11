@@ -54,7 +54,7 @@ namespace wrench {
          */
         template <class T> void addTimestamp(T *timestamp) {
           std::type_index type_index = std::type_index(typeid(T));
-          if (!(this->traces[type_index])) {
+          if (this->traces.find(type_index) == this->traces.end()) {
             this->traces[type_index] = new SimulationTrace<T>();
           }
           ((SimulationTrace<T> *)(this->traces[type_index]))->addTimestamp(new SimulationTimestamp<T>(timestamp));

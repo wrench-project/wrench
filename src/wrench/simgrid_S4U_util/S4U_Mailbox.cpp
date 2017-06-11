@@ -43,16 +43,26 @@ namespace wrench {
      * @brief A blocking method to receive a message from a mailbox
      *
      * @param mailbox: the mailbox name
-     * @return a unique pointer to the message
+     * @return a unique pointer to the message, or nullptr (in which case it's likely a brutal termination)
      *
-     * @throw std::runtime_error
+     * @throw std:runtime_error
+     *      - "network_error" (e.g., other end has died)
+     *
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::get(std::string mailbox_name) {
       WRENCH_DEBUG("IN GET from %s", mailbox_name.c_str());
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
-      SimulationMessage *msg = static_cast<SimulationMessage *>(simgrid::s4u::this_actor::recv(mailbox));
+      SimulationMessage *msg = nullptr;
+      try {
+        msg = static_cast<SimulationMessage *>(simgrid::s4u::this_actor::recv(mailbox));
+      } catch (xbt_ex &e) {
+        if (e.category == network_error) {
+          WRENCH_INFO("Network error while doing a get(). Likely the sender has died");
+          throw std::runtime_error("network_error");
+        }
+      }
       if (msg == NULL) {
-        throw std::runtime_error("NULL message received");
+        return nullptr;
       }
       WRENCH_DEBUG("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
       return std::unique_ptr<SimulationMessage>(msg);
@@ -63,9 +73,9 @@ namespace wrench {
      *
      * @param mailbox: the mailbox name
      * @param timeout:  a timeout value in seconds
-     * @return a unique pointer to the message, nullptr on timeout
+     * @return a unique pointer to the message, or nullptr (in which case it's likely a brutal termination)
      *
-     * @throw std::runtime_error
+     * @throw std::runtime_error:  ("timeout")
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::get(std::string mailbox_name, double timeout) {
       WRENCH_DEBUG("IN GET WITH TIMEOUT (%lf) FROM MAILBOX %s", timeout, mailbox_name.c_str());
@@ -76,12 +86,12 @@ namespace wrench {
         comm->wait(timeout);
       } catch (xbt_ex &e) {
         if (e.category == timeout_error) {
-          return nullptr;
+          throw std::runtime_error("timeout");
         }
       }
 
       if (data == nullptr) {
-        throw std::runtime_error("NULL message in task");
+        return nullptr;
       }
 
       SimulationMessage *msg = static_cast<SimulationMessage *>(data);
@@ -100,7 +110,11 @@ namespace wrench {
     void S4U_Mailbox::put(std::string mailbox_name, SimulationMessage *msg) {
       WRENCH_DEBUG("PUTTING to %s a %s message", mailbox_name.c_str(), msg->getName().c_str());
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+      try {
       simgrid::s4u::this_actor::send(mailbox, msg, (size_t) msg->payload);
+      } catch (std::exception &e) {
+        WRENCH_INFO("***************************************");
+      }
 
       return;
     }

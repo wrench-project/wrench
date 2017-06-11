@@ -124,9 +124,10 @@ namespace wrench {
                                                                PilotJob *job,
                                                                double payload) : ComputeServiceMessage(
             "SUBMIT_PILOT_JOB_REQUEST", payload) {
-      if (job == nullptr) {
-        throw std::invalid_argument("Invalid constructor arguments");
+      if ((job == nullptr) || (answer_mailbox == "")) {
+        throw std::invalid_argument("ComputeServiceSubmitPilotJobRequestMessage::ComputeServiceSubmitPilotJobRequestMessage(): Invalid constructor arguments");
       }
+      this->answer_mailbox = answer_mailbox;
       this->job = job;
     }
 
@@ -150,6 +151,9 @@ namespace wrench {
         throw std::invalid_argument("Invalid constructor arguments");
       }
       this->job = job;
+      this->compute_service = compute_service;
+      this->success = success;
+      this->failure_cause = failure_cause;
     }
 
     /**

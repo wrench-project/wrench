@@ -117,6 +117,11 @@ namespace wrench {
 
       std::unique_ptr<SimulationMessage> message = S4U_Mailbox::get(this->mailbox_name);
 
+      if (message == nullptr) {
+        WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
+        return false;
+      }
+
       WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
       if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {

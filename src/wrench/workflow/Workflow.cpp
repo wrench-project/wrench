@@ -408,7 +408,7 @@ namespace wrench {
         throw std::invalid_argument("Workflow::updateTaskState(): passed a nullptr task");
       }
 
-      WRENCH_DEBUG("Changing state of task %s from '%s' to '%s'",
+      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
                    task->getId().c_str(),
                    WorkflowTask::stateToString(task->state).c_str(),
                    WorkflowTask::stateToString(state).c_str());
@@ -458,6 +458,15 @@ namespace wrench {
           task->setState(WorkflowTask::NOT_READY);
           break;
         }
+        case WorkflowTask::FAILED: {
+          if (task->getState() == WorkflowTask::RUNNING) {
+            task->setState(WorkflowTask::FAILED);
+          } else {
+            throw std::runtime_error("Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
+                                     " task to WorkflowTask::FAILED");
+          }
+          break;
+        }
         default: {
           throw std::invalid_argument("Unknown task state '" +
                                       std::to_string(state) + "'");
@@ -478,5 +487,18 @@ namespace wrench {
         }
       }
       return input_files;
+    }
+
+    /**
+     * @brief Retrieve a file by its id
+     * @param id: the file id
+     * @return the file, or nullptr if not found
+     */
+    WorkflowFile *Workflow::getFileById(const std::string id) {
+      if (this->files.find(id) != this->files.end()) {
+        return this->files[id].get();
+      } else {
+        return nullptr;
+      }
     }
 };

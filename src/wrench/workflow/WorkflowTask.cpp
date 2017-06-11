@@ -202,6 +202,15 @@ namespace wrench {
     }
 
     /**
+     * @brief Set the task's start date
+     *
+     * @param date: the end date
+     */
+    void WorkflowTask::setStartDate(double date) {
+      this->start_date = date;
+    }
+
+    /**
      * @brief Set the task's end date
      *
      * @param date: the end date
@@ -215,6 +224,13 @@ namespace wrench {
      */
     void WorkflowTask::setReady() {
       this->workflow->updateTaskState(this, WorkflowTask::READY);
+    }
+
+    /**
+    * @brief Set the task to the failed state
+    */
+    void WorkflowTask::setFailed() {
+      this->workflow->updateTaskState(this, WorkflowTask::FAILED);
     }
 
     /**
@@ -293,5 +309,21 @@ namespace wrench {
         output.insert(f.second);
       }
       return output;
+    }
+
+    /**
+     * @brief Get the task's start date
+     * @return the start date
+     */
+    double WorkflowTask::getStartDate() {
+      return this->start_date;
+    }
+
+    /**
+     * @brief Get the task's end date
+     * @return the start date
+     */
+    double WorkflowTask::getEndDate() {
+      return this->end_date;
     }
 };
