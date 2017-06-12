@@ -21,7 +21,7 @@ namespace wrench {
      */
     SimulationMessage::SimulationMessage(std::string name, double payload) {
       if ((name == "") || (payload < 0)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("SimulationMessage::SimulationMessage(): Invalid arguments");
       }
       this->name = name;
       this->payload = payload;

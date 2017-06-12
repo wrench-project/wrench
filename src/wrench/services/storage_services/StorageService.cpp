@@ -45,13 +45,13 @@ namespace wrench {
     void StorageService::addFileToStorage(WorkflowFile *file) {
 
       if (file == nullptr) {
-        throw std::invalid_argument("StorageService::addFileToStorage(): file is nullptr");
+        throw std::invalid_argument("StorageService::addFileToStorage(): Invalid arguments");
       }
 
       if (file->getSize() > (this->capacity - this->occupied_space)) {
         WRENCH_WARN("File exceeds free space capacity on storage service (file size: %lf, storage free space: %lf)",
                     file->getSize(), (this->capacity - this->occupied_space));
-        throw std::runtime_error("File exceeds free space capacity on storage service");
+        throw std::runtime_error("StorageService::addFileToStorage(): File exceeds free space capacity on storage service");
       }
       this->stored_files.insert(file);
       this->occupied_space += file->getSize();
@@ -68,8 +68,12 @@ namespace wrench {
      */
     void StorageService::removeFileFromStorage(WorkflowFile *file) {
 
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::removeFileFromStorage(): Invalid arguments");
+      }
+
       if (this->stored_files.find(file) == this->stored_files.end()) {
-        throw std::runtime_error("Attempting to remove a file that is not on the storage service");
+        throw std::runtime_error("StorageService::removeFileFromStorage(): Attempting to remove a file that is not on the storage service");
       }
       this->stored_files.erase(file);
       this->occupied_space -= file->getSize();
@@ -139,7 +143,7 @@ namespace wrench {
       if (StorageServiceFreeSpaceAnswerMessage *msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage *>(message.get())) {
         return msg->free_space;
       } else {
-        throw std::runtime_error("StorageService::howMuchFreeSpace(): unexpected [" + msg->getName() + "] message");
+        throw std::runtime_error("StorageService::howMuchFreeSpace(): Unexpected [" + msg->getName() + "] message");
       }
     }
 
@@ -157,7 +161,7 @@ namespace wrench {
     bool StorageService::lookupFile(WorkflowFile *file) {
 
       if (file == nullptr) {
-        throw std::invalid_argument("StorageService::lookupFile(): invalid arguments");
+        throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
       }
 
       if (this->state == DOWN) {
@@ -194,7 +198,7 @@ namespace wrench {
       if (StorageServiceFileLookupAnswerMessage *msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
         return msg->file_is_available;
       } else {
-        throw std::runtime_error("StorageService::lookupFile(): unexpected [" + msg->getName() + "] message");
+        throw std::runtime_error("StorageService::lookupFile(): Unexpected [" + msg->getName() + "] message");
       }
     }
 
@@ -210,7 +214,7 @@ namespace wrench {
     void StorageService::readFile(WorkflowFile *file) {
 
       if (file == nullptr) {
-        throw std::invalid_argument("StorageService::readFile(): invalid arguments");
+        throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
       }
 
       if (this->state == DOWN) {
@@ -289,7 +293,7 @@ namespace wrench {
     void StorageService::writeFile(WorkflowFile *file) {
 
       if (file == nullptr) {
-        throw std::invalid_argument("StorageService::writeFile(): invalid arguments");
+        throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
       }
 
       if (this->state == DOWN) {
@@ -459,7 +463,7 @@ namespace wrench {
     void StorageService::deleteFile(WorkflowFile *file) {
 
       if (file == nullptr) {
-        throw std::invalid_argument("StorageService::deleteFile(): invalid arguments");
+        throw std::invalid_argument("StorageService::deleteFile(): Invalid arguments");
       }
 
       if (this->state == DOWN) {
@@ -501,7 +505,7 @@ namespace wrench {
         }
         WRENCH_INFO("Deleted file %s on storage service %s", file->getId().c_str(), this->getName().c_str());
       } else {
-        throw std::runtime_error("StorageService::deleteFile(): unexpected [" + message->getName() + "] message");
+        throw std::runtime_error("StorageService::deleteFile(): Unexpected [" + message->getName() + "] message");
       }
 
       return;
@@ -554,7 +558,7 @@ namespace wrench {
     void StorageService::copyFile(WorkflowFile *file, StorageService *src) {
 
       if ((file == nullptr) || (src == nullptr)) {
-        throw std::invalid_argument("StorageService::copyFile(): invalid arguments");
+        throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
       }
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -594,7 +598,7 @@ namespace wrench {
           throw WorkflowExecutionException(msg->failure_cause);
         }
       } else {
-        throw std::runtime_error("StorageService::copyFile(): unexpected [" + message->getName() + "] message");
+        throw std::runtime_error("StorageService::copyFile(): Unexpected [" + message->getName() + "] message");
       }
 
       return;
@@ -613,7 +617,7 @@ namespace wrench {
     void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file, StorageService *src) {
 
       if ((file == nullptr) || (src == nullptr)) {
-        throw std::invalid_argument("StorageService::initiateFileCopy(): invalid arguments");
+        throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid arguments");
       }
 
       if (this->state == DOWN) {

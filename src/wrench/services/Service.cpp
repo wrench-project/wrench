@@ -49,7 +49,7 @@ namespace wrench {
      */
     std::string Service::getPropertyValueAsString(std::string property) {
       if (this->property_list.find(property) == this->property_list.end()) {
-        throw std::runtime_error("Cannot find value for property " + property +
+        throw std::runtime_error("Service::getPropertyValueAsString(): Cannot find value for property " + property +
                                  " (perhaps a derived service class does not provide a default value?)");
       }
       return this->property_list[property];
@@ -65,7 +65,7 @@ namespace wrench {
     double Service::getPropertyValueAsDouble(std::string property) {
       double value;
       if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
-        throw std::runtime_error("Invalid double property value " + property + " " +
+        throw std::runtime_error("Service::getPropertyValueAsDouble(): Invalid double property value " + property + " " +
                                  this->getPropertyValueAsString(property));
       }
       return value;

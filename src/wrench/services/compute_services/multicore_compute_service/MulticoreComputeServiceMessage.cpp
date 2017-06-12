@@ -30,7 +30,7 @@ namespace wrench {
                                                                                                double payload)
             : compute_service(cs), MulticoreComputeServiceMessage("NOT_ENOUGH_CORES", payload) {
       if (job == nullptr) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("MulticoreComputeServiceNotEnoughCoresMessage::MulticoreComputeServiceNotEnoughCoresMessage(): Invalid arguments");
       }
       this->job = job;
     }
@@ -47,7 +47,7 @@ namespace wrench {
             "NUM_CORES_REQUEST",
             payload) {
       if (answer_mailbox == "") {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("MulticoreComputeServiceNumCoresRequestMessage::MulticoreComputeServiceNumCoresRequestMessage(): Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
     }
@@ -74,7 +74,7 @@ namespace wrench {
             std::string answer_mailbox, double payload)
             : MulticoreComputeServiceMessage("NUM_IDLE_CORES_REQUEST", payload) {
       if (answer_mailbox == "") {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("MulticoreComputeServiceNumIdleCoresRequestMessage::MulticoreComputeServiceNumIdleCoresRequestMessage(): Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
     }
@@ -101,7 +101,7 @@ namespace wrench {
                                                                                        double payload)
             : MulticoreComputeServiceMessage("TTL_REQUEST", payload) {
       if (answer_mailbox == "") {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("MulticoreComputeServiceTTLRequestMessage::MulticoreComputeServiceTTLRequestMessage(): Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
     }
@@ -127,7 +127,7 @@ namespace wrench {
             std::string answer_mailbox, double payload) : MulticoreComputeServiceMessage(
             "FLOP_RATE_REQUEST", payload) {
       if (answer_mailbox == "") {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("MulticoreComputeServiceFlopRateRequestMessage::MulticoreComputeServiceFlopRateRequestMessage(): Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
     }
@@ -143,7 +143,7 @@ namespace wrench {
                                                                                                double payload)
             : MulticoreComputeServiceMessage("FLOP_RATE_ANSWER", payload) {
       if ((flop_rate < 0.0)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("MulticoreComputeServiceFlopRateAnswerMessage::MulticoreComputeServiceFlopRateAnswerMessage(): Invalid arguments");
       }
       this->flop_rate = flop_rate;
     }

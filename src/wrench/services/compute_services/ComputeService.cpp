@@ -163,8 +163,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void ComputeService::submitStandardJob(StandardJob *job) {
-      throw std::runtime_error(
-              "Compute service '" + this->getName() + "' does not implement submitStandardJob(StandardJob *)");
+      throw std::runtime_error("ComputeService::submitStandardJob(): Not implemented here");
     }
 
     /**
@@ -174,8 +173,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void ComputeService::submitPilotJob(PilotJob *job) {
-      throw std::runtime_error(
-              "Compute service '" + this->getName() + "' does not implement submitPilotJob(StandardJob *)");
+      throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
     }
 
     /**
@@ -185,7 +183,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     double ComputeService::getCoreFlopRate() {
-      throw std::runtime_error("Compute service '" + this->getName() + "' does not implement getCoreFlopRate()");
+      throw std::runtime_error("ComputeService::getCoreFlopRate(): Not implemented here");
     }
 
     /**
@@ -195,7 +193,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     unsigned long ComputeService::getNumCores() {
-      throw std::runtime_error("Compute service '" + this->getName() + "' does not implement getNumCores()");
+      throw std::runtime_error("ComputeService::getNumCores(): Not implemented here");
     }
 
     /**
@@ -205,7 +203,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     unsigned long ComputeService::getNumIdleCores() {
-      throw std::runtime_error("Compute service '" + this->getName() + "' does not implement getNumIdleCores()");
+      throw std::runtime_error("ComputeService::getNumIdleCores(): Not implemented here");
     }
 
     /**
@@ -215,7 +213,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     double ComputeService::getTTL() {
-      throw std::runtime_error("Compute service '" + this->getName() + "' does not implement getTTL()");
+      throw std::runtime_error("ComputeService::getTTL(): Not implemented");
     }
 
     /**

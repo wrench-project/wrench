@@ -50,7 +50,7 @@ namespace wrench {
           return "Pilot";
         }
         default: {
-          throw std::runtime_error("WorkflowJob type '" +
+          throw std::runtime_error("WorkflowJob::getTypeAsString(): WorkflowJob type '" +
                                    std::to_string(this->type) + "' cannot be converted to a string");
         }
       }

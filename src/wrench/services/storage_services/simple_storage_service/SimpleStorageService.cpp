@@ -48,7 +48,7 @@ namespace wrench {
             StorageService("simple_storage_service" + suffix, "simple_storage_service" + suffix, capacity) {
 
       if (capacity < 0) {
-        throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): invalid argument");
+        throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): Invalid argument");
       }
 
       // Set default properties
@@ -113,8 +113,7 @@ namespace wrench {
           WRENCH_INFO("Giving up on this message...");
           return true;
         } else {
-          throw std::runtime_error(
-                  "SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a message.");
+          throw std::runtime_error("SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a message.");
         }
       }
 
@@ -203,15 +202,14 @@ namespace wrench {
               WRENCH_INFO("Giving up on this message...");
               return true;
             } else {
-              throw std::runtime_error(
-                      "SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a file content.");
+              throw std::runtime_error("SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a file content.");
             }
           }
 
           if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
             this->addFileToStorage(file_content_msg->file);
           } else {
-            throw std::runtime_error("Unexpected [ " + msg->getName() + "] message");
+            throw std::runtime_error("SimpleStorageService::processNextMessage(): Unexpected [ " + msg->getName() + "] message");
           }
         }
         return true;
@@ -289,7 +287,7 @@ namespace wrench {
         return true;
 
       } else {
-        throw std::runtime_error("Unexpected [" + message->getName() + "] message");
+        throw std::runtime_error("SimpleStorageService::processNextMessage(): Unexpected [" + message->getName() + "] message");
       }
     }
 

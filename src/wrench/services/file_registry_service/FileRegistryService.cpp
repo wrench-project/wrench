@@ -78,7 +78,7 @@ namespace wrench {
     std::set<StorageService *> FileRegistryService::lookupEntry(WorkflowFile *file) {
 
       if (file == nullptr) {
-        throw std::invalid_argument("Invalid input argument");
+        throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
       }
 
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
@@ -110,7 +110,7 @@ namespace wrench {
       if (FileRegistryFileLookupAnswerMessage *msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
         return msg->locations;
       } else {
-        throw std::runtime_error("Unexpected [" + message->getName() + "] message");
+        throw std::runtime_error("FileRegistryService::lookupEntry(): Unexpected [" + message->getName() + "] message");
       }
     }
 
@@ -127,7 +127,7 @@ namespace wrench {
     void FileRegistryService::addEntry(WorkflowFile *file, StorageService *storage_service) {
 
       if ((file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument("Invalid input argument");
+        throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
       }
 
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
@@ -176,7 +176,7 @@ namespace wrench {
     void FileRegistryService::removeEntry(WorkflowFile *file, StorageService *storage_service) {
 
       if ((file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument("Invalid input argument");
+        throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
       }
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
 
@@ -314,7 +314,7 @@ namespace wrench {
         return true;
 
       } else {
-        throw std::runtime_error("Unknown message type: " + std::to_string(message->payload));
+        throw std::runtime_error("FileRegistryService::processNextMessage(): Unknown message type: " + std::to_string(message->payload));
       }
     }
 

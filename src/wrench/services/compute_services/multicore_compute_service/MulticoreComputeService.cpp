@@ -52,8 +52,7 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error(
-                  "MulticoreComputeService::submitStandardJob(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error("MulticoreComputeService::submitStandardJob(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -65,8 +64,7 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error(
-                  "MulticoreComputeService::submitStandardJob(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error("MulticoreComputeService::submitStandardJob(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -76,8 +74,7 @@ namespace wrench {
           throw WorkflowExecutionException(msg->failure_cause);
         }
       } else {
-        throw std::runtime_error(
-                "MulticoreComputeService::submitStandardJob(): Received an unexpected [" + message->getName() +
+        throw std::runtime_error("MulticoreComputeService::submitStandardJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
 
@@ -110,8 +107,7 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error(
-                  "MulticoreComputeService::submitPilotJob(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error("MulticoreComputeService::submitPilotJob(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -124,8 +120,7 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error(
-                  "MulticoreComputeService::submitPilotJob(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error("MulticoreComputeService::submitPilotJob(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -136,8 +131,7 @@ namespace wrench {
         }
 
       } else {
-        throw std::runtime_error(
-                "MulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
+        throw std::runtime_error("MulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
     };
@@ -168,8 +162,7 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error(
-                  "MulticoreComputeService::getNumCores(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error("MulticoreComputeService::getNumCores(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -182,16 +175,14 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error(
-                  "MulticoreComputeService::getNumCores(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error("MulticoreComputeService::getNumCores(): Unknown exception: " + std::string(e.what()));
         }
       }
 
       if (MulticoreComputeServiceNumCoresAnswerMessage *msg = dynamic_cast<MulticoreComputeServiceNumCoresAnswerMessage *>(message.get())) {
         return msg->num_cores;
       } else {
-        throw std::runtime_error(
-                "MulticoreComputeService::getNumCores(): unexpected [" + msg->getName() + "] message");
+        throw std::runtime_error("MulticoreComputeService::getNumCores(): Unexpected [" + msg->getName() + "] message");
       }
     }
 
@@ -296,7 +287,7 @@ namespace wrench {
       if (MulticoreComputeServiceTTLAnswerMessage *msg = dynamic_cast<MulticoreComputeServiceTTLAnswerMessage *>(message.get())) {
         return msg->ttl;
       } else {
-        throw std::runtime_error("MulticoreComputeService::getTTL(): unexpected [" + msg->getName() + "] message");
+        throw std::runtime_error("MulticoreComputeService::getTTL(): Unexpected [" + msg->getName() + "] message");
       }
     }
 

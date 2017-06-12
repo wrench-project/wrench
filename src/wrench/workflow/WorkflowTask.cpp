@@ -261,11 +261,11 @@ namespace wrench {
                                     WorkflowFile *f) {
 
       if (map_to_check.find(f->id) != map_to_check.end()) {
-        throw std::invalid_argument("File ID '" + f->id + "' is already used as input or output file");
+        throw std::invalid_argument("WorkflowTask::addFileToMap(): File ID '" + f->id + "' is already used as input or output file");
       }
 
       if (map_to_insert.find(f->id) != map_to_insert.end()) {
-        throw std::invalid_argument("File ID '" + f->id + "' already exists");
+        throw std::invalid_argument("WorkflowTask::addFileToMap(): File ID '" + f->id + "' already exists");
       }
       map_to_insert[f->id] = f;
     }

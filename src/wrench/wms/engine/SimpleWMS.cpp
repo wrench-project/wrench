@@ -138,7 +138,7 @@ namespace wrench {
             break;
           }
           default: {
-            throw std::runtime_error("Unknown workflow execution event type '" +
+            throw std::runtime_error("SimpleWMS::main(): Unknown workflow execution event type '" +
                                      std::to_string(event->type) + "'");
           }
         }

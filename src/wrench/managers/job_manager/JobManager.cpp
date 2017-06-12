@@ -95,7 +95,7 @@ namespace wrench {
                                                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                                                std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
       if (tasks.size() < 1) {
-        throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
+        throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
       }
 
       StandardJob *raw_ptr = new StandardJob(tasks, file_locations, pre_file_copies, post_file_copies,
@@ -121,7 +121,7 @@ namespace wrench {
     StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
                                                std::map<WorkflowFile *, StorageService *> file_locations) {
       if (tasks.size() < 1) {
-        throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
+        throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
       }
 
       return this->createStandardJob(tasks, file_locations, {}, {}, {});
@@ -140,7 +140,7 @@ namespace wrench {
     JobManager::createStandardJob(WorkflowTask *task, std::map<WorkflowFile *, StorageService *> file_locations) {
 
       if (task == nullptr) {
-        throw std::invalid_argument("JobManager::createStandardJob(): invalid arguments");
+        throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
       }
 
       std::vector<WorkflowTask *> tasks;
@@ -160,7 +160,7 @@ namespace wrench {
      */
     PilotJob *JobManager::createPilotJob(Workflow *workflow, int num_cores, double duration) {
       if ((workflow == nullptr) || (num_cores < 1) || (duration <= 0.0)) {
-        throw std::invalid_argument("JobManager::createPilotJob(): invalid arguments");
+        throw std::invalid_argument("JobManager::createPilotJob(): Invalid arguments");
       }
       PilotJob *raw_ptr = new PilotJob(workflow, num_cores, duration);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
@@ -180,7 +180,7 @@ namespace wrench {
     void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service) {
 
       if ((job == nullptr) || (compute_service == nullptr)) {
-        throw std::invalid_argument("JobManager::submitJob(): invalid arguments");
+        throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
       }
 
       // Push back the mailbox of the manager,
@@ -218,7 +218,7 @@ namespace wrench {
      * @param job: a pointer to the PilotJob
      */
     void JobManager::cancelPilotJob(PilotJob *job) {
-      throw std::runtime_error("cancelPilotJob() not implemented yet");
+      throw std::runtime_error("JobManager::cancelPilotJob(): Not implemented yet");
     }
 
     /**
@@ -405,7 +405,7 @@ namespace wrench {
           }
 
         } else {
-          throw std::runtime_error("Unexpected [" + message->getName() + "] message");
+          throw std::runtime_error("JobManager::main(): Unexpected [" + message->getName() + "] message");
         }
       }
 

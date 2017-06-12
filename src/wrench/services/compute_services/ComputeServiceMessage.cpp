@@ -27,7 +27,7 @@ namespace wrench {
     ComputeServiceJobTypeNotSupportedMessage::ComputeServiceJobTypeNotSupportedMessage(WorkflowJob *job, ComputeService *cs, double payload)
             : ComputeServiceMessage("JOB_TYPE_NOT_SUPPORTED", payload) {
       if ((job == nullptr) || (cs == nullptr)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServiceJobTypeNotSupportedMessage::ComputeServiceJobTypeNotSupportedMessage(): Invalid arguments");
       }
       this->job = job;
       this->compute_service = cs;
@@ -44,7 +44,7 @@ namespace wrench {
                                                                      double payload) :
             ComputeServiceMessage("SUBMIT_STANDARD_JOB_REQUEST", payload) {
       if ((answer_mailbox == "") || (job == nullptr)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServiceSubmitStandardJobRequestMessage::ComputeServiceSubmitStandardJobRequestMessage(): Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
       this->job = job;
@@ -67,7 +67,7 @@ namespace wrench {
                                                                    double payload) :
             ComputeServiceMessage("SUBMIT_STANDARD_JOB_ANSWER", payload) {
       if ((job == nullptr) || (compute_service == nullptr)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServiceSubmitStandardJobAnswerMessage::ComputeServiceSubmitStandardJobAnswerMessage(): Invalid arguments");
       }
       this->job = job;
       this->compute_service = compute_service;
@@ -86,7 +86,7 @@ namespace wrench {
     ComputeServiceStandardJobDoneMessage::ComputeServiceStandardJobDoneMessage(StandardJob *job, ComputeService *cs, double payload)
             : ComputeServiceMessage("STANDARD_JOB_DONE", payload) {
       if (job == nullptr) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServiceStandardJobDoneMessage::ComputeServiceStandardJobDoneMessage(): Invalid arguments");
       }
       this->job = job;
       this->compute_service = cs;
@@ -106,7 +106,7 @@ namespace wrench {
                                                        double payload)
             : ComputeServiceMessage("STANDARD_JOB_FAILED", payload) {
       if ((job == nullptr) || (cs == nullptr)|| (cause == nullptr)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServiceStandardJobFailedMessage::ComputeServiceStandardJobFailedMessage(): Invalid arguments");
       }
       this->job = job;
       this->compute_service = cs;
@@ -125,7 +125,7 @@ namespace wrench {
                                                                double payload) : ComputeServiceMessage(
             "SUBMIT_PILOT_JOB_REQUEST", payload) {
       if ((job == nullptr) || (answer_mailbox == "")) {
-        throw std::invalid_argument("ComputeServiceSubmitPilotJobRequestMessage::ComputeServiceSubmitPilotJobRequestMessage(): Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServiceSubmitPilotJobRequestMessage::ComputeServiceSubmitPilotJobRequestMessage(): Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
       this->job = job;
@@ -148,7 +148,7 @@ namespace wrench {
                                                              double payload) : ComputeServiceMessage(
             "SUBMIT_PILOT_JOB_ANSWER", payload) {
       if ((job == nullptr) || (compute_service == nullptr)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServiceSubmitPilotJobAnswerMessage::ComputeServiceSubmitPilotJobAnswerMessage(): Invalid arguments");
       }
       this->job = job;
       this->compute_service = compute_service;
@@ -168,7 +168,7 @@ namespace wrench {
             : ComputeServiceMessage("PILOT_JOB_STARTED", payload) {
 
       if ((job == nullptr) || (cs == nullptr)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServicePilotJobStartedMessage::ComputeServicePilotJobStartedMessage(): Invalid arguments");
       }
       this->job = job;
       this->compute_service = cs;
@@ -185,7 +185,7 @@ namespace wrench {
     ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(PilotJob *job, ComputeService *cs, double payload)
             : ComputeServiceMessage("PILOT_JOB_EXPIRED", payload) {
       if ((job == nullptr) || (cs == nullptr)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServicePilotJobExpiredMessage::ComputeServicePilotJobExpiredMessage(): Invalid arguments");
       }
       this->job = job;
       this->compute_service = cs;
@@ -202,7 +202,7 @@ namespace wrench {
     ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(PilotJob *job, ComputeService *cs, double payload) : ComputeServiceMessage(
             "PILOT_JOB_FAILED", payload) {
       if ((job == nullptr) || (cs == nullptr)) {
-        throw std::invalid_argument("Invalid constructor arguments");
+        throw std::invalid_argument("ComputeServicePilotJobFailedMessage::ComputeServicePilotJobFailedMessage(): Invalid arguments");
       }
       this->job = job;
       this->compute_service = cs;

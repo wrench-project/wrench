@@ -35,7 +35,7 @@ namespace wrench {
 
       // Check that the host exists, and if not throw an exceptions
       if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
-        throw std::invalid_argument("Unknown host name '" + hostname + "'");
+        throw std::invalid_argument("S4U_DaemonWithMailbox::start(): Unknown host name '" + hostname + "'");
       }
 
       // Create the s4u_actor

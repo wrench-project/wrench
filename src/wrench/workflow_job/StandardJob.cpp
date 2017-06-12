@@ -44,7 +44,7 @@ namespace wrench {
 
       for (auto t : tasks) {
         if (t->getState() != WorkflowTask::READY) {
-          throw std::invalid_argument("All tasks used to create a StandardJob must be READY");
+          throw std::invalid_argument("StandardJob::StandardJob(): All tasks used to create a StandardJob must be READY");
         }
       }
 

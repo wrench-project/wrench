@@ -71,9 +71,9 @@ class NoopSimulationTestWMS : public wrench::WMS {
 
 public:
     NoopSimulationTestWMS(OneTaskTest *test,
-                            wrench::Workflow *workflow,
-                            std::unique_ptr<wrench::Scheduler> scheduler,
-                            std::string hostname) :
+                          wrench::Workflow *workflow,
+                          std::unique_ptr<wrench::Scheduler> scheduler,
+                          std::string hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -104,73 +104,77 @@ private:
 
 TEST_F(OneTaskTest, NoopSimulation) {
 
-  // TODO: Remove this when the engine->shutdown() S4U bug is fixed
-  ASSERT_EQ(1,1);
-  return;
+  pid_t pid = fork();
 
-  // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
-  int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("one_task_test");
+  if (pid) {
+    int e;
+    waitpid(pid, &e, 0);
+  } else {
 
+    // Create and initialize a simulation
+    wrench::Simulation *simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("one_task_test");
 
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
 
-  simulation->init(&argc, argv);
+    simulation->init(&argc, argv);
 
-  // Setting up the platform
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-  ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
-  // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a WMS
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new NoopSimulationTestWMS(this, workflow,
+    // Create a WMS
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+            std::unique_ptr<wrench::WMS>(new NoopSimulationTestWMS(this, workflow,
                                                                    std::unique_ptr<wrench::Scheduler>(
                                                                            new wrench::RandomScheduler()),
-                          hostname))));
+                            hostname))));
 
-  // Create a Compute Service
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
-  EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
-                                                      nullptr,
-                                                      {}))));
+    // Create a Compute Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    EXPECT_NO_THROW(compute_service = simulation->add(
+            std::unique_ptr<wrench::MulticoreComputeService>(
+                    new wrench::MulticoreComputeService(hostname, true, true,
+                                                        nullptr,
+                                                        {}))));
 
-  // Create a Storage Service
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+    // Create a Storage Service
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    EXPECT_NO_THROW(storage_service1 = simulation->add(
+            std::unique_ptr<wrench::SimpleStorageService>(
+                    new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
-  // Without a file registry service this should fail
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
-  ASSERT_THROW(simulation->stageFiles({input_file}, storage_service1), std::runtime_error);
+    // Without a file registry service this should fail
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    ASSERT_THROW(simulation->stageFiles({input_file}, storage_service1), std::runtime_error);
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
-
-  ASSERT_THROW(simulation->stageFiles({input_file}, nullptr), std::invalid_argument);
-  ASSERT_THROW(simulation->stageFiles({nullptr}, storage_service1), std::invalid_argument);
-
-  // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+    std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+            new wrench::FileRegistryService(hostname));
 
 
-  // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+    simulation->setFileRegistryService(std::move(file_registry_service));
+
+    ASSERT_THROW(simulation->stageFiles({input_file}, nullptr), std::invalid_argument);
+    ASSERT_THROW(simulation->stageFiles({nullptr}, storage_service1), std::invalid_argument);
+
+    // Staging the input_file on the storage service
+    EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
 
 
-  delete simulation;
+    // Running a "run a single task" simulation
+    EXPECT_NO_THROW(simulation->launch());
+
+    delete simulation;
+    exit(0);
+  }
+
 
 }
 
@@ -182,9 +186,9 @@ class ExecutionWithLocationMapTestWMS : public wrench::WMS {
 
 public:
     ExecutionWithLocationMapTestWMS(OneTaskTest *test,
-                            wrench::Workflow *workflow,
-                            std::unique_ptr<wrench::Scheduler> scheduler,
-                            std::string hostname) :
+                                    wrench::Workflow *workflow,
+                                    std::unique_ptr<wrench::Scheduler> scheduler,
+                                    std::string hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -229,74 +233,78 @@ private:
 
 TEST_F(OneTaskTest, ExecutionWithLocationMap) {
 
+  pid_t pid = fork();
 
-  // TODO: Remove this when the engine->shutdown() S4U bug is fixed
-    ASSERT_EQ(1,1);
-    return;
+  if (pid) {
+    int e;
+    waitpid(pid, &e, 0);
 
+  } else {
 
-  // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
-  int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("one_task_test");
+    // Create and initialize a simulation
+    wrench::Simulation *simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("one_task_test");
 
+    simulation->init(&argc, argv);
 
-  simulation->init(&argc, argv);
+    // Setting up the platform
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-  // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
 
-  // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+    // Create a WMS
+    EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+            std::unique_ptr<wrench::WMS>(new ExecutionWithLocationMapTestWMS(this, workflow,
+                                                                             std::unique_ptr<wrench::Scheduler>(
+                                                                                     new wrench::RandomScheduler()),
+                            hostname))));
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new ExecutionWithLocationMapTestWMS(this, workflow,
-                                                                   std::unique_ptr<wrench::Scheduler>(
-                                                                           new wrench::RandomScheduler()),
-                          hostname))));
+    // Create a Compute Service
+    EXPECT_NO_THROW(compute_service = simulation->add(
+            std::unique_ptr<wrench::MulticoreComputeService>(
+                    new wrench::MulticoreComputeService(hostname, true, true,
+                                                        nullptr,
+                                                        {}))));
 
-  // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
-                                                      nullptr,
-                                                      {}))));
+    // Create a Storage Service
+    EXPECT_NO_THROW(storage_service1 = simulation->add(
+            std::unique_ptr<wrench::SimpleStorageService>(
+                    new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
-  // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+    // Create a File Registry Service
+    std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+            new wrench::FileRegistryService(hostname));
 
-  // Create a File Registry Service
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
+    EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
 
-  EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
-
-  // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
-
-
-  // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
-
-  // Check that the output trace makes sense
-  ASSERT_EQ(task->getState(), wrench::WorkflowTask::COMPLETED);
-  ASSERT_EQ(task->getFailureCount(), 0);
-  ASSERT_GT(task->getStartDate(), 0.0);
-  ASSERT_GT(task->getEndDate(), 0.0);
-  ASSERT_GT(task->getEndDate(), task->getStartDate());
-
-  std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
-          simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>();
-  ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
-  ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getDate(), task->getEndDate());
-  ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(), task);
+    // Staging the input_file on the storage service
+    EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
 
 
-  delete simulation;
+    // Running a "run a single task" simulation
+    EXPECT_NO_THROW(simulation->launch());
+
+    // Check that the output trace makes sense
+    ASSERT_EQ(task->getState(), wrench::WorkflowTask::COMPLETED);
+    ASSERT_EQ(task->getFailureCount(), 0);
+    ASSERT_GT(task->getStartDate(), 0.0);
+    ASSERT_GT(task->getEndDate(), 0.0);
+    ASSERT_GT(task->getEndDate(), task->getStartDate());
+
+    std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
+            simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>();
+    ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
+    ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getDate(),
+              task->getEndDate());
+    ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
+              task);
+
+    delete simulation;
+    exit(0);
+  }
 
 }
 
@@ -308,9 +316,9 @@ class ExecutionWithDefaultStorageServiceTestWMS : public wrench::WMS {
 
 public:
     ExecutionWithDefaultStorageServiceTestWMS(OneTaskTest *test,
-                                    wrench::Workflow *workflow,
-                                    std::unique_ptr<wrench::Scheduler> scheduler,
-                                    std::string hostname) :
+                                              wrench::Workflow *workflow,
+                                              std::unique_ptr<wrench::Scheduler> scheduler,
+                                              std::string hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -354,76 +362,81 @@ private:
 
 TEST_F(OneTaskTest, ExecutionWithDefaultStorageService) {
 
+  pid_t pid = fork();
 
-  // TODO: Remove this when the engine->shutdown() S4U bug is fixed
-    ASSERT_EQ(1,1);
-    return;
+  if (pid) {
+    int e;
+    waitpid(pid, &e, 0);
+  } else {
+    // Create and initialize a simulation
+    wrench::Simulation *simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("one_task_test");
+
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
+
+    // Create a WMS
+    EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+            std::unique_ptr<wrench::WMS>(new ExecutionWithDefaultStorageServiceTestWMS(this, workflow,
+                                                                                       std::unique_ptr<wrench::Scheduler>(
+                                                                                               new wrench::RandomScheduler()),
+                            hostname))));
+
+    // Create a Storage Service
+    EXPECT_NO_THROW(storage_service1 = simulation->add(
+            std::unique_ptr<wrench::SimpleStorageService>(
+                    new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+    // Create a Compute Service
+    EXPECT_NO_THROW(compute_service = simulation->add(
+            std::unique_ptr<wrench::MulticoreComputeService>(
+                    new wrench::MulticoreComputeService(hostname, true, true,
+                                                        storage_service1,
+                                                        {}))));
+
+    // Create a File Registry Service
+    std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+            new wrench::FileRegistryService(hostname));
+    EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
+
+    // Staging the input_file on the storage service
+    EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
 
 
-  // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
-  int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("one_task_test");
+    // Running a "run a single task" simulation
+    EXPECT_NO_THROW(simulation->launch());
 
+    // Check that the output trace makes sense
+    ASSERT_EQ(task->getState(), wrench::WorkflowTask::COMPLETED);
+    ASSERT_EQ(task->getFailureCount(), 0);
+    ASSERT_GT(task->getStartDate(), 0.0);
+    ASSERT_GT(task->getEndDate(), 0.0);
+    ASSERT_GT(task->getEndDate(), task->getStartDate());
 
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
+    std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
+            simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>();
+    ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
+    ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getDate(),
+              task->getEndDate());
+    ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
+              task);
 
-  simulation->init(&argc, argv);
+    delete simulation;
+    exit(0);
 
-  // Setting up the platform
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-  ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+  }
 
-  // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
-
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new ExecutionWithDefaultStorageServiceTestWMS(this, workflow,
-                                                                           std::unique_ptr<wrench::Scheduler>(
-                                                                                   new wrench::RandomScheduler()),
-                          hostname))));
-
-  // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
-
-  // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
-                                                      storage_service1,
-                                                      {}))));
-
-  // Create a File Registry Service
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-  EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
-
-  // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
-
-
-  // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
-
-  // Check that the output trace makes sense
-  ASSERT_EQ(task->getState(), wrench::WorkflowTask::COMPLETED);
-  ASSERT_EQ(task->getFailureCount(), 0);
-  ASSERT_GT(task->getStartDate(), 0.0);
-  ASSERT_GT(task->getEndDate(), 0.0);
-  ASSERT_GT(task->getEndDate(), task->getStartDate());
-
-  std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
-          simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>();
-  ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
-  ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getDate(), task->getEndDate());
-  ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(), task);
-
-  delete simulation;
 
 }
 
@@ -435,9 +448,9 @@ class ExecutionWithPrePostCopiesAndCleanupTestWMS : public wrench::WMS {
 
 public:
     ExecutionWithPrePostCopiesAndCleanupTestWMS(OneTaskTest *test,
-                                              wrench::Workflow *workflow,
-                                              std::unique_ptr<wrench::Scheduler> scheduler,
-                                              std::string hostname) :
+                                                wrench::Workflow *workflow,
+                                                std::unique_ptr<wrench::Scheduler> scheduler,
+                                                std::string hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -495,78 +508,86 @@ private:
 
 TEST_F(OneTaskTest, ExecutionWithPrePostCopies) {
 
-  // TODO: Remove this when the engine->shutdown() S4U bug is fixed
-  ASSERT_EQ(1,1);
-  return;
+  pid_t pid = fork();
 
-  // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
-  int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("one_task_test");
+  if (pid) {
+    int e;
+    waitpid(pid, &e, 0);
+  } else {
+
+    // Create and initialize a simulation
+    wrench::Simulation *simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("one_task_test");
+
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+    simulation->init(&argc, argv);
+
+    // Setting up the platform
+    ASSERT_THROW(simulation->launch(), std::runtime_error);
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
+
+    // Create a WMS
+    EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+            std::unique_ptr<wrench::WMS>(new ExecutionWithPrePostCopiesAndCleanupTestWMS(this, workflow,
+                                                                                         std::unique_ptr<wrench::Scheduler>(
+                                                                                                 new wrench::RandomScheduler()),
+                            hostname))));
+
+    // Create a Storage Service
+    EXPECT_NO_THROW(storage_service1 = simulation->add(
+            std::unique_ptr<wrench::SimpleStorageService>(
+                    new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+    // Create another Storage Service
+    EXPECT_NO_THROW(storage_service2 = simulation->add(
+            std::unique_ptr<wrench::SimpleStorageService>(
+                    new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
 
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
+    // Create a Compute Service with default Storage Service #2
+    EXPECT_NO_THROW(compute_service = simulation->add(
+            std::unique_ptr<wrench::MulticoreComputeService>(
+                    new wrench::MulticoreComputeService(hostname, true, true,
+                                                        storage_service2,
+                                                        {}))));
 
-  simulation->init(&argc, argv);
+    // Create a File Registry Service
+    std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+            new wrench::FileRegistryService(hostname));
+    EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
 
-  // Setting up the platform
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-  ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+    // Staging the input_file on storage service #1
+    EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
 
-  // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+    // Running a "run a single task" simulation
+    EXPECT_NO_THROW(simulation->launch());
+    std::cerr << "ASDASDSADA\n";
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new ExecutionWithPrePostCopiesAndCleanupTestWMS(this, workflow,
-                                                                                     std::unique_ptr<wrench::Scheduler>(
-                                                                                             new wrench::RandomScheduler()),
-                          hostname))));
+    // Check that the output trace makes sense
+    ASSERT_EQ(task->getState(), wrench::WorkflowTask::COMPLETED);
+    ASSERT_EQ(task->getFailureCount(), 0);
+    ASSERT_GT(task->getStartDate(), 0.0);
+    ASSERT_GT(task->getEndDate(), 0.0);
+    ASSERT_GT(task->getEndDate(), task->getStartDate());
 
-  // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+    std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
+            simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>();
+    ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
+    ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getDate(),
+              task->getEndDate());
+    ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
+              task);
 
-  // Create another Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+    delete simulation;
+    exit(0);
+  }
 
-
-  // Create a Compute Service with default Storage Service #2
-  EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
-                                                      storage_service2,
-                                                      {}))));
-
-  // Create a File Registry Service
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-  EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
-
-  // Staging the input_file on storage service #1
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
-
-  // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
-
-  // Check that the output trace makes sense
-  ASSERT_EQ(task->getState(), wrench::WorkflowTask::COMPLETED);
-  ASSERT_EQ(task->getFailureCount(), 0);
-  ASSERT_GT(task->getStartDate(), 0.0);
-  ASSERT_GT(task->getEndDate(), 0.0);
-  ASSERT_GT(task->getEndDate(), task->getStartDate());
-
-  std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
-          simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>();
-  ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
-  ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getDate(), task->getEndDate());
-  ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(), task);
-
-  delete simulation;
 
 }

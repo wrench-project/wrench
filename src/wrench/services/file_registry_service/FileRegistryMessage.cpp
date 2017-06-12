@@ -22,7 +22,7 @@ namespace wrench {
             FileRegistryMessage("FILE_LOOKUP_REQUEST", payload) {
 
       if ((answer_mailbox == "") || file == nullptr) {
-        throw std::invalid_argument("Invalid constructor argument");
+        throw std::invalid_argument("FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(): Invalid argument");
       }
       this->answer_mailbox = answer_mailbox;
       this->file = file;
@@ -33,7 +33,7 @@ namespace wrench {
                                                                              double payload) :
             FileRegistryMessage("FILE_LOOKUP_ANSWER", payload) {
       if (file == nullptr) {
-        throw std::invalid_argument("Invalid constructor argument");
+        throw std::invalid_argument("FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(): Invalid argument");
       }
       this->file = file;
       this->locations = locations;
@@ -46,7 +46,7 @@ namespace wrench {
                                                                                  double payload) :
             FileRegistryMessage("REMOVE_ENTRY_REQUEST", payload) {
       if ((answer_mailbox == "") || (file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument("Invalid constructor argument");
+        throw std::invalid_argument("FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(): Invalid argument");
       }
       this->answer_mailbox = answer_mailbox;
       this->file = file;
@@ -66,7 +66,7 @@ namespace wrench {
                                                                            double payload) :
             FileRegistryMessage("ADD_ENTRY_REQUEST", payload) {
       if ((answer_mailbox == "") || (file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument("Invalid constructor argument");
+        throw std::invalid_argument("FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(): Invalid argument");
       }
       this->answer_mailbox = answer_mailbox;
       this->file = file;

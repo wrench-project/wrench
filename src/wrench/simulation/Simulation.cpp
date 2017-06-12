@@ -73,10 +73,10 @@ namespace wrench {
     void Simulation::init(int *argc, char **argv) {
 
       if (*argc < 1) {
-        throw std::invalid_argument("Invalid argc argument (must be >= 1)");
+        throw std::invalid_argument("Simulation::init(): Invalid argc argument (must be >= 1)");
       }
       if ((argv == nullptr) || (*argv == nullptr)) {
-        throw std::invalid_argument("Invalid argument argv (nullptr)");
+        throw std::invalid_argument("Simulation::init(): Invalid argument argv (nullptr)");
       }
 
       int i;
@@ -112,11 +112,11 @@ namespace wrench {
      */
     void Simulation::instantiatePlatform(std::string filename) {
       if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation is not initialized");
+        throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
       }
       static bool already_setup = false;
       if (already_setup) {
-        throw std::runtime_error("Platform already setup");
+        throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
       }
       this->s4u_simulation->setupPlatform(filename);
       already_setup = true;
@@ -140,42 +140,38 @@ namespace wrench {
     void Simulation::launch() {
       // Check that the simulation is initialized
       if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation is not initialized");
+        throw std::runtime_error("Simulation::launch(): Simulation is not initialized");
       }
 
       // Check that a platform has been setup
       if (not this->s4u_simulation->isPlatformSetup()) {
-        throw std::runtime_error("Simulation platform has not been setup");
+        throw std::runtime_error("Simulation::launch(): Simulation platform has not been setup");
       }
 
       // Check that a WMS is running
       if (not this->wms) {
-        throw std::runtime_error("A WMS should have been instantiated and passed to Simulation.setWMS()");
+        throw std::runtime_error("Simulation::launch(): A WMS should have been instantiated and passed to Simulation.setWMS()");
       }
 
       // Check that at least one ComputeService is running
       if (this->running_compute_services.size() <= 0) {
-        throw std::runtime_error(
-                "At least one ComputeService should have been instantiated add passed to Simulation.add()");
+        throw std::runtime_error("Simulation::launch(): At least one ComputeService should have been instantiated add passed to Simulation.add()");
       }
 
       // Check that at least one StorageService is running
       if (this->running_storage_services.size() <= 0) {
-        throw std::runtime_error(
-                "At least one StorageService should have been instantiated add passed to Simulation.add()");
+        throw std::runtime_error("Simulation::launch(): At least one StorageService should have been instantiated add passed to Simulation.add()");
       }
 
       // Check that a FileRegistryService is running
       if (not this->file_registry_service) {
-        throw std::runtime_error(
-                "A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()");
+        throw std::runtime_error("Simulation::launch(): A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()");
       }
 
       // Check that each input file is staged somewhere
       for (auto f : this->wms->workflow->getInputFiles()) {
         if (this->file_registry_service->entries.find(f) == this->file_registry_service->entries.end()) {
-          throw std::runtime_error(
-                  "Workflow input file " + f->getId() + " is not staged on any storage service!");
+          throw std::runtime_error("Simulation::launch(): Workflow input file " + f->getId() + " is not staged on any storage service!");
         }
       }
 
@@ -197,7 +193,7 @@ namespace wrench {
      */
     ComputeService *Simulation::add(std::unique_ptr<ComputeService> service) {
       if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation is not initialized");
+        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
       ComputeService *raw_ptr = service.get();
 
@@ -218,7 +214,7 @@ namespace wrench {
     */
     StorageService *Simulation::add(std::unique_ptr<StorageService> service) {
       if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation is not initialized");
+        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
       StorageService *raw_ptr = service.get();
 
@@ -238,7 +234,7 @@ namespace wrench {
      */
     WMS *Simulation::setWMS(std::unique_ptr<WMS> wms) {
       if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation is not initialized");
+        throw std::runtime_error("Simulation::setWMS(): Simulation is not initialized");
       }
 
       wms->setSimulation(this);
@@ -358,19 +354,17 @@ namespace wrench {
      */
     void Simulation::stageFile(WorkflowFile *file, StorageService *storage_service) {
       if ((file == nullptr) || (storage_service == nullptr)) {
-        throw std::invalid_argument("Invalid arguments");
+        throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
       }
 
       // Check that a FileRegistryService has been set
       if (!this->file_registry_service) {
-        throw std::runtime_error(
-                "Simulation::stageFile(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+        throw std::runtime_error("Simulation::stageFile(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
       }
 
       // Check that the file is not the output of anything
       if (file->isOuput()) {
-        throw std::runtime_error(
-               "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
+        throw std::runtime_error("Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
       }
 
       XBT_INFO("Staging file %s (%lf)", file->getId().c_str(), file->getSize());
@@ -397,13 +391,12 @@ namespace wrench {
     void Simulation::stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service) {
 
       if (storage_service == nullptr) {
-        throw std::invalid_argument("Invalid arguments");
+        throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
       }
 
       // Check that a FileRegistryService has been set
       if (!this->file_registry_service) {
-        throw std::runtime_error(
-                "A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+        throw std::runtime_error("Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
       }
 
       try {

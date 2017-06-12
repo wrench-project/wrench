@@ -47,7 +47,7 @@ namespace wrench {
             S4U_DaemonWithMailbox("worker_thread", "worker_thread") {
 
       if (startup_overhead < 0) {
-        throw std::invalid_argument("WorkerThread::WorkerThread(): startup overhead must be >= 0");
+        throw std::invalid_argument("WorkerThread::WorkerThread(): Startup overhead must be >= 0");
       }
 
       this->simulation = simulation;

@@ -37,12 +37,12 @@ namespace wrench {
                                     int num_procs) {
 
       if ((flops < 0.0) || (num_procs <= 0)) {
-        throw std::invalid_argument("WorkflowTask::adTask(): invalid argument");
+        throw std::invalid_argument("WorkflowTask::adTask(): Invalid argument");
       }
 
       // Check that the task doesn't really exist
-      if (tasks[id]) {
-        throw std::invalid_argument("Task ID '" + id + "' already exists");
+      if (tasks.find(id) != tasks.end()) {
+        throw std::invalid_argument("Workflow::addTask(): Task ID '" + id + "' already exists");
       }
 
       // Create the WorkflowTask object
@@ -69,7 +69,7 @@ namespace wrench {
     void Workflow::removeTask(WorkflowTask *task) {
 
       if (task == nullptr) {
-        throw std::invalid_argument("Workflow::removeTask(): passed a nullptr task");
+        throw std::invalid_argument("Workflow::removeTask(): Invalid arguments");
       }
 
       // check that task exists
@@ -109,7 +109,7 @@ namespace wrench {
     void Workflow::addControlDependency(WorkflowTask *src, WorkflowTask *dst) {
 
       if ((src == nullptr) || (dst == nullptr)) {
-        throw std::invalid_argument("Workflow::addControlDependency(): passed a nullptr task");
+        throw std::invalid_argument("Workflow::addControlDependency(): Invalid arguments");
       }
 
       if (not pathExists(src, dst)) {
@@ -138,12 +138,12 @@ namespace wrench {
     WorkflowFile *Workflow::addFile(const std::string id, double size) {
 
       if (size <= 0) {
-        throw std::invalid_argument("Workflow::addFile(): file size must be >0");
+        throw std::invalid_argument("Workflow::addFile(): Invalid arguments");
       }
 
       // Create the WorkflowFile object
       if (files.find(id) != files.end()) {
-        throw std::invalid_argument("WorkflowFile with id '" +
+        throw std::invalid_argument("Workflow::addFile(): WorkflowFile with id '" +
                                     id + "' already exists");
       }
 
@@ -202,7 +202,7 @@ namespace wrench {
       pugi::xml_document dax_tree;
 
       if (not dax_tree.load_file(filename.c_str())) {
-        throw std::invalid_argument("Invalid DAX file");
+        throw std::invalid_argument("Workflow::loadFromDAX(): Invalid DAX file");
       }
 
       // Get the root node
@@ -348,7 +348,7 @@ namespace wrench {
      */
     std::vector<WorkflowTask *> Workflow::getTaskChildren(const WorkflowTask *task) {
       if (task == nullptr) {
-        throw std::invalid_argument("Workflow::getTaskChildren(): passed a nullptr task");
+        throw std::invalid_argument("Workflow::getTaskChildren(): Invalid arguments");
       }
       std::vector<WorkflowTask *> children;
       for (lemon::ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
@@ -366,7 +366,7 @@ namespace wrench {
      */
     std::vector<WorkflowTask *> Workflow::getTaskParents(const WorkflowTask *task) {
       if (task == nullptr) {
-        throw std::invalid_argument("Workflow::getTaskParents(): passed a nullptr task");
+        throw std::invalid_argument("Workflow::getTaskParents(): Invalid arguments");
       }
       std::vector<WorkflowTask *> parents;
       for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
@@ -405,7 +405,7 @@ namespace wrench {
      */
     void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state) {
       if (task == nullptr) {
-        throw std::invalid_argument("Workflow::updateTaskState(): passed a nullptr task");
+        throw std::invalid_argument("Workflow::updateTaskState(): Invalid arguments");
       }
 
       WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
@@ -417,7 +417,7 @@ namespace wrench {
         // Make a task completed, which may failure_cause its children to become ready
         case WorkflowTask::COMPLETED: {
           if (task->getState() != WorkflowTask::RUNNING) {
-            throw std::runtime_error("Cannot set non-running task state to WorkflowTask::COMPLETED");
+            throw std::runtime_error("Workflow::updateTaskState(): Cannot set non-running task state to WorkflowTask::COMPLETED");
           }
           task->setState(WorkflowTask::COMPLETED);
 
@@ -435,7 +435,7 @@ namespace wrench {
             return;
           }
           if (task->getState() != WorkflowTask::NOT_READY && task->getState() != WorkflowTask::FAILED) {
-            throw std::runtime_error("Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
+            throw std::runtime_error("Workflow::updateTaskState(): Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
                                      " task to WorkflowTask::READY");
           }
           // Go through the parent and check whether they are all completed
@@ -462,13 +462,13 @@ namespace wrench {
           if (task->getState() == WorkflowTask::RUNNING) {
             task->setState(WorkflowTask::FAILED);
           } else {
-            throw std::runtime_error("Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
+            throw std::runtime_error("Workflow::updateTaskState(): Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
                                      " task to WorkflowTask::FAILED");
           }
           break;
         }
         default: {
-          throw std::invalid_argument("Unknown task state '" +
+          throw std::invalid_argument("Workflow::updateTaskState(): Unknown task state '" +
                                       std::to_string(state) + "'");
         }
       }

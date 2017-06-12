@@ -83,7 +83,7 @@ namespace wrench {
                                              StorageService *src,
                                              StorageService *dst) {
       if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
-        throw std::invalid_argument("DataMovementManager::initiateFileCopy(): invalid arguments");
+        throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
 
       try {
@@ -156,7 +156,7 @@ namespace wrench {
         }
 
       } else {
-        throw std::runtime_error("Unexpected [" + message->getName() + "] message");
+        throw std::runtime_error("DataMovementManager::processNextMessage(): Unexpected [" + message->getName() + "] message");
       }
 
       return false;
