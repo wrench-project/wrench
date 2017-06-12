@@ -891,8 +891,7 @@ namespace wrench {
         if (worker_thread_to_terminate == nullptr) {
           throw std::runtime_error("Can't find worker threads for work belonging to job " + w->job->getName());
         }
-        WRENCH_INFO("SHOULD NOW KILL WORKER THREAD %s", worker_thread_to_terminate->getName().c_str());
-        WRENCH_INFO("TODO TODO TODO TODO TODO TODO TODO");
+        WRENCH_INFO("Brutally killing worker thread that's working on work for job %s", w->job->getName().c_str());
         worker_thread_to_terminate->kill();
       }
 

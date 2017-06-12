@@ -17,8 +17,6 @@
 #include <exceptions/WorkflowExecutionException.h>
 #include <wrench-dev.h>
 
-#include "WorkflowExecutionEvent.h"
-
 XBT_LOG_NEW_DEFAULT_CATEGORY(workflow_execution_event, "Log category for Workflow Execution Event");
 
 
@@ -44,7 +42,8 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error("WorkflowExecutionEvent::waitForNextExecutionEvent(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error(
+                  "WorkflowExecutionEvent::waitForNextExecutionEvent(): Unknown exception: " + std::string(e.what()));
         }
       }
 

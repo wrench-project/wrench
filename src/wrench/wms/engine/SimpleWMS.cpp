@@ -86,7 +86,7 @@ namespace wrench {
         double flops = 10000.00; // bogus default
         if (ready_tasks.size() > 0) {
           // Heuristic: ask for something that can run 2 times the next ready tasks..
-          flops = 2 * this->scheduler->getTotalFlops((*ready_tasks.begin()).second);
+          flops = 1.5 * this->scheduler->getTotalFlops((*ready_tasks.begin()).second);
         }
         this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, flops,
                                            this->simulation->getComputeServices());
