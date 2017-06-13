@@ -76,7 +76,9 @@ namespace wrench {
 
         std::string data_write_mailbox_name;
 
-    };
+        unsigned long getNewUniqueNumber();
+
+        };
 
 };
 

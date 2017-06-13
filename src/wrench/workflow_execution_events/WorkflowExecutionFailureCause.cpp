@@ -95,7 +95,7 @@ namespace wrench {
       return this->job;
     }
 
-    ComputeService *JobTypeNotSupported::getComputeservice() {
+    ComputeService *JobTypeNotSupported::getComputeService() {
       return this->compute_service;
     }
 
@@ -114,7 +114,7 @@ namespace wrench {
       return this->job;
     }
 
-    ComputeService *NotEnoughCores::getComputeservice() {
+    ComputeService *NotEnoughCores::getComputeService() {
       return this->compute_service;
     }
 

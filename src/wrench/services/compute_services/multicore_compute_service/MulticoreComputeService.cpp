@@ -52,7 +52,8 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error("MulticoreComputeService::submitStandardJob(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error(
+                  "MulticoreComputeService::submitStandardJob(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -64,7 +65,8 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error("MulticoreComputeService::submitStandardJob(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error(
+                  "MulticoreComputeService::submitStandardJob(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -74,7 +76,8 @@ namespace wrench {
           throw WorkflowExecutionException(msg->failure_cause);
         }
       } else {
-        throw std::runtime_error("MulticoreComputeService::submitStandardJob(): Received an unexpected [" + message->getName() +
+        throw std::runtime_error(
+                "MulticoreComputeService::submitStandardJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
 
@@ -107,7 +110,8 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error("MulticoreComputeService::submitPilotJob(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error(
+                  "MulticoreComputeService::submitPilotJob(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -120,7 +124,8 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error("MulticoreComputeService::submitPilotJob(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error(
+                  "MulticoreComputeService::submitPilotJob(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -131,7 +136,8 @@ namespace wrench {
         }
 
       } else {
-        throw std::runtime_error("MulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
+        throw std::runtime_error(
+                "MulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
     };
@@ -162,7 +168,8 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error("MulticoreComputeService::getNumCores(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error(
+                  "MulticoreComputeService::getNumCores(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -175,7 +182,8 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error("MulticoreComputeService::getNumCores(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error(
+                  "MulticoreComputeService::getNumCores(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -827,10 +835,10 @@ namespace wrench {
      * @param cause: the failure cause
      */
     void MulticoreComputeService::failPendingStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause) {
-      WRENCH_INFO("Failing job %s", job->getName().c_str());
+      WRENCH_INFO("Failing pending job %s", job->getName().c_str());
       // Set all tasks back to the READY state and wipe out output files
       for (auto failed_task: job->getTasks()) {
-        failed_task->setFailed();
+//        failed_task->setFailed();
         failed_task->setReady();
         try {
           StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
@@ -860,7 +868,7 @@ namespace wrench {
   */
     void MulticoreComputeService::failRunningStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause) {
 
-      WRENCH_INFO("Failing job %s", job->getName().c_str());
+      WRENCH_INFO("Failing running job %s", job->getName().c_str());
 
       std::vector<WorkUnit *> works_to_terminate;
 
@@ -888,7 +896,7 @@ namespace wrench {
 
 
 
-      // Set all tasks back to the READY state and wipe out output files
+      // Set all non-COMPLETED tasks back to the READY state and wipe out output files
       for (auto failed_task: job->getTasks()) {
         if (failed_task->getState() != WorkflowTask::COMPLETED) {
           failed_task->setFailed();
@@ -1167,56 +1175,78 @@ namespace wrench {
      */
     void MulticoreComputeService::createWorkForNewlyDispatchedJob(StandardJob *job) {
 
-      std::vector<WorkUnit *> pre_file_copies_work_unit = {};
-      std::vector<WorkUnit *> post_file_copies_work_unit = {};
+      WorkUnit *pre_file_copies_work_unit = nullptr;
+      std::vector<WorkUnit *> task_work_units;
+      WorkUnit *post_file_copies_work_unit = nullptr;
+      WorkUnit *cleanup_workunit = nullptr;
 
-      // Create all the work units
+      // Create the clean work unit, if any
+      if (job->cleanup_file_deletions.size() > 0) {
+        cleanup_workunit = new WorkUnit(job, {}, {}, {}, {}, job->cleanup_file_deletions);
+      }
 
+      // Create the pre_file_copies work unit, if any
       if (job->pre_file_copies.size() > 0) {
-        pre_file_copies_work_unit.push_back(new WorkUnit(job, {}, 0, job->pre_file_copies, {}, {}, {}));
+        pre_file_copies_work_unit = new WorkUnit(job, job->pre_file_copies, {}, {}, {}, {});
       }
 
+      // Create the post_file_copies work unit, if any
       if (job->post_file_copies.size() > 0) {
-        post_file_copies_work_unit.push_back(new WorkUnit(job, {}, 0, {}, {}, {}, job->post_file_copies));
+        post_file_copies_work_unit = new WorkUnit(job, {}, {}, {}, job->post_file_copies, {});
       }
 
+      // Create the task work units, if any
       for (auto task : job->tasks) {
-        WorkUnit *task_work_unit = new WorkUnit(job, post_file_copies_work_unit, pre_file_copies_work_unit.size(),
-                                                {}, {task}, job->file_locations, {});
-        if (pre_file_copies_work_unit.size() > 0) {
-          pre_file_copies_work_unit[0]->children.push_back(task_work_unit);
-        }
-        if (post_file_copies_work_unit.size() > 0) {
-          post_file_copies_work_unit[0]->num_pending_parents++;
-        }
-
-        if (task_work_unit->num_pending_parents == 0) {
-          this->ready_works.push_back(task_work_unit);
-        } else {
-          this->non_ready_works.insert(task_work_unit);
-        };
+        task_work_units.push_back(new WorkUnit(job, {}, {task}, job->file_locations, {}, {}));
       }
 
-      // Add the pre and post work units to the lists
-
-      if (pre_file_copies_work_unit.size() > 0) {
-        if (pre_file_copies_work_unit[0]->num_pending_parents == 0) {
-          this->ready_works.push_back(pre_file_copies_work_unit[0]);
-        } else {
-          this->non_ready_works.insert(pre_file_copies_work_unit[0]);
+      // Add dependencies from pre copies to possible successors
+      if (pre_file_copies_work_unit != nullptr) {
+        if (task_work_units.size() > 0) {
+          for (auto twu: task_work_units) {
+            WorkUnit::addDependency(pre_file_copies_work_unit, twu);
+          }
+        } else if (post_file_copies_work_unit != nullptr) {
+          WorkUnit::addDependency(pre_file_copies_work_unit, post_file_copies_work_unit);
+        } else if (cleanup_workunit != nullptr) {
+          WorkUnit::addDependency(pre_file_copies_work_unit, cleanup_workunit);
         }
       }
 
-      if (post_file_copies_work_unit.size() > 0) {
-        if (post_file_copies_work_unit[0]->num_pending_parents == 0) {
-          this->ready_works.push_back(post_file_copies_work_unit[0]);
+      // Add dependencies from tasks to possible successors
+      for (auto twu: task_work_units) {
+        if (post_file_copies_work_unit != nullptr) {
+          WorkUnit::addDependency(twu, post_file_copies_work_unit);
+        } else if (cleanup_workunit != nullptr) {
+          WorkUnit::addDependency(twu, cleanup_workunit);
+        }
+      }
+
+      // Add dependencies from post copies to possible successors
+      if (post_file_copies_work_unit != nullptr) {
+        if (cleanup_workunit != nullptr) {
+          WorkUnit::addDependency(post_file_copies_work_unit, cleanup_workunit);
+        }
+      }
+
+      // Insert work units in the ready or non-ready queues
+      std::vector<WorkUnit *> all_work_units;
+      if (pre_file_copies_work_unit) all_work_units.push_back(pre_file_copies_work_unit);
+      for (auto twu : task_work_units) {
+        all_work_units.push_back(twu);
+      }
+      if (post_file_copies_work_unit) all_work_units.push_back(post_file_copies_work_unit);
+      if (cleanup_workunit) all_work_units.push_back(cleanup_workunit);
+
+      for (auto wu : all_work_units) {
+        if (wu->num_pending_parents == 0) {
+          this->ready_works.push_back(wu);
         } else {
-          this->non_ready_works.insert(post_file_copies_work_unit[0]);
+          this->non_ready_works.insert(wu);
         }
       }
 
       return;
     }
-
 
 };

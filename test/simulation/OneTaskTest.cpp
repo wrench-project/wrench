@@ -18,6 +18,8 @@
 #include <managers/data_movement_manager/DataMovementManager.h>
 #include <wrench-dev.h>
 
+#define EXIT_AFTER_TEST     exit((::testing::Test::HasFailure() ? 666 : 0))
+
 class OneTaskTest : public ::testing::Test {
 
 public:
@@ -120,7 +122,7 @@ TEST_F(OneTaskTest, NoopSimulation) {
     ASSERT_EQ(exit_code, 0);
   } else {
     this->do_NoopSimulation_test();
-    exit((::testing::Test::HasFailure() ? 666 : 0));
+    EXIT_AFTER_TEST;
   }
 }
 
@@ -189,7 +191,6 @@ void OneTaskTest::do_NoopSimulation_test() {
   delete simulation;
 }
 
-
 /**********************************************************************/
 /** EXECUTION WITH LOCATION_MAP SIMULATION TEST                      **/
 /**********************************************************************/
@@ -227,7 +228,6 @@ private:
       // Wait for the workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
       if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-        std::cerr << event->type << std::endl;
         throw std::runtime_error("Unexpected workflow execution event!");
       }
 
@@ -252,7 +252,7 @@ TEST_F(OneTaskTest, ExecutionWithLocationMap) {
     ASSERT_EQ(exit_code, 0);
   } else {
     this->do_ExecutionWithLocationMap_test();
-    exit((::testing::Test::HasFailure() ? 666 : 0));
+    EXIT_AFTER_TEST;
   }
 }
 
@@ -358,7 +358,6 @@ private:
       // Wait for the workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
       if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-        std::cerr << event->type << std::endl;
         throw std::runtime_error("Unexpected workflow execution event!");
       }
 
@@ -383,7 +382,7 @@ TEST_F(OneTaskTest, ExecutionWithDefaultStorageService) {
     ASSERT_EQ(exit_code, 0);
   } else {
     this->do_ExecutionWithDefaultStorageService_test();
-    exit((::testing::Test::HasFailure() ? 666 : 0));
+    EXIT_AFTER_TEST;
   }
 }
 
@@ -455,8 +454,6 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   delete simulation;
 }
 
-
-
 /**********************************************************************/
 /** EXECUTION WITH PRE/POST COPIES AND CLEANUP SIMULATION TEST       **/
 /**********************************************************************/
@@ -496,8 +493,16 @@ private:
 
       // Wait for the workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
-      if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
-        throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          break;
+        }
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+          throw std::runtime_error("Unexpected job failure: " + event->failure_cause->toString());
+        }
+        default:{
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
+        }
       }
 
       // Test file locations
@@ -531,7 +536,7 @@ TEST_F(OneTaskTest, ExecutionWithPrePostCopies) {
     ASSERT_EQ(exit_code, 0);
   } else {
     this->do_ExecutionWithPrePostCopies_test();
-    exit((::testing::Test::HasFailure() ? 666 : 0));
+    EXIT_AFTER_TEST;
   }
 }
 

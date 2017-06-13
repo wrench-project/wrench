@@ -69,9 +69,9 @@ namespace wrench {
 
         void shutdownAllStorageServices();
 
-        std::set<ComputeService *> getComputeServices();
+        std::set<ComputeService *> getRunningComputeServices();
 
-        std::set<StorageService *> getStorageServices();
+        std::set<StorageService *> getRunningStorageServices();
 
         FileRegistryService *getFileRegistryService();
 
@@ -83,9 +83,6 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void mark_compute_service_as_terminated(ComputeService *cs);
-
-        void mark_storage_service_as_terminated(StorageService *ss);
 
         /***********************/
         /** \endcond           */
@@ -96,13 +93,12 @@ namespace wrench {
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 
         std::unique_ptr<WMS> wms = nullptr;
+
         std::unique_ptr<FileRegistryService> file_registry_service = nullptr;
 
-        std::vector<std::unique_ptr<ComputeService>> running_compute_services;
-        std::vector<std::unique_ptr<ComputeService>> terminated_compute_services;
+        std::set<std::unique_ptr<ComputeService>> compute_services;
 
-        std::vector<std::unique_ptr<StorageService>> running_storage_services;
-        std::vector<std::unique_ptr<StorageService>> terminated_storage_services;
+        std::set<std::unique_ptr<StorageService>> storage_services;
 
     };
 

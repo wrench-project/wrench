@@ -80,13 +80,17 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_BLUE);
 
-      WRENCH_INFO("New Sequential Task Executor starting (%s) ", this->mailbox_name.c_str());
+      WRENCH_INFO("New Worker Thread starting (%s) to do: %ld pre file copies, %ld tasks, %ld post file copies",
+                  this->mailbox_name.c_str(),
+                  this->work->pre_file_copies.size(),
+                  this->work->tasks.size(),
+                  this->work->post_file_copies.size());
 
       SimulationMessage *msg_to_send_back = nullptr;
       bool success;
 
       try {
-        performWorkWithoutCleanupFileDeletions(this->work);
+        performWork(this->work);
 
         // build "success!" message
         success = true;
@@ -104,18 +108,6 @@ namespace wrench {
                 e.getCause(),
                 0.0);
       }
-
-      // Do the cleanup
-      for (auto cleanup : this->work->job->cleanup_file_deletions) {
-        WorkflowFile *file = std::get<0>(cleanup);
-        StorageService *storage_service = std::get<1>(cleanup);
-        try {
-          storage_service->deleteFile(file);
-        } catch (WorkflowExecutionException &e) {
-          // Ignore exceptions since files may not be created, etc..
-        }
-      }
-
 
       // Send the callback
       if (success) {
@@ -144,7 +136,7 @@ namespace wrench {
      * @param work: the work to perform
      */
     void
-    WorkerThread::performWorkWithoutCleanupFileDeletions(WorkUnit *work) {
+    WorkerThread::performWork(WorkUnit *work) {
 
       // Simulate the startup overhead
       S4U_Simulation::sleep(this->start_up_overhead);
@@ -156,6 +148,10 @@ namespace wrench {
         StorageService *src = std::get<1>(file_copy);
         StorageService *dst = std::get<2>(file_copy);
         try {
+          WRENCH_INFO("Copying file %s from %s to %s",
+                      file->getId().c_str(),
+                      src->getName().c_str(),
+                      dst->getName().c_str());
           dst->copyFile(file, src);
         } catch (WorkflowExecutionException &e) {
           throw;
@@ -208,6 +204,19 @@ namespace wrench {
         StorageService *dst = std::get<2>(file_copy);
         try {
           dst->copyFile(file, src);
+        } catch (WorkflowExecutionException &e) {
+          throw;
+        }
+      }
+
+      /** Perform all cleanup file deletions */
+      WRENCH_INFO("CLEANUP");
+      for (auto cleanup : work->cleanup_file_deletions) {
+        WorkflowFile *file = std::get<0>(cleanup);
+        StorageService *storage_service = std::get<1>(cleanup);
+        WRENCH_INFO("  CLEANUP FIL %s on %s", file->getId().c_str(), storage_service->getName().c_str());
+        try {
+          storage_service->deleteFile(file);
         } catch (WorkflowExecutionException &e) {
           throw;
         }

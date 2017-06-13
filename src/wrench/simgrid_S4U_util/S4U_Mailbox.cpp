@@ -145,7 +145,7 @@ namespace wrench {
      */
     void S4U_Mailbox::dputMessage(std::string mailbox_name, SimulationMessage *msg) {
 
-      WRENCH_DEBUG("DPUTTING to %s a %s message", mailbox_name.c_str(), msg->getName().c_str());
+      WRENCH_DEBUG("Dputting to %s a %s message", mailbox_name.c_str(), msg->getName().c_str());
 
       simgrid::s4u::CommPtr comm = nullptr;
 

@@ -48,7 +48,7 @@ namespace wrench {
 
         Simulation *simulation;
 
-        void performWorkWithoutCleanupFileDeletions(WorkUnit *work);
+        void performWork(WorkUnit *work);
         std::string callback_mailbox;
         std::string hostname;
         double start_up_overhead;

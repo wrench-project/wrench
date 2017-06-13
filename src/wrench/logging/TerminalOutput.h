@@ -14,6 +14,8 @@
 
 #include <simgrid/s4u/Actor.hpp>
 
+#include <iostream>
+
 /* Defined color codes */
 #define WRENCH_LOGGING_COLOR_BLACK      "\033[1;30m"
 #define WRENCH_LOGGING_COLOR_RED      "\033[1;31m"
@@ -25,8 +27,12 @@
 #define WRENCH_LOGGING_COLOR_WHITE      "\033[1;37m"
 
 /* Wrappers around XBT_* macros */
+
 #define WRENCH_INFO(...)  TerminalOutput::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; TerminalOutput::endThisProcessColor()
+//#define WRENCH_INFO(...)  TerminalOutput::beginThisProcessColor(); fprintf(stderr,__VA_ARGS__) ; fprintf(stderr,"\n"); TerminalOutput::endThisProcessColor()
+
 #define WRENCH_DEBUG(...)  TerminalOutput::beginThisProcessColor(); XBT_DEBUG(__VA_ARGS__) ; TerminalOutput::endThisProcessColor()
+
 #define WRENCH_WARN(...)  TerminalOutput::beginThisProcessColor(); XBT_WARN(__VA_ARGS__) ; TerminalOutput::endThisProcessColor()
 
 namespace wrench {

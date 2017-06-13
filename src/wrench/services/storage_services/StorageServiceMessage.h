@@ -64,7 +64,7 @@ namespace wrench {
      */
     class StorageServiceFileLookupAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileLookupAnswerMessage(WorkflowFile *file, bool file_is_availalbe, double payload);
+        StorageServiceFileLookupAnswerMessage(WorkflowFile *file, bool file_is_available, double payload);
 
         WorkflowFile *file;
         bool file_is_available;

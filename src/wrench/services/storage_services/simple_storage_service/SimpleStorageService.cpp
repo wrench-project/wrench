@@ -18,6 +18,16 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple St
 namespace wrench {
 
     /**
+    * @brief Generate a unique number
+    *
+    * @return a unique number
+    */
+    unsigned long SimpleStorageService::getNewUniqueNumber() {
+      static unsigned long sequence_number = 0;
+      return (sequence_number++);
+    }
+
+    /**
      * @brief Public constructor
      *
      * @param hostname: the name of the host on which to start the service
@@ -27,7 +37,7 @@ namespace wrench {
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                double capacity,
                                                std::map<std::string, std::string> plist) :
-            SimpleStorageService(hostname, capacity, plist, "") {}
+            SimpleStorageService(hostname, capacity, plist, "_"+std::to_string(getNewUniqueNumber())) {}
 
     /**
      * @brief Private constructor
@@ -82,7 +92,10 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
 
-      WRENCH_INFO("Simple Storage Service starting on host %s!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Simple Storage Service %s starting on host %s (holding %ld files)",
+                  this->getName().c_str(),
+                  S4U_Simulation::getHostName().c_str(),
+                  this->stored_files.size());
 
       /** Main loop **/
       while (this->processNextMessage()) {
@@ -93,7 +106,9 @@ namespace wrench {
         S4U_Mailbox::clear_dputs();
       }
 
-      WRENCH_INFO("Simple Storage Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Simple Storage Service %s on host %s terminated!",
+                  this->getName().c_str(),
+                  S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -219,6 +234,7 @@ namespace wrench {
         bool success = true;
         WorkflowExecutionFailureCause *failure_cause = nullptr;
         if (this->stored_files.find(msg->file) == this->stored_files.end()) {
+          WRENCH_INFO("Received a a read request for a file I don't have (%s)", this->getName().c_str());
           success = false;
           failure_cause = new FileNotFound(msg->file, this);
         }
@@ -248,6 +264,7 @@ namespace wrench {
 
         // Figure out whether this succeeds or not
         if (msg->file->getSize() > this->capacity - this->occupied_space) {
+          WRENCH_INFO("Cannot perform file copy due to lack of space");
           try {
             S4U_Mailbox::putMessage(msg->answer_mailbox,
                                     new StorageServiceFileCopyAnswerMessage(msg->file, this, false,
@@ -258,6 +275,10 @@ namespace wrench {
             return true;
           }
         }
+
+        WRENCH_INFO("Copying file %s from storage sercice %s",
+                    msg->file->getId().c_str(),
+                    msg->src->getName().c_str());
 
         // Get the file from the source
         // TODO: THIS SHOULDN'T BE SYNCHRONOUS!!!!!
@@ -273,6 +294,9 @@ namespace wrench {
             return true;
           }
         }
+
+        // Add the file to my storage
+        this->stored_files.insert(msg->file);
 
         // Send back the corresponding ack
         try {

@@ -104,7 +104,7 @@ namespace wrench {
     public:
         JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service);
         WorkflowJob *getJob();
-        ComputeService *getComputeservice();
+        ComputeService *getComputeService();
         std::string toString();
 
     private:
@@ -116,7 +116,7 @@ namespace wrench {
     public:
         NotEnoughCores(WorkflowJob *job, ComputeService *compute_service);
         WorkflowJob *getJob();
-        ComputeService *getComputeservice();
+        ComputeService *getComputeService();
         std::string toString();
 
     private:

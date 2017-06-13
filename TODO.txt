@@ -1,11 +1,11 @@
 
-Mailbox class:
-    - Add all exceptions
-    - Throughout the WHOLE CODE handle a  get()/put() failed!! This is going to be cumbersome
 
 -----------------------------------
 
 DATA STORAGE IMPLEMENTATION:
+
+    - Decide what to do about "partial failures"
+        - How do we report what has completed, and what hasn't upon failure
 
     - WHO UPDATES THE REGISTRY?
         - When the WMS does a file copy
@@ -34,7 +34,6 @@ BUGS:
 
 SOFTWARE ENGINEERING:
 
-
 - For the WMS, instead of having a big switch to handle events, instead do a "listener" thing:
    A single method that says "waitForAndProcessNextEvent", that does the getMessage() and then
    calls user-provided "take action" methods, which are defined as virtual no-op methods in the base WMS class.
@@ -43,14 +42,6 @@ SOFTWARE ENGINEERING:
 
 
 * "BIG" things:
-
-    - Deal with data
-        - Mechanisms:
-            - File Registry Service
-            - Data storage service (with dual-host crappy model for now)
-                    Issue: How to go wait_any() with S4U
-        - Usage:
-            - How jobs place data requests
 
     - Plan a first paper
         - Workflow makespan prediction

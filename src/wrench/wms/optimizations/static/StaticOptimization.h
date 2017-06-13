@@ -21,7 +21,7 @@ namespace wrench {
     /***********************/
 
     /**
-     *  @brief An abstract static optimizastion classe
+     *  @brief An abstract static optimization class
      */
     class StaticOptimization {
     public:

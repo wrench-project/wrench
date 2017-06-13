@@ -82,7 +82,7 @@ namespace wrench {
 
     /**
      * @brief Retrieve the file's workflow
-     * @return the woriflow
+     * @return the workflow
      */
     Workflow *WorkflowFile::getWorkflow() {
       return this->workflow;
@@ -93,7 +93,7 @@ namespace wrench {
      * @brief Returns true if the file is the output of some task, false otherwise
      * @return true or false
      */
-    bool WorkflowFile::isOuput() {
+    bool WorkflowFile::isOutput() {
       return (this->output_of != nullptr);
     };
 

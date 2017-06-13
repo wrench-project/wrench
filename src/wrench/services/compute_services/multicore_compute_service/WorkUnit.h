@@ -28,24 +28,24 @@ namespace wrench {
     public:
 
         WorkUnit(StandardJob *job,
-                 std::vector<WorkUnit *> children,
-                 long num_pending_parents,
                  std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                  std::vector<WorkflowTask *> tasks,
                  std::map<WorkflowFile *, StorageService *> file_locations,
-                 std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies);
+                 std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
+                 std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
 
-
-        bool cancelled = false;
+        static void addDependency(WorkUnit *parent, WorkUnit *child);
 
         StandardJob *job;
-        std::vector<WorkUnit *> children;
-        int num_pending_parents;
+        std::set<WorkUnit *> children;
+        unsigned long num_pending_parents;
 
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
         std::vector<WorkflowTask *> tasks;
         std::map<WorkflowFile *, StorageService *> file_locations;
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
+        std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
+
     };
 
 };

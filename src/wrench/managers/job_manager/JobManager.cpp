@@ -158,7 +158,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    PilotJob *JobManager::createPilotJob(Workflow *workflow, int num_cores, double duration) {
+    PilotJob *JobManager::createPilotJob(Workflow *workflow, unsigned int num_cores, double duration) {
       if ((workflow == nullptr) || (num_cores < 1) || (duration <= 0.0)) {
         throw std::invalid_argument("JobManager::createPilotJob(): Invalid arguments");
       }

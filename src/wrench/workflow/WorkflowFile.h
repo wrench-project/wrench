@@ -36,7 +36,7 @@ namespace wrench {
 
         std::string getId();
 
-        bool isOuput();
+        bool isOutput();
 
         /***********************/
         /** \cond DEVELOPER    */

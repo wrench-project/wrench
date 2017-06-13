@@ -86,11 +86,11 @@ namespace wrench {
      *        method of derived classes, if any
      */
     void StorageService::stop() {
-      // Notify the simulation that the service is terminated, if that
-      // service was registered with the simulation
-      if (this->simulation) {
-        this->simulation->mark_storage_service_as_terminated(this);
-      }
+//      // Notify the simulation that the service is terminated, if that
+//      // service was registered with the simulation
+//      if (this->simulation) {
+//        this->simulation->mark_storage_service_as_terminated(this);
+//      }
 
       // Call the super class's method
       Service::stop();
@@ -233,7 +233,7 @@ namespace wrench {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error("StorageService::readFile(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -428,8 +428,9 @@ namespace wrench {
         }
         if (action == READ) {
           try {
+            WRENCH_INFO("Reading file %s", f->getId().c_str());
             storage_service->readFile(f);
-            WRENCH_INFO("Read file %s", f->getId().c_str());
+            WRENCH_INFO("File %s read", f->getId().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {

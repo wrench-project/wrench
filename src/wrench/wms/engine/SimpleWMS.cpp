@@ -74,7 +74,7 @@ namespace wrench {
         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks = this->workflow->getReadyTasks();
 
         // Get the available compute services
-        std::set<ComputeService *> compute_services = this->simulation->getComputeServices();
+        std::set<ComputeService *> compute_services = this->simulation->getRunningComputeServices();
 
         if (compute_services.size() == 0) {
           WRENCH_INFO("Aborting - No compute services available!");
@@ -89,7 +89,7 @@ namespace wrench {
           flops = 1.5 * this->scheduler->getTotalFlops((*ready_tasks.begin()).second);
         }
         this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, flops,
-                                           this->simulation->getComputeServices());
+                                           this->simulation->getRunningComputeServices());
 
         // Perform dynamic optimizations
         runDynamicOptimizations();
@@ -98,7 +98,7 @@ namespace wrench {
         WRENCH_INFO("Scheduling tasks...");
         this->scheduler->scheduleTasks(job_manager.get(),
                                        ready_tasks,
-                                       this->simulation->getComputeServices());
+                                       this->simulation->getRunningComputeServices());
 
         // Wait for a workflow execution event
         std::unique_ptr<WorkflowExecutionEvent> event;

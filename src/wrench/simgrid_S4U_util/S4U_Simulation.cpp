@@ -80,7 +80,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrives the list of hostnames
+     * @brief Retrieves the list of hostnames
      *
      * @return a vector of hostnames
      */
