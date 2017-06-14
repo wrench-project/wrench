@@ -12,13 +12,26 @@
 
 #include <workflow/Workflow.h>
 #include <simulation/Simulation.h>
-#include <services/storage_services/simple_storage_service/SimpleStorageService.h>
+#include <services/storage_services/simple_storage_service/SimpleStorageServiceTest.h>
 #include <wms/scheduler/RandomScheduler.h>
 #include <services/compute_services/multicore_compute_service/MulticoreComputeService.h>
 #include <managers/data_movement_manager/DataMovementManager.h>
 #include <wrench-dev.h>
 
-#define EXIT_AFTER_TEST     exit((::testing::Test::HasFailure() ? 666 : 0))
+// Convenient macro to lauch a test inside a separate process
+// and check the exit code, which denotes an error
+#define DO_TEST_WITH_FORK(function){ \
+                                      pid_t pid = fork(); \
+                                      if (pid) { \
+                                        int exit_code; \
+                                        waitpid(pid, &exit_code, 0); \
+                                        ASSERT_EQ(exit_code, 0); \
+                                      } else { \
+                                        this->function(); \
+                                        exit((::testing::Test::HasFailure() ? 666 : 0)); \
+                                      } \
+                                   }
+
 
 class OneTaskTest : public ::testing::Test {
 
@@ -73,7 +86,6 @@ protected:
 
 };
 
-
 /**********************************************************************/
 /**  NOOP SIMULATION TEST                                            **/
 /**********************************************************************/
@@ -100,10 +112,14 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
 
-      // Create a job
-      wrench::StandardJob *job = job_manager->createStandardJob(test->task,
-                                                                {{test->input_file,  test->storage_service1},
-                                                                 {test->output_file, test->storage_service1}});
+      // Create a data movement manager
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
+              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+
+//      // Create a job
+//      wrench::StandardJob *job = job_manager->createStandardJob(test->task,
+//                                                                {{test->input_file,  test->storage_service1},
+//                                                                 {test->output_file, test->storage_service1}});
 
       // Terminate
       this->simulation->shutdownAllComputeServices();
@@ -114,16 +130,7 @@ private:
 };
 
 TEST_F(OneTaskTest, NoopSimulation) {
-
-  pid_t pid = fork();
-  if (pid) {
-    int exit_code;
-    waitpid(pid, &exit_code, 0);
-    ASSERT_EQ(exit_code, 0);
-  } else {
-    this->do_NoopSimulation_test();
-    EXIT_AFTER_TEST;
-  }
+  DO_TEST_WITH_FORK(do_NoopSimulation_test);
 }
 
 void OneTaskTest::do_NoopSimulation_test() {
@@ -244,16 +251,7 @@ private:
 };
 
 TEST_F(OneTaskTest, ExecutionWithLocationMap) {
-
-  pid_t pid = fork();
-  if (pid) {
-    int exit_code;
-    waitpid(pid, &exit_code, 0);
-    ASSERT_EQ(exit_code, 0);
-  } else {
-    this->do_ExecutionWithLocationMap_test();
-    EXIT_AFTER_TEST;
-  }
+  DO_TEST_WITH_FORK(do_ExecutionWithLocationMap_test);
 }
 
 void OneTaskTest::do_ExecutionWithLocationMap_test() {
@@ -375,15 +373,7 @@ private:
 
 TEST_F(OneTaskTest, ExecutionWithDefaultStorageService) {
 
-  pid_t pid = fork();
-  if (pid) {
-    int exit_code;
-    waitpid(pid, &exit_code, 0);
-    ASSERT_EQ(exit_code, 0);
-  } else {
-    this->do_ExecutionWithDefaultStorageService_test();
-    EXIT_AFTER_TEST;
-  }
+  DO_TEST_WITH_FORK(do_ExecutionWithDefaultStorageService_test);
 }
 
 void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
@@ -528,16 +518,7 @@ private:
 };
 
 TEST_F(OneTaskTest, ExecutionWithPrePostCopies) {
-
-  pid_t pid = fork();
-  if (pid) {
-    int exit_code;
-    waitpid(pid, &exit_code, 0);
-    ASSERT_EQ(exit_code, 0);
-  } else {
-    this->do_ExecutionWithPrePostCopies_test();
-    EXIT_AFTER_TEST;
-  }
+  DO_TEST_WITH_FORK(do_ExecutionWithPrePostCopies_test)
 }
 
 void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
