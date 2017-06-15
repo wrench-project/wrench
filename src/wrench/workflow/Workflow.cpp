@@ -482,7 +482,7 @@ namespace wrench {
     std::set<WorkflowFile *> Workflow::getInputFiles() {
       std::set<WorkflowFile *> input_files;
       for (auto const &x : this->files) {
-        if (x.second->output_of == nullptr) {
+        if ((x.second->output_of == nullptr) && (x.second->input_of.size() > 0)){
           input_files.insert(x.second.get());
         }
       }

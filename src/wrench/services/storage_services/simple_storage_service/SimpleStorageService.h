@@ -22,6 +22,8 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values =
                 {{SimpleStorageServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,         "1024"},
                  {SimpleStorageServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,      "1024"},
+                 {SimpleStorageServiceProperty::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                 {SimpleStorageServiceProperty::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                  {SimpleStorageServiceProperty::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD, "1024"},
                  {SimpleStorageServiceProperty::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD,  "1024"},
                  {SimpleStorageServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "1024"},

@@ -154,6 +154,7 @@ namespace wrench {
         } catch  (std::runtime_error &e) {
           return true;
         }
+        return true;
 
       } else {
         throw std::runtime_error("DataMovementManager::processNextMessage(): Unexpected [" + message->getName() + "] message");

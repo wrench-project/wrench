@@ -210,11 +210,9 @@ namespace wrench {
       }
 
       /** Perform all cleanup file deletions */
-      WRENCH_INFO("CLEANUP");
       for (auto cleanup : work->cleanup_file_deletions) {
         WorkflowFile *file = std::get<0>(cleanup);
         StorageService *storage_service = std::get<1>(cleanup);
-        WRENCH_INFO("  CLEANUP FIL %s on %s", file->getId().c_str(), storage_service->getName().c_str());
         try {
           storage_service->deleteFile(file);
         } catch (WorkflowExecutionException &e) {

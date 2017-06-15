@@ -274,9 +274,10 @@ namespace wrench {
           } catch (std::runtime_error &e) {
             return true;
           }
+          return true;
         }
 
-        WRENCH_INFO("Copying file %s from storage sercice %s",
+        WRENCH_INFO("Copying file %s from storage service %s",
                     msg->file->getId().c_str(),
                     msg->src->getName().c_str());
 
@@ -297,6 +298,7 @@ namespace wrench {
 
         // Add the file to my storage
         this->stored_files.insert(msg->file);
+        this->occupied_space += msg->file->getSize();
 
         // Send back the corresponding ack
         try {

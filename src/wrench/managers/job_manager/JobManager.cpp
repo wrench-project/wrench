@@ -85,6 +85,8 @@ namespace wrench {
      *                         before task executions begin
      * @param post_file_copies: a set of tuples that specify which file copy operations should be completed
      *                         after task executions end
+     * @param cleanup_file_deletions: a set of file tuples that specify file deletion operations that should be completed
+     *                                at the end of the job
      * @return a standard job
      *
      * @throw std::invalid_argument

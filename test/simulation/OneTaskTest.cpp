@@ -10,15 +10,9 @@
 
 #include <gtest/gtest.h>
 
-#include <workflow/Workflow.h>
-#include <simulation/Simulation.h>
-#include <services/storage_services/simple_storage_service/SimpleStorageServiceTest.h>
-#include <wms/scheduler/RandomScheduler.h>
-#include <services/compute_services/multicore_compute_service/MulticoreComputeService.h>
-#include <managers/data_movement_manager/DataMovementManager.h>
 #include <wrench-dev.h>
 
-// Convenient macro to lauch a test inside a separate process
+// Convenient macro to launch a test inside a separate process
 // and check the exit code, which denotes an error
 #define DO_TEST_WITH_FORK(function){ \
                                       pid_t pid = fork(); \
@@ -43,7 +37,7 @@ public:
     wrench::StorageService *storage_service2 = nullptr;
     wrench::ComputeService *compute_service = nullptr;
 
-    void do_NoopSimulation_test();
+    void do_Noop_test();
 
     void do_ExecutionWithLocationMap_test();
 
@@ -90,10 +84,10 @@ protected:
 /**  NOOP SIMULATION TEST                                            **/
 /**********************************************************************/
 
-class NoopSimulationTestWMS : public wrench::WMS {
+class NoopTestWMS : public wrench::WMS {
 
 public:
-    NoopSimulationTestWMS(OneTaskTest *test,
+    NoopTestWMS(OneTaskTest *test,
                           wrench::Workflow *workflow,
                           std::unique_ptr<wrench::Scheduler> scheduler,
                           std::string hostname) :
@@ -116,11 +110,6 @@ private:
       std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
               std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
 
-//      // Create a job
-//      wrench::StandardJob *job = job_manager->createStandardJob(test->task,
-//                                                                {{test->input_file,  test->storage_service1},
-//                                                                 {test->output_file, test->storage_service1}});
-
       // Terminate
       this->simulation->shutdownAllComputeServices();
       this->simulation->shutdownAllStorageServices();
@@ -129,11 +118,11 @@ private:
     }
 };
 
-TEST_F(OneTaskTest, NoopSimulation) {
-  DO_TEST_WITH_FORK(do_NoopSimulation_test);
+TEST_F(OneTaskTest, Noop) {
+  DO_TEST_WITH_FORK(do_Noop_test);
 }
 
-void OneTaskTest::do_NoopSimulation_test() {
+void OneTaskTest::do_Noop_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -156,7 +145,7 @@ void OneTaskTest::do_NoopSimulation_test() {
   // Create a WMS
   ASSERT_THROW(simulation->launch(), std::runtime_error);
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new NoopSimulationTestWMS(this, workflow,
+          std::unique_ptr<wrench::WMS>(new NoopTestWMS(this, workflow,
                                                                  std::unique_ptr<wrench::Scheduler>(
                                                                          new wrench::RandomScheduler()),
                           hostname))));

@@ -29,7 +29,7 @@ namespace wrench {
         enum Cause {
             NO_STORAGE_SERVICE_FOR_FILE,
             FILE_NOT_FOUND,
-            STORAGE_SERVICE_FULL,
+            STORAGE_NO_ENOUGH_SPACE,
             SERVICE_TERMINATED,
             JOB_TYPE_NOT_SUPPORTED,
             NOT_ENOUGH_CORES,

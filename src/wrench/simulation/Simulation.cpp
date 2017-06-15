@@ -180,7 +180,6 @@ namespace wrench {
       if (not this->file_registry_service) {
         throw std::runtime_error("Simulation::launch(): A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()");
       }
-
       // Check that each input file is staged somewhere
       for (auto f : this->wms->workflow->getInputFiles()) {
         if (this->file_registry_service->entries.find(f) == this->file_registry_service->entries.end()) {
@@ -321,7 +320,7 @@ namespace wrench {
     /**
      * @brief Retrieves the FileRegistryService
      *
-     * @return a raw pointer to the FileRegistryService instance
+     * @return a raw pointer to the FileRegistryService instance, if any
      */
     FileRegistryService *Simulation::getFileRegistryService() {
       return this->file_registry_service.get();

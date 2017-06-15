@@ -72,7 +72,7 @@ set(SOURCE_FILES
         src/wrench/services/storage_services/StorageService.cpp
         src/wrench/services/storage_services/StorageService.h
         src/wrench/services/storage_services/simple_storage_service/SimpleStorageService.cpp
-        src/wrench/services/storage_services/simple_storage_service/SimpleStorageServiceTest.h
+        src/wrench/services/storage_services/simple_storage_service/SimpleStorageService.h
         src/wrench/managers/data_movement_manager/DataMovementManager.cpp
         src/wrench/managers/data_movement_manager/DataMovementManager.h
         src/wrench/services/Service.cpp
@@ -109,7 +109,8 @@ set(TEST_FILES
         test/wms/optimizations/dynamic/FailureDynamicClusteringTest.cpp
         test/wms/optimizations/static/SimplePipelineClusteringTest.cpp
         test/simulation/OneTaskTest.cpp
-        test/simulation/SimpleStorageServiceTest.cpp)
+        test/simulation/SimpleStorageServiceTest.cpp
+        test/simulation/MulticoreComputeServiceTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)

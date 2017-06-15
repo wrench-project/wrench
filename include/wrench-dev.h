@@ -12,12 +12,19 @@
 
 #include "wrench.h"
 
+// Exceptions
+#include "exceptions/WorkflowExecutionException.h"
+
 // Compute Services
 #include "services/compute_services/ComputeService.h"
 #include "services/compute_services/multicore_compute_service/MulticoreComputeService.h"
 
-// Exceptions
-#include "exceptions/WorkflowExecutionException.h"
+// Storage Services
+#include "services/storage_services/StorageService.h"
+#include "services/storage_services/simple_storage_service/SimpleStorageService.h"
+
+// File Registry Service
+#include "services/file_registry_service/FileRegistryService.h"
 
 // Job Manager
 #include "managers/job_manager/JobManager.h"

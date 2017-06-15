@@ -38,7 +38,7 @@ namespace wrench {
 
     /**
      * @brief Get the file id
-     * @return
+     * @return the id
      */
     std::string WorkflowFile::getId() {
       return this->id;
@@ -87,7 +87,6 @@ namespace wrench {
     Workflow *WorkflowFile::getWorkflow() {
       return this->workflow;
     }
-
 
     /**
      * @brief Returns true if the file is the output of some task, false otherwise

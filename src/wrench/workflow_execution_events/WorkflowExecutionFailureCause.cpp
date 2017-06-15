@@ -55,7 +55,7 @@ namespace wrench {
     }
 
     StorageServiceFull::StorageServiceFull(WorkflowFile *file, StorageService *storage_service)
-            : WorkflowExecutionFailureCause(STORAGE_SERVICE_FULL) {
+            : WorkflowExecutionFailureCause(STORAGE_NO_ENOUGH_SPACE) {
       this->file = file;
       this->storage_service = storage_service;
     }

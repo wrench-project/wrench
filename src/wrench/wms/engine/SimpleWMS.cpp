@@ -14,8 +14,6 @@
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <wms/engine/SimpleWMS.h>
 #include <simulation/Simulation.h>
-#include <workflow_job/StandardJob.h>
-#include <workflow_job/PilotJob.h>
 #include <workflow_execution_events/WorkflowExecutionFailureCause.h>
 #include <exceptions/WorkflowExecutionException.h>
 

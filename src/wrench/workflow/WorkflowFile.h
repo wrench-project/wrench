@@ -16,7 +16,6 @@
 
 namespace wrench {
 
-
     class Workflow;
 
     class WorkflowTask;

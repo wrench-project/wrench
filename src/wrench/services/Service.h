@@ -33,6 +33,8 @@ namespace wrench {
         std::string getHostname();
         bool isUp();
 
+        std::string getPropertyValueAsString(std::string);
+        double getPropertyValueAsDouble(std::string);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -62,8 +64,6 @@ namespace wrench {
 
         // Property stuff
         void setProperty(std::string, std::string);
-        std::string getPropertyValueAsString(std::string);
-        double getPropertyValueAsDouble(std::string);
         std::map<std::string, std::string> property_list;
 
         enum State {
