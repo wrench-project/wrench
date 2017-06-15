@@ -598,8 +598,8 @@ namespace wrench {
         // Create a worker thread!
         WRENCH_INFO("Starting a worker thread to do some work");
 
-        WorkerThread *working_thread =
-                new WorkerThread(this->simulation,
+        WorkUnitExecutor *working_thread =
+                new WorkUnitExecutor(this->simulation,
                                  S4U_Simulation::getHostName(),
                                  this->mailbox_name,
                                  work_to_do,
@@ -880,7 +880,7 @@ namespace wrench {
       }
 
       for (auto w : works_to_terminate) {
-        WorkerThread *worker_thread_to_terminate = nullptr;
+        WorkUnitExecutor *worker_thread_to_terminate = nullptr;
         for (auto wt : this->working_threads) {
           if (wt->work == w) {
             worker_thread_to_terminate = wt;
@@ -961,7 +961,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void MulticoreComputeService::processWorkCompletion(WorkerThread *worker_thread, WorkUnit *work) {
+    void MulticoreComputeService::processWorkCompletion(WorkUnitExecutor *worker_thread, WorkUnit *work) {
 
       // Remove the work thread from the working list
       for (auto wt : this->working_threads) {
@@ -1031,7 +1031,7 @@ namespace wrench {
      * @param work: the work
      * @param cause: the cause of the failure
      */
-    void MulticoreComputeService::processWorkFailure(WorkerThread *worker_thread,
+    void MulticoreComputeService::processWorkFailure(WorkUnitExecutor *worker_thread,
                                                      WorkUnit *work,
                                                      WorkflowExecutionFailureCause *cause) {
 

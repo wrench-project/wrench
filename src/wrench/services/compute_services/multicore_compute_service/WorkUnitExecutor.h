@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_WORKERTHREAD_H
-#define WRENCH_WORKERTHREAD_H
+#ifndef WRENCH_WORKUNITEXECUTOR_H
+#define WRENCH_WORKUNITEXECUTOR_H
 
 
 #include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
@@ -29,11 +29,11 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
-    class WorkerThread : public S4U_DaemonWithMailbox {
+    class WorkUnitExecutor : public S4U_DaemonWithMailbox {
 
     public:
 
-        WorkerThread(Simulation *simulation,
+        WorkUnitExecutor(Simulation *simulation,
                      std::string hostname, std::string callback_mailbox,
                      WorkUnit *work,
                      StorageService *default_storage_service,
@@ -55,9 +55,6 @@ namespace wrench {
 
         StorageService *default_storage_service;
 
-
-
-
     };
 
     /***********************/
@@ -67,4 +64,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_WORKERTHREAD_H
+#endif //WRENCH_WORKUNITEXECUTOR_H

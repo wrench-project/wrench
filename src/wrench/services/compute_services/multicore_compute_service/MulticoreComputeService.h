@@ -16,7 +16,7 @@
 #include <services/compute_services/ComputeService.h>
 
 #include "MulticoreComputeServiceProperty.h"
-#include "WorkerThread.h"
+#include "WorkUnitExecutor.h"
 
 namespace wrench {
 
@@ -27,7 +27,7 @@ namespace wrench {
     class WorkflowExecutionFailureCause;
 
     /**  @brief Implementation of a Compute Service abstraction that
-     *   runs on a multi-core host.
+     *   runs on a multi-core host and can execute sets of single-core tasks.
      */
     class MulticoreComputeService : public ComputeService {
 
@@ -120,13 +120,14 @@ namespace wrench {
 
         std::string hostname;
         unsigned int max_num_worker_threads; // total threads to run tasks from standard jobs
+        unsigned int num_busy_cores;
         double ttl;
         bool has_ttl;
         double death_date;
         PilotJob *containing_pilot_job;
 
         // Vector of worker threads
-        std::set<WorkerThread*> working_threads;
+        std::set<WorkUnitExecutor*> working_threads;
 
         // Queue of pending jobs (standard or pilot) that haven't begun executing
         std::queue<WorkflowJob *> pending_jobs;
@@ -150,9 +151,9 @@ namespace wrench {
 
         void failCurrentStandardJobs(WorkflowExecutionFailureCause *cause);
 
-        void processWorkCompletion(WorkerThread *worker_thread, WorkUnit *work);
+        void processWorkCompletion(WorkUnitExecutor *worker_thread, WorkUnit *work);
 
-        void processWorkFailure(WorkerThread *worker_thread, WorkUnit *work,
+        void processWorkFailure(WorkUnitExecutor *worker_thread, WorkUnit *work,
                                 WorkflowExecutionFailureCause *);
 
         void processPilotJobCompletion(PilotJob *job);

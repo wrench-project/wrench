@@ -95,8 +95,8 @@ set(SOURCE_FILES
         src/wrench/services/storage_services/StorageServiceMessage.h
         src/wrench/services/file_registry_service/FileRegistryMessage.cpp
         src/wrench/services/file_registry_service/FileRegistryMessage.h
-        src/wrench/services/compute_services/multicore_compute_service/WorkerThread.cpp
-        src/wrench/services/compute_services/multicore_compute_service/WorkerThread.h
+        src/wrench/services/compute_services/multicore_compute_service/WorkUnitExecutor.cpp
+        src/wrench/services/compute_services/multicore_compute_service/WorkUnitExecutor.h
         src/wrench/services/compute_services/multicore_compute_service/WorkUnit.cpp
         src/wrench/services/compute_services/multicore_compute_service/WorkUnit.h)
 

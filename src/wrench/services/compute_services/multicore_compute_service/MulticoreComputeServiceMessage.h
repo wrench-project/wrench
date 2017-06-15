@@ -14,13 +14,13 @@
 
 #include <services/compute_services/ComputeServiceMessage.h>
 #include <vector>
-#include "WorkerThread.h"
+#include "WorkUnitExecutor.h"
 
 namespace wrench {
 
     class WorkflowTask;
 
-    class WorkerThread;
+    class WorkUnitExecutor;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -140,11 +140,11 @@ namespace wrench {
     class WorkerThreadWorkDoneMessage : public MulticoreComputeServiceMessage {
     public:
         WorkerThreadWorkDoneMessage(
-                WorkerThread *worker_thread,
+                WorkUnitExecutor *worker_thread,
                 WorkUnit *work_unit,
                 double payload);
 
-        WorkerThread *worker_thread;
+        WorkUnitExecutor *worker_thread;
         WorkUnit *work;
 
     };
@@ -155,12 +155,12 @@ namespace wrench {
     class WorkerThreadWorkFailedMessage : public MulticoreComputeServiceMessage {
     public:
         WorkerThreadWorkFailedMessage(
-                WorkerThread *worker_thread,
+                WorkUnitExecutor *worker_thread,
                 WorkUnit *work,
                 WorkflowExecutionFailureCause *cause,
                 double payload);
 
-        WorkerThread *worker_thread;
+        WorkUnitExecutor *worker_thread;
         WorkUnit *work;
 
         WorkflowExecutionFailureCause *cause;

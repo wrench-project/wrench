@@ -14,7 +14,7 @@
 #include <logging/TerminalOutput.h>
 #include <exceptions/WorkflowExecutionException.h>
 #include <simgrid_S4U_util/S4U_Simulation.h>
-#include "WorkerThread.h"
+#include "WorkUnitExecutor.h"
 #include "MulticoreComputeServiceMessage.h"
 #include <workflow/WorkflowTask.h>
 #include <workflow_job/StandardJob.h>
@@ -38,7 +38,7 @@ namespace wrench {
      * @param default_storage_service: the default storage service from which to read/write data (if any)
      * @param startup_overhead: the startup overhead, in seconds
      */
-    WorkerThread::WorkerThread(Simulation *simulation,
+    WorkUnitExecutor::WorkUnitExecutor(Simulation *simulation,
                                std::string hostname,
                                std::string callback_mailbox,
                                WorkUnit *work,
@@ -47,7 +47,7 @@ namespace wrench {
             S4U_DaemonWithMailbox("worker_thread", "worker_thread") {
 
       if (startup_overhead < 0) {
-        throw std::invalid_argument("WorkerThread::WorkerThread(): Startup overhead must be >= 0");
+        throw std::invalid_argument("WorkUnitExecutor::WorkUnitExecutor(): Startup overhead must be >= 0");
       }
 
       this->simulation = simulation;
@@ -64,7 +64,7 @@ namespace wrench {
     /**
      * @brief Kill the worker thread
      */
-    void WorkerThread::kill() {
+    void WorkUnitExecutor::kill() {
       this->kill_actor();
     }
 
@@ -76,7 +76,7 @@ namespace wrench {
     *
     * @throw std::runtime_error
     */
-    int WorkerThread::main() {
+    int WorkUnitExecutor::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_BLUE);
 
@@ -136,7 +136,7 @@ namespace wrench {
      * @param work: the work to perform
      */
     void
-    WorkerThread::performWork(WorkUnit *work) {
+    WorkUnitExecutor::performWork(WorkUnit *work) {
 
       // Simulate the startup overhead
       S4U_Simulation::sleep(this->start_up_overhead);
