@@ -462,10 +462,10 @@ private:
       // Create a job
       wrench::StandardJob *job = job_manager->createStandardJob({test->task},
                                                                 {},
-                                                                {{test->input_file, test->storage_service1, test->storage_service2}},
-                                                                {{test->output_file, test->storage_service2, test->storage_service1}},
-                                                                {{test->input_file, test->storage_service2},
-                                                                 {test->output_file, test->storage_service2}});
+                                                                {std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> {test->input_file, test->storage_service1, test->storage_service2}},
+                                                                {std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> {test->output_file, test->storage_service2, test->storage_service1}},
+                                                                {std::tuple<wrench::WorkflowFile*, wrench::StorageService*> {test->input_file, test->storage_service2},
+                                                                 std::tuple<wrench::WorkflowFile*, wrench::StorageService*> {test->output_file, test->storage_service2}});
 
       // Submit the job
       job_manager->submitJob(job, test->compute_service);
