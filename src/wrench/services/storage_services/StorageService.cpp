@@ -49,15 +49,13 @@ namespace wrench {
       }
 
       if (file->getSize() > (this->capacity - this->occupied_space)) {
-      // TODO: REPLACE WITH WRENCH_INFO WHEN WE CAN DETERMINE WHETHER CODE IS BEGIN RUN BY AN ACTOR OR NOT
-        XBT_WARN("File exceeds free space capacity on storage service (file size: %lf, storage free space: %lf)",
+        WRENCH_WARN("File exceeds free space capacity on storage service (file size: %lf, storage free space: %lf)",
                     file->getSize(), (this->capacity - this->occupied_space));
         throw std::runtime_error("StorageService::addFileToStorage(): File exceeds free space capacity on storage service");
       }
       this->stored_files.insert(file);
       this->occupied_space += file->getSize();
-      // TODO: REPLACE WITH WRENCH_INFO WHEN WE CAN DETERMINE WHETHER CODE IS BEGIN RUN BY AN ACTOR OR NOT
-      XBT_INFO("Stored file %s (storage usage: %.10lf%%)", file->getId().c_str(),
+      WRENCH_INFO("Stored file %s (storage usage: %.10lf%%)", file->getId().c_str(),
                   100.0 * this->occupied_space / this->capacity);
     }
 
