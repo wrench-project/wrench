@@ -58,6 +58,14 @@ namespace wrench {
       this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
     };
 
+
+    /**
+     * @brief Destructor
+     */
+    StandardJob::~StandardJob() {
+      std::cerr << "STANDARD_JOB DESTRUCTOR\n";
+    }
+
     /**
      * @brief Get the number of tasks in the job
      *

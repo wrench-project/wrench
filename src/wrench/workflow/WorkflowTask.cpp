@@ -39,7 +39,8 @@ namespace wrench {
 
       f->setInputOf(this);
 
-      WRENCH_DEBUG("Adding file '%s' as input to task %s",
+      // TODO: REPLACE WITH WRENCH_INFO WHEN WE CAN DETERMINE WHETHER CODE IS BEGIN RUN BY AN ACTOR OR NOT
+      XBT_DEBUG("Adding file '%s' as input to task %s",
                    f->getId().c_str(), this->getId().c_str());
       // Perhaps add a control dependency?
       if (f->getOutputOf()) {

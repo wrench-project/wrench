@@ -26,7 +26,6 @@ namespace wrench {
       TerminalOutput::colormap[simgrid::s4u::Actor::self()] = color;
     }
 
-
     /**
      * @brief Turn on colored output for the current process
      */
@@ -57,7 +56,9 @@ namespace wrench {
      * @return the color as a string
      */
     std::string TerminalOutput::getThisProcessLoggingColor() {
-      if (TerminalOutput::colormap.find(simgrid::s4u::Actor::self()) != TerminalOutput::colormap.end()) {
+
+      if (TerminalOutput::colormap.find(simgrid::s4u::Actor::self()) !=
+              TerminalOutput::colormap.end()) {
         return TerminalOutput::colormap[simgrid::s4u::Actor::self()];
       } else {
         return "";

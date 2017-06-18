@@ -174,9 +174,6 @@ private:
 };
 
 TEST_F(MulticoreComputeServiceTest, TwoSingleCoreTasks) {
-  // TODO: Un-disable this test once S4U is fixed
-  std::cerr << "\033[1;31m[ SKIPPING THIS TEST TEMPORARILY DUE TO S4U NEGATIVE REFCOUNT BUG ]\033[0m\n";
-  return;
   DO_TEST_WITH_FORK(do_TwoSingleCoreTasks_test);
 }
 

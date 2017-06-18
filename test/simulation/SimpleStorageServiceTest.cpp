@@ -280,8 +280,6 @@ private:
         }
       }
 
-      // TODO: Re-enable this when the refcount < 0 bug is fixed in S4U
-#if 0
       // Do an INVALID asynchronous file copy (file not there)
       try {
         data_movement_manager->submitFileCopy(this->test->file_500,
@@ -309,7 +307,6 @@ private:
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int)(event->type)));
         }
       }
-#endif
 
       // Terminate
       this->simulation->shutdownAllComputeServices();

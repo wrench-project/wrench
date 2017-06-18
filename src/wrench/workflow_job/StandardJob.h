@@ -64,6 +64,8 @@ namespace wrench {
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
         std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
 
+        ~StandardJob();
+
     private:
         friend class JobManager;
 
@@ -71,6 +73,7 @@ namespace wrench {
                     std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                     std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                     std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
+
 
         State state;
 

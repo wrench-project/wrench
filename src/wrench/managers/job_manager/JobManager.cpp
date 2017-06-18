@@ -46,6 +46,7 @@ namespace wrench {
      */
     JobManager::~JobManager() {
       this->kill();
+      this->jobs.clear();
     }
 
     /**
