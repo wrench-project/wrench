@@ -12,11 +12,13 @@
 
 
 #include <queue>
+#include <set>
 
 #include <services/compute_services/ComputeService.h>
 
 #include "MulticoreComputeServiceProperty.h"
 #include "WorkUnitExecutor.h"
+
 
 namespace wrench {
 
