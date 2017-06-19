@@ -88,9 +88,9 @@ class NoopTestWMS : public wrench::WMS {
 
 public:
     NoopTestWMS(OneTaskTest *test,
-                          wrench::Workflow *workflow,
-                          std::unique_ptr<wrench::Scheduler> scheduler,
-                          std::string hostname) :
+                wrench::Workflow *workflow,
+                std::unique_ptr<wrench::Scheduler> scheduler,
+                std::string hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -146,8 +146,8 @@ void OneTaskTest::do_Noop_test() {
   ASSERT_THROW(simulation->launch(), std::runtime_error);
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new NoopTestWMS(this, workflow,
-                                                                 std::unique_ptr<wrench::Scheduler>(
-                                                                         new wrench::RandomScheduler()),
+                                                       std::unique_ptr<wrench::Scheduler>(
+                                                               new wrench::RandomScheduler()),
                           hostname))));
 
   // Create a Compute Service
@@ -465,8 +465,7 @@ private:
                                                                 {std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> {test->input_file, test->storage_service1, test->storage_service2}},
                                                                 {std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> {test->output_file, test->storage_service2, test->storage_service1}},
                                                                 {std::tuple<wrench::WorkflowFile*, wrench::StorageService*> {test->input_file, test->storage_service2},
-                                                                 std::tuple<wrench::WorkflowFile*, wrench::StorageService*> {test->output_file, test->storage_service2}});
-
+                                                                 std::tuple<wrench::WorkflowFile*, wrench::StorageService*> {test->output_file, test->storage_service2}});
       // Submit the job
       job_manager->submitJob(job, test->compute_service);
 
