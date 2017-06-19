@@ -11,6 +11,7 @@
 #ifndef WRENCH_FILEREGISTRYSERVICE_H
 #define WRENCH_FILEREGISTRYSERVICE_H
 
+#include <set>
 
 #include <services/Service.h>
 
