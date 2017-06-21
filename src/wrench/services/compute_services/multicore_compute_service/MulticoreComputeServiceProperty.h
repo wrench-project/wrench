@@ -17,6 +17,9 @@
 
 namespace wrench {
 
+   /**
+    * @brief Class that specifies properties for a MulticoreComputeService
+    */
     class MulticoreComputeServiceProperty : public ComputeServiceProperty {
 
     public:

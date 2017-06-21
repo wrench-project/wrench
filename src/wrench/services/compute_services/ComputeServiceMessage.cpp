@@ -12,6 +12,11 @@
 
 namespace wrench {
 
+    /**
+     * @brief Constructor
+     * @param name: message name
+     * @param payload: message payload
+     */
     ComputeServiceMessage::ComputeServiceMessage(std::string name, double payload) :
           ServiceMessage("ComputeServiceMessage::" + name, payload) {
     }
@@ -96,6 +101,7 @@ namespace wrench {
      * @brief Constructor
      * @param job: pointer to a StandardJob
      * @param cs: points to a ComputeService
+     * @param cause: the cause of the failure
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument

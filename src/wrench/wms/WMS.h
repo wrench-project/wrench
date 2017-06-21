@@ -65,11 +65,16 @@ namespace wrench {
 
         friend class Simulation;
 
+        /** @brief The current simulation */
         Simulation *simulation;
+        /** @brief The workflow to execute */
         Workflow *workflow;
 
+        /** @brief The selected scheduler */
         std::unique_ptr<Scheduler> scheduler;
+        /** @brief The enabled dynamic optimizations */
         std::vector<std::unique_ptr<DynamicOptimization>> dynamic_optimizations;
+        /** @brief The enabled static optimizations */
         std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
 
         void setSimulation(Simulation *simulation);

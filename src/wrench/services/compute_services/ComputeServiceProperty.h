@@ -15,6 +15,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief Class that specifies properties for a ComputeService
+     */
     class ComputeServiceProperty : public ServiceProperty {
     public:
         /** The number of bytes in the control message sent by the daemon to state that it does not support the type of a submitted job **/

@@ -51,7 +51,7 @@ namespace wrench {
 
         friend class JobManager;
 
-        PilotJob(Workflow *workflow, unsigned long, double);
+        PilotJob(Workflow *workflow, unsigned long num_cores, double duration);
 
         PilotJob::State getState();
 

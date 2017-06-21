@@ -27,6 +27,5 @@ namespace wrench {
     SET_PROPERTY_NAME(ComputeServiceProperty, FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD);
     SET_PROPERTY_NAME(ComputeServiceProperty, FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD);
 
-
 };
 

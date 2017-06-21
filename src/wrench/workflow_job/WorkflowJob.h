@@ -29,6 +29,7 @@ namespace wrench {
     class WorkflowJob {
     public:
 
+        /** @brief Job type enum */
         enum Type {
             STANDARD,
             PILOT
@@ -56,24 +57,28 @@ namespace wrench {
 
         std::string getOriginCallbackMailbox();
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-
     protected:
 
         WorkflowJob(Type type, unsigned long num_cores, double duration);
 
         unsigned long getNewUniqueNumber();
 
-        std::stack<std::string> callback_mailbox_stack;    // Stack of callback mailboxes
+        /** @brief Stack of callback mailboxes (to pop notifications) */
+        std::stack<std::string> callback_mailbox_stack;
+        /** @brief The workflow this job belong to */
         Workflow *workflow;
+        /** @brief The job's type */
         Type type;
+        /** @brief The job's name */
         std::string name;
-
+        /** @brief The job's duration */
         double duration;
+        /** @brief The job's number of cores */
         unsigned long num_cores;
 
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 
     /***********************/

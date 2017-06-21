@@ -23,6 +23,9 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    /**
+     * @brief Top-level ComputeServiceMessage class
+     */
     class ComputeServiceMessage : public ServiceMessage {
     protected:
         ComputeServiceMessage(std::string name, double payload);

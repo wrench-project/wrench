@@ -26,8 +26,11 @@ namespace wrench {
 		class S4U_DaemonWithMailbox {
 
 		public:
+				/** @brief The name of the daemon */
 				std::string process_name;
+				/** @brief The name of the daemon's mailbox */
 				std::string mailbox_name;
+				/** @brief The name of the host on which the daemon is running */
 				std::string hostname;
 
 				S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix);

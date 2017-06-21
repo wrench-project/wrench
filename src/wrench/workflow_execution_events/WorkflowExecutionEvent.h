@@ -41,6 +41,7 @@ namespace wrench {
 
     public:
 
+        /** @brief Workflow execution event types */
         enum EventType {
             UNDEFINED,
             UNSUPPORTED_JOB_TYPE,
@@ -53,11 +54,17 @@ namespace wrench {
         };
 
 
+        /** @brief The event type */
         WorkflowExecutionEvent::EventType type;
+        /** @brief The relevant job, or nullptr */
         WorkflowJob *job = nullptr;
+        /** @brief The relevant compute service, or nullptr */
         ComputeService *compute_service = nullptr;
+        /** @brief The relevant file, or nullptr */
         WorkflowFile *file = nullptr;
+        /** @brief The relevant storage service, or nullptr */
         StorageService *storage_service = nullptr;
+        /** @brief The relevant failure cause, or nullptr */
         WorkflowExecutionFailureCause *failure_cause = nullptr;
 
     private:

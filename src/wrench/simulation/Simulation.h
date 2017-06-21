@@ -56,6 +56,7 @@ namespace wrench {
 
         WMS *setWMS(std::unique_ptr<WMS>);
 
+        /** @brief The simulation post-mortem output */
         SimulationOutput output;
 
         /***********************/

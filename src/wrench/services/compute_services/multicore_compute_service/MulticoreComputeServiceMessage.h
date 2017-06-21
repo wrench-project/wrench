@@ -26,34 +26,40 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    /**
+     * @brief Top-level MulticoreComputeServiceMessage class
+     */
     class MulticoreComputeServiceMessage : public ComputeServiceMessage {
     protected:
         MulticoreComputeServiceMessage(std::string name, double payload);
     };
 
     /**
-     * @brief "NOT_ENOUGH_CORES" SimulationMessage class
+     * @brief MulticoreComputeServiceNotEnoughCoresMessage class
      */
     class MulticoreComputeServiceNotEnoughCoresMessage : public MulticoreComputeServiceMessage {
     public:
         MulticoreComputeServiceNotEnoughCoresMessage(WorkflowJob *, ComputeService *, double payload);
 
+        /** @brief The job that couldn't run due to not enough cores */
         WorkflowJob *job;
+        /** @brief The compute service on which there weren't enough cores */
         ComputeService *compute_service;
     };
 
     /**
-     * @brief "NUM_CORES_REQUEST" SimulationMessage class
+     * @brief MulticoreComputeServiceNumCoresRequestMessage class
      */
     class MulticoreComputeServiceNumCoresRequestMessage : public MulticoreComputeServiceMessage {
     public:
         MulticoreComputeServiceNumCoresRequestMessage(std::string answer_mailbox, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
     };
 
     /**
-     * @brief "NUM_CORES_CORES_ANSWER" SimulationMessage class
+     * @brief MulticoreComputeServiceNumCoresAnswerMessage class
      */
     class MulticoreComputeServiceNumCoresAnswerMessage : public MulticoreComputeServiceMessage {
     public:
@@ -63,17 +69,18 @@ namespace wrench {
     };
 
     /**
-  * @brief "NUM_IDLE_CORES_REQUEST" SimulationMessage class
+  * @brief MulticoreComputeServiceNumIdleCoresRequestMessage class
   */
     class MulticoreComputeServiceNumIdleCoresRequestMessage : public MulticoreComputeServiceMessage {
     public:
         MulticoreComputeServiceNumIdleCoresRequestMessage(std::string answer_mailbox, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
     };
 
     /**
-     * @brief "NUM_IDLE_CORES_ANSWER" SimulationMessage class
+     * @brief MulticoreComputeServiceNumIdleCoresAnswerMessage class
      */
     class MulticoreComputeServiceNumIdleCoresAnswerMessage : public MulticoreComputeServiceMessage {
     public:
@@ -83,17 +90,18 @@ namespace wrench {
     };
 
     /**
-     * @brief "TTL_REQUEST" SimulationMessage class
+     * @brief MulticoreComputeServiceTTLRequestMessage class
      */
     class MulticoreComputeServiceTTLRequestMessage : public MulticoreComputeServiceMessage {
     public:
         MulticoreComputeServiceTTLRequestMessage(std::string answer_mailbox, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
     };
 
     /**
-     * @brief "TTL_ANSWER" SimulationMessage class
+     * @brief MulticoreComputeServiceTTLAnswerMessage class
      */
     class MulticoreComputeServiceTTLAnswerMessage : public MulticoreComputeServiceMessage {
     public:
@@ -103,17 +111,18 @@ namespace wrench {
     };
 
     /**
-     * @brief "FLOP_RATE_REQUEST" SimulationMessage class
+     * @brief MulticoreComputeServiceFlopRateRequestMessage class
      */
     class MulticoreComputeServiceFlopRateRequestMessage : public MulticoreComputeServiceMessage {
     public:
         MulticoreComputeServiceFlopRateRequestMessage(std::string answer_mailbox, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
     };
 
     /**
-     * @brief "FLOP_RATE_ANSWER" SimulationMessage class
+     * @brief MulticoreComputeServiceFlopRateAnswerMessage class
      */
     class MulticoreComputeServiceFlopRateAnswerMessage : public MulticoreComputeServiceMessage {
     public:
@@ -123,7 +132,7 @@ namespace wrench {
     };
 
     /**
-     * @brief "WORKER_THREAD_DO_WORK_REQUEST" SimulationMessage class
+     * @brief WorkerThreadDoWorkRequestMessage class
      */
     class WorkerThreadDoWorkRequestMessage : public MulticoreComputeServiceMessage {
     public:
@@ -135,7 +144,7 @@ namespace wrench {
     };
 
     /**
-     * @brief "WORKER_THREAD_WORK_DONE" SimulationMessage class
+     * @brief WorkerThreadWorkDoneMessage class
      */
     class WorkerThreadWorkDoneMessage : public MulticoreComputeServiceMessage {
     public:
@@ -150,7 +159,7 @@ namespace wrench {
     };
 
     /**
-     * @brief "WORKER_THREAD_WORK_FAILED" SimulationMessage class
+     * @brief WorkerThreadWorkFailedMessage class
      */
     class WorkerThreadWorkFailedMessage : public MulticoreComputeServiceMessage {
     public:
@@ -162,7 +171,6 @@ namespace wrench {
 
         WorkUnitExecutor *worker_thread;
         WorkUnit *work;
-
         WorkflowExecutionFailureCause *cause;
     };
 

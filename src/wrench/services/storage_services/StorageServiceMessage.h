@@ -20,163 +20,192 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    /**
+     * @brief Top-level StorageServiceMessage class
+     */
     class StorageServiceMessage : public ServiceMessage {
     protected:
         StorageServiceMessage(std::string name, double payload);
     };
 
 
-
-
     /**
-     * @brief "FREE_SPACE_REQUEST" SimulationMessage class
+     * @brief StorageServiceFreeSpaceRequestMessage class
      */
     class StorageServiceFreeSpaceRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFreeSpaceRequestMessage(std::string answer_mailbox, double payload);
-
+        /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
     };
 
     /**
-     * @brief "FREE_SPACE_ANSWER" SimulationMessage class
+     * @brief StorageServiceFreeSpaceAnswerMessage class
      */
     class StorageServiceFreeSpaceAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFreeSpaceAnswerMessage(double free_space, double payload);
 
+        /** @brief The amount of free space in bytes */
         double free_space;
     };
 
     /**
-    * @brief "FILE_LOOKUP_REQUEST" SimulationMessage class
+    * @brief StorageServiceFileLookupRequestMessage class
     */
     class StorageServiceFileLookupRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
 
+        /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The file to lookup */
         WorkflowFile *file;
     };
 
     /**
-     * @brief "FILE_LOOKUP_ANSWER" SimulationMessage class
+     * @brief StorageServiceFileLookupAnswerMessage class
      */
     class StorageServiceFileLookupAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileLookupAnswerMessage(WorkflowFile *file, bool file_is_available, double payload);
 
+        /** @brief The file that was looked up */
         WorkflowFile *file;
+        /** @brief Whether the file was found */
         bool file_is_available;
     };
 
     /**
-     * @brief "FILE_DELETE_REQUEST" SimulationMessage class
+     * @brief StorageServiceFileDeleteRequestMessage class
      */
     class StorageServiceFileDeleteRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
-                                 WorkflowFile *file,
-                                 double payload);
+                                               WorkflowFile *file,
+                                               double payload);
 
+        /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The file to delete */
         WorkflowFile *file;
     };
 
     /**
-     * @brief "FILE_DELETE_ANSWER" SimulationMessage class
+     * @brief StorageServiceFileDeleteAnswerMessage class
      */
     class StorageServiceFileDeleteAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
-                                StorageService *storage_service,
-                                bool success,
-                                WorkflowExecutionFailureCause *failure_cause,
-                                double payload);
+                                              StorageService *storage_service,
+                                              bool success,
+                                              WorkflowExecutionFailureCause *failure_cause,
+                                              double payload);
 
+        /** @brief The file that was deleted (or not) */
         WorkflowFile *file;
+        /** @brief The storage service on which the deletion happened (or not) */
         StorageService *storage_service;
+        /** @brief Whether the deletion was successful */
         bool success;
+        /** @brief The cause of the failure, or nullptr if success */
         WorkflowExecutionFailureCause *failure_cause;
     };
 
     /**
-    * @brief "FILE_COPY_REQUEST" SimulationMessage class
+    * @brief StorageServiceFileCopyRequestMessage class
     */
     class StorageServiceFileCopyRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *src, double payload);
+        StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
+                                             double payload);
 
+        /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The file to copy */
         WorkflowFile *file;
+        /** @brief The storage service from which to copy the file */
         StorageService *src;
     };
 
     /**
-     * @brief "FILE_COPY_ANSWER" SimulationMessage class
+     * @brief StorageServiceFileCopyAnswerMessage class
      */
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyAnswerMessage(WorkflowFile *file, StorageService *storage_service,
-                              bool success, WorkflowExecutionFailureCause *cause, double payload);
+                                            bool success, WorkflowExecutionFailureCause *cause, double payload);
 
+        /** @brief The file was was copied, or not */
         WorkflowFile *file;
+        /** @brief The storage service that performed the copy */
         StorageService *storage_service;
+        /** @brief Whether the copy was successful */
         bool success;
+        /** @brief The cause of the failure, or nullptr if success */
         WorkflowExecutionFailureCause *failure_cause;
     };
 
     /**
-    * @brief "FILE_WRITE_REQUEST" SimulationMessage class
+    * @brief StorageServiceFileWriteRequestMessage class
     */
     class StorageServiceFileWriteRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileWriteRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
 
+        /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The file to write */
         WorkflowFile *file;
     };
 
     /**
-     * @brief "FILE_WRITE_ANSWER" SimulationMessage class
+     * @brief StorageServiceFileWriteAnswerMessage class
      */
     class StorageServiceFileWriteAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
-                                StorageService *storage_service,
-                                bool success,
-                                WorkflowExecutionFailureCause *failure_cause,
-                                std::string data_write_mailbox_name,
-                                double payload);
+                                             StorageService *storage_service,
+                                             bool success,
+                                             WorkflowExecutionFailureCause *failure_cause,
+                                             std::string data_write_mailbox_name,
+                                             double payload);
 
+        /** @brief The workflow file that should be written */
         WorkflowFile *file;
+        /** @brief The storage service on which the file should be written */
         StorageService *storage_service;
+        /** @brief Whether the write operation request was accepted or not */
         bool success;
+        /** @brief The cause of the failure, if any, or nullptr */
         WorkflowExecutionFailureCause *failure_cause;
+        /** @brief The mailbox on which to actually write the file data (payload), in case of a success */
         std::string data_write_mailbox_name;
     };
 
     /**
-     * @brief "FILE_READ_REQUEST" SimulationMessage class
+     * @brief StorageServiceFileReadRequestMessage class
      */
     class StorageServiceFileReadRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileReadRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The file to read */
         WorkflowFile *file;
     };
 
     /**
-     * @brief "FILE_READ_ANSWER" SimulationMessage class
+     * @brief StorageServiceFileReadAnswerMessage class
      */
     class StorageServiceFileReadAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileReadAnswerMessage(WorkflowFile *file,
-                                  StorageService *storage_service,
-                                  bool success,
-                                  WorkflowExecutionFailureCause *failure_cause,
-                                  double payload);
+                                            StorageService *storage_service,
+                                            bool success,
+                                            WorkflowExecutionFailureCause *failure_cause,
+                                            double payload);
 
         WorkflowFile *file;
         StorageService *storage_service;
@@ -185,7 +214,7 @@ namespace wrench {
     };
 
     /**
-    * @brief "FILE_CONTENT" SimulationMessage class
+    * @brief StorageServiceFileContentMessage class
     */
     class StorageServiceFileContentMessage : public StorageServiceMessage {
     public:

@@ -61,7 +61,7 @@ namespace wrench {
         static void disableColor();
 
         /***********************/
-        /** \cond INTERNAL    */
+        /** \endcond           */
         /***********************/
 
     private:

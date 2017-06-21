@@ -15,6 +15,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief Class that specifies properties for a FileRegisteryService
+     */
     class FileRegistryServiceProperty: public ServiceProperty {
 
     public:

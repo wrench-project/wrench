@@ -19,6 +19,9 @@
 namespace wrench {
 
 
+    /**
+     * @brief Class that specifies properties that apply to all services
+     */
     class ServiceProperty {
 
     public:

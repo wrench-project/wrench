@@ -21,13 +21,16 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    /**
+     * @brief Top-level SimuationMessage class
+     */
     class ServiceMessage : public SimulationMessage {
     protected:
         ServiceMessage(std::string name, double payload);
 
     };
 
-/**
+    /**
      * @brief "STOP_DAEMON" SimulationMessage class
      */
     class ServiceStopDaemonMessage : public ServiceMessage {
@@ -37,9 +40,9 @@ namespace wrench {
         std::string ack_mailbox;
     };
 
-/**
- * @brief "DAEMON_STOPPED" SimulationMessage class
- */
+    /**
+     * @brief "DAEMON_STOPPED" SimulationMessage class
+     */
     class ServiceDaemonStoppedMessage : public ServiceMessage {
     public:
         ServiceDaemonStoppedMessage(double payload);

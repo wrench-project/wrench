@@ -83,6 +83,11 @@ namespace wrench {
       return this->flops;
     }
 
+    /**
+     * @brief Get the number of procs of the task
+     *
+     * @return the number of procs
+     */
     int WorkflowTask::getNumProcs() const {
       return this->number_of_processors;
     }
@@ -124,9 +129,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the state of the task as a string
+     * @brief Get a task state as a string
      *
-     * @return the task state as a string
+     * @param state: the state
+     *
+     * @return the state as a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::State state) {
       switch (state) {

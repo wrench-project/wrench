@@ -42,7 +42,8 @@ for ITEM in $CMD ; do
 	  SECTIONS="DEVELOPER INTERNAL"
 	fi
 	< ./Doxyfile.in sed "s/WRENCH_SECTIONS/$SECTIONS/" | sed "s/WRENCH_OUTPUT_DIRECTORY/\docs\/$VERSION\/$OUTPUT_DIRECTORY/"> $DOXYFILE
-	doxygen $DOXYFILE &> $DOXYFILE.log
+	#doxygen $DOXYFILE &> $DOXYFILE.log
+	doxygen $DOXYFILE 
 	if [[ ! -z "$GH_DOCS" ]] ; then
 	  mkdir -p ./docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY
 	  cp -R ./docs/$VERSION/$OUTPUT_DIRECTORY/html/*  ./docs/gh-pages/$VERSION/$OUTPUT_DIRECTORY

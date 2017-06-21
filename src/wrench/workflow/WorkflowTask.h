@@ -46,7 +46,7 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        /* Task-state enum */
+        /** @brief Task state enum */
         enum State {
             NOT_READY,
             READY,
@@ -102,14 +102,15 @@ namespace wrench {
 
         void setEndDate(double date);
 
-
         void incrementFailureCount();
 
         /***********************/
         /** \endcond           */
         /***********************/
 
+
     private:
+
         friend class Workflow;
 
         std::string id;                    // Task ID

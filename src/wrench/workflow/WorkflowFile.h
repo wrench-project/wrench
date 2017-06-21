@@ -25,10 +25,6 @@ namespace wrench {
      */
     class WorkflowFile {
 
-        friend class Workflow;
-
-        friend class WorkflowTask;
-
     public:
 
         double getSize();
@@ -48,6 +44,11 @@ namespace wrench {
         /***********************/
 
     private:
+
+        friend class Workflow;
+
+        friend class WorkflowTask;
+
         std::string id;
         double size; // in bytes
 

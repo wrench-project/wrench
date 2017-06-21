@@ -75,6 +75,10 @@ namespace wrench {
                        std::string data_mailbox_name_prefix,
                        double capacity);
 
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
     protected:
 
         friend class Simulation;

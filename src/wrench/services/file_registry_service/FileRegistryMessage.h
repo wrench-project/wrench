@@ -20,12 +20,18 @@ namespace wrench {
     /** \cond INTERNAL    **/
     /***********************/
 
+    /**
+     * @brief Top-level FileRegistryMessage class
+     */
     class FileRegistryMessage : public ServiceMessage {
     protected:
         FileRegistryMessage(std::string name, double payload);
 
     };
 
+    /**
+     * @brief FileRegistryFileLookupRequestMessage class
+     */
     class FileRegistryFileLookupRequestMessage: public FileRegistryMessage {
     public:
         FileRegistryFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
@@ -34,6 +40,9 @@ namespace wrench {
         WorkflowFile *file;
     };
 
+    /**
+     * @brief FileRegistryFileLookupAnswerMessage class
+     */
     class FileRegistryFileLookupAnswerMessage: public FileRegistryMessage {
     public:
         FileRegistryFileLookupAnswerMessage(WorkflowFile *file, std::set<StorageService*> locations, double payload);
@@ -42,6 +51,9 @@ namespace wrench {
         std::set<StorageService*> locations;
     };
 
+    /**
+     * @brief FileRegistryRemoveEntryRequestMessage class
+     */
     class FileRegistryRemoveEntryRequestMessage: public FileRegistryMessage {
     public:
         FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *storage_service, double payload);
@@ -51,6 +63,9 @@ namespace wrench {
         StorageService *storage_service;
     };
 
+    /**
+     * @brief FileRegistryRemoveEntryAnswerMessage
+     */
     class FileRegistryRemoveEntryAnswerMessage: public FileRegistryMessage {
     public:
         FileRegistryRemoveEntryAnswerMessage(bool success, double payload);
@@ -58,6 +73,9 @@ namespace wrench {
         bool success;
     };
 
+    /**
+     * @brief FileRegistryAddEntryRequestMessage class
+     */
     class FileRegistryAddEntryRequestMessage: public FileRegistryMessage {
     public:
         FileRegistryAddEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *storage_service, double payload);
@@ -67,6 +85,9 @@ namespace wrench {
         StorageService *storage_service;
     };
 
+    /**
+     * @brief FileRegistryAddEntryAnswerMessage class
+     */
     class FileRegistryAddEntryAnswerMessage: public FileRegistryMessage {
     public:
         FileRegistryAddEntryAnswerMessage(double payload);

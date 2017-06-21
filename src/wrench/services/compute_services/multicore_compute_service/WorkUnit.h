@@ -23,6 +23,13 @@ namespace wrench {
     class StorageService;
     class WorkflowTask;
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
+    /**
+     * @brief A class to describe a unit of work that's a sub-component of a StandardJob
+     */
     class WorkUnit {
 
     public:
@@ -36,17 +43,29 @@ namespace wrench {
 
         static void addDependency(WorkUnit *parent, WorkUnit *child);
 
+        /** @brief The job that this WorkUnit belongs to */
         StandardJob *job;
+        /** @brief The WorkUnits that depend on this WorkUnit */
         std::set<WorkUnit *> children;
+        /** @brief The number of WorkUnits this WorkUnit depends on */
         unsigned long num_pending_parents;
 
+        /** @brief File copies to perform before computational tasks begin */
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
+        /** @brief Computational tasks to perform */
         std::vector<WorkflowTask *> tasks;
+        /** @brief Locations where computational tasks should read/write files */
         std::map<WorkflowFile *, StorageService *> file_locations;
+        /** @brief File copies to perform after computational tasks completes */
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
+        /** @brief File deletions to perform last */
         std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
 
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
 

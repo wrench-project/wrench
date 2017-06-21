@@ -21,6 +21,9 @@ namespace wrench {
 
     class Simulation;
 
+    /**
+     * @brief A top-level service class
+     */
     class Service : public S4U_DaemonWithMailbox {
 
     public:
@@ -29,12 +32,19 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+        /** @brief Service states */
+        enum State {
+            UP,
+            DOWN,
+        };
+
         virtual void stop();
         std::string getHostname();
         bool isUp();
 
         std::string getPropertyValueAsString(std::string);
         double getPropertyValueAsDouble(std::string);
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -50,9 +60,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-
     protected:
-
 
         /***********************/
         /** \cond INTERNAL     */
@@ -64,21 +72,20 @@ namespace wrench {
 
         // Property stuff
         void setProperty(std::string, std::string);
+        /** @brief The service's property list */
         std::map<std::string, std::string> property_list;
 
-        enum State {
-            UP,
-            DOWN,
-        };
-
+        /** @brief The service's state */
         State state;
 
+        /** @brief The service's name */
         std::string name;
+
+        /** @brief The name of the host that runs the service */
         std::string hostname;
 
+        /** @brief The simulation */
         Simulation *simulation;
-
-
 
         /***********************/
         /** \endcond           */

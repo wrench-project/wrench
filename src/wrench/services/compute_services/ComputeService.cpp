@@ -68,7 +68,8 @@ namespace wrench {
      *
      * @param job_type: the job type
      * @param min_num_cores: the minimum number of cores required
-     * @param duration: the duration in seconds
+     * @param flops: the flops
+     *
      * @return true if the compute service can run the job, false otherwise
      */
     bool ComputeService::canRunJob(WorkflowJob::Type job_type,

@@ -22,10 +22,19 @@ namespace wrench {
     class ComputeService;
     class WorkflowJob;
 
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
+    /**
+     * @brief A class to describe all kinds of failures that can occur during
+     *        workflow execution
+     */
     class WorkflowExecutionFailureCause {
 
     public:
 
+        /** @brief Types of failure causes */
         enum Cause {
             NO_STORAGE_SERVICE_FOR_FILE,
             FILE_NOT_FOUND,
@@ -42,11 +51,14 @@ namespace wrench {
 
         Cause getCause();
 
-    protected:
+    private:
         Cause cause;
     };
 
 
+    /**
+     * @brief Workflow Execution Failure: File cannot be found anywhere
+     */
     class NoStorageServiceForFile : public WorkflowExecutionFailureCause {
 
     public:
@@ -59,7 +71,9 @@ namespace wrench {
         WorkflowFile *file;
     };
 
-
+    /**
+     * @brief Workflow Execution Failure: File is not found
+     */
     class FileNotFound : public WorkflowExecutionFailureCause {
 
     public:
@@ -75,6 +89,9 @@ namespace wrench {
         StorageService *storage_service;
     };
 
+    /**
+     * @brief Workflow Execution Failure: No space left on storage
+     */
     class StorageServiceFull : public WorkflowExecutionFailureCause {
 
     public:
@@ -90,6 +107,9 @@ namespace wrench {
         StorageService *storage_service;
     };
 
+    /**
+     * @brief Workflow Execution Failure: Service is down
+     */
     class ServiceIsDown : public WorkflowExecutionFailureCause {
     public:
         ServiceIsDown(Service *service);
@@ -100,6 +120,9 @@ namespace wrench {
         Service *service;
     };
 
+    /**
+     * @brief Workflow Execution Failure: Compute service does not support job type
+     */
     class JobTypeNotSupported : public WorkflowExecutionFailureCause {
     public:
         JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service);
@@ -112,6 +135,9 @@ namespace wrench {
         ComputeService *compute_service;
     };
 
+    /**
+     * @brief Workflow Execution Failure: Compute service doesn't have enough cores
+     */
     class NotEnoughCores : public WorkflowExecutionFailureCause {
     public:
         NotEnoughCores(WorkflowJob *job, ComputeService *compute_service);
@@ -124,6 +150,9 @@ namespace wrench {
         ComputeService *compute_service;
     };
 
+    /**
+     * @brief Workflow Execution Failure: Network error (or endpoint failure)
+     */
     class NetworkError : public WorkflowExecutionFailureCause {
     public:
         NetworkError();
@@ -131,6 +160,10 @@ namespace wrench {
 
     private:
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 };
 
 

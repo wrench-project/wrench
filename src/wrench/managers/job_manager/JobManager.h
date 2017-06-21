@@ -33,9 +33,8 @@ namespace wrench {
 
 
 		/**
-		 * @brief A  facility for managing pilot
- 		 *     jobs submitted by a WMS Engine to compute services.
-		 */
+     * @brief A helper daemon (co-located with the WMS) to handle jobs
+     */
 		class JobManager : public S4U_DaemonWithMailbox {
 
 		public:

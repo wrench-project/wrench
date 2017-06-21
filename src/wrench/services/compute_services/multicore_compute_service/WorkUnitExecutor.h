@@ -29,6 +29,9 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    /**
+     * @brief An actor that knows how to perform a work unit
+     */
     class WorkUnitExecutor : public S4U_DaemonWithMailbox {
 
     public:
@@ -39,9 +42,11 @@ namespace wrench {
                      StorageService *default_storage_service,
                      double startup_overhead = 0.0);
 
-        WorkUnit *work;
 
         void kill();
+
+        /** @brief The WorkUnit this WorkUnitExecutor is supposed to perform */
+        WorkUnit *work;
 
     private:
         int main();
