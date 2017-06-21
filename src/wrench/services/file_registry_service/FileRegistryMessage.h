@@ -36,7 +36,9 @@ namespace wrench {
     public:
         FileRegistryFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The file to lookup */
         WorkflowFile *file;
     };
 
@@ -47,7 +49,9 @@ namespace wrench {
     public:
         FileRegistryFileLookupAnswerMessage(WorkflowFile *file, std::set<StorageService*> locations, double payload);
 
+        /** @brief The file that was looked up */
         WorkflowFile *file;
+        /** @brief The (possibly empty) set of storage services where the file was found */
         std::set<StorageService*> locations;
     };
 
@@ -58,8 +62,11 @@ namespace wrench {
     public:
         FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *storage_service, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The file whose entry to remove */
         WorkflowFile *file;
+        /** @brief The storage service */
         StorageService *storage_service;
     };
 
@@ -70,6 +77,7 @@ namespace wrench {
     public:
         FileRegistryRemoveEntryAnswerMessage(bool success, double payload);
 
+        /** @brief Whether the remove entry operation was successful or not */
         bool success;
     };
 
@@ -80,8 +88,11 @@ namespace wrench {
     public:
         FileRegistryAddEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *storage_service, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The file for which to add an entry */
         WorkflowFile *file;
+        /** @brief The storage service */
         StorageService *storage_service;
     };
 

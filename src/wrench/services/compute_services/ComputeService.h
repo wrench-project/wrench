@@ -74,9 +74,12 @@ namespace wrench {
 
     protected:
 
+        /** @brief Whether the compute service supports pilot jobs */
         bool supports_pilot_jobs;
+        /** @brief Whether the compute service supports standard jobs */
         bool supports_standard_jobs;
 
+        /** @brief The default storage service associated to the compute service (nullptr if none) */
         StorageService *default_storage_service;
 
         /***********************/

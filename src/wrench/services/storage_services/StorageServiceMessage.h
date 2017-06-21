@@ -207,9 +207,13 @@ namespace wrench {
                                             WorkflowExecutionFailureCause *failure_cause,
                                             double payload);
 
+        /** @brief The file that was read */
         WorkflowFile *file;
+        /** @brief The storage service on which the file was read */
         StorageService *storage_service;
+        /** @brief Whether the read operation was successful or not */
         bool success;
+        /** @brief The cause of the failure, or nullptr on success */
         WorkflowExecutionFailureCause *failure_cause;
     };
 
@@ -220,6 +224,7 @@ namespace wrench {
     public:
         StorageServiceFileContentMessage(WorkflowFile *file);
 
+        /** @brief The file */
         WorkflowFile *file;
     };
 

@@ -32,118 +32,143 @@ namespace wrench {
     };
 
     /**
-     * @brief "JOB_TYPE_NOT_SUPPORTED" SimulationMessage class
+     * @brief ComputeServiceJobTypeNotSupportedMessage class
      */
     class ComputeServiceJobTypeNotSupportedMessage : public ComputeServiceMessage {
     public:
         ComputeServiceJobTypeNotSupportedMessage(WorkflowJob *, ComputeService *, double payload);
 
+        /** @brief The job that's not supported */
         WorkflowJob *job;
+        /** @brief The compute service that does not support it */
         ComputeService *compute_service;
     };
 
     /**
- * @brief "SUBMIT_STANDARD_JOB_REQUEST" SimulationMessage class
+ * @brief ComputeServiceSubmitStandardJobRequestMessage class
  */
     class ComputeServiceSubmitStandardJobRequestMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitStandardJobRequestMessage(std::string answer_mailbox, StandardJob *, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The submitted job */
         StandardJob *job;
     };
 
     /**
-     * @brief "SUBMIT_STANDARD_JOB_ANSWER" SimulationMessage class
+     * @brief ComputeServiceSubmitStandardJobAnswerMessage class
      */
     class ComputeServiceSubmitStandardJobAnswerMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitStandardJobAnswerMessage(StandardJob *, ComputeService *, bool success, WorkflowExecutionFailureCause *failure_cause, double payload);
 
+        /** @brief The standard job that was submitted */
         StandardJob *job;
+        /** @brief The compute service to which the job was submitted */
         ComputeService *compute_service;
+        /** @brief Whether to job submission was successful */
         bool success;
+        /** @brief The cause of the failure, or nullptr on success */
         WorkflowExecutionFailureCause *failure_cause;
     };
 
     /**
-     * @brief "STANDARD_JOB_DONE" SimulationMessage class
+     * @brief ComputeServiceStandardJobDoneMessage class
      */
     class ComputeServiceStandardJobDoneMessage : public ComputeServiceMessage {
     public:
         ComputeServiceStandardJobDoneMessage(StandardJob *, ComputeService *, double payload);
 
+        /** @brief The job that completed */
         StandardJob *job;
+        /** @brief The compute service that completed the job */
         ComputeService *compute_service;
     };
 
     /**
-     * @brief "STANDARD_JOB_FAILED" SimulationMessage class
+     * @brief ComputeServiceStandardJobFailedMessage class
      */
     class ComputeServiceStandardJobFailedMessage : public ComputeServiceMessage {
     public:
         ComputeServiceStandardJobFailedMessage(StandardJob *, ComputeService *, WorkflowExecutionFailureCause *, double payload);
 
+        /** @brief The job that failed */
         StandardJob *job;
+        /** @brief The compute service on which the job failed */
         ComputeService *compute_service;
+        /** @brief The cause of the failure */
         WorkflowExecutionFailureCause *cause;
     };
 
     /**
-     * @brief "SUBMIT_PILOT_REQUEST_JOB" SimulationMessage class
+     * @brief ComputeServiceSubmitPilotJobRequestMessage class
      */
     class ComputeServiceSubmitPilotJobRequestMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitPilotJobRequestMessage(std::string answer_mailbox, PilotJob *, double payload);
 
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The submitted pilot job */
         PilotJob *job;
     };
 
     /**
-    * @brief "SUBMIT_PILOT_ANSWER_JOB" SimulationMessage class
+    * @brief ComputeServiceSubmitPilotJobAnswerMessage class
     */
     class ComputeServiceSubmitPilotJobAnswerMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitPilotJobAnswerMessage(PilotJob *, ComputeService *, bool success, WorkflowExecutionFailureCause *, double payload);
 
+        /** @brief The submitted pilot job */
         PilotJob *job;
+        /** @brief The compute service to which the job was submitted */
         ComputeService *compute_service;
+        /** @brief Whether the job submission was successful or not */
         bool success;
+        /** @brief The cause of the failure, or nullptr on success */
         WorkflowExecutionFailureCause *failure_cause;
     };
 
 
     /**
-     * @brief "PILOT_JOB_STARTED" SimulationMessage class
+     * @brief ComputeServicePilotJobStartedMessage class
      */
     class ComputeServicePilotJobStartedMessage : public ComputeServiceMessage {
     public:
         ComputeServicePilotJobStartedMessage(PilotJob *, ComputeService *, double payload);
 
+        /** @brief The pilot job that just started */
         PilotJob *job;
+        /** @brief The compute service that just started the pilot job */
         ComputeService *compute_service;
     };
 
     /**
-     * @brief "PILOT_JOB_EXPIRED" SimulationMessage class
+     * @brief ComputeServicePilotJobExpiredMessage class
      */
     class ComputeServicePilotJobExpiredMessage : public ComputeServiceMessage {
     public:
         ComputeServicePilotJobExpiredMessage(PilotJob *, ComputeService *, double payload);
 
+        /** @brief The pilot job that expired */
         PilotJob *job;
+        /** @brief The compute service on which the pilot job expired */
         ComputeService *compute_service;
     };
 
     /**
-     * @brief "PILOT_JOB_FAILED" SimulationMessage class
+     * @brief ComputeServicePilotJobFailedMessage class
      */
     class ComputeServicePilotJobFailedMessage : public ComputeServiceMessage {
     public:
         ComputeServicePilotJobFailedMessage(PilotJob *, ComputeService *, double payload);
 
+        /** @brief The pilot job that failed */
         PilotJob *job;
+        /** @brief The compute service on which the pilot job failed */
         ComputeService *compute_service;
     };
 

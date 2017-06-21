@@ -65,6 +65,7 @@ namespace wrench {
     public:
         MulticoreComputeServiceNumCoresAnswerMessage(unsigned int num, double payload);
 
+        /** @brief The number of cores */
         unsigned int num_cores;
     };
 
@@ -86,6 +87,7 @@ namespace wrench {
     public:
         MulticoreComputeServiceNumIdleCoresAnswerMessage(unsigned int num, double payload);
 
+        /** @brief The number of idle cores */
         unsigned int num_idle_cores;
     };
 
@@ -107,6 +109,7 @@ namespace wrench {
     public:
         MulticoreComputeServiceTTLAnswerMessage(double ttl, double payload);
 
+        /** @brief The time-to-live */
         double ttl;
     };
 
@@ -128,6 +131,7 @@ namespace wrench {
     public:
         MulticoreComputeServiceFlopRateAnswerMessage(double flop_rate, double payload);
 
+        /** @brief The flop rate */
         double flop_rate;
     };
 
@@ -140,6 +144,7 @@ namespace wrench {
                 WorkUnit *work,
                 double payload);
 
+        /** @brief The work to be performed */
         WorkUnit *work;
     };
 
@@ -153,7 +158,9 @@ namespace wrench {
                 WorkUnit *work_unit,
                 double payload);
 
+        /** @brief The worker thread that performed the work */
         WorkUnitExecutor *worker_thread;
+        /** @brief The work that was performed */
         WorkUnit *work;
 
     };
@@ -169,8 +176,11 @@ namespace wrench {
                 WorkflowExecutionFailureCause *cause,
                 double payload);
 
+        /** @brief The worker thread that failed to perform the work */
         WorkUnitExecutor *worker_thread;
+        /** @brief The work that failed */
         WorkUnit *work;
+        /** @brief The cause of the failure */
         WorkflowExecutionFailureCause *cause;
     };
 

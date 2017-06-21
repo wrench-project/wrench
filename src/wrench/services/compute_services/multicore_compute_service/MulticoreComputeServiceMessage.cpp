@@ -13,14 +13,20 @@
 
 namespace wrench {
 
+    /**
+     * @brief Constructor
+     *
+     * @param name: the message name
+     * @param payload: the message size in bytes
+     */
     MulticoreComputeServiceMessage::MulticoreComputeServiceMessage(std::string name, double payload) :
             ComputeServiceMessage("ComputeServiceMessage::" + name, payload) {
     }
 
     /**
      * @brief Constructor
-     * @param job: pointer to a WorkflowJob
-     * @param cs: points to a ComputeService
+     * @param job: the workflow job
+     * @param cs: the compute service
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -38,7 +44,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
-    * @param payload: message size in bytes
+    * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
@@ -55,7 +61,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param num: number of cores
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -66,7 +72,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which to send the answer
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -82,7 +88,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param num: number of idle cores
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -93,7 +99,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which to send the answer
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -109,7 +115,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param ttl: time-to-live, in seconds (-1 means infinity)
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -119,7 +125,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
-    * @param payload: message size in bytes
+    * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
@@ -152,7 +158,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param work: the work to be done
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      */
     WorkerThreadDoWorkRequestMessage::WorkerThreadDoWorkRequestMessage(
             WorkUnit *work,
@@ -167,7 +173,7 @@ namespace wrench {
      * @brief Constructor
      * @param worker_thread: the worker thread on which the work was performed
      * @param work: the work unit that was performed
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      */
     WorkerThreadWorkDoneMessage::WorkerThreadWorkDoneMessage(
             WorkUnitExecutor *worker_thread,
@@ -185,7 +191,7 @@ namespace wrench {
      * @param worker_thread: the worker thread on which the work was performed
      * @param work: the work unit that was performed (and failed)
      * @param cause: the cause of the failure
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      */
     WorkerThreadWorkFailedMessage::WorkerThreadWorkFailedMessage(
             WorkUnitExecutor *worker_thread,

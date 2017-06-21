@@ -37,6 +37,7 @@ namespace wrench {
     class StandardJob : public WorkflowJob {
 
     public:
+        /** @brief Standad job states */
         enum State {
             NOT_SUBMITTED,
             PENDING,
@@ -56,12 +57,18 @@ namespace wrench {
         std::map<WorkflowFile *, StorageService *> getFileLocations();
 
         // Tasks to run
+        /** @brief The job's computational tasks */
         std::vector<WorkflowTask *> tasks;
+        /** @brief The number of computational tasks that have completed */
         unsigned long num_completed_tasks;
+        /** @brief The file locations that tasks should read/write files from/to */
         std::map<WorkflowFile *, StorageService *> file_locations;
 
+        /** @brief The file copy operations to perform before computational tasks */
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
+        /** @brief The file copy operations to perform after computational tasks */
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
+        /** @brief The file deletion operations to perform at the end */
         std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
 
         ~StandardJob();
@@ -73,7 +80,6 @@ namespace wrench {
                     std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                     std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                     std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
-
 
         State state;
 
