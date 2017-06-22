@@ -172,7 +172,7 @@ namespace wrench {
      * @param file: a file
      * @param storage_service: a storage service
      *
-     * @throw
+     * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */

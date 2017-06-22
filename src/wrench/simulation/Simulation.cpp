@@ -21,8 +21,11 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 
 namespace wrench {
 
-    /* Exception handler to catch SIGABRT signals from SimGrid (which should
+    /**
+     * @brief Exception handler to catch SIGABRT signals from SimGrid (which should
      * probably throw exceptions at some point)
+     *
+     * @param signal: the signal number
      */
     void signal_handler(int signal) {
       if (signal == SIGABRT) {
@@ -195,11 +198,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Adds a ComputeService to the simulation
+     * @brief Add a ComputeService to the simulation
      *
-     * @param executor: a unique pointer to a ComputeService object, the ownership of which is
-     *        then transferred to WRENCH
-     * @return a raw pointer to the ComputeService object
+     * @param service: a compute service
+     *
+     * @return (a raw pointer to) the compute service
      *
      * @throw std::runtime_error
      */
@@ -216,11 +219,10 @@ namespace wrench {
     }
 
     /**
-    * @brief Adds a StorageService to the simulation
+    * @brief Add a StorageService to the simulation
     *
-    * @param executor: a unique pointer to a StorageService object, the ownership of which is
-    *        then transferred to WRENCH
-    * @return a raw pointer to the StorageService object
+    * @param service: a storage service
+    * @return (a raw pointer to) the storage service
      *
     * @throw std::runtime_error
     */
@@ -239,8 +241,8 @@ namespace wrench {
     /**
      * @brief Set a WMS for the simulation
      *
-     * @param wms: a unique pointer to a WMS object
-     * @return a raw pointer to the WMS object
+     * @param wms: a WMS
+     * @return (a raw pointer to) the WMS
      *
      * @throw std::runtime_error
      */
@@ -257,7 +259,7 @@ namespace wrench {
     /**
      * @brief Set a FileRegistryService for the simulation
      *
-     * @param file_registry_service: a unique pointer to a FileRegistryService object
+     * @param file_registry_service: a file registry service
      */
     void Simulation::setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service) {
       this->file_registry_service = std::move(file_registry_service);
@@ -266,7 +268,7 @@ namespace wrench {
     /**
      * @brief Obtain the list of compute services
      *
-     * @return a vector of raw pointers to ComputeService objects
+     * @return a vector of compute services
      */
     std::set<ComputeService *> Simulation::getRunningComputeServices() {
       std::set<ComputeService *> set = {};
@@ -293,7 +295,7 @@ namespace wrench {
     /**
     * @brief Obtain the list of storage services
     *
-    * @return a vector of raw pointers to StorageService objects
+    * @return a vector of storage services
     */
     std::set<StorageService *> Simulation::getRunningStorageServices() {
       std::set<StorageService *> set = {};
@@ -320,7 +322,7 @@ namespace wrench {
     /**
      * @brief Retrieves the FileRegistryService
      *
-     * @return a raw pointer to the FileRegistryService instance, if any
+     * @return a file registry service, or nullptr
      */
     FileRegistryService *Simulation::getFileRegistryService() {
       return this->file_registry_service.get();
@@ -330,8 +332,8 @@ namespace wrench {
     /**
      * @brief Stage a copy of a file on a storage service
      *
-     * @param file: a raw pointer to a WorkflowFile object
-     * @param storage_service: a raw pointer to a StorageService object
+     * @param file: a file
+     * @param storage_service: a storage service
      *
      * @throw std::runtime_error
      * @throw std::invalid_argument
@@ -366,8 +368,8 @@ namespace wrench {
     /**
    * @brief Stage a set of a file copies on a storage service
      *
-   * @param files: a set of raw pointers to WorkflowFile objects
-   * @param storage_service: a raw pointer to a StorageService object
+   * @param files: a set of files
+   * @param storage_service: a storage service
    *
    * @throw std::runtime_error
    * @throw std::invalid_argument

@@ -22,7 +22,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level SimuationMessage class
+     * @brief Top-level SimulationMessage class
      */
     class ServiceMessage : public SimulationMessage {
     protected:
@@ -31,17 +31,18 @@ namespace wrench {
     };
 
     /**
-     * @brief "STOP_DAEMON" SimulationMessage class
+     * @brief ServiceStopDaemonMessage class
      */
     class ServiceStopDaemonMessage : public ServiceMessage {
     public:
         ServiceStopDaemonMessage(std::string ack_mailbox, double payload);
 
+        /** @brief the mailbox to which the "I stopped" ack should be sent */
         std::string ack_mailbox;
     };
 
     /**
-     * @brief "DAEMON_STOPPED" SimulationMessage class
+     * @brief ServiceDaemonStoppedMessage class
      */
     class ServiceDaemonStoppedMessage : public ServiceMessage {
     public:

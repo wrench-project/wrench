@@ -32,7 +32,9 @@ namespace wrench {
 
         virtual std::string getName();
 
+        /** @brief The message name */
         std::string name;
+        /** @brief The message size in bytes */
         double payload;
     };
 

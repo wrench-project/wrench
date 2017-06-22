@@ -42,7 +42,7 @@ namespace wrench {
     /**
      * @brief A blocking method to receive a message from a mailbox
      *
-     * @param mailbox: the mailbox name
+     * @param mailbox_name: the mailbox name
      * @return a unique pointer to the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std:runtime_error
@@ -74,7 +74,7 @@ namespace wrench {
     /**
      * @brief A blocking method to receive a message from a mailbox, with a timeout
      *
-     * @param mailbox: the mailbox name
+     * @param mailbox_name: the mailbox name
      * @param timeout:  a timeout value in seconds
      * @return a unique pointer to the message, or nullptr (in which case it's likely a brutal termination)
      *
@@ -94,14 +94,14 @@ namespace wrench {
           throw std::runtime_error("timeout");
         }
         if (e.category == network_error) {
-          WRENCH_INFO("Network error while doing a getMessage() with timeout. Likely the sender has died");
+          WRENCH_INFO("Network error while doing a getMessage() with timeout. Likely the sender has died.");
           throw std::runtime_error("network_error");
         }
       }
 
       // This is just because it seems that after something like a killAll() we get a nullptr
       if (data == nullptr) {
-        WRENCH_INFO("Network error while doing a getMessage() with timeout. Got a nullptr...");
+        WRENCH_INFO("Network error while doing a getMessage() with timeout (got a nullptr).");
         throw std::runtime_error("network_error");
       }
 
@@ -115,8 +115,8 @@ namespace wrench {
     /**
      * @brief A blocking method to send a message to a mailbox
      *
-     * @param mailbox: the mailbox name
-     * @param m: the SimulationMessage
+     * @param mailbox_name: the mailbox name
+     * @param msg: the SimulationMessage
      *
      * @throw std::runtime_error:  ("network_error")
      */
@@ -127,7 +127,7 @@ namespace wrench {
       simgrid::s4u::this_actor::send(mailbox, msg, (size_t) msg->payload);
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
-          WRENCH_INFO("Network error while doing a getMessage() with timeout. Got a nullptr...");
+          WRENCH_INFO("Network error while doing a putMessage)");
           throw std::runtime_error("network_error");
         }
       }
@@ -138,8 +138,8 @@ namespace wrench {
     /**
      * @brief A non-blocking method to send a message to a mailbox
      *
-     * @param mailbox: the mailbox name
-     * @param m: the SimulationMessage
+     * @param mailbox_name: the mailbox name
+     * @param msg: the SimulationMessage
      *
      * @throw std::runtime_error:  ("network_error")
      */
@@ -154,7 +154,7 @@ namespace wrench {
         comm = simgrid::s4u::Comm::send_async(mailbox, msg, (int) msg->payload);
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
-          WRENCH_INFO("Network error while doing a getMessage() with timeout. Got a nullptr...");
+          WRENCH_INFO("Network error while doing a dputMessage()");
           throw std::runtime_error("network_error");
         }
       }

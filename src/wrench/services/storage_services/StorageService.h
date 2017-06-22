@@ -75,9 +75,6 @@ namespace wrench {
                        std::string data_mailbox_name_prefix,
                        double capacity);
 
-        /***********************/
-        /** \endcond          **/
-        /***********************/
 
     protected:
 
@@ -87,9 +84,16 @@ namespace wrench {
 
         void removeFileFromStorage(WorkflowFile *);
 
+        /** @brief The set of files stored on the storage service */
         std::set<WorkflowFile *> stored_files;
+        /** @brief The storage service's capacity */
         double capacity;
+        /** @brief The storage service's occupied space */
         double occupied_space = 0;
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
     private:
 

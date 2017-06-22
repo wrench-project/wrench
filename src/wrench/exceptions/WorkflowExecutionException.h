@@ -57,7 +57,7 @@ namespace wrench {
 
 				/**
 				 * @brief Constructor
-				 * @param service_name: the service name
+				 * @param cause: the cause of the failure
 				 */
 				WorkflowExecutionException(WorkflowExecutionFailureCause *cause) {
 					this->cause = cause;

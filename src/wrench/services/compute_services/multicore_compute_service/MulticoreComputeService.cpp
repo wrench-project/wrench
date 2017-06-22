@@ -86,8 +86,7 @@ namespace wrench {
     /**
      * @brief Asynchronously submit a pilot job to the compute service
      *
-     * @param task: a pointer the PilotJob object
-     * @param callback_mailbox: the name of a mailbox to which a "pilot job started" callback will be sent
+     * @param job: a pilot job
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error

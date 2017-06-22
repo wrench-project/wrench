@@ -35,6 +35,9 @@ namespace wrench {
 
 				S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix);
 				void start(std::string hostname);
+				/** @brief The daemon's main routine
+				 * @return 0 on success, !=0 otherwise
+				 */
 				virtual int main() = 0;
 				void kill_actor();
         void setTerminated();

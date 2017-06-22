@@ -609,11 +609,13 @@ namespace wrench {
     /**
      * @brief Asynchronously asks the storage service to read a file from another storage service
      *
+     * @param answer_mailbox: the mailbox to which a notification message will be sent
      * @param file: the file
      * @param src: the storage service from which to read the file
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
+     * @throw std::runtime_error
      *
      */
     void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file, StorageService *src) {

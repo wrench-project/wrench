@@ -36,10 +36,17 @@ namespace wrench {
 
     public:
 
+        /**
+         * @brief Constructor
+         * @param d: a "daemon with mailbox" instance
+         */
         explicit S4U_DaemonWithMailboxActor(S4U_DaemonWithMailbox *d) {
           this->daemon = d;
         }
 
+        /**
+         * @brief The S4U way of doing things
+         */
         void operator()() {
           try {
             this->daemon->main();

@@ -12,11 +12,22 @@
 
 namespace wrench {
 
+    /**
+     * @brief Constructor
+     * @param name: the message name
+     * @param payload: the message size in bytes
+     */
     FileRegistryMessage::FileRegistryMessage(std::string name, double payload) :
             ServiceMessage("FileRegistry::" + name, payload) {
 
     }
 
+    /**
+     * @brief FileRegistryFileLookupRequestMessage class
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param file: the file to look up
+     * @param payload: the message size in bytes
+     */
     FileRegistryFileLookupRequestMessage::FileRegistryFileLookupRequestMessage(std::string answer_mailbox,
                                                                                WorkflowFile *file, double payload) :
             FileRegistryMessage("FILE_LOOKUP_REQUEST", payload) {
@@ -28,6 +39,12 @@ namespace wrench {
       this->file = file;
     }
 
+    /**
+     * @brief FileRegistryFileLookupAnswerMessage class
+     * @param file: the file that was looked up
+     * @param locations: the set of storage services where the file is located
+     * @param payload: the message size in bytes
+     */
     FileRegistryFileLookupAnswerMessage::FileRegistryFileLookupAnswerMessage(WorkflowFile *file,
                                                                              std::set<StorageService *> locations,
                                                                              double payload) :
@@ -40,6 +57,13 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief FileRegistryRemoveEntryRequestMessage class
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param file: the file in the entry to remove
+     * @param storage_service: the storage service in the entry to remove
+     * @param payload: the message size in bytes
+     */
     FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox,
                                                                                  WorkflowFile *file,
                                                                                  StorageService *storage_service,
@@ -54,12 +78,24 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief FileRegistryRemoveEntryAnswerMessage class
+     * @param success: whether the entry removal was successful
+     * @param payload: the message size in bytes
+     */
     FileRegistryRemoveEntryAnswerMessage::FileRegistryRemoveEntryAnswerMessage(bool success,
                                                                                double payload) :
             FileRegistryMessage("REMOVE_ENTRY_ANSWER", payload) {
       this->success = success;
     }
 
+    /**
+     * @brief FileRegistryAddEntryRequestMessage class
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param file: the file in the entry to add
+     * @param storage_service: the storage service in the entry to add
+     * @param payload: the message size in bytes
+     */
     FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(std::string answer_mailbox,
                                                                            WorkflowFile *file,
                                                                            StorageService *storage_service,
@@ -74,6 +110,10 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief FileRegistryAddEntryAnswerMessage class
+     * @param payload: the message size in bytes
+     */
     FileRegistryAddEntryAnswerMessage::FileRegistryAddEntryAnswerMessage(double payload) :
             FileRegistryMessage("ADD_ENTRY_ANSWER", payload) {
     }

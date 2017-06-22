@@ -29,7 +29,7 @@ namespace wrench {
     /**
      * @brief A template class to represent a trace of timestamps
      *
-     * @tparamt T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+     * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
      */
     template <class T> class SimulationTrace : public GenericSimulationTrace  {
 
@@ -39,7 +39,7 @@ namespace wrench {
          * @brief Append a timestamp to the trace
          *
          * @param timestamp: a pointer to a SimulationTimestamp<T> object
-         * @paramt T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          */
         void addTimestamp(SimulationTimestamp<T> *timestamp) {
           this->trace.push_back(timestamp);
@@ -48,7 +48,7 @@ namespace wrench {
         /**
          * @brief Retrieve the trace as a vector of timestamps
          *
-         * @paramt T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          * @return a vector of pointers to SimulationTimestamp<T> objects
          */
         std::vector<SimulationTimestamp<T> *> getTrace() {

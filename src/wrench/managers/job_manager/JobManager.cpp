@@ -117,7 +117,7 @@ namespace wrench {
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
      *
-     * @return a raw pointer to the StandardJob
+     * @return a raw pointer to the standard job
      *
      * @throw std::invalid_argument
      */
@@ -134,8 +134,9 @@ namespace wrench {
      * @brief Create a standard job
      *
      * @param task: a task
+     * @param file_locations: the locations where the task should read/write files
      *
-     * @return a raw pointer to the StandardJob
+     * @return a raw pointer to the standard job
      *
      * @throw std::invalid_argument
      */
@@ -157,7 +158,7 @@ namespace wrench {
      * @param workflow: a pointer to a Workflow
      * @param num_cores: the number of cores required by the PilotJob
      * @param duration: the PilotJob duration in seconds
-     * @return a raw pointer to the PilotJob
+     * @return a raw pointer to the pilot job
      *
      * @throw std::invalid_argument
      */

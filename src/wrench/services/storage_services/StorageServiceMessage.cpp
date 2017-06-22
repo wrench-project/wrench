@@ -13,6 +13,11 @@
 
 namespace wrench {
 
+    /**
+     * @brief Constructor
+     * @param name: the message name
+     * @param payload: the message size in bytes
+     */
     StorageServiceMessage::StorageServiceMessage(std::string name, double payload) :
             ServiceMessage("StorageService::" + name, payload) {
 
@@ -53,6 +58,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
+    * @param file: the file
     * @param payload: message size in bytes
     *
     * @throw std::invalid_argument
@@ -71,6 +77,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param file: the file
      * @param file_is_available: true if the file is available on the storage system
      * @param payload: message size in bytes
      *
@@ -89,6 +96,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which to send the answer
+     * @param file: the file
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -107,6 +115,9 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param file: the file to delete
+     * @param storage_service: the storage service on which to delete it
+     * @param success: whether the deletion was successful
      * @param failure_cause: the cause of a failure (nullptr means "no failure")
      * @param payload: message size in bytes
      *
@@ -195,6 +206,10 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file
+     * @param storage_service: the storage service
+     * @param success: whether the write operation succeeded
+     * @param failure_cause: the cause of the failure (nullptr if success)
+     * @param data_write_mailbox_name: the mailbox to which file content should be sent
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -240,6 +255,9 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param file: the file
+     * @param storage_service: the storage service
+     * @param success: whether the read operation was successful
+     * @param failure_cause: the cause of the failure (or nullptr on success)
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -263,7 +281,6 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param file: the workflow data file
-    * @param payload: message size in bytes
     */
     StorageServiceFileContentMessage::StorageServiceFileContentMessage(WorkflowFile *file) : StorageServiceMessage(
             "FILE_CONTENT", file->getSize()) {

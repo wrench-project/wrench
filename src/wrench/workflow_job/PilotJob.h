@@ -27,6 +27,8 @@ namespace wrench {
     class PilotJob : public WorkflowJob {
 
     public:
+
+        /** @brief Pilot job states */
         enum State {
             NOT_SUBMITTED,
             PENDING,
