@@ -21,7 +21,7 @@
 namespace wrench {
 
     /**
-     * @brief A class that provides means to access post-mortem simulation-generated data
+     * @brief The post-mortem simulation-generated data
      */
     class SimulationOutput {
 

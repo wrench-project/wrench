@@ -16,7 +16,7 @@
 namespace wrench {
 
     /**
-     * @brief Class that specifies properties for a ComputeService
+     * @brief Properties for a ComputeService
      */
     class ComputeServiceProperty : public ServiceProperty {
     public:

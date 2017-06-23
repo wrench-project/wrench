@@ -17,11 +17,6 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER   **/
-    /***********************/
-
-    /* Forward References */
 
     class Simulation;
 
@@ -37,6 +32,10 @@ namespace wrench {
     class ComputeService : public Service {
 
     public:
+
+        /***********************/
+        /** \cond DEVELOPER   **/
+        /***********************/
 
         void stop();
 

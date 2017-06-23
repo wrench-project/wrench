@@ -21,7 +21,7 @@
 namespace wrench {
 
     /**
-     * @brief class to represent a task in a Workflow
+     * @brief Abstraction for3 a task in a Workflow
      */
     class WorkflowTask {
 

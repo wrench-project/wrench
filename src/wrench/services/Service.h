@@ -22,7 +22,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief A top-level service class
+     * @brief A top-level class that defines a service
      */
     class Service : public S4U_DaemonWithMailbox {
 

@@ -20,15 +20,12 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER   **/
-    /***********************/
-
     class Simulation;
 
     class WorkflowFile;
 
     class WorkflowExecutionFailureCause;
+
 
     /**
      * @brief Abstract implementation of a storage service.
@@ -36,6 +33,10 @@ namespace wrench {
     class StorageService : public Service {
 
     public:
+
+    /***********************/
+    /** \cond DEVELOPER   **/
+    /***********************/
 
         void stop();
 

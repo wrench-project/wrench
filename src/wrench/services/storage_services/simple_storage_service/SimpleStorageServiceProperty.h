@@ -16,7 +16,7 @@
 namespace wrench {
 
    /**
-    * @brief Class that specifies properties for a SimpleStorageService
+    * @brief Properties for a SimpleStorageService
     */
     class SimpleStorageServiceProperty : public StorageServiceProperty {
     public:

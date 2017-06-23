@@ -16,7 +16,7 @@ namespace wrench {
     class WorkflowTask;
 
     /**
-    * @brief A class to represent the content of a "task completion" simulation event
+    * @brief A "task completion" simulation timestamp
     */
     class SimulationTimestampTaskCompletion {
 

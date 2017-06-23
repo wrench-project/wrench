@@ -17,7 +17,7 @@
 namespace wrench {
 
     /**
-     * @brief A templated class to represent a simulation timestamp
+     * @brief A simulation-generated timestamp
      *
      * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
      */

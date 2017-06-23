@@ -26,8 +26,7 @@ namespace wrench {
     class StorageService;
 
     /**
-     * @brief A class that keeps track of
-    *  the simulation state.
+     * @brief The simulation state
      */
     class Simulation {
 

@@ -17,7 +17,7 @@
 namespace wrench {
 
     /**
-     * @brief Implementation a simple storage service
+     * @brief Implementation a simple StorageService
      */
     class SimpleStorageService : public StorageService {
 

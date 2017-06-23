@@ -20,8 +20,12 @@ namespace wrench {
     class WorkflowFile;
     class StorageService;
 
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
+
     /**
-     * @brief A helper daemon (co-located with the WMS) to handle data movement operations
+     * @brief A helper daemon (co-located with a WMS) to handle data movement operations
      */
     class DataMovementManager : public S4U_DaemonWithMailbox {
 
