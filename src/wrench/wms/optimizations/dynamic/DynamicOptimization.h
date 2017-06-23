@@ -20,7 +20,7 @@ namespace wrench {
     /***********************/
 
     /**
-     *  @brief An abstract static optimization class
+     *  @brief An abstract dynamic optimization class
      */
     class DynamicOptimization {
     public:

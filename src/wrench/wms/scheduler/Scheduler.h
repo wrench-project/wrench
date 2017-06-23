@@ -20,16 +20,16 @@ namespace wrench {
 
     class JobManager;
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
-
     /**
-     * @brief A (mostly) abstract implementation of a scheduler
+     * @brief A workflow scheduler
      */
     class Scheduler {
 
+
     public:
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
         virtual void scheduleTasks(JobManager *job_manager,
                                    std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                                    const std::set<ComputeService *> &compute_services) = 0;
@@ -40,11 +40,11 @@ namespace wrench {
                                        const std::set<ComputeService *> &compute_services);
 
         static double getTotalFlops(std::vector<WorkflowTask *> tasks);
-    };
-
     /***********************/
     /** \endcond           */
     /***********************/
+    };
+
 
 }
 

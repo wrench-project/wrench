@@ -15,9 +15,6 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
 
     /**
      *  @brief A simple task clustering algorithm to group tasks in a pipeline
@@ -25,15 +22,18 @@ namespace wrench {
     class SimplePipelineClustering : public StaticOptimization {
     public:
 
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
         void process(Workflow *workflow);
 
     private:
         WorkflowTask *getTask(std::vector<WorkflowTask *> tasks);
-    };
-
     /***********************/
     /** \endcond           */
     /***********************/
+    };
+
 }
 
 #endif //WRENCH_SIMPLETASKCLUSTERING_H

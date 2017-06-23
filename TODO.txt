@@ -20,7 +20,7 @@ DATA STORAGE IMPLEMENTATION:
     - Track all task change updates and make sure they're all in the JobManager...
 
     - Chase memory leaks
-        - Cause/Exception unique_ptr?
+        - CauseType/Exception unique_ptr?
 
 ------------------------------------
 

@@ -50,7 +50,7 @@ namespace wrench {
     /**
      * @brief Add an output file to the task
      *
-     * @param f: the file
+     * @param file: the file
      */
     void WorkflowTask::addOutputFile(WorkflowFile *file) {
       WRENCH_DEBUG("Adding file '%s' as output t task %s",

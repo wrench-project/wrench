@@ -14,16 +14,19 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
 
     /**
-     * @brief A max-min Scheduler class
+     * @brief A max-min Scheduler
      */
     class MaxMinScheduler : public Scheduler {
 
+
     public:
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
         void scheduleTasks(JobManager *job_manager,
                            std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                            const std::set<ComputeService *> &compute_services);
@@ -33,11 +36,11 @@ namespace wrench {
             bool operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
                             std::pair<std::string, std::vector<WorkflowTask *>> &rhs);
         };
-    };
-
     /***********************/
     /** \endcond           */
     /***********************/
+    };
+
 
 }
 

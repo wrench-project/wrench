@@ -27,7 +27,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A class to describe all kinds of failures that can occur during
+     * @brief A top-level class to describe all simulation-valid failures that can occur during
      *        workflow execution
      */
     class WorkflowExecutionFailureCause {
@@ -35,29 +35,36 @@ namespace wrench {
     public:
 
         /** @brief Types of failure causes */
-        enum Cause {
+        enum CauseType {
+            /** @brief The file cannot be found anywhere */
             NO_STORAGE_SERVICE_FOR_FILE,
+            /** @brief The file was not found where it was supposed to be found */
             FILE_NOT_FOUND,
+            /** @brief The storage service does not have enough space to support operationg */
             STORAGE_NO_ENOUGH_SPACE,
+            /** @brief The service cannot be ised because it was terminated */
             SERVICE_TERMINATED,
+            /** @brief The compute service does not support this job type */
             JOB_TYPE_NOT_SUPPORTED,
+            /** @brief The compute service cannot run the job due to insufficient total number of cores */
             NOT_ENOUGH_CORES,
+            /** @brief There was a network error, or an endpoint was down */
             NETWORK_ERROR
         };
 
-        WorkflowExecutionFailureCause(Cause cause);
+        WorkflowExecutionFailureCause(CauseType cause);
 
         virtual std::string toString() = 0;
 
-        Cause getCause();
+        CauseType getCause();
 
     private:
-        Cause cause;
+        CauseType cause;
     };
 
 
     /**
-     * @brief Workflow Execution Failure: File cannot be found anywhere
+     * @brief A "file cannot be found anywhere" workflow execution failure cause
      */
     class NoStorageServiceForFile : public WorkflowExecutionFailureCause {
 
@@ -72,7 +79,7 @@ namespace wrench {
     };
 
     /**
-     * @brief Workflow Execution Failure: File is not found
+     * @brief A "file is not found" workflow execution failure cause
      */
     class FileNotFound : public WorkflowExecutionFailureCause {
 
@@ -90,7 +97,7 @@ namespace wrench {
     };
 
     /**
-     * @brief Workflow Execution Failure: No space left on storage
+     * @brief A "no space left on storage service" workflow execution failure cause
      */
     class StorageServiceFull : public WorkflowExecutionFailureCause {
 
@@ -108,7 +115,7 @@ namespace wrench {
     };
 
     /**
-     * @brief Workflow Execution Failure: Service is down
+     * @brief A "service is down" workflow execution failure cause
      */
     class ServiceIsDown : public WorkflowExecutionFailureCause {
     public:
@@ -121,7 +128,7 @@ namespace wrench {
     };
 
     /**
-     * @brief Workflow Execution Failure: Compute service does not support job type
+     * @brief A "compute service does not support requested job type" workflow execution failure cause
      */
     class JobTypeNotSupported : public WorkflowExecutionFailureCause {
     public:
@@ -136,7 +143,7 @@ namespace wrench {
     };
 
     /**
-     * @brief Workflow Execution Failure: Compute service doesn't have enough cores
+     * @brief A "compute service doesn't have enough cores" workflow execution failure cause
      */
     class NotEnoughCores : public WorkflowExecutionFailureCause {
     public:
@@ -151,7 +158,7 @@ namespace wrench {
     };
 
     /**
-     * @brief Workflow Execution Failure: Network error (or endpoint failure)
+     * @brief A "network error (or endpoint is down)" workflow execution failure cause
      */
     class NetworkError : public WorkflowExecutionFailureCause {
     public:

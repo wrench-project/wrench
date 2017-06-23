@@ -14,25 +14,25 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
 
     /**
-     * @brief A random Scheduler class
+     * @brief A random Scheduler
      */
     class RandomScheduler : public Scheduler {
 
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
     public:
         void scheduleTasks(JobManager *job_manager,
                            std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                            const std::set<ComputeService *> &compute_services);
 
-    };
-
     /***********************/
     /** \endcond           */
     /***********************/
+    };
+
 };
 
 #endif //WRENCH_RANDOMSCHEDULER_H

@@ -19,7 +19,7 @@ namespace wrench {
      * @brief Constructor
      * @param cause: the type of the failure cause
      */
-    WorkflowExecutionFailureCause::WorkflowExecutionFailureCause(Cause cause) {
+    WorkflowExecutionFailureCause::WorkflowExecutionFailureCause(CauseType cause) {
       this->cause = cause;
     }
 
@@ -27,7 +27,7 @@ namespace wrench {
      * @brief Retrieve the type of the failure cause
      * @return
      */
-    WorkflowExecutionFailureCause::Cause WorkflowExecutionFailureCause::getCause() {
+    WorkflowExecutionFailureCause::CauseType WorkflowExecutionFailureCause::getCause() {
       return this->cause;
     }
 

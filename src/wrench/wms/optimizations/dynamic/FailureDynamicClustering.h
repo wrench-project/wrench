@@ -14,22 +14,22 @@
 
 namespace wrench {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
 
     /**
      *  @brief A simple task clustering algorithm to group tasks in a pipeline
      */
     class FailureDynamicClustering : public DynamicOptimization {
     public:
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
         void process(Workflow *workflow);
-
-    };
-
     /***********************/
     /** \endcond           */
     /***********************/
+
+    };
+
 }
 
 #endif //WRENCH_SIMPLEDYNAMICOPTIMIZATION_H

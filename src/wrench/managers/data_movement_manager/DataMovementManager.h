@@ -25,7 +25,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A helper daemon (co-located with a WMS) to handle data movement operations
+     * @brief A helper daemon (co-located with a WMS) that handles data movement operations
      */
     class DataMovementManager : public S4U_DaemonWithMailbox {
 

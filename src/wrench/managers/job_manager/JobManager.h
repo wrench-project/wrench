@@ -33,7 +33,7 @@ namespace wrench {
 
 
 		/**
-     * @brief A helper daemon (co-located with the WMS) to handle jobs
+     * @brief A helper daemon (co-located with the WMS) to handle job executions
      */
 		class JobManager : public S4U_DaemonWithMailbox {
 

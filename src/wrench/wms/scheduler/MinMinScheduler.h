@@ -14,15 +14,15 @@
 
 namespace wrench {
 
+
+    /**
+      * @brief A min-min Scheduler
+      */
+    class MinMinScheduler : public Scheduler {
+
     /***********************/
     /** \cond DEVELOPER    */
     /***********************/
-
-
-    /**
-      * @brief A min-min scheduler class
-      */
-    class MinMinScheduler : public Scheduler {
 
     public:
         void scheduleTasks(JobManager *job_manager,
@@ -34,11 +34,11 @@ namespace wrench {
             bool operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
                             std::pair<std::string, std::vector<WorkflowTask *>> &rhs);
         };
-    };
-
     /***********************/
     /** \endcond           */
     /***********************/
+    };
+
 
 }
 

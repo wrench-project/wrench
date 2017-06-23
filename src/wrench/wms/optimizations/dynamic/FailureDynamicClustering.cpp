@@ -20,7 +20,7 @@ namespace wrench {
     /**
      * @brief Main function for dynamic optimizations: ungrouping failed clustered tasks.
      *
-     * @param workflow: a pointer to a Workflow object
+     * @param workflow: a workflow
      */
     void FailureDynamicClustering::process(Workflow *workflow) {
 

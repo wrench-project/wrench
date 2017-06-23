@@ -17,14 +17,22 @@
 
 namespace wrench {
 
+
     /***********************/
-    /** \cond DEVELOPER    */
+    /** \cond INTERNAL    */
     /***********************/
 
+    /** @brief A dummy top-level class */
     class GenericSimulationTrace {
 
     };
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
+    /***********************/
+    /** \cond DEVELOPER    */
+    /***********************/
 
     /**
      * @brief A template class to represent a trace of timestamps
