@@ -26,7 +26,7 @@ namespace wrench {
     /**
      * @brief Constructor, which starts a DataMovementManager daemon
      *
-     * @param workflow: a pointer to the Workflow whose data is to be managed
+     * @param workflow: the workflow whose data (files) are to be managed
      */
     DataMovementManager::DataMovementManager(Workflow *workflow) :
             S4U_DaemonWithMailbox("data_movement_manager", "data_movement_manager") {

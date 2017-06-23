@@ -15,7 +15,7 @@
 namespace wrench {
 
     /**
-     * @brief Main function for static optimizations: Group tasks in a pipeline
+     * @brief Main optimization procedure: Group tasks in a pipeline
      *
      * @param workflow: a workflow
      */

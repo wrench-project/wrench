@@ -32,17 +32,22 @@ namespace wrench {
     class WorkflowTask;
 
     /**
-     * @brief A standard (i.e., non-pilot) WorkflowJob
+     * @brief A standard (i.e., non-pilot) workflow job
      */
     class StandardJob : public WorkflowJob {
 
     public:
         /** @brief Standad job states */
         enum State {
+            /** @brief Not submitted yet */
             NOT_SUBMITTED,
+            /** @brief Submitted but not running yet */
             PENDING,
+            /** @brief Running */
             RUNNING,
+            /** @brief Completed successfully */
             COMPLETED,
+            /** @brief Failed */
             FAILED,
         };
 

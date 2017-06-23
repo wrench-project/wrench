@@ -31,7 +31,9 @@ namespace wrench {
 
         /** @brief Job type enum */
         enum Type {
+            /** @brief A standard job that is submitted as is */
             STANDARD,
+            /** @brief A pilot job that onces started will act as a mini compute service with an expiration date */
             PILOT
         };
 

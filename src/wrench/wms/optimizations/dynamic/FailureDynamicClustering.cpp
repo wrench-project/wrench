@@ -18,7 +18,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(failure_dynamic_clustering, "Log category for Simpl
 namespace wrench {
 
     /**
-     * @brief Main function for dynamic optimizations: ungrouping failed clustered tasks.
+     * @brief Main optimization procedure: Ungroup failed clustered tasks.
      *
      * @param workflow: a workflow
      */

@@ -29,7 +29,7 @@ namespace wrench {
     /**
      * @brief Constructor, which starts a job manager daemon
      *
-     * @param workflow: a pointer to the Workflow whose jobs are to be managed
+     * @param workflow: the workflow whose jobs are to be managed
      */
     JobManager::JobManager(Workflow *workflow) :
             S4U_DaemonWithMailbox("job_manager", "job_manager") {
@@ -79,7 +79,7 @@ namespace wrench {
      * @brief Create a standard job
      *
      * @param tasks: a vector of tasks
-     * @param file_locations: a map that specifies on which storage service input/output files should be read/written
+     * @param file_locations: a map that specifies on which storage services input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
      * @param pre_file_copies: a set of tuples that specify which file copy operations should be completed
@@ -88,7 +88,7 @@ namespace wrench {
      *                         after task executions end
      * @param cleanup_file_deletions: a set of file tuples that specify file deletion operations that should be completed
      *                                at the end of the job
-     * @return a standard job
+     * @return the standard job
      *
      * @throw std::invalid_argument
      */
@@ -113,11 +113,11 @@ namespace wrench {
      * @brief Create a standard job
      *
      * @param tasks: a vector of tasks
-     * @param file_locations: a map that specifies on which storage service input/output files should be read/written
+     * @param file_locations: a map that specifies on which storage services input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
      *
-     * @return a raw pointer to the standard job
+     * @return the standard job
      *
      * @throw std::invalid_argument
      */
@@ -134,9 +134,11 @@ namespace wrench {
      * @brief Create a standard job
      *
      * @param task: a task
-     * @param file_locations: the locations where the task should read/write files
+     * @param file_locations: a map that specifies on which storage services input/output files should be read/written
+     *         (default storage is used otherwise, provided that the job is submitted to a compute service
+     *          for which that default was specified)
      *
-     * @return a raw pointer to the standard job
+     * @return the standard job
      *
      * @throw std::invalid_argument
      */
@@ -155,10 +157,10 @@ namespace wrench {
     /**
      * @brief Create a pilot job
      *
-     * @param workflow: a pointer to a Workflow
-     * @param num_cores: the number of cores required by the PilotJob
-     * @param duration: the PilotJob duration in seconds
-     * @return a raw pointer to the pilot job
+     * @param workflow: a workflow
+     * @param num_cores: the number of cores required by the pilot job
+     * @param duration: the pilot job's duration in seconds
+     * @return athe pilot job
      *
      * @throw std::invalid_argument
      */
@@ -175,8 +177,8 @@ namespace wrench {
     /**
      * @brief Submit a job to a compute service
      *
-     * @param job: a pointer to a WorkflowJob object
-     * @param compute_service: a pointer to a ComputeService object
+     * @param job: a workflow job
+     * @param compute_service: a compute service
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
@@ -218,24 +220,24 @@ namespace wrench {
     }
 
     /**
-     * @brief Cancel a PilotJob that hasn't expired yet
-     * @param job: a pointer to the PilotJob
+     * @brief Cancel a pilot job that hasn't expired yet
+     * @param job: the pilot job
      */
     void JobManager::cancelPilotJob(PilotJob *job) {
       throw std::runtime_error("JobManager::cancelPilotJob(): Not implemented yet");
     }
 
     /**
-     * @brief Get the list of currently running PilotJob instances
-     * @return a set of PilotJob pointers
+     * @brief Get the list of currently running pilot jobs
+     * @return a set of pilot jobs
      */
     std::set<PilotJob *> JobManager::getRunningPilotJobs() {
       return this->running_pilot_jobs;
     }
 
     /**
-     * @brief Get the list of currently pending PilotJob instances
-     * @return a set of PilotJob pointers
+     * @brief Get the list of currently pending pilot jobs
+     * @return a set of pilot jobs
      */
     std::set<PilotJob *> JobManager::getPendingPilotJobs() {
       return this->pending_pilot_jobs;
@@ -244,7 +246,7 @@ namespace wrench {
     /**
      * @brief Forget a job (to free memory, typically once the job is completed)
      *
-     * @param job: a pointer to a WorkflowJob
+     * @param job: a workflow job
      */
     void JobManager::forgetJob(WorkflowJob *job) {
       if (job->getType() == WorkflowJob::STANDARD) {

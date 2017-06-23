@@ -20,12 +20,12 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(minmin_scheduler, "Log category for Min-Min Schedul
 namespace wrench {
 
     /**
-     * @brief Compare the number of flops between to WorkflowTask lists
+     * @brief Compare the number of flops between two lists of workflow tasks
      *
-     * @param lhs: a pair of a task ID and a list of WorkflowTask objects
-     * @param rhs: a pair of a task ID and a list of WorkflowTask objects
+     * @param lhs: a pair of a task ID and a list of workflow tasks
+     * @param rhs: a pair of a task ID and a list of workflow tasks
      *
-     * @return whether the number of flops from the left-hand-side WorkflowTask objects is smaller
+     * @return whether the number of flops from the left-hand-side workflow tasks is smaller
      */
     bool MinMinScheduler::MinMinComparator::operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
                                                        std::pair<std::string, std::vector<WorkflowTask *>> &rhs) {
@@ -34,11 +34,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Schedule and run a set of ready tasks in available compute resources
+     * @brief Schedule and run a set of ready tasks on available compute resources
      *
-     * @param job_manager: a pointer to a JobManager object
-     * @param ready_tasks: a vector of ready WorkflowTask objects (i.e., ready tasks in the workflow)
-     * @param compute_services: a set of pointers to ComputeService objects (compute services available to run jobs)
+     * @param job_manager: a job manager
+     * @param ready_tasks: a vector of ready workflow tasks
+     * @param compute_services: a set of compute services available to run jobs
      */
     void MinMinScheduler::scheduleTasks(JobManager *job_manager,
                                         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,

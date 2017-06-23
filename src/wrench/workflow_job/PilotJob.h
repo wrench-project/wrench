@@ -30,10 +30,15 @@ namespace wrench {
 
         /** @brief Pilot job states */
         enum State {
+            /** @brief Not submitted yet */
             NOT_SUBMITTED,
+            /** @brief Submitted but not running */
             PENDING,
+            /** @brief Running */
             RUNNING,
+            /** @brief Expired due to a time-to-live limit */
             EXPIRED,
+            /** @brief Failed */
             FAILED
         };
 

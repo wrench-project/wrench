@@ -94,7 +94,7 @@ namespace wrench {
     /**
      * @brief Get the workflow tasks in the job
      *
-     * @return a vector of pointers to WorkflowTasks objects
+     * @return a vector of workflow tasks
      */
     std::vector<WorkflowTask *> StandardJob::getTasks() {
       return this->tasks;
@@ -103,7 +103,7 @@ namespace wrench {
     /**
      * @brief Get the file location map for the job
      *
-     * @return a map
+     * @return a map of files to storage services
      */
     std::map<WorkflowFile *, StorageService *> StandardJob::getFileLocations() {
       return this->file_locations;

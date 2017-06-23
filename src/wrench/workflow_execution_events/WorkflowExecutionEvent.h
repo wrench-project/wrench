@@ -35,7 +35,7 @@ namespace wrench {
 
     /**
      * @brief A class to represent the various execution events that
-     * are relevant to the execution of a Workflow.
+     * are relevant to the execution of a workflow.
      */
     class WorkflowExecutionEvent {
 
@@ -43,13 +43,21 @@ namespace wrench {
 
         /** @brief Workflow execution event types */
         enum EventType {
+            /** @brief An error type */
             UNDEFINED,
+            /** @brief A job was submitted to a compute service that does not support its type */
             UNSUPPORTED_JOB_TYPE,
+            /** @brief A standard job successfully completed */
             STANDARD_JOB_COMPLETION,
+            /** @brief A standard job failed */
             STANDARD_JOB_FAILURE,
+            /** @brief A pilot job started */
             PILOT_JOB_START,
+            /** @brief A pilot job expired */
             PILOT_JOB_EXPIRATION,
+            /** @brief A file copy operation completed */
             FILE_COPY_COMPLETION,
+            /** @brief A file copy operation failed */
             FILE_COPY_FAILURE,
         };
 

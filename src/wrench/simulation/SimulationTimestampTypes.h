@@ -28,7 +28,7 @@ namespace wrench {
 
         /**
          * @brief Constructor
-         * @param task: a pointer to a WorkflowTask object
+         * @param task: a workflow task
          */
         SimulationTimestampTaskCompletion(WorkflowTask *task) {
           this->task = task;

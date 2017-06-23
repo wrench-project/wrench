@@ -19,10 +19,10 @@ namespace wrench {
     /**
      * @brief Schedule and run pilot jobs
      *
-     * @param job_manager: a pointer to a JobManager object
-     * @param workflow: a pointer to a Workflow object
-     * @param flops: the number of flops that the PilotJob should be able to do before terminating
-     * @param compute_services: a set of pointers to ComputeService objects (compute services available to run jobs)
+     * @param job_manager: a job manager
+     * @param workflow: a workflow
+     * @param flops: the number of flops that the pilot jobs should be able to do (assuming it constantly uses the CPU) before terminating
+     * @param compute_services: a set of compute services available to run jobs
      */
     void Scheduler::schedulePilotJobs(JobManager *job_manager,
                                       Workflow *workflow,

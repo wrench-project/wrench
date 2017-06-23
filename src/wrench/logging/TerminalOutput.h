@@ -42,7 +42,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Color-enabling wrappers around Simgrid's logging macros.
+     * @brief Color-enabling wrappers around Simgrid's XBT_INFO, XBT_DEBUG, XBT_WARN logging macros
      */
     class TerminalOutput {
 

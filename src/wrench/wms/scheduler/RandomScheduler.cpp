@@ -22,11 +22,11 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(random_scheduler, "Log category for Random Schedule
 namespace wrench {
 
     /**
-     * @brief Schedule and run a set of ready tasks in available compute resources
+     * @brief Schedule and run a set of ready tasks on available compute resources
      *
-     * @param job_manager: a pointer to a JobManager object
-     * @param ready_tasks: a map of ready WorkflowTask objects (i.e., ready tasks in the workflow)
-     * @param compute_services: a set of pointers to ComputeService objects (compute services available to run jobs)
+     * @param job_manager: a job manager
+     * @param ready_tasks: a map of ready workflow tasks
+     * @param compute_services: a set ofcompute services available to run jobs
      */
     void RandomScheduler::scheduleTasks(JobManager *job_manager,
                                         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
