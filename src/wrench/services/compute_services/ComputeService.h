@@ -27,7 +27,7 @@ namespace wrench {
     class StorageService;
 
     /**
-     * @brief Abstract implementation of a compute service.
+     * @brief  A top-level class that defines a compute service.
      */
     class ComputeService : public Service {
 

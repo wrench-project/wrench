@@ -204,9 +204,13 @@ namespace wrench {
      *
      * @return (a raw pointer to) the compute service
      *
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     ComputeService *Simulation::add(std::unique_ptr<ComputeService> service) {
+      if (service == nullptr) {
+        throw std::invalid_argument("Simulation::add(): invalid arguments");
+      }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
@@ -224,9 +228,13 @@ namespace wrench {
     * @param service: a storage service
     * @return (a raw pointer to) the storage service
      *
+    * @throw std::invalid_argument
     * @throw std::runtime_error
     */
     StorageService *Simulation::add(std::unique_ptr<StorageService> service) {
+      if (service == nullptr) {
+        throw std::invalid_argument("Simulation::add(): invalid arguments");
+      }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
@@ -244,9 +252,13 @@ namespace wrench {
      * @param wms: a WMS
      * @return (a raw pointer to) the WMS
      *
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     WMS *Simulation::setWMS(std::unique_ptr<WMS> wms) {
+      if (wms == nullptr) {
+        throw std::invalid_argument("Simulation::setWMS(): invalid arguments");
+      }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::setWMS(): Simulation is not initialized");
       }
@@ -260,8 +272,13 @@ namespace wrench {
      * @brief Set a FileRegistryService for the simulation
      *
      * @param file_registry_service: a file registry service
+     *
+     * @throw std::invalid_argument
      */
     void Simulation::setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service) {
+      if (file_registry_service == nullptr) {
+        throw std::invalid_argument("Simulation::setFileRegistryService(): invalid arguments");
+      }
       this->file_registry_service = std::move(file_registry_service);
     }
 
@@ -332,8 +349,8 @@ namespace wrench {
     /**
      * @brief Stage a copy of a file on a storage service
      *
-     * @param file: a file
-     * @param storage_service: a storage service
+     * @param file: a file to stage on a storage service
+     * @param storage_service: the storage service
      *
      * @throw std::runtime_error
      * @throw std::invalid_argument
@@ -368,8 +385,8 @@ namespace wrench {
     /**
    * @brief Stage a set of a file copies on a storage service
      *
-   * @param files: a set of files
-   * @param storage_service: a storage service
+   * @param files: a set of files to stage on a storage service
+   * @param storage_service: the storage service
    *
    * @throw std::runtime_error
    * @throw std::invalid_argument

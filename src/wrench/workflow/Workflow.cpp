@@ -22,13 +22,13 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(workflow, "Log category for Workflow");
 namespace wrench {
 
     /**
-     * @brief Create and add a new task to the workflow
+     * @brief Create and add a new computational task to the workflow
      *
      * @param id: a unique string id
      * @param flops: number of flops
      * @param num_procs: a number of processors
      *
-     * @return a pointer to a WorkflowTask object
+     * @return the WorkflowTask instance
      *
      * @throw std::invalid_argument
      */
@@ -62,7 +62,7 @@ namespace wrench {
     /**
      * @brief Remove a task from the workflow
      *
-     * @param task: a pointer to a WorkflowTask object
+     * @param task: a task
      *
      * @throw std::invalid_argument
      */
@@ -86,7 +86,7 @@ namespace wrench {
      *
      * @param id: a string id
      *
-     * @return a pointer to a WorkflowTask object
+     * @return a workflow task
      *
      * @throw std::invalid_argument
      */
@@ -101,8 +101,8 @@ namespace wrench {
      * @brief Create a control dependency between two workflow tasks. Will not
      *        do anything if there is already a path between the two tasks.
      *
-     * @param src: the source WorkflowTask object
-     * @param dst: the destination WorkflowTask object
+     * @param src: the parent task
+     * @param dst: the child task
      *
      * @throw std::invalid_argument
      */
@@ -126,12 +126,12 @@ namespace wrench {
 
 
     /**
-     * @brief Add a new file to the workflow specification
+     * @brief Add a new file to the workflow
      *
      * @param id: a unique string id
      * @param size: a file size in bytes
      *
-     * @return a pointer to a WorkflowFile object
+     * @return the WorkflowFile instance
      *
      * @throw std::invalid_argument
      */
@@ -160,18 +160,20 @@ namespace wrench {
      *
      * @param id: a string id
      *
-     * @return a pointer to a WorkflowFile object, nullptr if not found
+     * @return the WorkflowFile instance, or nullptr if not found
+     *
+     * @throw std::invalid_argument
      */
     WorkflowFile *Workflow::getWorkflowFileByID(const std::string id) {
       if (files.find(id) == files.end()) {
-        return nullptr;
+        throw std::invalid_argument("Workflow::getWorkflowFileByID(): Unknown WorkflowFile ID " + id);
       } else {
         return files[id].get();
       }
     }
 
     /**
-     * @brief Output a workflow's dependency graph to EPS
+     * @brief Output the workflow's dependency graph to EPS
      *
      * @param eps_filename: a filename to which the EPS content is saved
      *
@@ -475,9 +477,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the set of input files for a Workflow
+     * @brief Retrieve the set of input files for a workflow (i.e., those files
+     *        that are input to some tasks but output from none)
      *
-     * @return a std::set of raw pointers to WorkflowFile objects
+     * @return a std::set of files
      */
     std::set<WorkflowFile *> Workflow::getInputFiles() {
       std::set<WorkflowFile *> input_files;

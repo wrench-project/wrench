@@ -24,21 +24,21 @@ namespace wrench {
 
     public:
 
-        /** The number of bytes in the control message sent by the daemon to state that it does not have sufficient cores to run a submitted job **/
+        /** @brief The number of bytes in the control message sent by the daemon to state that it does not have sufficient cores to run a submitted job **/
         DECLARE_PROPERTY_NAME(NOT_ENOUGH_CORES_MESSAGE_PAYLOAD);
-        /** The number of bytes in the control message sent to the daemon to ask it for its number of cores **/
+        /** @brief The number of bytes in the control message sent to the daemon to ask it for its number of cores **/
         DECLARE_PROPERTY_NAME(NUM_CORES_REQUEST_MESSAGE_PAYLOAD);
-        /** The number of bytes in the control message sent by the daemon to state how many cores it has **/
+        /** @brief The number of bytes in the control message sent by the daemon to state how many cores it has **/
         DECLARE_PROPERTY_NAME(NUM_CORES_ANSWER_MESSAGE_PAYLOAD);
-        /** The number of bytes in the control message sent to the daemon to ask it for its number of idle cores **/
+        /** @brief The number of bytes in the control message sent to the daemon to ask it for its number of idle cores **/
         DECLARE_PROPERTY_NAME(NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD);
-        /** The number of bytes in the control message sent by the daemon to state how many idle cores it has **/
+        /** @brief The number of bytes in the control message sent by the daemon to state how many idle cores it has **/
         DECLARE_PROPERTY_NAME(NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD);
-        /** The number of bytes in the control message sent to the daemon to ask it for its per-core flop rate **/
+        /** @brief The number of bytes in the control message sent to the daemon to ask it for its per-core flop rate **/
         DECLARE_PROPERTY_NAME(FLOP_RATE_REQUEST_MESSAGE_PAYLOAD);
-        /** The number of bytes in the control message sent by the daemon to state its per-core flop rate **/
+        /** @brief The number of bytes in the control message sent by the daemon to state its per-core flop rate **/
         DECLARE_PROPERTY_NAME(FLOP_RATE_ANSWER_MESSAGE_PAYLOAD);
-        /** The overhead to start a task execution, in seconds **/
+        /** @brief The overhead to start a task execution, in seconds **/
         DECLARE_PROPERTY_NAME(TASK_STARTUP_OVERHEAD);
 
     };

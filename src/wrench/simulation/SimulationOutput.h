@@ -32,7 +32,7 @@ namespace wrench {
          *        once the simulation has completed
          *
          * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
-         * @return a vector of pointers to SimulationTimestampXXXX objects
+         * @return a vector pointers to SimulationTimestampXXXX instances
          */
         template <class T> std::vector<SimulationTimestamp<T> *> getTrace() {
           std::type_index type_index = std::type_index(typeid(T));

@@ -24,9 +24,9 @@ namespace wrench {
     /**
      * @brief Create a Simple WMS with a workflow instance and a scheduler implementation
      *
-     * @param workflow: a pointer to a workflow to execute
-     * @param scheduler: a pointer to a scheduler implementation
-     * @param hostname: the name of the host
+     * @param workflow: a workflow to execute
+     * @param scheduler: a scheduler implementation
+     * @param hostname: the name of the host on which to start the WMS
      */
     SimpleWMS::SimpleWMS(Workflow *workflow,
                          std::unique_ptr<Scheduler> scheduler,

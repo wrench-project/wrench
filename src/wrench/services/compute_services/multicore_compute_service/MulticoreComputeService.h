@@ -28,7 +28,7 @@ namespace wrench {
 
     class WorkflowExecutionFailureCause;
 
-    /**  @brief Implementation of a ComputeService abstraction that
+    /**  @brief A ComputeService implementation that
      *   runs on a multi-core host and can execute sets of independent single-core tasks
      */
     class MulticoreComputeService : public ComputeService {
@@ -65,12 +65,6 @@ namespace wrench {
                 };
 
     public:
-
-        // Public Constructor
-        MulticoreComputeService(std::string hostname,
-                             bool supports_standard_jobs,
-                             bool supports_pilot_jobs,
-                             std::map<std::string, std::string> = {});
 
         // Public Constructor
         MulticoreComputeService(std::string hostname,

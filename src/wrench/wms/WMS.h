@@ -21,7 +21,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief Abstract implementation of a Workflow Management System
+     * @brief A top-level class that defines a workflow management system
      */
     class WMS : public S4U_DaemonWithMailbox {
 

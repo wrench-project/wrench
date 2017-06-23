@@ -347,34 +347,16 @@ namespace wrench {
       } else {
         throw std::runtime_error(
                 "MulticoreComputeService::getCoreFLopRate(): unexpected [" + msg->getName() + "] message");
-      }
-    }
+      }}
+
 
     /**
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param supports_standard_jobs: true if the job executor should support standard jobs
-     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
-     * @param plist: a property list
-     */
-    MulticoreComputeService::MulticoreComputeService(std::string hostname,
-                                                     bool supports_standard_jobs,
-                                                     bool supports_pilot_jobs,
-                                                     std::map<std::string, std::string> plist) :
-            MulticoreComputeService::MulticoreComputeService(hostname,
-                                                             supports_standard_jobs,
-                                                             supports_pilot_jobs, plist, 0, -1, nullptr, "", nullptr) {
-
-    }
-
-    /**
-     * @brief Constructor
-     *
-     * @param hostname: the name of the host on which the job executor should be started
-     * @param supports_standard_jobs: true if the job executor should support standard jobs
-     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
-     * @param default_storage_service: a raw pointer to a StorageService object
+     * @param supports_standard_jobs: true if the compute service should support standard jobs
+     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
+     * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list
      */
     MulticoreComputeService::MulticoreComputeService(std::string hostname,

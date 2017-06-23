@@ -32,34 +32,34 @@ namespace wrench {
     /**
      * @brief Add an input file to the task
      *
-     * @param f: a pointer to the file
+     * @param file: the file
      */
-    void WorkflowTask::addInputFile(WorkflowFile *f) {
-      addFileToMap(input_files, output_files, f);
+    void WorkflowTask::addInputFile(WorkflowFile *file) {
+      addFileToMap(input_files, output_files, file);
 
-      f->setInputOf(this);
+      file->setInputOf(this);
 
       WRENCH_DEBUG("Adding file '%s' as input to task %s",
-                   f->getId().c_str(), this->getId().c_str());
+                   file->getId().c_str(), this->getId().c_str());
       // Perhaps add a control dependency?
-      if (f->getOutputOf()) {
-        workflow->addControlDependency(f->getOutputOf(), this);
+      if (file->getOutputOf()) {
+        workflow->addControlDependency(file->getOutputOf(), this);
       }
     }
 
     /**
      * @brief Add an output file to the task
      *
-     * @param f: a pointer to a WorkflowFile object
+     * @param f: the file
      */
-    void WorkflowTask::addOutputFile(WorkflowFile *f) {
+    void WorkflowTask::addOutputFile(WorkflowFile *file) {
       WRENCH_DEBUG("Adding file '%s' as output t task %s",
-                   f->getId().c_str(), this->getId().c_str());
+                   file->getId().c_str(), this->getId().c_str());
 
-      addFileToMap(output_files, input_files, f);
-      f->setOutputOf(this);
+      addFileToMap(output_files, input_files, file);
+      file->setOutputOf(this);
       // Perhaps add control dependencies?
-      for (auto const &x : f->getInputOf()) {
+      for (auto const &x : file->getInputOf()) {
         workflow->addControlDependency(this, x.second);
       }
 
@@ -86,7 +86,7 @@ namespace wrench {
     /**
      * @brief Get the number of procs of the task
      *
-     * @return the number of procs
+     * @return the number of procs required by the task (this is an "in-flux" feature)
      */
     int WorkflowTask::getNumProcs() const {
       return this->number_of_processors;

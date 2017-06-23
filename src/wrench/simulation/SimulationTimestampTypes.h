@@ -41,7 +41,7 @@ namespace wrench {
         /**
          * @brief Retrieve the task that has completed
          *
-         * @return a pointer to a WorkflowTask object
+         * @return the task
          */
         WorkflowTask *getTask() {
           return this->task;

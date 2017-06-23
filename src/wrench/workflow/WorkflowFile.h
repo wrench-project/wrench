@@ -21,7 +21,7 @@ namespace wrench {
     class WorkflowTask;
 
     /**
-     * @brief Abstraction for a data file used in a Workflow
+     * @brief A data file used i workflow
      */
     class WorkflowFile {
 
@@ -31,11 +31,12 @@ namespace wrench {
 
         std::string getId();
 
-        bool isOutput();
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
+
+        bool isOutput();
 
         Workflow *getWorkflow();
 

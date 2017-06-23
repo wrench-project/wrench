@@ -29,7 +29,7 @@ namespace wrench {
         /**
          * Retrieve the timestamp's date
          *
-         * @return the date
+         * @return the date (as a number of seconds since the beginning of the simulation)
          */
         double getDate() {
           return this->date;

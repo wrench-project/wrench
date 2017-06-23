@@ -14,9 +14,9 @@ namespace wrench {
     /**
      * @brief Create a WMS with a workflow instance and a scheduler implementation
      *
-     * @param workflow: a pointer to a workflow to execute
-     * @param scheduler: a pointer to a scheduler implementation
-     * @param hostname: the name of the host
+     * @param workflow: a workflow to execute
+     * @param scheduler: a scheduler implementation
+     * @param hostname: the name of the host on which to run the WMS
      * @param suffix: a string to append to the process name
      *
      * @throw std::invalid_argument
@@ -36,7 +36,7 @@ namespace wrench {
      * @brief Add a dynamic optimization to the list of optimizations. Optimizations are
      * executed in order of insertion
      *
-     * @param optimization: a pointer to a dynamic optimization implementation
+     * @param optimization: a dynamic optimization implementation
      */
     void WMS::addDynamicOptimization(std::unique_ptr<DynamicOptimization> optimization) {
       this->dynamic_optimizations.push_back(std::move(optimization));
@@ -46,7 +46,7 @@ namespace wrench {
      * @brief Add a static optimization to the list of optimizations. Optimizations are
      * executed in order of insertion
      *
-     * @param optimization: a pointer to a static optimization implementation
+     * @param optimization: a static optimization implementation
      */
     void WMS::addStaticOptimization(std::unique_ptr<StaticOptimization> optimization) {
       this->static_optimizations.push_back(std::move(optimization));
@@ -73,7 +73,7 @@ namespace wrench {
     /**
      * @brief Set the "simulation pointer"
      *
-     * @param simulation: a raw pointer to a Simulation object
+     * @param simulation: the current simulation
      *
      * @throw std::invalid_argument
      */

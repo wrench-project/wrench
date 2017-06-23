@@ -20,14 +20,14 @@ namespace wrench {
 
 
     /**
-     * @brief Class that specifies properties that apply to all services
+     * @brief Properties for a Service
      */
     class ServiceProperty {
 
     public:
-        /** The number of bytes in the control message sent to the daemon to terminate it **/
+        /** @brief The number of bytes in the control message sent to the daemon to terminate it **/
         DECLARE_PROPERTY_NAME(STOP_DAEMON_MESSAGE_PAYLOAD);
-        /** The number of bytes in the control message sent by the daemon to confirm it has terminate **/
+        /** @brief The number of bytes in the control message sent by the daemon to confirm it has terminate **/
         DECLARE_PROPERTY_NAME(DAEMON_STOPPED_MESSAGE_PAYLOAD);
 
     };

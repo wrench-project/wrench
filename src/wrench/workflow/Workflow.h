@@ -23,8 +23,7 @@ class WorkflowTask;
 namespace wrench {
 
     /**
-     * @brief A workflow abstraction that provides basic functionality to
-     * represent/instantiate/manipulate workflows
+     * @brief A workflow that an be executed by a WMS
      */
     class Workflow {
 

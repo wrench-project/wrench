@@ -21,7 +21,7 @@
 namespace wrench {
 
     /**
-     * @brief Abstraction for3 a task in a Workflow
+     * @brief A workflow computational task
      */
     class WorkflowTask {
 
@@ -36,9 +36,9 @@ namespace wrench {
 
         int getNumberOfParents() const;
 
-        void addInputFile(WorkflowFile *);
+        void addInputFile(WorkflowFile *file);
 
-        void addOutputFile(WorkflowFile *);
+        void addOutputFile(WorkflowFile *file);
 
         unsigned int getFailureCount();
 
