@@ -233,9 +233,9 @@ namespace wrench {
         throw std::invalid_argument("JobManager::terminateJob(): invalid argument");
       }
 
-      // Check things
-
-      // TODO
+      if (job->getParentComputeService() == nullptr) {
+        throw WorkflowExecutionException(new JobCannotBeTerminated(job));
+      }
 
       try {
         job->getParentComputeService()->terminateJob(job);

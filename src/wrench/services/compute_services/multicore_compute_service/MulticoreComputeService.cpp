@@ -1406,6 +1406,7 @@ namespace wrench {
     void MulticoreComputeService::processStandardJobTerminationRequest(StandardJob *job, std::string answer_mailbox) {
 
 
+      WRENCH_INFO("HERE1");
       // Check whether job is pending
       for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
         if (*it == job) {
@@ -1442,7 +1443,7 @@ namespace wrench {
       // If we got here, we're in trouble
       WRENCH_INFO("Trying to terminate a standard job that's neither pending nor running!");
       ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
-              job, this, false, new JobCannotBeTerminated(job, this),
+              job, this, false, new JobCannotBeTerminated(job),
               this->getPropertyValueAsDouble(
                       MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {

@@ -176,14 +176,12 @@ namespace wrench {
      */
     class JobCannotBeTerminated : public WorkflowExecutionFailureCause {
     public:
-        JobCannotBeTerminated(WorkflowJob *job, ComputeService *compute_service);
+        JobCannotBeTerminated(WorkflowJob *job);
         WorkflowJob *getJob();
-        ComputeService *getComputeService();
         std::string toString();
 
     private:
         WorkflowJob *job;
-        ComputeService *compute_service;
     };
 
     /***********************/

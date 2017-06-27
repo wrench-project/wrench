@@ -243,10 +243,9 @@ namespace wrench {
      * @param job: the job that couldn't be terminated
      * @param compute_service: the compute service that couldn't terminate the job
      */
-    JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job, ComputeService *compute_service) : WorkflowExecutionFailureCause(
+    JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job) : WorkflowExecutionFailureCause(
             JOB_CANNOT_BE_TERMINATED) {
       this->job = job;
-      this->compute_service = compute_service;
     }
 
 
@@ -256,14 +255,6 @@ namespace wrench {
      */
     WorkflowJob *JobCannotBeTerminated::getJob() {
       return this->job;
-    }
-
-    /**
-     * @brief Getter
-     * @return the compute service
-     */
-    ComputeService *JobCannotBeTerminated::getComputeService() {
-      return this->compute_service;
     }
 
     /**
