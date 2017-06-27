@@ -213,6 +213,7 @@ namespace wrench {
       // Submit the job to the service
       try {
         compute_service->runJob(job);
+        job->setParentComputeService(compute_service);
       } catch (WorkflowExecutionException &e) {
         throw;
       }
@@ -220,11 +221,28 @@ namespace wrench {
     }
 
     /**
-     * @brief Cancel a pilot job that hasn't expired yet
-     * @param job: the pilot job
+     * @brief Terminate a job (standard or pilot) that hasn't completed/expired/failed yet
+     * @param job: the job
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
      */
-    void JobManager::cancelPilotJob(PilotJob *job) {
-      throw std::runtime_error("JobManager::cancelPilotJob(): Not implemented yet");
+    void JobManager::terminateJob(WorkflowJob *job) {
+      if (job == nullptr) {
+        throw std::invalid_argument("JobManager::terminateJob(): invalid argument");
+      }
+
+      // Check things
+
+      // TODO
+
+      try {
+        job->getParentComputeService()->terminateJob(job);
+      } catch (std::exception &e) {
+        throw;
+      }
+
     }
 
     /**

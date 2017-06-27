@@ -147,8 +147,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the "simulation pointer"
-     * @param simulation: a raw pointer to a Simulation object
+     * @brief Set the simulation
+     * @param simulation: a simulation
      */
     void Service::setSimulation(Simulation *simulation) {
       this->simulation = simulation;

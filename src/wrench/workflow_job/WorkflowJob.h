@@ -18,6 +18,7 @@ namespace wrench {
 
 
     class Workflow;
+    class ComputeService;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -59,6 +60,10 @@ namespace wrench {
 
         std::string getOriginCallbackMailbox();
 
+        void setParentComputeService(ComputeService *compute_service);
+
+        ComputeService *getParentComputeService();
+
     protected:
 
         WorkflowJob(Type type, unsigned long num_cores, double duration);
@@ -77,6 +82,8 @@ namespace wrench {
         double duration;
         /** @brief The job's number of cores */
         unsigned long num_cores;
+        /** @brief The compute service to which the job was submitted */
+        ComputeService *parent_compute_service;
 
         /***********************/
         /** \endcond           */

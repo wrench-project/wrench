@@ -12,6 +12,7 @@
 
 
 #include <queue>
+#include <deque>
 #include <set>
 
 #include <services/compute_services/ComputeService.h>
@@ -48,15 +49,19 @@ namespace wrench {
                         {MulticoreComputeServiceProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,            "1024"},
                         {MulticoreComputeServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           "1024"},
                         {MulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         "1024"},
+                        {MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                        {MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
                         {MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
                         {MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
                         {MulticoreComputeServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,           "1024"},
                         {MulticoreComputeServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
                         {MulticoreComputeServiceProperty::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,            "1024"},
+                        {MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                        {MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
                         {MulticoreComputeServiceProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD,      "1024"},
                         {MulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,       "1024"},
-                        {MulticoreComputeServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD,      "1024"},
-                        {MulticoreComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD,       "1024"},
+                        {MulticoreComputeServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                        {MulticoreComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD,            "1024"},
                         {MulticoreComputeServiceProperty::TTL_REQUEST_MESSAGE_PAYLOAD,                 "1024"},
                         {MulticoreComputeServiceProperty::TTL_ANSWER_MESSAGE_PAYLOAD,                  "1024"},
                         {MulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD,           "1024"},
@@ -85,6 +90,12 @@ namespace wrench {
         void submitStandardJob(StandardJob *job);
 
         void submitPilotJob(PilotJob *job);
+
+        // Terminating jobs
+        void terminateStandardJob(StandardJob *job);
+
+        void terminatePilotJob(PilotJob *job);
+
 
         // Getting information
         unsigned long getNumCores();
@@ -126,7 +137,7 @@ namespace wrench {
         std::set<WorkUnitExecutor*> working_threads;
 
         // Queue of pending jobs (standard or pilot) that haven't begun executing
-        std::queue<WorkflowJob *> pending_jobs;
+        std::deque<WorkflowJob *> pending_jobs;
 
         // Set of currently running (standard or pilot) jobs
         std::set<WorkflowJob *> running_jobs;
@@ -154,6 +165,8 @@ namespace wrench {
 
         void processPilotJobCompletion(PilotJob *job);
 
+        void processStandardJobTerminationRequest(StandardJob *job, std::string answer_mailbox);
+
         bool processNextMessage(double timeout);
 
         bool dispatchNextPendingWork();
@@ -162,7 +175,9 @@ namespace wrench {
 
         void createWorkForNewlyDispatchedJob(StandardJob *job);
 
-        void failPendingStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
+        void terminateRunningStandardJob(StandardJob *job);
+
+          void failPendingStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
 
         void failRunningStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
     };

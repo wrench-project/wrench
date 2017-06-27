@@ -71,7 +71,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the "simulation pointer"
+     * @brief Set the simulation
      *
      * @param simulation: the current simulation
      *

@@ -253,8 +253,8 @@ namespace wrench {
     /**
      * @brief Determine whether one source is an ancestor of a destination task
      *
-     * @param src: a pointer to the source WorkflowTask object
-     * @param dst: a pointer to the destination WorkflowTask object
+     * @param src: the soure workflow task
+     * @param dst: the destination task
      *
      * @return true if there is a path from src to dst, false otherwise
      */
@@ -278,7 +278,7 @@ namespace wrench {
     /**
      * @brief Get a vector of the ready tasks
      *
-     * @return vector of pointers to WorkflowTask objects
+     * @return vector of workflow tasks
      */
     // TODO: Implement this more efficiently
     std::map<std::string, std::vector<WorkflowTask *>> Workflow::getReadyTasks() {
@@ -331,7 +331,7 @@ namespace wrench {
     /**
      * @brief Get a list of all tasks in the workflow
      *
-     * @return a vector of pointers to WorkflowTask objects
+     * @return a vector of workflow tasks
      */
     std::vector<WorkflowTask *> Workflow::getTasks() {
       std::vector<WorkflowTask *> all_tasks;
@@ -344,9 +344,9 @@ namespace wrench {
     /**
      * @brief Get list of children for a task
      *
-     * @param task: a pointer to a WorkflowTask object
+     * @param task: a workflow task
      *
-     * @return a vector of pointers to WorfklowTask objects
+     * @return a vector of workflow tasks
      */
     std::vector<WorkflowTask *> Workflow::getTaskChildren(const WorkflowTask *task) {
       if (task == nullptr) {
@@ -362,9 +362,9 @@ namespace wrench {
     /**
      * @brief Get list of parents for a task
      *
-     * @param task: a pointer to a WorkflowTask object
+     * @param task: a workflow task
      *
-     * @return a vector of pointers to WorfklowTask objects
+     * @return a vector of workflow tasks
      */
     std::vector<WorkflowTask *> Workflow::getTaskParents(const WorkflowTask *task) {
       if (task == nullptr) {
@@ -378,9 +378,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Wait for the next WorkflowExecutionEvent
+     * @brief Wait for the next worklow execution event
      *
-     * @return a unique pointer to a WorkflowExecutionEvent object
+     * @return a workflow execution event
      */
     std::unique_ptr<WorkflowExecutionEvent> Workflow::waitForNextExecutionEvent() {
       return WorkflowExecutionEvent::waitForNextExecutionEvent(this->callback_mailbox);
@@ -399,7 +399,7 @@ namespace wrench {
      * @brief Update the state of a task, and propagate the change
      *        to other tasks if necessary.
      *
-     * @param task: a pointer to a WorkflowTask object
+     * @param task: a workflow task
      * @param state: the new task state
      *
      * @throw std::invalid_argument
@@ -432,11 +432,10 @@ namespace wrench {
         }
         case WorkflowTask::READY: {
           if (task->getState() == WorkflowTask::READY ||
-              task->getState() == WorkflowTask::PENDING ||
               task->getState() == WorkflowTask::COMPLETED) {
             return;
           }
-          if (task->getState() != WorkflowTask::NOT_READY && task->getState() != WorkflowTask::FAILED) {
+          if (task->getState() != WorkflowTask::NOT_READY && task->getState() != WorkflowTask::FAILED && task->getState() != WorkflowTask::PENDING) {
             throw std::runtime_error("Workflow::updateTaskState(): Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
                                      " task to WorkflowTask::READY");
           }
@@ -504,4 +503,6 @@ namespace wrench {
         return nullptr;
       }
     }
+
+
 };

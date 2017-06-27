@@ -14,7 +14,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param workflow: a pointer to a Workflow object
+     * @param workflow: a workflow
      * @param num_cores: the number of cores required by the pilot job
      * @param duration: duration of the pilot job, in seconds
      */
@@ -35,7 +35,7 @@ namespace wrench {
 
     /**
      * @brief Get the compute service on which the pilot job is running
-     * @return a pointer to a ComputeService object
+     * @return a compute service
      */
     ComputeService *PilotJob::getComputeService() {
       return this->compute_service;
@@ -43,7 +43,7 @@ namespace wrench {
 
     /**
      * @brief Set the compute service on which the pilot job is running
-     * @param cs: a pointer to a ComputeService object
+     * @param cs: a compute service
      */
     void PilotJob::setComputeService(ComputeService *cs) {
       this->compute_service = cs;

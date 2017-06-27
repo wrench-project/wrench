@@ -270,7 +270,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCause() != wrench::WorkflowExecutionFailureCause::STORAGE_NO_ENOUGH_SPACE) {
+          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::STORAGE_NO_ENOUGH_SPACE) {
             throw std::runtime_error("Should have gotten a 'out of space' failure cause");
           }
           break;
@@ -298,7 +298,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCause() != wrench::WorkflowExecutionFailureCause::FILE_NOT_FOUND) {
+          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::FILE_NOT_FOUND) {
             throw std::runtime_error("Should have gotten a 'file not found' failure cause");
           }
           break;

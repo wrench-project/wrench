@@ -141,4 +141,20 @@ namespace wrench {
       return (sequence_number++);
     }
 
+    /**
+    * @brief Set the parent compute service of the job
+    * @param compute_service: a compute service
+    */
+    void WorkflowJob::setParentComputeService(ComputeService *compute_service) {
+      this->parent_compute_service = compute_service;
+    }
+
+    /**
+     * @brief Get the parent compute service of the job
+     *
+     * @return a compute service
+     */
+     ComputeService *WorkflowJob::getParentComputeService() {
+       return this->parent_compute_service;
+     }
 };

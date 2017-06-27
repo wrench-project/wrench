@@ -61,7 +61,7 @@ namespace wrench {
      */
     Simulation::~Simulation() {
       // TODO: Figure out why this segfaults... perhaps we don't need it
-      // this->s4u_simulation->shutdown();
+       this->s4u_simulation->shutdown();
     }
 
     /**
@@ -202,7 +202,7 @@ namespace wrench {
      *
      * @param service: a compute service
      *
-     * @return (a raw pointer to) the compute service
+     * @return the compute service
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
@@ -226,7 +226,7 @@ namespace wrench {
     * @brief Add a StorageService to the simulation
     *
     * @param service: a storage service
-    * @return (a raw pointer to) the storage service
+    * @return the storage service
      *
     * @throw std::invalid_argument
     * @throw std::runtime_error
@@ -250,7 +250,7 @@ namespace wrench {
      * @brief Set a WMS for the simulation
      *
      * @param wms: a WMS
-     * @return (a raw pointer to) the WMS
+     * @return the WMS
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error

@@ -42,21 +42,24 @@ namespace wrench {
             FILE_NOT_FOUND,
             /** @brief The storage service does not have enough space to support operationg */
             STORAGE_NO_ENOUGH_SPACE,
-            /** @brief The service cannot be ised because it was terminated */
+            /** @brief The service cannot be used because it was terminated */
             SERVICE_TERMINATED,
             /** @brief The compute service does not support this job type */
             JOB_TYPE_NOT_SUPPORTED,
             /** @brief The compute service cannot run the job due to insufficient total number of cores */
             NOT_ENOUGH_CORES,
             /** @brief There was a network error, or an endpoint was down */
-            NETWORK_ERROR
+            NETWORK_ERROR,
+            /** @brief The job cannot be terminated because it's neither pending nor running */
+            JOB_CANNOT_BE_TERMINATED
+
         };
 
         WorkflowExecutionFailureCause(CauseType cause);
 
         virtual std::string toString() = 0;
 
-        CauseType getCause();
+        CauseType getCauseType();
 
     private:
         CauseType cause;
@@ -166,6 +169,21 @@ namespace wrench {
         std::string toString();
 
     private:
+    };
+
+    /**
+     * @brief A "job cannot be terminated" workflow execution failure cause
+     */
+    class JobCannotBeTerminated : public WorkflowExecutionFailureCause {
+    public:
+        JobCannotBeTerminated(WorkflowJob *job, ComputeService *compute_service);
+        WorkflowJob *getJob();
+        ComputeService *getComputeService();
+        std::string toString();
+
+    private:
+        WorkflowJob *job;
+        ComputeService *compute_service;
     };
 
     /***********************/

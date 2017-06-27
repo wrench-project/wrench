@@ -35,12 +35,18 @@ namespace wrench {
 
     /**
      * @brief Submit a job to the compute service
-     * @param job: a pointer to the job
+     * @param job: the job
      *
      * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
      */
     void ComputeService::runJob(WorkflowJob *job) {
 
+      if (job == nullptr) {
+        throw std::invalid_argument("ComputeService::runJob(): invalid argument");  
+      }
+      
       if (this->state == ComputeService::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
@@ -53,6 +59,43 @@ namespace wrench {
           }
           case WorkflowJob::PILOT: {
             this->submitPilotJob((PilotJob *) job);
+            break;
+          }
+        }
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      } catch (std::runtime_error &e) {
+        throw;
+      }
+    }
+
+    /**
+     * @brief Terminate a previously-submitted job (which may or may not be running)
+     * 
+     * @param job: the job to terminate
+     * 
+     * @throw std::invalid_argument
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void ComputeService::terminateJob(WorkflowJob *job) {
+
+      if (job == nullptr) {
+        throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
+      }
+      
+      if (this->state == ComputeService::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      try {
+        switch (job->getType()) {
+          case WorkflowJob::STANDARD: {
+            this->terminateStandardJob((StandardJob *) job);
+            break;
+          }
+          case WorkflowJob::PILOT: {
+            this->terminatePilotJob((PilotJob *) job);
             break;
           }
         }
@@ -130,7 +173,7 @@ namespace wrench {
      *
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
-     * @param default_storage_service: a raw pointer to a StorageService object
+     * @param default_storage_service: a storage service
      */
     ComputeService::ComputeService(std::string service_name,
                                    std::string mailbox_name_prefix,
@@ -159,7 +202,7 @@ namespace wrench {
 
     /**
      * @brief Submit a standard job to the compute service (virtual)
-     * @param job: a pointer to the job
+     * @param job: the job
      *
      * @throw std::runtime_error
      */
@@ -169,7 +212,7 @@ namespace wrench {
 
     /**
      * @brief Submit a pilot job to the compute service (virtual)
-     * @param job: a pointer ot the job
+     * @param job: the job
      *
      * @throw std::runtime_error
      */
@@ -177,6 +220,26 @@ namespace wrench {
       throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
     }
 
+    /**
+    * @brief Terminate a standard job to the compute service (virtual)
+    * @param job: the job
+    *
+    * @throw std::runtime_error
+    */
+    void ComputeService::terminateStandardJob(StandardJob *job) {
+      throw std::runtime_error("ComputeService::terminateStandardJob(): Not implemented here");
+    }
+
+    /**
+     * @brief Terminate a pilot job to the compute service (virtual)
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
+    void ComputeService::terminatePilotJob(PilotJob *job) {
+      throw std::runtime_error("ComputeService::terminatePilotJob(): Not implemented here");
+    }
+    
     /**
      * @brief Get the flop/sec rate of one core of the compute service's host
      * @return  the flop rate
@@ -219,7 +282,7 @@ namespace wrench {
 
     /**
      * @brief Set the default StorageService for the ComputeService
-     * @param storage_service: a raw pointer to a StorageService object
+     * @param storage_service: a storage service
      */
     void ComputeService::setDefaultStorageService(StorageService *storage_service) {
       this->default_storage_service = storage_service;
@@ -227,7 +290,7 @@ namespace wrench {
 
     /**
     * @brief Get the default StorageService for the ComputeService
-    * @return a raw pointer to a StorageService object
+    * @return a storage service
     */
     StorageService *ComputeService::getDefaultStorageService() {
       return this->default_storage_service;

@@ -41,6 +41,8 @@ namespace wrench {
 
         void runJob(WorkflowJob *job);
 
+        void terminateJob(WorkflowJob *job);
+
         bool canRunJob(WorkflowJob::Type job_type, unsigned long min_num_cores, double duration);
 
         bool supportsStandardJobs();
@@ -66,6 +68,10 @@ namespace wrench {
         virtual void submitStandardJob(StandardJob *job);
 
         virtual void submitPilotJob(PilotJob *job);
+
+        virtual void terminateStandardJob(StandardJob *job);
+
+        virtual void terminatePilotJob(PilotJob *job);
 
         ComputeService(std::string service_name,
                        std::string mailbox_name_prefix,

@@ -81,6 +81,7 @@ namespace wrench {
 
         void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
 
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -95,6 +96,8 @@ namespace wrench {
         bool pathExists(WorkflowTask *, WorkflowTask *);
 
         std::string callback_mailbox;
+
+        ComputeService *parent_compute_service; // The compute service to which the job was submitted, if any
     };
 };
 

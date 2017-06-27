@@ -187,8 +187,8 @@ namespace wrench {
       } else if (StorageServiceFileWriteRequestMessage *msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
 
         if (msg->file->getSize() > (this->capacity - this->occupied_space)) {
-          std::cerr << " NO SPACE " << msg->file->getSize() << " " << this->capacity << " " << this->occupied_space
-                    << std::endl;
+//          std::cerr << " NO SPACE " << msg->file->getSize() << " " << this->capacity << " " << this->occupied_space
+//                    << std::endl;
           S4U_Mailbox::putMessage(msg->answer_mailbox,
                                   new StorageServiceFileWriteAnswerMessage(msg->file,
                                                                            this,
@@ -239,9 +239,9 @@ namespace wrench {
           failure_cause = new FileNotFound(msg->file, this);
         }
 
-        // Send back the corresponding ack
+        // Send back the corresponding ack, asynchronously (in case
         try {
-          S4U_Mailbox::putMessage(msg->answer_mailbox,
+          S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                   new StorageServiceFileReadAnswerMessage(msg->file, this, success, failure_cause,
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
@@ -257,6 +257,7 @@ namespace wrench {
             return true;
           }
         }
+
         return true;
 
       } else if (StorageServiceFileCopyRequestMessage *msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {

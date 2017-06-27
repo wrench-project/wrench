@@ -65,7 +65,7 @@ namespace wrench {
 
 				void submitJob(WorkflowJob *job, ComputeService *compute_service);
 
-				void cancelPilotJob(PilotJob *);
+				void terminateJob(WorkflowJob *);
 
 				void forgetJob(WorkflowJob *job);
 

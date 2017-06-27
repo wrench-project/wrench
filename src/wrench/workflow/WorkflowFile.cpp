@@ -47,7 +47,7 @@ namespace wrench {
     /**
      * @brief Define the task that outputs this file
      *
-     * @param task: a pointer to a WorkflowTask object
+     * @param task: a workflow task
      */
     void WorkflowFile::setOutputOf(WorkflowTask *task) {
       this->output_of = task;
@@ -56,7 +56,7 @@ namespace wrench {
     /**
      * @brief Get the task the outputs this file
      *
-     * @return a pointer to a WorkflowTask
+     * @return a workflow task
      */
     WorkflowTask *WorkflowFile::getOutputOf() {
       return this->output_of;
@@ -65,7 +65,7 @@ namespace wrench {
     /**
      * @brief Add a task that uses this file as input
      *
-     * @param task: a pointer to a WorkflowTask object
+     * @param task: a workflow task
      */
     void WorkflowFile::setInputOf(WorkflowTask *task) {
       this->input_of[task->getId()] = task;
@@ -74,7 +74,7 @@ namespace wrench {
     /**
      * @brief Get the set of tasks that use this file as input
      *
-     * @return a map of pointers to WorkflowTask objects
+     * @return a map of workflow tasks
      */
     std::map<std::string, WorkflowTask *> WorkflowFile::getInputOf() {
       return this->input_of;

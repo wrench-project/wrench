@@ -20,7 +20,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     MulticoreComputeServiceMessage::MulticoreComputeServiceMessage(std::string name, double payload) :
-            ComputeServiceMessage("ComputeServiceMessage::" + name, payload) {
+            ComputeServiceMessage("MulticoreComputeServiceMessage::" + name, payload) {
     }
 
     /**

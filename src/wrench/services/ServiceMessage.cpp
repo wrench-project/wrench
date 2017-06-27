@@ -17,7 +17,7 @@ namespace wrench {
      * @param payload: message size in bytes
      */
     ServiceMessage::ServiceMessage(std::string name, double payload) :
-            SimulationMessage("Service::" + name, payload) {}
+            SimulationMessage("ServiceMessage::" + name, payload) {}
 
     /**
      * @brief Constructor

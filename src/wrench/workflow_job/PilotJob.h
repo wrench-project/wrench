@@ -63,7 +63,7 @@ namespace wrench {
         PilotJob::State getState();
 
         State state;
-        ComputeService *compute_service; // Associated compute service
+        ComputeService *compute_service; // Associated compute service, i.e., the running pilot job
     };
 
     /***********************/

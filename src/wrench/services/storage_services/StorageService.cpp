@@ -37,7 +37,7 @@ namespace wrench {
     /**
      * @brief Internal method to add a file to the storage in a StorageService
      *
-     * @param file: a raw pointer to a WorkflowFile object
+     * @param file: a workflow file
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
@@ -63,7 +63,7 @@ namespace wrench {
     /**
      * @brief Internal method to delete a file from the storage  in a StorageService
      *
-     * @param file: a raw pointer to a WorkflowFile object
+     * @param file: a workflow file
      *
      * @throw std::runtime_error
      */
@@ -360,7 +360,7 @@ namespace wrench {
      * @param files: the set of files to read
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
-     * @return nullptr on success, a pointer to a workflow execution failure cause on failure
+     * @return nullptr on success, or a workflow execution failure cause on failure
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -383,7 +383,7 @@ namespace wrench {
      * @param files: the set of files to write
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
-     * @return nullptr on success, a pointer to a workflow execution failure cause on failure
+     * @return nullptr on success, or a workflow execution failure cause on failure
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -407,7 +407,7 @@ namespace wrench {
      * @param files: the set of files to read/write
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
-     * @return nullptr on success, a pointer to a workflow execution failure cause on failure
+     * @return nullptr on success, or a workflow execution failure cause on failure
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException

@@ -156,7 +156,7 @@ namespace wrench {
 
     /**
      * @brief Get the workflow that contains the task
-     * @return a raw pointer to a Workflow object
+     * @return a workflow
      */
     Workflow *WorkflowTask::getWorkflow() const {
       return this->workflow;
@@ -259,7 +259,7 @@ namespace wrench {
      *
      * @param map_to_insert: the map of workflow files to insert
      * @param map_to_check: the map of workflow files to check
-     * @param f: a pointer to a WorkflowFile object
+     * @param f: a workflow file
      *
      * @throw std::invalid_argument
      */
@@ -294,7 +294,7 @@ namespace wrench {
 
     /**
      * @brief Retrieves the set of input WorkflowFile objects for the task
-     * @return a set of raw WorkflowFile pointers
+     * @return a set workflow files
      */
     std::set<WorkflowFile *> WorkflowTask::getInputFiles() {
       std::set<WorkflowFile *> input;
@@ -307,7 +307,7 @@ namespace wrench {
 
     /**
      * @brief Retrieves the set of output WorkflowFile objects for the task
-     * @return a set of raw WorkflowFile pointers
+     * @return a set of workflow files
      */
     std::set<WorkflowFile *> WorkflowTask::getOutputFiles() {
       std::set<WorkflowFile *> output;

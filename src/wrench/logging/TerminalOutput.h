@@ -28,12 +28,12 @@
 
 /* Wrappers around XBT_* macros */
 
-#define WRENCH_INFO(...)  TerminalOutput::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; TerminalOutput::endThisProcessColor()
-//#define WRENCH_INFO(...)  TerminalOutput::beginThisProcessColor(); fprintf(stderr,__VA_ARGS__) ; fprintf(stderr,"\n"); TerminalOutput::endThisProcessColor()
+#define WRENCH_INFO(...)  wrench::TerminalOutput::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; wrench::TerminalOutput::endThisProcessColor()
+//#define WRENCH_INFO(...)  wrench::TerminalOutput::beginThisProcessColor(); fprintf(stderr,__VA_ARGS__) ; fprintf(stderr,"\n"); wrench::TerminalOutput::endThisProcessColor()
 
-#define WRENCH_DEBUG(...)  TerminalOutput::beginThisProcessColor(); XBT_DEBUG(__VA_ARGS__) ; TerminalOutput::endThisProcessColor()
+#define WRENCH_DEBUG(...)  wrench::TerminalOutput::beginThisProcessColor(); XBT_DEBUG(__VA_ARGS__) ; wrench::TerminalOutput::endThisProcessColor()
 
-#define WRENCH_WARN(...)  TerminalOutput::beginThisProcessColor(); XBT_WARN(__VA_ARGS__) ; TerminalOutput::endThisProcessColor()
+#define WRENCH_WARN(...)  wrench::TerminalOutput::beginThisProcessColor(); XBT_WARN(__VA_ARGS__) ; wrench::TerminalOutput::endThisProcessColor()
 
 namespace wrench {
 

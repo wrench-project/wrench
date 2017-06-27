@@ -28,7 +28,7 @@ namespace wrench {
     /**
      * @brief Asynchronously submit a standard job to the compute service
      *
-     * @param job: a pointer a StandardJob object
+     * @param job: a standard job
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -42,12 +42,12 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
 
-      //  send a "run a task" message to the daemon's mailbox
+      //  send a "run a standard job" message to the daemon's mailbox
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceSubmitStandardJobRequestMessage(answer_mailbox, job,
                                                                                   this->getPropertyValueAsDouble(
-                                                                                          MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                                                                          MulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::runtime_error &e) {
         if (!strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
@@ -347,7 +347,8 @@ namespace wrench {
       } else {
         throw std::runtime_error(
                 "MulticoreComputeService::getCoreFLopRate(): unexpected [" + msg->getName() + "] message");
-      }}
+      }
+    }
 
 
     /**
@@ -385,7 +386,7 @@ namespace wrench {
      * @param ttl: the time-ti-live, in seconds
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
-     * @param default_storage_service: a raw pointer to a StorageService object
+     * @param default_storage_service: a storage service
      *
      * @throw std::invalid_argument
      */
@@ -494,7 +495,7 @@ namespace wrench {
             case WorkflowJob::STANDARD: {
 
               // Put the job in the running queue
-              this->pending_jobs.pop();
+              this->pending_jobs.pop_back();
               this->running_jobs.insert(next_job);
 
               // Create all the work for the job
@@ -529,7 +530,7 @@ namespace wrench {
                 job->setComputeService(cs);
 
                 // Put the job in the running queue
-                this->pending_jobs.pop();
+                this->pending_jobs.pop_back();
                 this->running_jobs.insert(next_job);
 
                 // Send the "Pilot job has started" callback
@@ -581,12 +582,12 @@ namespace wrench {
 
         WorkUnitExecutor *working_thread =
                 new WorkUnitExecutor(this->simulation,
-                                 S4U_Simulation::getHostName(),
-                                 this->mailbox_name,
-                                 work_to_do,
-                                 this->default_storage_service,
-                                 this->getPropertyValueAsDouble(
-                                         MulticoreComputeServiceProperty::TASK_STARTUP_OVERHEAD));
+                                     S4U_Simulation::getHostName(),
+                                     this->mailbox_name,
+                                     work_to_do,
+                                     this->default_storage_service,
+                                     this->getPropertyValueAsDouble(
+                                             MulticoreComputeServiceProperty::TASK_STARTUP_OVERHEAD));
 
         this->working_threads.insert(working_thread);
         return true;
@@ -665,7 +666,7 @@ namespace wrench {
           return true;
         }
 
-        this->pending_jobs.push(msg->job);
+        this->pending_jobs.push_front(msg->job);
 
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
@@ -678,11 +679,12 @@ namespace wrench {
           return true;
         }
         return true;
+
       } else if (ComputeServiceSubmitPilotJobRequestMessage *msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
         WRENCH_INFO("Asked to run a pilot job with %d cores for %lf seconds", msg->job->getNumCores(),
                     msg->job->getDuration());
 
-        WRENCH_INFO("THE REPLY MAILBOX IS %s", msg->answer_mailbox.c_str());
+//        WRENCH_INFO("THE REPLY MAILBOX IS %s", msg->answer_mailbox.c_str());
 
         bool success = true;
         WorkflowExecutionFailureCause *failure_cause = nullptr;
@@ -721,8 +723,8 @@ namespace wrench {
         }
 
         // success
-        WRENCH_INFO("SENDING REPLY TO %s", msg->answer_mailbox.c_str());
-        this->pending_jobs.push(msg->job);
+//        WRENCH_INFO("SENDING REPLY TO %s", msg->answer_mailbox.c_str());
+        this->pending_jobs.push_front(msg->job);
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
@@ -792,7 +794,14 @@ namespace wrench {
           return true;
         }
         return true;
+
+      } else if (ComputeServiceTerminateStandardJobRequestMessage *msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage *>(message.get())) {
+
+        processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
+        return true;
+
       } else {
+        WRENCH_INFO("IN TROUBLE!");
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");
       }
     }
@@ -843,47 +852,15 @@ namespace wrench {
     }
 
     /**
-  * @brief fail a running standard job
-  * @param job: the job
-  * @param cause: the failure cause
-  */
+     * @brief fail a running standard job
+     * @param job: the job
+     * @param cause: the failure cause
+     */
     void MulticoreComputeService::failRunningStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause) {
 
       WRENCH_INFO("Failing running job %s", job->getName().c_str());
 
-      std::vector<WorkUnit *> works_to_terminate;
-
-      // Brutally terminate all relevant running work
-      for (auto w : this->running_works) {
-        if (w->job == job) {
-          works_to_terminate.push_back(w);
-        }
-      }
-
-      for (auto w : works_to_terminate) {
-        WorkUnitExecutor *worker_thread_to_terminate = nullptr;
-        for (auto wt : this->working_threads) {
-          if (wt->work == w) {
-            worker_thread_to_terminate = wt;
-            break;
-          }
-        }
-        if (worker_thread_to_terminate == nullptr) {
-          throw std::runtime_error("Can't find worker threads for work belonging to job " + w->job->getName());
-        }
-        WRENCH_INFO("Brutally killing worker thread that's working on work for job %s", w->job->getName().c_str());
-        worker_thread_to_terminate->kill();
-      }
-
-
-
-      // Set all non-COMPLETED tasks back to the READY state and wipe out output files
-      for (auto failed_task: job->getTasks()) {
-        if (failed_task->getState() != WorkflowTask::COMPLETED) {
-          failed_task->setFailed();
-          failed_task->setReady();
-        }
-      }
+      terminateRunningStandardJob(job);
 
       // Send back a job failed message (Not that it can be a partial fail)
       WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
@@ -898,6 +875,80 @@ namespace wrench {
       }
     }
 
+    /**
+    * @brief fail a running standard job
+    * @param job: the job
+    */
+    void MulticoreComputeService::terminateRunningStandardJob(StandardJob *job) {
+
+      std::vector<WorkUnit *> works_to_terminate;
+
+      // Find all works to terminate
+      for (auto w : this->running_works) {
+        if (w->job == job) {
+          works_to_terminate.push_back(w);
+        }
+      }
+
+      // Find all involved worker threads
+      std::set<WorkUnitExecutor *> worker_threads_to_terminate;
+      for (auto w : works_to_terminate) {
+        WorkUnitExecutor *worker_thread_to_terminate = nullptr;
+        for (auto wt : this->working_threads) {
+          if (wt->work == w) {
+            worker_thread_to_terminate = wt;
+            break;
+          }
+        }
+        if (worker_thread_to_terminate == nullptr) {
+          throw std::runtime_error("Can't find worker threads for work belonging to job " + w->job->getName());
+        }
+        if (worker_threads_to_terminate.find(worker_thread_to_terminate) == worker_threads_to_terminate.end()) {
+          worker_threads_to_terminate.insert(worker_thread_to_terminate);
+        }
+      }
+
+      // Terminate all worker threads
+      for (auto tw : worker_threads_to_terminate) {
+        WRENCH_INFO("Brutally killing a worker thread that's working on work for job %s", job->getName().c_str());
+        tw->kill();
+      }
+
+      // Set all non-COMPLETED tasks back to the READY state and wipe out output files
+      // TODO: At some point we'll have to think hard about the task life cycle and make it better/coherent
+      for (auto failed_task: job->getTasks()) {
+//        WRENCH_INFO("====> %s %s", failed_task->getId().c_str(), WorkflowTask::stateToString(failed_task->getState()).c_str());
+        switch (failed_task->getState()) {
+          case WorkflowTask::NOT_READY: {
+            break;
+          }
+          case WorkflowTask::READY: {
+            break;
+          }
+          case WorkflowTask::PENDING: {
+            failed_task->setReady();
+            break;
+          }
+          case WorkflowTask::RUNNING: {
+            failed_task->setFailed();
+            failed_task->setReady();
+            break;
+          }
+          case WorkflowTask::COMPLETED: {
+            break;
+          }
+          case WorkflowTask::FAILED: {
+            failed_task->setReady();
+            break;
+          }
+          default: {
+            throw std::runtime_error("MulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
+          }
+        }
+      }
+
+      return;
+    }
 
     /**
  * @brief Declare all current jobs as failed (likely because the daemon is being terminated
@@ -905,7 +956,6 @@ namespace wrench {
  */
     void MulticoreComputeService::failCurrentStandardJobs(WorkflowExecutionFailureCause *cause) {
 
-      WRENCH_INFO("Failing %ld running jobs", this->running_jobs.size());
       for (auto workflow_job : this->running_jobs) {
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           StandardJob *job = (StandardJob *) workflow_job;
@@ -913,10 +963,9 @@ namespace wrench {
         }
       }
 
-      WRENCH_INFO("Failing %ld pending jobs", this->pending_jobs.size());
       while (not this->pending_jobs.empty()) {
         WorkflowJob *workflow_job = this->pending_jobs.front();
-        this->pending_jobs.pop();
+        this->pending_jobs.pop_back();
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           StandardJob *job = (StandardJob *) workflow_job;
           this->failPendingStandardJob(job, cause);
@@ -1126,7 +1175,7 @@ namespace wrench {
     /**
      * @brief Process a pilot job completion
      *
-     * @param job: pointer to the PilotJob object
+     * @param job: the pilot job
      */
     void MulticoreComputeService::processPilotJobCompletion(PilotJob *job) {
 
@@ -1230,4 +1279,178 @@ namespace wrench {
       return;
     }
 
+
+    /**
+     * @brief Synchronously terminate a standard job previously submitted to the compute service
+     *
+     * @param job: the standard job
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     *
+     */
+    void MulticoreComputeService::terminateStandardJob(StandardJob *job) {
+
+      if (this->state == Service::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+
+      //  send a "terminate a standard job" message to the daemon's mailbox
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new ComputeServiceTerminateStandardJobRequestMessage(answer_mailbox, job,
+                                                                                     this->getPropertyValueAsDouble(
+                                                                                             MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error(
+                  "MulticoreComputeService::terminateStandardJob(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
+      // Get the answer
+      std::unique_ptr<SimulationMessage> message = nullptr;
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error(
+                  "MulticoreComputeService::terminateStandardJob(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
+      if (ComputeServiceTerminateStandardJobAnswerMessage *msg = dynamic_cast<ComputeServiceTerminateStandardJobAnswerMessage *>(message.get())) {
+        // If no success, throw an exception
+        if (not msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        }
+      } else {
+        throw std::runtime_error(
+                "MulticoreComputeService::terminateStandardJob(): Received an unexpected [" + message->getName() +
+                "] message!");
+      }
+
+    };
+
+    /**
+     * @brief Synchronously terminate a pilot job to the compute service
+     *
+     * @param job: a pilot job
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void MulticoreComputeService::terminatePilotJob(PilotJob *job) {
+
+      if (this->state == Service::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+
+      // Send a "terminate a pilot job" message to the daemon's mailbox
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new ComputeServiceTerminatePilotJobRequestMessage(answer_mailbox, job,
+                                                                                  this->getPropertyValueAsDouble(
+                                                                                          MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error(
+                  "MulticoreComputeService::terminatePilotJob(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
+      // Get the answer
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error(
+                  "MulticoreComputeService::terminatePilotJob(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
+      if (ComputeServiceTerminatePilotJobAnswerMessage *msg = dynamic_cast<ComputeServiceTerminatePilotJobAnswerMessage *>(message.get())) {
+        // If no success, throw an exception
+        if (not msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        }
+
+      } else {
+        throw std::runtime_error(
+                "MulticoreComputeService::terminatePilotJob(): Received an unexpected [" + message->getName() +
+                "] message!");
+      }
+    };
+
+
+    /**
+     * @brief Process a standard job termination request
+     *
+     * @param job: the job to terminate
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     */
+    void MulticoreComputeService::processStandardJobTerminationRequest(StandardJob *job, std::string answer_mailbox) {
+
+
+      // Check whether job is pending
+      for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
+        if (*it == job) {
+          this->pending_jobs.erase(it);
+          ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
+                  job, this, true, nullptr,
+                  this->getPropertyValueAsDouble(
+                          MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+          try {
+            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+          } catch (std::runtime_error &e) {
+            return;
+          }
+          return;
+        }
+      }
+
+      // Check whether the job is running
+      if (this->running_jobs.find(job) != this->running_jobs.end()) {
+        this->running_jobs.erase(job);
+        terminateRunningStandardJob(job);
+        ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
+                job, this, true, nullptr,
+                this->getPropertyValueAsDouble(
+                        MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+        try {
+          S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        } catch (std::runtime_error &e) {
+          return;
+        }
+        return;
+      }
+
+      // If we got here, we're in trouble
+      WRENCH_INFO("Trying to terminate a standard job that's neither pending nor running!");
+      ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
+              job, this, false, new JobCannotBeTerminated(job, this),
+              this->getPropertyValueAsDouble(
+                      MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+      try {
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+      } catch (std::runtime_error &e) {
+        return;
+      }
+      return;
+    }
 };
+

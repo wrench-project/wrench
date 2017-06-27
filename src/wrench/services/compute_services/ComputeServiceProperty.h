@@ -30,6 +30,10 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(STANDARD_JOB_DONE_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state that a running standard job has failed **/
         DECLARE_PROPERTY_NAME(STANDARD_JOB_FAILED_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent to the daemon to terminate a standard job to it **/
+        DECLARE_PROPERTY_NAME(TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent by the daemon to acknowledge a standard job termination **/
+        DECLARE_PROPERTY_NAME(TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent to the daemon to submit a pilot job to it **/
         DECLARE_PROPERTY_NAME(SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent from the daemon to acknowledge a pilot job submission **/
@@ -44,11 +48,10 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(TTL_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state its time-to-live **/
         DECLARE_PROPERTY_NAME(TTL_ANSWER_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the daemon to ask it for a file lookup **/
-        DECLARE_PROPERTY_NAME(FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to answer a file lookup request **/
-        DECLARE_PROPERTY_NAME(FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD);
-
+        /** @brief The number of bytes in the control message sent to the daemon to terminate a pilot job to it **/
+        DECLARE_PROPERTY_NAME(TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent by the daemon to acknowledge a pilot job termination **/
+        DECLARE_PROPERTY_NAME(TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD);
     };
 
 

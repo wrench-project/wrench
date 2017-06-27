@@ -27,7 +27,7 @@ namespace wrench {
      * @brief Retrieve the type of the failure cause
      * @return
      */
-    WorkflowExecutionFailureCause::CauseType WorkflowExecutionFailureCause::getCause() {
+    WorkflowExecutionFailureCause::CauseType WorkflowExecutionFailureCause::getCauseType() {
       return this->cause;
     }
 
@@ -236,4 +236,44 @@ namespace wrench {
     std::string NetworkError::toString() {
        return "Network error (link failure, or communication peer died)";
     };
+
+    /**
+     * @brief Constructor
+     *
+     * @param job: the job that couldn't be terminated
+     * @param compute_service: the compute service that couldn't terminate the job
+     */
+    JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job, ComputeService *compute_service) : WorkflowExecutionFailureCause(
+            JOB_CANNOT_BE_TERMINATED) {
+      this->job = job;
+      this->compute_service = compute_service;
+    }
+
+
+    /**
+     * @brief Getter
+     * @return the job
+     */
+    WorkflowJob *JobCannotBeTerminated::getJob() {
+      return this->job;
+    }
+
+    /**
+     * @brief Getter
+     * @return the compute service
+     */
+    ComputeService *JobCannotBeTerminated::getComputeService() {
+      return this->compute_service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string JobCannotBeTerminated::toString() {
+      return "Job cannot be terminated (because it's neither pending nor running)";
+    };
+
+
+
 };

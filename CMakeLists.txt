@@ -110,7 +110,9 @@ set(TEST_FILES
         test/wms/optimizations/static/SimplePipelineClusteringTest.cpp
         test/simulation/OneTaskTest.cpp
         test/simulation/SimpleStorageServiceTest.cpp
-        test/simulation/MulticoreComputeServiceTest.cpp)
+        test/simulation/MulticoreComputeServiceTestStandardJobs.cpp
+        test/simulation/MulticoreComputeServiceTestPilotJobs.cpp
+        )
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)

@@ -23,8 +23,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: pointer to a WorkflowJob
-     * @param cs: points to a ComputeService
+     * @param job: a workflow job
+     * @param cs: a compute service
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -44,7 +44,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param answer_mailbox: mailbox to which the answer message should be sent
-    * @param job: pointer to a StandardJob
+    * @param job: a standard job
     * @param payload: message size in bytes
     *
     * @throw std::invalid_arguments
@@ -64,7 +64,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: pointer to a StandardJob
+     * @param job: a standard job
      * @param compute_service: the compute service
      * @param success: true on success, false otherwise
      * @param failure_cause: cause of the failure (nullptr is success=true)
@@ -90,7 +90,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: pointer to a StandardJob
+     * @param job: a standard job
      * @param cs: points to a ComputeService
      * @param payload: message size in bytes
      *
@@ -109,8 +109,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: pointer to a StandardJob
-     * @param cs: points to a ComputeService
+     * @param job: a standard job
+     * @param cs: a compute service
      * @param cause: the cause of the failure
      * @param payload: message size in bytes
      *
@@ -131,9 +131,57 @@ namespace wrench {
     }
 
     /**
+    * @brief Constructor
+    * @param answer_mailbox: mailbox to which the answer message should be sent
+    * @param job: a standard job
+    * @param payload: message size in bytes
+    *
+    * @throw std::invalid_arguments
+    */
+    ComputeServiceTerminateStandardJobRequestMessage::ComputeServiceTerminateStandardJobRequestMessage(
+            std::string answer_mailbox,
+            StandardJob *job,
+            double payload) :
+            ComputeServiceMessage("TERMINATE_STANDARD_JOB_REQUEST", payload) {
+      if ((answer_mailbox == "") || (job == nullptr)) {
+        throw std::invalid_argument(
+                "ComputeServiceTerminateStandardJobRequestMessage::ComputeServiceTerminateStandardJobRequestMessage(): Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+      this->job = job;
+    }
+
+    /**
+     * @brief Constructor
+     * @param job: a standard job
+     * @param compute_service: the compute service
+     * @param success: true on success, false otherwise
+     * @param failure_cause: cause of the failure (nullptr is success=true)
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_arguments
+     */
+    ComputeServiceTerminateStandardJobAnswerMessage::ComputeServiceTerminateStandardJobAnswerMessage(StandardJob *job,
+                                                                                               ComputeService *compute_service,
+                                                                                               bool success,
+                                                                                               WorkflowExecutionFailureCause *failure_cause,
+                                                                                               double payload) :
+            ComputeServiceMessage("TERMINATE_STANDARD_JOB_ANSWER", payload) {
+      if ((job == nullptr) || (compute_service == nullptr)) {
+        throw std::invalid_argument(
+                "ComputeServiceTerminateStandardJobAnswerMessage::ComputeServiceTerminateStandardJobAnswerMessage(): Invalid arguments");
+      }
+      this->job = job;
+      this->compute_service = compute_service;
+      this->success = success;
+      this->failure_cause = failure_cause;
+    }
+
+
+    /**
      * @brief Constructor
      * @param answer_mailbox: mailbox to which the answer message should be sent
-     * @param job: pointer to a PilotJob
+     * @param job: a pilot job
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -180,8 +228,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: pointer to a PilotJob
-     * @param cs: points to a ComputeService
+     * @param job: a pilot job
+     * @param cs: a compute service
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -200,8 +248,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: pointer to a PilotJob
-     * @param cs: points to a ComputeService
+     * @param job: a pilot job
+     * @param cs: a compute service
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -219,8 +267,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: pointer to a PilotJob
-     * @param cs: points to a ComputeService
+     * @param job: a pilot job
+     * @param cs: a compute service
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -236,4 +284,50 @@ namespace wrench {
       this->compute_service = cs;
     }
 
+    /**
+    * @brief Constructor
+    * @param answer_mailbox: mailbox to which the answer message should be sent
+    * @param job: a pilot job
+    * @param payload: message size in bytes
+    *
+    * @throw std::invalid_arguments
+    */
+    ComputeServiceTerminatePilotJobRequestMessage::ComputeServiceTerminatePilotJobRequestMessage(
+            std::string answer_mailbox,
+            PilotJob *job,
+            double payload) :
+            ComputeServiceMessage("TERMINATE_STANDARD_JOB_REQUEST", payload) {
+      if ((answer_mailbox == "") || (job == nullptr)) {
+        throw std::invalid_argument(
+                "ComputeServiceTerminatePilotJobRequestMessage::ComputeServiceTerminatePilotJobRequestMessage(): Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+      this->job = job;
+    }
+
+    /**
+     * @brief Constructor
+     * @param job: a pilot job
+     * @param compute_service: the compute service
+     * @param success: true on success, false otherwise
+     * @param failure_cause: cause of the failure (nullptr is success=true)
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_arguments
+     */
+    ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(PilotJob *job,
+                                                                                                     ComputeService *compute_service,
+                                                                                                     bool success,
+                                                                                                     WorkflowExecutionFailureCause *failure_cause,
+                                                                                                     double payload) :
+            ComputeServiceMessage("TERMINATE_STANDARD_JOB_ANSWER", payload) {
+      if ((job == nullptr) || (compute_service == nullptr)) {
+        throw std::invalid_argument(
+                "ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(): Invalid arguments");
+      }
+      this->job = job;
+      this->compute_service = compute_service;
+      this->success = success;
+      this->failure_cause = failure_cause;
+    }
 };

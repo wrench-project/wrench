@@ -43,10 +43,10 @@ namespace wrench {
         /** @brief The compute service that does not support it */
         ComputeService *compute_service;
     };
-
-    /**
- * @brief ComputeServiceSubmitStandardJobRequestMessage class
- */
+    
+   /**
+    * @brief ComputeServiceSubmitStandardJobRequestMessage class
+    */
     class ComputeServiceSubmitStandardJobRequestMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitStandardJobRequestMessage(std::string answer_mailbox, StandardJob *, double payload);
@@ -102,6 +102,36 @@ namespace wrench {
         WorkflowExecutionFailureCause *cause;
     };
 
+    /**
+    * @brief ComputeServiceTerminateStandardJobRequestMessage class
+    */
+    class ComputeServiceTerminateStandardJobRequestMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceTerminateStandardJobRequestMessage(std::string answer_mailbox, StandardJob *, double payload);
+
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The job to terminate*/
+        StandardJob *job;
+    };
+
+    /**
+     * @brief ComputeServiceTerminateStandardJobAnswerMessage class
+     */
+    class ComputeServiceTerminateStandardJobAnswerMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceTerminateStandardJobAnswerMessage(StandardJob *, ComputeService *, bool success, WorkflowExecutionFailureCause *failure_cause, double payload);
+
+        /** @brief The standard job to terminate */
+        StandardJob *job;
+        /** @brief The compute service to which the job had been submitted */
+        ComputeService *compute_service;
+        /** @brief Whether to job termination was successful */
+        bool success;
+        /** @brief The cause of the failure, or nullptr on success */
+        WorkflowExecutionFailureCause *failure_cause;
+    };
+    
     /**
      * @brief ComputeServiceSubmitPilotJobRequestMessage class
      */
@@ -170,6 +200,36 @@ namespace wrench {
         PilotJob *job;
         /** @brief The compute service on which the pilot job failed */
         ComputeService *compute_service;
+    };
+
+    /**
+    * @brief ComputeServiceTerminatePilotJobRequestMessage class
+    */
+    class ComputeServiceTerminatePilotJobRequestMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceTerminatePilotJobRequestMessage(std::string answer_mailbox, PilotJob *, double payload);
+
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The job to terminate*/
+        PilotJob *job;
+    };
+
+    /**
+     * @brief ComputeServiceTerminatePilotJobAnswerMessage class
+     */
+    class ComputeServiceTerminatePilotJobAnswerMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceTerminatePilotJobAnswerMessage(PilotJob *, ComputeService *, bool success, WorkflowExecutionFailureCause *failure_cause, double payload);
+
+        /** @brief The job to terminate */
+        PilotJob *job;
+        /** @brief The compute service to which the job had been submitted */
+        ComputeService *compute_service;
+        /** @brief Whether to job termination was successful */
+        bool success;
+        /** @brief The cause of the failure, or nullptr on success */
+        WorkflowExecutionFailureCause *failure_cause;
     };
 
     /***********************/

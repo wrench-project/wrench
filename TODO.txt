@@ -1,4 +1,10 @@
+DETAIL:
+    - Is the UNSUPPORTED_JOB_TYPE Workflow Execution event useful since
+      the submitJob() method throws an exception....
 
+LIKELY BUG:
+    - When doing a suynchrnous interaction with something, likely use a private and TEMPORARY mailbox
+      to not get wires crossed with other asynchronous communications...
 
 -----------------------------------
 

@@ -43,7 +43,7 @@ namespace wrench {
      * @brief A blocking method to receive a message from a mailbox
      *
      * @param mailbox_name: the mailbox name
-     * @return a unique pointer to the message, or nullptr (in which case it's likely a brutal termination)
+     * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std:runtime_error
      *      - "network_error" (e.g., other end has died)
@@ -76,7 +76,7 @@ namespace wrench {
      *
      * @param mailbox_name: the mailbox name
      * @param timeout:  a timeout value in seconds
-     * @return a unique pointer to the message, or nullptr (in which case it's likely a brutal termination)
+     * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std::runtime_error:
      *        - "timeout"

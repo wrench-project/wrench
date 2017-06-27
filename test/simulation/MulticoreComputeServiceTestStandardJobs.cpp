@@ -28,7 +28,7 @@
                                    }
 
 
-class MulticoreComputeServiceTest : public ::testing::Test {
+class MulticoreComputeServiceTestStandardJobs : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
@@ -44,12 +44,14 @@ public:
 
     wrench::ComputeService *compute_service = nullptr;
 
+    void do_UnsupportedStandardJobs_test();
     void do_TwoSingleCoreTasks_test();
     void do_TwoDualCoreTasks_test();
+    void do_JobTermination_test();
 
 
 protected:
-    MulticoreComputeServiceTest() {
+    MulticoreComputeServiceTestStandardJobs() {
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -99,13 +101,121 @@ protected:
 
 
 /**********************************************************************/
+/**  UNSUPPORTED JOB TYPE TEST                                       **/
+/**********************************************************************/
+
+class MulticoreComputeServiceUnsupportedJobTypeTestWMS : public wrench::WMS {
+
+public:
+    MulticoreComputeServiceUnsupportedJobTypeTestWMS(MulticoreComputeServiceTestStandardJobs *test,
+                                                     wrench::Workflow *workflow,
+                                                     std::unique_ptr<wrench::Scheduler> scheduler,
+                                                     std::string hostname) :
+            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    MulticoreComputeServiceTestStandardJobs *test;
+
+    int main() {
+
+      // Create a data movement manager
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
+              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+
+      // Create a job  manager
+      std::unique_ptr<wrench::JobManager> job_manager =
+              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+
+      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+
+      // Create a 2-task job
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {}, {}, {});
+
+      // Submit the 2-task job for execution
+      bool success = true;
+      try {
+        job_manager->submitJob(two_task_job, this->test->compute_service);
+      } catch (wrench::WorkflowExecutionException &e) {
+        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::JOB_TYPE_NOT_SUPPORTED) {
+          throw std::runtime_error("Didn't get the expected exception");
+        }
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to submit a pilot job to a compute service that does not support them");
+      }
+
+      // Terminate
+      this->simulation->shutdownAllComputeServices();
+      this->simulation->shutdownAllStorageServices();
+      this->simulation->getFileRegistryService()->stop();
+      return 0;
+    }
+};
+
+TEST_F(MulticoreComputeServiceTestStandardJobs, UnsupportedStandardJobs) {
+  DO_TEST_WITH_FORK(do_UnsupportedStandardJobs_test);
+}
+
+void MulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("capacity_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceUnsupportedJobTypeTestWMS(this, workflow,
+                                                                                            std::unique_ptr<wrench::Scheduler>(
+                          new wrench::RandomScheduler()), hostname))));
+
+  // Create A Storage Services
+  EXPECT_NO_THROW(storage_service = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 100.0))));
+
+  // Create a Compute Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MulticoreComputeService>(
+                  new wrench::MulticoreComputeService(hostname, false, true, storage_service, {}))));
+
+  // Create a file registry
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname));
+
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+
+  // Staging the input file on the storage service
+  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+
+  // Running a "run a single task" simulation
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+}
+
+/**********************************************************************/
 /**  TWO SINGLE CORE TASKS SIMULATION TEST                           **/
 /**********************************************************************/
 
 class MulticoreComputeServiceTwoSingleCoreTasksTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceTwoSingleCoreTasksTestWMS(MulticoreComputeServiceTest *test,
+    MulticoreComputeServiceTwoSingleCoreTasksTestWMS(MulticoreComputeServiceTestStandardJobs *test,
                                                    wrench::Workflow *workflow,
                                                    std::unique_ptr<wrench::Scheduler> scheduler,
                                                    std::string hostname) :
@@ -115,7 +225,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTest *test;
+    MulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -174,11 +284,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTest, TwoSingleCoreTasks) {
+TEST_F(MulticoreComputeServiceTestStandardJobs, TwoSingleCoreTasks) {
   DO_TEST_WITH_FORK(do_TwoSingleCoreTasks_test);
 }
 
-void MulticoreComputeServiceTest::do_TwoSingleCoreTasks_test() {
+void MulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -233,7 +343,7 @@ void MulticoreComputeServiceTest::do_TwoSingleCoreTasks_test() {
 class MulticoreComputeServiceTwoDualCoreTasksTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceTwoDualCoreTasksTestWMS(MulticoreComputeServiceTest *test,
+    MulticoreComputeServiceTwoDualCoreTasksTestWMS(MulticoreComputeServiceTestStandardJobs *test,
                                                      wrench::Workflow *workflow,
                                                      std::unique_ptr<wrench::Scheduler> scheduler,
                                                      std::string hostname) :
@@ -243,7 +353,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTest *test;
+    MulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -302,13 +412,14 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTest, TwoDualCoreTasks) {
-  std::cerr << "\033[1;31m[ SKIPPING THIS TEST FOR NOW UNTIL THE MULTI-CORE TASK CONCEPT IS WELL DEFINED ]\n";
+TEST_F(MulticoreComputeServiceTestStandardJobs, DISABLED_TwoDualCoreTasks) {
+  // TODO: DESIGN THIS TEST WHEN THE MULTI-CORE TASK CONCEPT IS WELL DEFINED, OR WE DECIDE
+  // TO NOT SUPPORT IT FOR THIS COMPUTE SERVICE ABSTRACTION
   return;
   DO_TEST_WITH_FORK(do_TwoDualCoreTasks_test);
 }
 
-void MulticoreComputeServiceTest::do_TwoDualCoreTasks_test() {
+void MulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasks_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -352,6 +463,127 @@ void MulticoreComputeServiceTest::do_TwoDualCoreTasks_test() {
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+}
+
+
+/**********************************************************************/
+/**  JOB CANCELATION SIMULATION TEST                                 **/
+/**********************************************************************/
+
+class MulticoreComputeServiceJobTerminationTestWMS : public wrench::WMS {
+
+public:
+    MulticoreComputeServiceJobTerminationTestWMS(MulticoreComputeServiceTestStandardJobs *test,
+                                                   wrench::Workflow *workflow,
+                                                   std::unique_ptr<wrench::Scheduler> scheduler,
+                                                   std::string hostname) :
+            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    MulticoreComputeServiceTestStandardJobs *test;
+
+    int main() {
+
+      // Create a data movement manager
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
+              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+
+      // Create a job  manager
+      std::unique_ptr<wrench::JobManager> job_manager =
+              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+
+      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+
+      // Create a 2-task job
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {}, {}, {});
+
+      // Submit the 2-task job for execution
+      job_manager->submitJob(two_task_job, this->test->compute_service);
+
+      // Immediately terminate it
+      try {
+        job_manager->terminateJob(two_task_job);
+      } catch (std::exception &e) {
+        throw std::runtime_error("Unexpected exception while terminating job: " + std::string(e.what()));
+      }
+
+
+      // Terminate
+      this->simulation->shutdownAllComputeServices();
+      this->simulation->shutdownAllStorageServices();
+      this->simulation->getFileRegistryService()->stop();
+      return 0;
+    }
+};
+
+TEST_F(MulticoreComputeServiceTestStandardJobs, JobTermination) {
+  DO_TEST_WITH_FORK(do_JobTermination_test);
+}
+
+void MulticoreComputeServiceTestStandardJobs::do_JobTermination_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("capacity_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceJobTerminationTestWMS(this, workflow,
+                                                                                          std::unique_ptr<wrench::Scheduler>(
+                          new wrench::RandomScheduler()), hostname))));
+
+  // Create A Storage Services
+  EXPECT_NO_THROW(storage_service = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 100.0))));
+
+  // Create a Compute Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MulticoreComputeService>(
+                  new wrench::MulticoreComputeService(hostname, true, true, storage_service, {}))));
+
+  // Create a file registry
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname));
+
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+
+  // Staging the input file on the storage service
+  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+
+  // Running a "run a single task" simulation
+  EXPECT_NO_THROW(simulation->launch());
+
+  // Check completion states and times
+  if ((this->task1->getState() != wrench::WorkflowTask::READY) ||
+      (this->task2->getState() != wrench::WorkflowTask::READY) ) {
+    throw std::runtime_error("Unexpected task states: [" + this->task1->getId() + ": " + wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
+                                     this->task2->getId() + ": " + wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
+  }
+
+  // Check failure counts: Terminations DO NOT count as failures
+  if ((this->task1->getFailureCount() != 0) ||
+      (this->task2->getFailureCount() != 0) ) {
+    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getId() + ": " + std::to_string(this->task1->getFailureCount()) + ", " +
+                             this->task2->getId() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
+  }
+
 
   delete simulation;
 }

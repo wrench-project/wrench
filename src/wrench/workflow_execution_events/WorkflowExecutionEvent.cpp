@@ -27,7 +27,7 @@ namespace wrench {
      *        based on messages received on a mailbox
      *
      * @param mailbox: the name of the receiving mailbox
-     * @return a unique pointer to a WorkflowExecutionEvent object
+     * @return a workflow execution event
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
