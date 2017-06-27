@@ -1096,7 +1096,6 @@ namespace wrench {
       for (auto w : to_erase) {
         this->non_ready_works.erase(w);
       }
-      to_erase.clear();
 
       // Remove all other works for the job in the "ready" state
       for (std::deque<WorkUnit *>::iterator it = this->ready_works.begin(); it != this->ready_works.end(); it++) {
@@ -1106,6 +1105,7 @@ namespace wrench {
       }
 
       // Deal with running works!
+      to_erase.clear();
       for (auto w : this->running_works) {
         if (w->job == job) {
           if ((w->post_file_copies.size() != 0) || (w->pre_file_copies.size() != 0)) {
@@ -1116,14 +1116,20 @@ namespace wrench {
           for (auto wt :  this->working_threads) {
             if (wt->work == w) {
               wt->kill();
+              break;
             }
           }
           // Remove the work from the running queue
-          this->running_works.erase(w);
+          to_erase.push_back(w);
         }
       }
+      for (auto w : to_erase) {
+        this->running_works.erase(w);
+      }
+
 
       // Deal with completed works
+      to_erase.clear();
       for (auto w : this->completed_works) {
         if (w->job == job) {
           to_erase.push_back(w);
@@ -1132,7 +1138,6 @@ namespace wrench {
       for (auto w : to_erase) {
         this->non_ready_works.erase(w);
       }
-      to_erase.clear();
 
       // Remove the job from the list of running jobs
       this->running_jobs.erase(job);
