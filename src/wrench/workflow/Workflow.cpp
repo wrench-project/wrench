@@ -234,9 +234,11 @@ namespace wrench {
           double size = std::strtod(uses.attribute("size").value(), NULL);
           std::string link = uses.attribute("link").value();
           // Check whether the file already exists
-          WorkflowFile *file = this->getWorkflowFileByID(id);
+          WorkflowFile *file = nullptr;
 
-          if (not file) {
+          try {
+            file = this->getWorkflowFileByID(id);
+          } catch (std::invalid_argument) {
             file = this->addFile(id, size);
           }
           if (link == "input") {
@@ -411,15 +413,16 @@ namespace wrench {
       }
 
       WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
-                   task->getId().c_str(),
-                   WorkflowTask::stateToString(task->state).c_str(),
-                   WorkflowTask::stateToString(state).c_str());
+                  task->getId().c_str(),
+                  WorkflowTask::stateToString(task->state).c_str(),
+                  WorkflowTask::stateToString(state).c_str());
 
       switch (state) {
         // Make a task completed, which may failure_cause its children to become ready
         case WorkflowTask::COMPLETED: {
           if (task->getState() != WorkflowTask::RUNNING) {
-            throw std::runtime_error("Workflow::updateTaskState(): Cannot set non-running task state to WorkflowTask::COMPLETED");
+            throw std::runtime_error(
+                    "Workflow::updateTaskState(): Cannot set non-running task state to WorkflowTask::COMPLETED");
           }
           task->setState(WorkflowTask::COMPLETED);
 
@@ -435,8 +438,10 @@ namespace wrench {
               task->getState() == WorkflowTask::COMPLETED) {
             return;
           }
-          if (task->getState() != WorkflowTask::NOT_READY && task->getState() != WorkflowTask::FAILED && task->getState() != WorkflowTask::PENDING) {
-            throw std::runtime_error("Workflow::updateTaskState(): Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
+          if (task->getState() != WorkflowTask::NOT_READY && task->getState() != WorkflowTask::FAILED &&
+              task->getState() != WorkflowTask::PENDING) {
+            throw std::runtime_error("Workflow::updateTaskState(): Cannot set the state of a " +
+                                     WorkflowTask::stateToString(task->getState()) +
                                      " task to WorkflowTask::READY");
           }
           // Go through the parent and check whether they are all completed
@@ -463,7 +468,8 @@ namespace wrench {
           if (task->getState() == WorkflowTask::RUNNING) {
             task->setState(WorkflowTask::FAILED);
           } else {
-            throw std::runtime_error("Workflow::updateTaskState(): Cannot set the state of a " + WorkflowTask::stateToString(task->getState()) +
+            throw std::runtime_error("Workflow::updateTaskState(): Cannot set the state of a " +
+                                     WorkflowTask::stateToString(task->getState()) +
                                      " task to WorkflowTask::FAILED");
           }
           break;
@@ -484,7 +490,7 @@ namespace wrench {
     std::set<WorkflowFile *> Workflow::getInputFiles() {
       std::set<WorkflowFile *> input_files;
       for (auto const &x : this->files) {
-        if ((x.second->output_of == nullptr) && (x.second->input_of.size() > 0)){
+        if ((x.second->output_of == nullptr) && (x.second->input_of.size() > 0)) {
           input_files.insert(x.second.get());
         }
       }
@@ -503,6 +509,5 @@ namespace wrench {
         return nullptr;
       }
     }
-
-
+    
 };
