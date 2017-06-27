@@ -112,7 +112,7 @@ set(TEST_FILES
         test/simulation/SimpleStorageServiceTest.cpp
         test/simulation/MulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MulticoreComputeServiceTestPilotJobs.cpp
-        )
+        test/simulation/TestWithFork.h)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)

@@ -13,19 +13,9 @@
 
 #include <wrench-dev.h>
 
-// Convenient macro to launch a test inside a separate process
-// and check the exit code, which denotes an error
-#define DO_TEST_WITH_FORK(function){ \
-                                      pid_t pid = fork(); \
-                                      if (pid) { \
-                                        int exit_code; \
-                                        waitpid(pid, &exit_code, 0); \
-                                        ASSERT_EQ(exit_code, 0); \
-                                      } else { \
-                                        this->function(); \
-                                        exit((::testing::Test::HasFailure() ? 666 : 0)); \
-                                      } \
-                                   }
+#include "TestWithFork.h"
+
+
 
 
 class MulticoreComputeServiceTestPilotJobs : public ::testing::Test {
