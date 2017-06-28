@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#include <map>
+
 #include "wms/scheduler/pilot_job/CriticalPathScheduler.h"
 
 namespace wrench {
@@ -27,7 +29,7 @@ namespace wrench {
       double flops = 0;
 
       for (auto task : workflow->getTasks()) {
-        flops += 1.1 * task->getFlops();
+        flops = std::max(flops, task->getFlops() + getFlops(workflow, workflow->getTaskChildren(task)));
       }
 
 //      double flops = 10000.00; // bogus default
@@ -35,7 +37,28 @@ namespace wrench {
 //        // Heuristic: ask for something that can run 2 times the next ready tasks..
 //        flops = 1.5 * scheduler->getTotalFlops((*workflow->getReadyTasks().begin()).second);
 //      }
-      
+
       scheduler->schedulePilotJobs(job_manager, workflow, flops, compute_services);
+    }
+
+    /**
+     * @brief
+     *
+     * @param workflow: a workflow to execute
+     * @param tasks:
+     *
+     * @return
+     */
+    double CriticalPathScheduler::getFlops(Workflow *workflow, const std::vector<WorkflowTask *> tasks) {
+      double max_flops = 0;
+
+      for (auto task : tasks) {
+        if (this->flopsMap.find(task) == this->flopsMap.end()) {
+          double flops = task->getFlops() + getFlops(workflow, workflow->getTaskChildren(task));
+          this->flopsMap[task] = flops;
+        }
+        max_flops = std::max(this->flopsMap[task], max_flops);
+      }
+      return max_flops;
     }
 }

@@ -10,6 +10,8 @@
 #ifndef WRENCH_CRITICALPATHSCHEDULER_H
 #define WRENCH_CRITICALPATHSCHEDULER_H
 
+#include <vector>
+
 #include "wms/scheduler/pilot_job/PilotJobScheduler.h"
 
 namespace wrench {
@@ -25,6 +27,10 @@ namespace wrench {
         /***********************/
         void schedule(Scheduler *, Workflow *, JobManager *, const std::set<ComputeService *> &);
 
+    private:
+        std::map<WorkflowTask *, double> flopsMap;
+
+        double getFlops(Workflow *workflow, const std::vector<WorkflowTask *>);
         /***********************/
         /** \endcond           */
         /***********************/
