@@ -8,14 +8,14 @@
  */
 
 #include <iostream>
-#include <managers/data_movement_manager/DataMovementManager.h>
 
-#include <logging/TerminalOutput.h>
-#include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <wms/engine/SimpleWMS.h>
-#include <simulation/Simulation.h>
-#include <workflow_execution_events/WorkflowExecutionFailureCause.h>
-#include <exceptions/WorkflowExecutionException.h>
+#include "exceptions/WorkflowExecutionException.h"
+#include "logging/TerminalOutput.h"
+#include "managers/data_movement_manager/DataMovementManager.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "simulation/Simulation.h"
+#include "wms/engine/SimpleWMS.h"
+#include "workflow_execution_events/WorkflowExecutionFailureCause.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 
@@ -80,14 +80,18 @@ namespace wrench {
         }
 
         // Submit pilot jobs
-        WRENCH_INFO("Scheduling pilot jobs...");
-        double flops = 10000.00; // bogus default
-        if (ready_tasks.size() > 0) {
-          // Heuristic: ask for something that can run 2 times the next ready tasks..
-          flops = 1.5 * this->scheduler->getTotalFlops((*ready_tasks.begin()).second);
+        if (this->pilot_job_scheduler) {
+          WRENCH_INFO("Scheduling pilot jobs...");
+          this->pilot_job_scheduler.get()->schedule(this->scheduler.get(), this->workflow, job_manager.get(),
+                                                    this->simulation->getRunningComputeServices());
+//          double flops = 10000.00; // bogus default
+//          if (ready_tasks.size() > 0) {
+//            // Heuristic: ask for something that can run 2 times the next ready tasks..
+//            flops = 1.5 * this->scheduler->getTotalFlops((*ready_tasks.begin()).second);
+//          }
+//          this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, flops,
+//                                             this->simulation->getRunningComputeServices());
         }
-        this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, flops,
-                                           this->simulation->getRunningComputeServices());
 
         // Perform dynamic optimizations
         runDynamicOptimizations();
@@ -103,7 +107,8 @@ namespace wrench {
         try {
           event = workflow->waitForNextExecutionEvent();
         } catch (WorkflowExecutionException &e) {
-          WRENCH_INFO("Error while getting next execution event (%s)... ignoring and trying again", (e.getCause()->toString().c_str()));
+          WRENCH_INFO("Error while getting next execution event (%s)... ignoring and trying again",
+                      (e.getCause()->toString().c_str()));
           continue;
         }
 
@@ -144,7 +149,6 @@ namespace wrench {
         if (abort || workflow->isDone()) {
           break;
         }
-
       }
 
       S4U_Mailbox::clear_dputs();

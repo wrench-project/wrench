@@ -14,6 +14,7 @@
 #include "wms/scheduler/Scheduler.h"
 #include "wms/optimizations/dynamic/DynamicOptimization.h"
 #include "wms/optimizations/static/StaticOptimization.h"
+#include "wms/scheduler/pilot_job/PilotJobScheduler.h"
 #include "workflow/Workflow.h"
 
 namespace wrench {
@@ -29,6 +30,8 @@ namespace wrench {
         void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
         void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
+
+        void setPilotJobScheduler(std::unique_ptr<PilotJobScheduler>);
 
         /***********************/
         /** \cond DEVELOPER */
@@ -72,6 +75,8 @@ namespace wrench {
 
         /** @brief The selected scheduler */
         std::unique_ptr<Scheduler> scheduler;
+        /** @brief The pilot job scheduler */
+        std::unique_ptr<PilotJobScheduler> pilot_job_scheduler = nullptr;
         /** @brief The enabled dynamic optimizations */
         std::vector<std::unique_ptr<DynamicOptimization>> dynamic_optimizations;
         /** @brief The enabled static optimizations */

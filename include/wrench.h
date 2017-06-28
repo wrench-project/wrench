@@ -30,6 +30,10 @@
 #include "wms/scheduler/MinMinScheduler.h"
 #include "wms/scheduler/MaxMinScheduler.h"
 
+// Pilot Job Schedulers
+#include "wms/scheduler/pilot_job/PilotJobScheduler.h"
+#include "wms/scheduler/pilot_job/CriticalPathScheduler.h"
+
 // Static Optimizations
 #include "wms/optimizations/static/StaticOptimization.h"
 #include "wms/optimizations/static/SimplePipelineClustering.h"

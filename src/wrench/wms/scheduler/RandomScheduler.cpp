@@ -13,9 +13,8 @@
 #include "logging/TerminalOutput.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simulation/Simulation.h"
-#include "workflow_job/PilotJob.h"
-#include "workflow_job/StandardJob.h"
 #include "wms/scheduler/RandomScheduler.h"
+#include "workflow_job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(random_scheduler, "Log category for Random Scheduler");
 
@@ -26,14 +25,11 @@ namespace wrench {
      *
      * @param job_manager: a job manager
      * @param ready_tasks: a map of ready workflow tasks
-     * @param compute_services: a set ofcompute services available to run jobs
+     * @param compute_services: a set of compute services available to run jobs
      */
     void RandomScheduler::scheduleTasks(JobManager *job_manager,
                                         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                                         const std::set<ComputeService *> &compute_services) {
-
-
-      // TODO: Refactor to avoid code duplication
 
       WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
       for (auto itc : ready_tasks) {

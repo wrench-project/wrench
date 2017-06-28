@@ -53,6 +53,15 @@ namespace wrench {
     }
 
     /**
+     * @brief Set a pilot job scheduler strategy
+     *
+     * @param pilot_job_scheduler: a pilot job scheduler implementation
+     */
+    void WMS::setPilotJobScheduler(std::unique_ptr<PilotJobScheduler> pilot_job_scheduler) {
+      this->pilot_job_scheduler = std::move(pilot_job_scheduler);
+    }
+
+    /**
      * @brief Perform dynamic optimizations. Optimizations are executed in order of insertion
      */
     void WMS::runDynamicOptimizations() {

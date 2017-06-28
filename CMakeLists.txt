@@ -98,7 +98,10 @@ set(SOURCE_FILES
         src/wrench/services/compute_services/multicore_compute_service/WorkUnitExecutor.cpp
         src/wrench/services/compute_services/multicore_compute_service/WorkUnitExecutor.h
         src/wrench/services/compute_services/multicore_compute_service/WorkUnit.cpp
-        src/wrench/services/compute_services/multicore_compute_service/WorkUnit.h)
+        src/wrench/services/compute_services/multicore_compute_service/WorkUnit.h
+        src/wrench/wms/scheduler/pilot_job/PilotJobScheduler.h
+        src/wrench/wms/scheduler/pilot_job/CriticalPathScheduler.h
+        src/wrench/wms/scheduler/pilot_job/CriticalPathScheduler.cpp)
 
 # test files
 set(TEST_FILES

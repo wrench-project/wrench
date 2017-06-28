@@ -17,8 +17,8 @@
 #include "services/file_registry_service/FileRegistryService.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 #include "simulation/SimulationOutput.h"
-#include "workflow_job/StandardJob.h"
 #include "wms/WMS.h"
+#include "workflow_job/StandardJob.h"
 
 
 namespace wrench {

@@ -12,9 +12,9 @@
 
 #include <set>
 
-#include <services/compute_services/ComputeService.h>
-#include <managers/job_manager/JobManager.h>
-#include <workflow/WorkflowTask.h>
+#include "managers/job_manager/JobManager.h"
+#include "services/compute_services/ComputeService.h"
+#include "workflow/WorkflowTask.h"
 
 namespace wrench {
 
@@ -25,11 +25,10 @@ namespace wrench {
      */
     class Scheduler {
 
-
     public:
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
         virtual void scheduleTasks(JobManager *job_manager,
                                    std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                                    const std::set<ComputeService *> &compute_services) = 0;
@@ -40,11 +39,10 @@ namespace wrench {
                                        const std::set<ComputeService *> &compute_services);
 
         static double getTotalFlops(std::vector<WorkflowTask *> tasks);
-    /***********************/
-    /** \endcond           */
-    /***********************/
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
-
 
 }
 
