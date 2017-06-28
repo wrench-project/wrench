@@ -44,11 +44,17 @@ namespace wrench {
 
         ComputeService *getComputeService();
 
+        double getDuration();
+
+        /** @brief The job's duration (in seconds) */
+        double duration;
+
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
 
         void setComputeService(ComputeService *);
+
 
         /***********************/
         /** \endcond           */

@@ -34,7 +34,7 @@ namespace wrench {
                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                              std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) :
-            WorkflowJob(WorkflowJob::STANDARD, 1, 0.0),
+            WorkflowJob(WorkflowJob::STANDARD, 1),
             state(StandardJob::State::NOT_SUBMITTED),
             num_completed_tasks(0),
             file_locations(file_locations),
@@ -48,11 +48,10 @@ namespace wrench {
         }
       }
 
-      // TODO: This is just a sequential duration assuming num_cores = 1!!!
       for (auto t : tasks) {
         this->tasks.push_back(t);
         t->setJob(this);
-        this->duration += t->getFlops();
+        this->total_flops += t->getFlops();
       }
       this->workflow = this->tasks[0]->getWorkflow();
       this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());

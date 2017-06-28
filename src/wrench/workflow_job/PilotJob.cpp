@@ -19,9 +19,10 @@ namespace wrench {
      * @param duration: duration of the pilot job, in seconds
      */
     PilotJob::PilotJob(Workflow *workflow, unsigned long num_cores, double duration) :
-            WorkflowJob(WorkflowJob::PILOT, num_cores, duration), state(PilotJob::State::NOT_SUBMITTED) {
+            WorkflowJob(WorkflowJob::PILOT, num_cores), state(PilotJob::State::NOT_SUBMITTED) {
 
       this->workflow = workflow;
+      this->duration = duration;
       this->name = "pilot_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
     }
 
@@ -47,6 +48,14 @@ namespace wrench {
      */
     void PilotJob::setComputeService(ComputeService *cs) {
       this->compute_service = cs;
+    }
+
+    /** @brief Get the job's duration
+     *
+     * @return the duration in seconds
+     */
+    double PilotJob::getDuration() {
+      return this->duration;
     }
 
 };

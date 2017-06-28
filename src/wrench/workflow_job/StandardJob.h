@@ -64,6 +64,8 @@ namespace wrench {
         // Tasks to run
         /** @brief The job's computational tasks */
         std::vector<WorkflowTask *> tasks;
+        /** @brief The job's total computational cost (in flops) */
+        double total_flops;
         /** @brief The number of computational tasks that have completed */
         unsigned long num_completed_tasks;
         /** @brief The file locations that tasks should read/write files from/to */

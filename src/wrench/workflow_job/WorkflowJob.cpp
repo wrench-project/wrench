@@ -20,10 +20,9 @@ namespace wrench {
      *
      * @param type: job type
      * @param num_cores: the number of cores required by the job
-     * @param duration: duration of the pilot job, in seconds
      */
-    WorkflowJob::WorkflowJob(Type type, unsigned long num_cores, double duration) : type(type), num_cores(num_cores),
-                                                                                    duration(duration) {}
+    WorkflowJob::WorkflowJob(Type type, unsigned long num_cores) : type(type), num_cores(num_cores)
+                                                                                     {}
 
 
     /**
@@ -70,17 +69,8 @@ namespace wrench {
      *
      * @return  the number of cores
      */
-    int WorkflowJob::getNumCores() {
+    unsigned int WorkflowJob::getNumCores() {
       return this->num_cores;
-    }
-
-    /**
-     * @brief Get the duration of the job
-     *
-     * @return the duration in seconds
-     */
-    double WorkflowJob::getDuration() {
-      return this->duration;
     }
 
     /**

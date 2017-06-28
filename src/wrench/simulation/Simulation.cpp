@@ -60,7 +60,6 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-      // TODO: Figure out why this segfaults... perhaps we don't need it
        this->s4u_simulation->shutdown();
     }
 
