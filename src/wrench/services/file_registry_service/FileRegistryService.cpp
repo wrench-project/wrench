@@ -84,7 +84,7 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
       }
 
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
@@ -133,7 +133,7 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
       }
 
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
@@ -181,7 +181,7 @@ namespace wrench {
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
       }
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,

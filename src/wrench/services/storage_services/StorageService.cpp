@@ -116,7 +116,7 @@ namespace wrench {
       }
 
       // Send a message to the daemon
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("how_much_free_space");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFreeSpaceRequestMessage(
                 answer_mailbox,
@@ -129,7 +129,7 @@ namespace wrench {
         }
       }
 
-      // Wait to the message back
+      // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
@@ -170,7 +170,7 @@ namespace wrench {
       }
 
       // Send a message to the daemon
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileLookupRequestMessage(
                 answer_mailbox,
@@ -184,7 +184,7 @@ namespace wrench {
         }
       }
 
-      // Wait to the message back
+      // Wait for a reply
       std::unique_ptr<SimulationMessage> message;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
@@ -223,7 +223,7 @@ namespace wrench {
       }
 
       // Send a synchronous message to the daemon
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new StorageServiceFileReadRequestMessage(answer_mailbox,
@@ -238,7 +238,7 @@ namespace wrench {
         }
       }
 
-      // Wait for the answer
+      // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
@@ -302,7 +302,7 @@ namespace wrench {
       }
 
       // Send a synchronous message to the daemon
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new StorageServiceFileWriteRequestMessage(answer_mailbox,
@@ -317,7 +317,7 @@ namespace wrench {
         }
       }
 
-      // Wait for the answer
+      // Wait for a reply
       std::unique_ptr<SimulationMessage> message;
 
       try {
@@ -473,7 +473,7 @@ namespace wrench {
       }
 
       // Send a message to the daemon
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("delete_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileDeleteRequestMessage(
                 answer_mailbox,
@@ -487,7 +487,7 @@ namespace wrench {
         }
       }
 
-      // Wait to the message back
+      // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
@@ -567,7 +567,7 @@ namespace wrench {
       }
 
       // Send a message to the daemon
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
                 answer_mailbox,
@@ -582,7 +582,7 @@ namespace wrench {
         }
       }
 
-      // Wait to the message back
+      // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {

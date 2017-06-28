@@ -32,15 +32,13 @@ namespace wrench {
 		class S4U_Mailbox {
 
 		public:
-				static std::string generateUniqueMailboxName(std::string);
-				static std::string generateUniqueTemporaryMailboxName();
 				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox);
 				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox, double timeout);
 				static void putMessage(std::string mailbox, SimulationMessage *m);
 				static void dputMessage(std::string mailbox_name, SimulationMessage *msg);
 				static void clear_dputs();
 
-				static std::string getPrivateMailboxName();
+				static std::string generateUniqueMailboxName(std::string);
 
 
 		private:

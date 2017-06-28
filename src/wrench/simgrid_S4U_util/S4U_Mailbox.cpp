@@ -28,27 +28,7 @@ namespace wrench {
     std::map<simgrid::s4u::ActorPtr, std::set<simgrid::s4u::CommPtr>> S4U_Mailbox::dputs;
 
 
-    /**
-     * @brief A method to generate a unique sequence number
-     *
-     * @return a unique sequence number
-     */
-    unsigned long S4U_Mailbox::generateUniqueSequenceNumber() {
-      static unsigned long sequence_number = 0;
-      return sequence_number++;
-    }
 
-
-    /**
-     * @brief A method to generate a unique mailbox name give a prefix (this method
-     *        simply appends an increasing sequence number to the prefix)
-     *
-     * @param prefix: a prefix for the mailbox name
-     * @return a unique mailbox name as a string
-     */
-    std::string S4U_Mailbox::generateUniqueMailboxName(std::string prefix) {
-      return prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
-    }
 
     /**
      * @brief A blocking method to receive a message from a mailbox
@@ -202,23 +182,26 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the private mailbox name of a S4U actor
-     *
-     * @return the mailbox name
-     */
-    std::string S4U_Mailbox::getPrivateMailboxName() {
-      return "private_mailbox_" + simgrid::s4u::this_actor::name() + "_" +
-             std::to_string(simgrid::s4u::this_actor::pid());
+    * @brief A method to generate a unique sequence number
+    *
+    * @return a unique sequence number
+    */
+    unsigned long S4U_Mailbox::generateUniqueSequenceNumber() {
+      static unsigned long sequence_number = 0;
+      return sequence_number++;
     }
 
+
     /**
-     * @brief Get a temporary mailbox name for a S4U actor
+     * @brief A method to generate a unique mailbox name given a prefix (this method
+     *        simply appends an increasing sequence number to the prefix)
      *
-     * @return the mailbox name
+     * @param prefix: a prefix for the mailbox name
+     * @return a unique mailbox name as a string
      */
-    std::string S4U_Mailbox::generateUniqueTemporaryMailboxName() {
-      return "private_temporary_mailbox_" + simgrid::s4u::this_actor::name() + "_" +
-             std::to_string(simgrid::s4u::this_actor::pid()) + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
+    std::string S4U_Mailbox::generateUniqueMailboxName(std::string prefix) {
+      return prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
     }
+
 
 };

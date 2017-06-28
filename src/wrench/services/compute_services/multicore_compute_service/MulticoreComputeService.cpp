@@ -40,7 +40,7 @@ namespace wrench {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
       //  send a "run a standard job" message to the daemon's mailbox
       try {
@@ -97,7 +97,7 @@ namespace wrench {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
 
       // Send a "run a pilot job" message to the daemon's mailbox
       try {
@@ -114,7 +114,7 @@ namespace wrench {
         }
       }
 
-      // Get the answer
+      // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
@@ -156,7 +156,7 @@ namespace wrench {
       }
 
       // send a "num cores" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_num_cores");
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
@@ -172,7 +172,7 @@ namespace wrench {
         }
       }
 
-      // getMessage the reply
+      // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
@@ -208,7 +208,7 @@ namespace wrench {
       }
 
       // send a "num idle cores" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_num_idle_cores");
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new MulticoreComputeServiceNumIdleCoresRequestMessage(
@@ -260,7 +260,7 @@ namespace wrench {
       }
 
       // send a "ttl request" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_ttl");
 
       try {
         S4U_Mailbox::dputMessage(this->mailbox_name,
@@ -313,7 +313,7 @@ namespace wrench {
       }
 
       // send a "floprate request" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_core_flop_rate");
       try {
         S4U_Mailbox::dputMessage(this->mailbox_name,
                                  new MulticoreComputeServiceFlopRateRequestMessage(
@@ -1330,7 +1330,7 @@ namespace wrench {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_standard_job");
 
       //  send a "terminate a standard job" message to the daemon's mailbox
       try {
@@ -1387,7 +1387,7 @@ namespace wrench {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      std::string answer_mailbox = S4U_Mailbox::getPrivateMailboxName();
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_pilot_job");
 
       // Send a "terminate a pilot job" message to the daemon's mailbox
       try {
