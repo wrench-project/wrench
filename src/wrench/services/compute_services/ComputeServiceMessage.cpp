@@ -296,7 +296,7 @@ namespace wrench {
             std::string answer_mailbox,
             PilotJob *job,
             double payload) :
-            ComputeServiceMessage("TERMINATE_STANDARD_JOB_REQUEST", payload) {
+            ComputeServiceMessage("TERMINATE_PILOT_JOB_REQUEST", payload) {
       if ((answer_mailbox == "") || (job == nullptr)) {
         throw std::invalid_argument(
                 "ComputeServiceTerminatePilotJobRequestMessage::ComputeServiceTerminatePilotJobRequestMessage(): Invalid arguments");
@@ -320,7 +320,7 @@ namespace wrench {
                                                                                                      bool success,
                                                                                                      WorkflowExecutionFailureCause *failure_cause,
                                                                                                      double payload) :
-            ComputeServiceMessage("TERMINATE_STANDARD_JOB_ANSWER", payload) {
+            ComputeServiceMessage("TERMINATE_PILOT_JOB_ANSWER", payload) {
       if ((job == nullptr) || (compute_service == nullptr)) {
         throw std::invalid_argument(
                 "ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(): Invalid arguments");

@@ -800,8 +800,12 @@ namespace wrench {
         processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
         return true;
 
+      } else if (ComputeServiceTerminatePilotJobRequestMessage *msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
+
+        processPilotJobTerminationRequest(msg->job, msg->answer_mailbox);
+        return true;
+
       } else {
-        WRENCH_INFO("IN TROUBLE!");
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");
       }
     }
@@ -876,7 +880,7 @@ namespace wrench {
     }
 
     /**
-    * @brief fail a running standard job
+    * @brief terminate a running standard job
     * @param job: the job
     */
     void MulticoreComputeService::terminateRunningStandardJob(StandardJob *job) {
@@ -950,10 +954,36 @@ namespace wrench {
       return;
     }
 
+  /**
+   * @brief Terminate a running pilot job
+   * @param job: the job
+   *
+   * @throw std::runtime_error
+   */
+    void MulticoreComputeService::terminateRunningPilotJob(PilotJob *job) {
+
+    // Get the associated compute service
+    ComputeService *compute_service = job->getComputeService();
+
+    if (compute_service == nullptr) {
+      throw std::runtime_error("MulticoreComputeService::terminateRunningPilotJob(): can't find compute service associated to pilot job");
+    }
+
+    // Stop it
+    compute_service->stop();
+
+    // Remove the job from the running list
+    this->running_jobs.erase(job);
+
+    // Update the number of available cores
+    this->max_num_worker_threads += job->getNumCores();
+    }
+
+
     /**
- * @brief Declare all current jobs as failed (likely because the daemon is being terminated
- * or has timed out (because it's in fact a pilot job))
- */
+    * @brief Declare all current jobs as failed (likely because the daemon is being terminated
+    * or has timed out (because it's in fact a pilot job))
+    */
     void MulticoreComputeService::failCurrentStandardJobs(WorkflowExecutionFailureCause *cause) {
 
       for (auto workflow_job : this->running_jobs) {
@@ -1411,7 +1441,6 @@ namespace wrench {
     void MulticoreComputeService::processStandardJobTerminationRequest(StandardJob *job, std::string answer_mailbox) {
 
 
-      WRENCH_INFO("HERE1");
       // Check whether job is pending
       for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
         if (*it == job) {
@@ -1451,6 +1480,62 @@ namespace wrench {
               job, this, false, new JobCannotBeTerminated(job),
               this->getPropertyValueAsDouble(
                       MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+      try {
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+      } catch (std::runtime_error &e) {
+        return;
+      }
+      return;
+    }
+
+    /**
+     * @brief Process a pilot job termination request
+     *
+     * @param job: the job to terminate
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     */
+    void MulticoreComputeService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
+
+
+      // Check whether job is pending
+      for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
+        if (*it == job) {
+          this->pending_jobs.erase(it);
+          ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
+                  job, this, true, nullptr,
+                  this->getPropertyValueAsDouble(
+                          MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
+          try {
+            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+          } catch (std::runtime_error &e) {
+            return;
+          }
+          return;
+        }
+      }
+
+      // Check whether the job is running
+      if (this->running_jobs.find(job) != this->running_jobs.end()) {
+        this->running_jobs.erase(job);
+        terminateRunningPilotJob(job);
+        ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
+                job, this, true, nullptr,
+                this->getPropertyValueAsDouble(
+                        MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
+        try {
+          S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        } catch (std::runtime_error &e) {
+          return;
+        }
+        return;
+      }
+
+      // If we got here, we're in trouble
+      WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
+      ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
+              job, this, false, new JobCannotBeTerminated(job),
+              this->getPropertyValueAsDouble(
+                      MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::runtime_error &e) {

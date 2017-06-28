@@ -619,8 +619,15 @@ private:
       bool success = true;
       try {
         job_manager->terminateJob(two_task_job);
-      } catch (std::exception &e) {
+      } catch (wrench::WorkflowExecutionException &e) {
         success = false;
+        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::JOB_CANNOT_BE_TERMINATED) {
+          throw std::runtime_error("Got an exception, as expected, but it does not have the correct failure cause type");
+        }
+        wrench::JobCannotBeTerminated *real_cause = (wrench::JobCannotBeTerminated *)e.getCause();
+        if (real_cause->getJob() != two_task_job) {
+          throw std::runtime_error("Got the expected exception and failure cause, but the failure cause does not point to the right job");
+        }
       }
       if (success) {
         throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");

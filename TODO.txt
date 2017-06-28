@@ -2,9 +2,13 @@ DETAIL:
     - Is the UNSUPPORTED_JOB_TYPE Workflow Execution event useful since
       the submitJob() method throws an exception....
 
-LIKELY BUG:
-    - When doing a suynchrnous interaction with something, likely use a private and TEMPORARY mailbox
-      to not get wires crossed with other asynchronous communications...
+LIKELY SUPER ANNOYING BUG:
+    - Consider a service that has its own private mailbox (like all services). It keeps getting various
+      messages to that mailbox. Then, this service has to interact SYNCHRONOUSLY with another service by doing
+      some "send/recv". The problem is that for this SYNCHRONOUS OPERATION, if the service uses its private
+      mailbox, when it does the RECV it may get some totally unrelated message instead of the reply. The way
+      to solve this, which appears heavy-handed, seems to be to use a temporary unique mailbox. Appropriate
+      methods have been added to S4U_Mailbox, but not used for now...
 
 -----------------------------------
 

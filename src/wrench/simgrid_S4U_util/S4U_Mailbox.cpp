@@ -27,6 +27,18 @@ namespace wrench {
     // what will have to be waited on at some point
     std::map<simgrid::s4u::ActorPtr, std::set<simgrid::s4u::CommPtr>> S4U_Mailbox::dputs;
 
+
+    /**
+     * @brief A method to generate a unique sequence number
+     *
+     * @return a unique sequence number
+     */
+    unsigned long S4U_Mailbox::generateUniqueSequenceNumber() {
+      static unsigned long sequence_number = 0;
+      return sequence_number++;
+    }
+
+
     /**
      * @brief A method to generate a unique mailbox name give a prefix (this method
      *        simply appends an increasing sequence number to the prefix)
@@ -35,8 +47,7 @@ namespace wrench {
      * @return a unique mailbox name as a string
      */
     std::string S4U_Mailbox::generateUniqueMailboxName(std::string prefix) {
-      static unsigned long sequence_number = 0;
-      return prefix + "_" + std::to_string(sequence_number++);
+      return prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
     }
 
     /**
@@ -198,6 +209,16 @@ namespace wrench {
     std::string S4U_Mailbox::getPrivateMailboxName() {
       return "private_mailbox_" + simgrid::s4u::this_actor::name() + "_" +
              std::to_string(simgrid::s4u::this_actor::pid());
+    }
+
+    /**
+     * @brief Get a temporary mailbox name for a S4U actor
+     *
+     * @return the mailbox name
+     */
+    std::string S4U_Mailbox::generateUniqueTemporaryMailboxName() {
+      return "private_temporary_mailbox_" + simgrid::s4u::this_actor::name() + "_" +
+             std::to_string(simgrid::s4u::this_actor::pid()) + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
     }
 
 };

@@ -33,6 +33,7 @@ namespace wrench {
 
 		public:
 				static std::string generateUniqueMailboxName(std::string);
+				static std::string generateUniqueTemporaryMailboxName();
 				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox);
 				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox, double timeout);
 				static void putMessage(std::string mailbox, SimulationMessage *m);
@@ -43,6 +44,8 @@ namespace wrench {
 
 
 		private:
+				static unsigned long generateUniqueSequenceNumber();
+
 				static std::map<simgrid::s4u::ActorPtr , std::set<simgrid::s4u::CommPtr>> dputs;
 
 		};
