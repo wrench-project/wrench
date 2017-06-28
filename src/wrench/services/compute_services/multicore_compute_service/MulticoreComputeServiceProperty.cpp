@@ -20,6 +20,5 @@ namespace wrench {
     SET_PROPERTY_NAME(MulticoreComputeServiceProperty, FLOP_RATE_ANSWER_MESSAGE_PAYLOAD);
     SET_PROPERTY_NAME(MulticoreComputeServiceProperty, TASK_STARTUP_OVERHEAD);
 
-
 };
 

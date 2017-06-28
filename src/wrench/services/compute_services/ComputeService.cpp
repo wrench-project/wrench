@@ -22,12 +22,6 @@ namespace wrench {
      */
     void ComputeService::stop() {
 
-//      // Notify the simulation that the service is terminated, if that
-//      // service was registered with the simulation
-//      if (this->simulation) {
-//        this->simulation->mark_compute_service_as_terminated(this);
-//      }
-
       // Call the super class's method
       Service::stop();
 
@@ -151,9 +145,16 @@ namespace wrench {
       }
 
       try {
+
         // Check that the TTL is ok (does a communication with the daemons)
         double ttl = this->getTTL();
-        double duration = flops / this->getCoreFlopRate();
+        // TODO: This duration is really hard to compute because we don't know
+        // how many cores will be available, we don't know how the core schedule
+        // will work out, etc. So right now, if the service couldn't run the job
+        // sequentially, we say it can't run it at all. Something to fix at some point.
+        // One option is to ask the user to provide the maximum amount of flop that will
+        // be required on ONE core assuming min_num_cores cores are available?
+        double duration = (flops / this->getCoreFlopRate());
         if ((ttl > 0) && (ttl < duration)) {
           return false;
         }

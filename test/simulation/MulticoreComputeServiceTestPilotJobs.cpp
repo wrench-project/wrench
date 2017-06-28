@@ -34,7 +34,7 @@ public:
 
     wrench::ComputeService *compute_service = nullptr;
 
-    void do_UnsupportedPilotJob_test();
+    void do_UnsupportedPilotJobs_test();
     void do_OnePilotJobNoTimeoutWaitForExpiration_test();
     void do_OnePilotJobNoTimeoutShutdownService_test();
     void do_NonSubmittedPilotJobTermination_test();
@@ -84,10 +84,10 @@ protected:
 /**  UNSUPPORTED PILOT JOB                                           **/
 /**********************************************************************/
 
-class MulticoreComputeServicePilotJobUnsupportedTestWMS : public wrench::WMS {
+class MulticoreComputeServiceUnsupportedPilotJobsTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServicePilotJobUnsupportedTestWMS(MulticoreComputeServiceTestPilotJobs *test,
+    MulticoreComputeServiceUnsupportedPilotJobsTestWMS(MulticoreComputeServiceTestPilotJobs *test,
                                                    wrench::Workflow *workflow,
                                                    std::unique_ptr<wrench::Scheduler> scheduler,
                                                    std::string hostname) :
@@ -137,11 +137,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestPilotJobs, UnsupportedPilotJob) {
-  DO_TEST_WITH_FORK(do_UnsupportedPilotJob_test);
+TEST_F(MulticoreComputeServiceTestPilotJobs, UnsupportedPilotJobs) {
+  DO_TEST_WITH_FORK(do_UnsupportedPilotJobs_test);
 }
 
-void MulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJob_test() {
+void MulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -159,7 +159,7 @@ void MulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJob_test() {
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServicePilotJobUnsupportedTestWMS(this, workflow,
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceUnsupportedPilotJobsTestWMS(this, workflow,
                                                                                           std::unique_ptr<wrench::Scheduler>(
                           new wrench::RandomScheduler()), hostname))));
 
