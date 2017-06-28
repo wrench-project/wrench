@@ -102,7 +102,7 @@ before_install:
     fi
   # configure coveralls
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      sudo apt-getMessage install lcov;
+      sudo apt-get install lcov;
       sudo gem install coveralls-lcov;
     fi
 
