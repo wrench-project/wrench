@@ -10,6 +10,7 @@
 #ifndef WRENCH_CRITICALPATHSCHEDULER_H
 #define WRENCH_CRITICALPATHSCHEDULER_H
 
+#include <set>
 #include <vector>
 
 #include "wms/scheduler/pilot_job/PilotJobScheduler.h"
@@ -30,7 +31,9 @@ namespace wrench {
     private:
         std::map<WorkflowTask *, double> flopsMap;
 
-        double getFlops(Workflow *workflow, const std::vector<WorkflowTask *>);
+        double getFlops(Workflow *, const std::vector<WorkflowTask *>);
+
+        long getMaxParallelization(Workflow *, std::set<WorkflowTask *>);
         /***********************/
         /** \endcond           */
         /***********************/

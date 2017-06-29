@@ -27,24 +27,28 @@ namespace wrench {
                                          const std::set<ComputeService *> &compute_services) {
 
       double flops = 0;
+      std::set<WorkflowTask *> root_tasks;
 
       for (auto task : workflow->getTasks()) {
-        flops = std::max(flops, task->getFlops() + getFlops(workflow, workflow->getTaskChildren(task)));
+        flops = std::max(flops, task->getFlops() + this->getFlops(workflow, workflow->getTaskChildren(task)));
+
+        if (workflow->getTaskParents(task).size() == 0) {
+          root_tasks.insert(task);
+        }
       }
 
-//      double flops = 10000.00; // bogus default
-//      if (workflow->getReadyTasks().size() > 0) {
-//        // Heuristic: ask for something that can run 2 times the next ready tasks..
-//        flops = 1.5 * scheduler->getTotalFlops((*workflow->getReadyTasks().begin()).second);
-//      }
+      long max_parallel = this->getMaxParallelization(workflow, root_tasks);
 
-      scheduler->schedulePilotJobs(job_manager, workflow, flops, compute_services);
+      double total_flops = flops * (max_parallel <= compute_services.size() ?
+                                    max_parallel : max_parallel - compute_services.size());
+
+      scheduler->schedulePilotJobs(job_manager, workflow, total_flops, compute_services);
     }
 
     /**
      * @brief
      *
-     * @param workflow: a workflow to execute
+     * @param workflow: a pointer to the workflow object
      * @param tasks:
      *
      * @return
@@ -60,5 +64,29 @@ namespace wrench {
         max_flops = std::max(this->flopsMap[task], max_flops);
       }
       return max_flops;
+    }
+
+    /**
+     * @brief Get the maximal number of jobs that can run in parallel
+     *
+     * @param workflow: a pointer to the workflow object
+     * @param tasks: set of children tasks in a level
+     *
+     * @return the maximal number of jobs that can run in parallel
+     */
+    long CriticalPathScheduler::getMaxParallelization(Workflow *workflow, const std::set<WorkflowTask *> tasks) {
+      long count = tasks.size();
+
+      std::set<WorkflowTask *> children;
+
+      for (auto task : tasks) {
+        std::vector<WorkflowTask *> children_vector = workflow->getTaskChildren(task);
+        std::copy(children_vector.begin(), children_vector.end(), std::inserter(children, children.end()));
+      }
+      if (children.size() > 0) {
+        count = std::max(count, getMaxParallelization(workflow, children));
+      }
+
+      return count;
     }
 }
