@@ -39,10 +39,11 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(mailbox);
       } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
+        if (not strcmp(e.what(), "network_error")) {
           throw WorkflowExecutionException(new NetworkError());
         } else {
-          throw std::runtime_error("WorkflowExecutionEvent::waitForNextExecutionEvent(): Unknown exception: " + std::string(e.what()));
+          throw std::runtime_error(
+                  "WorkflowExecutionEvent::waitForNextExecutionEvent(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -82,7 +83,8 @@ namespace wrench {
           event->failure_cause = m->failure_cause;
         }
       } else {
-        throw std::runtime_error("WorkflowExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event");
+        throw std::runtime_error(
+                "WorkflowExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event");
       }
       return event;
     }
@@ -96,6 +98,5 @@ namespace wrench {
       this->job = nullptr;
       this->compute_service = nullptr;
     }
-
 
 };

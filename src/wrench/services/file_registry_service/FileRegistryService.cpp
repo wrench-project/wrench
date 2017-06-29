@@ -196,7 +196,7 @@ namespace wrench {
         }
       }
 
-      std::unique_ptr<SimulationMessage> message =nullptr;
+      std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
@@ -317,7 +317,8 @@ namespace wrench {
         return true;
 
       } else {
-        throw std::runtime_error("FileRegistryService::processNextMessage(): Unknown message type: " + std::to_string(message->payload));
+        throw std::runtime_error(
+                "FileRegistryService::processNextMessage(): Unknown message type: " + std::to_string(message->payload));
       }
     }
 

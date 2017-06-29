@@ -60,7 +60,7 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
-       this->s4u_simulation->shutdown();
+      this->s4u_simulation->shutdown();
     }
 
     /**
@@ -152,7 +152,8 @@ namespace wrench {
 
       // Check that a WMS is running
       if (not this->wms) {
-        throw std::runtime_error("Simulation::launch(): A WMS should have been instantiated and passed to Simulation.setWMS()");
+        throw std::runtime_error(
+                "Simulation::launch(): A WMS should have been instantiated and passed to Simulation.setWMS()");
       }
 
       // Check that at least one ComputeService is running
@@ -164,7 +165,8 @@ namespace wrench {
         }
       }
       if (!one_compute_service_running) {
-        throw std::runtime_error("Simulation::launch(): At least one ComputeService should have been instantiated add passed to Simulation.add()");
+        throw std::runtime_error(
+                "Simulation::launch(): At least one ComputeService should have been instantiated add passed to Simulation.add()");
       }
 
       // Check that at least one StorageService is running
@@ -175,17 +177,20 @@ namespace wrench {
         }
       }
       if (!one_storage_service_running) {
-        throw std::runtime_error("Simulation::launch(): At least one StorageService should have been instantiated add passed to Simulation.add()");
+        throw std::runtime_error(
+                "Simulation::launch(): At least one StorageService should have been instantiated add passed to Simulation.add()");
       }
 
       // Check that a FileRegistryService is running
       if (not this->file_registry_service) {
-        throw std::runtime_error("Simulation::launch(): A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()");
+        throw std::runtime_error(
+                "Simulation::launch(): A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()");
       }
       // Check that each input file is staged somewhere
       for (auto f : this->wms->workflow->getInputFiles()) {
         if (this->file_registry_service->entries.find(f) == this->file_registry_service->entries.end()) {
-          throw std::runtime_error("Simulation::launch(): Workflow input file " + f->getId() + " is not staged on any storage service!");
+          throw std::runtime_error(
+                  "Simulation::launch(): Workflow input file " + f->getId() + " is not staged on any storage service!");
         }
       }
 
@@ -360,13 +365,15 @@ namespace wrench {
       }
 
       // Check that a FileRegistryService has been set
-      if (!this->file_registry_service) {
-        throw std::runtime_error("Simulation::stageFile(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+      if (not this->file_registry_service) {
+        throw std::runtime_error(
+                "Simulation::stageFile(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
       }
 
       // Check that the file is not the output of anything
       if (file->isOutput()) {
-        throw std::runtime_error("Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
+        throw std::runtime_error(
+                "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
       }
 
       XBT_INFO("Staging file %s (%lf)", file->getId().c_str(), file->getSize());
@@ -397,8 +404,9 @@ namespace wrench {
       }
 
       // Check that a FileRegistryService has been set
-      if (!this->file_registry_service) {
-        throw std::runtime_error("Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+      if (not this->file_registry_service) {
+        throw std::runtime_error(
+                "Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
       }
 
       try {

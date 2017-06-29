@@ -37,7 +37,7 @@ namespace wrench {
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                double capacity,
                                                std::map<std::string, std::string> plist) :
-            SimpleStorageService(hostname, capacity, plist, "_"+std::to_string(getNewUniqueNumber())) {}
+            SimpleStorageService(hostname, capacity, plist, "_" + std::to_string(getNewUniqueNumber())) {}
 
     /**
      * @brief Private constructor
@@ -124,11 +124,12 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
       } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
+        if (not strcmp(e.what(), "network_error")) {
           WRENCH_INFO("Giving up on this message...");
           return true;
         } else {
-          throw std::runtime_error("SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a message.");
+          throw std::runtime_error(
+                  "SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a message.");
         }
       }
 
@@ -213,18 +214,20 @@ namespace wrench {
           try {
             file_content_message = S4U_Mailbox::getMessage(this->data_write_mailbox_name);
           } catch (std::runtime_error &e) {
-            if (!strcmp(e.what(), "network_error")) {
+            if (not strcmp(e.what(), "network_error")) {
               WRENCH_INFO("Giving up on this message...");
               return true;
             } else {
-              throw std::runtime_error("SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a file content.");
+              throw std::runtime_error(
+                      "SimpleStorageService::processNextMessage(): Got an unknown exception while receiving a file content.");
             }
           }
 
           if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
             this->addFileToStorage(file_content_msg->file);
           } else {
-            throw std::runtime_error("SimpleStorageService::processNextMessage(): Unexpected [ " + msg->getName() + "] message");
+            throw std::runtime_error(
+                    "SimpleStorageService::processNextMessage(): Unexpected [ " + msg->getName() + "] message");
           }
         }
         return true;
@@ -242,9 +245,9 @@ namespace wrench {
         // Send back the corresponding ack, asynchronously (in case
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                  new StorageServiceFileReadAnswerMessage(msg->file, this, success, failure_cause,
-                                                                          this->getPropertyValueAsDouble(
-                                                                                  SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
+                                   new StorageServiceFileReadAnswerMessage(msg->file, this, success, failure_cause,
+                                                                           this->getPropertyValueAsDouble(
+                                                                                   SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::runtime_error &e) {
           return true;
         }
@@ -314,7 +317,8 @@ namespace wrench {
         return true;
 
       } else {
-        throw std::runtime_error("SimpleStorageService::processNextMessage(): Unexpected [" + message->getName() + "] message");
+        throw std::runtime_error(
+                "SimpleStorageService::processNextMessage(): Unexpected [" + message->getName() + "] message");
       }
     }
 
