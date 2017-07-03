@@ -40,7 +40,6 @@ namespace wrench {
 
 				static std::string generateUniqueMailboxName(std::string);
 
-
 		private:
 				static unsigned long generateUniqueSequenceNumber();
 

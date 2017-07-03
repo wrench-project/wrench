@@ -90,20 +90,11 @@ SOFTWARE ENGINEERING:
 
 * LYON:
 
-    - Kill_all()
+    - Kill_all() [ OPEN ON GITHUB ]
         - The processes doing a GET() seem to get a NULL messages
         - The processes doing a wait() seem to segfault
 
-    - S4U: wait_any?  bug issued to github
-
-    - Could we have a "get with timeout"?
-
-    - Exiting before launch prints warning (as expected), but fails with a segfault
-      when SMPI is enabled....
-
-    - How to free memory for an actor that terminates...
-            - When the actor sends a "I am done" message, one cannot free it then...
-            - Or is it all taken care of by SimGrid?
+    - S4U: wait_any?  [OPEN ON GITHUB]
 
     - S4U: Storage
         - What will it look like?

@@ -78,8 +78,7 @@ namespace wrench {
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       void *data = nullptr;
       try {
-        simgrid::s4u::CommPtr comm = simgrid::s4u::this_actor::irecv(mailbox, &data);
-        comm->wait(timeout);
+        data = simgrid::s4u::this_actor::recv(mailbox, timeout);
       } catch (xbt_ex &e) {
         if (e.category == timeout_error) {
           throw std::runtime_error("timeout");
@@ -89,6 +88,19 @@ namespace wrench {
           throw std::runtime_error("network_error");
         }
       }
+
+//      try {
+//        simgrid::s4u::CommPtr comm = simgrid::s4u::this_actor::irecv(mailbox, &data);
+//        comm->wait(timeout);
+//      } catch (xbt_ex &e) {
+//        if (e.category == timeout_error) {
+//          throw std::runtime_error("timeout");
+//        }
+//        if (e.category == network_error) {
+//          WRENCH_INFO("Network error while doing a getMessage() with timeout. Likely the sender has died.");
+//          throw std::runtime_error("network_error");
+//        }
+//      }
 
       // This is just because it seems that after something like a killAll() we get a nullptr
       if (data == nullptr) {
