@@ -31,6 +31,7 @@ namespace wrench {
 				static double getClock();
 				static std::string getHostName();
 				static unsigned int getNumCores(std::string hostname);
+				static double getFlopRate(std::string hostname);
 				static void compute(double);
 				static void sleep(double);
 				bool isInitialized();

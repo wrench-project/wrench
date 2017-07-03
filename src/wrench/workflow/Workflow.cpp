@@ -412,10 +412,10 @@ namespace wrench {
         throw std::invalid_argument("Workflow::updateTaskState(): Invalid arguments");
       }
 
-      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
-                  task->getId().c_str(),
-                  WorkflowTask::stateToString(task->state).c_str(),
-                  WorkflowTask::stateToString(state).c_str());
+//      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
+//                  task->getId().c_str(),
+//                  WorkflowTask::stateToString(task->state).c_str(),
+//                  WorkflowTask::stateToString(state).c_str());
 
       switch (state) {
         // Make a task completed, which may failure_cause its children to become ready

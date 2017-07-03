@@ -43,6 +43,8 @@ SOFTWARE ENGINEERING:
 
 * "BIG" things:
 
+    - All PIDs are zero
+
     - Plan a first paper
         - Workflow makespan prediction
             - Comparison WRENCH / WorkflowSim
@@ -108,10 +110,6 @@ SOFTWARE ENGINEERING:
         - How to deal with pipelining of network/disk when remote putMessage()/getMessage()?
                - How does MSG do it?
 
-    - S4U: Failures
-        - Some way to do a "simcall_process_on_exit()"
-            - Or catch some "process failure exception"?
-        - Right now there is some uncaught exception in the maestro
 
     - S4U: When will we getMessage C++ Exceptions from SIMIX? (signal handler sucks)
         - Related: Actor throwing exception is not caught by launch()...

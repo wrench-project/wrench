@@ -785,7 +785,7 @@ namespace wrench {
         return true;
       } else if (MulticoreComputeServiceFlopRateRequestMessage *msg = dynamic_cast<MulticoreComputeServiceFlopRateRequestMessage *>(message.get())) {
         MulticoreComputeServiceFlopRateAnswerMessage *answer_message = new MulticoreComputeServiceFlopRateAnswerMessage(
-                simgrid::s4u::Host::by_name(this->hostname)->getPstateSpeed(0),
+                S4U_Simulation::getFlopRate(this->hostname),
                 this->getPropertyValueAsDouble(
                         MulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD));
         try {

@@ -9,6 +9,9 @@
  */
 
 #include <iostream>
+#include <xbt/ex.hpp>
+
+
 #include "simgrid_S4U_util/S4U_Simulation.h"
 
 namespace wrench {
@@ -69,7 +72,11 @@ namespace wrench {
      * @param filename: the path to an XML platform file
      */
     void S4U_Simulation::setupPlatform(std::string filename) {
-      this->engine->loadPlatform(filename.c_str());
+      try {
+        this->engine->loadPlatform(filename.c_str());
+      } catch (xbt_ex &e) {
+        // TODO: S4U doesn't throw for this
+      }
       this->platform_setup = true;
     }
 
@@ -98,13 +105,39 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieves the number of cores of a host
+     * @brief Retrieve the number of cores of a host
      *
      * @param hostname: the name of the host
      * @return the number of cores of the host
+     *
+     * @throw std::invalid_argument
      */
     unsigned int S4U_Simulation::getNumCores(std::string hostname) {
-      return (unsigned int)simgrid::s4u::Host::by_name(hostname)->coreCount();
+      unsigned int num_cores = 0;
+      try {
+        num_cores = (unsigned int) simgrid::s4u::Host::by_name(hostname)->coreCount();
+      } catch (std::out_of_range &e) {
+        throw std::invalid_argument("Unknown hostname " + hostname);
+      }
+      return num_cores;
+    }
+
+    /**
+     * @brief Retrieve the flop rate of a host
+     *
+     * @param hostname: the name of the host
+     * @return the flop rate in floating point operations per second
+     *
+     * @throw std::invalid_argument
+     */
+    double S4U_Simulation::getFlopRate(std::string hostname) {
+      double flop_rate = 0;
+      try {
+        flop_rate = simgrid::s4u::Host::by_name(hostname)->getPstateSpeed(0);
+      } catch (std::out_of_range &e) {
+        throw std::invalid_argument("Unknown hostname " + hostname);
+      }
+      return flop_rate;
     }
 
     /**
