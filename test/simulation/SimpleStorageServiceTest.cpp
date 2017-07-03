@@ -200,7 +200,7 @@ private:
 
       // Do a valid asynchronous file copy
       try {
-        data_movement_manager->submitFileCopy(this->test->file_1,
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
                                               this->test->storage_service_1000,
                                               this->test->storage_service_100);
       } catch (wrench::WorkflowExecutionException &e) {
@@ -242,7 +242,7 @@ private:
 
       // Do an INVALID asynchronous file copy (file too big)
       try {
-        data_movement_manager->submitFileCopy(this->test->file_500,
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
                                               this->test->storage_service_1000,
                                               this->test->storage_service_100);
       } catch (wrench::WorkflowExecutionException &e) {
@@ -270,7 +270,7 @@ private:
 
       // Do an INVALID asynchronous file copy (file not there)
       try {
-        data_movement_manager->submitFileCopy(this->test->file_500,
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500,
                                               this->test->storage_service_100,
                                               this->test->storage_service_500);
       } catch (wrench::WorkflowExecutionException &e) {

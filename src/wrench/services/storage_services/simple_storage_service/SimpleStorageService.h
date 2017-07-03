@@ -51,14 +51,6 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-//        void copyFile(WorkflowFile *file, StorageService *src);
-//
-//        void readFile(WorkflowFile *file);
-//
-//        void writeFile(WorkflowFile *file);
-//
-//        void deleteFile(WorkflowFile *file);
-
         /***********************/
         /** \endcond           */
         /***********************/

@@ -71,7 +71,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Ask the data manager to initiate a file copy
+     * @brief Ask the data manager to initiate an asynchronous file copy
      * @param file: the file
      * @param src: the source data storage
      * @param dst: the destination data storage
@@ -79,7 +79,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
      */
-    void DataMovementManager::submitFileCopy(WorkflowFile *file,
+    void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
                                              StorageService *src,
                                              StorageService *dst) {
       if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
@@ -91,8 +91,32 @@ namespace wrench {
       } catch (WorkflowExecutionException &e) {
         throw;
       }
-
     }
+
+    /**
+     * @brief Ask the data manager to perform a synchronous file copy
+     * @param file: the file
+     * @param src: the source data storage
+     * @param dst: the destination data storage
+     *
+     * @throw std::invalid_argument
+     * @throw WorkflowExecutionException
+     */
+    void DataMovementManager::doSynchronousFileCopy(WorkflowFile *file,
+                                             StorageService *src,
+                                             StorageService *dst) {
+      if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
+        throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
+      }
+
+      try {
+        dst->copyFile(file, src);
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      }
+    }
+
+
 
     /**
      * @brief Main method of the daemon that implements the DataMovementManager

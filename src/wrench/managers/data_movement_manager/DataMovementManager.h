@@ -39,7 +39,9 @@ namespace wrench {
 
         void kill();
 
-        void submitFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst);
+        void initiateAsynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst);
+
+        void doSynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst);
 
     private:
 
