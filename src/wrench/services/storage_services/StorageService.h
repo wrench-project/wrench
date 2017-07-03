@@ -46,15 +46,15 @@ namespace wrench {
 
         virtual void deleteFile(WorkflowFile *file);
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
         virtual void copyFile(WorkflowFile *file, StorageService *src);
 
         virtual void initiateFileCopy(std::string answer_mailbox,
                                       WorkflowFile *file,
                                       StorageService *src);
-
-        /***********************/
-        /** \cond INTERNAL    **/
-        /***********************/
 
         virtual void readFile(WorkflowFile *file);
 
