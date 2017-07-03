@@ -26,6 +26,10 @@ matrix:
             - doxygen-gui
             - graphviz
             - libboost-all-dev
+        sonarcloud:
+            organization: "wrench"
+            token:
+              secure: ${SONAR_TOKEN}
       env: GCC_VERSION=5
     - os: linux
       compiler: gcc
