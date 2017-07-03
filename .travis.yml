@@ -163,6 +163,9 @@ after_success:
   - ./generate_documentation.sh --USER --INTERNAL --DEVELOPER --GH
   # sonarcloud
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      curl -LsS https://sonarqube.com/static/cpp/build-wrapper-linux-x86.zip > build-wrapper-linux-x86.zip
+      unzip build-wrapper-linux-x86.zip
+      ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir bw-outputs make clean all test
       sonar-scanner
     fi
 
