@@ -51,6 +51,10 @@ matrix:
             - doxygen-gui
             - graphviz
             - libboost-all-dev
+        sonarcloud:
+          organization: "wrench"
+          token:
+            secure: ${SONAR_TOKEN}
       env: GCC_VERSION=6
     - os: linux
       compiler: clang
@@ -72,6 +76,10 @@ matrix:
             - doxygen-gui
             - graphviz
             - libboost-all-dev
+        sonarcloud:
+          organization: "wrench"
+          token:
+            secure: ${SONAR_TOKEN}
       env: CLANG_VERSION=3.6
     - os: linux
       compiler: clang
@@ -93,6 +101,10 @@ matrix:
             - doxygen-gui
             - graphviz
             - libboost-all-dev
+        sonarcloud:
+          organization: "wrench"
+          token:
+            secure: ${SONAR_TOKEN}
       env: CLANG_VERSION=3.7
 
 before_install:
@@ -149,6 +161,10 @@ after_success:
   - cd .. && chmod +x generate_documentation.sh
   - doxygen --version
   - ./generate_documentation.sh --USER --INTERNAL --DEVELOPER --GH
+  # sonarcloud
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      sonar-scanner
+    fi
 
 deploy:
   provider: pages
