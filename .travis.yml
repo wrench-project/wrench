@@ -155,8 +155,8 @@ after_success:
   - ./generate_documentation.sh --USER --INTERNAL --DEVELOPER --GH
   # sonarcloud
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      build-wrapper-linux-x86-64 --out-dir bw-output make all test
-      sonar-scanner
+      build-wrapper-linux-x86-64 --out-dir bw-output make all test;
+      sonar-scanner;
     fi
 
 deploy:
