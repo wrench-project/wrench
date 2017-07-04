@@ -9,6 +9,7 @@ DATA STORAGE IMPLEMENTATION:
 
     - Decide what to do about "partial failures"
         - How do we report what has completed, and what hasn't upon failure
+        - Or do we leave it as is and the WMS has to inspect things?
 
 
     - SIMPLE STORAGE SERVICE: How to deal with synchrony problem
@@ -21,14 +22,6 @@ DATA STORAGE IMPLEMENTATION:
 
     - Chase memory leaks
         - CauseType/Exception unique_ptr?
-
-------------------------------------
-
-BUGS:
-
-    - There is a SegFault when exiting before simulation.launch() is executed.
-        ("Invalid read of size 8" in simix_process())
-          Need to find good ways to cleanup stuff in S4U...
 
 ---------------------------------------------------------------------
 

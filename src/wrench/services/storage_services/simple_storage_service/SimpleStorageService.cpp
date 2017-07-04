@@ -100,10 +100,8 @@ namespace wrench {
       /** Main loop **/
       while (this->processNextMessage()) {
         // Clear pending asynchronous puts that are done
-        S4U_Mailbox::clear_dputs();
+//        S4U_Mailbox::clear_dputs();
 
-        // Clear pending asynchronous puts that are done
-        S4U_Mailbox::clear_dputs();
       }
 
       WRENCH_INFO("Simple Storage Service %s on host %s terminated!",

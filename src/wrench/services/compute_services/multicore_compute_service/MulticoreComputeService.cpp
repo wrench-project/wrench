@@ -460,7 +460,7 @@ namespace wrench {
       while (this->processNextMessage((this->has_ttl ? this->death_date - S4U_Simulation::getClock() : -1.0))) {
 
         // Clear pending asynchronous puts that are done
-        S4U_Mailbox::clear_dputs();
+//        S4U_Mailbox::clear_dputs();
 
         /** Dispatch currently pending work until no longer possible **/
         while (this->dispatchNextPendingWork());

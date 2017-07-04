@@ -316,7 +316,7 @@ namespace wrench {
           break;
         }
         // Clear finished asynchronous dputMessage()
-        S4U_Mailbox::clear_dputs();
+//        S4U_Mailbox::clear_dputs();
 
         WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 

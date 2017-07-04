@@ -25,7 +25,7 @@ namespace wrench {
 
     // A data structure to keep track of pending asynchronous putMessage() operations
     // what will have to be waited on at some point
-    std::map<simgrid::s4u::ActorPtr, std::set<simgrid::s4u::CommPtr>> S4U_Mailbox::dputs;
+//    std::map<simgrid::s4u::ActorPtr, std::set<simgrid::s4u::CommPtr>> S4U_Mailbox::dputs;
 
 
 
@@ -153,8 +153,21 @@ namespace wrench {
       simgrid::s4u::CommPtr comm = nullptr;
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+//      try {
+//        comm = simgrid::s4u::Comm::send_async(mailbox, msg, (int) msg->payload);
+//      } catch (xbt_ex &e) {
+//        if (e.category == network_error) {
+//          WRENCH_INFO("Network error while doing a dputMessage()");
+//          throw std::runtime_error("network_error");
+//        }
+//      }
+//
+//      // Insert the communication into the dputs map, so that it's not lost
+//      // and it can be "cleared" later
+//      S4U_Mailbox::dputs[simgrid::s4u::Actor::self()].insert(comm);
+
       try {
-        comm = simgrid::s4u::Comm::send_async(mailbox, msg, (int) msg->payload);
+        simgrid::s4u::this_actor::dsend(mailbox, msg, (int) msg->payload);
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a dputMessage()");
@@ -162,36 +175,37 @@ namespace wrench {
         }
       }
 
-      // Insert the communication into the dputs map, so that it's not lost
-      // and it can be "cleared" later
-      S4U_Mailbox::dputs[simgrid::s4u::Actor::self()].insert(comm);
-      return;
+//      // Insert the communication into the dputs map, so that it's not lost
+//      // and it can be "cleared" later
+//      S4U_Mailbox::dputs[simgrid::s4u::Actor::self()].insert(comm);
+
+        return;
     }
 
-    /**
-     * @brief A method that checks on and clears previous asynchronous communications. This is
-     * to avoid having the above levels deal with asynchronous communication stuff.
-     */
-    void S4U_Mailbox::clear_dputs() {
-      std::set<simgrid::s4u::CommPtr> set = S4U_Mailbox::dputs[simgrid::s4u::Actor::self()];
-      std::set<simgrid::s4u::CommPtr>::iterator it;
-      for (it = set.begin(); it != set.end(); ++it) {
-        // TODO: This is probably not great right now, but S4U asynchronous communication are
-        // TODO: in a state of flux, and so this seems to work but for the memory leak
-        // TODO: will have to talk to the S4U developers
-
-//        XBT_INFO("Getting the state of a previous communication! (%s)", simgrid::s4u::Actor::self()->name().c_str());
-        e_s4u_activity_state_t state = (*it)->getState();
-        if (state == finished) {
-//          XBT_INFO(
-//                  "The communication is finished.... remove it from the pending list [TODO: delete memory??? call test()???]");
-          set.erase(*it);
-        } else {
-//          XBT_INFO("State = %d (finished = %d)", state, finished);
-        }
-      }
-      return;
-    }
+//    /**
+//     * @brief A method that checks on and clears previous asynchronous communications. This is
+//     * to avoid having the above levels deal with asynchronous communication stuff.
+//     */
+//    void S4U_Mailbox::clear_dputs() {
+//      std::set<simgrid::s4u::CommPtr> set = S4U_Mailbox::dputs[simgrid::s4u::Actor::self()];
+//      std::set<simgrid::s4u::CommPtr>::iterator it;
+//      for (it = set.begin(); it != set.end(); ++it) {
+//        // TODO: This is probably not great right now, but S4U asynchronous communication are
+//        // TODO: in a state of flux, and so this seems to work but for the memory leak
+//        // TODO: will have to talk to the S4U developers
+//
+////        XBT_INFO("Getting the state of a previous communication! (%s)", simgrid::s4u::Actor::self()->name().c_str());
+//        e_s4u_activity_state_t state = (*it)->getState();
+//        if (state == finished) {
+////          XBT_INFO(
+////                  "The communication is finished.... remove it from the pending list [TODO: delete memory??? call test()???]");
+//          set.erase(*it);
+//        } else {
+////          XBT_INFO("State = %d (finished = %d)", state, finished);
+//        }
+//      }
+//      return;
+//    }
 
     /**
     * @brief A method to generate a unique sequence number

@@ -235,7 +235,7 @@ namespace wrench {
       while (this->processNextMessage()) {
 
         // Clear pending asynchronous puts that are done
-        S4U_Mailbox::clear_dputs();
+//        S4U_Mailbox::clear_dputs();
 
       }
 

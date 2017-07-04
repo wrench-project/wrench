@@ -51,7 +51,7 @@ namespace wrench {
           try {
             this->daemon->main();
             WRENCH_INFO("Daemon's main() function has returned");
-            S4U_Mailbox::clear_dputs();
+//            S4U_Mailbox::clear_dputs();
           } catch (std::exception &e) {
             throw;
           }
