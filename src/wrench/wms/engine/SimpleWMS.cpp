@@ -84,13 +84,6 @@ namespace wrench {
           WRENCH_INFO("Scheduling pilot jobs...");
           this->pilot_job_scheduler.get()->schedule(this->scheduler.get(), this->workflow, job_manager.get(),
                                                     this->simulation->getRunningComputeServices());
-//          double flops = 10000.00; // bogus default
-//          if (ready_tasks.size() > 0) {
-//            // Heuristic: ask for something that can run 2 times the next ready tasks..
-//            flops = 1.5 * this->scheduler->getTotalFlops((*ready_tasks.begin()).second);
-//          }
-//          this->scheduler->schedulePilotJobs(job_manager.get(), this->workflow, flops,
-//                                             this->simulation->getRunningComputeServices());
         }
 
         // Perform dynamic optimizations

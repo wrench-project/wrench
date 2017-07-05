@@ -14,7 +14,7 @@
 namespace wrench {
 
     /**
-     * @brief Schedule a
+     * @brief Schedule a pilot job for the length of the critical path
      *
      * @param scheduler: a scheduler implementation
      * @param workflow: a workflow to execute
@@ -30,14 +30,14 @@ namespace wrench {
       std::set<WorkflowTask *> root_tasks;
 
       for (auto task : workflow->getTasks()) {
-        flops = std::max(flops, task->getFlops() + this->getFlops(workflow, workflow->getTaskChildren(task)));
+        flops = (std::max)(flops, task->getFlops() + this->getFlops(workflow, workflow->getTaskChildren(task)));
 
         if (workflow->getTaskParents(task).size() == 0) {
           root_tasks.insert(task);
         }
       }
 
-      long max_parallel = this->getMaxParallelization(workflow, root_tasks);
+      unsigned long max_parallel = this->getMaxParallelization(workflow, root_tasks);
 
       double total_flops = flops * (max_parallel <= compute_services.size() ?
                                     max_parallel : max_parallel - compute_services.size());
@@ -46,10 +46,10 @@ namespace wrench {
     }
 
     /**
-     * @brief
+     * @brief Get the total number of flops recursively of the critical path for a given task
      *
      * @param workflow: a pointer to the workflow object
-     * @param tasks:
+     * @param tasks: a vector of children tasks
      *
      * @return
      */
@@ -61,7 +61,7 @@ namespace wrench {
           double flops = task->getFlops() + getFlops(workflow, workflow->getTaskChildren(task));
           this->flopsMap[task] = flops;
         }
-        max_flops = std::max(this->flopsMap[task], max_flops);
+        max_flops = (std::max)(this->flopsMap[task], max_flops);
       }
       return max_flops;
     }
@@ -74,9 +74,8 @@ namespace wrench {
      *
      * @return the maximal number of jobs that can run in parallel
      */
-    long CriticalPathScheduler::getMaxParallelization(Workflow *workflow, const std::set<WorkflowTask *> tasks) {
-      long count = tasks.size();
-
+    unsigned long CriticalPathScheduler::getMaxParallelization(Workflow *workflow, const std::set<WorkflowTask *> tasks) {
+      unsigned long count = tasks.size();
       std::set<WorkflowTask *> children;
 
       for (auto task : tasks) {
@@ -84,7 +83,7 @@ namespace wrench {
         std::copy(children_vector.begin(), children_vector.end(), std::inserter(children, children.end()));
       }
       if (children.size() > 0) {
-        count = std::max(count, getMaxParallelization(workflow, children));
+        count = (std::max)(count, getMaxParallelization(workflow, children));
       }
 
       return count;

@@ -33,7 +33,7 @@ namespace wrench {
 
         double getFlops(Workflow *, const std::vector<WorkflowTask *>);
 
-        long getMaxParallelization(Workflow *, std::set<WorkflowTask *>);
+        unsigned long getMaxParallelization(Workflow *, std::set<WorkflowTask *>);
         /***********************/
         /** \endcond           */
         /***********************/
