@@ -52,7 +52,7 @@ namespace wrench {
       WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
       // Create a job manager
-      std::unique_ptr<JobManager> job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
+      this->job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
 
       // Create a data movement manager
       std::unique_ptr<DataMovementManager> data_movement_manager = std::unique_ptr<DataMovementManager>(
@@ -60,8 +60,6 @@ namespace wrench {
 
       // Perform static optimizations
       runStaticOptimizations();
-
-      bool abort = false;
 
       while (true) {
 
@@ -82,7 +80,7 @@ namespace wrench {
         // Submit pilot jobs
         if (this->pilot_job_scheduler) {
           WRENCH_INFO("Scheduling pilot jobs...");
-          this->pilot_job_scheduler.get()->schedule(this->scheduler.get(), this->workflow, job_manager.get(),
+          this->pilot_job_scheduler.get()->schedule(this->scheduler.get(), this->workflow, this->job_manager.get(),
                                                     this->simulation->getRunningComputeServices());
         }
 
@@ -91,58 +89,20 @@ namespace wrench {
 
         // Run ready tasks with defined scheduler implementation
         WRENCH_INFO("Scheduling tasks...");
-        this->scheduler->scheduleTasks(job_manager.get(),
+        this->scheduler->scheduleTasks(this->job_manager.get(),
                                        ready_tasks,
                                        this->simulation->getRunningComputeServices());
 
-        // Wait for a workflow execution event
-        std::unique_ptr<WorkflowExecutionEvent> event;
+        // Wait for a workflow execution event, and process it
         try {
-          event = workflow->waitForNextExecutionEvent();
+          this->waitForAndProcessNextEvent();
         } catch (WorkflowExecutionException &e) {
           WRENCH_INFO("Error while getting next execution event (%s)... ignoring and trying again",
                       (e.getCause()->toString().c_str()));
           continue;
         }
 
-
-
-
-        switch (event->type) {
-          case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-            StandardJob *job = (StandardJob *) (event->job);
-            WRENCH_INFO("Notified that a %ld-task job has completed", job->getNumTasks());
-            break;
-          }
-          case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-            StandardJob *job = (StandardJob *) (event->job);
-            WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
-            WRENCH_INFO("CauseType: %s", event->failure_cause->toString().c_str());
-            job_manager->forgetJob(job);
-            WRENCH_INFO("As a SimpleWMS, I abort as soon as there is a failure");
-            abort = true;
-            break;
-          }
-          case WorkflowExecutionEvent::PILOT_JOB_START: {
-            WRENCH_INFO("Notified that a pilot job has started!");
-            break;
-          }
-          case WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-            WRENCH_INFO("Notified that a pilot job has expired!");
-            break;
-          }
-          case WorkflowExecutionEvent::UNSUPPORTED_JOB_TYPE: {
-            WRENCH_INFO("Notified that job '%s' was submitted to a service that doesn't support its job type",
-                        event->job->getName().c_str());
-            break;
-          }
-          default: {
-            throw std::runtime_error("SimpleWMS::main(): Unknown workflow execution event type '" +
-                                     std::to_string(event->type) + "'");
-          }
-        }
-
-        if (abort || workflow->isDone()) {
+        if (this->abort || workflow->isDone()) {
           break;
         }
       }
@@ -177,7 +137,23 @@ namespace wrench {
 
       WRENCH_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
 
+      this->job_manager.reset();
+
       return 0;
+    }
+
+    /**
+     * @brief Process a WorkflowExecutionEvent::STANDARD_JOB_FAILURE
+     *
+     * @param event: a workflow execution event
+     */
+    void SimpleWMS::processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent> event) {
+      StandardJob *job = (StandardJob *) (event->job);
+      WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
+      WRENCH_INFO("CauseType: %s", event->failure_cause->toString().c_str());
+      this->job_manager->forgetJob(job);
+      WRENCH_INFO("As a SimpleWMS, I abort as soon as there is a failure");
+      this->abort = true;
     }
 
 }
