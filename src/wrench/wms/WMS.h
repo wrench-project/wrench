@@ -16,6 +16,7 @@
 #include "wms/optimizations/static/StaticOptimization.h"
 #include "wms/scheduler/pilot_job/PilotJobScheduler.h"
 #include "workflow/Workflow.h"
+#include "workflow_execution_events/WorkflowExecutionEvent.h"
 
 namespace wrench {
 
@@ -57,6 +58,23 @@ namespace wrench {
         void runDynamicOptimizations();
 
         void runStaticOptimizations();
+
+        void waitForAndProcessNextEvent();
+
+        // workflow execution event processors
+        virtual void processEventUnsupportedJobType(std::unique_ptr<WorkflowExecutionEvent>);
+
+        virtual void processEventStandardJobCompletion(std::unique_ptr<WorkflowExecutionEvent>);
+
+        virtual void processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent>);
+
+        virtual void processEventPilotJobStart(std::unique_ptr<WorkflowExecutionEvent>);
+
+        virtual void processEventPilotJobExpiration(std::unique_ptr<WorkflowExecutionEvent>);
+
+        virtual void processEventFileCopyCompletion(std::unique_ptr<WorkflowExecutionEvent>);
+
+        virtual void processEventFileCopyFailure(std::unique_ptr<WorkflowExecutionEvent>);
 
         /***********************/
         /** \endcond           */

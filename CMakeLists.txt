@@ -118,6 +118,7 @@ set(TEST_FILES
         test/workflow/WorkflowTaskTest.cpp
         test/wms/optimizations/dynamic/FailureDynamicClusteringTest.cpp
         test/wms/optimizations/static/SimplePipelineClusteringTest.cpp
+        test/wms/scheduler/pilot_job/CriticalPathSchedulerTest.cpp
         test/simulation/OneTaskTest.cpp
         test/simulation/SimpleStorageServiceTest.cpp
         test/simulation/MulticoreComputeServiceTestStandardJobs.cpp

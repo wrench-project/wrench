@@ -10,6 +10,7 @@
 #ifndef WRENCH_CRITICALPATHSCHEDULER_H
 #define WRENCH_CRITICALPATHSCHEDULER_H
 
+#include <gtest/gtest_prod.h>
 #include <set>
 #include <vector>
 
@@ -28,15 +29,20 @@ namespace wrench {
         /***********************/
         void schedule(Scheduler *, Workflow *, JobManager *, const std::set<ComputeService *> &);
 
-    private:
-        std::map<WorkflowTask *, double> flopsMap;
+    protected:
+        double getFlops(Workflow *, const std::vector<WorkflowTask *> &);
 
-        double getFlops(Workflow *, const std::vector<WorkflowTask *>);
-
-        long getMaxParallelization(Workflow *, std::set<WorkflowTask *>);
+        unsigned long getMaxParallelization(Workflow *, const std::set<WorkflowTask *> &);
         /***********************/
         /** \endcond           */
         /***********************/
+
+    private:
+        std::map<WorkflowTask *, double> flopsMap;
+
+        FRIEND_TEST(CriticalPathSchedulerTest, GetTotalFlops);
+
+        FRIEND_TEST(CriticalPathSchedulerTest, GetMaxParallelization);
     };
 
 }
