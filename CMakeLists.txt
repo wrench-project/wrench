@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 project(wrench)
 
+add_definitions ("-Wall")
+
 set(CMAKE_CXX_STANDARD 11)
 
 include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
@@ -101,7 +103,11 @@ set(SOURCE_FILES
         src/wrench/services/compute_services/multicore_compute_service/WorkUnit.h
         src/wrench/wms/scheduler/pilot_job/PilotJobScheduler.h
         src/wrench/wms/scheduler/pilot_job/CriticalPathScheduler.h
-        src/wrench/wms/scheduler/pilot_job/CriticalPathScheduler.cpp)
+        src/wrench/wms/scheduler/pilot_job/CriticalPathScheduler.cpp
+        src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
+        src/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
+        src/wrench/services/storage_services/simple_storage_service/IncomingFile.cpp
+        src/wrench/services/storage_services/simple_storage_service/IncomingFile.h)
 
 # test files
 set(TEST_FILES
