@@ -13,12 +13,12 @@
 
 
 #include <vector>
-#include <simgrid/s4u/forward.hpp>
+#include <simgrid/s4u/Comm.hpp>
 
 namespace wrench {
 
     class SimulationMessage;
-    
+
     /** \cond INTERNAL */
 
     /** @brief This is a simple wrapper class around S4U */
