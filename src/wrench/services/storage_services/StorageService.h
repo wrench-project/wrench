@@ -51,12 +51,12 @@ namespace wrench {
         /***********************/
 
         virtual void copyFile(WorkflowFile *file, StorageService *src);
-
         virtual void initiateFileCopy(std::string answer_mailbox,
                                       WorkflowFile *file,
                                       StorageService *src);
 
         virtual void readFile(WorkflowFile *file);
+        virtual void initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file);
 
         virtual void writeFile(WorkflowFile *file);
 
@@ -81,7 +81,7 @@ namespace wrench {
 
         friend class Simulation;
 
-        void addFileToStorage(WorkflowFile *);
+        void stageFile(WorkflowFile *);
 
         void removeFileFromStorage(WorkflowFile *);
 
@@ -98,12 +98,12 @@ namespace wrench {
 
     private:
 
-        enum Action {
+        enum FileOperation {
             READ,
             WRITE,
         };
 
-        static void writeOrReadFiles(Action action, std::set<WorkflowFile *> files,
+        static void writeOrReadFiles(FileOperation action, std::set<WorkflowFile *> files,
                                      std::map<WorkflowFile *, StorageService *> file_locations,
                                      StorageService *default_storage_service);
 

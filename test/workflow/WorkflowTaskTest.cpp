@@ -17,7 +17,7 @@ protected:
       workflow = new wrench::Workflow();
 
       t1 = workflow->addTask("task-01", 100000);
-      t2 = workflow->addTask("task-02", 100, 4);
+      t2 = workflow->addTask("task-02", 100, 2, 4, 0.5);
 
       workflow->addControlDependency(t1, t2);
     }
@@ -37,8 +37,12 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
 
   ASSERT_GT(t1->getFlops(), t2->getFlops());
 
-  ASSERT_EQ(t1->getNumProcs(), 1);
-  ASSERT_EQ(t2->getNumProcs(), 4);
+  ASSERT_EQ(t1->getMinNumCores(), 1);
+  ASSERT_EQ(t1->getMaxNumCores(), 1);
+  ASSERT_EQ(t1->getParallelEfficiency(), 1.0);
+  ASSERT_EQ(t2->getMinNumCores(), 2);
+  ASSERT_EQ(t2->getMaxNumCores(), 4);
+  ASSERT_EQ(t2->getParallelEfficiency(), 0.5);
 
   EXPECT_EQ(t1->getState(), wrench::WorkflowTask::State::READY);
   EXPECT_EQ(t2->getState(), wrench::WorkflowTask::State::NOT_READY); // due to control dependency
@@ -66,12 +70,14 @@ TEST_F(WorkflowTaskTest, GetSet) {
   EXPECT_EQ(t1->getState(), wrench::WorkflowTask::State::READY);
   EXPECT_EQ(t2->getState(), wrench::WorkflowTask::State::NOT_READY);
 
-  ASSERT_THROW(t1->setCompleted(), std::runtime_error);
+  // Now, we can to any kind of setting
+  // ASSERT_THROW(t1->setCompleted(), std::runtime_error);
 
   t1->setRunning();
   EXPECT_EQ(t1->getState(), wrench::WorkflowTask::State::RUNNING);
 
-  ASSERT_THROW(t1->setReady(), std::runtime_error);
+  // Now, we can to any kind of setting
+  // ASSERT_THROW(t1->setReady(), std::runtime_error);
 
   t1->setCompleted();
   EXPECT_EQ(t1->getState(), wrench::WorkflowTask::State::COMPLETED);
@@ -97,7 +103,7 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
   ASSERT_THROW(t1->addInputFile(f2), std::invalid_argument);
   ASSERT_THROW(t1->addOutputFile(f1), std::invalid_argument);
 
-  wrench::WorkflowTask* t3 = workflow->addTask("task-03", 50, 2);
+  wrench::WorkflowTask* t3 = workflow->addTask("task-03", 50, 2, 4, 1.0);
   t3->addInputFile(f2);
 
   EXPECT_EQ(t3->getNumberOfParents(), 1);

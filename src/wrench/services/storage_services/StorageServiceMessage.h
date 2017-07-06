@@ -177,10 +177,10 @@ namespace wrench {
         StorageService *storage_service;
         /** @brief Whether the write operation request was accepted or not */
         bool success;
+        /** @brief The mailbox on which to send the file */
+        std::string data_write_mailbox_name;
         /** @brief The cause of the failure, if any, or nullptr */
         WorkflowExecutionFailureCause *failure_cause;
-        /** @brief The mailbox on which to actually write the file data (payload), in case of a success */
-        std::string data_write_mailbox_name;
     };
 
     /**
@@ -188,10 +188,14 @@ namespace wrench {
      */
     class StorageServiceFileReadRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileReadRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
+        StorageServiceFileReadRequestMessage(std::string answer_mailbox,
+                                             std::string mailbox_to_receive_the_file_content,
+                                             WorkflowFile *file, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The mailbox to which the file content should be sent */
+        std::string mailbox_to_receive_the_file_content;
         /** @brief The file to read */
         WorkflowFile *file;
     };

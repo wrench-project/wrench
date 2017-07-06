@@ -26,7 +26,9 @@ namespace wrench {
      *
      * @param id: a unique string id
      * @param flops: number of flops
-     * @param num_procs: a number of processors
+     * @param min_num_cores: the minimum number of cores required to run the task
+     * @param max_num_cores: the maximum number of cores that can be used by the task (0 meanx infinity)
+     * @param parallel_efficiency: the multi-core parallel efficiency
      *
      * @return the WorkflowTask instance
      *
@@ -34,10 +36,12 @@ namespace wrench {
      */
     WorkflowTask *Workflow::addTask(const std::string id,
                                     double flops,
-                                    int num_procs) {
+                                    int min_num_cores,
+                                    int max_num_cores,
+                                    double parallel_efficiency) {
 
-      if ((flops < 0.0) || (num_procs <= 0)) {
-        throw std::invalid_argument("WorkflowTask::adTask(): Invalid argument");
+      if ((flops < 0.0) || (min_num_cores < 1) || (max_num_cores < 0) || ((max_num_cores > 0) && (min_num_cores > max_num_cores))) {
+        throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
       }
 
       // Check that the task doesn't really exist
@@ -46,7 +50,7 @@ namespace wrench {
       }
 
       // Create the WorkflowTask object
-      WorkflowTask *task = new WorkflowTask(id, flops, num_procs);
+      WorkflowTask *task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency);
       // Create a DAG node for it
       task->workflow = this;
       task->DAG = this->DAG.get();
@@ -399,7 +403,8 @@ namespace wrench {
 
     /**
      * @brief Update the state of a task, and propagate the change
-     *        to other tasks if necessary.
+     *        to other tasks if necessary. WARNING: This method
+     *        doesn't do ANY CHECK about whether the state change makes sense
      *
      * @param task: a workflow task
      * @param state: the new task state
@@ -412,6 +417,10 @@ namespace wrench {
         throw std::invalid_argument("Workflow::updateTaskState(): Invalid arguments");
       }
 
+      if (task->getState() == state) {
+        return;
+      }
+
 //      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
 //                  task->getId().c_str(),
 //                  WorkflowTask::stateToString(task->state).c_str(),
@@ -420,10 +429,6 @@ namespace wrench {
       switch (state) {
         // Make a task completed, which may failure_cause its children to become ready
         case WorkflowTask::COMPLETED: {
-          if (task->getState() != WorkflowTask::RUNNING) {
-            throw std::runtime_error(
-                    "Workflow::updateTaskState(): Cannot set non-running task state to WorkflowTask::COMPLETED");
-          }
           task->setState(WorkflowTask::COMPLETED);
 
           // Go through the children and make them ready if possible
@@ -434,16 +439,6 @@ namespace wrench {
           break;
         }
         case WorkflowTask::READY: {
-          if (task->getState() == WorkflowTask::READY ||
-              task->getState() == WorkflowTask::COMPLETED) {
-            return;
-          }
-          if (task->getState() != WorkflowTask::NOT_READY && task->getState() != WorkflowTask::FAILED &&
-              task->getState() != WorkflowTask::PENDING) {
-            throw std::runtime_error("Workflow::updateTaskState(): Cannot set the state of a " +
-                                     WorkflowTask::stateToString(task->getState()) +
-                                     " task to WorkflowTask::READY");
-          }
           // Go through the parent and check whether they are all completed
           for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
             WorkflowTask *parent = (*DAG_node_map)[(*DAG).source(a)];
@@ -465,13 +460,7 @@ namespace wrench {
           break;
         }
         case WorkflowTask::FAILED: {
-          if (task->getState() == WorkflowTask::RUNNING) {
-            task->setState(WorkflowTask::FAILED);
-          } else {
-            throw std::runtime_error("Workflow::updateTaskState(): Cannot set the state of a " +
-                                     WorkflowTask::stateToString(task->getState()) +
-                                     " task to WorkflowTask::FAILED");
-          }
+          task->setState(WorkflowTask::FAILED);
           break;
         }
         default: {

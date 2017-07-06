@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.2)
 project(wrench)
 
-add_definitions ("-Wall")
+add_definitions ("-Wall -Wno-unused-variable -Wno-unused-private-field")
 
 set(CMAKE_CXX_STANDARD 11)
 
 include_directories(src/wrench/ include /usr/include /usr/local/include /opt/local/include)
+
 
 # source files
 set(SOURCE_FILES

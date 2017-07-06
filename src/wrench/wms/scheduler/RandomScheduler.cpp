@@ -9,6 +9,7 @@
 
 #include <xbt.h>
 #include <set>
+#include <exceptions/WorkflowExecutionException.h>
 
 #include "logging/TerminalOutput.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
@@ -44,7 +45,39 @@ namespace wrench {
         for (auto pj : running_pilot_jobs) {
           ComputeService *cs = pj->getComputeService();
 
-          if (not cs->canRunJob(WorkflowJob::STANDARD, 1, total_flops)) {
+          // Check that the pilot job could in principle run this job
+          if ((not cs->isUp()) || (not cs->supportsStandardJobs())) {
+            continue;
+          }
+
+          // Check that it can run it right now in terms of idle cores
+          try {
+            unsigned long num_idle_cores = cs->getNumIdleCores();
+//            WRENCH_INFO("The compute service says it has %ld idle cores", num_idle_cores);
+            if (num_idle_cores <= 0) {
+              continue;
+            }
+          } catch (WorkflowExecutionException &e) {
+            // The service has some problem, forget it
+            continue;
+          }
+
+          // Check that it can run it right now in terms of TTL
+          try {
+            // Check that the TTL is ok (does a communication with the daemons)
+            double ttl = cs->getTTL();
+            // TODO: This duration is really hard to compute because we don't know
+            // how many cores will be available, we don't know how the core schedule
+            // will work out, etc. So right now, if the service couldn't run the job
+            // sequentially, we say it can't run it at all. Something to fix at some point.
+            // One option is to ask the user to provide the maximum amount of flop that will
+            // be required on ONE core assuming min_num_cores cores are available?
+            double duration = (total_flops / cs->getCoreFlopRate());
+            if ((ttl > 0) && (ttl < duration)) {
+              continue;
+            }
+          } catch (WorkflowExecutionException &e) {
+            // Problem with the service, give up
             continue;
           }
 
@@ -67,14 +100,27 @@ namespace wrench {
 
         for (auto cs : compute_services) {
           WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
-          bool can_run_job = cs->canRunJob(WorkflowJob::STANDARD, 1, total_flops);
-          if (can_run_job) {
-            WRENCH_INFO("Compute service %s says it can run this standard job!", cs->getName().c_str());
-          } else {
-            WRENCH_INFO("Compute service %s says it CANNOT run this standard job :(", cs->getName().c_str());
+
+          // Check that the compute service could in principle run this job
+          if ((not cs->isUp()) || (not cs->supportsStandardJobs())) {
+            continue;
           }
 
-          if (not can_run_job) { continue; }
+          // Get the number of idle cores
+          unsigned long num_idle_cores;
+
+          // Check that it can run it right now in terms of idle cores
+          try {
+            num_idle_cores = cs->getNumIdleCores();
+          } catch (WorkflowExecutionException &e) {
+            // The service has some problem, forget it
+            continue;
+          }
+
+          // Decision making
+          if (num_idle_cores <= 0) {
+            continue;
+          }
 
           // We can submit!
           WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());

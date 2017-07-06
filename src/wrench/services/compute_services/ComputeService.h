@@ -43,8 +43,6 @@ namespace wrench {
 
         void terminateJob(WorkflowJob *job);
 
-        bool canRunJob(WorkflowJob::Type job_type, unsigned long min_num_cores, double duration);
-
         bool supportsStandardJobs();
 
         bool supportsPilotJobs();

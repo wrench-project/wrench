@@ -28,30 +28,39 @@ namespace wrench {
      * @param capacity:
      */
     StorageService::StorageService(std::string service_name, std::string mailbox_name_prefix, double capacity) :
-            Service(service_name, mailbox_name_prefix), capacity(capacity) {
+            Service(service_name, mailbox_name_prefix)  {
+
+      if (capacity < 0) {
+        throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): Invalid argument");
+      }
 
       this->simulation = nullptr; // will be filled in via Simulation::add()
       this->state = StorageService::UP;
+      this->capacity = capacity;
     }
 
     /**
-     * @brief Internal method to add a file to the storage in a StorageService
+     * @brief Internal method to add a file to the storage in a StorageService BEFORE the simulation start
      *
      * @param file: a workflow file
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void StorageService::addFileToStorage(WorkflowFile *file) {
+    void StorageService::stageFile(WorkflowFile *file) {
 
       if (file == nullptr) {
-        throw std::invalid_argument("StorageService::addFileToStorage(): Invalid arguments");
+        throw std::invalid_argument("StorageService::stageFile(): Invalid arguments");
+      }
+
+      if (!simgrid::s4u::this_actor::isMaestro()) {
+        throw std::runtime_error("StorageService::stageFile(): Can only be called before the simulation starts");
       }
 
       if (file->getSize() > (this->capacity - this->occupied_space)) {
         WRENCH_WARN("File exceeds free space capacity on storage service (file size: %lf, storage free space: %lf)",
                     file->getSize(), (this->capacity - this->occupied_space));
-        throw std::runtime_error("StorageService::addFileToStorage(): File exceeds free space capacity on storage service");
+        throw std::runtime_error("StorageService::stageFile(): File exceeds free space capacity on storage service");
       }
       this->stored_files.insert(file);
       this->occupied_space += file->getSize();
@@ -227,6 +236,7 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new StorageServiceFileReadRequestMessage(answer_mailbox,
+                                                                         answer_mailbox,
                                                                          file,
                                                                          this->getPropertyValueAsDouble(
                                                                                  StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
@@ -265,7 +275,7 @@ namespace wrench {
           if (!strcmp(e.what(), "network_error")) {
             throw WorkflowExecutionException(new NetworkError());
           } else {
-            throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
+            throw std::runtime_error("StorageService::readFile(): Unknown exception: " + std::string(e.what()));
           }
         }
 
@@ -412,7 +422,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
      */
-    void StorageService::writeOrReadFiles(Action action,
+    void StorageService::writeOrReadFiles(FileOperation action,
                                           std::set<WorkflowFile *> files,
                                           std::map<WorkflowFile *, StorageService *> file_locations,
                                           StorageService *default_storage_service) {
@@ -440,6 +450,7 @@ namespace wrench {
         } else {
           // Write the file
           try {
+            WRENCH_INFO("Writing file %s", f->getId().c_str());
             storage_service->writeFile(f);
             WRENCH_INFO("Wrote file %s", f->getId().c_str());
           } catch (std::runtime_error &e) {
@@ -559,6 +570,9 @@ namespace wrench {
      */
     void StorageService::copyFile(WorkflowFile *file, StorageService *src) {
 
+
+      WRENCH_INFO("IN COPY_FILE");
+
       if ((file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
       }
@@ -585,6 +599,7 @@ namespace wrench {
       // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
 
+      WRENCH_INFO("WIATING FOR THE FILECOPYANSWERMESSAGE on %s", answer_mailbox.c_str());
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
       } catch (std::runtime_error &e) {
@@ -594,6 +609,8 @@ namespace wrench {
           throw std::runtime_error("StorageService::copyFile(): Unknown exception: " + std::string(e.what()));
         }
       }
+
+      WRENCH_INFO("GOT IT!");
 
       if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (msg->failure_cause) {
@@ -643,6 +660,76 @@ namespace wrench {
         }
       }
 
+      return;
+
+    }
+
+
+    /**
+     * @brief Asynchrously read a file from the storage service
+     *
+     * @param answer_mailbox: the mailbox to which the file should be sent
+     * @param file: the file
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_arguments
+     */
+    void StorageService::initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::initiateFileRead(): Invalid arguments");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+
+      // Send a synchronous message to the daemon
+      std::string request_answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
+      WRENCH_INFO("IN InitiateFileRead(): send me request answer back to %s", request_answer_mailbox.c_str());
+
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new StorageServiceFileReadRequestMessage(request_answer_mailbox,
+                                                                         mailbox_that_should_receive_file_content,
+                                                                         file,
+                                                                         this->getPropertyValueAsDouble(
+                                                                                 StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::initiateFileRead(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
+      // Wait for a reply to the request
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(request_answer_mailbox);
+      } catch (std::runtime_error &e) {
+        if (!strcmp(e.what(), "network_error")) {
+          throw WorkflowExecutionException(new NetworkError());
+        } else {
+          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
+        }
+      }
+
+      if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
+        // If it's not a success, throw an exception
+        if (not msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        }
+      } else {
+        throw std::runtime_error("StorageService::initiateFileRead(): Received an unexpected [" +
+                                 message->getName() + "] message!");
+      }
+
+      WRENCH_INFO("IT's A SUCCESS... FILE WILL BE GOTTEN ON MAILBOX: %s", mailbox_that_should_receive_file_content.c_str());
+      // At this point, the file should show up at some point on the mailbox_that_should_receive_file_content
       return;
 
     }

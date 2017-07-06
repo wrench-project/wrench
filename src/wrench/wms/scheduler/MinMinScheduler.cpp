@@ -9,6 +9,7 @@
 
 #include <xbt.h>
 #include <set>
+#include <exceptions/WorkflowExecutionException.h>
 
 #include "logging/TerminalOutput.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
@@ -54,23 +55,37 @@ namespace wrench {
       for (auto itc : min_vector) {
         bool successfully_scheduled = false;
 
-        double total_flops = getTotalFlops((*ready_tasks.begin()).second);
-
-        // TODO: add pilot job support
-
         // Second: attempt to run the task on a compute resource
         WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", itc.first.c_str());
 
         for (auto cs : compute_services) {
           WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
 
-          if (cs->canRunJob(WorkflowJob::STANDARD, 1, total_flops)) {
-            WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
-            WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
-            job_manager->submitJob(job, cs);
-            successfully_scheduled = true;
-            break;
+          // Check that the compute service could in principle run this job
+          if ((not cs->isUp()) || (not cs->supportsStandardJobs())) {
+            continue;
           }
+
+          // Get the number of currently idle cores
+          unsigned long num_idle_cores;
+          try {
+            num_idle_cores = cs->getNumIdleCores();
+
+          } catch (WorkflowExecutionException &e) {
+            // The service has some problem, forget it
+            continue;
+          }
+
+          // Decision making
+          if (num_idle_cores <= 0) {
+            continue;
+          }
+
+          WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
+          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
+          job_manager->submitJob(job, cs);
+          successfully_scheduled = true;
+          break;
         }
         if (not successfully_scheduled) {
           WRENCH_INFO("no dice");

@@ -630,7 +630,7 @@ namespace wrench {
           return false;
         } else {
           throw std::runtime_error(
-                  "MulticoreComputeService::processNextMessage(): Unknown exception: " + std::string(e.what()));
+                  "MulticoreComputeService::waitForNextMessage(): Unknown exception: " + std::string(e.what()));
         }
       }
 
@@ -664,6 +664,15 @@ namespace wrench {
             return true;
           }
           return true;
+        }
+
+        for (auto task : msg->job->getTasks()) {
+          if ((task->getMinNumCores() > 1)) {
+            throw std::runtime_error("MulticoreComputeService currently does not support multi-core tasks, and task " +
+                                             task->getId() + " needs at least " +
+                                             std::to_string(task->getMinNumCores()) +
+                                                                    " cores");
+          }
         }
 
         this->pending_jobs.push_front(msg->job);
@@ -832,7 +841,6 @@ namespace wrench {
       WRENCH_INFO("Failing pending job %s", job->getName().c_str());
       // Set all tasks back to the READY state and wipe out output files
       for (auto failed_task: job->getTasks()) {
-//        failed_task->setFailed();
         failed_task->setReady();
         try {
           StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),

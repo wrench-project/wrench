@@ -234,21 +234,24 @@ namespace wrench {
     /**
    * @brief Constructor
    * @param answer_mailbox: the mailbox to which to send the answer
+   * @param mailbox_to_receive_the_file_content: the mailbox to which to send the file content
    * @param file: the file
    * @param payload: message size in bytes
    *
    * @throw std::invalid_argument
    */
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(std::string answer_mailbox,
+                                                                               std::string mailbox_to_receive_the_file_content,
                                                                                WorkflowFile *file,
                                                                                double payload) : StorageServiceMessage(
             "FILE_READ_REQUEST",
             payload +
             file->getSize()) {
-      if ((answer_mailbox == "") || (file == nullptr)) {
+      if ((answer_mailbox == "") || (mailbox_to_receive_the_file_content == "") || (file == nullptr)) {
         throw std::invalid_argument("StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
+      this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
       this->file = file;
     }
 

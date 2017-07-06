@@ -43,7 +43,7 @@ namespace wrench {
 
       // Customize the logging format
       // xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
-      xbt_log_control_set("root.fmt:[%d][%h:%t]%e%m%n");
+      xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
 
       // Setup the SIGABRT handler
       auto previous_handler = std::signal(SIGABRT, signal_handler);
@@ -379,7 +379,7 @@ namespace wrench {
       XBT_INFO("Staging file %s (%lf)", file->getId().c_str(), file->getSize());
       // Put the file on the storage service (not via the service daemon)
       try {
-        storage_service->addFileToStorage(file);
+        storage_service->stageFile(file);
       } catch (std::runtime_error &e) {
         throw;
       }

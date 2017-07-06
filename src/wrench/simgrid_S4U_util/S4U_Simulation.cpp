@@ -86,7 +86,7 @@ namespace wrench {
      * @return the hostname as a string
      */
     std::string S4U_Simulation::getHostName() {
-      return simgrid::s4u::Host::current()->name();
+      return simgrid::s4u::Host::current()->getName();
     }
 
     /**
@@ -96,10 +96,10 @@ namespace wrench {
      */
     std::vector<std::string> S4U_Simulation::getAllHostnames() {
       std::vector<simgrid::s4u::Host *> host_list;
-      this->engine->hostList(&host_list);
+      this->engine->getHostList(&host_list);
       std::vector<std::string> hostname_list;
       for (auto h : host_list) {
-        hostname_list.push_back(h->name());
+        hostname_list.push_back(h->getName());
       }
       return hostname_list;
     }
@@ -115,7 +115,7 @@ namespace wrench {
     unsigned int S4U_Simulation::getNumCores(std::string hostname) {
       unsigned int num_cores = 0;
       try {
-        num_cores = (unsigned int) simgrid::s4u::Host::by_name(hostname)->coreCount();
+        num_cores = (unsigned int) simgrid::s4u::Host::by_name(hostname)->getCoreCount();
       } catch (std::out_of_range &e) {
         throw std::invalid_argument("Unknown hostname " + hostname);
       }
@@ -146,17 +146,17 @@ namespace wrench {
      * @return the simulation clock
      */
     double S4U_Simulation::getClock() {
-      return simgrid::s4u::Engine::instance()->getClock();
+      return simgrid::s4u::Engine::getInstance()->getClock();
     }
 
     /**
      * @brief Simulates a computation on host on which the calling actor is running
      *
      * @param flops: the number of flops
+     * @throw runtime_error;
      */
     void S4U_Simulation::compute(double flops) {
-      e_smx_state_t state = simgrid::s4u::this_actor::execute(flops);
-//      std::cerr << "STATE RETURNED BY COMPUTE = " << state << std::endl;
+      simgrid::s4u::this_actor::execute(flops);
     }
 
     /**

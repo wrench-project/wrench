@@ -181,7 +181,7 @@ namespace wrench {
         return true;
 
       } else {
-        throw std::runtime_error("DataMovementManager::processNextMessage(): Unexpected [" + message->getName() + "] message");
+        throw std::runtime_error("DataMovementManager::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
       }
 
       return false;

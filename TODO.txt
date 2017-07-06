@@ -1,3 +1,7 @@
+
+
+-----------------------------------
+
 DETAIL:
     - Is the UNSUPPORTED_JOB_TYPE Workflow Execution event useful since
       the submitJob() method throws an exception.... Or should it be
@@ -11,11 +15,27 @@ DATA STORAGE IMPLEMENTATION:
         - How do we report what has completed, and what hasn't upon failure
         - Or do we leave it as is and the WMS has to inspect things?
 
-
     - SIMPLE STORAGE SERVICE: How to deal with synchrony problem
         - Wait for Mt to fix the wait_any()
+            - Implement my own
 
-    - Attach a default StorageService to the WMS??
+    - SIMULATION OF STORAGE RESOURCE WITH S4U!!!
+
+---------------------------------------------------------------------
+
+COMPUTE STORAGE IMPLEMENTATION:
+
+    - Deal with multi-core tasks...
+
+---------------------------------------------------------------------
+
+COMPUTE SERVICE: SIMPLE FIFO BATCH  (WOULD BE GREAT FOR THE UPCOMING PAPER)
+    - Really close to Condor...
+    - Will need to connect to BATSIM to do a batch
+
+---------------------------------------------------------------------
+
+SOFTWARE ENGINEERING:
 
     - Track all task change updates and make sure they're all in the JobManager...
         - They likely cannot, but the task life cycle is confusing right now
@@ -23,30 +43,52 @@ DATA STORAGE IMPLEMENTATION:
     - Chase memory leaks
         - CauseType/Exception unique_ptr?
 
+    - For the WMS, instead of having a big switch to handle events, instead do a "listener" thing:
+        A single method that says "waitForAndProcessNextEvent", that does the getMessage() and then
+        calls user-provided "take action" methods, which are defined as virtual no-op methods in the base WMS class.
+
+    - Add missing "const"
+
 ---------------------------------------------------------------------
 
-SOFTWARE ENGINEERING:
+USE CASE:
+    - PEGASUS? ANOTHER?
 
-- For the WMS, instead of having a big switch to handle events, instead do a "listener" thing:
-   A single method that says "waitForAndProcessNextEvent", that does the getMessage() and then
-   calls user-provided "take action" methods, which are defined as virtual no-op methods in the base WMS class.
+---------------------------------------------------------------------
 
+RELEASE:
+    - ALL THE ABOVE
+    - 09/22:  SG Release
+    - 10/5:   WRENCH 1.0alpha
+
+---------------------------------------------------------------------
+
+SURAJ?
+
+  - His M.S. thesis simulator?
+
+  - Cloud Compute Service?
+
+  - Batch Compute Service? (BATSIM integration)
+
+  - What to do for ICS632?
+
+---------------------------------------------------------------------
 ---------------------------------------------------------------------
 
 
 * "BIG" things:
 
-    - All PIDs are zero
-
     - Plan a first paper
         - Workflow makespan prediction
             - Comparison WRENCH / WorkflowSim
-                - Accuracy, Scalablity
+                - Accuracy, Scalability
                 - Experiments training/eval  for WorkflowSim, WorkflowSim+Calibration, WRENCH, WRENCH+Calibration
 
     - WRENCH in ICS632?
             - Homework assignment: answer a few experimental questions as a WRENCH user
             - Project: write something in WRENCH
+                - Modify scheduling algorithms?
 
     - Talk about another proposal?
             - Main idea: "WRENCH enables WMS research, let's do research"
@@ -58,12 +100,14 @@ SOFTWARE ENGINEERING:
                    - Results: We have both the tool and the methodology to do "WMS science"
                    - Stochastic studies, sensitivity studies, impact of platform parameters...
 
+            - Calibration: SHF?
+
             - WMS Research questions:
 
                    - Can we identify big problems with current designs?
                         - Perhaps when exploring upcoming Exascale scenarios
 
-                   - Explore impact of WMS designs?   (EAGER?)
+                   - Explore impact of WMS designs?  (EAGER?)
 
                    - Distributed WMS that partitions workflows on platforms?
                         - e.g., clouds?
@@ -96,5 +140,9 @@ SOFTWARE ENGINEERING:
         - What will it look like?
         - How to deal with pipelining of network/disk when remote putMessage()/getMessage()?
                - How does MSG do it?
+
+   - MulticoreExecute: available in low-levels, Mt is propagating up to S4U
+
+   - ActorDaemonize: available in low-level, FS is propagating up to S4U
 
 -----------------------------------------------------------------------

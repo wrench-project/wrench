@@ -16,6 +16,10 @@
 
 namespace wrench {
 
+    class SimulationMessage;
+    class S4U_PendingCommunication;
+    class IncomingFile;
+
     /**
      * @brief A simple StorageService implementation
      */
@@ -46,15 +50,6 @@ namespace wrench {
                              double capacity,
                              std::map<std::string, std::string> = {});
 
-
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
     private:
 
         friend class Simulation;
@@ -65,17 +60,22 @@ namespace wrench {
                              std::map<std::string, std::string>,
                              std::string suffix);
 
-        double capacity;
-
         int main();
 
-        bool processNextMessage();
-
-        std::string data_write_mailbox_name;
+        bool processControlMessage(S4U_PendingCommunication *comm);
+        bool processDataMessage(S4U_PendingCommunication *comm);
 
         unsigned long getNewUniqueNumber();
 
-        };
+        bool processFileWriteRequest(WorkflowFile *file, std::string answer_mailbox);
+        bool processFileReadRequest(WorkflowFile *file, std::string answer_mailbox, std::string mailbox_to_receive_the_file_content);
+        bool processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox);
+
+        std::vector<S4U_PendingCommunication *> pending_communications;
+
+        std::map<S4U_PendingCommunication *, IncomingFile*> incoming_files;
+
+    };
 
 };
 

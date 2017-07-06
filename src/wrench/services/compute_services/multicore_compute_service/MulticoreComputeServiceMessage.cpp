@@ -34,7 +34,7 @@ namespace wrench {
     MulticoreComputeServiceNotEnoughCoresMessage::MulticoreComputeServiceNotEnoughCoresMessage(WorkflowJob *job,
                                                                                                ComputeService *cs,
                                                                                                double payload)
-            : compute_service(cs), MulticoreComputeServiceMessage("NOT_ENOUGH_CORES", payload) {
+            : MulticoreComputeServiceMessage("NOT_ENOUGH_CORES", payload), compute_service(cs) {
       if (job == nullptr) {
         throw std::invalid_argument("MulticoreComputeServiceNotEnoughCoresMessage::MulticoreComputeServiceNotEnoughCoresMessage(): Invalid arguments");
       }
@@ -67,7 +67,7 @@ namespace wrench {
      */
     MulticoreComputeServiceNumCoresAnswerMessage::MulticoreComputeServiceNumCoresAnswerMessage(unsigned int num,
                                                                                                double payload)
-            : num_cores(num), MulticoreComputeServiceMessage("NUM_CORES_ANSWER", payload) {}
+            : MulticoreComputeServiceMessage("NUM_CORES_ANSWER", payload), num_cores(num) {}
 
     /**
      * @brief Constructor
@@ -94,7 +94,7 @@ namespace wrench {
      */
     MulticoreComputeServiceNumIdleCoresAnswerMessage::MulticoreComputeServiceNumIdleCoresAnswerMessage(unsigned int num,
                                                                                                        double payload)
-            : num_idle_cores(num), MulticoreComputeServiceMessage("NUM_IDLE_CORES_ANSWER", payload) {}
+            :  MulticoreComputeServiceMessage("NUM_IDLE_CORES_ANSWER", payload), num_idle_cores(num) {}
 
     /**
      * @brief Constructor
@@ -120,7 +120,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     MulticoreComputeServiceTTLAnswerMessage::MulticoreComputeServiceTTLAnswerMessage(double ttl, double payload)
-            : ttl(ttl), MulticoreComputeServiceMessage("TTL_ANSWER", payload) {}
+            :  MulticoreComputeServiceMessage("TTL_ANSWER", payload), ttl(ttl) {}
 
     /**
     * @brief Constructor

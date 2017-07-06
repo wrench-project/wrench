@@ -30,7 +30,9 @@ namespace wrench {
     public:
         Workflow();
 
-        WorkflowTask *addTask(std::string, double, int num_procs = 1);
+        WorkflowTask *addTask(std::string, double flops, int min_num_cores = 1,
+                              int max_num_cores = 1,
+                              double parallel_efficiency = 1.0);
 
         void removeTask(WorkflowTask *task);
 

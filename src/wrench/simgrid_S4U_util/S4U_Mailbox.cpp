@@ -28,10 +28,11 @@ namespace wrench {
 //    std::map<simgrid::s4u::ActorPtr, std::set<simgrid::s4u::CommPtr>> S4U_Mailbox::dputs;
 
 
+    // TODO:  Keep throwing runtime_error?? These are "part of the simulation" after all...
 
 
     /**
-     * @brief A blocking method to receive a message from a mailbox
+     * @brief Synchronously receive a message from a mailbox
      *
      * @param mailbox_name: the mailbox name
      * @return the message, or nullptr (in which case it's likely a brutal termination)
@@ -45,7 +46,7 @@ namespace wrench {
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       SimulationMessage *msg = nullptr;
       try {
-        msg = static_cast<SimulationMessage *>(simgrid::s4u::this_actor::recv(mailbox));
+        msg = static_cast<SimulationMessage *>(mailbox->get());
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a getMessage(). Likely the sender has died");
@@ -63,7 +64,7 @@ namespace wrench {
     }
 
     /**
-     * @brief A blocking method to receive a message from a mailbox, with a timeout
+     * @brief Synrhonously receive a message from a mailbox, with a timeout
      *
      * @param mailbox_name: the mailbox name
      * @param timeout:  a timeout value in seconds
@@ -78,7 +79,7 @@ namespace wrench {
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       void *data = nullptr;
       try {
-        data = simgrid::s4u::this_actor::recv(mailbox, timeout);
+        data = mailbox->get(timeout);
       } catch (xbt_ex &e) {
         if (e.category == timeout_error) {
           throw std::runtime_error("timeout");
@@ -116,7 +117,7 @@ namespace wrench {
     }
 
     /**
-     * @brief A blocking method to send a message to a mailbox
+     * @brief Synchronously send a message to a mailbox
      *
      * @param mailbox_name: the mailbox name
      * @param msg: the SimulationMessage
@@ -127,7 +128,7 @@ namespace wrench {
       WRENCH_DEBUG("PUTTING to %s a %s message", mailbox_name.c_str(), msg->getName().c_str());
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       try {
-      simgrid::s4u::this_actor::send(mailbox, msg, (size_t) msg->payload);
+        mailbox->put(msg, (size_t) msg->payload);
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a putMessage)");
@@ -139,7 +140,7 @@ namespace wrench {
     }
 
     /**
-     * @brief A non-blocking method to send a message to a mailbox
+     * @brief Asynchronously send a message to a mailbox in a "fire and forget" fashion
      *
      * @param mailbox_name: the mailbox name
      * @param msg: the SimulationMessage
@@ -167,7 +168,7 @@ namespace wrench {
 //      S4U_Mailbox::dputs[simgrid::s4u::Actor::self()].insert(comm);
 
       try {
-        simgrid::s4u::this_actor::dsend(mailbox, msg, (int) msg->payload);
+        mailbox->put_init(msg, msg->payload)->detach();
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a dputMessage()");
@@ -208,6 +209,66 @@ namespace wrench {
 //    }
 
     /**
+    * @brief Asynchronously send a message to a mailbox
+    *
+    * @param mailbox_name: the mailbox name
+    * @param msg: the SimulationMessage
+    *
+    * @return: a pending communication handle
+    *
+    * @throw std::runtime_error:  ("network_error")
+    */
+    S4U_PendingCommunication *S4U_Mailbox::iputMessage(std::string mailbox_name, SimulationMessage *msg) {
+
+      S4U_PendingCommunication *pending_communication = new S4U_PendingCommunication();
+
+      simgrid::s4u::CommPtr comm_ptr = nullptr;
+
+      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+      try {
+        comm_ptr = mailbox->put_async(msg, (size_t) msg->payload);
+      } catch (xbt_ex &e) {
+        if (e.category == network_error) {
+          WRENCH_INFO("Network error while doing a iputMessage() with timeout. Likely the sender has died.");
+          throw std::runtime_error("network_error");
+        }
+      }
+      pending_communication->comm_ptr = comm_ptr;
+      return pending_communication;
+    }
+
+    /**
+    * @brief Asynchronously receive a message from a mailbox
+    *
+    * @param mailbox_name: the mailbox name
+    * @param msg: the SimulationMessage
+    *
+    * @return: a pending communication handle
+    *
+    * @throw std::runtime_error:  ("network_error")
+    */
+    S4U_PendingCommunication *S4U_Mailbox::igetMessage(std::string mailbox_name) {
+
+      simgrid::s4u::CommPtr comm_ptr = nullptr;
+
+      S4U_PendingCommunication *pending_communication = new S4U_PendingCommunication();
+
+
+      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+      try {
+        comm_ptr = mailbox->get_async((void**)(&(pending_communication->simulation_message)));
+      } catch (xbt_ex &e) {
+        if (e.category == network_error) {
+          WRENCH_INFO("Network error while doing a igetMessage(). Likely the sender has died.");
+          throw std::runtime_error("network_error");
+        }
+      }
+      pending_communication->comm_ptr = comm_ptr;
+      return pending_communication;
+    }
+
+
+    /**
     * @brief A method to generate a unique sequence number
     *
     * @return a unique sequence number
@@ -228,6 +289,8 @@ namespace wrench {
     std::string S4U_Mailbox::generateUniqueMailboxName(std::string prefix) {
       return prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
     }
+
+
 
 
 };

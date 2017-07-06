@@ -17,6 +17,7 @@
 #include <set>
 
 #include <simgrid/s4u.hpp>
+#include "S4U_PendingCommunication.h"
 
 namespace wrench {
 
@@ -36,6 +37,8 @@ namespace wrench {
 				static std::unique_ptr<SimulationMessage> getMessage(std::string mailbox, double timeout);
 				static void putMessage(std::string mailbox, SimulationMessage *m);
 				static void dputMessage(std::string mailbox_name, SimulationMessage *msg);
+				static S4U_PendingCommunication *iputMessage(std::string mailbox_name, SimulationMessage *msg);
+				static S4U_PendingCommunication *igetMessage(std::string mailbox_name);
 //				static void clear_dputs();
 
 				static std::string generateUniqueMailboxName(std::string);

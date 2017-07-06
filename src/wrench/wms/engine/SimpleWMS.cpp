@@ -112,9 +112,6 @@ namespace wrench {
           continue;
         }
 
-
-
-
         switch (event->type) {
           case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
             StandardJob *job = (StandardJob *) (event->job);

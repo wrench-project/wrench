@@ -56,10 +56,10 @@ protected:
       output_file4 = workflow->addFile("output_file4", 10.0);
 
       // Create the tasks
-      task1 = workflow->addTask("task_1_10s_1core",  10, 1);
-      task2 = workflow->addTask("task_2_10s_1core",  10, 1);
-      task3 = workflow->addTask("task_3_10s_2cores", 10, 2);
-      task4 = workflow->addTask("task_4_10s_2cores", 10, 2);
+      task1 = workflow->addTask("task_1_10s_1core",  10.0, 1, 1, 1.0);
+      task2 = workflow->addTask("task_2_10s_1core",  10.0, 1, 1, 1.0);
+      task3 = workflow->addTask("task_3_10s_2cores", 10.0, 2, 2, 1.0);
+      task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 1.0);
 
       // Add file-task dependencies
       task1->addInputFile(input_file);

@@ -30,7 +30,7 @@ namespace wrench {
     class WorkflowExecutionFailureCause;
 
     /**  @brief A ComputeService implementation that
-     *   runs on a multi-core host and can execute sets of independent single-core tasks
+     *   runs on a multi-core host and can execute sets of independent SINGLE-CORE tasks
      */
     class MulticoreComputeService : public ComputeService {
 

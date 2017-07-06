@@ -23,10 +23,12 @@ namespace wrench {
      *
      * @param id: the task id
      * @param flops: the task's number of flops
-     * @param n: the number of processors for running the task
+     * @param min_cores: the minimum number of cores required for running the task
+     * @param max_cores: the maximum number of cores that the task can use (0 means infinity)
+     * @param parallel_efficiency: the multi-core parallel efficiency
      */
-    WorkflowTask::WorkflowTask(const std::string id, const double flops, const int n) :
-            id(id), flops(flops), number_of_processors(n), state(WorkflowTask::READY), job(nullptr) {
+    WorkflowTask::WorkflowTask(const std::string id, const double flops, const int min_num_cores, const int max_num_cores, const double parallel_efficiency) :
+            id(id), flops(flops), min_num_cores(min_num_cores), max_num_cores(max_num_cores), parallel_efficiency(parallel_efficiency), state(WorkflowTask::READY), job(nullptr) {
     }
 
     /**
@@ -84,12 +86,30 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the number of procs of the task
+     * @brief Get the minimum number of cores required for running the task
      *
-     * @return the number of procs required by the task (this is an "in-flux" feature)
+     * @return the number of cores
      */
-    int WorkflowTask::getNumProcs() const {
-      return this->number_of_processors;
+    int WorkflowTask::getMinNumCores() const {
+      return this->min_num_cores;
+    }
+
+    /**
+     * @brief Get the maximum number of cores for the task can use
+     *
+     * @return the number of cores
+     */
+    int WorkflowTask::getMaxNumCores() const {
+      return this->max_num_cores;
+    }
+
+    /**
+     * @brief Get the parallel efficiency of the task
+     *
+     * @return the parallel efficiency
+     */
+    double WorkflowTask::getParallelEfficiency() const {
+      return this->parallel_efficiency;
     }
 
     /**

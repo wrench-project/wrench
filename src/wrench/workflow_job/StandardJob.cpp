@@ -35,12 +35,13 @@ namespace wrench {
                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                              std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) :
             WorkflowJob(WorkflowJob::STANDARD, 1),
-            state(StandardJob::State::NOT_SUBMITTED),
             num_completed_tasks(0),
             file_locations(file_locations),
             pre_file_copies(pre_file_copies),
             post_file_copies(post_file_copies),
-            cleanup_file_deletions(cleanup_file_deletions) {
+            cleanup_file_deletions(cleanup_file_deletions),
+            state(StandardJob::State::NOT_SUBMITTED)
+    {
 
       for (auto t : tasks) {
         if (t->getState() != WorkflowTask::READY) {

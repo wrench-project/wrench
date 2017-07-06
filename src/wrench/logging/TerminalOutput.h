@@ -28,8 +28,21 @@
 
 /* Wrappers around XBT_* macros */
 
-#define WRENCH_INFO(...)  wrench::TerminalOutput::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; wrench::TerminalOutput::endThisProcessColor()
-//#define WRENCH_INFO(...)  wrench::TerminalOutput::beginThisProcessColor(); fprintf(stderr,__VA_ARGS__) ; fprintf(stderr,"\n"); wrench::TerminalOutput::endThisProcessColor()
+//#define RUNNING_IN_GTEST
+
+#ifndef RUNNING_IN_GTEST
+  #define WRENCH_INFO(...)  wrench::TerminalOutput::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; wrench::TerminalOutput::endThisProcessColor()
+#else
+#define WRENCH_INFO(...)  wrench::TerminalOutput::beginThisProcessColor(); \
+                        if (simgrid::s4u::this_actor::isMaestro()) { \
+                            fprintf(stderr, "[Maestro] ");\
+                        } else { \
+                            fprintf(stderr,"[%s] ", simgrid::s4u::Actor::self()->getName().c_str() ); \
+                        }; \
+                        fprintf(stderr,__VA_ARGS__) ; \
+                        fprintf(stderr,"\n"); \
+                        wrench::TerminalOutput::endThisProcessColor()
+#endif
 
 #define WRENCH_DEBUG(...)  wrench::TerminalOutput::beginThisProcessColor(); XBT_DEBUG(__VA_ARGS__) ; wrench::TerminalOutput::endThisProcessColor()
 
