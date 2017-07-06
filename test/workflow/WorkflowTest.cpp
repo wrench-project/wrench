@@ -101,7 +101,6 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
   // remove tasks
   EXPECT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
   workflow->removeTask(t1);
-  EXPECT_THROW(workflow->removeTask(t1), std::invalid_argument);
 
   EXPECT_THROW(workflow->getTaskChildren(nullptr), std::invalid_argument);
   EXPECT_THROW(workflow->getTaskParents(nullptr), std::invalid_argument);

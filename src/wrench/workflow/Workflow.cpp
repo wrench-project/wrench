@@ -64,7 +64,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Remove a task from the workflow
+     * @brief Remove a task from the workflow. WARNING: this method de-allocated
+     *        memory for the task, making any pointer to the task invalid
      *
      * @param task: a task
      *
