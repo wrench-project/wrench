@@ -8,11 +8,10 @@
  */
 
 
-
-
 #include <xbt/ex.hpp>
 #include <wrench-dev.h>
 #include "S4U_PendingCommunication.h"
+#include <simulation/SimulationMessage.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Communication");
 
