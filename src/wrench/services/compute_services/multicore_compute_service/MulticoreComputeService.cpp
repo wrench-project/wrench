@@ -690,7 +690,7 @@ namespace wrench {
         return true;
 
       } else if (ComputeServiceSubmitPilotJobRequestMessage *msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-        WRENCH_INFO("Asked to run a pilot job with %d cores for %lf seconds", msg->job->getNumCores(),
+        WRENCH_INFO("Asked to run a pilot job with %ld cores for %lf seconds", msg->job->getNumCores(),
                     msg->job->getDuration());
 
 //        WRENCH_INFO("THE REPLY MAILBOX IS %s", msg->answer_mailbox.c_str());

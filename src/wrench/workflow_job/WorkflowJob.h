@@ -44,7 +44,7 @@ namespace wrench {
 
         std::string getName();
 
-        unsigned int getNumCores();
+        unsigned long getNumCores();
 
         /***********************/
         /** \cond INTERNAL     */

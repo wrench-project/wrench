@@ -21,8 +21,9 @@ namespace wrench {
      * @param type: job type
      * @param num_cores: the number of cores required by the job
      */
-    WorkflowJob::WorkflowJob(Type type, unsigned long num_cores) : type(type), num_cores(num_cores)
-                                                                                     {}
+    WorkflowJob::WorkflowJob(Type type, unsigned long num_cores) : type(type), num_cores(num_cores) {
+      this->parent_compute_service = nullptr;
+    }
 
 
     /**
@@ -69,7 +70,7 @@ namespace wrench {
      *
      * @return  the number of cores
      */
-    unsigned int WorkflowJob::getNumCores() {
+    unsigned long WorkflowJob::getNumCores() {
       return this->num_cores;
     }
 
