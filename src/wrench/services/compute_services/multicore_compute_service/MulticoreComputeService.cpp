@@ -656,8 +656,8 @@ namespace wrench {
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                      new ComputeServiceSubmitStandardJobAnswerMessage(msg->job, this,
                                                                                       false,
-                                                                                      new JobTypeNotSupported(msg->job,
-                                                                                                              this),
+                                                                                      std::shared_ptr<WorkflowExecutionFailureCause>(new JobTypeNotSupported(msg->job,
+                                                                                                              this)),
                                                                                       this->getPropertyValueAsDouble(
                                                                                               MulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::runtime_error &e) {
@@ -696,8 +696,6 @@ namespace wrench {
 //        WRENCH_INFO("THE REPLY MAILBOX IS %s", msg->answer_mailbox.c_str());
 
         bool success = true;
-        WorkflowExecutionFailureCause *failure_cause = nullptr;
-
 
         if (not this->supportsPilotJobs()) {
           try {
@@ -705,8 +703,8 @@ namespace wrench {
                                      new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
                                                                                    this,
                                                                                    false,
-                                                                                   new JobTypeNotSupported(msg->job,
-                                                                                                           this),
+                                                                                   std::shared_ptr<WorkflowExecutionFailureCause>(new JobTypeNotSupported(msg->job,
+                                                                                                           this)),
                                                                                    this->getPropertyValueAsDouble(
                                                                                            MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::runtime_error &e) {
@@ -722,7 +720,7 @@ namespace wrench {
                                      new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
                                                                                    this,
                                                                                    false,
-                                                                                   new NotEnoughCores(msg->job, this),
+                                                                                   std::shared_ptr<WorkflowExecutionFailureCause>(new NotEnoughCores(msg->job, this)),
                                                                                    this->getPropertyValueAsDouble(
                                                                                            MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::runtime_error &e) {
@@ -837,7 +835,7 @@ namespace wrench {
      * @param job: the job
      * @param cause: the failure cause
      */
-    void MulticoreComputeService::failPendingStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause) {
+    void MulticoreComputeService::failPendingStandardJob(StandardJob *job, std::shared_ptr<WorkflowExecutionFailureCause> cause) {
       WRENCH_INFO("Failing pending job %s", job->getName().c_str());
       // Set all tasks back to the READY state and wipe out output files
       for (auto failed_task: job->getTasks()) {
@@ -868,7 +866,7 @@ namespace wrench {
      * @param job: the job
      * @param cause: the failure cause
      */
-    void MulticoreComputeService::failRunningStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause) {
+    void MulticoreComputeService::failRunningStandardJob(StandardJob *job, std::shared_ptr<WorkflowExecutionFailureCause> cause) {
 
       WRENCH_INFO("Failing running job %s", job->getName().c_str());
 
@@ -992,12 +990,12 @@ namespace wrench {
     * @brief Declare all current jobs as failed (likely because the daemon is being terminated
     * or has timed out (because it's in fact a pilot job))
     */
-    void MulticoreComputeService::failCurrentStandardJobs(WorkflowExecutionFailureCause *cause) {
+    void MulticoreComputeService::failCurrentStandardJobs(std::shared_ptr<WorkflowExecutionFailureCause> cause) {
 
       for (auto workflow_job : this->running_jobs) {
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           StandardJob *job = (StandardJob *) workflow_job;
-          this->failRunningStandardJob(job, cause);
+          this->failRunningStandardJob(job, std::move(cause));
         }
       }
 
@@ -1101,7 +1099,7 @@ namespace wrench {
      */
     void MulticoreComputeService::processWorkFailure(WorkUnitExecutor *worker_thread,
                                                      WorkUnit *work,
-                                                     WorkflowExecutionFailureCause *cause) {
+                                                     std::shared_ptr<WorkflowExecutionFailureCause> cause) {
 
       StandardJob *job = work->job;
 
@@ -1193,7 +1191,7 @@ namespace wrench {
       this->setStateToDown();
 
       WRENCH_INFO("Failing current standard jobs");
-      this->failCurrentStandardJobs(new ServiceIsDown(this));
+      this->failCurrentStandardJobs(std::shared_ptr<WorkflowExecutionFailureCause>(new ServiceIsDown(this)));
 
       WRENCH_INFO("Terminate all pilot jobs");
       this->terminateAllPilotJobs();
@@ -1485,7 +1483,7 @@ namespace wrench {
       // If we got here, we're in trouble
       WRENCH_INFO("Trying to terminate a standard job that's neither pending nor running!");
       ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
-              job, this, false, new JobCannotBeTerminated(job),
+              job, this, false,  std::shared_ptr<WorkflowExecutionFailureCause>(new JobCannotBeTerminated(job)),
               this->getPropertyValueAsDouble(
                       MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {
@@ -1541,7 +1539,7 @@ namespace wrench {
       // If we got here, we're in trouble
       WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
       ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-              job, this, false, new JobCannotBeTerminated(job),
+              job, this, false, std::shared_ptr<WorkflowExecutionFailureCause>(new JobCannotBeTerminated(job)),
               this->getPropertyValueAsDouble(
                       MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {

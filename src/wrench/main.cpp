@@ -32,11 +32,11 @@ int main(int argc, char **argv) {
 
 //  std::cerr << "Creating a few tasks..." << std::endl;
 //
-//  wrench::WorkflowTask *t1 = workflow.addTask("T1", 1.0, 1);
-//  wrench::WorkflowTask *t2 = workflow.addTask("T2", 10.0, 1);
-//  wrench::WorkflowTask *t3 = workflow.addTask("T3", 10.0, 1);
-//  wrench::WorkflowTask *t4 = workflow.addTask("T4", 10.0, 1);
-//  wrench::WorkflowTask *t5 = workflow.addTask("T5", 1.0, 1);
+//  wrench::WorkflowTask *t1 = workflow.addTask("T1", 1.0, 1, 1, 1.0);
+//  wrench::WorkflowTask *t2 = workflow.addTask("T2", 10.0, 1, 10, 0.8);
+//  wrench::WorkflowTask *t3 = workflow.addTask("T3", 10.0, 1, 1, 1.0);
+//  wrench::WorkflowTask *t4 = workflow.addTask("T4", 10.0, 1, 3, 1.0);
+//  wrench::WorkflowTask *t5 = workflow.addTask("T5", 1.0, 1, 10, 0.4);
 //
 //  std::cerr << "Creating a few  files..." << std::endl;
 //

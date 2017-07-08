@@ -12,6 +12,7 @@
 
 
 #include "workflow_job/WorkflowJob.h"
+#include "services/compute_services/ComputeService.h"
 
 namespace wrench {
 
@@ -53,7 +54,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void setComputeService(ComputeService *);
+        void setComputeService(ComputeService *cs);
 
 
         /***********************/
@@ -69,7 +70,7 @@ namespace wrench {
         PilotJob::State getState();
 
         State state;
-        ComputeService *compute_service; // Associated compute service, i.e., the running pilot job
+        std::unique_ptr<ComputeService> compute_service; // Associated compute service, i.e., the running pilot job
     };
 
     /***********************/

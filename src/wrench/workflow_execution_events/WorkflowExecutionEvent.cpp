@@ -80,7 +80,7 @@ namespace wrench {
           event->type = WorkflowExecutionEvent::FILE_COPY_FAILURE;
           event->file = m->file;
           event->storage_service = m->storage_service;
-          event->failure_cause = m->failure_cause;
+          event->failure_cause = std::move(m->failure_cause);
         }
       } else {
         throw std::runtime_error(

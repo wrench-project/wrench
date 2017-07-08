@@ -550,7 +550,7 @@ private:
         if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::JOB_CANNOT_BE_TERMINATED) {
           throw std::runtime_error("Got an exception, as expected, but it does not have the correct failure cause type");
         }
-        wrench::JobCannotBeTerminated *real_cause = (wrench::JobCannotBeTerminated *)e.getCause();
+        wrench::JobCannotBeTerminated *real_cause = (wrench::JobCannotBeTerminated *)e.getCause().get();
         if (real_cause->getJob() != pilot_job) {
           throw std::runtime_error("Got the expected exception and failure cause, but the failure cause does not point to the right job");
         }
@@ -862,7 +862,7 @@ private:
           if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_TERMINATED) {
             throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
           }
-          wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *)(event->failure_cause);
+          wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *)(event->failure_cause.get());
           if (real_cause->getService() != this->test->compute_service) {
             std::runtime_error("Got the correct failure even, a correct cause type, but the cause points to the wrong service");
           }

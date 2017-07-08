@@ -62,7 +62,8 @@ namespace wrench {
      */
     class ComputeServiceSubmitStandardJobAnswerMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceSubmitStandardJobAnswerMessage(StandardJob *, ComputeService *, bool success, WorkflowExecutionFailureCause *failure_cause, double payload);
+        ComputeServiceSubmitStandardJobAnswerMessage(StandardJob *, ComputeService *, bool success,
+                                                     std::shared_ptr<WorkflowExecutionFailureCause> failure_cause, double payload);
 
         /** @brief The standard job that was submitted */
         StandardJob *job;
@@ -71,7 +72,7 @@ namespace wrench {
         /** @brief Whether to job submission was successful */
         bool success;
         /** @brief The cause of the failure, or nullptr on success */
-        WorkflowExecutionFailureCause *failure_cause;
+        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause;
     };
 
     /**
@@ -92,14 +93,14 @@ namespace wrench {
      */
     class ComputeServiceStandardJobFailedMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceStandardJobFailedMessage(StandardJob *, ComputeService *, WorkflowExecutionFailureCause *, double payload);
+        ComputeServiceStandardJobFailedMessage(StandardJob *, ComputeService *, std::shared_ptr<WorkflowExecutionFailureCause> cause, double payload);
 
         /** @brief The job that failed */
         StandardJob *job;
         /** @brief The compute service on which the job failed */
         ComputeService *compute_service;
         /** @brief The cause of the failure */
-        WorkflowExecutionFailureCause *cause;
+        std::shared_ptr<WorkflowExecutionFailureCause> cause;
     };
 
     /**
@@ -120,7 +121,8 @@ namespace wrench {
      */
     class ComputeServiceTerminateStandardJobAnswerMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceTerminateStandardJobAnswerMessage(StandardJob *, ComputeService *, bool success, WorkflowExecutionFailureCause *failure_cause, double payload);
+        ComputeServiceTerminateStandardJobAnswerMessage(StandardJob *, ComputeService *, bool success,
+                                                        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause, double payload);
 
         /** @brief The standard job to terminate */
         StandardJob *job;
@@ -129,7 +131,7 @@ namespace wrench {
         /** @brief Whether to job termination was successful */
         bool success;
         /** @brief The cause of the failure, or nullptr on success */
-        WorkflowExecutionFailureCause *failure_cause;
+        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause;
     };
     
     /**
@@ -150,7 +152,8 @@ namespace wrench {
     */
     class ComputeServiceSubmitPilotJobAnswerMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceSubmitPilotJobAnswerMessage(PilotJob *, ComputeService *, bool success, WorkflowExecutionFailureCause *, double payload);
+        ComputeServiceSubmitPilotJobAnswerMessage(PilotJob *, ComputeService *, bool success,
+                                                  std::shared_ptr<WorkflowExecutionFailureCause> cause, double payload);
 
         /** @brief The submitted pilot job */
         PilotJob *job;
@@ -159,7 +162,7 @@ namespace wrench {
         /** @brief Whether the job submission was successful or not */
         bool success;
         /** @brief The cause of the failure, or nullptr on success */
-        WorkflowExecutionFailureCause *failure_cause;
+        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause;
     };
 
 
@@ -220,7 +223,8 @@ namespace wrench {
      */
     class ComputeServiceTerminatePilotJobAnswerMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceTerminatePilotJobAnswerMessage(PilotJob *, ComputeService *, bool success, WorkflowExecutionFailureCause *failure_cause, double payload);
+        ComputeServiceTerminatePilotJobAnswerMessage(PilotJob *, ComputeService *, bool success,
+                                                     std::shared_ptr<WorkflowExecutionFailureCause> failure_cause, double payload);
 
         /** @brief The job to terminate */
         PilotJob *job;
@@ -229,7 +233,7 @@ namespace wrench {
         /** @brief Whether to job termination was successful */
         bool success;
         /** @brief The cause of the failure, or nullptr on success */
-        WorkflowExecutionFailureCause *failure_cause;
+        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause;
     };
 
     /***********************/

@@ -385,7 +385,7 @@ namespace wrench {
           // Forward the notification along the notification chain
           try {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                     new ComputeServiceStandardJobFailedMessage(job, msg->compute_service, msg->cause,
+                                     new ComputeServiceStandardJobFailedMessage(job, msg->compute_service, std::move(msg->cause),
                                                                                 0.0));
           } catch (std::runtime_error &e) {
             keep_going = true;

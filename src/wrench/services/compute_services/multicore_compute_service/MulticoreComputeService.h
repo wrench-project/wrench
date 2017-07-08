@@ -156,12 +156,12 @@ namespace wrench {
 
         void terminateAllPilotJobs();
 
-        void failCurrentStandardJobs(WorkflowExecutionFailureCause *cause);
+        void failCurrentStandardJobs(std::shared_ptr<WorkflowExecutionFailureCause> cause);
 
         void processWorkCompletion(WorkUnitExecutor *worker_thread, WorkUnit *work);
 
         void processWorkFailure(WorkUnitExecutor *worker_thread, WorkUnit *work,
-                                WorkflowExecutionFailureCause *);
+                                std::shared_ptr<WorkflowExecutionFailureCause> cause);
 
         void processPilotJobCompletion(PilotJob *job);
 
@@ -181,9 +181,9 @@ namespace wrench {
 
         void terminateRunningPilotJob(PilotJob *job);
 
-        void failPendingStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
+        void failPendingStandardJob(StandardJob *job, std::shared_ptr<WorkflowExecutionFailureCause> cause);
 
-        void failRunningStandardJob(StandardJob *job, WorkflowExecutionFailureCause *cause);
+        void failRunningStandardJob(StandardJob *job, std::shared_ptr<WorkflowExecutionFailureCause> cause);
     };
 };
 

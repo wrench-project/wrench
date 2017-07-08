@@ -226,6 +226,7 @@ namespace wrench {
       return raw_ptr;
     }
 
+
     /**
     * @brief Add a StorageService to the simulation
     *

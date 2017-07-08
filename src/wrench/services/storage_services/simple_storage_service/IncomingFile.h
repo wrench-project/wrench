@@ -13,10 +13,10 @@
 
 
 #include <string>
-#include <simgrid_S4U_util/S4U_PendingCommunication.h>
 
 namespace wrench {
 
+    class S4U_PendingCommunication;
     class WorkflowFile;
 
     /**

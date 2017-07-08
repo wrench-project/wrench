@@ -99,7 +99,7 @@ namespace wrench {
         StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
                                               StorageService *storage_service,
                                               bool success,
-                                              WorkflowExecutionFailureCause *failure_cause,
+                                              std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
                                               double payload);
 
         /** @brief The file that was deleted (or not) */
@@ -109,7 +109,7 @@ namespace wrench {
         /** @brief Whether the deletion was successful */
         bool success;
         /** @brief The cause of the failure, or nullptr if success */
-        WorkflowExecutionFailureCause *failure_cause;
+        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause;
     };
 
     /**
@@ -134,7 +134,7 @@ namespace wrench {
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyAnswerMessage(WorkflowFile *file, StorageService *storage_service,
-                                            bool success, WorkflowExecutionFailureCause *cause, double payload);
+                                            bool success, std::shared_ptr<WorkflowExecutionFailureCause> cause, double payload);
 
         /** @brief The file was was copied, or not */
         WorkflowFile *file;
@@ -143,7 +143,7 @@ namespace wrench {
         /** @brief Whether the copy was successful */
         bool success;
         /** @brief The cause of the failure, or nullptr if success */
-        WorkflowExecutionFailureCause *failure_cause;
+        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause;
     };
 
     /**
@@ -167,7 +167,7 @@ namespace wrench {
         StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
                                              StorageService *storage_service,
                                              bool success,
-                                             WorkflowExecutionFailureCause *failure_cause,
+                                             std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
                                              std::string data_write_mailbox_name,
                                              double payload);
 
@@ -180,7 +180,7 @@ namespace wrench {
         /** @brief The mailbox on which to send the file */
         std::string data_write_mailbox_name;
         /** @brief The cause of the failure, if any, or nullptr */
-        WorkflowExecutionFailureCause *failure_cause;
+        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause;
     };
 
     /**
@@ -208,7 +208,7 @@ namespace wrench {
         StorageServiceFileReadAnswerMessage(WorkflowFile *file,
                                             StorageService *storage_service,
                                             bool success,
-                                            WorkflowExecutionFailureCause *failure_cause,
+                                            std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
                                             double payload);
 
         /** @brief The file that was read */
@@ -218,7 +218,7 @@ namespace wrench {
         /** @brief Whether the read operation was successful or not */
         bool success;
         /** @brief The cause of the failure, or nullptr on success */
-        WorkflowExecutionFailureCause *failure_cause;
+        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause;
     };
 
     /**

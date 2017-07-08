@@ -47,20 +47,20 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     unsigned long  S4U_PendingCommunication::waitForSomethingToHappen(
-            std::vector<S4U_PendingCommunication *> pending_comms) {
+            std::vector<std::unique_ptr<S4U_PendingCommunication>> *pending_comms) {
+
       std::set<S4U_PendingCommunication *> completed_comms;
 
-      if (pending_comms.size() == 0) {
+      if (pending_comms->size() == 0) {
         throw std::invalid_argument("S4U_PendingCommunication::waitForSomethingToHappen(): invalid argument");
       }
 
       std::vector<simgrid::s4u::CommPtr> pending_s4u_comms;
-      for (auto pc : pending_comms) {
-        pending_s4u_comms.push_back(pc->comm_ptr);
+      for (auto it=pending_comms->begin(); it < pending_comms->end(); it++) {
+        pending_s4u_comms.push_back((*it)->comm_ptr);
       }
 
       return (unsigned long) simgrid::s4u::Comm::wait_any(&pending_s4u_comms);
-
     }
 
     /**

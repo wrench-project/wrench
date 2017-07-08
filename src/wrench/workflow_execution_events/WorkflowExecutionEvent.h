@@ -13,6 +13,7 @@
 
 
 #include <string>
+#include <workflow_execution_events/WorkflowExecutionFailureCause.h>
 
 namespace wrench {
 
@@ -73,7 +74,8 @@ namespace wrench {
         /** @brief The relevant storage service, or nullptr */
         StorageService *storage_service = nullptr;
         /** @brief The relevant failure cause, or nullptr */
-        WorkflowExecutionFailureCause *failure_cause = nullptr;
+        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause = nullptr;
+
 
     private:
         WorkflowExecutionEvent();

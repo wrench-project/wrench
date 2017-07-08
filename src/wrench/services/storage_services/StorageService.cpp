@@ -514,7 +514,7 @@ namespace wrench {
       if (StorageServiceFileDeleteAnswerMessage *msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage *>(message.get())) {
         // On failure, throw an exception
         if (!msg->success) {
-          throw WorkflowExecutionException(msg->failure_cause);
+          throw WorkflowExecutionException(std::move(msg->failure_cause));
         }
         WRENCH_INFO("Deleted file %s on storage service %s", file->getId().c_str(), this->getName().c_str());
       } else {
@@ -614,7 +614,7 @@ namespace wrench {
 
       if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (msg->failure_cause) {
-          throw WorkflowExecutionException(msg->failure_cause);
+          throw WorkflowExecutionException(std::move(msg->failure_cause));
         }
       } else {
         throw std::runtime_error("StorageService::copyFile(): Unexpected [" + message->getName() + "] message");

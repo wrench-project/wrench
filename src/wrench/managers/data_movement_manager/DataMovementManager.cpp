@@ -174,7 +174,7 @@ namespace wrench {
           S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
                                    new StorageServiceFileCopyAnswerMessage(msg->file,
                                                                            msg->storage_service, msg->success,
-                                                                           msg->failure_cause, 0));
+                                                                           std::move(msg->failure_cause), 0));
         } catch  (std::runtime_error &e) {
           return true;
         }

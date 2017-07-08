@@ -14,6 +14,7 @@
 
 #include "logging/TerminalOutput.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "simulation/SimulationMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
@@ -218,9 +219,8 @@ namespace wrench {
     *
     * @throw std::runtime_error:  ("network_error")
     */
-    S4U_PendingCommunication *S4U_Mailbox::iputMessage(std::string mailbox_name, SimulationMessage *msg) {
+    std::unique_ptr<S4U_PendingCommunication> S4U_Mailbox::iputMessage(std::string mailbox_name, SimulationMessage *msg) {
 
-      S4U_PendingCommunication *pending_communication = new S4U_PendingCommunication();
 
       simgrid::s4u::CommPtr comm_ptr = nullptr;
 
@@ -233,6 +233,7 @@ namespace wrench {
           throw std::runtime_error("network_error");
         }
       }
+      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication());
       pending_communication->comm_ptr = comm_ptr;
       return pending_communication;
     }
@@ -247,12 +248,12 @@ namespace wrench {
     *
     * @throw std::runtime_error:  ("network_error")
     */
-    S4U_PendingCommunication *S4U_Mailbox::igetMessage(std::string mailbox_name) {
+//    S4U_PendingCommunication *S4U_Mailbox::igetMessage(std::string mailbox_name) {
+    std::unique_ptr<S4U_PendingCommunication> S4U_Mailbox::igetMessage(std::string mailbox_name) {
 
       simgrid::s4u::CommPtr comm_ptr = nullptr;
 
-      S4U_PendingCommunication *pending_communication = new S4U_PendingCommunication();
-
+      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication());
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       try {

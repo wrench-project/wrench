@@ -126,14 +126,14 @@ namespace wrench {
     StorageServiceFileDeleteAnswerMessage::StorageServiceFileDeleteAnswerMessage(WorkflowFile *file,
                                                                                  StorageService *storage_service,
                                                                                  bool success,
-                                                                                 WorkflowExecutionFailureCause *failure_cause,
+                                                                                 std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
                                                                                  double payload)
             : StorageServiceMessage("FILE_DELETE_ANSWER", payload) {
 
       this->file = file;
       this->storage_service = storage_service;
       this->success = success;
-      this->failure_cause = failure_cause;
+      this->failure_cause = std::move(failure_cause);
     }
 
     /**
@@ -171,7 +171,7 @@ namespace wrench {
     StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
                                                                              StorageService *storage_service,
                                                                              bool success,
-                                                                             WorkflowExecutionFailureCause *failure_cause,
+                                                                             std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
                                                                              double payload)
             : StorageServiceMessage("FILE_COPY_ANSWER", payload) {
       if ((file == nullptr) || (storage_service == nullptr)) {
@@ -217,7 +217,7 @@ namespace wrench {
     StorageServiceFileWriteAnswerMessage::StorageServiceFileWriteAnswerMessage(WorkflowFile *file,
                                                                                StorageService *storage_service,
                                                                                bool success,
-                                                                               WorkflowExecutionFailureCause *failure_cause,
+                                                                               std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
                                                                                std::string data_write_mailbox_name,
                                                                                double payload) : StorageServiceMessage(
             "FILE_WRITE_ANSWER", payload) {
@@ -268,7 +268,7 @@ namespace wrench {
     StorageServiceFileReadAnswerMessage::StorageServiceFileReadAnswerMessage(WorkflowFile *file,
                                                                              StorageService *storage_service,
                                                                              bool success,
-                                                                             WorkflowExecutionFailureCause *failure_cause,
+                                                                             std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
                                                                              double payload) : StorageServiceMessage(
             "FILE_READ_ANSWER",
             payload) {

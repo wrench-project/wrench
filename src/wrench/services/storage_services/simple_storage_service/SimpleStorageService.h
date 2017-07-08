@@ -13,6 +13,7 @@
 
 #include "services/storage_services/StorageService.h"
 #include "services/storage_services/simple_storage_service/SimpleStorageServiceProperty.h"
+#include "simgrid_S4U_util/S4U_PendingCommunication.h"
 
 namespace wrench {
 
@@ -62,8 +63,8 @@ namespace wrench {
 
         int main();
 
-        bool processControlMessage(S4U_PendingCommunication *comm);
-        bool processDataMessage(S4U_PendingCommunication *comm);
+        bool processControlMessage(std::unique_ptr<S4U_PendingCommunication> comm);
+        bool processDataMessage(std::unique_ptr<S4U_PendingCommunication> comm);
 
         unsigned long getNewUniqueNumber();
 
@@ -71,7 +72,8 @@ namespace wrench {
         bool processFileReadRequest(WorkflowFile *file, std::string answer_mailbox, std::string mailbox_to_receive_the_file_content);
         bool processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox);
 
-        std::vector<S4U_PendingCommunication *> pending_communications;
+//        std::vector<S4U_PendingCommunication *> pending_communications;
+        std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_communications;
 
         std::map<S4U_PendingCommunication *, IncomingFile*> incoming_files;
 

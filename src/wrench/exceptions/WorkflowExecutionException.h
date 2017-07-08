@@ -29,7 +29,7 @@ namespace wrench {
 		class WorkflowExecutionException: public std::exception {
 
 		private:
-				WorkflowExecutionFailureCause *cause;
+				std::shared_ptr<WorkflowExecutionFailureCause> cause;
 
 		public:
 
@@ -46,7 +46,7 @@ namespace wrench {
          * @brief Get the failure cause
          * @return the failure cause
          */
-        WorkflowExecutionFailureCause *getCause() {
+        std::shared_ptr<WorkflowExecutionFailureCause> getCause() {
           return this->cause;
         }
 
@@ -55,11 +55,21 @@ namespace wrench {
 				/** \cond INTERNAL    */
 				/***********************/
 
+
+
 				/**
 				 * @brief Constructor
 				 * @param cause: the cause of the failure
 				 */
 				WorkflowExecutionException(WorkflowExecutionFailureCause *cause) {
+					this->cause = std::shared_ptr<WorkflowExecutionFailureCause>(cause);
+				}
+
+				/**
+				 * @brief Constructor
+				 * @param cause: the cause of the failure
+				 */
+				WorkflowExecutionException(std::shared_ptr<WorkflowExecutionFailureCause> cause) {
 					this->cause = cause;
 				}
 
