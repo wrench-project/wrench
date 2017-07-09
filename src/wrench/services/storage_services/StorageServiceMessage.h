@@ -12,6 +12,8 @@
 #define WRENCH_STORAGESERVICEMESSAGE_H
 
 
+#include <memory>
+
 #include <services/ServiceMessage.h>
 #include <workflow_execution_events/WorkflowExecutionFailureCause.h>
 
