@@ -14,6 +14,7 @@
 
 #include <vector>
 #include <simgrid/s4u/Comm.hpp>
+#include "S4U_PendingCommunication.h"
 
 namespace wrench {
 
