@@ -13,6 +13,8 @@
 
 
 #include <services/ServiceMessage.h>
+#include <workflow_execution_events/WorkflowExecutionFailureCause.h>
+
 
 namespace wrench {
 
