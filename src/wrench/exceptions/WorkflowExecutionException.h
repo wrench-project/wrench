@@ -12,6 +12,7 @@
 #define WRENCH_EXCEPTION_H
 
 #include <exception>
+#include <memory>
 #include <string>
 #include <workflow_execution_events/WorkflowExecutionFailureCause.h>
 
