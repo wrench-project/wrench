@@ -241,7 +241,6 @@ namespace wrench {
      * @brief Constructor
      *
      * @param job: the job that couldn't be terminated
-     * @param compute_service: the compute service that couldn't terminate the job
      */
     JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job) : WorkflowExecutionFailureCause(
             JOB_CANNOT_BE_TERMINATED) {
@@ -265,6 +264,33 @@ namespace wrench {
       return "Job cannot be terminated (because it's neither pending nor running)";
     };
 
+
+    /**
+    * @brief Constructor
+    *
+    * @param job: the job that couldn't be forgotten
+    */
+    JobCannotBeForgotten::JobCannotBeForgotten(WorkflowJob *job) : WorkflowExecutionFailureCause(
+            JOB_CANNOT_BE_FORGOTTEN) {
+      this->job = job;
+    }
+
+
+    /**
+     * @brief Getter
+     * @return the job
+     */
+    WorkflowJob *JobCannotBeForgotten::getJob() {
+      return this->job;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string JobCannotBeForgotten::toString() {
+      return "Job cannot be forgotten (because it's not completed or failed)";
+    };
 
 
 };

@@ -11,7 +11,7 @@
 #ifndef WRENCH_COMPUTESERVICEMESSAGE_H
 #define WRENCH_COMPUTESERVICEMESSAGE_H
 
-
+#include <memory>
 #include <services/ServiceMessage.h>
 #include <workflow_execution_events/WorkflowExecutionFailureCause.h>
 

@@ -85,15 +85,18 @@ namespace wrench {
 				Workflow *workflow;
 
 				// Job map
-				std::map<std::string, std::unique_ptr<WorkflowJob>> jobs;
+				std::map<WorkflowJob*, std::unique_ptr<WorkflowJob>> jobs;
 
 				// Job lists
 				std::set<StandardJob *> pending_standard_jobs;
 				std::set<StandardJob *> running_standard_jobs;
 				std::set<StandardJob *> completed_standard_jobs;
+				std::set<StandardJob *> failed_standard_jobs;
+
 				std::set<PilotJob *> pending_pilot_jobs;
 				std::set<PilotJob *> running_pilot_jobs;
 				std::set<PilotJob *> completed_pilot_jobs;
+
 
 				/***********************/
 				/** \endcond           */

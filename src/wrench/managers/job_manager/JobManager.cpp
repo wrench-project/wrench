@@ -42,7 +42,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Destructor, which kills the daemon
+     * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
     JobManager::~JobManager() {
       this->kill();
@@ -105,7 +105,7 @@ namespace wrench {
                                              cleanup_file_deletions);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);
 
-      this->jobs[job->getName()] = std::move(job);
+      this->jobs[raw_ptr] = std::move(job);
       return raw_ptr;
     }
 
@@ -170,7 +170,7 @@ namespace wrench {
       }
       PilotJob *raw_ptr = new PilotJob(workflow, num_cores, duration);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
-      this->jobs[job->getName()] = std::move(job);
+      this->jobs[raw_ptr] = std::move(job);
       return raw_ptr;
     }
 
@@ -262,32 +262,45 @@ namespace wrench {
     }
 
     /**
-     * @brief Forget a job (to free memory, typically once the job is completed)
+     * @brief Forget a job (to free memory, only once a job is completed)
      *
      * @param job: a workflow job
+     *
+     * @throw std::invalid_argument
+     * @throw WorkflowExecutionException
      */
     void JobManager::forgetJob(WorkflowJob *job) {
+      if (job == nullptr) {
+        throw std::invalid_argument("JobManager::forgetJob(): invalid argument");
+      }
+
       if (job->getType() == WorkflowJob::STANDARD) {
-        if (this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) {
-          this->pending_standard_jobs.erase((StandardJob *) job);
-        }
-        if (this->running_standard_jobs.find((StandardJob *) job) != this->running_standard_jobs.end()) {
-          this->running_standard_jobs.erase((StandardJob *) job);
+        if ((this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) ||
+            (this->running_standard_jobs.find((StandardJob *) job) != this->running_standard_jobs.end())) {
+          throw WorkflowExecutionException(new JobCannotBeForgotten(job));
         }
         if (this->completed_standard_jobs.find((StandardJob *) job) != this->completed_standard_jobs.end()) {
           this->completed_standard_jobs.erase((StandardJob *) job);
+          this->jobs.erase(job);
+          return;
         }
+        if (this->failed_standard_jobs.find((StandardJob *) job) != this->failed_standard_jobs.end()) {
+          this->failed_standard_jobs.erase((StandardJob *) job);
+          this->jobs.erase(job);
+          return;
+        }
+        throw std::invalid_argument("JobManager::forgetJob(): unknown standard job");
       }
+
       if (job->getType() == WorkflowJob::PILOT) {
-        if (this->pending_pilot_jobs.find((PilotJob *) job) != this->pending_pilot_jobs.end()) {
-          this->pending_pilot_jobs.erase((PilotJob *) job);
-        }
-        if (this->running_pilot_jobs.find((PilotJob *) job) != this->running_pilot_jobs.end()) {
-          this->running_pilot_jobs.erase((PilotJob *) job);
+        if ((this->pending_pilot_jobs.find((PilotJob *) job) != this->pending_pilot_jobs.end()) ||
+            (this->running_pilot_jobs.find((PilotJob *) job) != this->running_pilot_jobs.end())) {
+          throw WorkflowExecutionException(new JobCannotBeForgotten(job));
         }
         if (this->completed_pilot_jobs.find((PilotJob *) job) != this->completed_pilot_jobs.end()) {
-          this->completed_pilot_jobs.erase((PilotJob *) job);
+          this->jobs.erase(job);
         }
+        throw std::invalid_argument("JobManager::forgetJob(): unknown pilot job");
       }
 
     }
@@ -381,6 +394,8 @@ namespace wrench {
 
           // remove the job from the "pending" list
           this->pending_standard_jobs.erase(job);
+          // put it in the "failed" list
+          this->failed_standard_jobs.insert(job);
 
           // Forward the notification along the notification chain
           try {

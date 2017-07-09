@@ -51,7 +51,9 @@ namespace wrench {
             /** @brief There was a network error, or an endpoint was down */
             NETWORK_ERROR,
             /** @brief The job cannot be terminated because it's neither pending nor running */
-            JOB_CANNOT_BE_TERMINATED
+            JOB_CANNOT_BE_TERMINATED,
+            /** @brief The job cannot be forgotten because it's not completed */
+            JOB_CANNOT_BE_FORGOTTEN
 
         };
 
@@ -177,6 +179,19 @@ namespace wrench {
     class JobCannotBeTerminated : public WorkflowExecutionFailureCause {
     public:
         JobCannotBeTerminated(WorkflowJob *job);
+        WorkflowJob *getJob();
+        std::string toString();
+
+    private:
+        WorkflowJob *job;
+    };
+
+    /**
+    * @brief A "job cannot be forgotten" workflow execution failure cause
+    */
+    class JobCannotBeForgotten : public WorkflowExecutionFailureCause {
+    public:
+        JobCannotBeForgotten(WorkflowJob *job);
         WorkflowJob *getJob();
         std::string toString();
 
