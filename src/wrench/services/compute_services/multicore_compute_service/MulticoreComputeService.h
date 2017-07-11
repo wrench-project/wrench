@@ -19,6 +19,7 @@
 
 #include "MulticoreComputeServiceProperty.h"
 #include "WorkUnitExecutor.h"
+#include "WorkUnit.h"
 
 
 namespace wrench {
@@ -142,10 +143,11 @@ namespace wrench {
         // Set of currently running (standard or pilot) jobs
         std::set<WorkflowJob *> running_jobs;
 
-        std::set<WorkUnit *> non_ready_works;
-        std::deque<WorkUnit *> ready_works;
-        std::set<WorkUnit *> running_works;
-        std::set<WorkUnit *> completed_works;
+        // Work units
+        std::set<std::shared_ptr<WorkUnit>> non_ready_works;
+        std::deque<std::shared_ptr<WorkUnit>> ready_works;
+        std::set<std::shared_ptr<WorkUnit>> running_works;
+        std::set<std::shared_ptr<WorkUnit>> completed_works;
 
         int main();
 
@@ -158,9 +160,9 @@ namespace wrench {
 
         void failCurrentStandardJobs(std::shared_ptr<WorkflowExecutionFailureCause> cause);
 
-        void processWorkCompletion(WorkUnitExecutor *worker_thread, WorkUnit *work);
+        void processWorkCompletion(WorkUnitExecutor *worker_thread, std::shared_ptr<WorkUnit> work);
 
-        void processWorkFailure(WorkUnitExecutor *worker_thread, WorkUnit *work,
+        void processWorkFailure(WorkUnitExecutor *worker_thread, std::shared_ptr<WorkUnit> work,
                                 std::shared_ptr<WorkflowExecutionFailureCause> cause);
 
         void processPilotJobCompletion(PilotJob *job);

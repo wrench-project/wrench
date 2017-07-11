@@ -38,7 +38,7 @@ namespace wrench {
 
         WorkUnitExecutor(Simulation *simulation,
                      std::string hostname, std::string callback_mailbox,
-                     WorkUnit *work,
+                     std::shared_ptr<WorkUnit> work,
                      StorageService *default_storage_service,
                      double startup_overhead = 0.0);
 
@@ -46,14 +46,14 @@ namespace wrench {
         void kill();
 
         /** @brief The WorkUnit this WorkUnitExecutor is supposed to perform */
-        WorkUnit *work;
+        std::shared_ptr<WorkUnit> work;
 
     private:
         int main();
 
         Simulation *simulation;
 
-        void performWork(WorkUnit *work);
+        void performWork(std::shared_ptr<WorkUnit> work);
         std::string callback_mailbox;
         std::string hostname;
         double start_up_overhead;

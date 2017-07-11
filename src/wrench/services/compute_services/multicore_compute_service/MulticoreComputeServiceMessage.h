@@ -155,13 +155,13 @@ namespace wrench {
     public:
         WorkerThreadWorkDoneMessage(
                 WorkUnitExecutor *worker_thread,
-                WorkUnit *work_unit,
+                std::shared_ptr<WorkUnit> work_unit,
                 double payload);
 
         /** @brief The worker thread that performed the work */
         WorkUnitExecutor *worker_thread;
         /** @brief The work that was performed */
-        WorkUnit *work;
+        std::shared_ptr<WorkUnit> work;
 
     };
 
@@ -172,14 +172,14 @@ namespace wrench {
     public:
         WorkerThreadWorkFailedMessage(
                 WorkUnitExecutor *worker_thread,
-                WorkUnit *work,
+                std::shared_ptr<WorkUnit> work,
                 std::shared_ptr<WorkflowExecutionFailureCause> cause,
                 double payload);
 
         /** @brief The worker thread that failed to perform the work */
         WorkUnitExecutor *worker_thread;
         /** @brief The work that failed */
-        WorkUnit *work;
+        std::shared_ptr<WorkUnit> work;
         /** @brief The cause of the failure */
         std::shared_ptr<WorkflowExecutionFailureCause> cause;
     };

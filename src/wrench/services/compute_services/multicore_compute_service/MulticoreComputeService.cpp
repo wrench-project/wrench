@@ -573,7 +573,7 @@ namespace wrench {
           (this->working_threads.size() < this->max_num_worker_threads)) {
 
         // Get the first work out of the pending work queue
-        WorkUnit *work_to_do = this->ready_works.front();
+        std::shared_ptr<WorkUnit> work_to_do = this->ready_works.front();
         this->ready_works.pop_front();
         this->running_works.insert(work_to_do);
 
@@ -891,7 +891,7 @@ namespace wrench {
     */
     void MulticoreComputeService::terminateRunningStandardJob(StandardJob *job) {
 
-      std::vector<WorkUnit *> works_to_terminate;
+      std::vector<std::shared_ptr<WorkUnit>> works_to_terminate;
 
       // Find all works to terminate
       for (auto w : this->running_works) {
@@ -907,6 +907,7 @@ namespace wrench {
         for (auto wt : this->working_threads) {
           if (wt->work == w) {
             worker_thread_to_terminate = wt;
+            this->working_threads.erase(wt);
             break;
           }
         }
@@ -923,6 +924,9 @@ namespace wrench {
         WRENCH_INFO("Brutally killing a worker thread that's working on work for job %s", job->getName().c_str());
         tw->kill();
       }
+
+      // Free al memory (not necessary since worker_threads_to_terminates will be out of scope?)
+      worker_threads_to_terminate.clear();
 
       // Set all non-COMPLETED tasks back to the READY state and wipe out output files
       // TODO: At some point we'll have to think hard about the task life cycle and make it better/coherent
@@ -1027,7 +1031,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void MulticoreComputeService::processWorkCompletion(WorkUnitExecutor *worker_thread, WorkUnit *work) {
+    void MulticoreComputeService::processWorkCompletion(WorkUnitExecutor *worker_thread, std::shared_ptr<WorkUnit> work) {
 
       // Remove the work thread from the working list
       for (auto wt : this->working_threads) {
@@ -1062,7 +1066,22 @@ namespace wrench {
       // Send the callback to the originator if the job has completed (i.e., if this
       // work unit has no children)
       if (work->children.size() == 0) {
+
+        // Erase all completed works for the job (there has to be an easier way to do this)
+        std::vector<std::shared_ptr<WorkUnit>> to_erase;
+        for (auto wu : this->completed_works) {
+          if (wu->job == work->job) {
+            to_erase.push_back(wu);
+          }
+        }
+        for (auto wu : to_erase) {
+          this->completed_works.erase(wu);
+        }
+        to_erase.clear();
+
+        // Erase the job
         this->running_jobs.erase(work->job);
+
         try {
           S4U_Mailbox::dputMessage(work->job->popCallbackMailbox(),
                                    new ComputeServiceStandardJobDoneMessage(work->job, this,
@@ -1098,7 +1117,7 @@ namespace wrench {
      * @param cause: the cause of the failure
      */
     void MulticoreComputeService::processWorkFailure(WorkUnitExecutor *worker_thread,
-                                                     WorkUnit *work,
+                                                     std::shared_ptr<WorkUnit> work,
                                                      std::shared_ptr<WorkflowExecutionFailureCause> cause) {
 
       StandardJob *job = work->job;
@@ -1121,7 +1140,7 @@ namespace wrench {
       this->running_works.erase(work);
 
       // Remove all other works for the job in the "not ready" state
-      std::vector<WorkUnit *> to_erase;
+      std::vector<std::shared_ptr<WorkUnit>> to_erase;
 
       for (auto w : this->non_ready_works) {
         if (w->job == job) {
@@ -1134,7 +1153,7 @@ namespace wrench {
       }
 
       // Remove all other works for the job in the "ready" state
-      for (std::deque<WorkUnit *>::iterator it = this->ready_works.begin(); it != this->ready_works.end(); it++) {
+      for (auto it = this->ready_works.begin(); it != this->ready_works.end(); it++) {
         if ((*it)->job == job) {
           this->ready_works.erase(it);
         }
@@ -1246,29 +1265,29 @@ namespace wrench {
      */
     void MulticoreComputeService::createWorkForNewlyDispatchedJob(StandardJob *job) {
 
-      WorkUnit *pre_file_copies_work_unit = nullptr;
-      std::vector<WorkUnit *> task_work_units;
-      WorkUnit *post_file_copies_work_unit = nullptr;
-      WorkUnit *cleanup_workunit = nullptr;
+      std::shared_ptr<WorkUnit> pre_file_copies_work_unit = nullptr;
+      std::vector<std::shared_ptr<WorkUnit>> task_work_units;
+      std::shared_ptr<WorkUnit> post_file_copies_work_unit = nullptr;
+      std::shared_ptr<WorkUnit> cleanup_workunit = nullptr;
 
       // Create the clean work unit, if any
       if (job->cleanup_file_deletions.size() > 0) {
-        cleanup_workunit = new WorkUnit(job, {}, {}, {}, {}, job->cleanup_file_deletions);
+        cleanup_workunit = std::shared_ptr<WorkUnit>(new WorkUnit(job, {}, {}, {}, {}, job->cleanup_file_deletions));
       }
 
       // Create the pre_file_copies work unit, if any
       if (job->pre_file_copies.size() > 0) {
-        pre_file_copies_work_unit = new WorkUnit(job, job->pre_file_copies, {}, {}, {}, {});
+        pre_file_copies_work_unit = std::shared_ptr<WorkUnit>(new WorkUnit(job, job->pre_file_copies, {}, {}, {}, {}));
       }
 
       // Create the post_file_copies work unit, if any
       if (job->post_file_copies.size() > 0) {
-        post_file_copies_work_unit = new WorkUnit(job, {}, {}, {}, job->post_file_copies, {});
+        post_file_copies_work_unit = std::shared_ptr<WorkUnit>(new WorkUnit(job, {}, {}, {}, job->post_file_copies, {}));
       }
 
       // Create the task work units, if any
       for (auto task : job->tasks) {
-        task_work_units.push_back(new WorkUnit(job, {}, {task}, job->file_locations, {}, {}));
+        task_work_units.push_back(std::shared_ptr<WorkUnit>(new WorkUnit(job, {}, {task}, job->file_locations, {}, {})));
       }
 
       // Add dependencies from pre copies to possible successors
@@ -1300,8 +1319,8 @@ namespace wrench {
         }
       }
 
-      // Insert work units in the ready or non-ready queues
-      std::vector<WorkUnit *> all_work_units;
+      // Create a list of all work units
+      std::vector<std::shared_ptr<WorkUnit>> all_work_units;
       if (pre_file_copies_work_unit) all_work_units.push_back(pre_file_copies_work_unit);
       for (auto twu : task_work_units) {
         all_work_units.push_back(twu);
@@ -1309,6 +1328,7 @@ namespace wrench {
       if (post_file_copies_work_unit) all_work_units.push_back(post_file_copies_work_unit);
       if (cleanup_workunit) all_work_units.push_back(cleanup_workunit);
 
+      // Insert work units in the ready or non-ready queues
       for (auto wu : all_work_units) {
         if (wu->num_pending_parents == 0) {
           this->ready_works.push_back(wu);

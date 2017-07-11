@@ -49,7 +49,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void WorkUnit::addDependency(WorkUnit *parent, WorkUnit *child) {
+    void WorkUnit::addDependency(std::shared_ptr<WorkUnit> parent, std::shared_ptr<WorkUnit> child) {
       if ((parent == nullptr) || (child == nullptr)) {
         throw std::invalid_argument("WorkUnit::addDependency(): Invalid arguments");
       }

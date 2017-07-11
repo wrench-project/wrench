@@ -41,7 +41,7 @@ namespace wrench {
     WorkUnitExecutor::WorkUnitExecutor(Simulation *simulation,
                                std::string hostname,
                                std::string callback_mailbox,
-                               WorkUnit *work,
+                               std::shared_ptr<WorkUnit> work,
                                StorageService *default_storage_service,
                                double startup_overhead) :
             S4U_DaemonWithMailbox("worker_thread", "worker_thread") {
@@ -136,7 +136,7 @@ namespace wrench {
      * @param work: the work to perform
      */
     void
-    WorkUnitExecutor::performWork(WorkUnit *work) {
+    WorkUnitExecutor::performWork(std::shared_ptr<WorkUnit> work) {
 
       // Simulate the startup overhead
       S4U_Simulation::sleep(this->start_up_overhead);
