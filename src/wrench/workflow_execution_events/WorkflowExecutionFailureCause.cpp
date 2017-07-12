@@ -96,7 +96,7 @@ namespace wrench {
      * @param file: the file that could not be written
      * @param storage_service:  the storage service that ran out of spacee
      */
-    StorageServiceFull::StorageServiceFull(WorkflowFile *file, StorageService *storage_service)
+    StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file, StorageService *storage_service)
             : WorkflowExecutionFailureCause(STORAGE_NO_ENOUGH_SPACE) {
       this->file = file;
       this->storage_service = storage_service;
@@ -106,7 +106,7 @@ namespace wrench {
      * @brief Getter
      * @return the file
      */
-    WorkflowFile *StorageServiceFull::getFile() {
+    WorkflowFile *StorageServiceNotEnoughSpace::getFile() {
       return this->file;
     }
 
@@ -114,7 +114,7 @@ namespace wrench {
      * @brief Getter
      * @return the storage service
      */
-    StorageService *StorageServiceFull::getStorageService() {
+    StorageService *StorageServiceNotEnoughSpace::getStorageService() {
       return this->storage_service;
     }
 
@@ -122,7 +122,7 @@ namespace wrench {
      * @brief Get the human-readable failure message
      * @return the message
      */
-    std::string StorageServiceFull::toString() {
+    std::string StorageServiceNotEnoughSpace::toString() {
       return "Cannot write file " + this->file->getId() + " to Storage Service " +
              this->storage_service->getName() + " due to lack of storage space";
     }

@@ -272,7 +272,7 @@ namespace wrench {
                                 new StorageServiceFileWriteAnswerMessage(file,
                                                                          this,
                                                                          false,
-                                                                         std::shared_ptr<WorkflowExecutionFailureCause>(new StorageServiceFull(file, this)),
+                                                                         std::shared_ptr<WorkflowExecutionFailureCause>(new StorageServiceNotEnoughSpace(file, this)),
                                                                          "",
                                                                          this->getPropertyValueAsDouble(
                                                                                  SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
@@ -377,7 +377,7 @@ namespace wrench {
         try {
           S4U_Mailbox::putMessage(answer_mailbox,
                                   new StorageServiceFileCopyAnswerMessage(file, this, false,
-                                                                          std::shared_ptr<WorkflowExecutionFailureCause>(new StorageServiceFull(file, this)),
+                                                                          std::shared_ptr<WorkflowExecutionFailureCause>(new StorageServiceNotEnoughSpace(file, this)),
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::runtime_error &e) {

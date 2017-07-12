@@ -102,12 +102,12 @@ namespace wrench {
     };
 
     /**
-     * @brief A "no space left on storage service" workflow execution failure cause
+     * @brief A "not enough space on storage service" workflow execution failure cause
      */
-    class StorageServiceFull : public WorkflowExecutionFailureCause {
+    class StorageServiceNotEnoughSpace : public WorkflowExecutionFailureCause {
 
     public:
-        StorageServiceFull(WorkflowFile *file, StorageService *storage_service);
+        StorageServiceNotEnoughSpace(WorkflowFile *file, StorageService *storage_service);
 
         WorkflowFile *getFile();
         StorageService *getStorageService();
