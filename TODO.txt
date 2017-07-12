@@ -9,6 +9,13 @@ DETAIL:
 
 -----------------------------------
 
+TESTS:
+	- Add new tests for SimpleStorage Services
+	- How come when sunmitting tasks with #cores=2 we don't get an exception on
+          a MulticoreComputeService....
+
+-----------------------------------
+
 DATA STORAGE IMPLEMENTATION:
 
     - Decide what to do about "partial failures"
@@ -29,9 +36,19 @@ COMPUTE STORAGE IMPLEMENTATION:
 
 ---------------------------------------------------------------------
 
-COMPUTE SERVICE: SIMPLE FIFO BATCH  (WOULD BE GREAT FOR THE UPCOMING PAPER)
+COMPUTE SERVICE: IMPLEMENT A SIMPLE FIFO BATCH  (WOULD BE GREAT FOR THE UPCOMING PAPER)
     - Really close to Condor...
     - Will need to connect to BATSIM to do a batch
+
+---------------------------------------------------------------------
+
+NEW FEATURES FOR EDDY:
+	- New workflows arrive on the fly
+		- Requirement: a synamic workflow submitter abstraction
+
+	- Implement a notion of "what time is it?"
+		- And of a Cron job that triggers a callback...
+
 
 ---------------------------------------------------------------------
 
