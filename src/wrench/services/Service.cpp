@@ -121,6 +121,9 @@ namespace wrench {
       } else {
         throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
       }
+
+      // Set the service state to down
+      this->state = Service::DOWN;
     }
 
     /**

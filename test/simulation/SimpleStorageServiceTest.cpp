@@ -33,6 +33,7 @@ public:
     void do_SynchronousFileCopy_test();
     void do_AsynchronousFileCopy_test();
     void do_SynchronousFileCopyFailures_test();
+    void do_AsynchronousFileCopyFailures_test();
 
 
 protected:
@@ -656,7 +657,7 @@ private:
         throw std::runtime_error("Should have gotten a 'file not found' exception");
       }
 
-      // Do the file copy from a storage service that's down
+      // Do the file copy from a dst storage service that's down
       this->test->storage_service_1000->stop();
 
       success = true;
@@ -665,17 +666,40 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_TERMINATED) {
+        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " + std::to_string(e.getCause()->getCauseType()));
         }
         // Check Exception details
         wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *)e.getCause().get();
         if (real_cause->getService() != this->test->storage_service_1000) {
-          throw std::runtime_error("Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
+          throw std::runtime_error("Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
         }
       }
       if (success) {
-        throw std::runtime_error("Should have gotten a 'file not found' exception");
+        throw std::runtime_error("Should have gotten a 'service is down' exception");
+      }
+
+
+      // Do the file copy from a src storage service that's down
+      this->test->storage_service_500->stop();
+
+      success = true;
+      try {
+        data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000, this->test->storage_service_500);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        // Check Exception
+        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " + std::to_string(e.getCause()->getCauseType()));
+        }
+        // Check Exception details
+        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *)e.getCause().get();
+        if (real_cause->getService() != this->test->storage_service_500) {
+          throw std::runtime_error("Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
+        }
+      }
+      if (success) {
+        throw std::runtime_error("Should have gotten a 'service is down' exception");
       }
 
       this->simulation->shutdownAllStorageServices();
@@ -710,6 +734,224 @@ void SimpleStorageServiceTest::do_SynchronousFileCopyFailures_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(this, workflow,
                                                                                                   std::unique_ptr<wrench::Scheduler>(
+                          new wrench::RandomScheduler()), hostname))));
+
+  // Create 3 Storage Services
+  EXPECT_NO_THROW(storage_service_1000 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 1000.0))));
+
+  EXPECT_NO_THROW(storage_service_500 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 500.0))));
+
+  EXPECT_NO_THROW(storage_service_100 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 100.0))));
+
+  // Create a file registry
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname));
+
+  // Create a Compute Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MulticoreComputeService>(
+                  new wrench::MulticoreComputeService(hostname, true, true, nullptr, {}))));
+
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+  // Staging file_500 on the 1000-byte storage service
+  EXPECT_NO_THROW(simulation->stageFiles({file_500}, storage_service_1000));
+
+  // Running a "run a single task" simulation
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+}
+
+
+
+/**********************************************************************/
+/**  ASYNCHRONOUS FILE COPY TEST WITH FAILURES                        **/
+/**********************************************************************/
+
+class SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS : public wrench::WMS {
+
+public:
+    SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(SimpleStorageServiceTest *test,
+                                                            wrench::Workflow *workflow,
+                                                            std::unique_ptr<wrench::Scheduler> scheduler,
+                                                            std::string hostname) :
+            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    SimpleStorageServiceTest *test;
+
+    int main() {
+
+      // Create a data movement manager
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
+              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+
+      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+
+      // Do the file copy while space doesn't fit
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500, this->test->storage_service_1000, this->test->storage_service_100);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Got an unexpected exception");
+      }
+
+      // Wait for the next execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+
+      try {
+        event = workflow->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
+          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::STORAGE_NO_ENOUGH_SPACE) {
+            throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " + std::to_string(event->failure_cause->getCauseType()));
+          }
+          wrench::StorageServiceNotEnoughSpace *real_cause = (wrench::StorageServiceNotEnoughSpace *)event->failure_cause.get();
+          if (real_cause->getFile() != this->test->file_500) {
+            throw std::runtime_error("Got the expected exception and failure type, but the failure cause doesn't point to the right file");
+          }
+          if (real_cause->getStorageService() != this->test->storage_service_100) {
+            throw std::runtime_error("Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");
+          }
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int)(event->type)));
+        }
+      }
+
+      // Do the file copy for a file that's not there
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_100, this->test->storage_service_1000, this->test->storage_service_100);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Got an unexpected exception");
+      }
+
+      // Wait for the next execution event
+      try {
+        event = workflow->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
+          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::FILE_NOT_FOUND) {
+            throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " + std::to_string(event->failure_cause->getCauseType()));
+          }
+          wrench::FileNotFound *real_cause = (wrench::FileNotFound *)event->failure_cause.get();
+          if (real_cause->getFile() != this->test->file_100) {
+            throw std::runtime_error("Got the expected exception and failure type, but the failure cause doesn't point to the right file");
+          }
+          if (real_cause->getStorageService() != this->test->storage_service_1000) {
+            throw std::runtime_error("Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");
+          }
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int)(event->type)));
+        }
+      }
+
+      // Do the file copy for a src storage service that's down
+      this->test->storage_service_1000->stop();
+
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_100, this->test->storage_service_1000, this->test->storage_service_500);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Got an unexpected exception");
+      }
+
+      // Wait for the next execution event
+      try {
+        event = workflow->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
+          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
+            throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " + std::to_string(event->failure_cause->getCauseType()));
+          }
+          wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *)event->failure_cause.get();
+          if (real_cause->getService() != this->test->storage_service_1000) {
+            throw std::runtime_error("Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");
+          }
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int)(event->type)));
+        }
+      }
+
+      // Do the file copy from a dst storage service that's down
+      this->test->storage_service_500->stop();
+
+      bool success = true;
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500, this->test->storage_service_1000, this->test->storage_service_500);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        // Check Exception
+        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " + std::to_string(e.getCause()->getCauseType()));
+        }
+        // Check Exception details
+        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *)e.getCause().get();
+        if (real_cause->getService() != this->test->storage_service_500) {
+          throw std::runtime_error("Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
+        }
+      }
+      if (success) {
+        throw std::runtime_error("Should have gotten a 'service is down' exception");
+      }
+
+      this->simulation->shutdownAllStorageServices();
+      this->simulation->shutdownAllComputeServices();
+      this->simulation->getFileRegistryService()->stop();
+
+      return 0;
+    }
+};
+
+TEST_F(SimpleStorageServiceTest, AsynchronousFileCopyFailures) {
+  DO_TEST_WITH_FORK(do_AsynchronousFileCopyFailures_test);
+}
+
+void SimpleStorageServiceTest::do_AsynchronousFileCopyFailures_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("capacity_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+          std::unique_ptr<wrench::WMS>(new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(this, workflow,
+                                                                                                   std::unique_ptr<wrench::Scheduler>(
                           new wrench::RandomScheduler()), hostname))));
 
   // Create 3 Storage Services

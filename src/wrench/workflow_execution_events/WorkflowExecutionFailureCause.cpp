@@ -131,7 +131,7 @@ namespace wrench {
      * @brief Constructor
      * @param service: the service that was down
      */
-    ServiceIsDown::ServiceIsDown(Service *service) : WorkflowExecutionFailureCause(SERVICE_TERMINATED) {
+    ServiceIsDown::ServiceIsDown(Service *service) : WorkflowExecutionFailureCause(SERVICE_DOWN) {
       this->service = service;
     }
 

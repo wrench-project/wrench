@@ -42,8 +42,8 @@ namespace wrench {
             FILE_NOT_FOUND,
             /** @brief The storage service does not have enough space to support operation */
             STORAGE_NO_ENOUGH_SPACE,
-            /** @brief The service cannot be used because it was terminated */
-            SERVICE_TERMINATED,
+            /** @brief The service cannot be used because it is down (likely was terminated) */
+            SERVICE_DOWN,
             /** @brief The compute service does not support this job type */
             JOB_TYPE_NOT_SUPPORTED,
             /** @brief The compute service cannot run the job due to insufficient total number of cores */

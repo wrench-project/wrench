@@ -859,7 +859,7 @@ private:
       }
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_TERMINATED) {
+          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
             throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
           }
           wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *)(event->failure_cause.get());
