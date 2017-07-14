@@ -34,7 +34,7 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a dputMessage()");
-          throw std::shared_ptr<new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName())>;
+          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName()));
         } else {
           throw std::runtime_error("S4U_Mailbox::iputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
