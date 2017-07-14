@@ -61,7 +61,7 @@ namespace wrench {
     void DataMovementManager::stop() {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
     }

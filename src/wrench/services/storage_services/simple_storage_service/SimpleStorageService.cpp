@@ -442,7 +442,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message;
       try {
         message = comm->wait();
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         WRENCH_INFO("SimpleStorageService::processDataMessage(): Communication failure when receiving file '%s",
                     incoming_file->file->getId().c_str());
         // Process the failure, meaning, just re-decrease the occupied space
@@ -451,9 +451,7 @@ namespace wrench {
                 "Sending back an ack since this was a file copy and some client is waiting for me to say something");
         try {
           S4U_Mailbox::putMessage(incoming_file->ack_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(incoming_file->file, this, false,
-                                                                          std::shared_ptr<FailureCause>(
-                                                                                  cause),
+                                  new StorageServiceFileCopyAnswerMessage(incoming_file->file, this, false, cause,
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {

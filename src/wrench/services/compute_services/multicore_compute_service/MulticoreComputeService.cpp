@@ -48,7 +48,7 @@ namespace wrench {
                                 new ComputeServiceSubmitStandardJobRequestMessage(answer_mailbox, job,
                                                                                   this->getPropertyValueAsDouble(
                                                                                           MulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -56,7 +56,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -95,7 +95,7 @@ namespace wrench {
                                 new ComputeServiceSubmitPilotJobRequestMessage(answer_mailbox, job,
                                                                                this->getPropertyValueAsDouble(
                                                                                        MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -104,7 +104,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -143,7 +143,7 @@ namespace wrench {
                                 new MulticoreComputeServiceNumCoresRequestMessage(answer_mailbox,
                                                                                   this->getPropertyValueAsDouble(
                                                                                           MulticoreComputeServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -152,7 +152,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -185,7 +185,7 @@ namespace wrench {
                 answer_mailbox,
                 this->getPropertyValueAsDouble(
                         MulticoreComputeServiceProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -193,7 +193,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -228,7 +228,7 @@ namespace wrench {
                                          answer_mailbox,
                                          this->getPropertyValueAsDouble(
                                                  MulticoreComputeServiceProperty::TTL_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -237,7 +237,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -270,7 +270,7 @@ namespace wrench {
                                          answer_mailbox,
                                          this->getPropertyValueAsDouble(
                                                  MulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -278,7 +278,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -478,7 +478,7 @@ namespace wrench {
                                            new ComputeServicePilotJobStartedMessage(job, this,
                                                                                     this->getPropertyValueAsDouble(
                                                                                             MulticoreComputeServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
-                } catch (NetworkError *cause) {
+                } catch (std::shared_ptr<NetworkError> cause) {
                   throw WorkflowExecutionException(cause);
                 }
 
@@ -1294,7 +1294,7 @@ namespace wrench {
                                 new ComputeServiceTerminateStandardJobRequestMessage(answer_mailbox, job,
                                                                                      this->getPropertyValueAsDouble(
                                                                                              MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -1302,7 +1302,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -1341,7 +1341,7 @@ namespace wrench {
                                 new ComputeServiceTerminatePilotJobRequestMessage(answer_mailbox, job,
                                                                                   this->getPropertyValueAsDouble(
                                                                                           MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -1350,7 +1350,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 

@@ -38,7 +38,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(mailbox);
-      } catch (NetworkError *cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 
