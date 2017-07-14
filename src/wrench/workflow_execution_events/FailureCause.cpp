@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "WorkflowExecutionFailureCause.h"
+#include "FailureCause.h"
 #include "workflow/WorkflowFile.h"
 #include "workflow_job/WorkflowJob.h"
 #include "services/storage_services/StorageService.h"
@@ -19,7 +19,7 @@ namespace wrench {
      * @brief Constructor
      * @param cause: the type of the failure cause
      */
-    WorkflowExecutionFailureCause::WorkflowExecutionFailureCause(CauseType cause) {
+    FailureCause::FailureCause(CauseType cause) {
       this->cause = cause;
     }
 
@@ -27,7 +27,7 @@ namespace wrench {
      * @brief Retrieve the type of the failure cause
      * @return
      */
-    WorkflowExecutionFailureCause::CauseType WorkflowExecutionFailureCause::getCauseType() {
+    FailureCause::CauseType FailureCause::getCauseType() {
       return this->cause;
     }
 
@@ -35,7 +35,7 @@ namespace wrench {
      * @brief Constructor
      * @param file: the file that cannot be find on any storage service
      */
-    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) : WorkflowExecutionFailureCause(
+    NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) : FailureCause(
             NO_STORAGE_SERVICE_FOR_FILE) {
       this->file = file;
     }
@@ -61,7 +61,7 @@ namespace wrench {
      * @param file: the file that could not be found
      * @param storage_service: the storage service on which it was not found
      */
-    FileNotFound::FileNotFound(WorkflowFile *file, StorageService *storage_service) : WorkflowExecutionFailureCause(
+    FileNotFound::FileNotFound(WorkflowFile *file, StorageService *storage_service) : FailureCause(
             FILE_NOT_FOUND) {
       this->file = file;
       this->storage_service = storage_service;
@@ -97,7 +97,7 @@ namespace wrench {
      * @param storage_service:  the storage service that ran out of spacee
      */
     StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file, StorageService *storage_service)
-            : WorkflowExecutionFailureCause(STORAGE_NO_ENOUGH_SPACE) {
+            : FailureCause(STORAGE_NO_ENOUGH_SPACE) {
       this->file = file;
       this->storage_service = storage_service;
     }
@@ -131,7 +131,7 @@ namespace wrench {
      * @brief Constructor
      * @param service: the service that was down
      */
-    ServiceIsDown::ServiceIsDown(Service *service) : WorkflowExecutionFailureCause(SERVICE_DOWN) {
+    ServiceIsDown::ServiceIsDown(Service *service) : FailureCause(SERVICE_DOWN) {
       this->service = service;
     }
 
@@ -157,7 +157,7 @@ namespace wrench {
      * @param compute_service: the compute service that did not support it
      */
     JobTypeNotSupported::JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service)
-            : WorkflowExecutionFailureCause(JOB_TYPE_NOT_SUPPORTED) {
+            : FailureCause(JOB_TYPE_NOT_SUPPORTED) {
       this->job = job;
       this->compute_service = compute_service;
     }
@@ -192,7 +192,7 @@ namespace wrench {
      * @param job: the job that could not be executed
      * @param compute_service: the compute service that didn't have enough cores
      */
-    NotEnoughCores::NotEnoughCores(WorkflowJob *job, ComputeService *compute_service) : WorkflowExecutionFailureCause(
+    NotEnoughCores::NotEnoughCores(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
             NOT_ENOUGH_CORES) {
       this->job = job;
       this->compute_service = compute_service;
@@ -226,7 +226,33 @@ namespace wrench {
     /**
      * @brief Constructor
      */
-    NetworkError::NetworkError() : WorkflowExecutionFailureCause(NETWORK_ERROR) {
+    NetworkError::NetworkError(NetworkError::OperationType operation_type, std::string mailbox) : FailureCause(NETWORK_ERROR) {
+      this->operation_type = operation_type;
+      this->mailbox = mailbox;
+    }
+
+    /**
+     * @brief Returns whether the network error occurred while receiving
+     * @return true or false
+     */
+    bool NetworkError::whileReceiving() {
+      return (this->operation_type == NetworkError::RECEIVING);
+    }
+
+    /**
+     * @brief Returns whether the network error occurred while sending
+     * @return true or false
+     */
+    bool NetworkError::whileSending() {
+      return (this->operation_type == NetworkError::SENDING);
+    }
+
+    /**
+     * @brief Returns the mailbox name on which the error occurred
+     * @return the mailbox name
+     */
+    std::string NetworkError::getMailbox() {
+      return this->mailbox;
     }
 
     /**
@@ -234,7 +260,59 @@ namespace wrench {
      * @return the message
      */
     std::string NetworkError::toString() {
-       return "Network error (link failure, or communication peer died)";
+      std::string operation;
+      if (this->while_sending) {
+        operation = "sending to";
+      } else {
+        operation = "receiving from";
+      }
+      return "Network error (link failure, or communication peer died) while " + operation + " mailbox " + this->mailbox;
+    };
+
+    /**
+     * @brief Constructor
+     */
+    NetworkTimeout::NetworkTimeout(NetworkTimeout::OperationType operation_type, std::string mailbox) : FailureCause(NETWORK_TIMEOUT) {
+      this->operation_type = operation_type;
+      this->mailbox = mailbox;
+    }
+
+    /**
+     * @brief Returns whether the network error occurred while receiving
+     * @return true or false
+     */
+    bool NetworkTimeout::whileReceiving() {
+      return (this->operation_type == NetworkTimeout::RECEIVING);
+    }
+
+    /**
+     * @brief Returns whether the network error occurred while sending
+     * @return true or false
+     */
+    bool NetworkTimeout::whileSending() {
+      return (this->operation_type == NetworkTimeout::SENDING);
+    }
+
+    /**
+     * @brief Returns the mailbox name on which the error occurred
+     * @return the mailbox name
+     */
+    std::string NetworkTimeout::getMailbox() {
+      return this->mailbox;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string NetworkTimeout::toString() {
+      std::string operation;
+      if (this->while_sending) {
+        operation = "sending to";
+      } else {
+        operation = "receiving from";
+      }
+      return "Network timeout while " + operation + " mailbox " + this->mailbox;
     };
 
     /**
@@ -242,7 +320,7 @@ namespace wrench {
      *
      * @param job: the job that couldn't be terminated
      */
-    JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job) : WorkflowExecutionFailureCause(
+    JobCannotBeTerminated::JobCannotBeTerminated(WorkflowJob *job) : FailureCause(
             JOB_CANNOT_BE_TERMINATED) {
       this->job = job;
     }
@@ -270,7 +348,7 @@ namespace wrench {
     *
     * @param job: the job that couldn't be forgotten
     */
-    JobCannotBeForgotten::JobCannotBeForgotten(WorkflowJob *job) : WorkflowExecutionFailureCause(
+    JobCannotBeForgotten::JobCannotBeForgotten(WorkflowJob *job) : FailureCause(
             JOB_CANNOT_BE_FORGOTTEN) {
       this->job = job;
     }

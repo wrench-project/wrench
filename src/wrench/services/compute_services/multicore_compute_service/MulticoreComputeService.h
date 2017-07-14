@@ -28,7 +28,7 @@ namespace wrench {
 
     class StorageService;
 
-    class WorkflowExecutionFailureCause;
+    class FailureCause;
 
     /**  @brief A ComputeService implementation that
      *   runs on a multi-core host and can execute sets of independent SINGLE-CORE tasks
@@ -158,12 +158,12 @@ namespace wrench {
 
         void terminateAllPilotJobs();
 
-        void failCurrentStandardJobs(std::shared_ptr<WorkflowExecutionFailureCause> cause);
+        void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
 
         void processWorkCompletion(WorkUnitExecutor *worker_thread, std::shared_ptr<WorkUnit> work);
 
         void processWorkFailure(WorkUnitExecutor *worker_thread, std::shared_ptr<WorkUnit> work,
-                                std::shared_ptr<WorkflowExecutionFailureCause> cause);
+                                std::shared_ptr<FailureCause> cause);
 
         void processPilotJobCompletion(PilotJob *job);
 
@@ -183,9 +183,9 @@ namespace wrench {
 
         void terminateRunningPilotJob(PilotJob *job);
 
-        void failPendingStandardJob(StandardJob *job, std::shared_ptr<WorkflowExecutionFailureCause> cause);
+        void failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
 
-        void failRunningStandardJob(StandardJob *job, std::shared_ptr<WorkflowExecutionFailureCause> cause);
+        void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
     };
 };
 

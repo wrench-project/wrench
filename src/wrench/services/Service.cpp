@@ -94,12 +94,8 @@ namespace wrench {
                                 new ServiceStopDaemonMessage(
                                         ack_mailbox,
                                         this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("Service::stop(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (NetworkError *cause) {
+          throw WorkflowExecutionException(cause);
       }
 
       // Wait for the ack
@@ -108,12 +104,8 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(ack_mailbox);
-      }  catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("Service::stop(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (NetworkError *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (ServiceDaemonStoppedMessage *msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {

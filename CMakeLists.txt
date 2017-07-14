@@ -86,8 +86,8 @@ set(SOURCE_FILES
         src/wrench/services/file_registry_service/FileRegistryServiceProperty.cpp
         src/wrench/services/compute_services/multicore_compute_service/MulticoreComputeServiceProperty.cpp
         src/wrench/services/storage_services/simple_storage_service/SimpleStorageServiceProperty.cpp
-        src/wrench/workflow_execution_events/WorkflowExecutionFailureCause.h
-        src/wrench/workflow_execution_events/WorkflowExecutionFailureCause.cpp
+        src/wrench/workflow_execution_events/FailureCause.h
+        src/wrench/workflow_execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessage.h
         src/wrench/services/compute_services/ComputeServiceMessage.cpp

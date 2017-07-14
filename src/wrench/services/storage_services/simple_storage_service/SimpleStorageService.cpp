@@ -10,7 +10,6 @@
 #include "wrench-dev.h"
 #include "services/ServiceMessage.h"
 #include "services/storage_services/StorageServiceMessage.h"
-#include "simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "IncomingFile.h"
 
@@ -74,7 +73,6 @@ namespace wrench {
       } catch (std::invalid_argument &e) {
         throw;
       }
-
     }
 
     /**
@@ -103,14 +101,9 @@ namespace wrench {
           std::unique_ptr<S4U_PendingCommunication> comm = nullptr;
           try {
             comm = S4U_Mailbox::igetMessage(this->mailbox_name);
-          } catch (std::runtime_error &e) {
-            if (not strcmp(e.what(), "network_error")) {
-              WRENCH_INFO("Can't even place an asynchronous get...something must be really wrong...aborting");
-              break;
-            } else {
-              throw std::runtime_error(
-                      "SimpleStorageService::waitForNextMessage(): Got an unknown exception while receiving a message.");
-            }
+          } catch (std::shared_ptr<NetworkError> cause) {
+            WRENCH_INFO("Can't even place an asynchronous get...something must be really wrong...aborting");
+            break;
           }
           this->pending_communications.push_back(std::move(comm));
           should_post_a_receive_on_my_standard_mailbox = false;
@@ -169,8 +162,8 @@ namespace wrench {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
                                   new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                           SimpleStorageServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
-          // Too bad...
+        } catch (std::shared_ptr<NetworkError> cause) {
+          return false;
         }
         return false;
 
@@ -181,18 +174,18 @@ namespace wrench {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new StorageServiceFreeSpaceAnswerMessage(free_space, this->getPropertyValueAsDouble(
                                            SimpleStorageServiceProperty::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
-          // Too bad...
+        } catch (std::shared_ptr<NetworkError> cause) {
+          return false;
         }
         return true;
 
       } else if (StorageServiceFileDeleteRequestMessage *msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
 
         bool success = true;
-        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause = nullptr;
+        std::shared_ptr<FailureCause> failure_cause = nullptr;
         if (this->stored_files.find(msg->file) == this->stored_files.end()) {
           success = false;
-          failure_cause = std::shared_ptr<WorkflowExecutionFailureCause>(new FileNotFound(msg->file, this));
+          failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(msg->file, this));
         } else {
           this->removeFileFromStorage(msg->file);
         }
@@ -206,8 +199,8 @@ namespace wrench {
                                                                              failure_cause,
                                                                              this->getPropertyValueAsDouble(
                                                                                      SimpleStorageServiceProperty::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
-          // too bad, do nothing
+        } catch (std::shared_ptr<NetworkError> cause) {
+          return true;
         }
 
         return true;
@@ -220,8 +213,8 @@ namespace wrench {
                                    new StorageServiceFileLookupAnswerMessage(msg->file, file_found,
                                                                              this->getPropertyValueAsDouble(
                                                                                      SimpleStorageServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
-          // too bad, do nothing
+        } catch (std::shared_ptr<NetworkError> cause) {
+          return true;
         }
 
         return true;
@@ -237,19 +230,6 @@ namespace wrench {
       } else if (StorageServiceFileCopyRequestMessage *msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
 
         return processFileCopyRequest(msg->file, msg->src, msg->answer_mailbox);
-
-//        this->stored_files.insert(msg->file);
-//        WRENCH_INFO("GOT A FILE!!!");
-        // TODO #1: IF THIS COMMUNICATION FAILED, WE ALREADY UPDATED THE OCCUPIED SPACE, AND WE'LL THINK THE STORAGE IS FULLER THAN IT IS
-
-        // TODO #2: And we MIGHT had to send ACKS to say "we're done"!!!
-        //  TODO:  Create a map of "expected files"
-        //  TODO:  That tells you what to do upon success and upon failure
-
-        // QUESTION: SHOULD WE HAVE N MAILBOXES:
-        //    - ONE FOR CONTROL, TO WHICH WE ALWAYS HAVE A getMessage
-        //    - N * ONE FOR FILE RECEPTION, TO WHICH WE HAVE a number of CommPtr going on... to a temporary mailbox
-
 
       } else {
         throw std::runtime_error(
@@ -268,14 +248,21 @@ namespace wrench {
 
       // Check the file size and capacity, and reply "no" if not enough space
       if (file->getSize() > (this->capacity - this->occupied_space)) {
-        S4U_Mailbox::putMessage(answer_mailbox,
-                                new StorageServiceFileWriteAnswerMessage(file,
-                                                                         this,
-                                                                         false,
-                                                                         std::shared_ptr<WorkflowExecutionFailureCause>(new StorageServiceNotEnoughSpace(file, this)),
-                                                                         "",
-                                                                         this->getPropertyValueAsDouble(
-                                                                                 SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+        try {
+          S4U_Mailbox::putMessage(answer_mailbox,
+                                  new StorageServiceFileWriteAnswerMessage(file,
+                                                                           this,
+                                                                           false,
+                                                                           std::shared_ptr<FailureCause>(
+                                                                                   new StorageServiceNotEnoughSpace(
+                                                                                           file,
+                                                                                           this)),
+                                                                           "",
+                                                                           this->getPropertyValueAsDouble(
+                                                                                   SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> cause) {
+          return true;
+        }
         return true;
       }
 
@@ -286,26 +273,24 @@ namespace wrench {
       std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
 
       // Reply with a "go ahead, send me the file" message
-      S4U_Mailbox::putMessage(answer_mailbox,
-                              new StorageServiceFileWriteAnswerMessage(file,
-                                                                       this,
-                                                                       true,
-                                                                       nullptr,
-                                                                       file_reception_mailbox,
-                                                                       this->getPropertyValueAsDouble(
-                                                                               SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+      try {
+        S4U_Mailbox::putMessage(answer_mailbox,
+                                new StorageServiceFileWriteAnswerMessage(file,
+                                                                         this,
+                                                                         true,
+                                                                         nullptr,
+                                                                         file_reception_mailbox,
+                                                                         this->getPropertyValueAsDouble(
+                                                                                 SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> cause) {
+        return true;
+      }
 
       std::unique_ptr<S4U_PendingCommunication> pending_comm = nullptr;
       try {
         pending_comm = S4U_Mailbox::igetMessage(file_reception_mailbox);
-      } catch (std::runtime_error &e) {
-        if (not strcmp(e.what(), "network_error")) {
-          WRENCH_INFO("Giving up on this message...");
-          return true;
-        } else {
-          throw std::runtime_error(
-                  "SimpleStorageService::processFileWriteRequest(): Got an unknown exception while receiving a file content.");
-        }
+      } catch (std::shared_ptr<NetworkError> cause) {
+        return true;
       }
 
       // Create an "incoming file" record
@@ -325,17 +310,18 @@ namespace wrench {
      * @param mailbox_to_receive_the_file_content: the mailbox to which the file will be sent
      * @return
      */
-    bool SimpleStorageService::processFileReadRequest(WorkflowFile *file, std::string answer_mailbox, std::string mailbox_to_receive_the_file_content) {
+    bool SimpleStorageService::processFileReadRequest(WorkflowFile *file, std::string answer_mailbox,
+                                                      std::string mailbox_to_receive_the_file_content) {
 
       // Figure out whether this succeeds or not
       bool success = true;
-      std::shared_ptr<WorkflowExecutionFailureCause> failure_cause = nullptr;
+      std::shared_ptr<FailureCause> failure_cause = nullptr;
       if (this->stored_files.
               find(file) == this->stored_files.
               end()) {
         WRENCH_INFO("Received a a read request for a file I don't have (%s)", this->getName().c_str());
         success = false;
-        failure_cause = std::shared_ptr<WorkflowExecutionFailureCause>(new FileNotFound(file, this));
+        failure_cause = std::shared_ptr<FailureCause>(new FileNotFound(file, this));
       }
 
       // Send back the corresponding ack, asynchronously and in a "fire and forget" fashion
@@ -344,7 +330,7 @@ namespace wrench {
                                  new StorageServiceFileReadAnswerMessage(file, this, success, failure_cause,
                                                                          this->getPropertyValueAsDouble(
                                                                                  SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         return true;
       }
 
@@ -354,7 +340,7 @@ namespace wrench {
         try {
           S4U_Mailbox::dputMessage(mailbox_to_receive_the_file_content, new
                   StorageServiceFileContentMessage(file));
-        } catch (std::runtime_error &e) {
+        } catch (std::shared_ptr<NetworkError> cause) {
           return true;
         }
       }
@@ -369,7 +355,8 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @return
      */
-    bool SimpleStorageService::processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox) {
+    bool
+    SimpleStorageService::processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox) {
 
       // Figure out whether this succeeds or not
       if (file->getSize() > this->capacity - this->occupied_space) {
@@ -377,10 +364,12 @@ namespace wrench {
         try {
           S4U_Mailbox::putMessage(answer_mailbox,
                                   new StorageServiceFileCopyAnswerMessage(file, this, false,
-                                                                          std::shared_ptr<WorkflowExecutionFailureCause>(new StorageServiceNotEnoughSpace(file, this)),
+                                                                          std::shared_ptr<FailureCause>(
+                                                                                  new StorageServiceNotEnoughSpace(file,
+                                                                                                                   this)),
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
+        } catch (std::shared_ptr<NetworkError> cause) {
           return true;
         }
         return true;
@@ -402,7 +391,7 @@ namespace wrench {
                                   new StorageServiceFileCopyAnswerMessage(file, this, false, e.getCause(),
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
+        } catch (std::shared_ptr<NetworkError> cause) {
           return true;
         }
       }
@@ -411,7 +400,7 @@ namespace wrench {
       std::unique_ptr<S4U_PendingCommunication> pending_comm;
       try {
         pending_comm = S4U_Mailbox::igetMessage(file_reception_mailbox);
-      } catch (std::runtime_error &e) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         return true;
       }
 
@@ -424,7 +413,6 @@ namespace wrench {
 
       // Add the communication to the list of pending_communications
       this->pending_communications.push_back(std::move(pending_comm));
-
 
 
       return true;
@@ -443,7 +431,8 @@ namespace wrench {
 
       // Find the Incoming File record
       if (this->incoming_files.find(comm.get()) == this->incoming_files.end()) {
-        throw std::runtime_error("SimpleStorageService::processDataMessage(): Cannot find incoming file record for communications...");
+        throw std::runtime_error(
+                "SimpleStorageService::processDataMessage(): Cannot find incoming file record for communications...");
       }
 
       IncomingFile *incoming_file = this->incoming_files[comm.get()];
@@ -453,19 +442,21 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message;
       try {
         message = comm->wait();
-      } catch (std::exception &e) {
-        WRENCH_INFO("SimpleStorageService::processDataMessage(): Communication failure when receiving file '%s", incoming_file->file->getId().c_str());
+      } catch (NetworkError *cause) {
+        WRENCH_INFO("SimpleStorageService::processDataMessage(): Communication failure when receiving file '%s",
+                    incoming_file->file->getId().c_str());
         // Process the failure, meaning, just re-decrease the occupied space
         this->occupied_space -= incoming_file->file->getSize();
-        WRENCH_INFO("Sending back an ack since this was a file copy and some client is waiting for me to say something");
+        WRENCH_INFO(
+                "Sending back an ack since this was a file copy and some client is waiting for me to say something");
         try {
           S4U_Mailbox::putMessage(incoming_file->ack_mailbox,
                                   new StorageServiceFileCopyAnswerMessage(incoming_file->file, this, false,
-                                                                          std::shared_ptr<WorkflowExecutionFailureCause>(new NetworkError()),
+                                                                          std::shared_ptr<FailureCause>(
+                                                                                  cause),
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
-          WRENCH_INFO("Couldn't send ack... nevermind");
+        } catch (std::shared_ptr<NetworkError> cause) {
           return true;
         }
         return true;
@@ -481,7 +472,8 @@ namespace wrench {
       if (StorageServiceFileContentMessage *msg = dynamic_cast<StorageServiceFileContentMessage *>(message.get())) {
 
         if (msg->file != incoming_file->file) {
-          throw std::runtime_error("SimpleStorageService::processDataMessage(): Mismatch between received file and expected file... a bug in SimpleStorageService");
+          throw std::runtime_error(
+                  "SimpleStorageService::processDataMessage(): Mismatch between received file and expected file... a bug in SimpleStorageService");
         }
 
         // Add the file to my storage
@@ -490,21 +482,21 @@ namespace wrench {
 
         // Send back the corresponding ack?
         if (incoming_file->send_file_copy_ack) {
-          WRENCH_INFO("Sending back an ack since this was a file copy and some client is waiting for me to say something");
+          WRENCH_INFO(
+                  "Sending back an ack since this was a file copy and some client is waiting for me to say something");
           try {
             S4U_Mailbox::putMessage(incoming_file->ack_mailbox,
                                     new StorageServiceFileCopyAnswerMessage(incoming_file->file, this, true, nullptr,
                                                                             this->getPropertyValueAsDouble(
                                                                                     SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-          } catch (std::runtime_error &e) {
-            WRENCH_INFO("Couldn't send ack... nevermind");
+          } catch (std::shared_ptr<NetworkError> cause) {
             return true;
           }
         }
 
 
         return true;
-      }  else {
+      } else {
         throw std::runtime_error(
                 "SimpleStorageService::processControlMessage(): Unexpected [" + message->getName() + "] message");
       }

@@ -119,7 +119,7 @@ private:
       try {
         job_manager->submitJob(pilot_job, this->test->compute_service);
       } catch (wrench::WorkflowExecutionException &e) {
-        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::JOB_TYPE_NOT_SUPPORTED) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_TYPE_NOT_SUPPORTED) {
           throw std::runtime_error("Didn't get the expected exception");
         }
         success = false;
@@ -547,7 +547,7 @@ private:
         job_manager->terminateJob(pilot_job);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
-        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::JOB_CANNOT_BE_TERMINATED) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_CANNOT_BE_TERMINATED) {
           throw std::runtime_error("Got an exception, as expected, but it does not have the correct failure cause type");
         }
         wrench::JobCannotBeTerminated *real_cause = (wrench::JobCannotBeTerminated *)e.getCause().get();
@@ -859,7 +859,7 @@ private:
       }
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
+          if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
             throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
           }
           wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *)(event->failure_cause.get());

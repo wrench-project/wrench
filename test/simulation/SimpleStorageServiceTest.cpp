@@ -263,7 +263,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::STORAGE_NO_ENOUGH_SPACE) {
+          if (event->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
             throw std::runtime_error("Should have gotten a 'out of space' failure cause");
           }
           break;
@@ -291,7 +291,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::FILE_NOT_FOUND) {
+          if (event->failure_cause->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
             throw std::runtime_error("Should have gotten a 'file not found' failure cause");
           }
           break;
@@ -618,7 +618,7 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::STORAGE_NO_ENOUGH_SPACE) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " + std::to_string(e.getCause()->getCauseType()));
         }
         // Check Exception details
@@ -641,7 +641,7 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::FILE_NOT_FOUND) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " + std::to_string(e.getCause()->getCauseType()));
         }
         // Check Exception details
@@ -666,7 +666,7 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " + std::to_string(e.getCause()->getCauseType()));
         }
         // Check Exception details
@@ -689,7 +689,7 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " + std::to_string(e.getCause()->getCauseType()));
         }
         // Check Exception details
@@ -816,7 +816,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::STORAGE_NO_ENOUGH_SPACE) {
+          if (event->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
             throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " + std::to_string(event->failure_cause->getCauseType()));
           }
           wrench::StorageServiceNotEnoughSpace *real_cause = (wrench::StorageServiceNotEnoughSpace *)event->failure_cause.get();
@@ -849,7 +849,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::FILE_NOT_FOUND) {
+          if (event->failure_cause->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
             throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " + std::to_string(event->failure_cause->getCauseType()));
           }
           wrench::FileNotFound *real_cause = (wrench::FileNotFound *)event->failure_cause.get();
@@ -884,7 +884,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
+          if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
             throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " + std::to_string(event->failure_cause->getCauseType()));
           }
           wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *)event->failure_cause.get();
@@ -907,7 +907,7 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::WorkflowExecutionFailureCause::SERVICE_DOWN) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " + std::to_string(e.getCause()->getCauseType()));
         }
         // Check Exception details

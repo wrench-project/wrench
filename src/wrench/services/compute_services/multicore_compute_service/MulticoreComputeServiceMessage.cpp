@@ -196,7 +196,7 @@ namespace wrench {
     WorkerThreadWorkFailedMessage::WorkerThreadWorkFailedMessage(
             WorkUnitExecutor *worker_thread,
             std::shared_ptr<WorkUnit> work,
-            std::shared_ptr<WorkflowExecutionFailureCause> cause,
+            std::shared_ptr<FailureCause> cause,
             double payload):
     MulticoreComputeServiceMessage("WORKER_THREAD_WORK_FAILED", payload) {
       this->worker_thread = worker_thread;

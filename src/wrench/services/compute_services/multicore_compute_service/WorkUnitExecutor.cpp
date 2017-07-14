@@ -120,7 +120,7 @@ namespace wrench {
 
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
-      } catch (std::runtime_error &e) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         WRENCH_INFO("Worker thread on host %s can't report back due to network error!", S4U_Simulation::getHostName().c_str());
         return 0;
       }

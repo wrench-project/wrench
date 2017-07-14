@@ -14,7 +14,7 @@
 #include <exception>
 #include <memory>
 #include <string>
-#include <workflow_execution_events/WorkflowExecutionFailureCause.h>
+#include <workflow_execution_events/FailureCause.h>
 
 namespace wrench {
 
@@ -30,7 +30,7 @@ namespace wrench {
 		class WorkflowExecutionException: public std::exception {
 
 		private:
-				std::shared_ptr<WorkflowExecutionFailureCause> cause;
+				std::shared_ptr<FailureCause> cause;
 
 		public:
 
@@ -47,7 +47,7 @@ namespace wrench {
          * @brief Get the failure cause
          * @return the failure cause
          */
-        std::shared_ptr<WorkflowExecutionFailureCause> getCause() {
+        std::shared_ptr<FailureCause> getCause() {
           return this->cause;
         }
 
@@ -62,15 +62,15 @@ namespace wrench {
 				 * @brief Constructor
 				 * @param cause: the cause of the failure
 				 */
-				WorkflowExecutionException(WorkflowExecutionFailureCause *cause) {
-					this->cause = std::shared_ptr<WorkflowExecutionFailureCause>(cause);
+				WorkflowExecutionException(FailureCause *cause) {
+					this->cause = std::shared_ptr<FailureCause>(cause);
 				}
 
 				/**
 				 * @brief Constructor
 				 * @param cause: the cause of the failure
 				 */
-				WorkflowExecutionException(std::shared_ptr<WorkflowExecutionFailureCause> cause) {
+				WorkflowExecutionException(std::shared_ptr<FailureCause> cause) {
 					this->cause = cause;
 				}
 

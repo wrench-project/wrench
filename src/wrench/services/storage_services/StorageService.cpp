@@ -28,7 +28,7 @@ namespace wrench {
      * @param capacity:
      */
     StorageService::StorageService(std::string service_name, std::string mailbox_name_prefix, double capacity) :
-            Service(service_name, mailbox_name_prefix)  {
+            Service(service_name, mailbox_name_prefix) {
 
       if (capacity < 0) {
         throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): Invalid argument");
@@ -83,7 +83,8 @@ namespace wrench {
       }
 
       if (this->stored_files.find(file) == this->stored_files.end()) {
-        throw std::runtime_error("StorageService::removeFileFromStorage(): Attempting to remove a file that is not on the storage service");
+        throw std::runtime_error(
+                "StorageService::removeFileFromStorage(): Attempting to remove a file that is not on the storage service");
       }
       this->stored_files.erase(file);
       this->occupied_space -= file->getSize();
@@ -96,11 +97,6 @@ namespace wrench {
      *        method of derived classes, if any
      */
     void StorageService::stop() {
-//      // Notify the simulation that the service is terminated, if that
-//      // service was registered with the simulation
-//      if (this->simulation) {
-//        this->simulation->mark_storage_service_as_terminated(this);
-//      }
 
       // Call the super class's method
       Service::stop();
@@ -130,24 +126,16 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFreeSpaceRequestMessage(
                 answer_mailbox,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::howMuchFreeSpace(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::howMuchFreeSpace(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (StorageServiceFreeSpaceAnswerMessage *msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage *>(message.get())) {
@@ -185,24 +173,16 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
       std::unique_ptr<SimulationMessage> message;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (StorageServiceFileLookupAnswerMessage *msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
@@ -240,12 +220,8 @@ namespace wrench {
                                                                          file,
                                                                          this->getPropertyValueAsDouble(
                                                                                  StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::readFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
@@ -253,12 +229,8 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
@@ -271,12 +243,8 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> file_content_message = nullptr;
         try {
           file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
-        } catch (std::runtime_error &e) {
-          if (!strcmp(e.what(), "network_error")) {
-            throw WorkflowExecutionException(new NetworkError());
-          } else {
-            throw std::runtime_error("StorageService::readFile(): Unknown exception: " + std::string(e.what()));
-          }
+        } catch (FailureCause *cause) {
+          throw WorkflowExecutionException(cause);
         }
 
         if (StorageServiceFileContentMessage *file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {
@@ -319,12 +287,8 @@ namespace wrench {
                                                                           file,
                                                                           this->getPropertyValueAsDouble(
                                                                                   StorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::writeFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
@@ -332,12 +296,8 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::writeFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (StorageServiceFileWriteAnswerMessage *msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
@@ -349,12 +309,8 @@ namespace wrench {
         // Otherwise, synchronously send the file up!
         try {
           S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
-        } catch (std::runtime_error &e) {
-          if (!strcmp(e.what(), "network_error")) {
-            throw WorkflowExecutionException(new NetworkError());
-          } else {
-            throw std::runtime_error("StorageService::writeFile(): Unknown exception: " + std::string(e.what()));
-          }
+        } catch (FailureCause *cause) {
+          throw WorkflowExecutionException(cause);
         }
 
       } else {
@@ -490,12 +446,8 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::deleteFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
@@ -503,12 +455,8 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::deleteFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (StorageServiceFileDeleteAnswerMessage *msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage *>(message.get())) {
@@ -588,12 +536,8 @@ namespace wrench {
                 file,
                 src,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::copyFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
@@ -602,12 +546,8 @@ namespace wrench {
       WRENCH_INFO("WIATING FOR THE FILECOPYANSWERMESSAGE on %s", answer_mailbox.c_str());
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::copyFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       WRENCH_INFO("GOT IT!");
@@ -652,12 +592,8 @@ namespace wrench {
                 file,
                 src,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::initiateFileCopy(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       return;
@@ -697,12 +633,8 @@ namespace wrench {
                                                                          file,
                                                                          this->getPropertyValueAsDouble(
                                                                                  StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::initiateFileRead(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply to the request
@@ -710,12 +642,8 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(request_answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("StorageService::lookupFile(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (FailureCause *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
@@ -728,7 +656,8 @@ namespace wrench {
                                  message->getName() + "] message!");
       }
 
-      WRENCH_INFO("IT's A SUCCESS... FILE WILL BE GOTTEN ON MAILBOX: %s", mailbox_that_should_receive_file_content.c_str());
+      WRENCH_INFO("IT's A SUCCESS... FILE WILL BE GOTTEN ON MAILBOX: %s",
+                  mailbox_that_should_receive_file_content.c_str());
       // At this point, the file should show up at some point on the mailbox_that_should_receive_file_content
       return;
 

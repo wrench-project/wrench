@@ -75,7 +75,7 @@ namespace wrench {
     ComputeServiceSubmitStandardJobAnswerMessage::ComputeServiceSubmitStandardJobAnswerMessage(StandardJob *job,
                                                                                                ComputeService *compute_service,
                                                                                                bool success,
-                                                                                               std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
+                                                                                               std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) :
             ComputeServiceMessage("SUBMIT_STANDARD_JOB_ANSWER", payload) {
       if ((job == nullptr) || (compute_service == nullptr)) {
@@ -118,7 +118,7 @@ namespace wrench {
      */
     ComputeServiceStandardJobFailedMessage::ComputeServiceStandardJobFailedMessage(StandardJob *job,
                                                                                    ComputeService *cs,
-                                                                                   std::shared_ptr<WorkflowExecutionFailureCause> cause,
+                                                                                   std::shared_ptr<FailureCause> cause,
                                                                                    double payload)
             : ComputeServiceMessage("STANDARD_JOB_FAILED", payload) {
       if ((job == nullptr) || (cs == nullptr) || (cause == nullptr)) {
@@ -164,7 +164,7 @@ namespace wrench {
     ComputeServiceTerminateStandardJobAnswerMessage::ComputeServiceTerminateStandardJobAnswerMessage(StandardJob *job,
                                                                                                ComputeService *compute_service,
                                                                                                bool success,
-                                                                                               std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
+                                                                                               std::shared_ptr<FailureCause> failure_cause,
                                                                                                double payload) :
             ComputeServiceMessage("TERMINATE_STANDARD_JOB_ANSWER", payload) {
       if ((job == nullptr) || (compute_service == nullptr)) {
@@ -212,7 +212,7 @@ namespace wrench {
     ComputeServiceSubmitPilotJobAnswerMessage::ComputeServiceSubmitPilotJobAnswerMessage(PilotJob *job,
                                                                                          ComputeService *compute_service,
                                                                                          bool success,
-                                                                                         std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
+                                                                                         std::shared_ptr<FailureCause> failure_cause,
                                                                                          double payload)
             : ComputeServiceMessage(
             "SUBMIT_PILOT_JOB_ANSWER", payload) {
@@ -318,7 +318,7 @@ namespace wrench {
     ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(PilotJob *job,
                                                                                                      ComputeService *compute_service,
                                                                                                      bool success,
-                                                                                                     std::shared_ptr<WorkflowExecutionFailureCause> failure_cause,
+                                                                                                     std::shared_ptr<FailureCause> failure_cause,
                                                                                                      double payload) :
             ComputeServiceMessage("TERMINATE_PILOT_JOB_ANSWER", payload) {
       if ((job == nullptr) || (compute_service == nullptr)) {

@@ -13,7 +13,7 @@
 
 
 #include <string>
-#include <workflow_execution_events/WorkflowExecutionFailureCause.h>
+#include <workflow_execution_events/FailureCause.h>
 
 namespace wrench {
 
@@ -28,7 +28,7 @@ namespace wrench {
 
     class StorageService;
 
-    class WorkflowExecutionFailureCause;
+    class FailureCause;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -74,7 +74,7 @@ namespace wrench {
         /** @brief The relevant storage service, or nullptr */
         StorageService *storage_service = nullptr;
         /** @brief The relevant failure cause, or nullptr */
-        std::shared_ptr<WorkflowExecutionFailureCause> failure_cause = nullptr;
+        std::shared_ptr<FailureCause> failure_cause = nullptr;
 
 
     private:

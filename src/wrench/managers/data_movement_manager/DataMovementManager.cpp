@@ -61,12 +61,8 @@ namespace wrench {
     void DataMovementManager::stop() {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("DataMovementManager::stop(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (NetworkError *cause) {
+        throw WorkflowExecutionException(cause);
       }
     }
 
@@ -80,8 +76,8 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
-                                             StorageService *src,
-                                             StorageService *dst) {
+                                                           StorageService *src,
+                                                           StorageService *dst) {
       if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
@@ -103,8 +99,8 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void DataMovementManager::doSynchronousFileCopy(WorkflowFile *file,
-                                             StorageService *src,
-                                             StorageService *dst) {
+                                                    StorageService *src,
+                                                    StorageService *dst) {
       if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
@@ -152,7 +148,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
-      } catch (std::runtime_error &e) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         return true;
       }
 
@@ -175,7 +171,7 @@ namespace wrench {
                                    new StorageServiceFileCopyAnswerMessage(msg->file,
                                                                            msg->storage_service, msg->success,
                                                                            std::move(msg->failure_cause), 0));
-        } catch  (std::runtime_error &e) {
+        } catch  (std::shared_ptr<NetworkError> cause) {
           return true;
         }
         return true;

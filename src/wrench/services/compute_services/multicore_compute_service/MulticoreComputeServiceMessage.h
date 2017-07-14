@@ -173,7 +173,7 @@ namespace wrench {
         WorkerThreadWorkFailedMessage(
                 WorkUnitExecutor *worker_thread,
                 std::shared_ptr<WorkUnit> work,
-                std::shared_ptr<WorkflowExecutionFailureCause> cause,
+                std::shared_ptr<FailureCause> cause,
                 double payload);
 
         /** @brief The worker thread that failed to perform the work */
@@ -181,7 +181,7 @@ namespace wrench {
         /** @brief The work that failed */
         std::shared_ptr<WorkUnit> work;
         /** @brief The cause of the failure */
-        std::shared_ptr<WorkflowExecutionFailureCause> cause;
+        std::shared_ptr<FailureCause> cause;
     };
 
     /***********************/

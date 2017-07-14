@@ -20,8 +20,7 @@ namespace wrench {
     /**
      * @brief Wait for a pending communication
      *
-     * @throw std::runtime_error
-     *          - "network_error" (e.g., other end has died)
+     * @throw *NetworkError
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
 
@@ -32,7 +31,9 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a dputMessage()");
-          throw std::runtime_error("network_error");
+          throw new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName());
+        } else {
+          throw std::runtime_error("S4U_Mailbox::iputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
       return std::unique_ptr<SimulationMessage>(this->simulation_message);

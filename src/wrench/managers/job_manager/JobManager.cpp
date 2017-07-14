@@ -66,12 +66,8 @@ namespace wrench {
     void JobManager::stop() {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("DataMovementManager::stop(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (std::shared_ptr<NetworkError> cause) {
+        throw WorkflowExecutionException(cause);
       }
     }
 
@@ -320,7 +316,7 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
           message = S4U_Mailbox::getMessage(this->mailbox_name);
-        } catch (std::runtime_error &e) {
+        } catch (std::shared_ptr<NetworkError> cause) {
           continue;
         }
 
@@ -360,7 +356,7 @@ namespace wrench {
           try {
             S4U_Mailbox::dputMessage(msg->job->popCallbackMailbox(),
                                      new ComputeServiceJobTypeNotSupportedMessage(msg->job, msg->compute_service, 0));
-          } catch (std::runtime_error &e) {
+          } catch (std::shared_ptr<NetworkError> cause) {
             keep_going = true;
           }
 
@@ -377,7 +373,7 @@ namespace wrench {
           try {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                      new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
-          } catch (std::runtime_error &e) {
+          } catch (std::shared_ptr<NetworkError> cause) {
             keep_going = true;
           }
         } else if (ComputeServiceStandardJobFailedMessage *msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
@@ -402,7 +398,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                      new ComputeServiceStandardJobFailedMessage(job, msg->compute_service, std::move(msg->cause),
                                                                                 0.0));
-          } catch (std::runtime_error &e) {
+          } catch (std::shared_ptr<NetworkError> cause) {
             keep_going = true;
           }
 
@@ -421,7 +417,7 @@ namespace wrench {
           try {
             S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                      new ComputeServicePilotJobStartedMessage(job, msg->compute_service, 0.0));
-          } catch (std::runtime_error &e) {
+          } catch (std::shared_ptr<NetworkError> cause) {
             keep_going = true;
           }
 
@@ -439,7 +435,7 @@ namespace wrench {
           try {
             S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                      new ComputeServicePilotJobExpiredMessage(job, msg->compute_service, 0.0));
-          } catch (std::runtime_error &e) {
+          } catch (std::shared_ptr<NetworkError> cause) {
             keep_going = true;
           }
 

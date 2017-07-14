@@ -30,34 +30,35 @@ namespace wrench {
      * @brief A top-level class to describe all simulation-valid failures that can occur during
      *        workflow execution
      */
-    class WorkflowExecutionFailureCause {
+    class FailureCause {
 
     public:
 
         /** @brief Types of failure causes */
         enum CauseType {
             /** @brief The file cannot be found anywhere */
-            NO_STORAGE_SERVICE_FOR_FILE,
+                    NO_STORAGE_SERVICE_FOR_FILE,
             /** @brief The file was not found where it was supposed to be found */
-            FILE_NOT_FOUND,
+                    FILE_NOT_FOUND,
             /** @brief The storage service does not have enough space to support operation */
-            STORAGE_NO_ENOUGH_SPACE,
+                    STORAGE_NO_ENOUGH_SPACE,
             /** @brief The service cannot be used because it is down (likely was terminated) */
-            SERVICE_DOWN,
+                    SERVICE_DOWN,
             /** @brief The compute service does not support this job type */
-            JOB_TYPE_NOT_SUPPORTED,
+                    JOB_TYPE_NOT_SUPPORTED,
             /** @brief The compute service cannot run the job due to insufficient total number of cores */
-            NOT_ENOUGH_CORES,
+                    NOT_ENOUGH_CORES,
             /** @brief There was a network error, or an endpoint was down */
-            NETWORK_ERROR,
+                    NETWORK_ERROR,
+            /** @brief There was a network timeout (for a "with timeout" network operation) */
+                    NETWORK_TIMEOUT,
             /** @brief The job cannot be terminated because it's neither pending nor running */
-            JOB_CANNOT_BE_TERMINATED,
+                    JOB_CANNOT_BE_TERMINATED,
             /** @brief The job cannot be forgotten because it's not completed */
-            JOB_CANNOT_BE_FORGOTTEN
-
+                    JOB_CANNOT_BE_FORGOTTEN
         };
 
-        WorkflowExecutionFailureCause(CauseType cause);
+        FailureCause(CauseType cause);
 
         virtual std::string toString() = 0;
 
@@ -69,9 +70,9 @@ namespace wrench {
 
 
     /**
-     * @brief A "file cannot be found anywhere" workflow execution failure cause
+     * @brief A "file cannot be found anywhere" failure cause
      */
-    class NoStorageServiceForFile : public WorkflowExecutionFailureCause {
+    class NoStorageServiceForFile : public FailureCause {
 
     public:
         NoStorageServiceForFile(WorkflowFile *file);
@@ -84,9 +85,9 @@ namespace wrench {
     };
 
     /**
-     * @brief A "file is not found" workflow execution failure cause
+     * @brief A "file is not found" failure cause
      */
-    class FileNotFound : public WorkflowExecutionFailureCause {
+    class FileNotFound : public FailureCause {
 
     public:
         FileNotFound(WorkflowFile *file, StorageService *storage_service);
@@ -102,9 +103,9 @@ namespace wrench {
     };
 
     /**
-     * @brief A "not enough space on storage service" workflow execution failure cause
+     * @brief A "not enough space on storage service" failure cause
      */
-    class StorageServiceNotEnoughSpace : public WorkflowExecutionFailureCause {
+    class StorageServiceNotEnoughSpace : public FailureCause {
 
     public:
         StorageServiceNotEnoughSpace(WorkflowFile *file, StorageService *storage_service);
@@ -120,9 +121,9 @@ namespace wrench {
     };
 
     /**
-     * @brief A "service is down" workflow execution failure cause
+     * @brief A "service is down" failure cause
      */
-    class ServiceIsDown : public WorkflowExecutionFailureCause {
+    class ServiceIsDown : public FailureCause {
     public:
         ServiceIsDown(Service *service);
         Service *getService();
@@ -133,9 +134,9 @@ namespace wrench {
     };
 
     /**
-     * @brief A "compute service does not support requested job type" workflow execution failure cause
+     * @brief A "compute service does not support requested job type" failure cause
      */
-    class JobTypeNotSupported : public WorkflowExecutionFailureCause {
+    class JobTypeNotSupported : public FailureCause {
     public:
         JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service);
         WorkflowJob *getJob();
@@ -148,9 +149,9 @@ namespace wrench {
     };
 
     /**
-     * @brief A "compute service doesn't have enough cores" workflow execution failure cause
+     * @brief A "compute service doesn't have enough cores" failure cause
      */
-    class NotEnoughCores : public WorkflowExecutionFailureCause {
+    class NotEnoughCores : public FailureCause {
     public:
         NotEnoughCores(WorkflowJob *job, ComputeService *compute_service);
         WorkflowJob *getJob();
@@ -163,20 +164,53 @@ namespace wrench {
     };
 
     /**
-     * @brief A "network error (or endpoint is down)" workflow execution failure cause
+     * @brief A "network error (or endpoint is down)" failure cause
      */
-    class NetworkError : public WorkflowExecutionFailureCause {
+    class NetworkError : public FailureCause {
     public:
-        NetworkError();
+        enum OperationType {
+            SENDING,
+            RECEIVING
+        };
+
+        NetworkError(NetworkError::OperationType, std::string mailbox);
         std::string toString();
+        bool whileReceiving();
+        bool whileSending();
+        std::string getMailbox();
 
     private:
+        NetworkError::OperationType operation_type;
+        bool while_sending = false;
+        std::string mailbox = "";
     };
 
     /**
-     * @brief A "job cannot be terminated" workflow execution failure cause
+    * @brief A "network timout" failure cause
+    */
+    class NetworkTimeout : public FailureCause {
+    public:
+        enum OperationType {
+            SENDING,
+            RECEIVING
+        };
+
+        NetworkTimeout(NetworkTimeout::OperationType, std::string mailbox);
+        std::string toString();
+        bool whileReceiving();
+        bool whileSending();
+        std::string getMailbox();
+
+    private:
+        NetworkTimeout::OperationType operation_type;
+        bool while_sending = false;
+        std::string mailbox = "";
+    };
+    
+    /**
+     * @brief A "job cannot be terminated" failure cause
      */
-    class JobCannotBeTerminated : public WorkflowExecutionFailureCause {
+    class JobCannotBeTerminated : public FailureCause {
     public:
         JobCannotBeTerminated(WorkflowJob *job);
         WorkflowJob *getJob();
@@ -187,9 +221,9 @@ namespace wrench {
     };
 
     /**
-    * @brief A "job cannot be forgotten" workflow execution failure cause
+    * @brief A "job cannot be forgotten" failure cause
     */
-    class JobCannotBeForgotten : public WorkflowExecutionFailureCause {
+    class JobCannotBeForgotten : public FailureCause {
     public:
         JobCannotBeForgotten(WorkflowJob *job);
         WorkflowJob *getJob();

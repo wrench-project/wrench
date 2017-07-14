@@ -8,9 +8,13 @@
  */
 
 #include <iostream>
+#include <memory>
 #include <xbt/ex.hpp>
 #include <simgrid/s4u/Mailbox.hpp>
 #include <simgrid/s4u.hpp>
+
+#include "exceptions/WorkflowExecutionException.h"
+#include "workflow_execution_events/FailureCause.h"
 
 #include "logging/TerminalOutput.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
@@ -24,22 +28,13 @@ namespace wrench {
 
     class WorkflowTask;
 
-    // A data structure to keep track of pending asynchronous putMessage() operations
-    // what will have to be waited on at some point
-//    std::map<simgrid::s4u::ActorPtr, std::set<simgrid::s4u::CommPtr>> S4U_Mailbox::dputs;
-
-
-    // TODO:  Keep throwing runtime_error?? These are "part of the simulation" after all...
-
-
     /**
      * @brief Synchronously receive a message from a mailbox
      *
      * @param mailbox_name: the mailbox name
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
-     * @throw std:runtime_error
-     *      - "network_error" (e.g., other end has died)
+     * @throw std::shared_ptr<NetworkError>
      *
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name) {
@@ -50,14 +45,15 @@ namespace wrench {
         msg = static_cast<SimulationMessage *>(mailbox->get());
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
-          WRENCH_INFO("Network error while doing a getMessage(). Likely the sender has died");
-          throw std::runtime_error("network_error");
+          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, mailbox_name));
+        } else {
+          throw std::runtime_error("S4U_Mailbox::getMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
       // This is just because it seems that after something like a killAll() we get a nullptr
       if (msg == nullptr) {
         WRENCH_INFO("Network error while doing a getMessage(). Got a nullptr...");
-        throw std::runtime_error("network_error");
+        throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, mailbox_name));
       }
 
       WRENCH_DEBUG("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
@@ -71,9 +67,8 @@ namespace wrench {
      * @param timeout:  a timeout value in seconds
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
-     * @throw std::runtime_error:
-     *        - "timeout"
-     *        - "network_error" (e.g., other end has died)
+     * @throw std::shared_ptr<NetworkError>
+     * @throw std::shared_ptr<NetworkTimeout>
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name, double timeout) {
       WRENCH_DEBUG("IN GET WITH TIMEOUT (%lf) FROM MAILBOX %s", timeout, mailbox_name.c_str());
@@ -83,31 +78,20 @@ namespace wrench {
         data = mailbox->get(timeout);
       } catch (xbt_ex &e) {
         if (e.category == timeout_error) {
-          throw std::runtime_error("timeout");
+          throw std::shared_ptr<NetworkTimeout>(new NetworkTimeout(NetworkTimeout::RECEIVING, mailbox_name));
         }
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a getMessage() with timeout. Likely the sender has died.");
-          throw std::runtime_error("network_error");
+          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, mailbox_name));
+        } else {
+          throw std::runtime_error("S4U_Mailbox::getMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
-
-//      try {
-//        simgrid::s4u::CommPtr comm = simgrid::s4u::this_actor::irecv(mailbox, &data);
-//        comm->wait(timeout);
-//      } catch (xbt_ex &e) {
-//        if (e.category == timeout_error) {
-//          throw std::runtime_error("timeout");
-//        }
-//        if (e.category == network_error) {
-//          WRENCH_INFO("Network error while doing a getMessage() with timeout. Likely the sender has died.");
-//          throw std::runtime_error("network_error");
-//        }
-//      }
 
       // This is just because it seems that after something like a killAll() we get a nullptr
       if (data == nullptr) {
         WRENCH_INFO("Network error while doing a getMessage() with timeout (got a nullptr).");
-        throw std::runtime_error("network_error");
+        throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, mailbox_name));
       }
 
       SimulationMessage *msg = static_cast<SimulationMessage *>(data);
@@ -123,7 +107,7 @@ namespace wrench {
      * @param mailbox_name: the mailbox name
      * @param msg: the SimulationMessage
      *
-     * @throw std::runtime_error:  ("network_error")
+     * @throw std::shared_ptr<NetworkError>
      */
     void S4U_Mailbox::putMessage(std::string mailbox_name, SimulationMessage *msg) {
       WRENCH_DEBUG("PUTTING to %s a %s message", mailbox_name.c_str(), msg->getName().c_str());
@@ -133,7 +117,9 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a putMessage)");
-          throw std::runtime_error("network_error");
+          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, mailbox_name));
+        } else {
+          throw std::runtime_error("S4U_Mailbox::putMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
 
@@ -146,7 +132,7 @@ namespace wrench {
      * @param mailbox_name: the mailbox name
      * @param msg: the SimulationMessage
      *
-     * @throw std::runtime_error:  ("network_error")
+     * @throw std::shared_ptr<NetworkError>
      */
     void S4U_Mailbox::dputMessage(std::string mailbox_name, SimulationMessage *msg) {
 
@@ -155,59 +141,20 @@ namespace wrench {
       simgrid::s4u::CommPtr comm = nullptr;
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
-//      try {
-//        comm = simgrid::s4u::Comm::send_async(mailbox, msg, (int) msg->payload);
-//      } catch (xbt_ex &e) {
-//        if (e.category == network_error) {
-//          WRENCH_INFO("Network error while doing a dputMessage()");
-//          throw std::runtime_error("network_error");
-//        }
-//      }
-//
-//      // Insert the communication into the dputs map, so that it's not lost
-//      // and it can be "cleared" later
-//      S4U_Mailbox::dputs[simgrid::s4u::Actor::self()].insert(comm);
 
       try {
         mailbox->put_init(msg, msg->payload)->detach();
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a dputMessage()");
-          throw std::runtime_error("network_error");
+          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, mailbox_name));
+        } else {
+          throw std::runtime_error("S4U_Mailbox::dputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
 
-//      // Insert the communication into the dputs map, so that it's not lost
-//      // and it can be "cleared" later
-//      S4U_Mailbox::dputs[simgrid::s4u::Actor::self()].insert(comm);
-
         return;
     }
-
-//    /**
-//     * @brief A method that checks on and clears previous asynchronous communications. This is
-//     * to avoid having the above levels deal with asynchronous communication stuff.
-//     */
-//    void S4U_Mailbox::clear_dputs() {
-//      std::set<simgrid::s4u::CommPtr> set = S4U_Mailbox::dputs[simgrid::s4u::Actor::self()];
-//      std::set<simgrid::s4u::CommPtr>::iterator it;
-//      for (it = set.begin(); it != set.end(); ++it) {
-//        // TODO: This is probably not great right now, but S4U asynchronous communication are
-//        // TODO: in a state of flux, and so this seems to work but for the memory leak
-//        // TODO: will have to talk to the S4U developers
-//
-////        XBT_INFO("Getting the state of a previous communication! (%s)", simgrid::s4u::Actor::self()->name().c_str());
-//        e_s4u_activity_state_t state = (*it)->getState();
-//        if (state == finished) {
-////          XBT_INFO(
-////                  "The communication is finished.... remove it from the pending list [TODO: delete memory??? call test()???]");
-//          set.erase(*it);
-//        } else {
-////          XBT_INFO("State = %d (finished = %d)", state, finished);
-//        }
-//      }
-//      return;
-//    }
 
     /**
     * @brief Asynchronously send a message to a mailbox
@@ -217,7 +164,7 @@ namespace wrench {
     *
     * @return: a pending communication handle
     *
-    * @throw std::runtime_error:  ("network_error")
+     * @throw std::shared_ptr<NetworkError>
     */
     std::unique_ptr<S4U_PendingCommunication> S4U_Mailbox::iputMessage(std::string mailbox_name, SimulationMessage *msg) {
 
@@ -230,7 +177,9 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a iputMessage() with timeout. Likely the sender has died.");
-          throw std::runtime_error("network_error");
+          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, mailbox_name));
+        } else {
+          throw std::runtime_error("S4U_Mailbox::iputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
       std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication());
@@ -246,9 +195,8 @@ namespace wrench {
     *
     * @return: a pending communication handle
     *
-    * @throw std::runtime_error:  ("network_error")
+     * @throw std::shared_ptr<NetworkError>
     */
-//    S4U_PendingCommunication *S4U_Mailbox::igetMessage(std::string mailbox_name) {
     std::unique_ptr<S4U_PendingCommunication> S4U_Mailbox::igetMessage(std::string mailbox_name) {
 
       simgrid::s4u::CommPtr comm_ptr = nullptr;
@@ -261,7 +209,9 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a igetMessage(). Likely the sender has died.");
-          throw std::runtime_error("network_error");
+          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, mailbox_name));
+        } else {
+          throw std::runtime_error("S4U_Mailbox::igetMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
       pending_communication->comm_ptr = comm_ptr;
@@ -290,8 +240,5 @@ namespace wrench {
     std::string S4U_Mailbox::generateUniqueMailboxName(std::string prefix) {
       return prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
     }
-
-
-
 
 };

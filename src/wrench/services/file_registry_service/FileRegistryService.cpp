@@ -90,24 +90,16 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
                                                                                              this->getPropertyValueAsDouble(
                                                                                                      FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("FileRegistryService::lookupEntry(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (NetworkError *cause) {
+          throw WorkflowExecutionException(cause);
       }
 
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("FileRegistryService::lookupEntry(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (NetworkError *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (FileRegistryFileLookupAnswerMessage *msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
@@ -140,24 +132,16 @@ namespace wrench {
                                 new FileRegistryAddEntryRequestMessage(answer_mailbox, file, storage_service,
                                                                        this->getPropertyValueAsDouble(
                                                                                FileRegistryServiceProperty::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("FileRegistryService::addEntry(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (NetworkError *cause) {
+          throw WorkflowExecutionException(cause);
       }
 
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("FileRegistryService::addEntry(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (NetworkError *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (FileRegistryAddEntryAnswerMessage *msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
@@ -188,24 +172,16 @@ namespace wrench {
                                 new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, storage_service,
                                                                           this->getPropertyValueAsDouble(
                                                                                   FileRegistryServiceProperty::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("FileRegistryService::removeEntry(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (NetworkError *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::runtime_error &e) {
-        if (!strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error("FileRegistryService::removeEntry(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (std::shared_ptr<NetworkError> cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (FileRegistryRemoveEntryAnswerMessage *msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
@@ -255,7 +231,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
-      } catch (std::runtime_error &e) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         return true;
       }
 
@@ -272,7 +248,7 @@ namespace wrench {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
                                   new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                           FileRegistryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
+        } catch (std::shared_ptr<NetworkError> cause) {
           return false;
         }
         return false;
@@ -287,7 +263,7 @@ namespace wrench {
                                    new FileRegistryFileLookupAnswerMessage(msg->file, locations,
                                                                            this->getPropertyValueAsDouble(
                                                                                    FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
+        } catch (std::shared_ptr<NetworkError> cause) {
           return true;
         }
         return true;
@@ -298,7 +274,7 @@ namespace wrench {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new FileRegistryAddEntryAnswerMessage(this->getPropertyValueAsDouble(
                                            FileRegistryServiceProperty::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
+        } catch (std::shared_ptr<NetworkError> cause) {
           return true;
         }
         return true;
@@ -311,7 +287,7 @@ namespace wrench {
                                    new FileRegistryRemoveEntryAnswerMessage(success,
                                                                             this->getPropertyValueAsDouble(
                                                                                     FileRegistryServiceProperty::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::runtime_error &e) {
+        } catch (std::shared_ptr<NetworkError> cause) {
           return true;
         }
         return true;

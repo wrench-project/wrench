@@ -38,13 +38,8 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(mailbox);
-      } catch (std::runtime_error &e) {
-        if (not strcmp(e.what(), "network_error")) {
-          throw WorkflowExecutionException(new NetworkError());
-        } else {
-          throw std::runtime_error(
-                  "WorkflowExecutionEvent::waitForNextExecutionEvent(): Unknown exception: " + std::string(e.what()));
-        }
+      } catch (NetworkError *cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       std::unique_ptr<WorkflowExecutionEvent> event =

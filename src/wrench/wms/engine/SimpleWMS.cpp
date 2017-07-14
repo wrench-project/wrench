@@ -15,7 +15,7 @@
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "simulation/Simulation.h"
 #include "wms/engine/SimpleWMS.h"
-#include "workflow_execution_events/WorkflowExecutionFailureCause.h"
+#include "workflow_execution_events/FailureCause.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 
