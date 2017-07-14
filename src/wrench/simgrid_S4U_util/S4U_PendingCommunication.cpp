@@ -7,11 +7,14 @@
  * (at your option) any later version.
  */
 
+#include <memory>
+
 
 #include <xbt/ex.hpp>
 #include <wrench-dev.h>
 #include "S4U_PendingCommunication.h"
-#include <simulation/SimulationMessage.h>
+#include "simulation/SimulationMessage.h"
+#include "workflow_execution_events/FailureCause.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Communication");
 
@@ -20,7 +23,7 @@ namespace wrench {
     /**
      * @brief Wait for a pending communication
      *
-     * @throw *NetworkError
+     * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
 
@@ -31,7 +34,7 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a dputMessage()");
-          throw new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName());
+          throw std::shared_ptr<new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName())>;
         } else {
           throw std::runtime_error("S4U_Mailbox::iputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }

@@ -126,9 +126,6 @@ namespace wrench {
 
       while (processNextMessage()) {
 
-        // Clear finished asynchronous dputMessage()
-//        S4U_Mailbox::clear_dputs();
-
       }
 
       WRENCH_INFO("Data Movement Manager terminating");

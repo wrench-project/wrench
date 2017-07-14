@@ -63,9 +63,6 @@ namespace wrench {
 
       while (true) {
 
-        // Take care of previously posted iput() that should be cleared
-//        S4U_Mailbox::clear_dputs();
-
         // Get the ready tasks
         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks = this->workflow->getReadyTasks();
 
@@ -106,8 +103,6 @@ namespace wrench {
           break;
         }
       }
-
-//      S4U_Mailbox::clear_dputs();
 
       WRENCH_INFO("--------------------------------------------------------");
       if (workflow->isDone()) {

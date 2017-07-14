@@ -145,7 +145,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message;
       try {
         message = comm->wait();
-      } catch (std::exception &e) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         WRENCH_INFO("Network error while receiving a control message... ignoring");
         return true;
       }
