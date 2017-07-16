@@ -146,7 +146,7 @@ namespace wrench {
      * @return the simulation clock
      */
     double S4U_Simulation::getClock() {
-      return simgrid::s4u::Engine::getInstance()->getClock();
+      return simgrid::s4u::Engine::getClock();
     }
 
     /**

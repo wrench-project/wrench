@@ -120,7 +120,8 @@ set(TEST_FILES
         test/wms/optimizations/static/SimplePipelineClusteringTest.cpp
         test/wms/scheduler/pilot_job/CriticalPathSchedulerTest.cpp
         test/simulation/OneTaskTest.cpp
-        test/simulation/SimpleStorageServiceTest.cpp
+        test/simulation/SimpleStorageServiceFunctionalTest.cpp
+        test/simulation/SimpleStorageServicePerformanceTest.cpp
         test/simulation/MulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/TestWithFork.h)

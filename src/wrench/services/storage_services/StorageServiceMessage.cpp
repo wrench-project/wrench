@@ -245,8 +245,7 @@ namespace wrench {
                                                                                WorkflowFile *file,
                                                                                double payload) : StorageServiceMessage(
             "FILE_READ_REQUEST",
-            payload +
-            file->getSize()) {
+            payload) {
       if ((answer_mailbox == "") || (mailbox_to_receive_the_file_content == "") || (file == nullptr)) {
         throw std::invalid_argument("StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(): Invalid arguments");
       }

@@ -75,6 +75,8 @@ namespace wrench {
 
         FileRegistryService *getFileRegistryService();
 
+        double getCurrentSimulatedDate();
+
         /***********************/
         /** \endcond            */
         /***********************/

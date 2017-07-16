@@ -613,6 +613,9 @@ namespace wrench {
      */
     void StorageService::initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file) {
 
+      WRENCH_INFO("Initiating a file read operation for file %s on storage service %s",
+                  file->getId().c_str(), this->getName().c_str());
+
       if (file == nullptr) {
         throw std::invalid_argument("StorageService::initiateFileRead(): Invalid arguments");
       }
@@ -624,7 +627,6 @@ namespace wrench {
 
       // Send a synchronous message to the daemon
       std::string request_answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
-      WRENCH_INFO("IN InitiateFileRead(): send me request answer back to %s", request_answer_mailbox.c_str());
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
@@ -637,6 +639,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
+
       // Wait for a reply to the request
       std::unique_ptr<SimulationMessage> message = nullptr;
 
@@ -645,6 +648,7 @@ namespace wrench {
       } catch (FailureCause *cause) {
         throw WorkflowExecutionException(cause);
       }
+
 
       if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
         // If it's not a success, throw an exception
@@ -656,7 +660,7 @@ namespace wrench {
                                  message->getName() + "] message!");
       }
 
-      WRENCH_INFO("IT's A SUCCESS... FILE WILL BE GOTTEN ON MAILBOX: %s",
+      WRENCH_INFO("File read request accepted (will receive file content on mailbox %s)",
                   mailbox_that_should_receive_file_content.c_str());
       // At this point, the file should show up at some point on the mailbox_that_should_receive_file_content
       return;

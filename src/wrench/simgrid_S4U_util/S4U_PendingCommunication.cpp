@@ -23,6 +23,8 @@ namespace wrench {
     /**
      * @brief Wait for a pending communication
      *
+     * @return A (unique pointer to a) simulation message
+     *
      * @throw std::shared_ptr<NetworkError>
      */
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
@@ -52,6 +54,8 @@ namespace wrench {
      */
     unsigned long  S4U_PendingCommunication::waitForSomethingToHappen(
             std::vector<std::unique_ptr<S4U_PendingCommunication>> *pending_comms) {
+
+      WRENCH_DEBUG("WAITING FOR SOME PENDING COMM TO HAVE SOME EVENT");
 
       std::set<S4U_PendingCommunication *> completed_comms;
 

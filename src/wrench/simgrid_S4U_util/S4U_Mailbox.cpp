@@ -56,7 +56,7 @@ namespace wrench {
         throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, mailbox_name));
       }
 
-      WRENCH_DEBUG("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
+      WRENCH_INFO("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
       return std::unique_ptr<SimulationMessage>(msg);
     }
 
@@ -96,7 +96,7 @@ namespace wrench {
 
       SimulationMessage *msg = static_cast<SimulationMessage *>(data);
 
-      WRENCH_DEBUG("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
+      WRENCH_INFO("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
 
       return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -110,7 +110,7 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      */
     void S4U_Mailbox::putMessage(std::string mailbox_name, SimulationMessage *msg) {
-      WRENCH_DEBUG("PUTTING to %s a %s message", mailbox_name.c_str(), msg->getName().c_str());
+      WRENCH_DEBUG("PUTTING to %s a %s message (%lf bytes)", mailbox_name.c_str(), msg->getName().c_str(), msg->payload);
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       try {
         mailbox->put(msg, (size_t) msg->payload);
@@ -169,6 +169,8 @@ namespace wrench {
     std::unique_ptr<S4U_PendingCommunication> S4U_Mailbox::iputMessage(std::string mailbox_name, SimulationMessage *msg) {
 
 
+      WRENCH_DEBUG("iPUTTING to mailbox %s", mailbox_name.c_str());
+
       simgrid::s4u::CommPtr comm_ptr = nullptr;
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
@@ -200,6 +202,8 @@ namespace wrench {
     std::unique_ptr<S4U_PendingCommunication> S4U_Mailbox::igetMessage(std::string mailbox_name) {
 
       simgrid::s4u::CommPtr comm_ptr = nullptr;
+
+      WRENCH_DEBUG("iGETTING from mailbox %s", mailbox_name.c_str());
 
       std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication());
 

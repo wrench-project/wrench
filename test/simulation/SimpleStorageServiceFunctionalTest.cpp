@@ -16,7 +16,7 @@
 
 
 
-class SimpleStorageServiceTest : public ::testing::Test {
+class SimpleStorageServiceFunctionalTest : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *file_1;
@@ -37,7 +37,7 @@ public:
 
 
 protected:
-    SimpleStorageServiceTest() {
+    SimpleStorageServiceFunctionalTest() {
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -74,7 +74,7 @@ protected:
 class SimpleStorageServiceBasicFunctionalityTestWMS : public wrench::WMS {
 
 public:
-    SimpleStorageServiceBasicFunctionalityTestWMS(SimpleStorageServiceTest *test,
+    SimpleStorageServiceBasicFunctionalityTestWMS(SimpleStorageServiceFunctionalTest *test,
                                                   wrench::Workflow *workflow,
                                                   std::unique_ptr<wrench::Scheduler> scheduler,
                                                   std::string hostname) :
@@ -84,7 +84,7 @@ public:
 
 private:
 
-    SimpleStorageServiceTest *test;
+    SimpleStorageServiceFunctionalTest *test;
 
     int main() {
 
@@ -309,11 +309,11 @@ private:
     }
 };
 
-TEST_F(SimpleStorageServiceTest, BasicFunctionality) {
+TEST_F(SimpleStorageServiceFunctionalTest, BasicFunctionality) {
   DO_TEST_WITH_FORK(do_BasicFunctionality_test);
 }
 
-void SimpleStorageServiceTest::do_BasicFunctionality_test() {
+void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -374,7 +374,7 @@ void SimpleStorageServiceTest::do_BasicFunctionality_test() {
 class SimpleStorageServiceSynchronousFileCopyTestWMS : public wrench::WMS {
 
 public:
-    SimpleStorageServiceSynchronousFileCopyTestWMS(SimpleStorageServiceTest *test,
+    SimpleStorageServiceSynchronousFileCopyTestWMS(SimpleStorageServiceFunctionalTest *test,
                                                    wrench::Workflow *workflow,
                                                    std::unique_ptr<wrench::Scheduler> scheduler,
                                                    std::string hostname) :
@@ -384,7 +384,7 @@ public:
 
 private:
 
-    SimpleStorageServiceTest *test;
+    SimpleStorageServiceFunctionalTest *test;
 
     int main() {
 
@@ -410,11 +410,11 @@ private:
     }
 };
 
-TEST_F(SimpleStorageServiceTest, SynchronousFileCopy) {
+TEST_F(SimpleStorageServiceFunctionalTest, SynchronousFileCopy) {
   DO_TEST_WITH_FORK(do_SynchronousFileCopy_test);
 }
 
-void SimpleStorageServiceTest::do_SynchronousFileCopy_test() {
+void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -473,7 +473,7 @@ void SimpleStorageServiceTest::do_SynchronousFileCopy_test() {
 class SimpleStorageServiceAsynchronousFileCopyTestWMS : public wrench::WMS {
 
 public:
-    SimpleStorageServiceAsynchronousFileCopyTestWMS(SimpleStorageServiceTest *test,
+    SimpleStorageServiceAsynchronousFileCopyTestWMS(SimpleStorageServiceFunctionalTest *test,
                                                     wrench::Workflow *workflow,
                                                     std::unique_ptr<wrench::Scheduler> scheduler,
                                                     std::string hostname) :
@@ -483,7 +483,7 @@ public:
 
 private:
 
-    SimpleStorageServiceTest *test;
+    SimpleStorageServiceFunctionalTest *test;
 
     int main() {
 
@@ -528,11 +528,11 @@ private:
     }
 };
 
-TEST_F(SimpleStorageServiceTest, AsynchronousFileCopy) {
+TEST_F(SimpleStorageServiceFunctionalTest, AsynchronousFileCopy) {
   DO_TEST_WITH_FORK(do_AsynchronousFileCopy_test);
 }
 
-void SimpleStorageServiceTest::do_AsynchronousFileCopy_test() {
+void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -591,7 +591,7 @@ void SimpleStorageServiceTest::do_AsynchronousFileCopy_test() {
 class SimpleStorageServiceSynchronousFileCopyFailuresTestWMS : public wrench::WMS {
 
 public:
-    SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(SimpleStorageServiceTest *test,
+    SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(SimpleStorageServiceFunctionalTest *test,
                                                            wrench::Workflow *workflow,
                                                            std::unique_ptr<wrench::Scheduler> scheduler,
                                                            std::string hostname) :
@@ -601,7 +601,7 @@ public:
 
 private:
 
-    SimpleStorageServiceTest *test;
+    SimpleStorageServiceFunctionalTest *test;
 
     int main() {
 
@@ -710,11 +710,11 @@ private:
     }
 };
 
-TEST_F(SimpleStorageServiceTest, SynchronousFileCopyFailures) {
+TEST_F(SimpleStorageServiceFunctionalTest, SynchronousFileCopyFailures) {
   DO_TEST_WITH_FORK(do_SynchronousFileCopyFailures_test);
 }
 
-void SimpleStorageServiceTest::do_SynchronousFileCopyFailures_test() {
+void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -778,7 +778,7 @@ void SimpleStorageServiceTest::do_SynchronousFileCopyFailures_test() {
 class SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS : public wrench::WMS {
 
 public:
-    SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(SimpleStorageServiceTest *test,
+    SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(SimpleStorageServiceFunctionalTest *test,
                                                             wrench::Workflow *workflow,
                                                             std::unique_ptr<wrench::Scheduler> scheduler,
                                                             std::string hostname) :
@@ -788,7 +788,7 @@ public:
 
 private:
 
-    SimpleStorageServiceTest *test;
+    SimpleStorageServiceFunctionalTest *test;
 
     int main() {
 
@@ -928,11 +928,11 @@ private:
     }
 };
 
-TEST_F(SimpleStorageServiceTest, AsynchronousFileCopyFailures) {
+TEST_F(SimpleStorageServiceFunctionalTest, AsynchronousFileCopyFailures) {
   DO_TEST_WITH_FORK(do_AsynchronousFileCopyFailures_test);
 }
 
-void SimpleStorageServiceTest::do_AsynchronousFileCopyFailures_test() {
+void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();

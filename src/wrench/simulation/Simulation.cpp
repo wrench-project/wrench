@@ -421,4 +421,12 @@ namespace wrench {
       }
     }
 
+    /**
+     * @brief Get the current simulated date
+     * @return the date
+     */
+    double Simulation::getCurrentSimulatedDate() {
+      return S4U_Simulation::getClock();
+    }
+
 };
