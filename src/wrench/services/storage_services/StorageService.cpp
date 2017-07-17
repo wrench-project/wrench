@@ -543,14 +543,11 @@ namespace wrench {
       // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
 
-      WRENCH_INFO("WIATING FOR THE FILECOPYANSWERMESSAGE on %s", answer_mailbox.c_str());
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
       } catch (FailureCause *cause) {
         throw WorkflowExecutionException(cause);
       }
-
-      WRENCH_INFO("GOT IT!");
 
       if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (msg->failure_cause) {
