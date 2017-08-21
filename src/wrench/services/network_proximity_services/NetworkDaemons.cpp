@@ -1,6 +1,11 @@
-//
-// Created by suraj on 8/9/17.
-//
+/**
+ * Copyright (c) 2017. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 
 
 #include <logging/TerminalOutput.h>
@@ -14,9 +19,14 @@
 XBT_LOG_NEW_DEFAULT_CATEGORY(network_daemons_service, "Log category for Network Daemons Service");
 
 namespace wrench {
+
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
+     * @param network_proximity_service_mailbox the mailbox of the network proximity service
+     * @param message_size the size of the message to be sent between network daemons to compute proximity
+     * @param measurement_period the time-difference between two message transfer to compute proximity
+     * @param noise the noise to add to compute the time-difference
      */
     NetworkDaemons::NetworkDaemons(std::string hostname,
                                    std::string network_proximity_service_mailbox,
@@ -30,8 +40,13 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
+     * @param network_proximity_service_mailbox the mailbox of the network proximity service
+     * @param message_size the size of the message to be sent between network daemons to compute proximity
+     * @param measurement_period the time-difference between two message transfer to compute proximity
+     * @param noise the noise to add to compute the time-difference
      * @param suffix: suffix to append to the service name and mailbox
      */
+
     NetworkDaemons::NetworkDaemons(
             std::string hostname,
             std::string network_proximity_service_mailbox,
@@ -124,6 +139,8 @@ namespace wrench {
         WRENCH_INFO("Network Daemons Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
         return 0;
     }
+
+
 
     bool NetworkDaemons::processNextMessage(double timeout) {
 

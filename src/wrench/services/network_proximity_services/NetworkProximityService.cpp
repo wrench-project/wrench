@@ -1,6 +1,11 @@
-//
-// Created by suraj on 8/6/17.
-//
+/**
+ * Copyright (c) 2017. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 
 #include <logging/TerminalOutput.h>
 #include "NetworkProximityService.h"
@@ -75,12 +80,11 @@ namespace wrench {
 
 
     /**
-     * @brief Lookup an entry for a file
-     * @param file: the file to lookup
-     * @return The storage services that hold a copy of the file
+     * @brief Lookup for the proximity value in database
+     * @param hosts: the pair of hosts to look for the proximity value
+     * @return The proximity value between those pair of hosts
      *
      * @throw WorkflowExecutionException
-     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     double NetworkProximityService::query(std::pair<std::string, std::string> hosts) {

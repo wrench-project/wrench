@@ -1,6 +1,11 @@
-//
-// Created by suraj on 8/6/17.
-//
+/**
+ * Copyright (c) 2017. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 
 #include "NetworkProximityMessage.h"
 
@@ -18,7 +23,7 @@ namespace wrench {
     /**
      * @brief NetworkProximityLookupRequestMessage class
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param file: the file to look up
+     * @param hosts: the pair of hosts to look for
      * @param payload: the message size in bytes
      */
     NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(std::string answer_mailbox, std::pair<std::string,std::string> hosts, double payload) :
@@ -34,8 +39,8 @@ namespace wrench {
 
     /**
      * @brief NetworkProximityLookupAnswerMessage class
-     * @param file: the file that was looked up
-     * @param locations: the set of storage services where the file is located
+     * @param hosts: the pair of hosts that were looked up
+     * @param proximityvalue: the proximity value between the pair of hosts
      * @param payload: the message size in bytes
      */
     NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(std::pair<std::string,std::string> hosts, double proximityvalue, double payload) :
@@ -48,9 +53,9 @@ namespace wrench {
     }
 
     /**
-     * @brief NetworkProximityLookupAnswerMessage class
-     * @param file: the file that was looked up
-     * @param locations: the set of storage services where the file is located
+     * @brief NetworkProximityComputeAnswerMessage class
+     * @param hosts: the pair of hosts that were looked up
+     * @param proximityvalue: the proximity value between the pair of hosts
      * @param payload: the message size in bytes
      */
     NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(std::pair<std::string,std::string> hosts,double proximityvalue,double payload) :
@@ -65,7 +70,7 @@ namespace wrench {
 
     /**
      * @brief NextContactDaemonRequestMessage class
-     * @param string: the mailbox to return the request to
+     * @param answer_mailbox: the mailbox to return the request to
      * @param payload: the message size in bytes
      */
     NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(std::string answer_mailbox, double payload) :
@@ -75,8 +80,8 @@ namespace wrench {
 
     /**
      * @brief NextContactDaemonAnswerMessage class
-     * @param string: the next mailbox to contact
-     * @param string: the next host to contact
+     * @param next_host_to_send: the next host to contact
+     * @param next_mailbox_to_send: the next mailbox to contact
      * @param payload: the message size in bytes
      */
     NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,std::string next_mailbox_to_send,double payload) :
@@ -88,7 +93,7 @@ namespace wrench {
 
     /**
      * @brief NetworkProximityTransferMessage class
-     * @param string: the message to transfer to measure proximity
+     * @param message_to_transfer: the message to transfer to measure proximity
      * @param payload: the message size in bytes
      */
     NetworkProximityTransferMessage::NetworkProximityTransferMessage(std::string message_to_transfer,double payload) :
