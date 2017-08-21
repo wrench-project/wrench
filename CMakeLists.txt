@@ -108,7 +108,16 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
         src/wrench/services/storage_services/simple_storage_service/IncomingFile.cpp
-        src/wrench/services/storage_services/simple_storage_service/IncomingFile.h)
+        src/wrench/services/storage_services/simple_storage_service/IncomingFile.h
+        src/wrench/services/network_proximity_services/NetworkProximityService.cpp
+        src/wrench/services/network_proximity_services/NetworkProximityService.h
+        src/wrench/services/network_proximity_services/NetworkQueryServiceProperty.cpp
+        src/wrench/services/network_proximity_services/NetworkQueryServiceProperty.h
+        src/wrench/services/network_proximity_services/NetworkProximityMessage.cpp
+        src/wrench/services/network_proximity_services/NetworkProximityMessage.h
+        src/wrench/services/network_proximity_services/NetworkDaemons.cpp
+        src/wrench/services/network_proximity_services/NetworkDaemons.h
+        )
 
 # test files
 set(TEST_FILES
@@ -124,7 +133,8 @@ set(TEST_FILES
         test/simulation/SimpleStorageServicePerformanceTest.cpp
         test/simulation/MulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MulticoreComputeServiceTestPilotJobs.cpp
-        test/simulation/TestWithFork.h)
+        test/simulation/TestWithFork.h
+        test/simulation/NetworkProximityTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)
