@@ -103,8 +103,6 @@ private:
             proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
         }
 
-        std::cout<<"Proximity Value: "<<proximity<<"\n";
-
 
         // Terminate
         this->simulation->shutdownAllComputeServices();
