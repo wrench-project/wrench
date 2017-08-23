@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "services/file_registry_service/FileRegistryService.h"
+#include "services/network_proximity_services/NetworkProximityService.h"
 #include "simgrid_S4U_util/S4U_Simulation.h"
 #include "simulation/SimulationOutput.h"
 #include "wms/WMS.h"
@@ -49,6 +50,8 @@ namespace wrench {
 
         void setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service);
 
+        void setNetworkProximityService(std::unique_ptr<NetworkProximityService> network_proximity_service);
+
         void stageFile(WorkflowFile *file, StorageService *storage_service);
 
         void stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service);
@@ -75,6 +78,8 @@ namespace wrench {
 
         FileRegistryService *getFileRegistryService();
 
+        NetworkProximityService *getNetworkProximityService();
+
         double getCurrentSimulatedDate();
 
         /***********************/
@@ -97,6 +102,8 @@ namespace wrench {
         std::unique_ptr<WMS> wms = nullptr;
 
         std::unique_ptr<FileRegistryService> file_registry_service = nullptr;
+
+        std::unique_ptr<NetworkProximityService> network_proximity_service = nullptr;
 
         std::set<std::unique_ptr<ComputeService>> compute_services;
 

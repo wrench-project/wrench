@@ -194,6 +194,7 @@ namespace wrench {
         }
       }
 
+
       try {
         this->s4u_simulation->runSimulation();
       } catch (std::runtime_error &e) {
@@ -287,6 +288,23 @@ namespace wrench {
       this->file_registry_service = std::move(file_registry_service);
     }
 
+
+    /**
+     * @brief Set a NetworkProximityService for the simulation
+     *
+     * @param network_proximity_service: a network proximity service
+     *
+     * @throw std::invalid_argument
+     */
+    void Simulation::setNetworkProximityService(std::unique_ptr<NetworkProximityService> network_proximity_service) {
+        if (network_proximity_service == nullptr) {
+            throw std::invalid_argument("Simulation::setNetworkProximityService(): invalid arguments");
+        }
+        this->network_proximity_service = std::move(network_proximity_service);
+    }
+
+
+
     /**
      * @brief Obtain the list of compute services
      *
@@ -348,6 +366,15 @@ namespace wrench {
      */
     FileRegistryService *Simulation::getFileRegistryService() {
       return this->file_registry_service.get();
+    }
+
+    /**
+     * @brief Retrieves the NetworkProximityService
+     *
+     * @return a network proximity service, or nullptr
+     */
+    NetworkProximityService *Simulation::getNetworkProximityService() {
+        return this->network_proximity_service.get();
     }
 
 

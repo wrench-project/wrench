@@ -118,7 +118,15 @@ set(SOURCE_FILES
         src/wrench/services/compute_services/standard_job_executor/StandardJobExecutor.h
         src/wrench/services/compute_services/standard_job_executor/StandardJobExecutor.cpp
         src/wrench/services/compute_services/standard_job_executor/StandardJobExecutorProperty.cpp
-        src/wrench/services/compute_services/standard_job_executor/StandardJobExecutorProperty.h)
+        src/wrench/services/compute_services/standard_job_executor/StandardJobExecutorProperty.h
+        src/wrench/services/network_proximity_services/NetworkProximityService.cpp
+        src/wrench/services/network_proximity_services/NetworkProximityService.h
+        src/wrench/services/network_proximity_services/NetworkQueryServiceProperty.cpp
+        src/wrench/services/network_proximity_services/NetworkQueryServiceProperty.h
+        src/wrench/services/network_proximity_services/NetworkProximityMessage.cpp
+        src/wrench/services/network_proximity_services/NetworkProximityMessage.h
+        src/wrench/services/network_proximity_services/NetworkDaemons.cpp
+        src/wrench/services/network_proximity_services/NetworkDaemons.h)
 
 # test files
 set(TEST_FILES
@@ -134,7 +142,9 @@ set(TEST_FILES
         test/simulation/SimpleStorageServicePerformanceTest.cpp
         test/simulation/MulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MulticoreComputeServiceTestPilotJobs.cpp
-        test/simulation/TestWithFork.h test/simulation/StandardJobExecutorTest.cpp test/simulation/StandardJobExecutorTest.h)
+        test/simulation/TestWithFork.h
+        test/simulation/StandardJobExecutorTest.cpp
+        test/simulation/NetworkProximityTest.cpp)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)
