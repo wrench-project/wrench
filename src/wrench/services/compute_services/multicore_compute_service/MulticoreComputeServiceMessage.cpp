@@ -9,7 +9,7 @@
 
 
 #include "MulticoreComputeServiceMessage.h"
-#include "WorkUnitExecutor.h"
+#include "WorkUnitMulticoreExecutor.h"
 
 namespace wrench {
 
@@ -176,7 +176,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     WorkerThreadWorkDoneMessage::WorkerThreadWorkDoneMessage(
-            WorkUnitExecutor *worker_thread,
+            WorkUnitMultiCoreExecutor *worker_thread,
             std::shared_ptr<WorkUnit> work,
             double payload) :
     MulticoreComputeServiceMessage("WORKER_THREAD_WORK_DONE", payload) {
@@ -194,7 +194,7 @@ namespace wrench {
      * @param payload: the message size in bytes
      */
     WorkerThreadWorkFailedMessage::WorkerThreadWorkFailedMessage(
-            WorkUnitExecutor *worker_thread,
+            WorkUnitMultiCoreExecutor *worker_thread,
             std::shared_ptr<WorkUnit> work,
             std::shared_ptr<FailureCause> cause,
             double payload):

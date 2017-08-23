@@ -8,28 +8,25 @@
  */
 
 #include <workflow_job/StandardJob.h>
-#include "WorkUnit.h"
+#include "Workunit.h"
 
 namespace wrench {
 
     /**
     * @brief Constructor
-    * @param job: the job on behalf of which this work's performed
     * @param pre_file_copies: a set of file copy actions to perform first
     * @param tasks: a set of tasks to execute in sequence
     * @param file_locations: locations where tasks should read/write files
     * @param post_file_copies: a set of file copy actions to perform after all tasks
     * @param cleanup_file_deletions: a set of file deletion actions to perform last
     */
-    WorkUnit::WorkUnit(
-            StandardJob *job,
+    Workunit::Workunit(
             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
             std::vector<WorkflowTask *> tasks,
             std::map<WorkflowFile *, StorageService *> file_locations,
             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
             std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
 
-      this->job = job;
       this->num_pending_parents = 0;
 
       this->pre_file_copies = pre_file_copies;
@@ -49,9 +46,9 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void WorkUnit::addDependency(std::shared_ptr<WorkUnit> parent, std::shared_ptr<WorkUnit> child) {
+    void Workunit::addDependency(std::shared_ptr<Workunit> parent, std::shared_ptr<Workunit> child) {
       if ((parent == nullptr) || (child == nullptr)) {
-        throw std::invalid_argument("WorkUnit::addDependency(): Invalid arguments");
+        throw std::invalid_argument("Workunit::addDependency(): Invalid arguments");
       }
 
       // If dependency already exits, do nothing
@@ -64,7 +61,7 @@ namespace wrench {
       return;
     }
 
-    WorkUnit::~WorkUnit() {
+    Workunit::~Workunit() {
       this->tasks.clear();
     }
 

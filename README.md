@@ -9,7 +9,7 @@
 ### Prerequisites
 
   - Install **SimGrid** - unstable S4U-enabled version (http://simgrid.gforge.inria.fr/)
-  - Install **Lemon C++** library - version 1.3.1 or superior (https://lemon.cs.elte.hu/)
+  - Install **Lemon C++** library - version 1.3.1 or superior (http://lemon.cs.elte.hu/)
   - Install **PugiXML** - version 1.8 or superior (http://pugixml.org/)
   - Install **Google Test** - version 1.8 or superior (https://github.com/google/googletest)
 

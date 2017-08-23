@@ -99,7 +99,7 @@ set(SOURCE_FILES
         src/wrench/services/file_registry_service/FileRegistryMessage.cpp
         src/wrench/services/file_registry_service/FileRegistryMessage.h
         src/wrench/services/compute_services/multicore_compute_service/WorkUnitExecutor.cpp
-        src/wrench/services/compute_services/multicore_compute_service/WorkUnitExecutor.h
+        src/wrench/services/compute_services/multicore_compute_service/WorkUnitMulticoreExecutor.h
         src/wrench/services/compute_services/multicore_compute_service/WorkUnit.cpp
         src/wrench/services/compute_services/multicore_compute_service/WorkUnit.h
         src/wrench/wms/scheduler/pilot_job/PilotJobScheduler.h
@@ -108,7 +108,17 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
         src/wrench/services/storage_services/simple_storage_service/IncomingFile.cpp
-        src/wrench/services/storage_services/simple_storage_service/IncomingFile.h)
+        src/wrench/services/storage_services/simple_storage_service/IncomingFile.h
+        src/wrench/services/compute_services/standard_job_executor/Workunit.h
+        src/wrench/services/compute_services/standard_job_executor/Workunit.cpp
+        src/wrench/services/compute_services/standard_job_executor/WorkunitMulticoreExecutor.h
+        src/wrench/services/compute_services/standard_job_executor/WorkunitMulticoreExecutor.cpp
+        src/wrench/services/compute_services/standard_job_executor/StandardJobExecutorMessage.h
+        src/wrench/services/compute_services/standard_job_executor/StandardJobExecutorMessage.cpp
+        src/wrench/services/compute_services/standard_job_executor/StandardJobExecutor.h
+        src/wrench/services/compute_services/standard_job_executor/StandardJobExecutor.cpp
+        src/wrench/services/compute_services/standard_job_executor/StandardJobExecutorProperty.cpp
+        src/wrench/services/compute_services/standard_job_executor/StandardJobExecutorProperty.h)
 
 # test files
 set(TEST_FILES
@@ -124,7 +134,7 @@ set(TEST_FILES
         test/simulation/SimpleStorageServicePerformanceTest.cpp
         test/simulation/MulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MulticoreComputeServiceTestPilotJobs.cpp
-        test/simulation/TestWithFork.h)
+        test/simulation/TestWithFork.h test/simulation/StandardJobExecutorTest.cpp test/simulation/StandardJobExecutorTest.h)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)

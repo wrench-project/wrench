@@ -33,7 +33,7 @@ DATA STORAGE IMPLEMENTATION:
 
 ---------------------------------------------------------------------
 
-COMPUTE STORAGE IMPLEMENTATION:
+COMPUTE SERVICE IMPLEMENTATION:
 
     - Deal with multi-core tasks...
 
@@ -52,10 +52,16 @@ NEW FEATURES FOR EDDY:
 	- Implement a notion of "what time is it?"
 		- And of a Cron job that triggers a callback...
 
-
 ---------------------------------------------------------------------
 
 SOFTWARE ENGINEERING:
+
+    - Make num cores in tasks unsigned long (instead of int)
+
+    - While implementing a test for the StandardJobExecutor abstraction, Henri noted
+      that when one does not create a ComputeService and launch the simulation, we
+      get a strange behavior that's not clear. Clearly this needs to be tested in the
+      most basic OneTaskTest thingy. (Henri will do it)
 
     - Track all task change updates and make sure they're all in the JobManager...
         - They likely cannot, but the task life cycle is confusing right now
@@ -83,17 +89,10 @@ RELEASE:
 
 ---------------------------------------------------------------------
 
-SURAJ?
+ICS632:
+    - CASE STUDIES AS BASIS FOR "RUN, TWEAK, AND OBSERVE" assignment for UG course, with
+      a pilot "try and contribute" study in ICS632
 
-  - His M.S. thesis simulator?
-
-  - Cloud Compute Service?
-
-  - Batch Compute Service? (BATSIM integration)
-
-  - What to do for ICS632?
-
----------------------------------------------------------------------
 ---------------------------------------------------------------------
 
 

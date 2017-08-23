@@ -31,7 +31,7 @@ public:
 
     wrench::ComputeService *compute_service = nullptr;
 
-    void do_Concurrency_test();
+    void do_ConcurrencyFileCopies_test();
 
 
 protected:
@@ -77,13 +77,13 @@ protected:
 
 
 /**********************************************************************/
-/**  CONCURRENCY TEST                                                **/
+/**  CONCURRENT FILE COPIES TEST                                     **/
 /**********************************************************************/
 
-class SimpleStorageServiceConcurrencyTestWMS : public wrench::WMS {
+class SimpleStorageServiceConcurrencyFileCopiesTestWMS : public wrench::WMS {
 
 public:
-    SimpleStorageServiceConcurrencyTestWMS(SimpleStorageServicePerformanceTest *test,
+    SimpleStorageServiceConcurrencyFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
                                                   wrench::Workflow *workflow,
                                                   std::unique_ptr<wrench::Scheduler> scheduler,
                                                   std::string hostname) :
@@ -131,10 +131,6 @@ private:
       std::unique_ptr<wrench::WorkflowExecutionEvent> event3 = workflow->waitForNextExecutionEvent();
       double event3_arrival = this->simulation->getCurrentSimulatedDate();
 
-//      std::cerr << "START_1 " << copy1_start << " END_1 " << event1_arrival << "\n";
-//      std::cerr << "START_2 " << copy2_start << " END_2 " << event2_arrival << "\n";
-//      std::cerr << "START_3 " << copy3_start << " END_3 " << event3_arrival << "\n";
-
       double transfer_time_1 = event1_arrival - copy1_start;
       double transfer_time_2 = event2_arrival - copy2_start;
       double transfer_time_3 = event3_arrival - copy3_start;
@@ -159,11 +155,11 @@ private:
     }
 };
 
-TEST_F(SimpleStorageServicePerformanceTest, Concurrency) {
-  DO_TEST_WITH_FORK(do_Concurrency_test);
+TEST_F(SimpleStorageServicePerformanceTest, ConcurrencyFileCopies) {
+  DO_TEST_WITH_FORK(do_ConcurrencyFileCopies_test);
 }
 
-void SimpleStorageServicePerformanceTest::do_Concurrency_test() {
+void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -178,7 +174,7 @@ void SimpleStorageServicePerformanceTest::do_Concurrency_test() {
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyTestWMS(this, workflow,
+          std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesTestWMS(this, workflow,
                                                                                          std::unique_ptr<wrench::Scheduler>(
                           new wrench::RandomScheduler()), "WMSHost"))));
 

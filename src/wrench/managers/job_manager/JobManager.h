@@ -39,7 +39,7 @@ namespace wrench {
 
 		public:
 
-				JobManager(Workflow *);
+				JobManager(Workflow *workflow);
 
 				~JobManager();
 

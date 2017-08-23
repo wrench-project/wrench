@@ -26,7 +26,7 @@ namespace wrench {
 
     protected:
         /***********************/
-        /** \cond DEVELOPER */
+        /** \cond DEVELOPER    */
         /***********************/
 
         void processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent>);

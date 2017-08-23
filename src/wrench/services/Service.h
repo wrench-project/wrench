@@ -72,6 +72,7 @@ namespace wrench {
 
         // Property stuff
         void setProperty(std::string, std::string);
+
         /** @brief The service's property list */
         std::map<std::string, std::string> property_list;
 

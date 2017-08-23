@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_WORKUNITEXECUTOR_H
-#define WRENCH_WORKUNITEXECUTOR_H
+#ifndef WRENCH_WORKUNITMULTICOREEXECUTOR_H
+#define WRENCH_WORKUNITMULTICOREEXECUTOR_H
 
 
 #include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
@@ -23,7 +23,7 @@ namespace wrench {
     class StorageService;
     class StandardJob;
     class WorkerThreadWork;
-    class WorkUnit;
+    class Workunit;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -32,31 +32,34 @@ namespace wrench {
     /**
      * @brief An actor that knows how to perform a work unit
      */
-    class WorkUnitExecutor : public S4U_DaemonWithMailbox {
+    class WorkunitMulticoreExecutor : public S4U_DaemonWithMailbox {
 
     public:
 
-        WorkUnitExecutor(Simulation *simulation,
-                     std::string hostname, std::string callback_mailbox,
-                     std::shared_ptr<WorkUnit> work,
+        WorkunitMulticoreExecutor(
+                     Simulation *simulation,
+                     std::string hostname,
+                     unsigned long num_cores,
+                     std::string callback_mailbox,
+                     std::shared_ptr<Workunit> workunit,
                      StorageService *default_storage_service,
                      double startup_overhead = 0.0);
 
-
         void kill();
 
-        /** @brief The WorkUnit this WorkUnitExecutor is supposed to perform */
-        std::shared_ptr<WorkUnit> work;
+        /** @brief The Workunit this WorkunitExecutor is supposed to perform */
+        std::shared_ptr<Workunit> workunit;
 
     private:
         int main();
 
-        Simulation *simulation;
+        void performWork(std::shared_ptr<Workunit> work);
 
-        void performWork(std::shared_ptr<WorkUnit> work);
+        Simulation *simulation;
         std::string callback_mailbox;
         std::string hostname;
         double start_up_overhead;
+        unsigned long num_cores;
 
         StorageService *default_storage_service;
 

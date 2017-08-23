@@ -14,13 +14,13 @@
 
 #include <services/compute_services/ComputeServiceMessage.h>
 #include <vector>
-#include "WorkUnitExecutor.h"
+#include "WorkUnitMulticoreExecutor.h"
 
 namespace wrench {
 
     class WorkflowTask;
 
-    class WorkUnitExecutor;
+    class WorkUnitMultiCoreExecutor;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -154,12 +154,12 @@ namespace wrench {
     class WorkerThreadWorkDoneMessage : public MulticoreComputeServiceMessage {
     public:
         WorkerThreadWorkDoneMessage(
-                WorkUnitExecutor *worker_thread,
+                WorkUnitMultiCoreExecutor *worker_thread,
                 std::shared_ptr<WorkUnit> work_unit,
                 double payload);
 
         /** @brief The worker thread that performed the work */
-        WorkUnitExecutor *worker_thread;
+        WorkUnitMultiCoreExecutor *worker_thread;
         /** @brief The work that was performed */
         std::shared_ptr<WorkUnit> work;
 
@@ -171,13 +171,13 @@ namespace wrench {
     class WorkerThreadWorkFailedMessage : public MulticoreComputeServiceMessage {
     public:
         WorkerThreadWorkFailedMessage(
-                WorkUnitExecutor *worker_thread,
+                WorkUnitMultiCoreExecutor *worker_thread,
                 std::shared_ptr<WorkUnit> work,
                 std::shared_ptr<FailureCause> cause,
                 double payload);
 
         /** @brief The worker thread that failed to perform the work */
-        WorkUnitExecutor *worker_thread;
+        WorkUnitMultiCoreExecutor *worker_thread;
         /** @brief The work that failed */
         std::shared_ptr<WorkUnit> work;
         /** @brief The cause of the failure */

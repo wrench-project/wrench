@@ -14,47 +14,54 @@
 #include <logging/TerminalOutput.h>
 #include <exceptions/WorkflowExecutionException.h>
 #include <simgrid_S4U_util/S4U_Simulation.h>
-#include "WorkUnitMulticoreExecutor.h"
-#include "MulticoreComputeServiceMessage.h"
+#include "WorkunitMulticoreExecutor.h"
+#include "StandardJobExecutorMessage.h"
 #include <workflow/WorkflowTask.h>
 #include <workflow_job/StandardJob.h>
 #include <simulation/SimulationTimestampTypes.h>
-#include "WorkUnit.h"
+#include "Workunit.h"
 #include <simulation/Simulation.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(worker_thread, "Log category for Worker Thread");
+XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Worker Thread");
 
 
 namespace wrench {
 
     /**
-     * @brief Constructor, which starts the worker thread on the host
+     * @brief Constructor, which starts the workunit executor on the host
      *
      * @param simulation: the simulation
      * @param hostname: the name of the host
+     * @param num_cores: the number of cores available to the executor
      * @param callback_mailbox: the callback mailbox to which the worker
      *        thread can send "work done" messages
-     * @param work: the work to do
+     * @param workunit: the workinit to perform
      * @param default_storage_service: the default storage service from which to read/write data (if any)
      * @param startup_overhead: the startup overhead, in seconds
      */
-    WorkUnitMultiCoreExecutor::WorkUnitMultiCoreExecutor(Simulation *simulation,
-                               std::string hostname,
-                               std::string callback_mailbox,
-                               std::shared_ptr<WorkUnit> work,
-                               StorageService *default_storage_service,
-                               double startup_overhead) :
-            S4U_DaemonWithMailbox("worker_thread", "worker_thread") {
+    WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(
+            Simulation *simulation,
+            std::string hostname,
+            unsigned long num_cores,
+            std::string callback_mailbox,
+            std::shared_ptr<Workunit> workunit,
+            StorageService *default_storage_service,
+            double startup_overhead) :
+            S4U_DaemonWithMailbox("workunit_multicore_executor", "workunit_multicore_executor") {
 
       if (startup_overhead < 0) {
-        throw std::invalid_argument("WorkUnitMultiCoreExecutor::WorkUnitMultiCoreExecutor(): Startup overhead must be >= 0");
+        throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): startup_overhead must be >= 0");
+      }
+      if (num_cores < 1) {
+        throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): num_cores must be >= 1");
       }
 
       this->simulation = simulation;
       this->hostname = hostname;
       this->callback_mailbox = callback_mailbox;
-      this->work = work;
+      this->workunit = workunit;
       this->start_up_overhead = startup_overhead;
+      this->num_cores = num_cores;
       this->default_storage_service = default_storage_service;
 
       // Start my daemon on the host
@@ -64,7 +71,9 @@ namespace wrench {
     /**
      * @brief Kill the worker thread
      */
-    void WorkUnitMultiCoreExecutor::kill() {
+    void WorkunitMulticoreExecutor::kill() {
+      // TODO: kill all worker threads...
+      throw std::runtime_error("WorkunitMulticoreExecutor::kill(): not implemented yet");
       this->kill_actor();
     }
 
@@ -76,35 +85,35 @@ namespace wrench {
     *
     * @throw std::runtime_error
     */
-    int WorkUnitMultiCoreExecutor::main() {
+    int WorkunitMulticoreExecutor::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_BLUE);
 
       WRENCH_INFO("New Worker Thread starting (%s) to do: %ld pre file copies, %ld tasks, %ld post file copies",
                   this->mailbox_name.c_str(),
-                  this->work->pre_file_copies.size(),
-                  this->work->tasks.size(),
-                  this->work->post_file_copies.size());
+                  this->workunit->pre_file_copies.size(),
+                  this->workunit->tasks.size(),
+                  this->workunit->post_file_copies.size());
 
       SimulationMessage *msg_to_send_back = nullptr;
       bool success;
 
       try {
-        performWork(this->work);
+        performWork(this->workunit);
 
         // build "success!" message
         success = true;
-        msg_to_send_back = new WorkerThreadWorkDoneMessage(
+        msg_to_send_back = new WorkunitExecutorDoneMessage(
                 this,
-                this->work,
+                this->workunit,
                 0.0);
 
       } catch (WorkflowExecutionException &e) {
         // build "failed!" message
         success = false;
-        msg_to_send_back = new WorkerThreadWorkFailedMessage(
+        msg_to_send_back = new WorkunitExecutorFailedMessage(
                 this,
-                this->work,
+                this->workunit,
                 e.getCause(),
                 0.0);
       }
@@ -121,11 +130,11 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
       } catch (std::shared_ptr<NetworkError> cause) {
-        WRENCH_INFO("Worker thread on host %s can't report back due to network error!", S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("Work unit executor on host %s can't report back due to network error!", S4U_Simulation::getHostName().c_str());
         return 0;
       }
 
-      WRENCH_INFO("Worker thread on host %s terminating!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -136,7 +145,7 @@ namespace wrench {
      * @param work: the work to perform
      */
     void
-    WorkUnitMultiCoreExecutor::performWork(std::shared_ptr<WorkUnit> work) {
+    WorkunitMulticoreExecutor::performWork(std::shared_ptr<Workunit> work) {
 
       // Simulate the startup overhead
       S4U_Simulation::sleep(this->start_up_overhead);
@@ -172,6 +181,7 @@ namespace wrench {
         }
 
         // Run the task
+        // TODO: The task could be multicore!!!
         WRENCH_INFO("Executing task %s (%lf flops)", task->getId().c_str(), task->getFlops());
         task->setRunning();
         task->setStartDate(S4U_Simulation::getClock());

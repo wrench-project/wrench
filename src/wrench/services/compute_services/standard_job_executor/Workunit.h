@@ -31,24 +31,21 @@ namespace wrench {
     /**
      * @brief A class to describe a unit of work that's a sub-component of a StandardJob
      */
-    class WorkUnit {
+    class Workunit {
 
     public:
 
-        WorkUnit(StandardJob *job,
-                 std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
+        Workunit(std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                  std::vector<WorkflowTask *> tasks,
                  std::map<WorkflowFile *, StorageService *> file_locations,
                  std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                  std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
 
-        static void addDependency(std::shared_ptr<WorkUnit> parent, std::shared_ptr<WorkUnit> child);
+        static void addDependency(std::shared_ptr<Workunit> parent, std::shared_ptr<Workunit> child);
 
-        /** @brief The job that this WorkUnit belongs to */
-        StandardJob *job;
-        /** @brief The WorkUnits that depend on this WorkUnit */
-        std::set<std::shared_ptr<WorkUnit>> children;
-        /** @brief The number of WorkUnits this WorkUnit depends on */
+        /** @brief The Workunits that depend on this Workunit */
+        std::set<std::shared_ptr<Workunit>> children;
+        /** @brief The number of Workunits this Workunit depends on */
         unsigned long num_pending_parents;
 
         /** @brief File copies to perform before computational tasks begin */
@@ -63,7 +60,7 @@ namespace wrench {
         std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
 
 
-        ~WorkUnit();
+        ~Workunit();
     };
 
     /***********************/

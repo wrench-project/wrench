@@ -30,7 +30,7 @@ namespace wrench {
       this->state = Service::UP;
     }
 
-    /**
+ /**
    * @brief Set a property of the Service
    * @param property: the property
    * @param value: the property value
