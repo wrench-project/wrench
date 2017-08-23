@@ -12,23 +12,12 @@ DETAILS:
 
 -----------------------------------
 
-TESTS:
-	- Add new tests for SimpleStorage Services
-	- How come when sunmitting tasks with #cores=2 we don't get an exception on
-          a MulticoreComputeService....
-
------------------------------------
-
 DATA STORAGE IMPLEMENTATION:
 
     - Decide what to do about "partial failures"
         - How do we report what has completed, and what hasn't upon failure
         - Or do we leave it as is and the WMS has to inspect things?
-
-    - SIMPLE STORAGE SERVICE: How to deal with synchrony problem
-        - Wait for Mt to fix the wait_any()
-            - Implement my own
-
+        
     - SIMULATION OF STORAGE RESOURCE WITH S4U!!!
 
 ---------------------------------------------------------------------
@@ -36,6 +25,12 @@ DATA STORAGE IMPLEMENTATION:
 COMPUTE SERVICE IMPLEMENTATION:
 
     - Deal with multi-core tasks...
+
+---------------------------------------------------------------------
+
+NETWORK PROXIMITY:
+
+    - At some point (later), implement Vivaldi
 
 ---------------------------------------------------------------------
 
@@ -55,6 +50,10 @@ NEW FEATURES FOR EDDY:
 ---------------------------------------------------------------------
 
 SOFTWARE ENGINEERING:
+    - Add new tests for SimpleStorage Services
+
+	- How come when sunmitting tasks with #cores=2 we don't get an exception on
+          a MulticoreComputeService (still relevant?)....
 
     - Make num cores in tasks unsigned long (instead of int)
 

@@ -93,16 +93,24 @@ private:
         std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
                 std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
 
-
         std::pair<std::string,std::string> hosts_to_compute_proximity;
         hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[3],this->simulation->getHostnameList()[50]);
-        int count=0;
+        int count=0, max_count=100;
         double proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
-        while(proximity<0 && count<10000){
+
+        while(proximity<0 && count<max_count){
             count++;
+            wrench::S4U_Simulation::sleep(1.0);
             proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
         }
 
+        if (count == max_count) {
+            throw std::runtime_error("Never got an answer to proximity query");
+        }
+
+        if (proximity < 0.0) {
+          throw std::runtime_error("Got a negative proximity value");
+        }
 
         // Terminate
         this->simulation->shutdownAllComputeServices();
@@ -125,20 +133,15 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("one_task_test");
 
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-
     simulation->init(&argc, argv);
 
     // Setting up the platform
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
     EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-    ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
     // Get a hostname
     std::string hostname = simulation->getHostnameList()[0];
 
     // Create a WMS
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
     EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
             std::unique_ptr<wrench::WMS>(new ProxTestWMS(this, workflow,
                                                          std::unique_ptr<wrench::Scheduler>(
@@ -146,7 +149,6 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                             hostname))));
 
     // Create a Compute Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
     EXPECT_NO_THROW(compute_service = simulation->add(
             std::unique_ptr<wrench::MulticoreComputeService>(
                     new wrench::MulticoreComputeService(hostname, true, true,
@@ -154,51 +156,34 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                                                         {}))));
 
     // Create a Storage Service
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
     EXPECT_NO_THROW(storage_service1 = simulation->add(
             std::unique_ptr<wrench::SimpleStorageService>(
                     new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
-    // Without a file registry service this should fail
-    ASSERT_THROW(simulation->launch(), std::runtime_error);
-    ASSERT_THROW(simulation->stageFiles({input_file}, storage_service1), std::runtime_error);
-
     std::unique_ptr<wrench::FileRegistryService> file_registry_service(
             new wrench::FileRegistryService(hostname));
 
-
     simulation->setFileRegistryService(std::move(file_registry_service));
-
-    ASSERT_THROW(simulation->stageFiles({input_file}, nullptr), std::invalid_argument);
-    ASSERT_THROW(simulation->stageFiles({nullptr}, storage_service1), std::invalid_argument);
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
 
-
     // Get a host for network proximity host
     std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
-
 
     //Get two hosts to communicate with each other for proximity value
     std::string network_daemon1 = simulation->getHostnameList()[3];
     std::string network_daemon2 = simulation->getHostnameList()[50];
-    std::vector<std::string> hosts_in_network;
-    hosts_in_network.push_back(network_daemon1);
-    hosts_in_network.push_back(network_daemon2);
+    std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2};
 
     std::unique_ptr<wrench::NetworkProximityService> network_proximity_service(
             new wrench::NetworkProximityService(network_proximity_db_hostname,hosts_in_network,1,2,1)
     );
 
-
-
     EXPECT_NO_THROW(simulation->setNetworkProximityService(std::move(network_proximity_service)));
 
     // Running a "run a single task" simulation
     EXPECT_NO_THROW(simulation->launch());
-
-
 
     delete simulation;
 

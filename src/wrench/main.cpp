@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
                                                                      new wrench::RandomScheduler()),
                                                              wms_host)));
   wms->setPilotJobScheduler(std::unique_ptr<wrench::PilotJobScheduler>(new wrench::CriticalPathScheduler()));
-
+
   wms->addStaticOptimization(std::unique_ptr<wrench::StaticOptimization>(new wrench::SimplePipelineClustering()));
 //  wms->addDynamicOptimization(std::unique_ptr<wrench::DynamicOptimization>(new wrench::FailureDynamicClustering()));
 
