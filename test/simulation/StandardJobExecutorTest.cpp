@@ -111,7 +111,7 @@ private:
               my_mailbox,
               test->simulation->getHostnameList()[0],
               job,
-              {{test->simulation->getHostnameList()[0], 2}},
+              {std::tuple<std::string, unsigned long>{test->simulation->getHostnameList()[0], 2}},
               nullptr,
               {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(thread_startup_overhead)}}
               );
@@ -282,7 +282,7 @@ private:
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
                 job,
-                {{test->simulation->getHostnameList()[0], 6}},
+                {std::tuple<std::string, unsigned long>{test->simulation->getHostnameList()[0], 6}},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
@@ -341,7 +341,7 @@ private:
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
                 job,
-                {{test->simulation->getHostnameList()[0], 10}},
+                {std::tuple<std::string, unsigned long>{test->simulation->getHostnameList()[0], 10}},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
@@ -401,7 +401,7 @@ private:
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
                 job,
-                {{test->simulation->getHostnameList()[0], 10}},
+                {std::tuple<std::string, unsigned long>{test->simulation->getHostnameList()[0], 10}},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(thread_startup_overhead)}}
         );
