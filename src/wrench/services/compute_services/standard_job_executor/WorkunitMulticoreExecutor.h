@@ -43,7 +43,7 @@ namespace wrench {
                      std::string callback_mailbox,
                      std::shared_ptr<Workunit> workunit,
                      StorageService *default_storage_service,
-                     double startup_overhead = 0.0);
+                     double thread_startup_overhead = 0.0);
 
         void kill();
 
@@ -55,11 +55,14 @@ namespace wrench {
 
         void performWork(std::shared_ptr<Workunit> work);
 
-        Simulation *simulation;
+        void runMulticoreComputation(double flops, double parallel_efficiency);
+
+
+            Simulation *simulation;
         std::string callback_mailbox;
         std::string hostname;
-        double start_up_overhead;
         unsigned long num_cores;
+        double thread_startup_overhead;
 
         StorageService *default_storage_service;
 

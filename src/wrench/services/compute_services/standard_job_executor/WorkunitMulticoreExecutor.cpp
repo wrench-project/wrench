@@ -20,6 +20,7 @@
 #include <workflow_job/StandardJob.h>
 #include <simulation/SimulationTimestampTypes.h>
 #include "Workunit.h"
+#include "ComputeThread.h"
 #include <simulation/Simulation.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Worker Thread");
@@ -37,7 +38,7 @@ namespace wrench {
      *        thread can send "work done" messages
      * @param workunit: the workinit to perform
      * @param default_storage_service: the default storage service from which to read/write data (if any)
-     * @param startup_overhead: the startup overhead, in seconds
+     * @param thread_startup_overhead: the thread_startup overhead, in seconds
      */
     WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(
             Simulation *simulation,
@@ -46,11 +47,11 @@ namespace wrench {
             std::string callback_mailbox,
             std::shared_ptr<Workunit> workunit,
             StorageService *default_storage_service,
-            double startup_overhead) :
+            double thread_startup_overhead) :
             S4U_DaemonWithMailbox("workunit_multicore_executor", "workunit_multicore_executor") {
 
-      if (startup_overhead < 0) {
-        throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): startup_overhead must be >= 0");
+      if (thread_startup_overhead < 0) {
+        throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): thread_startup_overhead must be >= 0");
       }
       if (num_cores < 1) {
         throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): num_cores must be >= 1");
@@ -60,7 +61,7 @@ namespace wrench {
       this->hostname = hostname;
       this->callback_mailbox = callback_mailbox;
       this->workunit = workunit;
-      this->start_up_overhead = startup_overhead;
+      this->thread_startup_overhead = thread_startup_overhead;
       this->num_cores = num_cores;
       this->default_storage_service = default_storage_service;
 
@@ -148,10 +149,9 @@ namespace wrench {
     WorkunitMulticoreExecutor::performWork(std::shared_ptr<Workunit> work) {
 
       // Simulate the startup overhead
-      S4U_Simulation::sleep(this->start_up_overhead);
+      S4U_Simulation::sleep(this->thread_startup_overhead);
 
       /** Perform all pre file copies operations */
-      // TODO: This is sequential right now, but probably it should be concurrent in some fashion
       for (auto file_copy : work->pre_file_copies) {
         WorkflowFile *file = std::get<0>(file_copy);
         StorageService *src = std::get<1>(file_copy);
@@ -161,6 +161,7 @@ namespace wrench {
                       file->getId().c_str(),
                       src->getName().c_str(),
                       dst->getName().c_str());
+          S4U_Simulation::sleep(this->thread_startup_overhead);
           dst->copyFile(file, src);
         } catch (WorkflowExecutionException &e) {
           throw;
@@ -180,13 +181,13 @@ namespace wrench {
           throw;
         }
 
-        // Run the task
-        // TODO: The task could be multicore!!!
+        // Run the task's computation (which can be multicore)
         WRENCH_INFO("Executing task %s (%lf flops)", task->getId().c_str(), task->getFlops());
         task->setRunning();
         task->setStartDate(S4U_Simulation::getClock());
 
-        S4U_Simulation::compute(task->getFlops());
+        runMulticoreComputation(task->getFlops(), task->getParallelEfficiency());
+
 
         WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(), task->getId().c_str());
 
@@ -213,6 +214,7 @@ namespace wrench {
         StorageService *src = std::get<1>(file_copy);
         StorageService *dst = std::get<2>(file_copy);
         try {
+          S4U_Simulation::sleep(this->thread_startup_overhead);
           dst->copyFile(file, src);
         } catch (WorkflowExecutionException &e) {
           throw;
@@ -224,10 +226,36 @@ namespace wrench {
         WorkflowFile *file = std::get<0>(cleanup);
         StorageService *storage_service = std::get<1>(cleanup);
         try {
+          S4U_Simulation::sleep(this->thread_startup_overhead);
           storage_service->deleteFile(file);
         } catch (WorkflowExecutionException &e) {
           throw;
         }
+      }
+
+    }
+
+    void WorkunitMulticoreExecutor::runMulticoreComputation(double flops, double parallel_efficiency) {
+       double effective_flops = (flops / (this->num_cores * parallel_efficiency));
+
+      // Create an actor to run the computation
+      std::vector<simgrid::s4u::ActorPtr> compute_threads;
+
+      for (int i=0; i < this->num_cores; i++) {
+        try {
+          S4U_Simulation::sleep(this->thread_startup_overhead);
+          compute_threads.push_back(simgrid::s4u::Actor::createActor("compute_thread",
+                                                   simgrid::s4u::Host::by_name(S4U_Simulation::getHostName()),
+                                                   ComputeThread(effective_flops)));
+        } catch (std::exception &e) {
+          // Some internal SimGrid exceptions...
+          std::abort();
+        }
+      }
+
+      // Wait for all actors to complete
+      for (int i=0; i < compute_threads.size(); i++) {
+        compute_threads[i]->join();
       }
 
     }

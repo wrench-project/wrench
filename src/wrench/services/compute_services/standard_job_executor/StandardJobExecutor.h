@@ -80,8 +80,9 @@ namespace wrench {
         std::map<std::string, std::string> property_list;
 
         std::map<std::string, std::string> default_property_values = {
-                        {StandardJobExecutorProperty::WORKUNIT_EXECUTOR_STARTUP_OVERHEAD, "0"},
+                        {StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"},
                         {StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
+                        {StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
                 };
 
         int main();

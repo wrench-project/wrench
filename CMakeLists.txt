@@ -126,7 +126,8 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity_services/NetworkProximityMessage.cpp
         src/wrench/services/network_proximity_services/NetworkProximityMessage.h
         src/wrench/services/network_proximity_services/NetworkDaemons.cpp
-        src/wrench/services/network_proximity_services/NetworkDaemons.h)
+        src/wrench/services/network_proximity_services/NetworkDaemons.h
+        src/wrench/services/compute_services/standard_job_executor/ComputeThread.h)
 
 # test files
 set(TEST_FILES

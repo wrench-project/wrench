@@ -24,8 +24,9 @@ namespace wrench {
     public:
 
         /** @brief The number of seconds to start a work unit executor **/
-        DECLARE_PROPERTY_NAME(WORKUNIT_EXECUTOR_STARTUP_OVERHEAD);
+        DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
         DECLARE_PROPERTY_NAME(STANDARD_JOB_DONE_MESSAGE_PAYLOAD);
+        DECLARE_PROPERTY_NAME(STANDARD_JOB_FAILED_MESSAGE_PAYLOAD);
     };
 
     /***********************/

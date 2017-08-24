@@ -13,6 +13,7 @@
 #include <services/compute_services/standard_job_executor/StandardJobExecutor.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
+#include <services/compute_services/standard_job_executor/StandardJobExecutorMessage.h>
 
 #include "TestWithFork.h"
 
@@ -25,7 +26,7 @@ public:
     wrench::Simulation *simulation;
 
 
-    void do_OneTask_test();
+    void do_OneSingleCoreTaskTestWMS_test();
 
 //    void do_ExecutionWithDefaultStorageService_test();
 //
@@ -61,13 +62,13 @@ protected:
 };
 
 /**********************************************************************/
-/**  ONE TASK SIMULATION TEST                                        **/
+/**  ONE SINGLE-CORE TASK SIMULATION TEST                            **/
 /**********************************************************************/
 
-class OneTaskTestWMS : public wrench::WMS {
+class OneSingleCoreTaskTestWMS : public wrench::WMS {
 
 public:
-    OneTaskTestWMS(StandardJobExecutorTest *test,
+    OneSingleCoreTaskTestWMS(StandardJobExecutorTest *test,
                 wrench::Workflow *workflow,
                 std::unique_ptr<wrench::Scheduler> scheduler,
                 std::string hostname) :
@@ -90,8 +91,10 @@ private:
 //      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
 //              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
 
-      // Get the one task
-      wrench::WorkflowTask * task = this->workflow->getTasks()[0];
+      // Create a sequential task that lasts one hour
+      wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0);
+      task->addInputFile(workflow->getFileById("input_file"));
+      task->addOutputFile(workflow->getFileById("output_file"));
 
       // Create a StandardJob
       wrench::StandardJob *job = job_manager->createStandardJob(
@@ -109,8 +112,10 @@ private:
               my_mailbox,
               test->simulation->getHostnameList()[0],
               job,
-              {{test->simulation->getHostnameList()[0], 1}},
-              nullptr);
+              {{test->simulation->getHostnameList()[0], 2}},
+              nullptr,
+              {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
+              );
 
       // Wait for a message on my mailbox
       std::unique_ptr<wrench::SimulationMessage> message;
@@ -120,9 +125,16 @@ private:
         throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
       }
 
-      std::cerr << "GOT A REPLY!!!\n";
+      // Did we get the expected message?
+      wrench::StandardJobExecutorDoneMessage *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+      if (!msg) {
+        throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+      }
 
-
+      // Does the task completion time make sense?
+      if ((task->getEndDate() < task->getFlops()) || (task->getEndDate() > task->getFlops() + 0.5)) {
+        throw std::runtime_error("Unexpected task completion time (should be around " + std::to_string(task->getFlops()) + " but is " + std::to_string(task->getEndDate()));
+      }
 
       // Terminate everything
       this->simulation->shutdownAllComputeServices();
@@ -132,11 +144,11 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorTest, DISABLED_OneTaskTest) {
-  DO_TEST_WITH_FORK(do_OneTask_test);
+TEST_F(StandardJobExecutorTest, OneSingleCoreTaskTestWMS) {
+  DO_TEST_WITH_FORK(do_OneSingleCoreTaskTestWMS_test);
 }
 
-void StandardJobExecutorTest::do_OneTask_test() {
+void StandardJobExecutorTest::do_OneSingleCoreTaskTestWMS_test() {
 
   // Create and initialize a simulation
   simulation = new wrench::Simulation();
@@ -154,10 +166,9 @@ void StandardJobExecutorTest::do_OneTask_test() {
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new OneTaskTestWMS(this, workflow,
+          std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskTestWMS(this, workflow,
                                                        std::unique_ptr<wrench::Scheduler>(
-                                                               new wrench::RandomScheduler()),
-                          hostname))));
+                                                               new wrench::RandomScheduler()), hostname))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -177,21 +188,17 @@ void StandardJobExecutorTest::do_OneTask_test() {
 
   simulation->setFileRegistryService(std::move(file_registry_service));
 
-  // Populate the workflow
+  // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
-
-  // Create one task
-  wrench::WorkflowTask *task = this->workflow->addTask("task", 3600);
-  task->addInputFile(input_file);
-  task->addOutputFile(output_file);
-
 
   // Staging the input_file on the storage service
   EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
 
 
   // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;

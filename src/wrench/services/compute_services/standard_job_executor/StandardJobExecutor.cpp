@@ -190,7 +190,7 @@ namespace wrench {
 
 
       // Find a host that can run it, picking the host with the largest number of cores
-      // TODO: This is heuristic here, in which we try to maximumize the number of cores
+      // TODO: This is heuristic here, in which we try to maximimize the number of cores
       // TODO: per task. This many not be judicious since it may be better to run a bunch
       // TODO: of 1-core tasks in terms of parallel efficiency. The "how do I pick cores?"
       // TODO: method here is a feature of the executor, and perhaps could be configured
@@ -223,9 +223,9 @@ namespace wrench {
                                             ready_workunit,
                                             this->default_storage_service,
                                             this->getPropertyValueAsDouble(
-                                                    StandardJobExecutorProperty::WORKUNIT_EXECUTOR_STARTUP_OVERHEAD));
+                                                    StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD));
 
-      // Update core availabililties
+      // Update core availabilities
       this->core_availabilities[target_host] -= target_num_cores;
 
       // Update data structures
@@ -325,9 +325,8 @@ namespace wrench {
         // Erase all completed works for the job
         this->completed_workunits.clear();
 
-        WRENCH_INFO("SENDING A CALLBACK to mailbox '%s'", this->callback_mailbox.c_str());
         try {
-          S4U_Mailbox::dputMessage(this->callback_mailbox,
+          S4U_Mailbox::putMessage(this->callback_mailbox,
                                    new StandardJobExecutorDoneMessage(this->job, this,
                                                                             this->getPropertyValueAsDouble(
                                                                                     StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
@@ -335,7 +334,6 @@ namespace wrench {
           WRENCH_INFO("Failed to send the callback... oh well");
           return;
         }
-        WRENCH_INFO("CALLBACK SENT");
       } else {
         // Otherwise, update children
         for (auto child : workunit->children) {
@@ -413,10 +411,10 @@ namespace wrench {
 
       // Send the notification back
       try {
-        S4U_Mailbox::dputMessage(this->callback_mailbox,
+        S4U_Mailbox::putMessage(this->callback_mailbox,
                                  new StandardJobExecutorFailedMessage(this->job, this, cause,
                                                                           this->getPropertyValueAsDouble(
-                                                                                  StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+                                                                                  StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
         return;
       }

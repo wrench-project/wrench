@@ -12,6 +12,7 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(StandardJobExecutorProperty, WORKUNIT_EXECUTOR_STARTUP_OVERHEAD);
+    SET_PROPERTY_NAME(StandardJobExecutorProperty, THREAD_STARTUP_OVERHEAD);
     SET_PROPERTY_NAME(StandardJobExecutorProperty, STANDARD_JOB_DONE_MESSAGE_PAYLOAD);
+    SET_PROPERTY_NAME(StandardJobExecutorProperty, STANDARD_JOB_FAILED_MESSAGE_PAYLOAD);
 };

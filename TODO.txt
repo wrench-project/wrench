@@ -17,7 +17,7 @@ DATA STORAGE IMPLEMENTATION:
     - Decide what to do about "partial failures"
         - How do we report what has completed, and what hasn't upon failure
         - Or do we leave it as is and the WMS has to inspect things?
-        
+
     - SIMULATION OF STORAGE RESOURCE WITH S4U!!!
 
 ---------------------------------------------------------------------
@@ -118,7 +118,7 @@ ICS632:
                    - Results: We have both the tool and the methodology to do "WMS science"
                    - Stochastic studies, sensitivity studies, impact of platform parameters...
 
-            - Calibration: SHF?
+            - Calibration: SHF? November 15th deadline
 
             - WMS Research questions:
 
@@ -148,8 +148,6 @@ ICS632:
     - Kill_all() [ OPEN ON GITHUB ]
         - The processes doing a GET() seem to get a NULL messages
         - The processes doing a wait() seem to segfault
-
-    - S4U: wait_any?  [OPEN ON GITHUB]
 
     - S4U: When will we getMessage C++ Exceptions from SIMIX? (signal handler sucks)
         - Related: Actor throwing exception is not caught by launch()...
