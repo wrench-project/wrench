@@ -305,8 +305,9 @@ private:
 
         double observed_task_duration = after - before;
 
+        double expected_duration = task->getFlops() / 6;
         // Does the task completion time make sense?
-        if ((observed_task_duration < (task->getFlops() / 6)) || (observed_task_duration > (task->getFlops() + EPSILON) / 6)) {
+        if ((observed_task_duration < expected_duration) || (observed_task_duration > expected_duration + EPSILON)) {
           throw std::runtime_error(
                   "Case 1: Unexpected task duration (should be around " + std::to_string(task->getFlops()) + " but is " +
                   std::to_string(observed_task_duration) + ")");
@@ -316,9 +317,124 @@ private:
       }
 
 
+       /** Case 2: Create a multicore task with 50% parallel efficiency that lasts one hour **/
+      {
+        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
+        task->addInputFile(workflow->getFileById("input_file"));
+        task->addOutputFile(workflow->getFileById("output_file"));
 
+        // Create a StandardJob
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                task,
+                {
+                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                });
 
+        std::string my_mailbox = "TEST_CALLBACK_MAILBOX";
 
+        double before = wrench::S4U_Simulation::getClock();
+
+        // Create a StandardJobExecutor that will run stuff on one host and 6 core
+        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+                test->simulation,
+                my_mailbox,
+                test->simulation->getHostnameList()[0],
+                job,
+                {{test->simulation->getHostnameList()[0], 10}},
+                nullptr,
+                {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
+        );
+
+        // Wait for a message on my mailbox
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+          message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> cause) {
+          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        wrench::StandardJobExecutorDoneMessage *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        if (!msg) {
+          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        double after = wrench::S4U_Simulation::getClock();
+
+        double observed_task_duration = after - before;
+
+        double expected_duration = task->getFlops() / (10 * task->getParallelEfficiency());
+
+        // Does the task completion time make sense?
+        if ((observed_task_duration < expected_duration) || (observed_task_duration > expected_duration  + EPSILON)) {
+          throw std::runtime_error(
+                  "Case 2: Unexpected task duration (should be around " + std::to_string(task->getFlops()) + " but is " +
+                  std::to_string(observed_task_duration) + ")");
+        }
+
+        workflow->removeTask(task);
+      }
+
+      /** Case 3: Create a multicore task with 50% parallel efficiency and include thread startup overhead **/
+      {
+        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
+        task->addInputFile(workflow->getFileById("input_file"));
+        task->addOutputFile(workflow->getFileById("output_file"));
+
+        // Create a StandardJob
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                task,
+                {
+                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                });
+
+        std::string my_mailbox = "TEST_CALLBACK_MAILBOX";
+
+        double before = wrench::S4U_Simulation::getClock();
+
+        // Create a StandardJobExecutor that will run stuff on one host and 6 core
+        double thread_startup_overhead = 14;
+        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+                test->simulation,
+                my_mailbox,
+                test->simulation->getHostnameList()[0],
+                job,
+                {{test->simulation->getHostnameList()[0], 10}},
+                nullptr,
+                {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(thread_startup_overhead)}}
+        );
+
+        // Wait for a message on my mailbox
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+          message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> cause) {
+          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        wrench::StandardJobExecutorDoneMessage *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        if (!msg) {
+          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        double after = wrench::S4U_Simulation::getClock();
+
+        double observed_task_duration = after - before;
+
+        double expected_duration = 10 * thread_startup_overhead + task->getFlops() / (10 * task->getParallelEfficiency());
+
+        // Does the task completion time make sense?
+        if ((observed_task_duration < expected_duration) || (observed_task_duration > expected_duration  + EPSILON)) {
+          throw std::runtime_error(
+                  "Case 3: Unexpected task duration (should be around " + std::to_string(task->getFlops()) + " but is " +
+                  std::to_string(observed_task_duration) + ")");
+        }
+
+        workflow->removeTask(task);
+      }
 
 
       // Terminate everything
