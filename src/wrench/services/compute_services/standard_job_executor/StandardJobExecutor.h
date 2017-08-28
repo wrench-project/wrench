@@ -12,7 +12,6 @@
 
 
 #include <queue>
-#include <deque>
 #include <set>
 
 #include <services/compute_services/ComputeService.h>
@@ -47,7 +46,7 @@ namespace wrench {
                 std::string callback_mailbox,
                 std::string hostname,
                 StandardJob *job,
-                std::set<std::tuple<std::string, unsigned long>> compute_resources,
+                std::set<std::pair<std::string, unsigned long>> compute_resources,
                 StorageService *default_storage_service,
                 std::map<std::string, std::string> plist = {});
 
@@ -60,7 +59,7 @@ namespace wrench {
         Simulation *simulation;
         std::string callback_mailbox;
         StandardJob *job;
-        std::set<std::tuple<std::string, unsigned long>> compute_resources;
+        std::set<std::pair<std::string, unsigned long>> compute_resources;
         int total_num_cores;
         StorageService *default_storage_service;
 
@@ -72,7 +71,7 @@ namespace wrench {
 
         // Work units
         std::set<std::shared_ptr<Workunit>> non_ready_workunits;
-        std::deque<std::shared_ptr<Workunit>> ready_workunits;
+        std::set<std::shared_ptr<Workunit>> ready_workunits;
         std::set<std::shared_ptr<Workunit>> running_workunits;
         std::set<std::shared_ptr<Workunit>> completed_workunits;
 
@@ -80,10 +79,13 @@ namespace wrench {
         std::map<std::string, std::string> property_list;
 
         std::map<std::string, std::string> default_property_values = {
-                        {StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"},
-                        {StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
-                        {StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
-                };
+                {StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"},
+                {StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
+                {StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
+                {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, "maximum"},
+                {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM, "maximum_flops"},
+                {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "best_fit"},
+        };
 
         int main();
 
@@ -100,9 +102,11 @@ namespace wrench {
 
         bool processNextMessage();
 
-        bool dispatchNextPendingWork();
+        void dispatchReadyWorkunits();
 
         void createWorkunits();
+
+        std::vector<std::shared_ptr<Workunit>> sortReadyWorkunits();
 
     };
 

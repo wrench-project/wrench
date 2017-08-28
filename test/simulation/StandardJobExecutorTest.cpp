@@ -27,8 +27,9 @@ public:
     wrench::Simulation *simulation;
 
 
-    void do_OneSingleCoreTaskTestWMS_test();
-    void do_OneMultiCoreTaskTestWMS_test();
+    void do_OneSingleCoreTaskTest_test();
+    void do_OneMultiCoreTaskTest_test();
+    void do_TwoMultiCoreTasksTest_test();
 
 
 protected:
@@ -67,9 +68,9 @@ class OneSingleCoreTaskTestWMS : public wrench::WMS {
 
 public:
     OneSingleCoreTaskTestWMS(StandardJobExecutorTest *test,
-                wrench::Workflow *workflow,
-                std::unique_ptr<wrench::Scheduler> scheduler,
-                std::string hostname) :
+                             wrench::Workflow *workflow,
+                             std::unique_ptr<wrench::Scheduler> scheduler,
+                             std::string hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -94,27 +95,32 @@ private:
       task->addInputFile(workflow->getFileById("input_file"));
       task->addOutputFile(workflow->getFileById("output_file"));
 
-      // Create a StandardJob
+      // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
       wrench::StandardJob *job = job_manager->createStandardJob(
-              task,
+              {task},
               {
                       {*(task->getInputFiles().begin()), this->test->storage_service1},
                       {*(task->getOutputFiles().begin()), this->test->storage_service1}
-              });
+              },
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(workflow->getFileById("input_file"), this->test->storage_service1, this->test->storage_service2)},
+              {},
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"), this->test->storage_service2)});
 
-      std::string my_mailbox = "TEST_CALLBACK_MAILBOX";
+      std::string my_mailbox = "test_callback_mailbox";
 
-      // Create a StandardJobExecutor that wil run stuff on one host and one core
+      double before = wrench::S4U_Simulation::getClock();
+
+      // Create a StandardJobExecutor that will run stuff on one host and one core
       double thread_startup_overhead = 10.0;
       wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
               test->simulation,
               my_mailbox,
               test->simulation->getHostnameList()[0],
               job,
-              {std::tuple<std::string, unsigned long>{test->simulation->getHostnameList()[0], 2}},
+              {std::pair<std::string, unsigned long>{test->simulation->getHostnameList()[0], 2}},
               nullptr,
               {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(thread_startup_overhead)}}
-              );
+      );
 
       // Wait for a message on my mailbox
       std::unique_ptr<wrench::SimulationMessage> message;
@@ -130,17 +136,22 @@ private:
         throw std::runtime_error("Unexpected '" + message->getName() + "' message");
       }
 
+      double after = wrench::S4U_Simulation::getClock();
+
+      double observed_duration = after - before;
+
+      double expected_duration = task->getFlops()  + 2 * thread_startup_overhead;
+
       // Does the task completion time make sense?
-      if ((task->getEndDate() < task->getFlops() + thread_startup_overhead) ||
-              (task->getEndDate() > task->getFlops() + thread_startup_overhead + EPSILON)) {
+      if ((task->getEndDate() < expected_duration) ||
+          (task->getEndDate() > expected_duration + thread_startup_overhead + EPSILON)) {
         throw std::runtime_error("Unexpected task completion time (should be around " +
-                                         std::to_string(task->getFlops() + thread_startup_overhead) + " but is " +
-                                         std::to_string(task->getEndDate()) + ")");
+                                 std::to_string(expected_duration) + " but is " +
+                                 std::to_string(task->getEndDate()) + ")");
       }
 
       // Doe the task-stored time information look good
-      if ((task->getStartDate() > EPSILON) || (task->getEndDate() > wrench::S4U_Simulation::getClock()) ||
-              (wrench::S4U_Simulation::getClock() - task->getEndDate() > EPSILON)) {
+      if ((task->getStartDate() > thread_startup_overhead + EPSILON) || (task->getEndDate() > wrench::S4U_Simulation::getClock() - thread_startup_overhead)) {
         throw std::runtime_error(
                 "Case 1: Unexpected task start and/or end date (start = " + std::to_string(task->getStartDate()) +
                 "; end = " + std::to_string(task->getEndDate()));
@@ -161,11 +172,11 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorTest, OneSingleCoreTaskTestWMS) {
-  DO_TEST_WITH_FORK(do_OneSingleCoreTaskTestWMS_test);
+TEST_F(StandardJobExecutorTest, OneSingleCoreTaskTest) {
+  DO_TEST_WITH_FORK(do_OneSingleCoreTaskTest_test);
 }
 
-void StandardJobExecutorTest::do_OneSingleCoreTaskTestWMS_test() {
+void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
 
   // Create and initialize a simulation
   simulation = new wrench::Simulation();
@@ -184,8 +195,297 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTestWMS_test() {
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskTestWMS(this, workflow,
-                                                       std::unique_ptr<wrench::Scheduler>(
-                                                               new wrench::RandomScheduler()), hostname))));
+                                                                    std::unique_ptr<wrench::Scheduler>(
+                          new wrench::RandomScheduler()), hostname))));
+
+  // Create a Compute Service (we don't use it)
+  wrench::ComputeService *compute_service;
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MulticoreComputeService>(
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      nullptr,
+                                                      {}))));
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+  // Create another Storage Service
+  EXPECT_NO_THROW(storage_service2 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname));
+
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+  // Create two workflow files
+  wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
+  wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  ONE MULTI-CORE TASK SIMULATION TEST                            **/
+/**********************************************************************/
+
+class OneMultiCoreTaskTestWMS : public wrench::WMS {
+
+public:
+    OneMultiCoreTaskTestWMS(StandardJobExecutorTest *test,
+                            wrench::Workflow *workflow,
+                            std::unique_ptr<wrench::Scheduler> scheduler,
+                            std::string hostname) :
+            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    StandardJobExecutorTest *test;
+
+    int main() {
+
+      // Create a job manager
+      std::unique_ptr<wrench::JobManager> job_manager =
+              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+
+//      // Create a data movement manager
+//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
+//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+
+
+
+      /** Case 1: Create a multicore task with perfect parallel efficiency that lasts one hour **/
+      {
+        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 1.0);
+        task->addInputFile(workflow->getFileById("input_file"));
+        task->addOutputFile(workflow->getFileById("output_file"));
+
+        // Create a StandardJob
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                task,
+                {
+                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                });
+
+        std::string my_mailbox = "test_callback_mailbox";
+
+        double before = wrench::S4U_Simulation::getClock();
+
+        // Create a StandardJobExecutor that will run stuff on one host and 6 core
+        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+                test->simulation,
+                my_mailbox,
+                test->simulation->getHostnameList()[0],
+                job,
+                {std::pair<std::string, unsigned long>{test->simulation->getHostnameList()[0], 6}},
+                nullptr,
+                {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
+        );
+
+        // Wait for a message on my mailbox
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+          message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> cause) {
+          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        wrench::StandardJobExecutorDoneMessage *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        if (!msg) {
+          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        double after = wrench::S4U_Simulation::getClock();
+
+        double observed_duration = after - before;
+
+        double expected_duration = task->getFlops() / 6;
+        // Does the task completion time make sense?
+        if ((observed_duration < expected_duration) || (observed_duration > expected_duration + EPSILON)) {
+          throw std::runtime_error(
+                  "Case 1: Unexpected task duration (should be around " + std::to_string(expected_duration) + " but is " +
+                  std::to_string(observed_duration) + ")");
+        }
+
+        workflow->removeTask(task);
+      }
+
+
+      /** Case 2: Create a multicore task with 50% parallel efficiency that lasts one hour **/
+      {
+        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
+        task->addInputFile(workflow->getFileById("input_file"));
+        task->addOutputFile(workflow->getFileById("output_file"));
+
+        // Create a StandardJob
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                task,
+                {
+                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                });
+
+        std::string my_mailbox = "test_callback_mailbox";
+
+        double before = wrench::S4U_Simulation::getClock();
+
+        // Create a StandardJobExecutor that will run stuff on one host and 6 core
+        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+                test->simulation,
+                my_mailbox,
+                test->simulation->getHostnameList()[0],
+                job,
+                {std::pair<std::string, unsigned long>{test->simulation->getHostnameList()[0], 10}},
+                nullptr,
+                {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
+        );
+
+        // Wait for a message on my mailbox
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+          message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> cause) {
+          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        wrench::StandardJobExecutorDoneMessage *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        if (!msg) {
+          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        double after = wrench::S4U_Simulation::getClock();
+
+        double observed_duration = after - before;
+
+        double expected_duration = task->getFlops() / (10 * task->getParallelEfficiency());
+
+        // Does the task completion time make sense?
+        if ((observed_duration < expected_duration) || (observed_duration > expected_duration  + EPSILON)) {
+          throw std::runtime_error(
+                  "Case 2: Unexpected task duration (should be around " + std::to_string(expected_duration) + " but is " +
+                  std::to_string(observed_duration) + ")");
+        }
+
+        workflow->removeTask(task);
+      }
+
+      /** Case 3: Create a multicore task with 50% parallel efficiency and include thread startup overhead **/
+      {
+        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
+        task->addInputFile(workflow->getFileById("input_file"));
+        task->addOutputFile(workflow->getFileById("output_file"));
+
+        // Create a StandardJob
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                task,
+                {
+                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                });
+
+        std::string my_mailbox = "test_callback_mailbox";
+
+        double before = wrench::S4U_Simulation::getClock();
+
+        // Create a StandardJobExecutor that will run stuff on one host and 6 core
+        double thread_startup_overhead = 14;
+        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+                test->simulation,
+                my_mailbox,
+                test->simulation->getHostnameList()[0],
+                job,
+                {std::pair<std::string, unsigned long>{test->simulation->getHostnameList()[0], 10}},
+                nullptr,
+                {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(thread_startup_overhead)}}
+        );
+
+        // Wait for a message on my mailbox
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+          message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> cause) {
+          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        wrench::StandardJobExecutorDoneMessage *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        if (!msg) {
+          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        double after = wrench::S4U_Simulation::getClock();
+
+        double observed_duration = after - before;
+
+        double expected_duration = 10 * thread_startup_overhead + task->getFlops() / (10 * task->getParallelEfficiency());
+
+        // Does the task completion time make sense?
+        if ((observed_duration < expected_duration) || (observed_duration > expected_duration  + EPSILON)) {
+          throw std::runtime_error(
+                  "Case 3: Unexpected job duration (should be around " + std::to_string(expected_duration) + " but is " +
+                  std::to_string(observed_duration) + ")");
+        }
+
+        workflow->removeTask(task);
+      }
+
+
+      // Terminate everything
+      this->simulation->shutdownAllComputeServices();
+      this->simulation->shutdownAllStorageServices();
+      this->simulation->getFileRegistryService()->stop();
+      return 0;
+    }
+};
+
+TEST_F(StandardJobExecutorTest, OneMultiCoreTaskTest) {
+  DO_TEST_WITH_FORK(do_OneMultiCoreTaskTest_test);
+}
+
+void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
+
+  // Create and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+          std::unique_ptr<wrench::WMS>(new OneMultiCoreTaskTestWMS(this, workflow,
+                                                                   std::unique_ptr<wrench::Scheduler>(
+                          new wrench::RandomScheduler()), hostname))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -226,14 +526,15 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTestWMS_test() {
 
 
 
+
 /**********************************************************************/
-/**  ONE MULTI-CORE TASK SIMULATION TEST                            **/
+/**  TWO MULTI-CORE TASKS SIMULATION TEST                            **/
 /**********************************************************************/
 
-class OneMultiCoreTaskTestWMS : public wrench::WMS {
+class TwoMultiCoreTasksTestWMS : public wrench::WMS {
 
 public:
-    OneMultiCoreTaskTestWMS(StandardJobExecutorTest *test,
+    TwoMultiCoreTasksTestWMS(StandardJobExecutorTest *test,
                              wrench::Workflow *workflow,
                              std::unique_ptr<wrench::Scheduler> scheduler,
                              std::string hostname) :
@@ -257,32 +558,38 @@ private:
 //              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
 
 
-
-      /** Case 1: Create a multicore task with perfect parallel efficiency that lasts one hour **/
+      /** Case 1: Create two tasks that will run in sequence **/
       {
-        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 1.0);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 2, 6, 1.0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 300, 6, 6, 1.0);
+        task1->addInputFile(workflow->getFileById("input_file"));
+        task1->addOutputFile(workflow->getFileById("output_file"));
+        task2->addInputFile(workflow->getFileById("input_file"));
+        task2->addOutputFile(workflow->getFileById("output_file"));
 
-        // Create a StandardJob
+        // Create a StandardJob with both tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
-                task,
+                {task1, task2},
                 {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
-                });
+                        {workflow->getFileById("input_file"),  this->test->storage_service1},
+                        {workflow->getFileById("output_file"), this->test->storage_service1}
+                },
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(workflow->getFileById("input_file"), this->test->storage_service1, this->test->storage_service2)},
+                {},
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"), this->test->storage_service2)}
+        );
 
-        std::string my_mailbox = "TEST_CALLBACK_MAILBOX";
+        std::string my_mailbox = "test_callback_mailbox";
 
         double before = wrench::S4U_Simulation::getClock();
 
-        // Create a StandardJobExecutor that will run stuff on one host and 6 core
+        // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
         wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
                 job,
-                {std::tuple<std::string, unsigned long>{test->simulation->getHostnameList()[0], 6}},
+                {std::pair<std::string, unsigned long>{test->simulation->getHostnameList()[0], 10}},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
@@ -303,138 +610,22 @@ private:
 
         double after = wrench::S4U_Simulation::getClock();
 
-        double observed_task_duration = after - before;
+        double observed_duration = after - before;
 
-        double expected_duration = task->getFlops() / 6;
+        double expected_duration = task1->getFlops() / 6 + task2->getFlops() / 6;
         // Does the task completion time make sense?
-        if ((observed_task_duration < expected_duration) || (observed_task_duration > expected_duration + EPSILON)) {
+        if ((observed_duration < expected_duration) || (observed_duration > expected_duration + EPSILON)) {
           throw std::runtime_error(
-                  "Case 1: Unexpected task duration (should be around " + std::to_string(task->getFlops()) + " but is " +
-                  std::to_string(observed_task_duration) + ")");
+                  "Case 1: Unexpected job duration (should be around " +
+                  std::to_string(expected_duration) + " but is " +
+                  std::to_string(observed_duration) + ")");
         }
 
-        workflow->removeTask(task);
+        workflow->removeTask(task1);
+        workflow->removeTask(task2);
       }
 
 
-       /** Case 2: Create a multicore task with 50% parallel efficiency that lasts one hour **/
-      {
-        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
-
-        // Create a StandardJob
-        wrench::StandardJob *job = job_manager->createStandardJob(
-                task,
-                {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
-                });
-
-        std::string my_mailbox = "TEST_CALLBACK_MAILBOX";
-
-        double before = wrench::S4U_Simulation::getClock();
-
-        // Create a StandardJobExecutor that will run stuff on one host and 6 core
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
-                test->simulation,
-                my_mailbox,
-                test->simulation->getHostnameList()[0],
-                job,
-                {std::tuple<std::string, unsigned long>{test->simulation->getHostnameList()[0], 10}},
-                nullptr,
-                {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
-
-        // Wait for a message on my mailbox
-        std::unique_ptr<wrench::SimulationMessage> message;
-        try {
-          message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> cause) {
-          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-        }
-
-        // Did we get the expected message?
-        wrench::StandardJobExecutorDoneMessage *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
-        if (!msg) {
-          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-        }
-
-        double after = wrench::S4U_Simulation::getClock();
-
-        double observed_task_duration = after - before;
-
-        double expected_duration = task->getFlops() / (10 * task->getParallelEfficiency());
-
-        // Does the task completion time make sense?
-        if ((observed_task_duration < expected_duration) || (observed_task_duration > expected_duration  + EPSILON)) {
-          throw std::runtime_error(
-                  "Case 2: Unexpected task duration (should be around " + std::to_string(task->getFlops()) + " but is " +
-                  std::to_string(observed_task_duration) + ")");
-        }
-
-        workflow->removeTask(task);
-      }
-
-      /** Case 3: Create a multicore task with 50% parallel efficiency and include thread startup overhead **/
-      {
-        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
-
-        // Create a StandardJob
-        wrench::StandardJob *job = job_manager->createStandardJob(
-                task,
-                {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
-                });
-
-        std::string my_mailbox = "TEST_CALLBACK_MAILBOX";
-
-        double before = wrench::S4U_Simulation::getClock();
-
-        // Create a StandardJobExecutor that will run stuff on one host and 6 core
-        double thread_startup_overhead = 14;
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
-                test->simulation,
-                my_mailbox,
-                test->simulation->getHostnameList()[0],
-                job,
-                {std::tuple<std::string, unsigned long>{test->simulation->getHostnameList()[0], 10}},
-                nullptr,
-                {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(thread_startup_overhead)}}
-        );
-
-        // Wait for a message on my mailbox
-        std::unique_ptr<wrench::SimulationMessage> message;
-        try {
-          message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> cause) {
-          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
-        }
-
-        // Did we get the expected message?
-        wrench::StandardJobExecutorDoneMessage *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
-        if (!msg) {
-          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
-        }
-
-        double after = wrench::S4U_Simulation::getClock();
-
-        double observed_task_duration = after - before;
-
-        double expected_duration = 10 * thread_startup_overhead + task->getFlops() / (10 * task->getParallelEfficiency());
-
-        // Does the task completion time make sense?
-        if ((observed_task_duration < expected_duration) || (observed_task_duration > expected_duration  + EPSILON)) {
-          throw std::runtime_error(
-                  "Case 3: Unexpected task duration (should be around " + std::to_string(task->getFlops()) + " but is " +
-                  std::to_string(observed_task_duration) + ")");
-        }
-
-        workflow->removeTask(task);
-      }
 
 
       // Terminate everything
@@ -445,11 +636,11 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorTest, OneMultiCoreTaskTestWMS) {
-  DO_TEST_WITH_FORK(do_OneMultiCoreTaskTestWMS_test);
+TEST_F(StandardJobExecutorTest, TwoMultiCoreTasksTest) {
+  DO_TEST_WITH_FORK(do_TwoMultiCoreTasksTest_test);
 }
 
-void StandardJobExecutorTest::do_OneMultiCoreTaskTestWMS_test() {
+void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
 
   // Create and initialize a simulation
   simulation = new wrench::Simulation();
@@ -467,7 +658,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestWMS_test() {
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new OneMultiCoreTaskTestWMS(this, workflow,
+          std::unique_ptr<wrench::WMS>(new TwoMultiCoreTasksTestWMS(this, workflow,
                                                                     std::unique_ptr<wrench::Scheduler>(
                           new wrench::RandomScheduler()), hostname))));
 
@@ -479,8 +670,13 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTestWMS_test() {
                                                       nullptr,
                                                       {}))));
 
-  // Create a Storage Service
+  // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+  // Create another Storage Services
+  EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
                   new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 

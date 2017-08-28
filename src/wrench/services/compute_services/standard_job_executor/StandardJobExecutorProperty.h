@@ -23,10 +23,34 @@ namespace wrench {
 
     public:
 
-        /** @brief The number of seconds to start a work unit executor **/
+        /** @brief The number of seconds to start a thread **/
         DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
+        /** @brief The number of bytes in the control message sent by the executor to state that it has completed a job **/
         DECLARE_PROPERTY_NAME(STANDARD_JOB_DONE_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent by the executor to state that a job has failed **/
         DECLARE_PROPERTY_NAME(STANDARD_JOB_FAILED_MESSAGE_PAYLOAD);
+
+
+        /** @brief The algorithm that decides how many cores are given to
+         *         a computational task. Possible values are:
+         *                  - maximum (default)
+         *                  - minimum
+         **/
+        DECLARE_PROPERTY_NAME(CORE_ALLOCATION_ALGORITHM);
+
+        /** @brief The algorithm that decides which ready computational task,
+         *         in case multiple could be ran, should run first. Possible values are:
+         *                  - maximum_flops (default)
+         *                  - maximum_minimum_cores
+         **/
+        DECLARE_PROPERTY_NAME(TASK_SELECTION_ALGORITHM);
+
+        /** @brief The algorithm that decides on which host a task should
+         *         be placed. Possible values are:
+         *                  - best fit (default)
+         */
+        DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
+
     };
 
     /***********************/

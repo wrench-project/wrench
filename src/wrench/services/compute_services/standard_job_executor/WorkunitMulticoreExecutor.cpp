@@ -67,6 +67,7 @@ namespace wrench {
 
       // Start my daemon on the host
       this->start(this->hostname);
+
     }
 
     /**
@@ -153,6 +154,12 @@ namespace wrench {
         WorkflowFile *file = std::get<0>(file_copy);
         StorageService *src = std::get<1>(file_copy);
         StorageService *dst = std::get<2>(file_copy);
+
+        if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
+          throw std::runtime_error("WorkunitMulticoreExecutor::performWork(): internal error: malformed workunit");
+        }
+
+//        std::cerr << "   " << file->getId() << " from " << src->getName() << " to " << dst->getName() << "\n";
         try {
           WRENCH_INFO("Copying file %s from %s to %s",
                       file->getId().c_str(),
@@ -235,6 +242,11 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Simulate the execution of a multicore computation
+     * @param flops: the number of flops
+     * @param parallel_efficiency: the parallel efficiency
+     */
     void WorkunitMulticoreExecutor::runMulticoreComputation(double flops, double parallel_efficiency) {
        double effective_flops = (flops / (this->num_cores * parallel_efficiency));
 
@@ -258,6 +270,22 @@ namespace wrench {
         compute_threads[i]->join();
       }
 
+    }
+
+    /**
+     * @brief Returns the name of the host the executor is running on
+     * @return a hostname
+     */
+    std::string WorkunitMulticoreExecutor::getHostname() {
+      return this->hostname;
+    }
+
+    /**
+     * @brief Returns the number of cores the executor is running on
+     * @return number of cores
+     */
+    unsigned long WorkunitMulticoreExecutor::getNumCores() {
+      return this->num_cores;
     }
 
 };

@@ -97,6 +97,55 @@ namespace wrench {
         throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
       }
 
+      // Do a sanity check of everything (looking for nullptr)
+      for (auto t : tasks) {
+        if (t == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr task in the task vector");
+        }
+      }
+
+      for (auto fl : file_locations) {
+        if (fl.first == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the file_locations map");
+        }
+        if (fl.second == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the file_locations map");
+        }
+      }
+
+      for (auto fc : pre_file_copies) {
+        if (std::get<0>(fc) == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the pre_file_copies set");
+        }
+        if (std::get<1>(fc) == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the pre_file_copies set");
+        }
+        if (std::get<2>(fc) == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the pre_file_copies set");
+        }
+      }
+
+      for (auto fc : post_file_copies) {
+        if (std::get<0>(fc) == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the post_file_copies set");
+        }
+        if (std::get<1>(fc) == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the post_file_copies set");
+        }
+        if (std::get<2>(fc) == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the post_file_copies set");
+        }
+      }
+
+      for (auto fd : cleanup_file_deletions) {
+        if (std::get<0>(fd) == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the cleanup_file_deletions set");
+        }
+        if (std::get<1>(fd) == nullptr) {
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the cleanup_file_deletions set");
+        }
+      }
+
       StandardJob *raw_ptr = new StandardJob(tasks, file_locations, pre_file_copies, post_file_copies,
                                              cleanup_file_deletions);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);

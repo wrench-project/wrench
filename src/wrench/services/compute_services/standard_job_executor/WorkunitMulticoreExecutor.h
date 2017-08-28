@@ -47,6 +47,9 @@ namespace wrench {
 
         void kill();
 
+        std::string getHostname();
+        unsigned long getNumCores();
+
         /** @brief The Workunit this WorkunitExecutor is supposed to perform */
         std::shared_ptr<Workunit> workunit;
 
@@ -58,7 +61,7 @@ namespace wrench {
         void runMulticoreComputation(double flops, double parallel_efficiency);
 
 
-            Simulation *simulation;
+        Simulation *simulation;
         std::string callback_mailbox;
         std::string hostname;
         unsigned long num_cores;
