@@ -62,7 +62,7 @@ namespace wrench {
       }
 
       // Check that there are enough cores to run the computational tasks
-      int min_required_num_cores = 0;
+      unsigned long min_required_num_cores = 0;
       for (auto task : job->tasks) {
         min_required_num_cores = (min_required_num_cores < task->getMinNumCores() ? task->getMinNumCores() : min_required_num_cores);
       }

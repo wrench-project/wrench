@@ -253,7 +253,7 @@ namespace wrench {
       // Create an actor to run the computation
       std::vector<simgrid::s4u::ActorPtr> compute_threads;
 
-      for (int i=0; i < this->num_cores; i++) {
+      for (unsigned long i=0; i < this->num_cores; i++) {
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
           compute_threads.push_back(simgrid::s4u::Actor::createActor("compute_thread",
