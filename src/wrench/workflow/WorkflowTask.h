@@ -30,9 +30,9 @@ namespace wrench {
 
         double getFlops() const;
 
-        int getMinNumCores() const;
+        unsigned long getMinNumCores() const;
 
-        int getMaxNumCores() const;
+        unsigned long getMaxNumCores() const;
 
         double getParallelEfficiency() const;
 
@@ -120,8 +120,8 @@ namespace wrench {
         std::string id;                    // Task ID
         std::string cluster_id;            // ID for clustered task
         double flops;                      // Number of flops
-        int min_num_cores = 1; // = 1 (always?)
-        int max_num_cores = 1; // = infty?
+        unsigned long min_num_cores = 1; // = 1 (always?)
+        unsigned long max_num_cores = 1; // = infty?
         double parallel_efficiency = 1.0;
 
         double start_date = -1.0;          // Date at which task began execution (getter?)

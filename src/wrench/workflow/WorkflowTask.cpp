@@ -90,7 +90,7 @@ namespace wrench {
      *
      * @return the number of cores
      */
-    int WorkflowTask::getMinNumCores() const {
+    unsigned long WorkflowTask::getMinNumCores() const {
       return this->min_num_cores;
     }
 
@@ -99,7 +99,7 @@ namespace wrench {
      *
      * @return the number of cores
      */
-    int WorkflowTask::getMaxNumCores() const {
+    unsigned long WorkflowTask::getMaxNumCores() const {
       return this->max_num_cores;
     }
 
