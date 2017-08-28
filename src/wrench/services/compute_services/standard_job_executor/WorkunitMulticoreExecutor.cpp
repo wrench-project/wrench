@@ -187,7 +187,7 @@ namespace wrench {
         }
 
         // Run the task's computation (which can be multicore)
-        WRENCH_INFO("Executing task %s (%lf flops)", task->getId().c_str(), task->getFlops());
+        WRENCH_INFO("Executing task %s (%lf flops) on %ld cores", task->getId().c_str(), task->getFlops(), this->num_cores);
         task->setRunning();
         task->setStartDate(S4U_Simulation::getClock());
 
@@ -266,7 +266,7 @@ namespace wrench {
       }
 
       // Wait for all actors to complete
-      for (int i=0; i < compute_threads.size(); i++) {
+      for (unsigned long i=0; i < compute_threads.size(); i++) {
         compute_threads[i]->join();
       }
 

@@ -207,12 +207,12 @@ namespace wrench {
           std::string core_allocation_algorithm =
                   this->getPropertyValueAsString(StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM);
 
-          minimum_num_cores = (unsigned long) (wu->tasks[0]->getMinNumCores());
+          minimum_num_cores = wu->tasks[0]->getMinNumCores();
 
           if (core_allocation_algorithm == "maximum") {
-            desired_num_cores = (unsigned long) wu->tasks[0]->getMaxNumCores();
+            desired_num_cores = wu->tasks[0]->getMaxNumCores();
           } else if (core_allocation_algorithm == "minimum") {
-            desired_num_cores = (unsigned long) wu->tasks[0]->getMinNumCores();
+            desired_num_cores = wu->tasks[0]->getMinNumCores();
           } else {
             throw std::runtime_error("Unknown StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
                                      + core_allocation_algorithm + "'");
@@ -228,6 +228,7 @@ namespace wrench {
         // Find a host on which to run the workunit
 
 
+        WRENCH_INFO("Looking for a host to run a working unit that needs at least %ld cores and would like %ld cores", minimum_num_cores, desired_num_cores);
         std::string host_selection_algorithm =
                 this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
 
@@ -451,6 +452,9 @@ namespace wrench {
         }
       }
 
+      // Update core availabilities
+      this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
+
       // Remove the work from the running work queue
       if (this->running_workunits.find(workunit) == this->running_workunits.end()) {
         throw std::runtime_error(
@@ -493,9 +497,8 @@ namespace wrench {
         return;
       }
 
+
     }
-
-
 
 
 

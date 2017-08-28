@@ -519,8 +519,6 @@ namespace wrench {
     void StorageService::copyFile(WorkflowFile *file, StorageService *src) {
 
 
-      WRENCH_INFO("IN COPY_FILE");
-
       if ((file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
       }

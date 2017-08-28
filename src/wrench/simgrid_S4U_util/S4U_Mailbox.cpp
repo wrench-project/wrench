@@ -56,7 +56,7 @@ namespace wrench {
         throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, mailbox_name));
       }
 
-      WRENCH_INFO("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
+      WRENCH_DEBUG("GOT a '%s' message from %s", msg->getName().c_str(), mailbox_name.c_str());
       return std::unique_ptr<SimulationMessage>(msg);
     }
 
