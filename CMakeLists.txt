@@ -15,10 +15,10 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationMessage.h
         src/wrench/workflow_execution_events/WorkflowExecutionEvent.cpp
         src/wrench/workflow_execution_events/WorkflowExecutionEvent.h
-        src/wrench/simgrid_S4U_util/S4U_DaemonWithMailbox.cpp
-        src/wrench/simgrid_S4U_util/S4U_DaemonWithMailbox.h
-        src/wrench/simgrid_S4U_util/S4U_DaemonWithMailboxActor.cpp
-        src/wrench/simgrid_S4U_util/S4U_DaemonWithMailboxActor.h
+        src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
+        src/wrench/simgrid_S4U_util/S4U_Daemon.h
+        src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
+        src/wrench/simgrid_S4U_util/S4U_DaemonActor.h
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
         src/wrench/simgrid_S4U_util/S4U_Simulation.h
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp

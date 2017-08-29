@@ -25,7 +25,7 @@ namespace wrench {
      * @param mailbox_name_prefix: the prefix for the mailbox name
      */
     Service::Service(std::string process_name_prefix, std::string mailbox_name_prefix) :
-            S4U_DaemonWithMailbox(process_name_prefix, mailbox_name_prefix) {
+            S4U_Daemon(process_name_prefix, mailbox_name_prefix) {
       this->name = process_name_prefix;
       this->state = Service::UP;
     }

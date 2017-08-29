@@ -48,7 +48,7 @@ namespace wrench {
                                              std::set<std::pair<std::string, unsigned long>> compute_resources,
                                              StorageService *default_storage_service,
                                              std::map<std::string, std::string> plist) :
-            S4U_DaemonWithMailbox("standard_job_executor", "standard_job_executor") {
+            S4U_Daemon("standard_job_executor", "standard_job_executor") {
 
       if ((job == nullptr) || (compute_resources.size() <= 0)) {
         throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): invalid arguments");

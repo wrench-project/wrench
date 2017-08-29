@@ -12,7 +12,7 @@
 #define WRENCH_DATAMOVEMENTMANAGER_H
 
 
-#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
+#include <simgrid_S4U_util/S4U_Daemon.h>
 
 namespace wrench {
 
@@ -27,7 +27,7 @@ namespace wrench {
     /**
      * @brief A helper daemon (co-located with a WMS) that handles data movement operations
      */
-    class DataMovementManager : public S4U_DaemonWithMailbox {
+    class DataMovementManager : public S4U_Daemon {
 
     public:
 

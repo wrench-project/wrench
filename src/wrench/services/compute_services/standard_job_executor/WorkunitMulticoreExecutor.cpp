@@ -48,7 +48,7 @@ namespace wrench {
             std::shared_ptr<Workunit> workunit,
             StorageService *default_storage_service,
             double thread_startup_overhead) :
-            S4U_DaemonWithMailbox("workunit_multicore_executor", "workunit_multicore_executor") {
+            S4U_Daemon("workunit_multicore_executor_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber())) {
 
       if (thread_startup_overhead < 0) {
         throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): thread_startup_overhead must be >= 0");
@@ -178,7 +178,7 @@ namespace wrench {
       for (auto task : work->tasks) {
 
         // Read  all input files
-        WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getId().c_str());
+//        WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getId().c_str());
         try {
           StorageService::readFiles(task->getInputFiles(),
                                     work->file_locations,
@@ -195,7 +195,7 @@ namespace wrench {
         runMulticoreComputation(task->getFlops(), task->getParallelEfficiency());
 
 
-        WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(), task->getId().c_str());
+//        WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(), task->getId().c_str());
 
         // Write all output files
         try {

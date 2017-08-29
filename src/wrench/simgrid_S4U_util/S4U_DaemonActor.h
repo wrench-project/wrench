@@ -9,10 +9,10 @@
  *
  */
 
-#ifndef WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
-#define WRENCH_SIM4U_DAEMONWITHMAILBOXACTOR_H
+#ifndef WRENCH_SIM4U_DAEMONACTOR_H
+#define WRENCH_SIM4U_DAEMONACTOR_H
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(S4U_DaemonWithMailboxActor, "S4U_DaemonWithMailboxActor");
+XBT_LOG_NEW_DEFAULT_CATEGORY(S4U_DaemonWithMailboxActor, "S4U_DaemonActor");
 
 #include <xbt.h>
 #include <string>
@@ -27,12 +27,12 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
-    class S4U_DaemonWithMailbox;
+    class S4U_Daemon;
 
     /**
      * @brief The actor for the S4U_DaemonWithMailbox abstraction
      */
-    class S4U_DaemonWithMailboxActor {
+    class S4U_DaemonActor {
 
     public:
 
@@ -40,7 +40,7 @@ namespace wrench {
          * @brief Constructor
          * @param d: a "daemon with mailbox" instance
          */
-        explicit S4U_DaemonWithMailboxActor(S4U_DaemonWithMailbox *d) {
+        explicit S4U_DaemonActor(S4U_Daemon *d) {
           this->daemon = d;
         }
 
@@ -50,8 +50,7 @@ namespace wrench {
         void operator()() {
           try {
             this->daemon->main();
-            WRENCH_INFO("Daemon's main() function has returned");
-//            S4U_Mailbox::clear_dputs();
+//            WRENCH_INFO("Daemon's main() function has returned");
           } catch (std::exception &e) {
             throw;
           }
@@ -59,7 +58,7 @@ namespace wrench {
         }
 
     private:
-        S4U_DaemonWithMailbox *daemon;
+        S4U_Daemon *daemon;
 
     };
 

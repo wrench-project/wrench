@@ -12,7 +12,7 @@
 #define WRENCH_WORKUNITMULTICOREEXECUTOR_H
 
 
-#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
+#include <simgrid_S4U_util/S4U_Daemon.h>
 
 namespace wrench {
 
@@ -32,7 +32,7 @@ namespace wrench {
     /**
      * @brief An actor that knows how to perform a work unit
      */
-    class WorkunitMulticoreExecutor : public S4U_DaemonWithMailbox {
+    class WorkunitMulticoreExecutor : public S4U_Daemon {
 
     public:
 

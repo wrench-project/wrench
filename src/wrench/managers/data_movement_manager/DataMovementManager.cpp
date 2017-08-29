@@ -29,7 +29,7 @@ namespace wrench {
      * @param workflow: the workflow whose data (files) are to be managed
      */
     DataMovementManager::DataMovementManager(Workflow *workflow) :
-            S4U_DaemonWithMailbox("data_movement_manager", "data_movement_manager") {
+            S4U_Daemon("data_movement_manager", "data_movement_manager") {
 
       this->workflow = workflow;
 

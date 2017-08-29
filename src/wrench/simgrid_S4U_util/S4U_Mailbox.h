@@ -42,9 +42,9 @@ namespace wrench {
 //				static void clear_dputs();
 
 				static std::string generateUniqueMailboxName(std::string);
+				static unsigned long generateUniqueSequenceNumber();
 
 		private:
-				static unsigned long generateUniqueSequenceNumber();
 
 //				static std::map<simgrid::s4u::ActorPtr , std::set<simgrid::s4u::CommPtr>> dputs;
 

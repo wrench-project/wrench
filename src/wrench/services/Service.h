@@ -15,7 +15,7 @@
 #include <string>
 #include <map>
 
-#include <simgrid_S4U_util/S4U_DaemonWithMailbox.h>
+#include <simgrid_S4U_util/S4U_Daemon.h>
 
 namespace wrench {
 
@@ -24,7 +24,7 @@ namespace wrench {
     /**
      * @brief A top-level class that defines a service
      */
-    class Service : public S4U_DaemonWithMailbox {
+    class Service : public S4U_Daemon {
 
     public:
 

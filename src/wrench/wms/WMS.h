@@ -10,7 +10,7 @@
 #ifndef WRENCH_WMS_H
 #define WRENCH_WMS_H
 
-#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
+#include "simgrid_S4U_util/S4U_Daemon.h"
 #include "wms/scheduler/Scheduler.h"
 #include "wms/optimizations/dynamic/DynamicOptimization.h"
 #include "wms/optimizations/static/StaticOptimization.h"
@@ -25,7 +25,7 @@ namespace wrench {
     /**
      * @brief A top-level class that defines a workflow management system
      */
-    class WMS : public S4U_DaemonWithMailbox {
+    class WMS : public S4U_Daemon {
 
     public:
         void addStaticOptimization(std::unique_ptr<StaticOptimization>);

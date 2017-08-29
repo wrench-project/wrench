@@ -14,7 +14,7 @@
 #include <vector>
 #include <set>
 
-#include "simgrid_S4U_util/S4U_DaemonWithMailbox.h"
+#include "simgrid_S4U_util/S4U_Daemon.h"
 
 namespace wrench {
 
@@ -35,7 +35,7 @@ namespace wrench {
 		/**
      * @brief A helper daemon (co-located with the WMS) to handle job executions
      */
-		class JobManager : public S4U_DaemonWithMailbox {
+		class JobManager : public S4U_Daemon {
 
 		public:
 

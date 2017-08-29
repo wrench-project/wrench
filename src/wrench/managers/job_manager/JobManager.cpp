@@ -32,7 +32,7 @@ namespace wrench {
      * @param workflow: the workflow whose jobs are to be managed
      */
     JobManager::JobManager(Workflow *workflow) :
-            S4U_DaemonWithMailbox("job_manager", "job_manager") {
+            S4U_Daemon("job_manager", "job_manager") {
 
       this->workflow = workflow;
 

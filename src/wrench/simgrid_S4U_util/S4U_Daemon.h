@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_SIM4U_DAEMONWITHMAILBOX_H
-#define WRENCH_SIM4U_DAEMONWITHMAILBOX_H
+#ifndef WRENCH_SIM4U_DAEMON_H
+#define WRENCH_SIM4U_DAEMON_H
 
 #include <string>
 
@@ -23,7 +23,7 @@ namespace wrench {
 		/**
 		 * @brief A generic "running daemon that listens on a mailbox" abstraction
 		 */
-		class S4U_DaemonWithMailbox {
+		class S4U_Daemon {
 
 		public:
 				/** @brief The name of the daemon */
@@ -33,7 +33,9 @@ namespace wrench {
 				/** @brief The name of the host on which the daemon is running */
 				std::string hostname;
 
-				S4U_DaemonWithMailbox(std::string process_name, std::string mailbox_prefix);
+				S4U_Daemon(std::string process_name, std::string mailbox_prefix);
+				S4U_Daemon(std::string process_name);
+
 				void start(std::string hostname);
 				/** @brief The daemon's main routine
 				 * @return 0 on success, !=0 otherwise

@@ -30,7 +30,7 @@ namespace wrench {
              std::unique_ptr<Scheduler> scheduler,
              std::string hostname,
              std::string suffix) :
-            S4U_DaemonWithMailbox("wms_" + suffix, "wms_" + suffix),
+            S4U_Daemon("wms_" + suffix, "wms_" + suffix),
             workflow(workflow),
             scheduler(std::move(scheduler)) {
 

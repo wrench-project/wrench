@@ -110,7 +110,6 @@ namespace wrench {
         }
 
         // Wait for a message
-        WRENCH_INFO("Waiting for next message...");
         unsigned long target = S4U_PendingCommunication::waitForSomethingToHappen(&(this->pending_communications));
 
         // Extract the pending comm
