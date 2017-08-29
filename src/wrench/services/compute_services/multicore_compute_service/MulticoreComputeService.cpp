@@ -585,14 +585,14 @@ namespace wrench {
           return true;
         }
 
-        for (auto task : msg->job->getTasks()) {
-          if ((task->getMinNumCores() > 1)) {
-            throw std::runtime_error("MulticoreComputeService currently does not support multi-core tasks, and task " +
-                                     task->getId() + " needs at least " +
-                                     std::to_string(task->getMinNumCores()) +
-                                     " cores");
-          }
-        }
+//        for (auto task : msg->job->getTasks()) {
+//          if ((task->getMinNumCores() > 1)) {
+//            throw std::runtime_error("MulticoreComputeService currently does not support multi-core tasks, and task " +
+//                                     task->getId() + " needs at least " +
+//                                     std::to_string(task->getMinNumCores()) +
+//                                     " cores");
+//          }
+//        }
 
         this->pending_jobs.push_front(msg->job);
 
