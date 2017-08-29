@@ -9,7 +9,6 @@
 
 
 #include "MulticoreComputeServiceMessage.h"
-#include "WorkUnitMulticoreExecutor.h"
 
 namespace wrench {
 
@@ -92,7 +91,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MulticoreComputeServiceNumIdleCoresAnswerMessage::MulticoreComputeServiceNumIdleCoresAnswerMessage(unsigned int num,
+    MulticoreComputeServiceNumIdleCoresAnswerMessage::MulticoreComputeServiceNumIdleCoresAnswerMessage(unsigned long num,
                                                                                                        double payload)
             :  MulticoreComputeServiceMessage("NUM_IDLE_CORES_ANSWER", payload), num_idle_cores(num) {}
 
@@ -155,54 +154,5 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Constructor
-     * @param work: the work to be done
-     * @param payload: the message size in bytes
-     */
-    WorkerThreadDoWorkRequestMessage::WorkerThreadDoWorkRequestMessage(
-            WorkUnit *work,
-            double payload) :
-            MulticoreComputeServiceMessage("WORKER_THREAD_DO_WORK_REQUEST",
-                                           payload) {
-      this->work = work;
-    }
-
-
-    /**
-     * @brief Constructor
-     * @param worker_thread: the worker thread on which the work was performed
-     * @param work: the work unit that was performed
-     * @param payload: the message size in bytes
-     */
-    WorkerThreadWorkDoneMessage::WorkerThreadWorkDoneMessage(
-            WorkUnitMultiCoreExecutor *worker_thread,
-            std::shared_ptr<WorkUnit> work,
-            double payload) :
-    MulticoreComputeServiceMessage("WORKER_THREAD_WORK_DONE", payload) {
-      this->worker_thread = worker_thread;
-      this->work = work;
-
-
-    }
-
-    /**
-     * @brief Constructor
-     * @param worker_thread: the worker thread on which the work was performed
-     * @param work: the work unit that was performed (and failed)
-     * @param cause: the cause of the failure
-     * @param payload: the message size in bytes
-     */
-    WorkerThreadWorkFailedMessage::WorkerThreadWorkFailedMessage(
-            WorkUnitMultiCoreExecutor *worker_thread,
-            std::shared_ptr<WorkUnit> work,
-            std::shared_ptr<FailureCause> cause,
-            double payload):
-    MulticoreComputeServiceMessage("WORKER_THREAD_WORK_FAILED", payload) {
-      this->worker_thread = worker_thread;
-      this->work = work;
-
-      this->cause = cause;
-    }
 
 };

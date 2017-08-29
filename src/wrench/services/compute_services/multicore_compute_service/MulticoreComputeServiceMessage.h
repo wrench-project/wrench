@@ -14,7 +14,6 @@
 
 #include <services/compute_services/ComputeServiceMessage.h>
 #include <vector>
-#include "WorkUnitMulticoreExecutor.h"
 
 namespace wrench {
 
@@ -85,10 +84,10 @@ namespace wrench {
      */
     class MulticoreComputeServiceNumIdleCoresAnswerMessage : public MulticoreComputeServiceMessage {
     public:
-        MulticoreComputeServiceNumIdleCoresAnswerMessage(unsigned int num, double payload);
+        MulticoreComputeServiceNumIdleCoresAnswerMessage(unsigned long num, double payload);
 
         /** @brief The number of idle cores */
-        unsigned int num_idle_cores;
+        unsigned long num_idle_cores;
     };
 
     /**
@@ -135,54 +134,7 @@ namespace wrench {
         double flop_rate;
     };
 
-    /**
-     * @brief WorkerThreadDoWorkRequestMessage class
-     */
-    class WorkerThreadDoWorkRequestMessage : public MulticoreComputeServiceMessage {
-    public:
-        WorkerThreadDoWorkRequestMessage(
-                WorkUnit *work,
-                double payload);
 
-        /** @brief The work to be performed */
-        WorkUnit *work;
-    };
-
-    /**
-     * @brief WorkerThreadWorkDoneMessage class
-     */
-    class WorkerThreadWorkDoneMessage : public MulticoreComputeServiceMessage {
-    public:
-        WorkerThreadWorkDoneMessage(
-                WorkUnitMultiCoreExecutor *worker_thread,
-                std::shared_ptr<WorkUnit> work_unit,
-                double payload);
-
-        /** @brief The worker thread that performed the work */
-        WorkUnitMultiCoreExecutor *worker_thread;
-        /** @brief The work that was performed */
-        std::shared_ptr<WorkUnit> work;
-
-    };
-
-    /**
-     * @brief WorkerThreadWorkFailedMessage class
-     */
-    class WorkerThreadWorkFailedMessage : public MulticoreComputeServiceMessage {
-    public:
-        WorkerThreadWorkFailedMessage(
-                WorkUnitMultiCoreExecutor *worker_thread,
-                std::shared_ptr<WorkUnit> work,
-                std::shared_ptr<FailureCause> cause,
-                double payload);
-
-        /** @brief The worker thread that failed to perform the work */
-        WorkUnitMultiCoreExecutor *worker_thread;
-        /** @brief The work that failed */
-        std::shared_ptr<WorkUnit> work;
-        /** @brief The cause of the failure */
-        std::shared_ptr<FailureCause> cause;
-    };
 
     /***********************/
     /** \endcond           */

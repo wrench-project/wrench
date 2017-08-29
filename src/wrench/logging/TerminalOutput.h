@@ -30,7 +30,6 @@
 
 //#define RUNNING_IN_GTEST
 
-
 #ifndef RUNNING_IN_GTEST
   #define WRENCH_INFO(...)  wrench::TerminalOutput::beginThisProcessColor(); XBT_INFO(__VA_ARGS__) ; wrench::TerminalOutput::endThisProcessColor()
 #else

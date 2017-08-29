@@ -74,8 +74,9 @@ namespace wrench {
      * @brief Kill the worker thread
      */
     void WorkunitMulticoreExecutor::kill() {
-      // TODO: kill all worker threads...
-      throw std::runtime_error("WorkunitMulticoreExecutor::kill(): not implemented yet");
+      for (unsigned long i=0; i < this->compute_threads.size(); i++) {
+        this->compute_threads[i]->kill();
+      }
       this->kill_actor();
     }
 
@@ -250,9 +251,7 @@ namespace wrench {
     void WorkunitMulticoreExecutor::runMulticoreComputation(double flops, double parallel_efficiency) {
        double effective_flops = (flops / (this->num_cores * parallel_efficiency));
 
-      // Create an actor to run the computation
-      std::vector<simgrid::s4u::ActorPtr> compute_threads;
-
+      // Create an actor to run the computation on each core
       for (unsigned long i=0; i < this->num_cores; i++) {
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
@@ -266,8 +265,8 @@ namespace wrench {
       }
 
       // Wait for all actors to complete
-      for (unsigned long i=0; i < compute_threads.size(); i++) {
-        compute_threads[i]->join();
+      for (unsigned long i=0; i < this->compute_threads.size(); i++) {
+        this->compute_threads[i]->join();
       }
 
     }

@@ -38,8 +38,15 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(FLOP_RATE_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state its per-core flop rate **/
         DECLARE_PROPERTY_NAME(FLOP_RATE_ANSWER_MESSAGE_PAYLOAD);
-        /** @brief The overhead to start a task execution, in seconds **/
-        DECLARE_PROPERTY_NAME(TASK_STARTUP_OVERHEAD);
+
+        /** @brief The core allocation policy:
+         *      - aggressive: always given a job as much as it might need up to the number
+         *                    of available cores (default)
+         */
+        DECLARE_PROPERTY_NAME(CORE_ALLOCATION_POLICY);
+
+        /** @brief The overhead to start a thread execution, in seconds **/
+        DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
 
     };
 

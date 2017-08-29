@@ -16,11 +16,9 @@
 #include <set>
 
 #include <services/compute_services/ComputeService.h>
+#include <services/compute_services/standard_job_executor/StandardJobExecutor.h>
 
 #include "MulticoreComputeServiceProperty.h"
-#include "WorkUnitMulticoreExecutor.h"
-#include "WorkUnit.h"
-
 
 namespace wrench {
 
@@ -67,7 +65,8 @@ namespace wrench {
                         {MulticoreComputeServiceProperty::TTL_ANSWER_MESSAGE_PAYLOAD,                     "1024"},
                         {MulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD,              "1024"},
                         {MulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD,               "1024"},
-                        {MulticoreComputeServiceProperty::TASK_STARTUP_OVERHEAD,                          "0.0"}
+                        {MulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                         "0.0"},
+                        {MulticoreComputeServiceProperty::CORE_ALLOCATION_POLICY,               "aggressive"}
                 };
 
     public:
@@ -121,38 +120,32 @@ namespace wrench {
                                 bool supports_standard_jobs,
                                 bool supports_pilot_jobs,
                                 std::map<std::string, std::string>,
-                                unsigned int num_worker_threads,
+                                unsigned long num_cores,
                                 double ttl,
                                 PilotJob *pj, std::string suffix,
                                 StorageService *default_storage_service);
 
         std::string hostname;
-        unsigned int max_num_worker_threads; // total threads to run tasks from standard jobs
-        unsigned int num_busy_cores;
+        unsigned long num_available_cores;
+
         double ttl;
         bool has_ttl;
         double death_date;
         PilotJob *containing_pilot_job;
 
-        // Vector of worker threads
-        std::set<WorkUnitMultiCoreExecutor *> working_threads;
+        // Vector of standard job executors
+        std::set<StandardJobExecutor *> standard_job_executors;
+
+        // Set of running jobs
+        std::set<WorkflowJob *> running_jobs;
 
         // Queue of pending jobs (standard or pilot) that haven't begun executing
         std::deque<WorkflowJob *> pending_jobs;
 
-        // Set of currently running (standard or pilot) jobs
-        std::set<WorkflowJob *> running_jobs;
-
-        // Work units
-        std::set<std::shared_ptr<WorkUnit>> non_ready_works;
-        std::deque<std::shared_ptr<WorkUnit>> ready_works;
-        std::set<std::shared_ptr<WorkUnit>> running_works;
-        std::set<std::shared_ptr<WorkUnit>> completed_works;
 
         int main();
 
         // Helper functions to make main() a bit more palatable
-        void initialize();
 
         void terminate(bool notify_pilot_job_submitters);
 
@@ -160,10 +153,11 @@ namespace wrench {
 
         void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
 
-        void processWorkCompletion(WorkUnitMultiCoreExecutor *worker_thread, std::shared_ptr<WorkUnit> work);
+        void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
 
-        void processWorkFailure(WorkUnitMultiCoreExecutor *worker_thread, std::shared_ptr<WorkUnit> work,
-                                std::shared_ptr<FailureCause> cause);
+        void processStandardJobFailure(StandardJobExecutor *executor,
+                                       StandardJob *job,
+                                       std::shared_ptr<FailureCause> cause);
 
         void processPilotJobCompletion(PilotJob *job);
 
@@ -172,8 +166,6 @@ namespace wrench {
         void processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox);
 
         bool processNextMessage(double timeout);
-
-        bool dispatchNextPendingWork();
 
         bool dispatchNextPendingJob();
 

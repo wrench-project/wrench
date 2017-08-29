@@ -52,6 +52,8 @@ namespace wrench {
 
         void kill();
 
+        StandardJob *getJob();
+
     private:
 
         friend class Simulation;

@@ -69,6 +69,8 @@ namespace wrench {
 
         StorageService *default_storage_service;
 
+        std::vector<simgrid::s4u::ActorPtr> compute_threads;
+
     };
 
     /***********************/

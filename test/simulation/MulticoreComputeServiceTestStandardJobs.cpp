@@ -301,7 +301,6 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(this, workflow,
                                                                                             std::unique_ptr<wrench::Scheduler>(
                                                                                                     new wrench::RandomScheduler()), hostname))));
-
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(

@@ -393,9 +393,10 @@ namespace wrench {
         this->job->incrementNumCompletedTasks();
       }
 
-      // Send the callback to the originator if the job has completed (i.e., if this
-      // work unit has no children)
-      if (workunit->children.size() == 0) {
+      // Send the callback to the originator if the job has completed
+      if ((this->non_ready_workunits.size() == 0) &&
+          (this->ready_workunits.size() == 0) &&
+          (this->running_workunits.size() == 0)) {
 
         // Erase all completed works for the job
         this->completed_workunits.clear();
@@ -681,6 +682,15 @@ namespace wrench {
 
 //      std::cerr << "RETURNING FROM sortReadyWorkunits()\n";
       return sorted_workunits;
+    }
+
+
+    /**
+     * @brief Retrieve the executor's job
+     * @return a standard job
+     */
+    StandardJob *StandardJobExecutor::getJob() {
+      return this->job;
     }
 
 
