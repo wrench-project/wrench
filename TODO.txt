@@ -50,13 +50,14 @@ NEW FEATURES FOR EDDY:
 ---------------------------------------------------------------------
 
 SOFTWARE ENGINEERING / TESTINS:
+    - Add properties to the MultiCore compute service that corresponds to the
+      undelying properties of the StandardJobExecutors it will use
+
     - Add new tests for SimpleStorage Services
         - What if one does a copy from src to src (i.e., same storage service)
 
 	- How come when sunmitting tasks with #cores=2 we don't get an exception on
           a MulticoreComputeService (still relevant?)....
-
-    - Make num cores in tasks unsigned long (instead of int)
 
     - While implementing a test for the StandardJobExecutor abstraction, Henri noted
       that when one does not create a ComputeService and launch the simulation, we
@@ -68,10 +69,6 @@ SOFTWARE ENGINEERING / TESTINS:
 
     - Chase memory leaks
         - CauseType/Exception unique_ptr?
-
-    - For the WMS, instead of having a big switch to handle events, instead do a "listener" thing:
-        A single method that says "waitForAndProcessNextEvent", that does the getMessage() and then
-        calls user-provided "take action" methods, which are defined as virtual no-op methods in the base WMS class.
 
     - Add missing "const"
 
