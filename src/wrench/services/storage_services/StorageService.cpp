@@ -397,7 +397,7 @@ namespace wrench {
           try {
             WRENCH_INFO("Reading file %s", f->getId().c_str());
             storage_service->readFile(f);
-            WRENCH_INFO("File %s read", f->getId().c_str());
+//            WRENCH_INFO("File %s read", f->getId().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -408,7 +408,7 @@ namespace wrench {
           try {
             WRENCH_INFO("Writing file %s", f->getId().c_str());
             storage_service->writeFile(f);
-            WRENCH_INFO("Wrote file %s", f->getId().c_str());
+//            WRENCH_INFO("Wrote file %s", f->getId().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {

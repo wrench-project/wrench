@@ -188,7 +188,7 @@ namespace wrench {
         }
 
         // Run the task's computation (which can be multicore)
-        WRENCH_INFO("Executing task %s (%lf flops) on %ld cores", task->getId().c_str(), task->getFlops(), this->num_cores);
+        WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getId().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
         task->setRunning();
         task->setStartDate(S4U_Simulation::getClock());
 

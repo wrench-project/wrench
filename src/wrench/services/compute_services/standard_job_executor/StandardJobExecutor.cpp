@@ -228,7 +228,7 @@ namespace wrench {
         // Find a host on which to run the workunit
 
 
-        WRENCH_INFO("Looking for a host to run a working unit that needs at least %ld cores and would like %ld cores", minimum_num_cores, desired_num_cores);
+        WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores and would like %ld cores", minimum_num_cores, desired_num_cores);
         std::string host_selection_algorithm =
                 this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
 
@@ -243,9 +243,10 @@ namespace wrench {
           for (auto h : this->compute_resources) {
             std::string hostname = std::get<0>(h);
             unsigned long num_available_cores = this->core_availabilities[hostname];
-//            std::cerr << "** LOOKING AT HOST " << hostname <<  ": " << num_available_cores << "\n";
+//              WRENCH_INFO("Looking at host %s", hostname.c_str());
 
             if (num_available_cores < minimum_num_cores) {
+//              WRENCH_INFO("Not enough cores!");
               continue;
             }
 
@@ -270,6 +271,7 @@ namespace wrench {
 
 
         if (target_host == "") { // didn't find a suitable host
+          WRENCH_INFO("Didn't find a suitable host");
 //          std::cerr << "DID NOT FIND A HOST, GOING TO NEXT WORK UNIT\n";
           continue;
         }
