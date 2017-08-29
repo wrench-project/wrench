@@ -49,8 +49,9 @@ NEW FEATURES FOR EDDY:
 
 ---------------------------------------------------------------------
 
-SOFTWARE ENGINEERING:
+SOFTWARE ENGINEERING / TESTINS:
     - Add new tests for SimpleStorage Services
+        - What if one does a copy from src to src (i.e., same storage service)
 
 	- How come when sunmitting tasks with #cores=2 we don't get an exception on
           a MulticoreComputeService (still relevant?)....
