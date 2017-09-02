@@ -9,11 +9,18 @@
 
 #include <gtest/gtest.h>
 
-#include <wrench-dev.h>
-#include <services/compute_services/standard_job_executor/StandardJobExecutor.h>
-#include <simgrid_S4U_util/S4U_Mailbox.h>
-#include <simulation/SimulationMessage.h>
-#include <services/compute_services/standard_job_executor/StandardJobExecutorMessage.h>
+#include "wrench/managers/DataMovementManager.h"
+#include "wrench/workflow/Workflow.h"
+#include "wrench/wms/WMS.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/wms/scheduler/RandomScheduler.h"
+#include "wrench/services/storage/SimpleStorageService.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench.h"
+#include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "simulation/SimulationMessage.h"
+#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 
 #include "TestWithFork.h"
 

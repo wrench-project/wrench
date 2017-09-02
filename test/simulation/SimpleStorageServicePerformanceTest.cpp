@@ -8,12 +8,18 @@
  */
 
 
-#include <math.h>
+#include <cmath>
 
 #include <gtest/gtest.h>
 
-#include <wrench-dev.h>
-
+#include "wrench/managers/DataMovementManager.h"
+#include "wrench/workflow/Workflow.h"
+#include "wrench/wms/WMS.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/wms/scheduler/RandomScheduler.h"
+#include "wrench/services/storage/SimpleStorageService.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench.h"
 #include "TestWithFork.h"
 
 
@@ -84,9 +90,9 @@ class SimpleStorageServiceConcurrencyFileCopiesTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceConcurrencyFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
-                                                  wrench::Workflow *workflow,
-                                                  std::unique_ptr<wrench::Scheduler> scheduler,
-                                                  std::string hostname) :
+                                                     wrench::Workflow *workflow,
+                                                     std::unique_ptr<wrench::Scheduler> scheduler,
+                                                     std::string hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -106,23 +112,23 @@ private:
 
       // Time the time it takes to transfer a file from Src to Dst
       double copy1_start = this->simulation->getCurrentSimulatedDate();
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
-                                                            this->test->storage_service_1,
-                                                            this->test->storage_service_2);
+      data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
+                                                          this->test->storage_service_1,
+                                                          this->test->storage_service_2);
 
       std::unique_ptr<wrench::WorkflowExecutionEvent> event1 = workflow->waitForNextExecutionEvent();
       double event1_arrival = this->simulation->getCurrentSimulatedDate();
 
       // Now do 2 of them in parallel
       double copy2_start = this->simulation->getCurrentSimulatedDate();
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_2,
-                                                            this->test->storage_service_1,
-                                                            this->test->storage_service_2);
+      data_movement_manager->initiateAsynchronousFileCopy(this->test->file_2,
+                                                          this->test->storage_service_1,
+                                                          this->test->storage_service_2);
 
       double copy3_start = this->simulation->getCurrentSimulatedDate();
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_3,
-                                                            this->test->storage_service_1,
-                                                            this->test->storage_service_2);
+      data_movement_manager->initiateAsynchronousFileCopy(this->test->file_3,
+                                                          this->test->storage_service_1,
+                                                          this->test->storage_service_2);
 
 
       std::unique_ptr<wrench::WorkflowExecutionEvent> event2 = workflow->waitForNextExecutionEvent();
@@ -139,7 +145,8 @@ private:
         throw std::runtime_error("Time between two asynchronous operations is too big");
       }
 
-      if ((fabs(transfer_time_2 / transfer_time_1 - 2.0) > 0.001) || (fabs(transfer_time_3 / transfer_time_1 - 2.0) > 0.001)) {
+      if ((fabs(transfer_time_2 / transfer_time_1 - 2.0) > 0.001) ||
+          (fabs(transfer_time_3 / transfer_time_1 - 2.0) > 0.001)) {
         throw std::runtime_error("Concurrent transfers should be roughly twice slower");
       }
 
@@ -175,7 +182,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesTestWMS(this, workflow,
-                                                                                         std::unique_ptr<wrench::Scheduler>(
+                                                                                            std::unique_ptr<wrench::Scheduler>(
                           new wrench::RandomScheduler()), "WMSHost"))));
 
   // Create a (unused) Compute Service

@@ -7,18 +7,18 @@
  * (at your option) any later version.
  */
 
-#include <services/compute_services/multicore_compute_service/MulticoreComputeService.h>
-#include <logging/TerminalOutput.h>
-#include <simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench/services/compute/MulticoreComputeService.h>
+#include <wrench/logging/TerminalOutput.h>
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
 #include <services/ServiceMessage.h>
 
-#include "FileRegistryService.h"
+#include "wrench/services/file_registry/FileRegistryService.h"
 #include "FileRegistryMessage.h"
-#include <services/storage_services/StorageService.h>
-#include <workflow/WorkflowFile.h>
-#include <exceptions/WorkflowExecutionException.h>
+#include <wrench/services/storage/StorageService.h>
+#include <wrench/workflow/WorkflowFile.h>
+#include <wrench/exceptions/WorkflowExecutionException.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
 

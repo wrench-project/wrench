@@ -7,16 +7,16 @@
  * (at your option) any later version.
  */
 
-#include <logging/TerminalOutput.h>
-#include "NetworkProximityService.h"
-#include <simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench/logging/TerminalOutput.h>
+#include "wrench/services/network_proximity/NetworkProximityService.h"
+#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <simulation/SimulationMessage.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
 #include "NetworkProximityMessage.h"
-#include "NetworkDaemons.h"
+#include "wrench/services/network_proximity/NetworkDaemons.h"
 
-#include <exceptions/WorkflowExecutionException.h>
+#include <wrench/exceptions/WorkflowExecutionException.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service, "Log category for Network Proximity Service");
 
@@ -49,7 +49,7 @@ namespace wrench {
             int message_size, double measurement_period, int noise,
             std::map<std::string, std::string> plist,
             std::string suffix) :
-            Service("network_proximity_service" + suffix, "network_proximity_service" + suffix) {
+            Service("network_proximity_services" + suffix, "network_proximity_services" + suffix) {
 
         this->hosts_in_network = std::move(hosts_in_network);
 

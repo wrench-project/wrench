@@ -8,10 +8,14 @@
  */
 
 
-#include <wrench-dev.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
 #include "ServiceMessage.h"
+#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/services/Service.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/services/ServiceProperty.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
 

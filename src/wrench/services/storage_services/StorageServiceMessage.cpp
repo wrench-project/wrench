@@ -9,7 +9,7 @@
 
 
 #include "StorageServiceMessage.h"
-#include <workflow/WorkflowFile.h>
+#include <wrench/workflow/WorkflowFile.h>
 
 namespace wrench {
 

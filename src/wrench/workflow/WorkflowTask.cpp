@@ -10,9 +10,9 @@
 #include <lemon/list_graph.h>
 #include <xbt.h>
 
-#include "logging/TerminalOutput.h"
-#include "workflow/WorkflowTask.h"
-#include "workflow/Workflow.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/workflow/WorkflowTask.h"
+#include "wrench/workflow/Workflow.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workflowTask, "Log category for WorkflowTask");
 
