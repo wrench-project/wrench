@@ -143,7 +143,7 @@ set(TEST_FILES
 
 # wrench library
 add_library(wrench SHARED ${SOURCE_FILES})
-target_link_libraries(wrench -lsimgrid -lpugixml -lemon)
+target_link_libraries(wrench simgrid pugixml emon)
 
 install(TARGETS wrench DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)

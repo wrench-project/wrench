@@ -16,5 +16,5 @@ set(SOURCE_FILES
         main.cpp)
 
 add_executable(simple-wms ${SOURCE_FILES})
-target_link_libraries(simple-wms -lwrench -lsimgrid -lpugixml -lemon)
+target_link_libraries(simple-wms wrench simgrid pugixml emon)
 install(TARGETS simple-wms DESTINATION bin)
