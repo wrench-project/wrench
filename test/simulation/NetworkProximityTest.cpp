@@ -9,17 +9,8 @@
 
 
 #include <gtest/gtest.h>
-
 #include <wrench-dev.h>
-#include "wrench/services/network_proximity/NetworkProximityService.h"
-#include "wrench/managers/DataMovementManager.h"
-#include "wrench/workflow/Workflow.h"
-#include "wrench/wms/WMS.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/wms/scheduler/RandomScheduler.h"
-#include "wrench/services/storage/SimpleStorageService.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench.h"
+
 #include "TestWithFork.h"
 
 class NetworkProximityTest : public ::testing::Test {
@@ -31,9 +22,7 @@ public:
     wrench::StorageService *storage_service1 = nullptr;
     wrench::ComputeService *compute_service = nullptr;
 
-
     void do_NetworkProximity_Test();
-
 
 protected:
     NetworkProximityTest() {
@@ -50,27 +39,15 @@ protected:
       task->addInputFile(input_file);
       task->addOutputFile(output_file);
 
-<<<<<<< HEAD
-        // Create a one-host platform file
-        std::string xml = "<?xml version='1.0'?>"
-                "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                "<platform version=\"4.1\"> "
-                "   <AS id=\"AS0\" routing=\"Full\"> "
-                "       <cluster id=\"cluster\" prefix=\"host-\" suffix=\".hawaii.edu\""
-                "           radical=\"0-63\" speed=\"200Gf\" bw=\"10Gbps\" lat=\"20us\"/> "
-                "   </AS> "
-                "</platform>";
-=======
       // Create a one-host platform file
       std::string xml = "<?xml version='1.0'?>"
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-              "<platform version=\"4\"> "
+              "<platform version=\"4.1\"> "
               "   <AS id=\"AS0\" routing=\"Full\"> "
               "       <cluster id=\"cluster\" prefix=\"host-\" suffix=\".hawaii.edu\""
               "           radical=\"0-63\" speed=\"200Gf\" bw=\"10Gbps\" lat=\"20us\"/> "
               "   </AS> "
               "</platform>";
->>>>>>> ff27596f3bcf9578d81d3e361db17646557461ae
 
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
