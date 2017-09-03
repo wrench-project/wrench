@@ -39,12 +39,8 @@ namespace wrench {
           throw std::shared_ptr<NetworkError>(
                   new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName()));
         } else {
-<<<<<<< HEAD
-          throw std::runtime_error("S4U_PendingCommunication::wait(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
-=======
           throw std::runtime_error(
-                  "S4U_Mailbox::iputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
->>>>>>> ff27596f3bcf9578d81d3e361db17646557461ae
+                  "S4U_PendingCommunication::wait(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
       return std::unique_ptr<SimulationMessage>(this->simulation_message);
@@ -78,11 +74,14 @@ namespace wrench {
         index = (unsigned long) simgrid::s4u::Comm::wait_any(&pending_s4u_comms);
       } catch (xbt_ex &e) {
         if (e.category != network_error) {
-          throw std::runtime_error("S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
+          throw std::runtime_error(
+                  "S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected xbt_ex exception (" +
+                  std::to_string(e.category) + ")");
         }
         one_comm_failed = true;
       } catch (std::exception &e) {
-        throw std::runtime_error("S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" + std::string(e.what()) + ")");
+        throw std::runtime_error("S4U_PendingCommunication::waitForSomethingToHappen(): Unexpected std::exception  (" +
+                                 std::string(e.what()) + ")");
       }
 
       if (one_comm_failed) {

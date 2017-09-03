@@ -54,7 +54,8 @@ set(HEADER_FILES
         include/wrench/simulation/SimulationTimestamp.h
         include/wrench/simulation/SimulationTrace.h
         include/wrench.h
-        include/wrench-dev.h)
+        include/wrench-dev.h
+        )
 
 # source files
 set(SOURCE_FILES
@@ -110,6 +111,8 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/services/storage_services/simple_storage_service/IncomingFile.cpp
         src/wrench/services/storage_services/simple_storage_service/IncomingFile.h
+        src/wrench/services/compute/standard_job_executor/ComputeThread.h
+        src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp
         src/wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.h
@@ -121,9 +124,7 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity_services/NetworkProximityMessage.cpp
         src/wrench/services/network_proximity_services/NetworkProximityMessage.h
         src/wrench/services/network_proximity_services/NetworkDaemons.cpp
-        src/wrench/services/network_proximity_services/NetworkDaemons.h
-        src/wrench/services/compute_services/standard_job_executor/ComputeThread.h
-        src/wrench/services/compute_services/standard_job_executor/ComputeThread.cpp)
+        )
 
 # test files
 set(TEST_FILES
@@ -141,7 +142,8 @@ set(TEST_FILES
         test/simulation/MulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/TestWithFork.h
         test/simulation/StandardJobExecutorTest.cpp
-        test/simulation/NetworkProximityTest.cpp)
+        test/simulation/NetworkProximityTest.cpp
+        )
 
 # wrench library
 add_library(wrench STATIC ${SOURCE_FILES})
@@ -160,7 +162,7 @@ add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 # build examples
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
 
-foreach(cmakefile ${CMAKEFILES_TXT})
+foreach (cmakefile ${CMAKEFILES_TXT})
     string(REPLACE "/CMakeLists.txt" "" repository ${cmakefile})
     add_subdirectory("${CMAKE_HOME_DIRECTORY}/${repository}")
-endforeach()
+endforeach ()

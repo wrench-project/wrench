@@ -11,13 +11,7 @@
 #ifndef WRENCH_COMPUTETHREAD_H
 #define WRENCH_COMPUTETHREAD_H
 
-<<<<<<< HEAD:src/wrench/services/compute_services/standard_job_executor/ComputeThread.h
-#include <simgrid_S4U_util/S4U_Simulation.h>
-=======
-
-#include <wrench/simgrid_S4U_util/S4U_Simulation.h>
->>>>>>> ff27596f3bcf9578d81d3e361db17646557461ae:src/wrench/services/compute/standard_job_executor/ComputeThread.h
-
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
 
 namespace wrench {
@@ -51,6 +45,7 @@ namespace wrench {
 
     private:
         double flops;
+
         void compute(double flops);
 
     };
