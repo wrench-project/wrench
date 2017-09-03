@@ -141,9 +141,15 @@ set(TEST_FILES
         test/simulation/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp)
 
+# dependencies
+find_library(SIMGRID_LIB NAMES simgrid)
+find_library(PUGIXML_LIB NAMES pugixml)
+find_library(LEMON_LIB NAMES emon)
+find_library(GOOGLE_TEST NAMES gtest)
+
 # wrench library
 add_library(wrench SHARED ${SOURCE_FILES})
-target_link_libraries(wrench simgrid pugixml emon)
+target_link_libraries(wrench ${SIMGRID_LIB} ${LEMON_LIB} ${PUGIXML_LIB})
 
 install(TARGETS wrench DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
