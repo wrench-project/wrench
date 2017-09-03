@@ -88,7 +88,7 @@ protected:
       // Create a one-host dual-core platform file
       std::string xml = "<?xml version='1.0'?>"
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-              "<platform version=\"4\"> "
+              "<platform version=\"4.1\"> "
               "   <AS id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
               "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "

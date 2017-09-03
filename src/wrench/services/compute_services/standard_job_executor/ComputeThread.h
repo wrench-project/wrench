@@ -11,8 +11,8 @@
 #ifndef WRENCH_COMPUTETHREAD_H
 #define WRENCH_COMPUTETHREAD_H
 
-
 #include <simgrid_S4U_util/S4U_Simulation.h>
+
 
 
 namespace wrench {
@@ -40,11 +40,13 @@ namespace wrench {
          * @brief The S4U way of doing things
          */
         void operator()() {
-          S4U_Simulation::compute(this->flops);
+          this->compute(this->flops);
         }
+
 
     private:
         double flops;
+        void compute(double flops);
 
     };
 

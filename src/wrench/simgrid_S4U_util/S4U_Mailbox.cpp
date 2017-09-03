@@ -121,6 +121,8 @@ namespace wrench {
         } else {
           throw std::runtime_error("S4U_Mailbox::putMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
+      } catch (std::exception &e) {
+        throw;
       }
 
       return;

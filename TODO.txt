@@ -49,12 +49,15 @@ NEW FEATURES FOR EDDY:
 
 ---------------------------------------------------------------------
 
-SOFTWARE ENGINEERING / TESTINS:
+SOFTWARE ENGINEERING / TESTING:
     - Add properties to the MultiCore compute service that corresponds to the
       undelying properties of the StandardJobExecutors it will use
 
+    - Test for killing a standard job executor
+
     - Add new tests for SimpleStorage Services
         - What if one does a copy from src to src (i.e., same storage service)
+        - What happerns if I copy a file to a storage service that already has it
 
 	- How come when sunmitting tasks with #cores=2 we don't get an exception on
           a MulticoreComputeService (still relevant?)....

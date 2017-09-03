@@ -41,12 +41,14 @@ namespace wrench {
 				 * @return 0 on success, !=0 otherwise
 				 */
 				virtual int main() = 0;
-				void kill_actor();
         void setTerminated();
 				std::string getName();
 
+		protected:
+				void kill_actor();
+
 		private:
-        bool terminated;
+				bool terminated;
 				simgrid::s4u::ActorPtr s4u_actor;
 
 

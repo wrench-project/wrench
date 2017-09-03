@@ -46,7 +46,7 @@ protected:
         // Create a one-host platform file
         std::string xml = "<?xml version='1.0'?>"
                 "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                "<platform version=\"4\"> "
+                "<platform version=\"4.1\"> "
                 "   <AS id=\"AS0\" routing=\"Full\"> "
                 "       <cluster id=\"cluster\" prefix=\"host-\" suffix=\".hawaii.edu\""
                 "           radical=\"0-63\" speed=\"200Gf\" bw=\"10Gbps\" lat=\"20us\"/> "

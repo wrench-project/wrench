@@ -289,9 +289,12 @@ namespace wrench {
                                                                                   StorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (FailureCause *cause) {
         throw WorkflowExecutionException(cause);
+      } catch (std::exception &e) {
+        WRENCH_INFO("HOLY CRAP");
       }
 
       // Wait for a reply
+      WRENCH_INFO("GETTING A REPLY");
       std::unique_ptr<SimulationMessage> message;
 
       try {
@@ -307,6 +310,7 @@ namespace wrench {
         }
 
         // Otherwise, synchronously send the file up!
+        WRENCH_INFO("SENDING THE FILE UP");
         try {
           S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
         } catch (FailureCause *cause) {

@@ -117,11 +117,13 @@ namespace wrench {
      * @brief Kill the executor
      */
     void StandardJobExecutor::kill() {
+
+      // THE ORDER IN WHICH WE KILL THINGS IS VERY IMPORTANT
+      this->kill_actor();
       // Kill all workunit executors
       for (auto workunit_executor :  this->workunit_executors)  {
         workunit_executor->kill();
       }
-      this->kill_actor();
     }
 
     /**

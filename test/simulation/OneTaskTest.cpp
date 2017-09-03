@@ -52,7 +52,7 @@ protected:
       // Create a one-host platform file
       std::string xml = "<?xml version='1.0'?>"
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-              "<platform version=\"4\"> "
+              "<platform version=\"4.1\"> "
               "   <AS id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"SingleHost\" speed=\"1f\"/> "
               "   </AS> "

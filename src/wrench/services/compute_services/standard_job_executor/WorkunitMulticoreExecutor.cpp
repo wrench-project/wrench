@@ -23,7 +23,7 @@
 #include "ComputeThread.h"
 #include <simulation/Simulation.h>
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Worker Thread");
+XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Multicore Workunit Executor");
 
 
 namespace wrench {
@@ -74,10 +74,13 @@ namespace wrench {
      * @brief Kill the worker thread
      */
     void WorkunitMulticoreExecutor::kill() {
+      // THE ORDER HERE IS SUPER IMPORTANT
+      // IF WE KILL THE COMPUTE THREADS, THE JOIN() RETURNS
+      // AND THE WORKUNIT EXECUTOR MOVES ON FOR A WHILE... WHCIH IS BAD
+      this->kill_actor();
       for (unsigned long i=0; i < this->compute_threads.size(); i++) {
         this->compute_threads[i]->kill();
       }
-      this->kill_actor();
     }
 
 
@@ -223,6 +226,7 @@ namespace wrench {
 
           S4U_Simulation::sleep(this->thread_startup_overhead);
           dst->copyFile(file, src);
+
         } catch (WorkflowExecutionException &e) {
           throw;
         }
@@ -243,6 +247,7 @@ namespace wrench {
 
     }
 
+
     /**
      * @brief Simulate the execution of a multicore computation
      * @param flops: the number of flops
@@ -255,6 +260,7 @@ namespace wrench {
       for (unsigned long i=0; i < this->num_cores; i++) {
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
+          ComputeThread *ct = new ComputeThread(effective_flops);
           compute_threads.push_back(simgrid::s4u::Actor::createActor("compute_thread",
                                                    simgrid::s4u::Host::by_name(S4U_Simulation::getHostName()),
                                                    ComputeThread(effective_flops)));
@@ -264,9 +270,14 @@ namespace wrench {
         }
       }
 
+
       // Wait for all actors to complete
       for (unsigned long i=0; i < this->compute_threads.size(); i++) {
-        this->compute_threads[i]->join();
+        try {
+          this->compute_threads[i]->join();
+        } catch (std::exception &e) {
+          throw;
+        }
       }
 
     }
