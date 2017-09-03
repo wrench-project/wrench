@@ -9,12 +9,11 @@
 
 #include <xbt.h>
 #include <set>
-#include <exceptions/WorkflowExecutionException.h>
 
-#include "logging/TerminalOutput.h"
-#include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "simulation/Simulation.h"
-#include "wms/scheduler/RandomScheduler.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/wms/scheduler/RandomScheduler.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/logging/TerminalOutput.h"
 #include "workflow_job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(random_scheduler, "Log category for Random Scheduler");

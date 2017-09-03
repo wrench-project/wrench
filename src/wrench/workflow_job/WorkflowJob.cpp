@@ -10,8 +10,8 @@
 
 #include <string>
 #include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "workflow_job/WorkflowJob.h"
-#include "workflow/Workflow.h"
+#include "wrench/workflow/WorkflowJob.h"
+#include "wrench/workflow/Workflow.h"
 
 namespace wrench {
 

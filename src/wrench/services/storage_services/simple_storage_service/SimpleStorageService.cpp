@@ -7,11 +7,15 @@
  * (at your option) any later version.
  */
 
-#include "wrench-dev.h"
+#include "wrench/services/storage/SimpleStorageService.h"
 #include "services/ServiceMessage.h"
 #include "services/storage_services/StorageServiceMessage.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "IncomingFile.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/workflow/WorkflowFile.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
 

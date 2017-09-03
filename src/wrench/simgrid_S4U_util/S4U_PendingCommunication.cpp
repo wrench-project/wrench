@@ -8,13 +8,13 @@
  */
 
 #include <memory>
-
+#include <iostream>
 
 #include <xbt/ex.hpp>
-#include <wrench-dev.h>
-#include "S4U_PendingCommunication.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "simulation/SimulationMessage.h"
-#include "workflow_execution_events/FailureCause.h"
+#include "wrench/workflow/FailureCause.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Communication");
 
@@ -36,9 +36,15 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a dputMessage()");
-          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName()));
+          throw std::shared_ptr<NetworkError>(
+                  new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName()));
         } else {
+<<<<<<< HEAD
           throw std::runtime_error("S4U_PendingCommunication::wait(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
+=======
+          throw std::runtime_error(
+                  "S4U_Mailbox::iputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
+>>>>>>> ff27596f3bcf9578d81d3e361db17646557461ae
         }
       }
       return std::unique_ptr<SimulationMessage>(this->simulation_message);
@@ -52,7 +58,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    unsigned long  S4U_PendingCommunication::waitForSomethingToHappen(
+    unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
             std::vector<std::unique_ptr<S4U_PendingCommunication>> *pending_comms) {
 
       std::set<S4U_PendingCommunication *> completed_comms;
@@ -62,7 +68,7 @@ namespace wrench {
       }
 
       std::vector<simgrid::s4u::CommPtr> pending_s4u_comms;
-      for (auto it=pending_comms->begin(); it < pending_comms->end(); it++) {
+      for (auto it = pending_comms->begin(); it < pending_comms->end(); it++) {
         pending_s4u_comms.push_back((*it)->comm_ptr);
       }
 

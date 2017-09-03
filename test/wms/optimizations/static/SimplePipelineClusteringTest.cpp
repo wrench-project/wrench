@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include <workflow/WorkflowTask.h>
+#include <wrench/workflow/WorkflowTask.h>
 #include <workflow/Workflow.h>
 
 #include "wms/optimizations/static/SimplePipelineClustering.h"

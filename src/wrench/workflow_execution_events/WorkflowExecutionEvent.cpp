@@ -11,11 +11,11 @@
 
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 
-#include <simulation/SimulationMessage.h>
-#include <services/compute_services/ComputeServiceMessage.h>
-#include <services/storage_services/StorageServiceMessage.h>
-#include <exceptions/WorkflowExecutionException.h>
-#include <wrench-dev.h>
+#include "simulation/SimulationMessage.h"
+#include "services/compute/ComputeServiceMessage.h"
+#include "services/storage_services/StorageServiceMessage.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workflow_execution_event, "Log category for Workflow Execution Event");
 

@@ -12,10 +12,10 @@
 #include <lemon/bfs.h>
 #include <pugixml.hpp>
 
-#include "logging/TerminalOutput.h"
+#include "wrench/logging/TerminalOutput.h"
 #include "simulation/SimulationMessage.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "workflow/Workflow.h"
+#include "wrench/workflow/Workflow.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workflow, "Log category for Workflow");
 

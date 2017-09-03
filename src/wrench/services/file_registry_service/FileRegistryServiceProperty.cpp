@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "FileRegistryServiceProperty.h"
+#include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 
 namespace wrench {
 

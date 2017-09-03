@@ -8,8 +8,8 @@
  */
 
 #include <set>
-#include "workflow/Workflow.h"
-#include "workflow_job/StandardJob.h"
+#include "wrench/workflow/Workflow.h"
+#include "wrench/workflow/StandardJob.h"
 
 namespace wrench {
 

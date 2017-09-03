@@ -10,7 +10,13 @@
 
 #include <gtest/gtest.h>
 
-#include <wrench-dev.h>
+#include "wrench/managers/DataMovementManager.h"
+#include "wrench/workflow/Workflow.h"
+#include "wrench/wms/WMS.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/wms/scheduler/RandomScheduler.h"
+#include "wrench/services/storage/SimpleStorageService.h"
+#include "wrench.h"
 
 #include "TestWithFork.h"
 
@@ -453,10 +459,16 @@ private:
       // Create a job
       wrench::StandardJob *job = job_manager->createStandardJob({test->task},
                                                                 {},
-                                                                {std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> {test->input_file, test->storage_service1, test->storage_service2}},
-                                                                {std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> {test->output_file, test->storage_service2, test->storage_service1}},
-                                                                {std::tuple<wrench::WorkflowFile*, wrench::StorageService*> {test->input_file, test->storage_service2},
-                                                                 std::tuple<wrench::WorkflowFile*, wrench::StorageService*> {test->output_file, test->storage_service2}});
+                                                                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *> {
+                                                                        test->input_file, test->storage_service1,
+                                                                        test->storage_service2}},
+                                                                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *> {
+                                                                        test->output_file, test->storage_service2,
+                                                                        test->storage_service1}},
+                                                                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *> {
+                                                                        test->input_file, test->storage_service2},
+                                                                 std::tuple<wrench::WorkflowFile *, wrench::StorageService *> {
+                                                                         test->output_file, test->storage_service2}});
       // Submit the job
       job_manager->submitJob(job, test->compute_service);
 
@@ -469,7 +481,7 @@ private:
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
           throw std::runtime_error("Unexpected job failure: " + event->failure_cause->toString());
         }
-        default:{
+        default: {
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
         }
       }

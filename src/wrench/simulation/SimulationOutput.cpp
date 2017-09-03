@@ -8,7 +8,7 @@
  */
 
 
-#include "SimulationOutput.h"
+#include "wrench/simulation/SimulationOutput.h"
 
 namespace wrench {
 

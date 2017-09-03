@@ -7,11 +7,11 @@
  * (at your option) any later version.
  */
 
-#include "FailureCause.h"
-#include "workflow/WorkflowFile.h"
-#include "workflow_job/WorkflowJob.h"
-#include "services/storage_services/StorageService.h"
-#include "services/compute_services/ComputeService.h"
+#include "wrench/workflow/FailureCause.h"
+#include "wrench/workflow/WorkflowFile.h"
+#include "wrench/workflow/WorkflowJob.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {
 
