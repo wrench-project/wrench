@@ -10,16 +10,9 @@
 #include <math.h>
 
 #include <gtest/gtest.h>
+#include <wrench-dev.h>
 
-#include "wrench/managers/DataMovementManager.h"
-#include "wrench/workflow/Workflow.h"
-#include "wrench/wms/WMS.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/wms/scheduler/RandomScheduler.h"
-#include "wrench/services/storage/SimpleStorageService.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
 #include "workflow_job/PilotJob.h"
-#include "wrench.h"
 #include "TestWithFork.h"
 
 
@@ -562,11 +555,11 @@ private:
       wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 3600);
 
       // Try to terminate it right now, which is stupid
-      bool success = true;
+//      bool success = true;
       try {
         job_manager->terminateJob(pilot_job);
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
+//        success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_CANNOT_BE_TERMINATED) {
           throw std::runtime_error(
                   "Got an exception, as expected, but it does not have the correct failure cause type");

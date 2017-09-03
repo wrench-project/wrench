@@ -39,8 +39,8 @@
 #include "wrench/workflow/WorkflowFile.h"
 
 // Workflow Job
+#include "wrench/workflow/WorkflowJob.h"
+#include "wrench/workflow/StandardJob.h"
 //#include "workflow_job/PilotJob.h"
-//#include "wrench/workflow/job/StandardJob.h"
-//#include "workflow_job/WorkflowJob.h"
 
 #endif //WRENCH_WRENCH_DEV_H
