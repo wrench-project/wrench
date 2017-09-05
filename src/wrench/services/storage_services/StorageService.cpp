@@ -310,7 +310,6 @@ namespace wrench {
         }
 
         // Otherwise, synchronously send the file up!
-        WRENCH_INFO("SENDING THE FILE UP");
         try {
           S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
         } catch (FailureCause *cause) {

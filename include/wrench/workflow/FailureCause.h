@@ -40,6 +40,8 @@ namespace wrench {
                     NO_STORAGE_SERVICE_FOR_FILE,
             /** @brief The file was not found where it was supposed to be found */
                     FILE_NOT_FOUND,
+            /** @brief The file to be written was already there */
+                    FILE_ALREADY_THERE,
             /** @brief The storage service does not have enough space to support operation */
                     STORAGE_NO_ENOUGH_SPACE,
             /** @brief The service cannot be used because it is down (likely was terminated) */
@@ -119,6 +121,25 @@ namespace wrench {
         WorkflowFile *file;
         StorageService *storage_service;
     };
+
+    /**
+     * @brief A "file already there" failure cause
+     */
+    class StorageServiceFileAlreadyThere : public FailureCause {
+
+    public:
+        StorageServiceFileAlreadyThere(WorkflowFile *file, StorageService *storage_service);
+
+        WorkflowFile *getFile();
+        StorageService *getStorageService();
+        std::string toString();
+
+
+    private:
+        WorkflowFile *file;
+        StorageService *storage_service;
+    };
+
 
     /**
      * @brief A "service is down" failure cause

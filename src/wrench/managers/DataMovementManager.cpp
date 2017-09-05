@@ -143,6 +143,7 @@ namespace wrench {
 
       std::unique_ptr<SimulationMessage> message = nullptr;
 
+      WRENCH_INFO("GOT MESSAGE");
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
       } catch (std::shared_ptr<NetworkError> cause) {

@@ -370,5 +370,41 @@ namespace wrench {
       return "Job cannot be forgotten (because it's not completed or failed)";
     };
 
+    /**
+     * @brief Constructor
+     * @param file: the file that is already there
+     * @param storage_service:  the storage service on which it is
+     */
+    StorageServiceFileAlreadyThere::StorageServiceFileAlreadyThere(WorkflowFile *file, StorageService *storage_service)
+            : FailureCause(FILE_ALREADY_THERE) {
+      this->file = file;
+      this->storage_service = storage_service;
+    }
+
+    /**
+     * @brief Getter
+     * @return the file
+     */
+    WorkflowFile *StorageServiceFileAlreadyThere::getFile() {
+      return this->file;
+    }
+
+    /**
+     * @brief Getter
+     * @return the storage service
+     */
+    StorageService *StorageServiceFileAlreadyThere::getStorageService() {
+      return this->storage_service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string StorageServiceFileAlreadyThere::toString() {
+      return "Cannot write file " + this->file->getId() + " to Storage Service " +
+             this->storage_service->getName() + " because it's already stored there";
+    }
+
 
 };

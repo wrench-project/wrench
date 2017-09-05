@@ -249,6 +249,26 @@ namespace wrench {
      */
     bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::string answer_mailbox) {
 
+      // If the file is already there, send back a failure
+      if (this->stored_files.find(file) != this->stored_files.end()) {
+        try {
+          S4U_Mailbox::putMessage(answer_mailbox,
+                                  new StorageServiceFileWriteAnswerMessage(file,
+                                                                           this,
+                                                                           false,
+                                                                           std::shared_ptr<FailureCause>(
+                                                                                   new StorageServiceFileAlreadyThere(
+                                                                                           file,
+                                                                                           this)),
+                                                                           "",
+                                                                           this->getPropertyValueAsDouble(
+                                                                                   SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> cause) {
+          return true;
+        }
+        return true;
+      }
+
       // Check the file size and capacity, and reply "no" if not enough space
       if (file->getSize() > (this->capacity - this->occupied_space)) {
         try {
@@ -360,6 +380,26 @@ namespace wrench {
      */
     bool
     SimpleStorageService::processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox) {
+
+      // If the file is already there, send back a failure
+      if (this->stored_files.find(file) != this->stored_files.end()) {
+        WRENCH_INFO("Cannot perform file copy because file is already there");
+        try {
+          S4U_Mailbox::putMessage(answer_mailbox,
+                                  new StorageServiceFileCopyAnswerMessage(file,
+                                                                           this,
+                                                                           false,
+                                                                           std::shared_ptr<FailureCause>(
+                                                                                   new StorageServiceFileAlreadyThere(
+                                                                                           file,
+                                                                                           this)),
+                                                                           this->getPropertyValueAsDouble(
+                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> cause) {
+          return true;
+        }
+        return true;
+      }
 
       // Figure out whether this succeeds or not
       if (file->getSize() > this->capacity - this->occupied_space) {
