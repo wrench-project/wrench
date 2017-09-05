@@ -70,17 +70,20 @@ namespace wrench {
 
     }
 
+    int bye(void *x, void*y) {WRENCH_INFO("TERMINATING...BUT AM I REALLY DEAD?"); return 0;}
     /**
      * @brief Kill the worker thread
      */
     void WorkunitMulticoreExecutor::kill() {
       // THE ORDER HERE IS SUPER IMPORTANT
       // IF WE KILL THE COMPUTE THREADS, THE JOIN() RETURNS
-      // AND THE WORKUNIT EXECUTOR MOVES ON FOR A WHILE... WHCIH IS BAD
+      // AND THE WORKUNIT EXECUTOR MOVES ON FOR A WHILE... WHICH IS BAD
       this->kill_actor();
       for (unsigned long i=0; i < this->compute_threads.size(); i++) {
+        this->compute_threads[i]->onExit(bye, nullptr);
         this->compute_threads[i]->kill();
       }
+
     }
 
 

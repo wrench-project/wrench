@@ -118,8 +118,16 @@ namespace wrench {
      */
     void StandardJobExecutor::kill() {
 
-//      // THE ORDER IN WHICH WE KILL THINGS IS VERY IMPORTANT
+      // THE ORDER IN WHICH WE KILL THINGS IS VERY IMPORTANT
+      // WEIRDLY, KILLING IN THIS ORDER WORKS....
+      // TODO: INVESTIGATE
+      // IF WE SWAP THE ORDER, THEN THE WORKUNITEXECUTORS
+      // SOMEHOW DON'T SUCCEED IN KILLING THEIR COMPUTE THREADS,
+      // EVEN THOUGH THOSE COMPUTE THREADS CALL THEIR onExit()
+      // FUNCTION. LIKELY A WEIRD BUG IN SimGrid...
+
 //      this->kill_actor();
+
       // Kill all workunit executors
       for (auto workunit_executor :  this->workunit_executors)  {
         workunit_executor->kill();

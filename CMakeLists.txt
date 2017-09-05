@@ -5,7 +5,7 @@ add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include )
 
 # library header files
 set(HEADER_FILES

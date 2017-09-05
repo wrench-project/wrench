@@ -8,6 +8,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <random>
 
 #include "wrench/managers/DataMovementManager.h"
 #include "wrench/workflow/Workflow.h"
@@ -40,6 +41,7 @@ public:
     void do_MultiHostTest_test();
     void do_JobTerminationTestDuringAComputation_test();
     void do_JobTerminationTestDuringATransfer_test();
+    void do_JobTerminationTestAtRandomTimes_test();
 
     static bool isJustABitGreater(double base, double variable) {
       return ((variable > base) && (variable < base + EPSILON));
@@ -1395,18 +1397,18 @@ private:
       /**  Create a 4-task job and kill it **/
       {
         wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-//        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
-//        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
-//        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
+        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
+        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
         task1->addInputFile(workflow->getFileById("input_file"));
         task1->addOutputFile(workflow->getFileById("output_file"));
-//        task2->addInputFile(workflow->getFileById("input_file"));
-//        task2->addOutputFile(workflow->getFileById("output_file"));
+        task2->addInputFile(workflow->getFileById("input_file"));
+        task2->addOutputFile(workflow->getFileById("output_file"));
 
         // Create a StandardJob with both tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
-//                {task1, task2, task3, task4},
-                {task1},
+                {task1, task2, task3, task4},
+//                {task1},
                 {
                         {workflow->getFileById("input_file"),  this->test->storage_service1},
                         {workflow->getFileById("output_file"), this->test->storage_service1}
@@ -1442,9 +1444,9 @@ private:
 
 
         workflow->removeTask(task1);
-//        workflow->removeTask(task2);
-//        workflow->removeTask(task3);
-//        workflow->removeTask(task4);
+        workflow->removeTask(task2);
+        workflow->removeTask(task3);
+        workflow->removeTask(task4);
       }
 
 
@@ -1456,7 +1458,7 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorTest, JobTerminationTestDuringAComputation) {
+TEST_F(StandardJobExecutorTest, DISABLED_JobTerminationTestDuringAComputation) {
   DO_TEST_WITH_FORK(do_JobTerminationTestDuringAComputation_test);
 }
 
@@ -1559,18 +1561,17 @@ private:
       /**  Create a 4-task job and kill it **/
       {
         wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-//        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
-//        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
-//        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
+        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
+        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
         task1->addInputFile(workflow->getFileById("input_file"));
         task1->addOutputFile(workflow->getFileById("output_file"));
-//        task2->addInputFile(workflow->getFileById("input_file"));
-//        task2->addOutputFile(workflow->getFileById("output_file"));
+        task2->addInputFile(workflow->getFileById("input_file"));
+        task2->addOutputFile(workflow->getFileById("output_file"));
 
         // Create a StandardJob with both tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
-//                {task1, task2, task3, task4},
-                {task1},
+                {task1, task2, task3, task4},
                 {
                         {workflow->getFileById("input_file"),  this->test->storage_service1},
                         {workflow->getFileById("output_file"), this->test->storage_service1}
@@ -1596,7 +1597,7 @@ private:
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
 
-        // Sleep 1 second
+        // Sleep 48.20 second
         wrench::S4U_Simulation::sleep(48.20);
 
         // Terminate the job
@@ -1606,9 +1607,9 @@ private:
 
 
         workflow->removeTask(task1);
-//        workflow->removeTask(task2);
-//        workflow->removeTask(task3);
-//        workflow->removeTask(task4);
+        workflow->removeTask(task2);
+        workflow->removeTask(task3);
+        workflow->removeTask(task4);
       }
 
 
@@ -1620,7 +1621,7 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorTest, JobTerminationTestDuringATransfer) {
+TEST_F(StandardJobExecutorTest, DISABLED_JobTerminationTestDuringATransfer) {
   DO_TEST_WITH_FORK(do_JobTerminationTestDuringATransfer_test);
 }
 
@@ -1686,3 +1687,176 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
 }
 
 
+
+
+
+/**********************************************************************/
+/**  TERMINATION TEST    #3 (RANDOM TIME)                            **/
+/**********************************************************************/
+
+class JobTerminationTestAtRandomTimesWMS : public wrench::WMS {
+
+public:
+    JobTerminationTestAtRandomTimesWMS(StandardJobExecutorTest *test,
+                                         wrench::Workflow *workflow,
+                                         std::unique_ptr<wrench::Scheduler> scheduler,
+                                         std::string hostname) :
+            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    StandardJobExecutorTest *test;
+
+    int main() {
+
+      // Create a job manager
+      std::unique_ptr<wrench::JobManager> job_manager =
+              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+
+//      // Create a data movement manager
+//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
+//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+
+      //Type of random number distribution
+      std::uniform_real_distribution<double> dist(0, 150);  //(min, max)
+      //Mersenne Twister: Good quality random number generator
+      std::mt19937 rng;
+      //Initialize with non-deterministic seeds
+      rng.seed(std::random_device{}());
+
+      for (int trial =0; trial < 100; trial++) {
+
+        /**  Create a 4-task job and kill it **/
+        {
+          wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
+        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
+        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
+          task1->addInputFile(workflow->getFileById("input_file"));
+          task1->addOutputFile(workflow->getFileById("output_file"));
+//        task2->addInputFile(workflow->getFileById("input_file"));
+//        task2->addOutputFile(workflow->getFileById("output_file"));
+
+          // Create a StandardJob with both tasks
+          wrench::StandardJob *job = job_manager->createStandardJob(
+                {task1, task2, task3, task4},
+                  {
+                          {workflow->getFileById("input_file"),  this->test->storage_service1},
+                          {workflow->getFileById("output_file"), this->test->storage_service1}
+                  },
+                  {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                          workflow->getFileById("input_file"), this->test->storage_service1,
+                          this->test->storage_service2)},
+                  {},
+                  {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                                                                                this->test->storage_service2)}
+          );
+
+          std::string my_mailbox = "test_callback_mailbox";
+
+          double before = wrench::S4U_Simulation::getClock();
+
+          // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
+          wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+                  test->simulation,
+                  my_mailbox,
+                  "Host3",
+                  job,
+                  {std::pair<std::string, unsigned long>{"Host3", 10},
+                   std::pair<std::string, unsigned long>{"Host4", 10}},
+                  nullptr,
+                  {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
+          );
+
+          // Sleep some random number of seconds
+          wrench::S4U_Simulation::sleep(dist(rng));
+
+          // Terminate the job
+          executor->kill();
+
+          // We should be good now, with nothing running
+
+
+          workflow->removeTask(task1);
+        workflow->removeTask(task2);
+        workflow->removeTask(task3);
+        workflow->removeTask(task4);
+        }
+      }
+
+
+      // Terminate everything
+      this->simulation->shutdownAllComputeServices();
+      this->simulation->shutdownAllStorageServices();
+      this->simulation->getFileRegistryService()->stop();
+      return 0;
+    }
+};
+
+TEST_F(StandardJobExecutorTest, DISABLED_JobTerminationTestAtRandomTimes) {
+  DO_TEST_WITH_FORK(do_JobTerminationTestAtRandomTimes_test);
+}
+
+void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
+
+  // Create and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+          std::unique_ptr<wrench::WMS>(new JobTerminationTestAtRandomTimesWMS(this, workflow,
+                                                                                std::unique_ptr<wrench::Scheduler>(
+                          new wrench::RandomScheduler()), "Host3"))));
+
+  // Create a Compute Service (we don't use it)
+  wrench::ComputeService *compute_service;
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MulticoreComputeService>(
+                  new wrench::MulticoreComputeService("Host3", true, true,
+                                                      nullptr,
+                                                      {}))));
+
+  // Create a Storage Services
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService("Host4", 10000000000000.0))));
+
+  // Create another Storage Services
+  EXPECT_NO_THROW(storage_service2 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService("Host4", 10000000000000.0))));
+
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService("Host3"));
+
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+  // Create two workflow files
+  wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+  wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
