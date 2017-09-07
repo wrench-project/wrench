@@ -1,11 +1,26 @@
 cmake_minimum_required(VERSION 3.2)
-project(wrench)
+message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
+
+project(wrench CXX)
 
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include )
+# build the version number
+set(WRENCH_VERSION_MAJOR "1")
+set(WRENCH_VERSION_MINOR "0")
+set(WRENCH_VERSION_PATCH "0")
+
+if (${WRENCH_VERSION_PATCH} EQUAL "0")
+    set(WRENCH_RELEASE_VERSION "${WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}")
+else ()
+    set(WRENCH_RELEASE_VERSION "$(WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}.${WRENCH_VERSION_PATCH}")
+endif ()
+
+
+include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include)
+
 
 # library header files
 set(HEADER_FILES
@@ -161,10 +176,14 @@ set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
 set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
 add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 
-# build examples
+
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
 
+# build examples
 foreach (cmakefile ${CMAKEFILES_TXT})
     string(REPLACE "/CMakeLists.txt" "" repository ${cmakefile})
     add_subdirectory("${CMAKE_HOME_DIRECTORY}/${repository}")
 endforeach ()
+
+
+include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Documentation.cmake)
