@@ -2,11 +2,8 @@ find_package(Doxygen)
 
 if (DOXYGEN_FOUND)
 
-#    file(MAKE_DIRECTORY ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION})
-
     foreach (SECTION USER DEVELOPER INTERNAL)
         string(TOLOWER ${SECTION} SECTION_LOWER)
-#        file(MAKE_DIRECTORY ${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}/${SECTION_LOWER})
         set(DOXYGEN_OUT ${CMAKE_HOME_DIRECTORY}/docs/logs/Doxyfile_${SECTION})
         set(WRENCH_SECTIONS ${SECTION})
         set(WRENCH_SECTIONS_OUTPUT ${SECTION_LOWER})
@@ -21,6 +18,7 @@ if (DOXYGEN_FOUND)
 
         LIST(APPEND WRENCH_SECTIONS_LIST doc-${SECTION_LOWER})
     endforeach ()
+
     get_directory_property(extra_clean_files ADDITIONAL_MAKE_CLEAN_FILES)
     set_directory_properties(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES "${extra_clean_files};${CMAKE_HOME_DIRECTORY}/docs/${WRENCH_RELEASE_VERSION}")
 
