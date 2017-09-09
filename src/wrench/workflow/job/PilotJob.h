@@ -11,7 +11,7 @@
 #define WRENCH_PILOTJOB_H
 
 
-#include "wrench/workflow/WorkflowJob.h"
+#include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/services/compute/ComputeService.h"
 
 namespace wrench {

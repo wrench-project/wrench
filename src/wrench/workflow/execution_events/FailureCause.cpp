@@ -7,9 +7,9 @@
  * (at your option) any later version.
  */
 
-#include "wrench/workflow/FailureCause.h"
+#include "wrench/workflow/execution_events/FailureCause.h"
 #include "wrench/workflow/WorkflowFile.h"
-#include "wrench/workflow/WorkflowJob.h"
+#include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/compute/ComputeService.h"
 

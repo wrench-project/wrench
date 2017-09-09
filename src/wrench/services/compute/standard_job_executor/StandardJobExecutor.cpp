@@ -11,7 +11,7 @@
 #include "wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h"
 #include "wrench/services/compute/standard_job_executor/Workunit.h"
 #include "wrench/simulation/Simulation.h"
-#include "wrench/workflow/StandardJob.h"
+#include "wrench/workflow/job/StandardJob.h"
 
 #include "wrench/logging/TerminalOutput.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
@@ -20,7 +20,7 @@
 #include "services/ServiceMessage.h"
 #include "services/compute/ComputeServiceMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
-#include "workflow_job/PilotJob.h"
+#include "workflow/job/PilotJob.h"
 #include "StandardJobExecutorMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard Job Executor");

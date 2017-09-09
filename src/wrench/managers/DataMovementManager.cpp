@@ -14,7 +14,7 @@
 #include <services/ServiceMessage.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
-#include <services/storage_services/StorageServiceMessage.h>
+#include <services/storage/StorageServiceMessage.h>
 #include <wrench/workflow/WorkflowFile.h>
 #include "wrench/workflow/Workflow.h"
 #include "wrench/managers/DataMovementManager.h"

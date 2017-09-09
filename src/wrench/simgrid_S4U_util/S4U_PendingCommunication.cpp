@@ -14,7 +14,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "simulation/SimulationMessage.h"
-#include "wrench/workflow/FailureCause.h"
+#include "wrench/workflow/execution_events/FailureCause.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Communication");
 

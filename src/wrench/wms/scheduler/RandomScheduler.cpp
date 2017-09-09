@@ -14,7 +14,7 @@
 #include "wrench/wms/scheduler/RandomScheduler.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "workflow_job/PilotJob.h"
+#include "workflow/job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(random_scheduler, "Log category for Random Scheduler");
 

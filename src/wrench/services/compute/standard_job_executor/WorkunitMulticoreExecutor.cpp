@@ -17,7 +17,7 @@
 #include "wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h"
 #include "StandardJobExecutorMessage.h"
 #include <wrench/workflow/WorkflowTask.h>
-#include <wrench/workflow/StandardJob.h>
+#include <wrench/workflow/job/StandardJob.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
 #include "wrench/services/compute/standard_job_executor/Workunit.h"
 #include "ComputeThread.h"

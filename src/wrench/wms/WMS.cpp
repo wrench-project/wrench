@@ -10,7 +10,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/wms/WMS.h"
-#include "wrench/workflow/StandardJob.h"
+#include "wrench/workflow/job/StandardJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
 

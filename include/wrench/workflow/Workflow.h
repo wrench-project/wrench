@@ -14,7 +14,7 @@
 #include <map>
 #include <set>
 
-#include "WorkflowExecutionEvent.h"
+#include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
 #include "WorkflowFile.h"
 #include "WorkflowTask.h"
 

@@ -43,10 +43,10 @@ set(HEADER_FILES
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
-        include/wrench/workflow/WorkflowJob.h
-        include/wrench/workflow/StandardJob.h
-        include/wrench/workflow/FailureCause.h
-        include/wrench/workflow/WorkflowExecutionEvent.h
+        include/wrench/workflow/job/WorkflowJob.h
+        include/wrench/workflow/job/StandardJob.h
+        include/wrench/workflow/execution_events/FailureCause.h
+        include/wrench/workflow/execution_events/WorkflowExecutionEvent.h
         include/wrench/managers/JobManager.h
         include/wrench/managers/DataMovementManager.h
         include/wrench/services/Service.h
@@ -81,7 +81,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
         src/wrench/simulation/SimulationMessage.cpp
         src/wrench/simulation/SimulationMessage.h
-        src/wrench/workflow_execution_events/WorkflowExecutionEvent.cpp
+        src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.h
@@ -97,40 +97,40 @@ set(SOURCE_FILES
         src/wrench/wms/scheduler/RandomScheduler.cpp
         src/wrench/services/compute/ComputeService.cpp
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeService.cpp
-        src/wrench/workflow_job/PilotJob.cpp
-        src/wrench/workflow_job/PilotJob.h
+        src/wrench/workflow/job/PilotJob.cpp
+        src/wrench/workflow/job/PilotJob.h
         src/wrench/managers/JobManager.cpp
         src/wrench/simulation/Simulation.cpp
-        src/wrench/workflow_job/WorkflowJob.cpp
-        src/wrench/workflow_job/StandardJob.cpp
+        src/wrench/workflow/job/WorkflowJob.cpp
+        src/wrench/workflow/job/StandardJob.cpp
         src/wrench/simulation/SimulationTimestamp.cpp
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/simulation/SimulationOutput.cpp
-        src/wrench/services/file_registry_service/FileRegistryService.cpp
-        src/wrench/services/storage_services/StorageService.cpp
-        src/wrench/services/storage_services/simple_storage_service/SimpleStorageService.cpp
+        src/wrench/services/file_registry/FileRegistryService.cpp
+        src/wrench/services/storage/StorageService.cpp
+        src/wrench/services/storage/simple_storage/SimpleStorageService.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
         src/wrench/services/compute/ComputeServiceProperty.cpp
-        src/wrench/services/storage_services/StorageServiceProperty.cpp
-        src/wrench/services/file_registry_service/FileRegistryServiceProperty.cpp
+        src/wrench/services/storage/StorageServiceProperty.cpp
+        src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeServiceProperty.cpp
-        src/wrench/services/storage_services/simple_storage_service/SimpleStorageServiceProperty.cpp
-        src/wrench/workflow_execution_events/FailureCause.cpp
+        src/wrench/services/storage/simple_storage/SimpleStorageServiceProperty.cpp
+        src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessage.h
         src/wrench/services/compute/ComputeServiceMessage.cpp
         src/wrench/services/compute/ComputeServiceMessage.h
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeServiceMessage.cpp
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeServiceMessage.h
-        src/wrench/services/storage_services/StorageServiceMessage.cpp
-        src/wrench/services/storage_services/StorageServiceMessage.h
-        src/wrench/services/file_registry_service/FileRegistryMessage.cpp
-        src/wrench/services/file_registry_service/FileRegistryMessage.h
+        src/wrench/services/storage/StorageServiceMessage.cpp
+        src/wrench/services/storage/StorageServiceMessage.h
+        src/wrench/services/file_registry/FileRegistryMessage.cpp
+        src/wrench/services/file_registry/FileRegistryMessage.h
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
-        src/wrench/services/storage_services/simple_storage_service/IncomingFile.cpp
-        src/wrench/services/storage_services/simple_storage_service/IncomingFile.h
+        src/wrench/services/storage/simple_storage/IncomingFile.cpp
+        src/wrench/services/storage/simple_storage/IncomingFile.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp
@@ -139,11 +139,11 @@ set(SOURCE_FILES
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutor.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.cpp
-        src/wrench/services/network_proximity_services/NetworkProximityService.cpp
-        src/wrench/services/network_proximity_services/NetworkQueryServiceProperty.cpp
-        src/wrench/services/network_proximity_services/NetworkProximityMessage.cpp
-        src/wrench/services/network_proximity_services/NetworkProximityMessage.h
-        src/wrench/services/network_proximity_services/NetworkDaemons.cpp
+        src/wrench/services/network_proximity/NetworkProximityService.cpp
+        src/wrench/services/network_proximity/NetworkQueryServiceProperty.cpp
+        src/wrench/services/network_proximity/NetworkProximityMessage.cpp
+        src/wrench/services/network_proximity/NetworkProximityMessage.h
+        src/wrench/services/network_proximity/NetworkDaemons.cpp
         )
 
 # test files
@@ -185,6 +185,7 @@ add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
 
+
 # build examples
 foreach (cmakefile ${CMAKEFILES_TXT})
     string(REPLACE "/CMakeLists.txt" "" repository ${cmakefile})
@@ -192,4 +193,5 @@ foreach (cmakefile ${CMAKEFILES_TXT})
 endforeach ()
 
 
+# build documentation
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Documentation.cmake)

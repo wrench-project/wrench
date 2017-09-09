@@ -46,7 +46,7 @@ namespace wrench {
             std::string hostname,
             std::map<std::string, std::string> plist,
             std::string suffix) :
-            Service("file_registry_service" + suffix, "file_registry_service" + suffix) {
+            Service("file_registry" + suffix, "file_registry" + suffix) {
 
       // Set default properties
       for (auto p : this->default_property_values) {

@@ -15,7 +15,7 @@
 #include <lemon/list_graph.h>
 #include <set>
 
-#include "wrench/workflow/WorkflowJob.h"
+#include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/workflow/WorkflowFile.h"
 
 namespace wrench {
