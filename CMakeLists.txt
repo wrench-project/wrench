@@ -167,10 +167,12 @@ set(TEST_FILES
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
+find_library(PUGIXML_LIBRARY NAMES pugixml)
+find_library(LEMON_LIBRARY NAMES emon)
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
-target_link_libraries(wrench ${SIMGRID_LIBRARY} -lpugixml -lemon)
+target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 
 install(TARGETS wrench DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
