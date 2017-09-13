@@ -525,6 +525,11 @@ namespace wrench {
       if ((file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
       }
+
+      if (src == this) {
+        throw std::invalid_argument("StorageService::copyFile(): Cannot copy a file from oneself");
+      }
+
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
@@ -577,6 +582,10 @@ namespace wrench {
 
       if ((file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid arguments");
+      }
+
+      if (src == this) {
+        throw std::invalid_argument("StorageService::copyFile(): Cannot copy a file from oneself");
       }
 
       if (this->state == DOWN) {

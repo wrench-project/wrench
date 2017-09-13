@@ -53,14 +53,8 @@ SOFTWARE ENGINEERING / TESTING:
     - Add properties to the MultiCore compute service that corresponds to the
       undelying properties of the StandardJobExecutors it will use
 
-    - Test for killing a standard job executor (wait on S4U::Actor::kill() to be fixed)
-
-    - Add new tests for SimpleStorage Services
-        - What if one does a copy from src to src (i.e., same storage service)
-        [DONE] What happerns if I copy a file to a storage service that already has it
-
-	- How come when sunmitting tasks with #cores=2 we don't get an exception on
-          a MulticoreComputeService (still relevant?)....
+    - Test for killing a standard job executor 
+	- wait on S4U::Actor::kill() to be fixed
 
     - While implementing a test for the StandardJobExecutor abstraction, Henri noted
       that when one does not create a ComputeService and launch the simulation, we

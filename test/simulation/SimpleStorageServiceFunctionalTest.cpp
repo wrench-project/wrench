@@ -719,6 +719,19 @@ private:
         throw std::runtime_error("Should have gotten a 'not enough space' exception");
       }
 
+      // Fo a file copy from myself
+      success = true;
+      try {
+        data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_500,
+                                                     this->test->storage_service_500);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should have gotten a 'can't copy from myself' exception");
+      }
+
+
 
       // Do the file copy for a file that's not there
 
