@@ -9,7 +9,7 @@
 
 #include "wrench/services/storage/SimpleStorageService.h"
 #include "services/ServiceMessage.h"
-#include "services/storage_services/StorageServiceMessage.h"
+#include "services/storage/StorageServiceMessage.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "IncomingFile.h"
 #include "wrench/logging/TerminalOutput.h"
@@ -59,7 +59,7 @@ namespace wrench {
             double capacity,
             std::map<std::string, std::string> plist,
             std::string suffix) :
-            StorageService("simple_storage_service" + suffix, "simple_storage_service" + suffix, capacity) {
+            StorageService("simple_storage" + suffix, "simple_storage" + suffix, capacity) {
 
       // Set default properties
       for (auto p : this->default_property_values) {

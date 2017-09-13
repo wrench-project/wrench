@@ -19,8 +19,8 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "simulation/SimulationMessage.h"
 #include "wrench/workflow/WorkflowTask.h"
-#include "wrench/workflow/StandardJob.h"
-#include "workflow_job/PilotJob.h"
+#include "wrench/workflow/job/StandardJob.h"
+#include "workflow/job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 

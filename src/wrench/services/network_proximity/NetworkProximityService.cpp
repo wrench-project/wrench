@@ -49,7 +49,7 @@ namespace wrench {
             int message_size, double measurement_period, int noise,
             std::map<std::string, std::string> plist,
             std::string suffix) :
-            Service("network_proximity_services" + suffix, "network_proximity_services" + suffix) {
+            Service("network_proximity" + suffix, "network_proximity" + suffix) {
 
         this->hosts_in_network = std::move(hosts_in_network);
 

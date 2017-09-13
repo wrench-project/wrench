@@ -13,7 +13,7 @@
 #include <map>
 
 #include "wrench/services/Service.h"
-#include "wrench/workflow/WorkflowJob.h"
+#include "wrench/workflow/job/WorkflowJob.h"
 
 namespace wrench {
 

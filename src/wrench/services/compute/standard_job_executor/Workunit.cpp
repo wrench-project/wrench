@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include <wrench/workflow/StandardJob.h>
+#include <wrench/workflow/job/StandardJob.h>
 #include "wrench/services/compute/standard_job_executor/Workunit.h"
 
 namespace wrench {

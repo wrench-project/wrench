@@ -16,7 +16,7 @@
 #include "StaticOptimization.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 #include "wrench/workflow/Workflow.h"
-#include "wrench/workflow/WorkflowExecutionEvent.h"
+#include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
 
 namespace wrench {
 

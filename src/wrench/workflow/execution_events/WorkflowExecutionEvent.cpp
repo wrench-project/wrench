@@ -13,7 +13,7 @@
 
 #include "simulation/SimulationMessage.h"
 #include "services/compute/ComputeServiceMessage.h"
-#include "services/storage_services/StorageServiceMessage.h"
+#include "services/storage/StorageServiceMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench.h"
 

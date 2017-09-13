@@ -9,7 +9,7 @@
 
 #include <set>
 #include "wrench/workflow/Workflow.h"
-#include "wrench/workflow/StandardJob.h"
+#include "wrench/workflow/job/StandardJob.h"
 
 namespace wrench {
 

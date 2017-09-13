@@ -1,12 +1,30 @@
 cmake_minimum_required(VERSION 3.2)
-project(wrench)
+message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CMAKE_PATCH_VERSION}")
+
+project(wrench CXX)
 
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
 
 set(CMAKE_CXX_STANDARD 11)
 
-include_directories(src/wrench/ include/ /usr/include /Users/casanova/Home/PROJECTS/SIMGRID/simgrid/include /usr/local/include /opt/local/include )
-#include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include )
+# build the version number
+set(WRENCH_VERSION_MAJOR "1")
+set(WRENCH_VERSION_MINOR "0")
+set(WRENCH_VERSION_PATCH "0")
+set(WRENCH_VERSION_EXTRA "alpha")
+
+if (${WRENCH_VERSION_PATCH} EQUAL "0")
+    set(WRENCH_RELEASE_VERSION "${WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}")
+else ()
+    set(WRENCH_RELEASE_VERSION "$(WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}.${WRENCH_VERSION_PATCH}")
+endif ()
+
+if (NOT ${WRENCH_VERSION_EXTRA} EQUAL "")
+    set(WRENCH_RELEASE_VERSION "${WRENCH_RELEASE_VERSION}-${WRENCH_VERSION_EXTRA}")
+endif ()
+
+
+include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include)
 
 # library header files
 set(HEADER_FILES
@@ -24,10 +42,10 @@ set(HEADER_FILES
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
-        include/wrench/workflow/WorkflowJob.h
-        include/wrench/workflow/StandardJob.h
-        include/wrench/workflow/FailureCause.h
-        include/wrench/workflow/WorkflowExecutionEvent.h
+        include/wrench/workflow/job/WorkflowJob.h
+        include/wrench/workflow/job/StandardJob.h
+        include/wrench/workflow/execution_events/FailureCause.h
+        include/wrench/workflow/execution_events/WorkflowExecutionEvent.h
         include/wrench/managers/JobManager.h
         include/wrench/managers/DataMovementManager.h
         include/wrench/services/Service.h
@@ -62,7 +80,7 @@ set(HEADER_FILES
 set(SOURCE_FILES
         src/wrench/simulation/SimulationMessage.cpp
         src/wrench/simulation/SimulationMessage.h
-        src/wrench/workflow_execution_events/WorkflowExecutionEvent.cpp
+        src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.h
@@ -78,40 +96,40 @@ set(SOURCE_FILES
         src/wrench/wms/scheduler/RandomScheduler.cpp
         src/wrench/services/compute/ComputeService.cpp
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeService.cpp
-        src/wrench/workflow_job/PilotJob.cpp
-        src/wrench/workflow_job/PilotJob.h
+        src/wrench/workflow/job/PilotJob.cpp
+        src/wrench/workflow/job/PilotJob.h
         src/wrench/managers/JobManager.cpp
         src/wrench/simulation/Simulation.cpp
-        src/wrench/workflow_job/WorkflowJob.cpp
-        src/wrench/workflow_job/StandardJob.cpp
+        src/wrench/workflow/job/WorkflowJob.cpp
+        src/wrench/workflow/job/StandardJob.cpp
         src/wrench/simulation/SimulationTimestamp.cpp
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/simulation/SimulationOutput.cpp
-        src/wrench/services/file_registry_service/FileRegistryService.cpp
-        src/wrench/services/storage_services/StorageService.cpp
-        src/wrench/services/storage_services/simple_storage_service/SimpleStorageService.cpp
+        src/wrench/services/file_registry/FileRegistryService.cpp
+        src/wrench/services/storage/StorageService.cpp
+        src/wrench/services/storage/simple_storage/SimpleStorageService.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
         src/wrench/services/compute/ComputeServiceProperty.cpp
-        src/wrench/services/storage_services/StorageServiceProperty.cpp
-        src/wrench/services/file_registry_service/FileRegistryServiceProperty.cpp
+        src/wrench/services/storage/StorageServiceProperty.cpp
+        src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeServiceProperty.cpp
-        src/wrench/services/storage_services/simple_storage_service/SimpleStorageServiceProperty.cpp
-        src/wrench/workflow_execution_events/FailureCause.cpp
+        src/wrench/services/storage/simple_storage/SimpleStorageServiceProperty.cpp
+        src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessage.h
         src/wrench/services/compute/ComputeServiceMessage.cpp
         src/wrench/services/compute/ComputeServiceMessage.h
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeServiceMessage.cpp
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeServiceMessage.h
-        src/wrench/services/storage_services/StorageServiceMessage.cpp
-        src/wrench/services/storage_services/StorageServiceMessage.h
-        src/wrench/services/file_registry_service/FileRegistryMessage.cpp
-        src/wrench/services/file_registry_service/FileRegistryMessage.h
+        src/wrench/services/storage/StorageServiceMessage.cpp
+        src/wrench/services/storage/StorageServiceMessage.h
+        src/wrench/services/file_registry/FileRegistryMessage.cpp
+        src/wrench/services/file_registry/FileRegistryMessage.h
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
-        src/wrench/services/storage_services/simple_storage_service/IncomingFile.cpp
-        src/wrench/services/storage_services/simple_storage_service/IncomingFile.h
+        src/wrench/services/storage/simple_storage/IncomingFile.cpp
+        src/wrench/services/storage/simple_storage/IncomingFile.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp
@@ -120,11 +138,11 @@ set(SOURCE_FILES
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutor.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.cpp
-        src/wrench/services/network_proximity_services/NetworkProximityService.cpp
-        src/wrench/services/network_proximity_services/NetworkQueryServiceProperty.cpp
-        src/wrench/services/network_proximity_services/NetworkProximityMessage.cpp
-        src/wrench/services/network_proximity_services/NetworkProximityMessage.h
-        src/wrench/services/network_proximity_services/NetworkDaemons.cpp
+        src/wrench/services/network_proximity/NetworkProximityService.cpp
+        src/wrench/services/network_proximity/NetworkQueryServiceProperty.cpp
+        src/wrench/services/network_proximity/NetworkProximityMessage.cpp
+        src/wrench/services/network_proximity/NetworkProximityMessage.h
+        src/wrench/services/network_proximity/NetworkDaemons.cpp
         )
 
 # test files
@@ -148,9 +166,12 @@ set(TEST_FILES
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
+find_library(PUGIXML_LIBRARY NAMES pugixml)
+find_library(LEMON_LIBRARY NAMES emon)
 
 add_library(wrench STATIC ${SOURCE_FILES})
-target_link_libraries(wrench ${SIMGRID_LIBRARY} -lpugixml -lemon)
+set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
+target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 
 install(TARGETS wrench DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
@@ -162,10 +183,16 @@ set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
 set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
 add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 
-# build examples
+
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
 
+
+# build examples
 foreach (cmakefile ${CMAKEFILES_TXT})
     string(REPLACE "/CMakeLists.txt" "" repository ${cmakefile})
     add_subdirectory("${CMAKE_HOME_DIRECTORY}/${repository}")
 endforeach ()
+
+
+# build documentation
+include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Documentation.cmake)

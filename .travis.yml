@@ -143,7 +143,7 @@ install:
 
 script:
   - cmake -DCMAKE_VERBOSE_MAKEFILE=ON .
-  - make all unit_tests
+  - make all unit_tests doc-gh
   - ./unit_tests
 
 after_success:
@@ -153,10 +153,6 @@ after_success:
       lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
       coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
     fi
-  # generate documentation
-  - chmod +x generate_documentation.sh
-  - doxygen --version
-  - ./generate_documentation.sh --USER --INTERNAL --DEVELOPER --GH
   # sonarcloud
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       build-wrapper-linux-x86-64 --out-dir bw-output make all unit_tests;
