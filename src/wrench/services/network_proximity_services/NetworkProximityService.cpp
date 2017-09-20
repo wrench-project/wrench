@@ -14,6 +14,7 @@
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
 #include "NetworkProximityMessage.h"
+#include "NetworkDaemons.h"
 
 #include <exceptions/WorkflowExecutionException.h>
 

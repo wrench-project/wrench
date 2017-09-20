@@ -108,7 +108,6 @@ namespace wrench {
       try {
         this->start(hostname);
       } catch (std::invalid_argument &e) {
-        std::cout<<e.what();
         throw &e;
       }
     }
@@ -195,6 +194,8 @@ namespace wrench {
       // hosts/cores, if possible
       for (auto wu : sorted_ready_workunits) {
 
+      unsigned long target_num_cores = 0;
+      std::string target_host = "";
       // TODO: via some property, etc.
       // TODO: method here is a feature of the executor, and perhaps could be configured
       // TODO: of 1-core tasks in terms of parallel efficiency. The "how do I pick cores?"
