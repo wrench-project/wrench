@@ -39,7 +39,6 @@ set(HEADER_FILES
         include/wrench/wms/DynamicOptimization.h
         include/wrench/wms/scheduler/PilotJobScheduler.h
         include/wrench/wms/scheduler/Scheduler.h
-        include/wrench/wms/scheduler/RandomScheduler.h
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
@@ -94,7 +93,6 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/wms/WMS.cpp
         src/wrench/wms/Scheduler.cpp
-        src/wrench/wms/scheduler/RandomScheduler.cpp
         src/wrench/services/compute/ComputeService.cpp
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeService.cpp
         src/wrench/workflow/job/PilotJob.cpp

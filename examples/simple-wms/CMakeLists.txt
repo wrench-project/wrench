@@ -7,6 +7,8 @@ set(SOURCE_FILES
         optimizations/dynamic/FailureDynamicClustering.cpp
         SimpleWMS.h
         SimpleWMS.cpp
+        scheduler/RandomScheduler.h
+        scheduler/RandomScheduler.cpp
         scheduler/MinMinScheduler.h
         scheduler/MinMinScheduler.cpp
         scheduler/MaxMinScheduler.h

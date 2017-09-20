@@ -10,7 +10,7 @@
 #ifndef WRENCH_RANDOMSCHEDULER_H
 #define WRENCH_RANDOMSCHEDULER_H
 
-#include "wrench/wms/scheduler/Scheduler.h"
+#include <wrench-dev.h>
 
 namespace wrench {
 

@@ -11,7 +11,7 @@
 #include <set>
 
 #include "wrench/simulation/Simulation.h"
-#include "wrench/wms/scheduler/RandomScheduler.h"
+#include "RandomScheduler.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "workflow/job/PilotJob.h"
