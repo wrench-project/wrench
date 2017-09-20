@@ -662,6 +662,17 @@ private:
         throw std::runtime_error("Unexpected exception while terminating job: " + std::string(e.what()));
       }
 
+      // Check that the job's state has been updated
+      if (two_task_job->getState() != wrench::StandardJob::TERMINATED) {
+        throw std::runtime_error("Terminated Standard Job is not in TERMINATED state");
+      }
+
+      // Check that task states make sense
+      if ((this->test->task1->getState() != wrench::WorkflowTask::READY) ||
+          (this->test->task2->getState() != wrench::WorkflowTask::READY)) {
+        throw std::runtime_error("Tasks in a FAILED job should be in the READY state");
+      }
+
       // Terminate
       this->simulation->shutdownAllComputeServices();
       this->simulation->shutdownAllStorageServices();
