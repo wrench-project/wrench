@@ -12,7 +12,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "workflow/job/PilotJob.h"
+#include "wrench/workflow/job/PilotJob.h"
 #include "NoopScheduler.h"
 #include "TestWithFork.h"
 

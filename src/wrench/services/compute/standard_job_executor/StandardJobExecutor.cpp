@@ -20,7 +20,7 @@
 #include "services/ServiceMessage.h"
 #include "services/compute/ComputeServiceMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
-#include "workflow/job/PilotJob.h"
+#include "wrench/workflow/job/PilotJob.h"
 #include "StandardJobExecutorMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard Job Executor");

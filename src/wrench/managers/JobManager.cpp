@@ -20,7 +20,7 @@
 #include "simulation/SimulationMessage.h"
 #include "wrench/workflow/WorkflowTask.h"
 #include "wrench/workflow/job/StandardJob.h"
-#include "workflow/job/PilotJob.h"
+#include "wrench/workflow/job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 
@@ -286,6 +286,12 @@ namespace wrench {
         job->getParentComputeService()->terminateJob(job);
       } catch (std::exception &e) {
         throw;
+      }
+
+      if (job->getType() == WorkflowJob::STANDARD) {
+        ((StandardJob *)job)->state = StandardJob::State::TERMINATED;
+      } else if (job->getType() == WorkflowJob::PILOT) {
+        ((PilotJob *) job)->state = PilotJob::State::TERMINATED;
       }
 
     }

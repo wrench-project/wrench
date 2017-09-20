@@ -109,4 +109,12 @@ namespace wrench {
       return this->file_locations;
     }
 
+    /**
+     * @brief Get the state of the standard job
+     * @return the state
+     */
+    StandardJob::State StandardJob::getState() {
+      return this->state;
+    }
+
 };

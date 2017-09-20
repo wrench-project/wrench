@@ -17,7 +17,7 @@
 #include "services/ServiceMessage.h"
 #include "services/compute/ComputeServiceMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
-#include "workflow/job/PilotJob.h"
+#include "wrench/workflow/job/PilotJob.h"
 #include "MulticoreComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 

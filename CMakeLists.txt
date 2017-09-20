@@ -44,6 +44,7 @@ set(HEADER_FILES
         include/wrench/workflow/WorkflowTask.h
         include/wrench/workflow/job/WorkflowJob.h
         include/wrench/workflow/job/StandardJob.h
+        include/wrench/workflow/job/PilotJob.h
         include/wrench/workflow/execution_events/FailureCause.h
         include/wrench/workflow/execution_events/WorkflowExecutionEvent.h
         include/wrench/managers/JobManager.h
@@ -96,7 +97,6 @@ set(SOURCE_FILES
         src/wrench/services/compute/ComputeService.cpp
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeService.cpp
         src/wrench/workflow/job/PilotJob.cpp
-        src/wrench/workflow/job/PilotJob.h
         src/wrench/managers/JobManager.cpp
         src/wrench/simulation/Simulation.cpp
         src/wrench/workflow/job/WorkflowJob.cpp
