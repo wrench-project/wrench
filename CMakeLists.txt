@@ -123,7 +123,11 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity_services/NetworkProximityMessage.h
         src/wrench/services/network_proximity_services/NetworkDaemons.cpp
         src/wrench/services/network_proximity_services/NetworkDaemons.h
-        src/wrench/services/compute_services/standard_job_executor/ComputeThread.h)
+        src/wrench/services/compute_services/standard_job_executor/ComputeThread.h
+        src/wrench/services/batch_service/BatchService.cpp
+        src/wrench/services/batch_service/BatchService.h
+        src/wrench/services/batch_service/BatchServiceProperty.cpp
+        src/wrench/services/batch_service/BatchServiceProperty.h)
 
 # test files
 set(TEST_FILES
@@ -141,7 +145,8 @@ set(TEST_FILES
         test/simulation/MulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/TestWithFork.h
         test/simulation/StandardJobExecutorTest.cpp
-        test/simulation/NetworkProximityTest.cpp)
+        test/simulation/NetworkProximityTest.cpp
+        test/simulation/BatchServiceTest.cpp src/wrench/services/batch_service/BatchJob.cpp src/wrench/services/batch_service/BatchJob.h src/wrench/services/batch_service/BatchServiceMessage.cpp src/wrench/services/batch_service/BatchServiceMessage.h src/wrench/services/batch_service/BatchScheduler.cpp src/wrench/services/batch_service/BatchScheduler.h)
 
 set(INCLUDE_FILES include/wrench.h)
 set(INCLUDE_DEV_FILES include/wrench-dev.h)

@@ -194,7 +194,14 @@ namespace wrench {
       // hosts/cores, if possible
       for (auto wu : sorted_ready_workunits) {
 
-//        std::cerr << "** LOOKING AT A READY WU\n";
+      unsigned long target_num_cores = 0;
+      std::string target_host = "";
+      // TODO: via some property, etc.
+      // TODO: method here is a feature of the executor, and perhaps could be configured
+      // TODO: of 1-core tasks in terms of parallel efficiency. The "how do I pick cores?"
+      // TODO: per task. This many not be judicious since it may be better to run a bunch
+      // TODO: This is heuristic here, in which we try to maximize the number of cores
+      // Find a host that can run it, picking the host with the largest number of cores
 
         // Compute the workunit's desired number of cores
         unsigned long desired_num_cores, minimum_num_cores;
