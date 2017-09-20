@@ -25,6 +25,7 @@ endif ()
 
 
 include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include)
+#include_directories(src/wrench/ include/ /usr/include /Users/casanova/Home/PROJECTS/SIMGRID/simgrid/include /usr/local/include /opt/local/include)
 
 # library header files
 set(HEADER_FILES
@@ -162,7 +163,7 @@ set(TEST_FILES
         test/simulation/TestWithFork.h
         test/simulation/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
-        )
+        test/simulation/NoopScheduler.cpp test/simulation/NoopScheduler.h)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)

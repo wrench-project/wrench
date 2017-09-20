@@ -9,20 +9,12 @@
 
 #include <gtest/gtest.h>
 #include <random>
+#include <wrench-dev.h>
 
-#include "wrench/managers/DataMovementManager.h"
-#include "wrench/workflow/Workflow.h"
-#include "wrench/wms/WMS.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/wms/scheduler/RandomScheduler.h"
-#include "wrench/services/storage/SimpleStorageService.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench.h"
-#include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "simulation/SimulationMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 
+#include "NoopScheduler.h"
 #include "TestWithFork.h"
 
 #define EPSILON 0.05
@@ -235,7 +227,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskTestWMS(this, workflow,
                                                                     std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -396,7 +388,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskNotEnoughCoresTest_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskNotEnoughCoresTestWMS(this, workflow,
                                                                     std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -582,7 +574,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskBogusPreFileCopyTestWMS(this, workflow,
                                                                                   std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -764,7 +756,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskMissingFileTestWMS(this, workflow,
                                                                                     std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -1061,7 +1053,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new OneMultiCoreTaskTestWMS(this, workflow,
                                                                    std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -1412,7 +1404,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new TwoMultiCoreTasksTestWMS(this, workflow,
                                                                     std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -1685,7 +1677,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new MultiHostTestWMS(this, workflow,
                                                             std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -1848,7 +1840,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new JobTerminationTestDuringAComputationWMS(this, workflow,
                                                             std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), "Host3"))));
+                          new NoopScheduler()), "Host3"))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -2011,7 +2003,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new JobTerminationTestDuringATransferWMS(this, workflow,
                                                                  std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), "Host3"))));
+                          new NoopScheduler()), "Host3"))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
@@ -2186,7 +2178,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new JobTerminationTestAtRandomTimesWMS(this, workflow,
                                                                                 std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), "Host3"))));
+                          new NoopScheduler()), "Host3"))));
 
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;

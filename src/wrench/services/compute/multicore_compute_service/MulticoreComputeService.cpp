@@ -533,6 +533,7 @@ namespace wrench {
       try {
         if (this->has_ttl) {
           if (timeout <= 0) {
+            this->terminate(true);
             return false;
           } else {
             message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
@@ -1146,8 +1147,11 @@ namespace wrench {
 
       // Check whether the job is running
       if (this->running_jobs.find(job) != this->running_jobs.end()) {
+        // Remove the job from the list of running jobs
         this->running_jobs.erase(job);
+        // terminate it
         terminateRunningStandardJob(job);
+        // reply
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                 job, this, true, nullptr,
                 this->getPropertyValueAsDouble(

@@ -12,14 +12,9 @@
 
 #include <gtest/gtest.h>
 
-#include "wrench/managers/DataMovementManager.h"
-#include "wrench/workflow/Workflow.h"
-#include "wrench/wms/WMS.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/wms/scheduler/RandomScheduler.h"
-#include "wrench/services/storage/SimpleStorageService.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench.h"
+#include <wrench-dev.h>
+
+#include "NoopScheduler.h"
 #include "TestWithFork.h"
 
 
@@ -183,7 +178,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesTestWMS(this, workflow,
                                                                                             std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), "WMSHost"))));
+                          new NoopScheduler()), "WMSHost"))));
 
   // Create a (unused) Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(

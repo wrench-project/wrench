@@ -9,14 +9,9 @@
 
 
 #include <gtest/gtest.h>
+#include <wrench-dev.h>
 
-#include "wrench/managers/DataMovementManager.h"
-#include "wrench/workflow/Workflow.h"
-#include "wrench/wms/WMS.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/wms/scheduler/RandomScheduler.h"
-#include "wrench/services/storage/SimpleStorageService.h"
-#include "wrench.h"
+#include "NoopScheduler.h"
 
 #include "TestWithFork.h"
 
@@ -141,7 +136,7 @@ void OneTaskTest::do_Noop_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new NoopTestWMS(this, workflow,
                                                        std::unique_ptr<wrench::Scheduler>(
-                                                               new wrench::RandomScheduler()),
+                                                               new NoopScheduler()),
                           hostname))));
 
   // Create a Compute Service
@@ -260,7 +255,7 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new ExecutionWithLocationMapTestWMS(this, workflow,
                                                                            std::unique_ptr<wrench::Scheduler>(
-                                                                                   new wrench::RandomScheduler()),
+                                                                                   new NoopScheduler()),
                           hostname))));
 
   // Create a Compute Service
@@ -385,7 +380,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new ExecutionWithDefaultStorageServiceTestWMS(this, workflow,
                                                                                      std::unique_ptr<wrench::Scheduler>(
-                                                                                             new wrench::RandomScheduler()),
+                                                                                             new NoopScheduler()),
                           hostname))));
 
   // Create a Storage Service
@@ -536,7 +531,7 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new ExecutionWithPrePostCopiesAndCleanupTestWMS(this, workflow,
                                                                                        std::unique_ptr<wrench::Scheduler>(
-                                                                                               new wrench::RandomScheduler()),
+                                                                                               new NoopScheduler()),
                           hostname))));
 
   // Create a Storage Service

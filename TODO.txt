@@ -22,11 +22,6 @@ DATA STORAGE IMPLEMENTATION:
 
 ---------------------------------------------------------------------
 
-COMPUTE SERVICE IMPLEMENTATION:
-
-    - Deal with multi-core tasks...
-
----------------------------------------------------------------------
 
 NETWORK PROXIMITY:
 
@@ -36,7 +31,7 @@ NETWORK PROXIMITY:
 
 COMPUTE SERVICE: IMPLEMENT A SIMPLE FIFO BATCH  (WOULD BE GREAT FOR THE UPCOMING PAPER)
     - Really close to Condor...
-    - Will need to connect to BATSIM to do a batch
+    - Will need to connect to BATSIM to do a batch, or SLURM?
 
 ---------------------------------------------------------------------
 
@@ -51,10 +46,10 @@ NEW FEATURES FOR EDDY:
 
 SOFTWARE ENGINEERING / TESTING:
     - Add properties to the MultiCore compute service that corresponds to the
-      undelying properties of the StandardJobExecutors it will use
+      underlying properties of the StandardJobExecutors it will use
 
     - Test for killing a standard job executor 
-	- wait on S4U::Actor::kill() to be fixed
+	    - wait on S4U::Actor::kill() to be fixed
 
     - While implementing a test for the StandardJobExecutor abstraction, Henri noted
       that when one does not create a ComputeService and launch the simulation, we
