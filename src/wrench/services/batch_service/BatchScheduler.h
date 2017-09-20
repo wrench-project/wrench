@@ -6,9 +6,23 @@
 #define WRENCH_BATCHSCHEDULER_H
 
 
-class BatchScheduler {
+#include "BatchJob.h"
+#include "BatchService.h"
 
-};
+namespace wrench {
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+    class BatchScheduler {
+    public:
+        BatchScheduler();
+        std::set<std::pair<std::string,unsigned long>> schedule_on_hosts(BatchJob *job);
+        BatchJob* schedule_job();
+    };
+    /***********************/
+    /** \endcond           */
+    /***********************/
+}
 
 
 #endif //WRENCH_BATCHSCHEDULER_H

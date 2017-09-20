@@ -41,6 +41,8 @@ namespace wrench {
 
         void runJob(WorkflowJob *job);
 
+        void runJob(WorkflowJob *job,std::map<std::string,unsigned long> batch_job_args);
+
         void terminateJob(WorkflowJob *job);
 
         bool supportsStandardJobs();
@@ -65,7 +67,11 @@ namespace wrench {
 
         virtual void submitStandardJob(StandardJob *job);
 
+        virtual unsigned long submitStandardJob(StandardJob *job,std::map<std::string,unsigned long> batch_job_args);
+
         virtual void submitPilotJob(PilotJob *job);
+
+        virtual unsigned long submitPilotJob(PilotJob *job,std::map<std::string,unsigned long> batch_job_args);
 
         virtual void terminateStandardJob(StandardJob *job);
 

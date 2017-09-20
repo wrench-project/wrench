@@ -65,6 +65,8 @@ namespace wrench {
 
 				void submitJob(WorkflowJob *job, ComputeService *compute_service);
 
+				void submitJob(WorkflowJob *job, ComputeService *compute_service, std::map<std::string,unsigned long> batchjobargs);
+
 				void terminateJob(WorkflowJob *);
 
 				void forgetJob(WorkflowJob *job);
