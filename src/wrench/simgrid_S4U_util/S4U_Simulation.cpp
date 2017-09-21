@@ -12,7 +12,7 @@
 #include <xbt/ex.hpp>
 
 
-#include "simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
 namespace wrench {
 

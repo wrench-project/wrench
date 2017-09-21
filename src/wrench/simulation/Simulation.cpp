@@ -10,12 +10,12 @@
 
 #include <csignal>
 
-#include "logging/TerminalOutput.h"
-#include "services/Service.h"
-#include "services/compute_services/multicore_compute_service/MulticoreComputeService.h"
-#include "services/file_registry_service/FileRegistryService.h"
-#include "services/storage_services/StorageService.h"
-#include "simulation/Simulation.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/Service.h"
+#include "wrench/services/compute/MulticoreComputeService.h"
+#include "wrench/services/file_registry/FileRegistryService.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/simulation/Simulation.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 
@@ -42,7 +42,6 @@ namespace wrench {
     Simulation::Simulation() {
 
       // Customize the logging format
-      // xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
       xbt_log_control_set("root.fmt:[%d][%h:%t(%i)]%e%m%n");
 
       // Setup the SIGABRT handler

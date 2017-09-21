@@ -13,7 +13,7 @@
 
 #include <string>
 #include <map>
-#include <workflow_execution_events/FailureCause.h>
+#include <wrench/workflow/execution_events/FailureCause.h>
 
 namespace wrench {
 

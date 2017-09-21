@@ -13,35 +13,34 @@
 #include "wrench.h"
 
 // Exceptions
-#include "exceptions/WorkflowExecutionException.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
 
 // Compute Services
-#include "services/compute_services/ComputeService.h"
-#include "services/compute_services/multicore_compute_service/MulticoreComputeService.h"
+#include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/compute/ComputeServiceProperty.h"
 
 // Storage Services
-#include "services/storage_services/StorageService.h"
-#include "services/storage_services/simple_storage_service/SimpleStorageService.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/services/storage/StorageServiceProperty.h"
 
 // File Registry Service
-#include "services/file_registry_service/FileRegistryService.h"
+#include "wrench/services/file_registry/FileRegistryService.h"
+#include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 
-// Job Manager
-#include "managers/job_manager/JobManager.h"
-
-// Data Movement Manager
-#include "managers/data_movement_manager/DataMovementManager.h"
+// Managers
+#include "wrench/managers/JobManager.h"
+#include "wrench/managers/DataMovementManager.h"
 
 // Logging
-#include "logging/TerminalOutput.h"
+#include "wrench/logging/TerminalOutput.h"
 
 // Workflow
-#include "workflow/WorkflowTask.h"
-#include "workflow/WorkflowFile.h"
+#include "wrench/workflow/WorkflowTask.h"
+#include "wrench/workflow/WorkflowFile.h"
 
 // Workflow Job
-#include "workflow_job/PilotJob.h"
-#include "workflow_job/StandardJob.h"
-#include "workflow_job/WorkflowJob.h"
+#include "wrench/workflow/job/WorkflowJob.h"
+#include "wrench/workflow/job/StandardJob.h"
+//#include "workflow_job/PilotJob.h"
 
 #endif //WRENCH_WRENCH_DEV_H

@@ -9,8 +9,9 @@
 
 
 #include <gtest/gtest.h>
-
 #include <wrench-dev.h>
+
+#include "NoopScheduler.h"
 
 #include "TestWithFork.h"
 
@@ -52,7 +53,7 @@ protected:
       // Create a one-host platform file
       std::string xml = "<?xml version='1.0'?>"
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-              "<platform version=\"4\"> "
+              "<platform version=\"4.1\"> "
               "   <AS id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"SingleHost\" speed=\"1f\"/> "
               "   </AS> "
@@ -135,7 +136,7 @@ void OneTaskTest::do_Noop_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new NoopTestWMS(this, workflow,
                                                        std::unique_ptr<wrench::Scheduler>(
-                                                               new wrench::RandomScheduler()),
+                                                               new NoopScheduler()),
                           hostname))));
 
   // Create a Compute Service
@@ -254,7 +255,7 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new ExecutionWithLocationMapTestWMS(this, workflow,
                                                                            std::unique_ptr<wrench::Scheduler>(
-                                                                                   new wrench::RandomScheduler()),
+                                                                                   new NoopScheduler()),
                           hostname))));
 
   // Create a Compute Service
@@ -379,7 +380,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new ExecutionWithDefaultStorageServiceTestWMS(this, workflow,
                                                                                      std::unique_ptr<wrench::Scheduler>(
-                                                                                             new wrench::RandomScheduler()),
+                                                                                             new NoopScheduler()),
                           hostname))));
 
   // Create a Storage Service
@@ -453,10 +454,16 @@ private:
       // Create a job
       wrench::StandardJob *job = job_manager->createStandardJob({test->task},
                                                                 {},
-                                                                {std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> {test->input_file, test->storage_service1, test->storage_service2}},
-                                                                {std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> {test->output_file, test->storage_service2, test->storage_service1}},
-                                                                {std::tuple<wrench::WorkflowFile*, wrench::StorageService*> {test->input_file, test->storage_service2},
-                                                                 std::tuple<wrench::WorkflowFile*, wrench::StorageService*> {test->output_file, test->storage_service2}});
+                                                                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *> {
+                                                                        test->input_file, test->storage_service1,
+                                                                        test->storage_service2}},
+                                                                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *> {
+                                                                        test->output_file, test->storage_service2,
+                                                                        test->storage_service1}},
+                                                                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *> {
+                                                                        test->input_file, test->storage_service2},
+                                                                 std::tuple<wrench::WorkflowFile *, wrench::StorageService *> {
+                                                                         test->output_file, test->storage_service2}});
       // Submit the job
       job_manager->submitJob(job, test->compute_service);
 
@@ -469,7 +476,7 @@ private:
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
           throw std::runtime_error("Unexpected job failure: " + event->failure_cause->toString());
         }
-        default:{
+        default: {
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
         }
       }
@@ -524,7 +531,7 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new ExecutionWithPrePostCopiesAndCleanupTestWMS(this, workflow,
                                                                                        std::unique_ptr<wrench::Scheduler>(
-                                                                                               new wrench::RandomScheduler()),
+                                                                                               new NoopScheduler()),
                           hostname))));
 
   // Create a Storage Service

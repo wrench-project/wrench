@@ -10,41 +10,41 @@
 #ifndef WRENCH_WRENCH_H
 #define WRENCH_WRENCH_H
 
-#include "simulation/Simulation.h"
-#include "simulation/SimulationTimestamp.h"
-#include "workflow/Workflow.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/workflow/Workflow.h"
 
 // Services and Service Properties
-#include <services/compute_services/multicore_compute_service/MulticoreComputeService.h>
-#include <services/compute_services/multicore_compute_service/MulticoreComputeServiceProperty.h>
-#include <services/storage_services/simple_storage_service/SimpleStorageService.h>
-#include <services/storage_services/simple_storage_service/SimpleStorageServiceProperty.h>
+#include "wrench/services/compute/MulticoreComputeService.h"
+#include "wrench/services/compute/MulticoreComputeServiceProperty.h"
+#include "wrench/services/storage/SimpleStorageService.h"
+#include "wrench/services/storage/SimpleStorageServiceProperty.h"
+#include "wrench/services/file_registry/FileRegistryService.h"
+#include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 
 // WMS Implementations
-#include "wms/WMS.h"
-#include "wms/engine/SimpleWMS.h"
+#include "wrench/wms/WMS.h"
 
 // Schedulers
-#include "wms/scheduler/Scheduler.h"
-#include "wms/scheduler/RandomScheduler.h"
-#include "wms/scheduler/MinMinScheduler.h"
-#include "wms/scheduler/MaxMinScheduler.h"
+#include "wrench/wms/scheduler/Scheduler.h"
+#include "../examples/simple-wms/scheduler/RandomScheduler.h"
+//#include "wms/scheduler/MinMinScheduler.h"
+//#include "wms/scheduler/MaxMinScheduler.h"
 
 // Pilot Job Schedulers
-#include "wms/scheduler/pilot_job/PilotJobScheduler.h"
-#include "wms/scheduler/pilot_job/CriticalPathScheduler.h"
+#include "wrench/wms/scheduler/PilotJobScheduler.h"
+//#include "wms/scheduler/pilot_job/CriticalPathScheduler.h"
 
 // Static Optimizations
-#include "wms/optimizations/static/StaticOptimization.h"
-#include "wms/optimizations/static/SimplePipelineClustering.h"
+#include "wrench/wms/StaticOptimization.h"
+//#include "wms/optimizations/static/SimplePipelineClustering.h"
 
 // Dynamic Optimizations
-#include "wms/optimizations/dynamic/DynamicOptimization.h"
-#include "wms/optimizations/dynamic/FailureDynamicClustering.h"
+#include "wrench/wms/DynamicOptimization.h"
+//#include "wms/optimizations/dynamic/FailureDynamicClustering.h"
 
 // Simulation Output Analysis
-#include "simulation/SimulationTimestamp.h"
-#include "simulation/SimulationTimestampTypes.h"
+#include "wrench/simulation/SimulationTimestamp.h"
+#include "wrench/simulation/SimulationTimestampTypes.h"
 
 
 #endif //WRENCH_WRENCH_H

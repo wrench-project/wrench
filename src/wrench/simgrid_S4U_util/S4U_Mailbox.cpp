@@ -13,12 +13,12 @@
 #include <simgrid/s4u/Mailbox.hpp>
 #include <simgrid/s4u.hpp>
 
-#include "exceptions/WorkflowExecutionException.h"
-#include "workflow_execution_events/FailureCause.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/workflow/execution_events/FailureCause.h"
 
-#include "logging/TerminalOutput.h"
+#include "wrench/logging/TerminalOutput.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "simgrid_S4U_util/S4U_PendingCommunication.h"
+#include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "simulation/SimulationMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
@@ -121,6 +121,8 @@ namespace wrench {
         } else {
           throw std::runtime_error("S4U_Mailbox::putMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
+      } catch (std::exception &e) {
+        throw;
       }
 
       return;

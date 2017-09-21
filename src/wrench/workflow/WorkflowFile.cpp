@@ -10,8 +10,8 @@
 #include <map>
 #include <xbt.h>
 
-#include "WorkflowFile.h"
-#include "WorkflowTask.h"
+#include "wrench/workflow/WorkflowFile.h"
+#include "wrench/workflow/WorkflowTask.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workflowFile, "Log category for WorkflowFile");
 
