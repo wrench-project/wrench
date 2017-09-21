@@ -74,6 +74,7 @@ namespace wrench {
         this->supports_pilot_jobs = supports_pilot_jobs;
 
         this->parent_pilot_job = parent_pilot_job;
+        this->hostname = hostname;
 
         this->generateUniqueJobId();
 
@@ -185,6 +186,8 @@ namespace wrench {
                     "] message!");
         }
 
+        return jobid;
+
     }
 
 
@@ -256,7 +259,6 @@ namespace wrench {
         unsigned long jobid = this->generateUniqueJobId();
         BatchJob* batch_job = new BatchJob(job,jobid,time_asked_for,nodes_asked_for,cores_asked_for,-1);
 
-
         //  send a "run a batch job" message to the daemon's mailbox
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_pilot_job_mailbox");
         try {
@@ -287,6 +289,7 @@ namespace wrench {
                     "BatchService::submitPilotJob(): Received an unexpected [" + message->getName() +
                     "] message!");
         }
+        return jobid;
     }
 
     /**
@@ -316,6 +319,7 @@ namespace wrench {
             }else{
                 //check if some jobs have expired and should be killed
                 if (this->running_jobs.size() > 0) {
+                    std::cout<<"Running pilot job timestamp "<<job_timeout<<"\n";
                     std::set<BatchJob*>::iterator it;
                     for (it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
                         if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock());
@@ -542,7 +546,7 @@ namespace wrench {
 
         for (auto workflow_job : this->running_jobs) {
             if (workflow_job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-                StandardJob *job = (StandardJob *) workflow_job;
+                StandardJob *job = (StandardJob*) workflow_job->getWorkflowJob();
                 this->failRunningStandardJob(job, std::move(cause));
             }
         }
@@ -566,6 +570,29 @@ namespace wrench {
 
         WRENCH_INFO("Failing current standard jobs");
         this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+
+        if(this->supports_pilot_jobs){
+            for(auto workflow_job:this->running_jobs){
+                if(workflow_job->getWorkflowJob()->getType()==WorkflowJob::PILOT){
+                    PilotJob* p_job = (PilotJob*) (workflow_job->getWorkflowJob());
+                    BatchService* cs = (BatchService*)p_job->getComputeService();
+                    if (cs == nullptr) {
+                        throw std::runtime_error("BatchService::terminate(): can't find compute service associated to pilot job");
+                    }
+                    cs->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+                    cs->stop();
+                    // Remove the job from the running list
+                    this->running_jobs.erase(workflow_job);
+                    // Update the available resources
+                    std::set<std::pair<std::string,unsigned long>> resources = (workflow_job)->getResourcesAllocated();
+                    std::set<std::pair<std::string,unsigned long>>::iterator resource_it;
+                    for(resource_it=resources.begin();resource_it!=resources.end();resource_it++){
+                        this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
+                    }
+
+                }
+            }
+        }
 
         if (notify_pilot_job_submitters && this->parent_pilot_job) {
 
@@ -606,6 +633,7 @@ namespace wrench {
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
         if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+            this->terminate(false);
             // This is Synchronous
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -619,32 +647,69 @@ namespace wrench {
 
         }else if (BatchServiceJobRequestMessage *msg = dynamic_cast<BatchServiceJobRequestMessage *>(message.get())) {
             WRENCH_INFO("Asked to run a batch job using batchservice with jobid %ld",msg->job->getJobID());
-            if (not this->supportsStandardJobs()) {
-                try {
-                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                             new ComputeServiceSubmitStandardJobAnswerMessage((StandardJob*)msg->job->getWorkflowJob(), this,
-                                                                                              false,
-                                                                                              std::shared_ptr<FailureCause>(new JobTypeNotSupported(msg->job->getWorkflowJob(),
-                                                                                                                                                    this)),
-                                                                                              this->getPropertyValueAsDouble(
-                                                                                                      BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-                } catch (std::shared_ptr<NetworkError> cause) {
+            if (msg->job->getWorkflowJob()->getType()==WorkflowJob::STANDARD) {
+                if (not this->supports_standard_jobs) {
+                    try {
+                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                                 new ComputeServiceSubmitStandardJobAnswerMessage(
+                                                         (StandardJob *) msg->job->getWorkflowJob(), this,
+                                                         false,
+                                                         std::shared_ptr<FailureCause>(
+                                                                 new JobTypeNotSupported(msg->job->getWorkflowJob(),
+                                                                                         this)),
+                                                         this->getPropertyValueAsDouble(
+                                                                 BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                    } catch (std::shared_ptr<NetworkError> cause) {
+                        return true;
+                    }
                     return true;
                 }
-                return true;
+            }else if(msg->job->getWorkflowJob()->getType()==WorkflowJob::PILOT){
+                if (not this->supports_pilot_jobs) {
+                    try {
+                        S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                                 new ComputeServiceSubmitPilotJobAnswerMessage(
+                                                         (PilotJob *) msg->job->getWorkflowJob(), this,
+                                                         false,
+                                                         std::shared_ptr<FailureCause>(
+                                                                 new JobTypeNotSupported(msg->job->getWorkflowJob(),
+                                                                                         this)),
+                                                         this->getPropertyValueAsDouble(
+                                                                 BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                    } catch (std::shared_ptr<NetworkError> cause) {
+                        return true;
+                    }
+                    return true;
+                }
             }
 
             this->pending_jobs.push_back(msg->job);
 
-            try {
-                S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                         new ComputeServiceSubmitStandardJobAnswerMessage((StandardJob*)msg->job->getWorkflowJob(), this,
-                                                                                          true,
-                                                                                          nullptr,
-                                                                                          this->getPropertyValueAsDouble(
-                                                                                                  BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> cause) {
-                return true;
+            if (msg->job->getWorkflowJob()->getType()==WorkflowJob::STANDARD) {
+
+                try {
+                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                             new ComputeServiceSubmitStandardJobAnswerMessage(
+                                                     (StandardJob *) msg->job->getWorkflowJob(), this,
+                                                     true,
+                                                     nullptr,
+                                                     this->getPropertyValueAsDouble(
+                                                             BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                } catch (std::shared_ptr<NetworkError> cause) {
+                    return true;
+                }
+            }else if(msg->job->getWorkflowJob()->getType()==WorkflowJob::PILOT){
+                try {
+                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                                             new ComputeServiceSubmitPilotJobAnswerMessage(
+                                                     (PilotJob *) msg->job->getWorkflowJob(), this,
+                                                     true,
+                                                     nullptr,
+                                                     this->getPropertyValueAsDouble(
+                                                             BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                } catch (std::shared_ptr<NetworkError> cause) {
+                    return true;
+                }
             }
             return true;
 

@@ -252,9 +252,6 @@ namespace wrench {
 
 //        std::cerr << "** FINDING A HOST USING " << host_selection_algorithm << "\n";
 
-        std::string target_host = "";
-        unsigned long target_num_cores = 0;
-
         if (host_selection_algorithm == "best_fit") {
           unsigned long target_slack = 0;
 

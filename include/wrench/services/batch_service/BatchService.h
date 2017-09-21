@@ -34,6 +34,7 @@ namespace wrench {
                  {BatchServiceProperty::THREAD_STARTUP_OVERHEAD,              "1024"},
                  {BatchServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,    "1024"},
                  {BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,    "1024"},
+                 {BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,        "1024"},
                  {BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,  "1024"},
                  {BatchServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,    "1024"},
                  {BatchServiceProperty::SUBMIT_BATCH_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},

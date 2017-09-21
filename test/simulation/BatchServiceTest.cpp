@@ -8,6 +8,7 @@
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
 #include <wrench/services/batch_service/BatchService.h>
+#include "NoopScheduler.h"
 
 #include "TestWithFork.h"
 
@@ -79,36 +80,60 @@ private:
         // Create a job manager
         std::unique_ptr<wrench::JobManager> job_manager =
                 std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+        {
+            // Create a sequential task that lasts one hour and requires 12 cores
+            wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 2, 2, 1.0);
+            task->addInputFile(workflow->getFileById("input_file"));
+            task->addOutputFile(workflow->getFileById("output_file"));
 
-        // Create a sequential task that lasts one hour and requires 12 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 2, 2, 1.0);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
+            // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
-        // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+            wrench::StandardJob *job = job_manager->createStandardJob(
+                    {task},
+                    {
+                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                    },
+                    {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                            workflow->getFileById("input_file"), this->test->storage_service1,
+                            this->test->storage_service2)},
+                    {},
+                    {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                                                                                  this->test->storage_service2)});
 
-        wrench::StandardJob *job = job_manager->createStandardJob(
-                {task},
-                {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
-                },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service1,
-                        this->test->storage_service2)},
-                {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
-                                                                              this->test->storage_service2)});
+            std::map<std::string, unsigned long> batch_job_args;
+            batch_job_args["-N"] = 1;
+            batch_job_args["-t"] = 1; //time in minutes
+            batch_job_args["-c"] = 4; //number of cores per node
+            try {
+                job_manager->submitJob(job, this->test->compute_service, batch_job_args);
+            }catch (wrench::WorkflowExecutionException &e){
+                throw std::runtime_error(
+                        "Got some exception"
+                );
+            }
+        }
+
+        {
+            // Create a pilot job
+            wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 30);
+
+            std::map<std::string, unsigned long> batch_job_args;
+            batch_job_args["-N"] = 1;
+            batch_job_args["-t"] = 1; //time in minutes
+            batch_job_args["-c"] = 4; //number of cores per node
+
+            // Submit a pilot job
+            try {
+                job_manager->submitJob((wrench::WorkflowJob*)pilot_job, this->test->compute_service, batch_job_args);
+            } catch (wrench::WorkflowExecutionException &e){
+                throw std::runtime_error(
+                        "Got some exception"
+                );
+            }
+        }
 
 
-        std::string my_mailbox = "test_callback_mailbox";
-
-        std::map<std::string,unsigned long> batch_job_args;
-        batch_job_args["-N"] = 1;
-        batch_job_args["-t"] = 1; //time in minutes
-        batch_job_args["-c"] = 4; //number of cores per node
-        job_manager->submitJob(job,this->test->compute_service,batch_job_args);
-        workflow->removeTask(task);
 
         // Terminate everything
         this->simulation->shutdownAllComputeServices();
@@ -143,7 +168,7 @@ void BatchServiceTest::do_StandardJobTaskTest_test() {
     EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
             std::unique_ptr<wrench::WMS>(new OneStandardJobSubmissionTestWMS(this, workflow,
                                                                                               std::unique_ptr<wrench::Scheduler>(
-                            new wrench::RandomScheduler()), hostname))));
+                            new NoopScheduler()), hostname))));
 
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(
