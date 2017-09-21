@@ -2,7 +2,7 @@
 // Created by suraj on 9/16/17.
 //
 
-#include "BatchScheduler.h"
+#include "wrench/services/batch_service/BatchScheduler.h"
 
 namespace wrench{
     BatchScheduler::BatchScheduler() {

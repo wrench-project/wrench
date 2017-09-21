@@ -2,21 +2,20 @@
 // Created by suraj on 8/29/17.
 //
 
-#include <logging/TerminalOutput.h>
-#include <simgrid_S4U_util/S4U_Simulation.h>
-#include "BatchService.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/services/batch_service/BatchService.h"
 #include <simulation/SimulationMessage.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
-#include <exceptions/WorkflowExecutionException.h>
-#include <services/compute_services/ComputeServiceMessage.h>
-#include <services/compute_services/standard_job_executor/StandardJobExecutorMessage.h>
+#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "services/compute/ComputeServiceMessage.h"
+#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <algorithm>
-#include <simulation/Simulation.h>
-#include <services/storage_services/StorageService.h>
-#include <workflow_job/PilotJob.h>
-#include "workflow_job/PilotJob.h"
-#include "BatchServiceMessage.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/workflow/job/PilotJob.h"
+#include "wrench/services/batch_service/BatchServiceMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 

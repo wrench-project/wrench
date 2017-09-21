@@ -75,6 +75,11 @@ set(HEADER_FILES
         include/wrench/simulation/SimulationTrace.h
         include/wrench.h
         include/wrench-dev.h
+        include/wrench/services/batch_service/BatchJob.h
+        include/wrench/services/batch_service/BatchServiceMessage.h
+        include/wrench/services/batch_service/BatchScheduler.h
+        include/wrench/services/batch_service/BatchService.h
+        include/wrench/services/batch_service/BatchServiceProperty.h
         )
 
 # source files
@@ -142,6 +147,11 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.h
         src/wrench/services/network_proximity/NetworkDaemons.cpp
+        src/wrench/services/batch_service/BatchJob.cpp
+        src/wrench/services/batch_service/BatchServiceMessage.cpp
+        src/wrench/services/batch_service/BatchScheduler.cpp
+        src/wrench/services/batch_service/BatchService.cpp
+        src/wrench/services/batch_service/BatchServiceProperty.cpp
         )
 
 # test files
@@ -161,7 +171,7 @@ set(TEST_FILES
         test/simulation/TestWithFork.h
         test/simulation/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
-        test/simulation/BatchServiceTest.cpp src/wrench/services/batch_service/BatchJob.cpp src/wrench/services/batch_service/BatchJob.h src/wrench/services/batch_service/BatchServiceMessage.cpp src/wrench/services/batch_service/BatchServiceMessage.h src/wrench/services/batch_service/BatchScheduler.cpp src/wrench/services/batch_service/BatchScheduler.h)
+        test/simulation/BatchServiceTest.cpp
         test/simulation/NoopScheduler.cpp test/simulation/NoopScheduler.h)
 
 # wrench library

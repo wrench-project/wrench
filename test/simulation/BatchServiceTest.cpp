@@ -2,12 +2,12 @@
 // Created by suraj on 9/10/17.
 //
 
-#include "BatchServiceTest.h"
-
 #include <wrench-dev.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
-#include <services/compute_services/standard_job_executor/StandardJobExecutorMessage.h>
+#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include <gtest/gtest.h>
+#include <wrench/services/batch_service/BatchService.h>
 
 #include "TestWithFork.h"
 
@@ -184,4 +184,3 @@ void BatchServiceTest::do_StandardJobTaskTest_test() {
     free(argv[0]);
     free(argv);
 }
-#include <services/batch_service/BatchService.h>

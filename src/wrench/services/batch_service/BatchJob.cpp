@@ -2,7 +2,7 @@
 // Created by suraj on 9/16/17.
 //
 
-#include "BatchJob.h"
+#include "wrench/services/batch_service/BatchJob.h"
 
 namespace wrench {
     BatchJob::BatchJob(WorkflowJob * job, unsigned long jobid, unsigned long time_in_minutes, unsigned long num_nodes,

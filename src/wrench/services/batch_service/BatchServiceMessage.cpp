@@ -2,7 +2,7 @@
 // Created by suraj on 9/16/17.
 //
 
-#include "BatchServiceMessage.h"
+#include "wrench/services/batch_service/BatchServiceMessage.h"
 
 namespace wrench {
 

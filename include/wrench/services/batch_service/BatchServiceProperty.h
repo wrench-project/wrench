@@ -5,7 +5,7 @@
 #ifndef WRENCH_BATCHSERVICEPROPERTY_H
 #define WRENCH_BATCHSERVICEPROPERTY_H
 
-#include <services/compute_services/ComputeServiceProperty.h>
+#include "wrench/services/compute/ComputeServiceProperty.h"
 
 namespace wrench {
 

@@ -6,8 +6,8 @@
 #define WRENCH_BATCHSERVICEMESSAGE_H
 
 
-#include <services/compute_services/ComputeServiceMessage.h>
-#include "BatchJob.h"
+#include "services/compute/ComputeServiceMessage.h"
+#include "wrench/services/batch_service/BatchJob.h"
 
 namespace wrench{
     /***********************/

@@ -5,14 +5,14 @@
 #ifndef WRENCH_BATCH_SERVICE_H
 #define WRENCH_BATCH_SERVICE_H
 
-#include <services/Service.h>
+#include "wrench/services/Service.h"
 #include <queue>
 #include <deque>
-#include <workflow_job/StandardJob.h>
+#include "wrench/workflow/job/StandardJob.h"
 #include "BatchServiceProperty.h"
-#include <services/compute_services/ComputeService.h>
-#include <services/compute_services/standard_job_executor/StandardJobExecutor.h>
-#include <workflow_job/WorkflowJob.h>
+#include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
+#include "wrench/workflow/job/WorkflowJob.h"
 #include <tuple>
 #include "BatchJob.h"
 #include "BatchScheduler.h"
