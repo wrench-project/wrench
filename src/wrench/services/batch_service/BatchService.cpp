@@ -307,26 +307,24 @@ namespace wrench {
         /** Main loop **/
         bool life = true;
         double next_timeout_timestamp = 0;
-        if(this->timeslots.size()>0) {
-            next_timeout_timestamp = *std::min_element(this->timeslots.begin(), this->timeslots.end());
-        }else{
-            next_timeout_timestamp = S4U_Simulation::getClock()+this->random_interval;
-        }
         while (life) {
+//            if(this->timeslots.size()>0) {
+//                next_timeout_timestamp = *std::min_element(this->timeslots.begin(), this->timeslots.end());
+//            }else{
+            next_timeout_timestamp = S4U_Simulation::getClock()+this->random_interval;
+//            }
             double job_timeout = next_timeout_timestamp-S4U_Simulation::getClock();
             if (job_timeout>0){
                 life = processNextMessage(job_timeout);
             }else{
                 //check if some jobs have expired and should be killed
                 if (this->running_jobs.size() > 0) {
-                    std::cout<<"Running pilot job timestamp "<<job_timeout<<"\n";
                     std::set<BatchJob*>::iterator it;
                     for (it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
                         if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock());
                         {
                             if((*it)->getWorkflowJob()->getType()==WorkflowJob::STANDARD) {
-                                this->failRunningStandardJob((StandardJob *) (*it)->getWorkflowJob(),
-                                                             std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+                                this->processStandardJobTimeout((StandardJob*)(*it)->getWorkflowJob());
                             }else if((*it)->getWorkflowJob()->getType()==WorkflowJob::PILOT){
                                 PilotJob* p_job = (PilotJob*) (*it);
                                 BatchService* cs = (BatchService*)p_job->getComputeService();
@@ -347,6 +345,44 @@ namespace wrench {
 
         WRENCH_INFO("Batch Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
         return 0;
+    }
+
+    void BatchService::processStandardJobTimeout(StandardJob *job) {
+        StandardJobExecutor *executor = nullptr;
+        for (auto e : this->standard_job_executors) {
+            if (e->getJob() == job) {
+                executor = e;
+            }
+        }
+        if (executor == nullptr) {
+            throw std::runtime_error("BatchService::processStandardJobTimeout(): Cannot find standard job executor corresponding to job being timedout");
+        }
+
+        // Terminate the executor
+        WRENCH_INFO("Terminating a standard job executor");
+        executor->kill();
+
+        this->standard_job_executors.erase(executor);
+
+        // Remove the job from the running job list
+        bool job_on_the_list = false;
+        std::set<BatchJob*>::iterator it;
+        for(it=this->running_jobs.begin();it!=this->running_jobs.end();it++){
+            if((*it)->getWorkflowJob()==job){
+                job_on_the_list = true;
+                this->running_jobs.erase(*it);
+                // Update the cores count in the available resources
+                std::set<std::pair<std::string,unsigned long>> resources = (*it)->getResourcesAllocated();
+                std::set<std::pair<std::string,unsigned long>>::iterator resource_it;
+                for(resource_it=resources.begin();resource_it!=resources.end();resource_it++){
+                    this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
+                }
+            }
+        }
+        if(!job_on_the_list){
+            throw std::runtime_error("BatchService::processStandardJobTimeout(): Received a standard job timeout, but the job is not in the running job list");
+        }
+
     }
 
     /**
@@ -404,12 +440,16 @@ namespace wrench {
         if (host_selection_algorithm=="FIRSTFIT"){
                 std::vector<std::string> hosts_assigned = {};
                 std::map<std::string,unsigned long>::iterator it;
+                unsigned long host_count = 0;
                 for(it=this->available_nodes_to_cores.begin();it!=this->available_nodes_to_cores.end();it++){
                     if((*it).second>=cores_per_node){
                         //Remove that many cores from the available_nodes_to_core
                         (*it).second-=cores_per_node;
                         hosts_assigned.push_back((*it).first);
                         resources.insert({(*it).first,cores_per_node});
+                        if(++host_count>=num_nodes){
+                            break;
+                        }
                     }
                 }
                 if(resources.size()<num_nodes){
@@ -462,6 +502,7 @@ namespace wrench {
         //Try to schedule hosts based on FIRSTFIT OR BESTFIT
         std::set<std::pair<std::string,unsigned long>> resources = this->scheduleOnHosts(this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
                                                                             num_nodes_asked_for,cores_per_node_asked_for);
+
         if(resources.empty()){
             return false;
         }
@@ -713,7 +754,7 @@ namespace wrench {
             }
             return true;
 
-        }else if (StandardJobExecutorDoneMessage *msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
+        } else if (StandardJobExecutorDoneMessage *msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
             processStandardJobCompletion(msg->executor, msg->job);
             return true;
 
@@ -780,8 +821,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void BatchService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
-
-
         // Remove the executor from the executor list
         WRENCH_INFO("====> %ld", this->standard_job_executors.size());
         if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
@@ -807,7 +846,6 @@ namespace wrench {
         if(!job_on_the_list){
             throw std::runtime_error("BatchService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
         }
-
 
 
         WRENCH_INFO("A standard job executor has completed job %s", job->getName().c_str());
