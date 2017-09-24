@@ -495,7 +495,12 @@ namespace wrench {
                 hosts_assigned.push_back(target_host);
                 resources.insert({target_host, cores_per_node});
             }
+        }else{
+            throw std::invalid_argument(
+                    "BatchService::scheduleOnHosts(): We don't support "+host_selection_algorithm +" as host selection algorithm"
+            );
         }
+
         return resources;
     }
 
@@ -540,6 +545,8 @@ namespace wrench {
         if(resources.empty()){
             return false;
         }
+
+
         switch (next_job->getType()) {
             case WorkflowJob::STANDARD: {
                 WRENCH_INFO("Creating a StandardJobExecutor on %ld cores for a standard job on %ld nodes", cores_per_node_asked_for,num_nodes_asked_for);
@@ -618,11 +625,10 @@ namespace wrench {
     * or has timed out (because it's in fact a pilot job))
     */
     void BatchService::failCurrentStandardJobs(std::shared_ptr<FailureCause> cause) {
-
         for (auto workflow_job : this->running_jobs) {
             if (workflow_job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
                 StandardJob *job = (StandardJob*) workflow_job->getWorkflowJob();
-                this->failRunningStandardJob(job, std::move(cause));
+                this->failRunningStandardJob(job, cause);
             }
         }
 
@@ -640,7 +646,6 @@ namespace wrench {
      * @brief Terminate the daemon, dealing with pending/running jobs
      */
     void BatchService::terminate(bool notify_pilot_job_submitters) {
-
         this->setStateToDown();
 
         WRENCH_INFO("Failing current standard jobs");
