@@ -437,8 +437,8 @@ namespace wrench {
     std::set<std::pair<std::string,unsigned long>> BatchService::scheduleOnHosts(std::string host_selection_algorithm,
                                                                                  unsigned long num_nodes, unsigned long cores_per_node) {
         std::set<std::pair<std::string,unsigned long>> resources = {};
+        std::vector<std::string> hosts_assigned = {};
         if (host_selection_algorithm=="FIRSTFIT"){
-                std::vector<std::string> hosts_assigned = {};
                 std::map<std::string,unsigned long>::iterator it;
                 unsigned long host_count = 0;
                 for(it=this->available_nodes_to_cores.begin();it!=this->available_nodes_to_cores.end();it++){
@@ -460,7 +460,41 @@ namespace wrench {
                     }
                 }
         }else if (host_selection_algorithm=="BESTFIT"){
+            while(resources.size()<num_nodes) {
+                unsigned long target_slack = 0;
+                std::string target_host = "";
+                unsigned long target_num_cores = 0;
 
+                for (auto h : this->available_nodes_to_cores) {
+                    std::string hostname = std::get<0>(h);
+                    unsigned long num_available_cores = std::get<1>(h);
+                    if (num_available_cores < cores_per_node) {
+                        continue;
+                    }
+                    unsigned long tentative_target_num_cores = MIN(num_available_cores, cores_per_node);
+                    unsigned long tentative_target_slack = num_available_cores - tentative_target_num_cores;
+
+                    if ((target_host == "") ||
+                        (tentative_target_num_cores > target_num_cores) ||
+                        ((tentative_target_num_cores == target_num_cores) && (target_slack > tentative_target_slack))) {
+                        target_host = hostname;
+                        target_num_cores = tentative_target_num_cores;
+                        target_slack = tentative_target_slack;
+                    }
+                }
+                if (target_host == "") {
+                    WRENCH_INFO("Didn't find a suitable host");
+                    resources = {};
+                    std::vector<std::string>::iterator it;
+                    for (it = hosts_assigned.begin(); it != hosts_assigned.end(); it++) {
+                        available_nodes_to_cores[*it] += cores_per_node;
+                    }
+                    break;
+                }
+                this->available_nodes_to_cores[target_host] -= cores_per_node;
+                hosts_assigned.push_back(target_host);
+                resources.insert({target_host, cores_per_node});
+            }
         }
         return resources;
     }
