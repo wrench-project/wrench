@@ -40,12 +40,16 @@ namespace wrench {
             /** @brief Expired due to a time-to-live limit */
             EXPIRED,
             /** @brief Failed */
-            FAILED
+            FAILED,
+            /** @brief Terminated by submitter **/
+            TERMINATED
         };
 
         ComputeService *getComputeService();
 
         double getDuration();
+
+        PilotJob::State getState();
 
         /** @brief The job's duration (in seconds) */
         double duration;
@@ -66,8 +70,6 @@ namespace wrench {
         friend class JobManager;
 
         PilotJob(Workflow *workflow, unsigned long num_cores, double duration);
-
-        PilotJob::State getState();
 
         State state;
         std::unique_ptr<ComputeService> compute_service; // Associated compute service, i.e., the running pilot job

@@ -10,15 +10,10 @@
 #include <math.h>
 
 #include <gtest/gtest.h>
+#include <wrench-dev.h>
 
-#include "wrench/managers/DataMovementManager.h"
-#include "wrench/workflow/Workflow.h"
-#include "wrench/wms/WMS.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/wms/scheduler/RandomScheduler.h"
-#include "wrench/services/storage/SimpleStorageService.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench.h"
+#include "NoopScheduler.h"
+
 #include "TestWithFork.h"
 
 #define EPSILON 0.05
@@ -200,7 +195,7 @@ void MulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceUnsupportedJobTypeTestWMS(this, workflow,
                                                                                             std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
@@ -329,7 +324,7 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(this, workflow,
                                                                                             std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -458,7 +453,7 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(this, workflow,
                                                                                                std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
@@ -593,7 +588,7 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(this, workflow,
                                                                                                std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
@@ -667,6 +662,16 @@ private:
         throw std::runtime_error("Unexpected exception while terminating job: " + std::string(e.what()));
       }
 
+      // Check that the job's state has been updated
+      if (two_task_job->getState() != wrench::StandardJob::TERMINATED) {
+        throw std::runtime_error("Terminated Standard Job is not in TERMINATED state");
+      }
+
+      // Check that task states make sense
+      if ((this->test->task1->getState() != wrench::WorkflowTask::READY) ||
+          (this->test->task2->getState() != wrench::WorkflowTask::READY)) {
+        throw std::runtime_error("Tasks in a FAILED job should be in the READY state");
+      }
 
       // Terminate
       this->simulation->shutdownAllComputeServices();
@@ -700,7 +705,7 @@ void MulticoreComputeServiceTestStandardJobs::do_JobTermination_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceJobTerminationTestWMS(this, workflow,
                                                                                         std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
@@ -834,7 +839,7 @@ void MulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(this, workflow,
                                                                                                     std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
@@ -979,7 +984,7 @@ void MulticoreComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceCompletedJobTerminationTestWMS(this, workflow,
                                                                                                  std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
@@ -1123,7 +1128,7 @@ void MulticoreComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
           std::unique_ptr<wrench::WMS>(
                   new MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(this, workflow,
                                                                                             std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
@@ -1267,7 +1272,7 @@ void MulticoreComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
           std::unique_ptr<wrench::WMS>(
                   new MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(this, workflow,
                                                                                                std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(

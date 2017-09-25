@@ -10,14 +10,8 @@
 
 #include <gtest/gtest.h>
 
-#include "wrench/managers/DataMovementManager.h"
-#include "wrench/workflow/Workflow.h"
-#include "wrench/wms/WMS.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/wms/scheduler/RandomScheduler.h"
-#include "wrench/services/storage/SimpleStorageService.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench.h"
+#include <wrench-dev.h>
+#include "NoopScheduler.h"
 #include "TestWithFork.h"
 
 
@@ -348,7 +342,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceBasicFunctionalityTestWMS(this, workflow,
                                                                                          std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -475,7 +469,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceSynchronousFileCopyTestWMS(this, workflow,
                                                                                           std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create 2 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
@@ -633,7 +627,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceAsynchronousFileCopyTestWMS(this, workflow,
                                                                                            std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create 2 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
@@ -848,7 +842,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(this, workflow,
                                                                                                   std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create 3 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
@@ -1080,7 +1074,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(this, workflow,
                                                                                                    std::unique_ptr<wrench::Scheduler>(
-                          new wrench::RandomScheduler()), hostname))));
+                          new NoopScheduler()), hostname))));
 
   // Create 3 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(

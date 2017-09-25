@@ -64,6 +64,43 @@ namespace wrench {
     }
 
     /**
+     * @brief Submit a job to the batch service
+     * @param job: the job
+     * @param batch_job_args: arguments to the batch job
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    void ComputeService::runJob(WorkflowJob *job,std::map<std::string,unsigned long> batch_job_args) {
+
+        if (job == nullptr) {
+            throw std::invalid_argument("ComputeService::runJob(): invalid argument");
+        }
+
+        if (this->state == ComputeService::DOWN) {
+            throw WorkflowExecutionException(new ServiceIsDown(this));
+        }
+
+        try {
+            switch (job->getType()) {
+                case WorkflowJob::STANDARD: {
+                    this->submitStandardJob((StandardJob*) job,batch_job_args);
+                    break;
+                }
+                case WorkflowJob::PILOT: {
+                    this->submitPilotJob((PilotJob *) job, batch_job_args);
+                    break;
+                }
+            }
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        } catch (std::runtime_error &e) {
+            throw;
+        }
+    }
+
+    /**
      * @brief Terminate a previously-submitted job (which may or may not be running)
      * 
      * @param job: the job to terminate
@@ -150,6 +187,17 @@ namespace wrench {
     }
 
     /**
+    * @brief Submit a standard job to a batch service (virtual)
+    * @param job: the job
+    * @param batch_job_args: arguments to the batch job
+    *
+    * @throw std::runtime_error
+    */
+    unsigned long ComputeService::submitStandardJob(StandardJob *job,std::map<std::string,unsigned long> batch_job_args) {
+        throw std::runtime_error("ComputeService::submitStandardJob(): Not implemented here");
+    }
+
+    /**
      * @brief Submit a pilot job to the compute service (virtual)
      * @param job: the job
      *
@@ -157,6 +205,17 @@ namespace wrench {
      */
     void ComputeService::submitPilotJob(PilotJob *job) {
       throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
+    }
+
+    /**
+    * @brief Submit a pilot job to a batch service (virtual)
+    * @param job: the job
+    * @param batch_job_args: arguments to the batch job
+    *
+    * @throw std::runtime_error
+    */
+    unsigned long ComputeService::submitPilotJob(PilotJob *job,std::map<std::string,unsigned long> batch_job_args) {
+        throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
     }
 
     /**

@@ -25,6 +25,7 @@ endif ()
 
 
 include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include)
+#include_directories(src/wrench/ include/ /usr/include /Users/casanova/Home/PROJECTS/SIMGRID/simgrid/include /usr/local/include /opt/local/include)
 
 # library header files
 set(HEADER_FILES
@@ -38,12 +39,12 @@ set(HEADER_FILES
         include/wrench/wms/DynamicOptimization.h
         include/wrench/wms/scheduler/PilotJobScheduler.h
         include/wrench/wms/scheduler/Scheduler.h
-        include/wrench/wms/scheduler/RandomScheduler.h
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
         include/wrench/workflow/job/WorkflowJob.h
         include/wrench/workflow/job/StandardJob.h
+        include/wrench/workflow/job/PilotJob.h
         include/wrench/workflow/execution_events/FailureCause.h
         include/wrench/workflow/execution_events/WorkflowExecutionEvent.h
         include/wrench/managers/JobManager.h
@@ -75,6 +76,11 @@ set(HEADER_FILES
         include/wrench/simulation/SimulationTrace.h
         include/wrench.h
         include/wrench-dev.h
+        include/wrench/services/batch_service/BatchJob.h
+        include/wrench/services/batch_service/BatchServiceMessage.h
+        include/wrench/services/batch_service/BatchScheduler.h
+        include/wrench/services/batch_service/BatchService.h
+        include/wrench/services/batch_service/BatchServiceProperty.h
         )
 
 # source files
@@ -94,11 +100,9 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/wms/WMS.cpp
         src/wrench/wms/Scheduler.cpp
-        src/wrench/wms/scheduler/RandomScheduler.cpp
         src/wrench/services/compute/ComputeService.cpp
         src/wrench/services/compute/multicore_compute_service/MulticoreComputeService.cpp
         src/wrench/workflow/job/PilotJob.cpp
-        src/wrench/workflow/job/PilotJob.h
         src/wrench/managers/JobManager.cpp
         src/wrench/simulation/Simulation.cpp
         src/wrench/workflow/job/WorkflowJob.cpp
@@ -145,6 +149,11 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.h
         src/wrench/services/network_proximity/NetworkDaemons.cpp
+        src/wrench/services/batch_service/BatchJob.cpp
+        src/wrench/services/batch_service/BatchServiceMessage.cpp
+        src/wrench/services/batch_service/BatchScheduler.cpp
+        src/wrench/services/batch_service/BatchService.cpp
+        src/wrench/services/batch_service/BatchServiceProperty.cpp
         )
 
 # test files
@@ -164,7 +173,8 @@ set(TEST_FILES
         test/simulation/TestWithFork.h
         test/simulation/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
-        )
+        test/simulation/BatchServiceTest.cpp
+        test/simulation/NoopScheduler.cpp test/simulation/NoopScheduler.h)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)

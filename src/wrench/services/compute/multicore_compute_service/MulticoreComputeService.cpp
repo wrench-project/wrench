@@ -7,20 +7,17 @@
  * (at your option) any later version.
  */
 
-#include <simgrid/s4u/VirtualMachine.hpp>
-
 #include "services/ServiceMessage.h"
 #include "services/compute/ComputeServiceMessage.h"
 #include "services/compute/multicore_compute_service/MulticoreComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "simulation/SimulationMessage.h"
-#include "wrench/services/compute/MulticoreComputeService.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/storage/StorageService.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
-#include "workflow/job/PilotJob.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/compute/MulticoreComputeService.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/workflow/job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_compute_service, "Log category for Multicore Compute Service");
 
@@ -526,6 +523,7 @@ namespace wrench {
       try {
         if (this->has_ttl) {
           if (timeout <= 0) {
+            this->terminate(true);
             return false;
           } else {
             message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
@@ -1151,8 +1149,11 @@ namespace wrench {
 
       // Check whether the job is running
       if (this->running_jobs.find(job) != this->running_jobs.end()) {
+        // Remove the job from the list of running jobs
         this->running_jobs.erase(job);
+        // terminate it
         terminateRunningStandardJob(job);
+        // reply
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                 job, this, true, nullptr,
                 this->getPropertyValueAsDouble(

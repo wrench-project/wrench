@@ -49,6 +49,8 @@ namespace wrench {
             COMPLETED,
             /** @brief Failed */
             FAILED,
+            /** @brief Terminated by submitter */
+            TERMINATED
         };
 
         std::vector<WorkflowTask *> getTasks();
@@ -58,6 +60,8 @@ namespace wrench {
         unsigned long getNumCompletedTasks();
 
         unsigned long getNumTasks();
+
+        StandardJob::State getState();
 
         std::map<WorkflowFile *, StorageService *> getFileLocations();
 

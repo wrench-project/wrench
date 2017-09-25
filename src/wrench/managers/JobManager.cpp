@@ -20,7 +20,7 @@
 #include "simulation/SimulationMessage.h"
 #include "wrench/workflow/WorkflowTask.h"
 #include "wrench/workflow/job/StandardJob.h"
-#include "workflow/job/PilotJob.h"
+#include "wrench/workflow/job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 
@@ -266,6 +266,53 @@ namespace wrench {
     }
 
     /**
+     * @brief Submit a job to batch service
+     *
+     * @param job: a workflow job
+     * @param compute_service: a batch service
+     * @param batchjobargs: arguments to a batch service (-t,-n,-N,-c)
+     *
+     * @throw std::invalid_argument
+     * @throw WorkflowExecutionException
+     */
+    void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service,std::map<std::string,unsigned long> batch_job_args) {
+
+      if ((job == nullptr) || (compute_service == nullptr)) {
+        throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
+      }
+
+      // Push back the mailbox of the manager,
+      // so that it will getMessage the initial callback
+      job->pushCallbackMailbox(this->mailbox_name);
+
+      // Update the job state and insert it into the pending list
+      switch (job->getType()) {
+        case WorkflowJob::STANDARD: {
+          ((StandardJob *) job)->state = StandardJob::PENDING;
+          for (auto t : ((StandardJob *) job)->tasks) {
+            t->setState(WorkflowTask::State::PENDING);
+          }
+          this->pending_standard_jobs.insert((StandardJob *) job);
+          break;
+        }
+        case WorkflowJob::PILOT: {
+          ((PilotJob *) job)->state = PilotJob::PENDING;
+          this->pending_pilot_jobs.insert((PilotJob *) job);
+          break;
+        }
+      }
+
+      // Submit the job to the service
+      try {
+        compute_service->runJob(job,batch_job_args);
+        job->setParentComputeService(compute_service);
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      }
+
+    }
+
+    /**
      * @brief Terminate a job (standard or pilot) that hasn't completed/expired/failed yet
      * @param job: the job
      *
@@ -286,6 +333,12 @@ namespace wrench {
         job->getParentComputeService()->terminateJob(job);
       } catch (std::exception &e) {
         throw;
+      }
+
+      if (job->getType() == WorkflowJob::STANDARD) {
+        ((StandardJob *)job)->state = StandardJob::State::TERMINATED;
+      } else if (job->getType() == WorkflowJob::PILOT) {
+        ((PilotJob *) job)->state = PilotJob::State::TERMINATED;
       }
 
     }

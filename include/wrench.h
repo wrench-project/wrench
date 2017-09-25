@@ -27,7 +27,7 @@
 
 // Schedulers
 #include "wrench/wms/scheduler/Scheduler.h"
-#include "wrench/wms/scheduler/RandomScheduler.h"
+#include "../examples/simple-wms/scheduler/RandomScheduler.h"
 //#include "wms/scheduler/MinMinScheduler.h"
 //#include "wms/scheduler/MaxMinScheduler.h"
 

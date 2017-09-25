@@ -10,6 +10,7 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
+#include "NoopScheduler.h"
 
 #include "TestWithFork.h"
 
@@ -142,7 +143,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new ProxTestWMS(this, workflow,
                                                        std::unique_ptr<wrench::Scheduler>(
-                                                               new wrench::RandomScheduler()),
+                                                               new NoopScheduler()),
                           hostname))));
 
   // Create a Compute Service

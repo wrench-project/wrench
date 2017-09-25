@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "PilotJob.h"
+#include "wrench/workflow/job/PilotJob.h"
 
 namespace wrench {
 
