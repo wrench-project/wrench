@@ -73,6 +73,8 @@ namespace wrench {
 
         ComputeService(std::string service_name,
                        std::string mailbox_name_prefix,
+                       bool supports_standard_jobs,
+                       bool supports_pilot_jobs,
                        StorageService *default_storage_service);
 
     protected:
@@ -88,6 +90,9 @@ namespace wrench {
         /***********************/
         /** \endcond          **/
         /***********************/
+
+        void setProperties(std::map<std::string, std::string> default_property_values,
+                           std::map<std::string, std::string> plist);
 
     };
 

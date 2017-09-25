@@ -89,11 +89,22 @@ int main(int argc, char **argv) {
   try {
 
     std::cerr << "Instantiating a MultiCore Job executor on " << executor_host << "..." << std::endl;
-    simulation.add(
-            std::unique_ptr<wrench::MulticoreComputeService>(
-                    new wrench::MulticoreComputeService(executor_host, true, true,
-                                                        storage_service,
-                                                        {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+//    simulation.add(
+//            std::unique_ptr<wrench::MulticoreComputeService>(
+//                    new wrench::MulticoreComputeService(executor_host, true, true,
+//                                                        storage_service,
+//                                                        {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+
+    std::unique_ptr<wrench::CloudService> cloud_service(new wrench::CloudService(wms_host));
+    simulation.add(cloud_service.get()->createVM(executor_host, 1, storage_service));
+    simulation.add(cloud_service.get()->createVM(executor_host, 1, storage_service));
+    simulation.add(cloud_service.get()->createVM(executor_host, 1, storage_service));
+
+//    simulation.add(
+//            std::unique_ptr<wrench::VMComputeService>(
+//                    new wrench::VMComputeService(executor_host, 1, true, true,
+//                                                        storage_service,
+//                                                        {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << executor_host << "..." << std::endl;
 //    simulation.add(std::unique_ptr<wrench::MulticoreComputeService>(

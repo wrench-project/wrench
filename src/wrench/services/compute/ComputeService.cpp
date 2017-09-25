@@ -38,9 +38,9 @@ namespace wrench {
     void ComputeService::runJob(WorkflowJob *job) {
 
       if (job == nullptr) {
-        throw std::invalid_argument("ComputeService::runJob(): invalid argument");  
+        throw std::invalid_argument("ComputeService::runJob(): invalid argument");
       }
-      
+
       if (this->state == ComputeService::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
@@ -77,7 +77,7 @@ namespace wrench {
       if (job == nullptr) {
         throw std::invalid_argument("ComputeService::terminateJob(): invalid argument");
       }
-      
+
       if (this->state == ComputeService::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
@@ -105,13 +105,20 @@ namespace wrench {
      *
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
+     * @param supports_standard_jobs: true if the job executor should support standard jobs
+     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
      * @param default_storage_service: a storage service
      */
     ComputeService::ComputeService(std::string service_name,
                                    std::string mailbox_name_prefix,
+                                   bool supports_standard_jobs,
+                                   bool supports_pilot_jobs,
                                    StorageService *default_storage_service) :
             Service(service_name, mailbox_name_prefix),
+            supports_pilot_jobs(supports_pilot_jobs),
+            supports_standard_jobs(supports_standard_jobs),
             default_storage_service(default_storage_service) {
+
       this->simulation = nullptr; // will be filled in via Simulation::add()
       this->state = ComputeService::UP;
     }
@@ -171,7 +178,7 @@ namespace wrench {
     void ComputeService::terminatePilotJob(PilotJob *job) {
       throw std::runtime_error("ComputeService::terminatePilotJob(): Not implemented here");
     }
-    
+
     /**
      * @brief Get the flop/sec rate of one core of the compute service's host
      * @return  the flop rate
@@ -226,5 +233,23 @@ namespace wrench {
     */
     StorageService *ComputeService::getDefaultStorageService() {
       return this->default_storage_service;
+    }
+
+    /**
+     * @brief Set default and user defined properties
+     * @param default_property_values: list of default properties
+     * @param plist: user defined list of properties
+     */
+    void ComputeService::setProperties(std::map<std::string, std::string> default_property_values,
+                                       std::map<std::string, std::string> plist) {
+      // Set default properties
+      for (auto p : default_property_values) {
+        this->setProperty(p.first, p.second);
+      }
+
+      // Set specified properties
+      for (auto p : plist) {
+        this->setProperty(p.first, p.second);
+      }
     }
 };

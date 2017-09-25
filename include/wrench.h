@@ -20,6 +20,7 @@
 #include "wrench/services/storage/SimpleStorageServiceProperty.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/file_registry/FileRegistryServiceProperty.h"
+#include "wrench/services/cloud/CloudService.h"
 
 // WMS Implementations
 #include "wrench/wms/WMS.h"
