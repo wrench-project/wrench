@@ -41,6 +41,8 @@ namespace wrench {
 
         void runJob(WorkflowJob *job);
 
+        void runJob(WorkflowJob *job,std::map<std::string,unsigned long> batch_job_args);
+
         void terminateJob(WorkflowJob *job);
 
         bool supportsStandardJobs();
@@ -65,7 +67,11 @@ namespace wrench {
 
         virtual void submitStandardJob(StandardJob *job);
 
+        virtual unsigned long submitStandardJob(StandardJob *job,std::map<std::string,unsigned long> batch_job_args);
+
         virtual void submitPilotJob(PilotJob *job);
+
+        virtual unsigned long submitPilotJob(PilotJob *job,std::map<std::string,unsigned long> batch_job_args);
 
         virtual void terminateStandardJob(StandardJob *job);
 
@@ -73,6 +79,8 @@ namespace wrench {
 
         ComputeService(std::string service_name,
                        std::string mailbox_name_prefix,
+                       bool supports_standard_jobs,
+                       bool supports_pilot_jobs,
                        StorageService *default_storage_service);
 
     protected:
@@ -88,6 +96,9 @@ namespace wrench {
         /***********************/
         /** \endcond          **/
         /***********************/
+
+        void setProperties(std::map<std::string, std::string> default_property_values,
+                           std::map<std::string, std::string> plist);
 
     };
 

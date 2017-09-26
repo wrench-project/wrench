@@ -7,19 +7,17 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/MulticoreComputeService.h"
-
-#include "wrench/simulation/Simulation.h"
-#include "wrench/logging/TerminalOutput.h"
-#include "simgrid_S4U_util/S4U_Mailbox.h"
-#include "simulation/SimulationMessage.h"
-#include "wrench/services/storage/StorageService.h"
 #include "services/ServiceMessage.h"
 #include "services/compute/ComputeServiceMessage.h"
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/workflow/job/PilotJob.h"
-#include "MulticoreComputeServiceMessage.h"
+#include "services/compute/multicore_compute_service/MulticoreComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/compute/MulticoreComputeService.h"
+#include "wrench/services/storage/StorageService.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/workflow/job/PilotJob.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_compute_service, "Log category for Multicore Compute Service");
 
@@ -324,7 +322,7 @@ namespace wrench {
      * @param supports_pilot_jobs: true if the job executor should support pilot jobs
      * @param plist: a property list
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
-     * @param ttl: the time-ti-live, in seconds
+     * @param ttl: the time-to-live, in seconds
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
      * @param default_storage_service: a storage service
@@ -343,17 +341,12 @@ namespace wrench {
             StorageService *default_storage_service) :
             ComputeService("multicore_compute_service" + suffix,
                            "multicore_compute_service" + suffix,
+                           supports_standard_jobs,
+                           supports_pilot_jobs,
                            default_storage_service) {
 
-      // Set default properties
-      for (auto p : this->default_property_values) {
-        this->setProperty(p.first, p.second);
-      }
-
-      // Set specified properties
-      for (auto p : plist) {
-        this->setProperty(p.first, p.second);
-      }
+      // Set default and specified properties
+      this->setProperties(this->default_property_values, plist);
 
       this->hostname = hostname;
       if (num_cores > 0) {
@@ -364,9 +357,6 @@ namespace wrench {
       this->ttl = ttl;
       this->has_ttl = (ttl >= 0);
       this->containing_pilot_job = pj;
-
-      this->supports_standard_jobs = supports_standard_jobs;
-      this->supports_pilot_jobs = supports_pilot_jobs;
 
       // Start the daemon on the same host
       try {
@@ -423,7 +413,7 @@ namespace wrench {
 
       switch (next_job->getType()) {
         case WorkflowJob::STANDARD: {
-          for (auto t : ((StandardJob *)next_job)->getTasks()) {
+          for (auto t : ((StandardJob *) next_job)->getTasks()) {
             minimum_num_cores = MAX(minimum_num_cores, t->getMinNumCores());
             maximum_num_cores += t->getMaxNumCores();
           }
@@ -431,8 +421,8 @@ namespace wrench {
           break;
         }
         case WorkflowJob::PILOT: {
-          minimum_num_cores = ((PilotJob *)next_job)->getNumCores();
-          maximum_num_cores = ((PilotJob *)next_job)->getNumCores();
+          minimum_num_cores = ((PilotJob *) next_job)->getNumCores();
+          maximum_num_cores = ((PilotJob *) next_job)->getNumCores();
           break;
         }
       }
@@ -461,7 +451,7 @@ namespace wrench {
                   this->simulation,
                   this->mailbox_name,
                   this->hostname,
-                  (StandardJob *)next_job,
+                  (StandardJob *) next_job,
                   {std::pair<std::string, unsigned long>{this->hostname, num_allocated_cores}},
                   this->default_storage_service,
                   {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
@@ -575,8 +565,10 @@ namespace wrench {
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                      new ComputeServiceSubmitStandardJobAnswerMessage(msg->job, this,
                                                                                       false,
-                                                                                      std::shared_ptr<FailureCause>(new JobTypeNotSupported(msg->job,
-                                                                                                                                            this)),
+                                                                                      std::shared_ptr<FailureCause>(
+                                                                                              new JobTypeNotSupported(
+                                                                                                      msg->job,
+                                                                                                      this)),
                                                                                       this->getPropertyValueAsDouble(
                                                                                               MulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::shared_ptr<NetworkError> cause) {
@@ -611,8 +603,10 @@ namespace wrench {
                                      new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
                                                                                    this,
                                                                                    false,
-                                                                                   std::shared_ptr<FailureCause>(new JobTypeNotSupported(msg->job,
-                                                                                                                                         this)),
+                                                                                   std::shared_ptr<FailureCause>(
+                                                                                           new JobTypeNotSupported(
+                                                                                                   msg->job,
+                                                                                                   this)),
                                                                                    this->getPropertyValueAsDouble(
                                                                                            MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::shared_ptr<NetworkError> cause) {
@@ -628,7 +622,9 @@ namespace wrench {
                                      new ComputeServiceSubmitPilotJobAnswerMessage(msg->job,
                                                                                    this,
                                                                                    false,
-                                                                                   std::shared_ptr<FailureCause>(new NotEnoughCores(msg->job, this)),
+                                                                                   std::shared_ptr<FailureCause>(
+                                                                                           new NotEnoughCores(msg->job,
+                                                                                                              this)),
                                                                                    this->getPropertyValueAsDouble(
                                                                                            MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::shared_ptr<NetworkError> cause) {
@@ -805,7 +801,8 @@ namespace wrench {
         }
       }
       if (executor == nullptr) {
-        throw std::runtime_error("MulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
+        throw std::runtime_error(
+                "MulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
       }
 
       // Terminate the executor
@@ -860,7 +857,8 @@ namespace wrench {
       ComputeService *compute_service = job->getComputeService();
 
       if (compute_service == nullptr) {
-        throw std::runtime_error("MulticoreComputeService::terminateRunningPilotJob(): can't find compute service associated to pilot job");
+        throw std::runtime_error(
+                "MulticoreComputeService::terminateRunningPilotJob(): can't find compute service associated to pilot job");
       }
 
       // Stop it
@@ -911,13 +909,15 @@ namespace wrench {
       // Remove the executor from the executor list
       WRENCH_INFO("====> %ld", this->standard_job_executors.size());
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
-        throw std::runtime_error("MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
+        throw std::runtime_error(
+                "MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
       this->standard_job_executors.erase(executor);
 
       // Remove the job from the running job list
       if (this->running_jobs.find(job) == this->running_jobs.end()) {
-        throw std::runtime_error("MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
+        throw std::runtime_error(
+                "MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
       }
       this->running_jobs.erase(job);
 
@@ -949,13 +949,15 @@ namespace wrench {
 
       // Remove the executor from the executor list
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
-        throw std::runtime_error("MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
+        throw std::runtime_error(
+                "MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
       this->standard_job_executors.erase(executor);
 
       // Remove the job from the running job list
       if (this->running_jobs.find(job) == this->running_jobs.end()) {
-        throw std::runtime_error("MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
+        throw std::runtime_error(
+                "MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
       }
       this->running_jobs.erase(job);
 
@@ -1167,7 +1169,7 @@ namespace wrench {
       // If we got here, we're in trouble
       WRENCH_INFO("Trying to terminate a standard job that's neither pending nor running!");
       ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
-              job, this, false,  std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
+              job, this, false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
               this->getPropertyValueAsDouble(
                       MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {
