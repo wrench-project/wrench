@@ -909,7 +909,7 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestPilotJobs, NonIdlePilotJobTermination) {
+TEST_F(MulticoreComputeServiceTestPilotJobs, DISABLED_NonIdlePilotJobTermination) {
   DO_TEST_WITH_FORK(do_NonIdlePilotJobTermination_test);
 }
 
