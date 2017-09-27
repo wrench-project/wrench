@@ -1,6 +1,12 @@
-//
-// Created by suraj on 8/29/17.
-//
+/**
+ * Copyright (c) 2017. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
+
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -407,27 +413,6 @@ namespace wrench {
         executor->kill();
 
         this->standard_job_executors.erase(executor);
-
-        // Remove the job from the running job list
-//        bool job_on_the_list = false;
-//        std::set<BatchJob*>::iterator it;
-//        for(it=this->running_jobs.begin();it!=this->running_jobs.end();it++){
-//            if((*it)->getWorkflowJob()==job){
-//                job_on_the_list = true;
-//                this->running_jobs.erase(it);
-//                // Update the cores count in the available resources
-//                std::set<std::pair<std::string,unsigned long>> resources = (*it)->getResourcesAllocated();
-//                std::set<std::pair<std::string,unsigned long>>::iterator resource_it;
-//                for(resource_it=resources.begin();resource_it!=resources.end();resource_it++){
-//                    this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
-//                }
-//                break;
-//            }
-//        }
-//        if(!job_on_the_list){
-//            throw std::runtime_error("BatchService::processStandardJobTimeout(): Received a standard job timeout, but the job is not in the running job list");
-//        }
-
     }
 
     /**
@@ -664,8 +649,6 @@ namespace wrench {
                     throw WorkflowExecutionException(cause);
                 }
 
-                // Push my own mailbox onto the pilot job!
-//                job->pushCallbackMailbox(this->mailbox_name);
                 return true;
             }
             break;
