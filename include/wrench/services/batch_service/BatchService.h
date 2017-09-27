@@ -65,6 +65,7 @@ namespace wrench {
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
                      PilotJob* parent_job,
+                     unsigned long reduced_cores,
         std::map<std::string, std::string> plist,
         std::string suffix);
 
@@ -73,12 +74,6 @@ namespace wrench {
 
         //Configuration to create randomness in measurement period initially
         unsigned long random_interval = 10;
-
-        //current host selection type
-//        std::string host_selection_algorithm;
-
-        //current job selection type
-//        std::string job_selection_algorithm;
 
 
         /* Resources information in Batchservice */
@@ -106,7 +101,7 @@ namespace wrench {
         //overriden function of parent Compute Service
         unsigned long submitPilotJob(PilotJob *job,std::map<std::string,unsigned long> batch_job_args) override;
 
-        int main();
+        int main() override;
         bool processNextMessage(double);
         bool dispatchNextPendingJob();
         void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
@@ -135,6 +130,18 @@ namespace wrench {
 
         //Process standardjob timeout
         void processStandardJobTimeout(StandardJob* job);
+
+        //Process standardjob timeout
+        void processPilotJobTimeout(PilotJob* job);
+
+        //notify upper level job submitters (about pilot job termination)
+        void notifyJobSubmitters(PilotJob* job);
+
+        //update the resources
+        void udpateResources(std::set<std::pair<std::string,unsigned long>> resources);
+
+        //send call back to the pilot job submitters
+        void sendPilotJobCallBackMessage(PilotJob* job);
 
     };
 }

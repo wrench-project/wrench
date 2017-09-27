@@ -90,6 +90,7 @@ private:
             task->addInputFile(workflow->getFileById("input_file"));
             task->addOutputFile(workflow->getFileById("output_file"));
 
+
             // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
             wrench::StandardJob *job = job_manager->createStandardJob(
@@ -117,28 +118,24 @@ private:
                 );
             }
 
-            wrench::S4U_Simulation::sleep(60);
+            // Wait for a workflow execution event
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            try {
+                event = workflow->waitForNextExecutionEvent();
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            }
+            switch (event->type) {
+                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+                    // success, do nothing for now
+                    break;
+                }
+                default: {
+                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+                }
+            }
             workflow->removeTask(task);
         }
-
-//        {
-//            // Create a pilot job
-//            wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 30);
-//
-//            std::map<std::string, unsigned long> batch_job_args;
-//            batch_job_args["-N"] = 1;
-//            batch_job_args["-t"] = 1; //time in minutes
-//            batch_job_args["-c"] = 4; //number of cores per node
-//
-//            // Submit a pilot job
-//            try {
-//                job_manager->submitJob((wrench::WorkflowJob*)pilot_job, this->test->compute_service, batch_job_args);
-//            } catch (wrench::WorkflowExecutionException &e){
-//                throw std::runtime_error(
-//                        "Got some exception"
-//                );
-//            }
-//        }
 
 
 
@@ -258,8 +255,39 @@ private:
                         "Got some exception "+std::string(e.what())
                 );
             }
-        }
 
+            // Wait for a workflow execution event
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            try {
+                event = workflow->waitForNextExecutionEvent();
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            }
+            switch (event->type) {
+                case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
+                    // success, do nothing for now
+                    break;
+                }
+                default: {
+                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+                }
+            }
+
+            try {
+                event = workflow->waitForNextExecutionEvent();
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            }
+            switch (event->type) {
+                case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
+                    // success, do nothing for now
+                    break;
+                }
+                default: {
+                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+                }
+            }
+        }
 
         // Terminate everything
         this->simulation->shutdownAllComputeServices();
@@ -392,7 +420,22 @@ private:
                         "Got some exception"
                 );
             }
-            wrench::S4U_Simulation::sleep(60);
+            // Wait for a workflow execution event
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            try {
+                event = workflow->waitForNextExecutionEvent();
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            }
+            switch (event->type) {
+                case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+                    // success, do nothing for now
+                    break;
+                }
+                default: {
+                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+                }
+            }
             workflow->removeTask(task);
         }
 
@@ -412,6 +455,38 @@ private:
                 throw std::runtime_error(
                         "Got some exception "+std::string(e.what())
                 );
+            }
+
+            // Wait for a workflow execution event
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            try {
+                event = workflow->waitForNextExecutionEvent();
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            }
+            switch (event->type) {
+                case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
+                    // success, do nothing for now
+                    break;
+                }
+                default: {
+                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+                }
+            }
+
+            try {
+                event = workflow->waitForNextExecutionEvent();
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            }
+            switch (event->type) {
+                case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
+                    // success, do nothing for now
+                    break;
+                }
+                default: {
+                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+                }
             }
         }
 
@@ -607,7 +682,27 @@ private:
                 );
             }
 
-            wrench::S4U_Simulation::sleep(300);
+            //wait for three standard job completion events
+            int num_events = 0;
+            while(num_events<3) {
+                std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+                try {
+                    event = workflow->waitForNextExecutionEvent();
+                } catch (wrench::WorkflowExecutionException &e) {
+                    throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+                }
+                switch (event->type) {
+                    case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+                        // success, do nothing for now
+                        break;
+                    }
+                    default: {
+                        throw std::runtime_error(
+                                "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+                    }
+                }
+                num_events++;
+            }
             workflow->removeTask(task);
             workflow->removeTask(task1);
             workflow->removeTask(task2);
