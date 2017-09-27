@@ -96,9 +96,8 @@ int main(int argc, char **argv) {
 //                                                        {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
     std::unique_ptr<wrench::CloudService> cloud_service(new wrench::CloudService(wms_host));
-    simulation.add(cloud_service.get()->createVM(executor_host, 1, storage_service));
-    simulation.add(cloud_service.get()->createVM(executor_host, 1, storage_service));
-    simulation.add(cloud_service.get()->createVM(executor_host, 1, storage_service));
+    simulation.add(cloud_service->createVM(executor_host, 1, true, true, storage_service,
+                                           {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}}));
 
 //    simulation.add(
 //            std::unique_ptr<wrench::VMComputeService>(

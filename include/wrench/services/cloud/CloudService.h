@@ -27,13 +27,18 @@ namespace wrench {
     public:
         explicit CloudService(std::string &hostname);
 
-        std::unique_ptr<ComputeService> createVM(std::string pm_hostname,
+        std::unique_ptr<ComputeService> createVM(std::string &pm_hostname,
                                                  int num_cores,
-                                                 StorageService *default_storage_service);
+                                                 bool supports_standard_jobs,
+                                                 bool supports_pilot_jobs,
+                                                 StorageService *default_storage_service,
+                                                 std::map<std::string, std::string> plist);
 
 
     private:
         int main();
+
+        void terminate();
 
         std::map<std::string, std::string> default_property_values = {};
 

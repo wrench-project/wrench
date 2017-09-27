@@ -106,7 +106,7 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-    protected:
+    private:
 
         friend class Simulation;
 
