@@ -12,8 +12,6 @@
 
 
 #include <queue>
-#include <deque>
-#include <set>
 
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
@@ -79,27 +77,19 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-
-
         // Running jobs
-        void submitStandardJob(StandardJob *job);
-
-        void submitPilotJob(PilotJob *job);
+        void submitPilotJob(PilotJob *job) override;
 
         // Terminating jobs
-        void terminateStandardJob(StandardJob *job);
+        void terminateStandardJob(StandardJob *job) override;
 
-        void terminatePilotJob(PilotJob *job);
+        void terminatePilotJob(PilotJob *job) override;
 
 
         // Getting information
-        unsigned long getNumCores();
+        double getTTL() override;
 
-        unsigned long getNumIdleCores();
-
-        double getTTL();
-
-        double getCoreFlopRate();
+        double getCoreFlopRate() override;
 
 
         /***********************/
@@ -140,7 +130,7 @@ namespace wrench {
         std::deque<WorkflowJob *> pending_jobs;
 
 
-        int main();
+        int main() override;
 
         // Helper functions to make main() a bit more palatable
 
@@ -175,6 +165,12 @@ namespace wrench {
         void failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
 
         void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
+
+        void processGetNumCores(std::string &answer_mailbox) override;
+
+        void processGetNumIdleCores(std::string &answer_mailbox) override;
+
+        void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job) override;
     };
 };
 

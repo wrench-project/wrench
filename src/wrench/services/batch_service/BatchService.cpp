@@ -67,16 +67,8 @@ namespace wrench {
                            supports_pilot_jobs,
                            default_storage_service) {
 
-        // Set default properties
-        for (auto p : this->default_property_values) {
-            this->setProperty(p.first, p.second);
-        }
-
-        // Set specified properties
-        for (auto p : plist) {
-            this->setProperty(p.first, p.second);
-        }
-
+        // Set default and specified properties
+        this->setProperties(this->default_property_values, plist);
 
         //create a map for host to cores
         std::vector<std::string>::iterator it;

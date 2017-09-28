@@ -152,4 +152,22 @@ namespace wrench {
     void Service::setSimulation(Simulation *simulation) {
       this->simulation = simulation;
     }
+
+    /**
+ * @brief Set default and user defined properties
+ * @param default_property_values: list of default properties
+ * @param plist: user defined list of properties
+ */
+    void Service::setProperties(std::map<std::string, std::string> default_property_values,
+                                       std::map<std::string, std::string> plist) {
+      // Set default properties
+      for (auto p : default_property_values) {
+        this->setProperty(p.first, p.second);
+      }
+
+      // Set specified properties
+      for (auto p : plist) {
+        this->setProperty(p.first, p.second);
+      }
+    }
 };

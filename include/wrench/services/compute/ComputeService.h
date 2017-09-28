@@ -17,7 +17,6 @@
 
 namespace wrench {
 
-
     class Simulation;
 
     class StandardJob;
@@ -37,11 +36,11 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
-        void stop();
+        void stop() override;
 
         void runJob(WorkflowJob *job);
 
-        void runJob(WorkflowJob *job,std::map<std::string,unsigned long> batch_job_args);
+        void runJob(WorkflowJob *job, std::map<std::string, unsigned long> batch_job_args);
 
         void terminateJob(WorkflowJob *job);
 
@@ -49,11 +48,11 @@ namespace wrench {
 
         bool supportsPilotJobs();
 
+        unsigned long getNumCores();
+
+        unsigned long getNumIdleCores();
+
         virtual double getCoreFlopRate();
-
-        virtual unsigned long getNumCores();
-
-        virtual unsigned long getNumIdleCores();
 
         virtual double getTTL();
 
@@ -61,17 +60,17 @@ namespace wrench {
 
         StorageService *getDefaultStorageService();
 
+        virtual void submitStandardJob(StandardJob *job);
+
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual void submitStandardJob(StandardJob *job);
-
-        virtual unsigned long submitStandardJob(StandardJob *job,std::map<std::string,unsigned long> batch_job_args);
+        virtual unsigned long submitStandardJob(StandardJob *job, std::map<std::string, unsigned long> batch_job_args);
 
         virtual void submitPilotJob(PilotJob *job);
 
-        virtual unsigned long submitPilotJob(PilotJob *job,std::map<std::string,unsigned long> batch_job_args);
+        virtual unsigned long submitPilotJob(PilotJob *job, std::map<std::string, unsigned long> batch_job_args);
 
         virtual void terminateStandardJob(StandardJob *job);
 
@@ -85,28 +84,27 @@ namespace wrench {
 
     protected:
 
+        virtual void processGetNumCores(std::string &answer_mailbox);
+
+        virtual void processGetNumIdleCores(std::string &answer_mailbox);
+
+        virtual void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job);
+
         /** @brief Whether the compute service supports pilot jobs */
         bool supports_pilot_jobs;
         /** @brief Whether the compute service supports standard jobs */
         bool supports_standard_jobs;
-
         /** @brief The default storage service associated to the compute service (nullptr if none) */
         StorageService *default_storage_service;
 
         /***********************/
         /** \endcond          **/
         /***********************/
-
-        void setProperties(std::map<std::string, std::string> default_property_values,
-                           std::map<std::string, std::string> plist);
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-
 };
-
 
 #endif //SIMULATION_COMPUTESERVICE_H

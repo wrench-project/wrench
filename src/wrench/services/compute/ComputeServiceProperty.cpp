@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-
 #include "wrench/services/compute/ComputeServiceProperty.h"
 
 namespace wrench {
@@ -28,6 +27,9 @@ namespace wrench {
     SET_PROPERTY_NAME(ComputeServiceProperty, TTL_ANSWER_MESSAGE_PAYLOAD);
     SET_PROPERTY_NAME(ComputeServiceProperty, TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD);
     SET_PROPERTY_NAME(ComputeServiceProperty, TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD);
+    SET_PROPERTY_NAME(ComputeServiceProperty, NUM_CORES_REQUEST_MESSAGE_PAYLOAD);
+    SET_PROPERTY_NAME(ComputeServiceProperty, NUM_CORES_ANSWER_MESSAGE_PAYLOAD);
+    SET_PROPERTY_NAME(ComputeServiceProperty, NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD);
+    SET_PROPERTY_NAME(ComputeServiceProperty, NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD);
 
 };
-

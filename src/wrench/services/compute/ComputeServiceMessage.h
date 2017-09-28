@@ -12,12 +12,13 @@
 #define WRENCH_COMPUTESERVICEMESSAGE_H
 
 #include <memory>
-#include <services/ServiceMessage.h>
-#include <wrench/workflow/execution_events/FailureCause.h>
+#include "wrench/workflow/execution_events/FailureCause.h"
+#include "services/ServiceMessage.h"
 
 namespace wrench {
 
     class StandardJob;
+
     class PilotJob;
 
     /***********************/
@@ -44,10 +45,10 @@ namespace wrench {
         /** @brief The compute service that does not support it */
         ComputeService *compute_service;
     };
-    
-   /**
-    * @brief ComputeServiceSubmitStandardJobRequestMessage class
-    */
+
+    /**
+     * @brief ComputeServiceSubmitStandardJobRequestMessage class
+     */
     class ComputeServiceSubmitStandardJobRequestMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitStandardJobRequestMessage(std::string answer_mailbox, StandardJob *, double payload);
@@ -94,7 +95,8 @@ namespace wrench {
      */
     class ComputeServiceStandardJobFailedMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceStandardJobFailedMessage(StandardJob *, ComputeService *, std::shared_ptr<FailureCause> cause, double payload);
+        ComputeServiceStandardJobFailedMessage(StandardJob *, ComputeService *, std::shared_ptr<FailureCause> cause,
+                                               double payload);
 
         /** @brief The job that failed */
         StandardJob *job;
@@ -134,7 +136,7 @@ namespace wrench {
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
     };
-    
+
     /**
      * @brief ComputeServiceSubmitPilotJobRequestMessage class
      */
@@ -235,6 +237,50 @@ namespace wrench {
         bool success;
         /** @brief The cause of the failure, or nullptr on success */
         std::shared_ptr<FailureCause> failure_cause;
+    };
+
+    /**
+     * @brief ComputeServiceNumCoresRequestMessage class
+     */
+    class ComputeServiceNumCoresRequestMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceNumCoresRequestMessage(std::string answer_mailbox, double payload);
+
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+    };
+
+    /**
+     * @brief ComputeServiceNumCoresAnswerMessage class
+     */
+    class ComputeServiceNumCoresAnswerMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceNumCoresAnswerMessage(unsigned int num, double payload);
+
+        /** @brief The number of cores */
+        unsigned int num_cores;
+    };
+
+    /**
+  * @brief ComputeServiceNumIdleCoresRequestMessage class
+  */
+    class ComputeServiceNumIdleCoresRequestMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceNumIdleCoresRequestMessage(std::string answer_mailbox, double payload);
+
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+    };
+
+    /**
+     * @brief MulticoreComputeServiceNumIdleCoresAnswerMessage class
+     */
+    class ComputeServiceNumIdleCoresAnswerMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceNumIdleCoresAnswerMessage(unsigned long num, double payload);
+
+        /** @brief The number of idle cores */
+        unsigned long num_idle_cores;
     };
 
     /***********************/

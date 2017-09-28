@@ -39,10 +39,13 @@ namespace wrench {
         };
 
         virtual void stop();
+
         std::string getHostname();
+
         bool isUp();
 
         std::string getPropertyValueAsString(std::string);
+
         double getPropertyValueAsDouble(std::string);
 
         /***********************/
@@ -54,6 +57,7 @@ namespace wrench {
         /***********************/
 
         void setStateToDown();
+
         void setSimulation(Simulation *simulation);
 
         /***********************/
@@ -72,6 +76,9 @@ namespace wrench {
 
         // Property stuff
         void setProperty(std::string, std::string);
+
+        void setProperties(std::map<std::string, std::string> default_property_values,
+                           std::map<std::string, std::string> plist);
 
         /** @brief The service's property list */
         std::map<std::string, std::string> property_list;
