@@ -11,6 +11,8 @@
 #include <wrench.h>
 
 #include "SimpleWMS.h"
+#include "scheduler/RandomScheduler.h"
+#include "scheduler/CloudScheduler.h"
 
 int main(int argc, char **argv) {
 
@@ -86,24 +88,21 @@ int main(int argc, char **argv) {
 
 
   std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
+
+//  wrench::ComputeService *cloud_service = new wrench::CloudService(wms_host, true, true,
+//                                                                   {{wrench::CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
+  std::vector<std::string> execution_hosts = {executor_host};
+
   try {
 
     std::cerr << "Instantiating a MultiCore Job executor on " << executor_host << "..." << std::endl;
-//    simulation.add(
-//            std::unique_ptr<wrench::MulticoreComputeService>(
-//                    new wrench::MulticoreComputeService(executor_host, true, true,
-//                                                        storage_service,
-//                                                        {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+    simulation.add(
+            std::unique_ptr<wrench::MulticoreComputeService>(
+                    new wrench::MulticoreComputeService(executor_host, true, true,
+                                                        storage_service,
+                                                        {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
 
-    std::unique_ptr<wrench::CloudService> cloud_service(new wrench::CloudService(wms_host));
-    simulation.add(cloud_service->createVM(executor_host, 1, true, true, storage_service,
-                                           {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}}));
-
-//    simulation.add(
-//            std::unique_ptr<wrench::VMComputeService>(
-//                    new wrench::VMComputeService(executor_host, 1, true, true,
-//                                                        storage_service,
-//                                                        {{wrench::MulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}})));
+//    simulation.add(std::unique_ptr<wrench::ComputeService>(cloud_service));
 
 //    std::cerr << "Instantiating a  MultiCore Job executor on " << executor_host << "..." << std::endl;
 //    simulation.add(std::unique_ptr<wrench::MulticoreComputeService>(
@@ -131,10 +130,13 @@ int main(int argc, char **argv) {
 
   // WMS Configuration
   wrench::WMS *wms = simulation.setWMS(
-          std::unique_ptr<wrench::WMS>(new wrench::SimpleWMS(&workflow,
-                                                             std::unique_ptr<wrench::Scheduler>(
-                                                                     new wrench::RandomScheduler()),
-                                                             wms_host)));
+          std::unique_ptr<wrench::WMS>(
+                  new wrench::SimpleWMS(&workflow,
+                                        std::unique_ptr<wrench::Scheduler>(
+                                                new wrench::RandomScheduler()),
+//                                                new wrench::CloudScheduler(cloud_service, execution_hosts, &simulation)),
+                                        wms_host)));
+
 //  wms->setPilotJobScheduler(std::unique_ptr<wrench::PilotJobScheduler>(new wrench::CriticalPathScheduler()));
 
 //  wms->addStaticOptimization(std::unique_ptr<wrench::StaticOptimization>(new wrench::SimplePipelineClustering()));

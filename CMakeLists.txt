@@ -60,6 +60,7 @@ set(HEADER_FILES
         include/wrench/services/compute/MulticoreComputeService.h
         include/wrench/services/compute/MulticoreComputeServiceProperty.h
         include/wrench/services/cloud/CloudService.h
+        include/wrench/services/cloud/CloudServiceProperty.h
         include/wrench/services/storage/StorageService.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/SimpleStorageService.h
@@ -133,6 +134,9 @@ set(SOURCE_FILES
         src/wrench/services/file_registry/FileRegistryMessage.cpp
         src/wrench/services/file_registry/FileRegistryMessage.h
         src/wrench/services/cloud/CloudService.cpp
+        src/wrench/services/cloud/CloudServiceProperty.cpp
+        src/wrench/services/cloud/CloudServiceMessage.h
+        src/wrench/services/cloud/CloudServiceMessage.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/services/storage/simple_storage/IncomingFile.cpp
         src/wrench/services/storage/simple_storage/IncomingFile.h

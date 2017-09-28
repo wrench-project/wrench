@@ -162,10 +162,10 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceTerminateStandardJobAnswerMessage::ComputeServiceTerminateStandardJobAnswerMessage(StandardJob *job,
-                                                                                               ComputeService *compute_service,
-                                                                                               bool success,
-                                                                                               std::shared_ptr<FailureCause> failure_cause,
-                                                                                               double payload) :
+                                                                                                     ComputeService *compute_service,
+                                                                                                     bool success,
+                                                                                                     std::shared_ptr<FailureCause> failure_cause,
+                                                                                                     double payload) :
             ComputeServiceMessage("TERMINATE_STANDARD_JOB_ANSWER", payload) {
       if ((job == nullptr) || (compute_service == nullptr)) {
         throw std::invalid_argument(
@@ -316,10 +316,10 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ComputeServiceTerminatePilotJobAnswerMessage::ComputeServiceTerminatePilotJobAnswerMessage(PilotJob *job,
-                                                                                                     ComputeService *compute_service,
-                                                                                                     bool success,
-                                                                                                     std::shared_ptr<FailureCause> failure_cause,
-                                                                                                     double payload) :
+                                                                                               ComputeService *compute_service,
+                                                                                               bool success,
+                                                                                               std::shared_ptr<FailureCause> failure_cause,
+                                                                                               double payload) :
             ComputeServiceMessage("TERMINATE_PILOT_JOB_ANSWER", payload) {
       if ((job == nullptr) || (compute_service == nullptr)) {
         throw std::invalid_argument(
@@ -330,4 +330,57 @@ namespace wrench {
       this->success = success;
       this->failure_cause = failure_cause;
     }
+
+    /**
+    * @brief Constructor
+    * @param answer_mailbox: the mailbox to which to send the answer
+    * @param payload: the message size in bytes
+    *
+    * @throw std::invalid_argument
+    */
+    ComputeServiceNumCoresRequestMessage::ComputeServiceNumCoresRequestMessage(
+            std::string answer_mailbox, double payload) : ComputeServiceMessage("NUM_CORES_REQUEST", payload) {
+      if (answer_mailbox.empty()) {
+        throw std::invalid_argument(
+                "ComputeServiceNumCoresRequestMessage::ComputeServiceNumCoresRequestMessage(): Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+    }
+
+    /**
+     * @brief Constructor
+     * @param num: number of cores
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    ComputeServiceNumCoresAnswerMessage::ComputeServiceNumCoresAnswerMessage(unsigned int num, double payload)
+            : ComputeServiceMessage("NUM_CORES_ANSWER", payload), num_cores(num) {}
+
+    /**
+     * @brief Constructor
+     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    ComputeServiceNumIdleCoresRequestMessage::ComputeServiceNumIdleCoresRequestMessage(std::string answer_mailbox,
+                                                                                       double payload)
+            : ComputeServiceMessage("NUM_IDLE_CORES_REQUEST", payload) {
+      if (answer_mailbox.empty()) {
+        throw std::invalid_argument(
+                "ComputeServiceNumIdleCoresRequestMessage::ComputeServiceNumIdleCoresRequestMessage(): Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+    }
+
+    /**
+     * @brief Constructor
+     * @param num: number of idle cores
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    ComputeServiceNumIdleCoresAnswerMessage::ComputeServiceNumIdleCoresAnswerMessage(unsigned long num, double payload)
+            : ComputeServiceMessage("NUM_IDLE_CORES_ANSWER", payload), num_idle_cores(num) {}
 };

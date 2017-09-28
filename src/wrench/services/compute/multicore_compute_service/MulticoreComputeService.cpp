@@ -24,54 +24,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_compute_service, "Log category for Multic
 namespace wrench {
 
     /**
-     * @brief Asynchronously submit a standard job to the compute service
-     *
-     * @param job: a standard job
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     *
-     */
-    void MulticoreComputeService::submitStandardJob(StandardJob *job) {
-
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
-
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
-
-      //  send a "run a standard job" message to the daemon's mailbox
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new ComputeServiceSubmitStandardJobRequestMessage(answer_mailbox, job,
-                                                                                  this->getPropertyValueAsDouble(
-                                                                                          MulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      // Get the answer
-      std::unique_ptr<SimulationMessage> message = nullptr;
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (ComputeServiceSubmitStandardJobAnswerMessage *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
-        // If no success, throw an exception
-        if (not msg->success) {
-          throw WorkflowExecutionException(msg->failure_cause);
-        }
-      } else {
-        throw std::runtime_error(
-                "MulticoreComputeService::submitStandardJob(): Received an unexpected [" + message->getName() +
-                "] message!");
-      }
-
-    }
-
-    /**
      * @brief Asynchronously submit a pilot job to the compute service
      *
      * @param job: a pilot job
@@ -116,91 +68,6 @@ namespace wrench {
         throw std::runtime_error(
                 "MulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
                 "] message!");
-      }
-    }
-
-
-    /**
-     * @brief Synchronously ask the service how many cores it has
-     *
-     * @return the number of cores
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
-    unsigned long MulticoreComputeService::getNumCores() {
-
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
-
-      // send a "num cores" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_num_cores");
-
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new MulticoreComputeServiceNumCoresRequestMessage(answer_mailbox,
-                                                                                  this->getPropertyValueAsDouble(
-                                                                                          MulticoreComputeServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      // Wait for a reply
-      std::unique_ptr<SimulationMessage> message = nullptr;
-
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (MulticoreComputeServiceNumCoresAnswerMessage *msg = dynamic_cast<MulticoreComputeServiceNumCoresAnswerMessage *>(message.get())) {
-        return msg->num_cores;
-      } else {
-        throw std::runtime_error("MulticoreComputeService::getNumCores(): Unexpected [" + msg->getName() + "] message");
-      }
-    }
-
-    /**
-     * @brief Synchronously ask the service how many idle cores it has
-     *
-     * @return the number of currently idle cores
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
-    unsigned long MulticoreComputeService::getNumIdleCores() {
-
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
-
-      // send a "num idle cores" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_num_idle_cores");
-
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new MulticoreComputeServiceNumIdleCoresRequestMessage(
-                answer_mailbox,
-                this->getPropertyValueAsDouble(
-                        MulticoreComputeServiceProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      // Get the reply
-      std::unique_ptr<SimulationMessage> message = nullptr;
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (MulticoreComputeServiceNumIdleCoresAnswerMessage *msg = dynamic_cast<MulticoreComputeServiceNumIdleCoresAnswerMessage *>(message.get())) {
-        return msg->num_idle_cores;
-      } else {
-        throw std::runtime_error(
-                "MulticoreComputeService::getNumIdleCores(): unexpected [" + msg->getName() + "] message");
       }
     }
 
@@ -558,37 +425,8 @@ namespace wrench {
         }
         return false;
 
-      } else if (ComputeServiceSubmitStandardJobRequestMessage *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
-        WRENCH_INFO("Asked to run a standard job with %ld tasks", msg->job->getNumTasks());
-        if (not this->supportsStandardJobs()) {
-          try {
-            S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                     new ComputeServiceSubmitStandardJobAnswerMessage(msg->job, this,
-                                                                                      false,
-                                                                                      std::shared_ptr<FailureCause>(
-                                                                                              new JobTypeNotSupported(
-                                                                                                      msg->job,
-                                                                                                      this)),
-                                                                                      this->getPropertyValueAsDouble(
-                                                                                              MulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-          } catch (std::shared_ptr<NetworkError> cause) {
-            return true;
-          }
-          return true;
-        }
-
-        this->pending_jobs.push_front(msg->job);
-
-        try {
-          S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                   new ComputeServiceSubmitStandardJobAnswerMessage(msg->job, this,
-                                                                                    true,
-                                                                                    nullptr,
-                                                                                    this->getPropertyValueAsDouble(
-                                                                                            MulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
-          return true;
-        }
+      } else if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
+        processSubmitStandardJob(msg->answer_mailbox, msg->job);
         return true;
 
       } else if (ComputeServiceSubmitPilotJobRequestMessage *msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
@@ -652,28 +490,14 @@ namespace wrench {
         processPilotJobCompletion(msg->job);
         return true;
 
-      } else if (MulticoreComputeServiceNumCoresRequestMessage *msg = dynamic_cast<MulticoreComputeServiceNumCoresRequestMessage *>(message.get())) {
-        MulticoreComputeServiceNumCoresAnswerMessage *answer_message = new MulticoreComputeServiceNumCoresAnswerMessage(
-                S4U_Simulation::getNumCores(this->hostname),
-                this->getPropertyValueAsDouble(
-                        MulticoreComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
-        try {
-          S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> cause) {
-          return true;
-        }
+      } else if (auto *msg = dynamic_cast<ComputeServiceNumCoresRequestMessage *>(message.get())) {
+        processGetNumCores(msg->answer_mailbox);
         return true;
-      } else if (MulticoreComputeServiceNumIdleCoresRequestMessage *msg = dynamic_cast<MulticoreComputeServiceNumIdleCoresRequestMessage *>(message.get())) {
-        MulticoreComputeServiceNumIdleCoresAnswerMessage *answer_message = new MulticoreComputeServiceNumIdleCoresAnswerMessage(
-                this->num_available_cores,
-                this->getPropertyValueAsDouble(
-                        MulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
-        try {
-          S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> cause) {
-          return true;
-        }
+
+      } else if (auto *msg = dynamic_cast<ComputeServiceNumIdleCoresRequestMessage *>(message.get())) {
+        processGetNumIdleCores(msg->answer_mailbox);
         return true;
+
       } else if (MulticoreComputeServiceTTLRequestMessage *msg = dynamic_cast<MulticoreComputeServiceTTLRequestMessage *>(message.get())) {
         MulticoreComputeServiceTTLAnswerMessage *answer_message = new MulticoreComputeServiceTTLAnswerMessage(
                 this->death_date - S4U_Simulation::getClock(),
@@ -1180,14 +1004,13 @@ namespace wrench {
       return;
     }
 
-/**
- * @brief Process a pilot job termination request
- *
- * @param job: the job to terminate
- * @param answer_mailbox: the mailbox to which the answer message should be sent
- */
+    /**
+     * @brief Process a pilot job termination request
+     *
+     * @param job: the job to terminate
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     */
     void MulticoreComputeService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
-
 
       // Check whether job is pending
       for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
@@ -1199,7 +1022,7 @@ namespace wrench {
                           MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
           try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             return;
           }
           return;
@@ -1216,7 +1039,7 @@ namespace wrench {
                         MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
           S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
         return;
@@ -1230,11 +1053,82 @@ namespace wrench {
                       MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
-      return;
     }
 
+    /**
+     * @brief Process a get number of cores request
+     *
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     *
+     * @throw std::runtime_error
+     */
+    void MulticoreComputeService::processGetNumCores(std::string &answer_mailbox) {
+      ComputeServiceNumCoresAnswerMessage *answer_message = new ComputeServiceNumCoresAnswerMessage(
+              S4U_Simulation::getNumCores(this->hostname),
+              this->getPropertyValueAsDouble(
+                      ComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
+      try {
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
+
+    /**
+     * @brief Process a get number of idle cores request
+     *
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     */
+    void MulticoreComputeService::processGetNumIdleCores(std::string &answer_mailbox) {
+      ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
+              this->num_available_cores,
+              this->getPropertyValueAsDouble(
+                      MulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
+      try {
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
+
+    /**
+     * @brief Process a submit standard job request
+     *
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
+    void MulticoreComputeService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job) {
+      WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
+      if (not this->supportsStandardJobs()) {
+        try {
+          S4U_Mailbox::dputMessage(
+                  answer_mailbox,
+                  new ComputeServiceSubmitStandardJobAnswerMessage(
+                          job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
+                          this->getPropertyValueAsDouble(
+                                  ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          return;
+        }
+        return;
+      }
+
+      this->pending_jobs.push_front((WorkflowJob *) job);
+
+      try {
+        S4U_Mailbox::dputMessage(
+                answer_mailbox,
+                new ComputeServiceSubmitStandardJobAnswerMessage(
+                        job, this, true, nullptr, this->getPropertyValueAsDouble(
+                                ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
 };
 

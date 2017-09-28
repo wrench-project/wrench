@@ -41,61 +41,6 @@ namespace wrench {
     }
 
     /**
-    * @brief Constructor
-    * @param answer_mailbox: the mailbox to which to send the answer
-    * @param payload: the message size in bytes
-    *
-    * @throw std::invalid_argument
-    */
-    MulticoreComputeServiceNumCoresRequestMessage::MulticoreComputeServiceNumCoresRequestMessage(
-            std::string answer_mailbox, double payload) : MulticoreComputeServiceMessage(
-            "NUM_CORES_REQUEST",
-            payload) {
-      if (answer_mailbox == "") {
-        throw std::invalid_argument("MulticoreComputeServiceNumCoresRequestMessage::MulticoreComputeServiceNumCoresRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-    }
-
-    /**
-     * @brief Constructor
-     * @param num: number of cores
-     * @param payload: the message size in bytes
-     *
-     * @throw std::invalid_argument
-     */
-    MulticoreComputeServiceNumCoresAnswerMessage::MulticoreComputeServiceNumCoresAnswerMessage(unsigned int num,
-                                                                                               double payload)
-            : MulticoreComputeServiceMessage("NUM_CORES_ANSWER", payload), num_cores(num) {}
-
-    /**
-     * @brief Constructor
-     * @param answer_mailbox: the mailbox to which to send the answer
-     * @param payload: the message size in bytes
-     *
-     * @throw std::invalid_argument
-     */
-    MulticoreComputeServiceNumIdleCoresRequestMessage::MulticoreComputeServiceNumIdleCoresRequestMessage(
-            std::string answer_mailbox, double payload)
-            : MulticoreComputeServiceMessage("NUM_IDLE_CORES_REQUEST", payload) {
-      if (answer_mailbox == "") {
-        throw std::invalid_argument("MulticoreComputeServiceNumIdleCoresRequestMessage::MulticoreComputeServiceNumIdleCoresRequestMessage(): Invalid arguments");
-      }
-      this->answer_mailbox = answer_mailbox;
-    }
-
-    /**
-     * @brief Constructor
-     * @param num: number of idle cores
-     * @param payload: the message size in bytes
-     *
-     * @throw std::invalid_argument
-     */
-    MulticoreComputeServiceNumIdleCoresAnswerMessage::MulticoreComputeServiceNumIdleCoresAnswerMessage(unsigned long num,
-                                                                                                       double payload)
-            :  MulticoreComputeServiceMessage("NUM_IDLE_CORES_ANSWER", payload), num_idle_cores(num) {}
-
-    /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which to send the answer
      * @param payload: the message size in bytes

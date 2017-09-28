@@ -15,34 +15,80 @@
 
 #include "wrench/services/Service.h"
 #include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/cloud/CloudServiceProperty.h"
+#include "wrench/simulation/Simulation.h"
 
 namespace wrench {
 
-    class CloudService : public Service {
+    class Simulation;
 
-        /**
-         * @brief A Cloud Service
-         */
+    class ComputeService;
 
-    public:
-        explicit CloudService(std::string &hostname);
-
-        std::unique_ptr<ComputeService> createVM(std::string &pm_hostname,
-                                                 int num_cores,
-                                                 bool supports_standard_jobs,
-                                                 bool supports_pilot_jobs,
-                                                 StorageService *default_storage_service,
-                                                 std::map<std::string, std::string> plist);
-
+    /**
+     * @brief A Cloud Service
+     */
+    class CloudService : public ComputeService {
 
     private:
-        int main();
+        std::map<std::string, std::string> default_property_values =
+                {{CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
+                 {CloudServiceProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD,      "1024"},
+                 {CloudServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,       "1024"},
+                 {CloudServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                 {CloudServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD,            "1024"},
+                 {CloudServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                 {CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
+                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"}
+                };
+
+    public:
+        CloudService(std::string &hostname,
+                     bool supports_standard_jobs,
+                     bool supports_pilot_jobs,
+                     std::map<std::string, std::string> plist);
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
+        bool createVM(const std::string &pm_hostname,
+                      const std::string &vm_hostname,
+                      int num_cores,
+                      std::map<std::string, std::string> plist = {});
+
+        void turnAllVMsOff(std::string pm_hostname);
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
+    private:
+        friend class Simulation;
+
+        int main() override;
+
+        bool processNextMessage();
+
+        void processGetNumCores(std::string &answer_mailbox) override;
+
+        void processGetNumIdleCores(std::string &answer_mailbox) override;
+
+        void processCreateVM(const std::string &answer_mailbox,
+                             const std::string &pm_hostname,
+                             const std::string &vm_hostname,
+                             int num_cores,
+                             bool supports_standard_jobs,
+                             bool supports_pilot_jobs,
+                             std::map<std::string, std::string> plist);
+
+        void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job) override;
 
         void terminate();
 
-        std::map<std::string, std::string> default_property_values = {};
-
         std::map<std::string, simgrid::s4u::VirtualMachine *> vm_list;
+
+        std::map<std::string, std::unique_ptr<ComputeService>> cs_list;
     };
 
 }
