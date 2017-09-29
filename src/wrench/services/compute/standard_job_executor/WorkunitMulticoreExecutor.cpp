@@ -25,6 +25,7 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Multicore Workunit Executor");
 
+//#define S4U_KILL_JOIN_WORKS
 
 namespace wrench {
 
