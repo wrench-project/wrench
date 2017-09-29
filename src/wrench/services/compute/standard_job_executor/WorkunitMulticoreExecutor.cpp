@@ -86,7 +86,7 @@ namespace wrench {
       // First kill the executor's main actor
 //      WRENCH_INFO("Killing an the main actor of a workunit executor");
       this->kill_actor();
-      // Then kill all compute threads
+      // Then kill all compute threads, if any
       for (unsigned long i=0; i < this->compute_threads.size(); i++) {
 //        WRENCH_INFO("Killing a compute thread");
         this->compute_threads[i]->onExit(bye, nullptr);
