@@ -70,7 +70,11 @@ namespace wrench {
 
     }
 
-    int bye(void *x, void*y) {WRENCH_INFO("TERMINATING...BUT AM I REALLY DEAD?"); return 0;}
+    int bye(void *x, void*y) {
+//      WRENCH_INFO("TERMINATING...BUT AM I REALLY DEAD?");
+      return 0;
+    }
+
     /**
      * @brief Kill the worker thread
      */
@@ -78,11 +82,17 @@ namespace wrench {
       // THE ORDER HERE IS SUPER IMPORTANT
       // IF WE KILL THE COMPUTE THREADS, THE JOIN() RETURNS
       // AND THE WORKUNIT EXECUTOR MOVES ON FOR A WHILE... WHICH IS BAD
+
+      // First kill the executor's main actor
+//      WRENCH_INFO("Killing an the main actor of a workunit executor");
       this->kill_actor();
+      // Then kill all compute threads
       for (unsigned long i=0; i < this->compute_threads.size(); i++) {
+//        WRENCH_INFO("Killing a compute thread");
         this->compute_threads[i]->onExit(bye, nullptr);
         this->compute_threads[i]->kill();
       }
+      this->compute_threads.clear();
 
     }
 
@@ -259,14 +269,16 @@ namespace wrench {
     void WorkunitMulticoreExecutor::runMulticoreComputation(double flops, double parallel_efficiency) {
        double effective_flops = (flops / (this->num_cores * parallel_efficiency));
 
+      std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");
+
       // Create an actor to run the computation on each core
       for (unsigned long i=0; i < this->num_cores; i++) {
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
-          ComputeThread *ct = new ComputeThread(effective_flops);
+//          ComputeThread *ct = new ComputeThread(effective_flops, tmp_mailbox);
           compute_threads.push_back(simgrid::s4u::Actor::createActor("compute_thread",
                                                    simgrid::s4u::Host::by_name(S4U_Simulation::getHostName()),
-                                                   ComputeThread(effective_flops)));
+                                                   ComputeThread(effective_flops, tmp_mailbox)));
         } catch (std::exception &e) {
           // Some internal SimGrid exceptions...
           std::abort();
@@ -275,13 +287,25 @@ namespace wrench {
 
 
       // Wait for all actors to complete
+      #ifndef S4U_KILL_JOIN_WORKS
+      for (unsigned long i=0; i < this->compute_threads.size(); i++) {
+        try {
+          S4U_Mailbox::getMessage(tmp_mailbox);
+        } catch (std::exception &e) {
+          // Do nothing, perhaps the child has died... move on to the next one
+        }
+      }
+      #else
       for (unsigned long i=0; i < this->compute_threads.size(); i++) {
         try {
           this->compute_threads[i]->join();
         } catch (std::exception &e) {
-          throw;
+          // Do nothing, perhaps the child has died...
         }
       }
+      #endif
+
+      this->compute_threads.clear();
 
     }
 
