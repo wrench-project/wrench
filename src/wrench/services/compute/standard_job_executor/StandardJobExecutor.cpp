@@ -126,13 +126,15 @@ namespace wrench {
       // EVEN THOUGH THOSE COMPUTE THREADS CALL THEIR onExit()
       // FUNCTION. LIKELY A WEIRD BUG IN SimGrid...
 
-//      this->kill_actor();
+//      WRENCH_INFO("In StandardJobExecutor::kill()");
+      this->kill_actor();
 
       // Kill all workunit executors
       for (auto workunit_executor :  this->workunit_executors)  {
+//        WRENCH_INFO("Killing a workunit executor!");
         workunit_executor->kill();
       }
-      this->kill_actor();
+//      this->kill_actor();
     }
 
     /**

@@ -60,7 +60,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: The job that completed
+     * @param job: the job that completed
      * @param executor: The executor that completed it
      * @param payload: the message size in bytes
      */
@@ -73,6 +73,13 @@ namespace wrench {
       this->executor = executor;
     }
 
+    /**
+     * @brief Constructor
+     * @param job: the job that failed
+     * @param executor: the executor on which the job failed
+     * @param cause: the cause of the failure
+     * @param payload: the message size in bytes
+     */
     StandardJobExecutorFailedMessage::StandardJobExecutorFailedMessage(
             StandardJob *job,
             StandardJobExecutor *executor,
@@ -84,4 +91,15 @@ namespace wrench {
       this->cause = cause;
 
     }
+
+    /**
+     * @brief Constructor
+     */
+    ComputeThreadDoneMessage::ComputeThreadDoneMessage() :
+            StandardJobExecutorMessage("COMPUTE_THREAD_DONE", 0) {
+    }
+
+
+
+
 };

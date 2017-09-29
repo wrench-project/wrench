@@ -1803,7 +1803,6 @@ private:
 
         // We should be good now, with nothing running
 
-
         workflow->removeTask(task1);
         workflow->removeTask(task2);
         workflow->removeTask(task3);
@@ -1819,7 +1818,7 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorTest, DISABLED_JobTerminationTestDuringAComputation) {
+TEST_F(StandardJobExecutorTest, JobTerminationTestDuringAComputation) {
   DO_TEST_WITH_FORK(do_JobTerminationTestDuringAComputation_test);
 }
 
@@ -1982,7 +1981,7 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorTest, DISABLED_JobTerminationTestDuringATransfer) {
+TEST_F(StandardJobExecutorTest, JobTerminationTestDuringATransfer) {
   DO_TEST_WITH_FORK(do_JobTerminationTestDuringATransfer_test);
 }
 
@@ -2157,7 +2156,7 @@ private:
     }
 };
 
-TEST_F(StandardJobExecutorTest, DISABLED_JobTerminationTestAtRandomTimes) {
+TEST_F(StandardJobExecutorTest, JobTerminationTestAtRandomTimes) {
   DO_TEST_WITH_FORK(do_JobTerminationTestAtRandomTimes_test);
 }
 

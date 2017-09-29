@@ -110,6 +110,15 @@ namespace wrench {
 
     };
 
+    /**
+     * @brief ComputeThreadDoneMessage class
+     */
+    class ComputeThreadDoneMessage : public StandardJobExecutorMessage {
+    public:
+        ComputeThreadDoneMessage();
+
+    };
+
 
     /***********************/
     /** \endcond           */
