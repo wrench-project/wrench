@@ -247,7 +247,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -277,9 +277,10 @@ namespace wrench {
       //  send a "run a standard job" message to the daemon's mailbox
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
-                                new ComputeServiceSubmitStandardJobRequestMessage(answer_mailbox, job,
-                                                                                  this->getPropertyValueAsDouble(
-                                                                                          ComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                new ComputeServiceSubmitStandardJobRequestMessage(
+                                        answer_mailbox, job,
+                                        this->getPropertyValueAsDouble(
+                                                ComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }

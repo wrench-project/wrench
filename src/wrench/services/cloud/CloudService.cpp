@@ -324,13 +324,27 @@ namespace wrench {
         return;
       }
 
+      FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+
       for (auto &cs : cs_list) {
         if (cs.second->getNumIdleCores() >= job->getNumCores()) {
+          // stage in files to VM storage
+          for (auto task : job->getTasks()) {
+            for (auto file : task->getInputFiles()) {
+              std::set<StorageService *> storage_list = file_registry_service->lookupEntry(file);
+              std::cout << "--------- LOOKING FOR FILE: " << file->getId() << std::endl;
+              std::cout << "----------- STORAGE LIST SIZE: " << storage_list.size() << std::endl;
+              if (storage_list.find(cs.second->getDefaultStorageService()) == storage_list.end()) {
+                std::cout << "------------ CREATING REQUEST FROM: " << (*storage_list.begin())->getName() << std::endl;
+                job->pre_file_copies.insert(std::tuple<WorkflowFile *, StorageService *, StorageService *>(
+                        file, (*storage_list.begin()), cs.second->getDefaultStorageService()));
+              }
+            }
+          }
 
-          FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
-          //TODO Stage in files?
+          cs.second->getDefaultStorageService();
+
           cs.second->submitStandardJob(job);
-
           try {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
