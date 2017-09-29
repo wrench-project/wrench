@@ -115,7 +115,7 @@ namespace wrench {
       try {
         mailbox->put(msg, (size_t) msg->payload);
       } catch (xbt_ex &e) {
-        if (e.category == network_error) {
+        if ((e.category == network_error) || (e.category == timeout_error)) {
           WRENCH_INFO("Network error while doing a putMessage)");
           throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, mailbox_name));
         } else {
@@ -155,7 +155,7 @@ namespace wrench {
         }
       }
 
-        return;
+      return;
     }
 
     /**
