@@ -12,6 +12,7 @@
   - Install **Lemon C++** library - version 1.3.1 or superior (http://lemon.cs.elte.hu/)
   - Install **PugiXML** - version 1.8 or superior (http://pugixml.org/)
   - Install **Google Test** - version 1.8 or superior (https://github.com/google/googletest)
+  - Install **JSON for Modern C++** - version 2.11 or superior (https://github.com/nlohmann/json)
 
 #### Compiler
 

@@ -63,7 +63,9 @@ int main(int argc, char **argv) {
 //
 //  workflow.exportToEPS("workflow.eps");
 
-  workflow.loadFromDAX(dax_file);
+  //workflow.loadFromDAX(dax_file);
+  wrench::WorkflowUtil::loadFromDAX(dax_file, &workflow);
+    wrench::WorkflowUtil::loadFromJson("../../../examples/jsonTest", &workflow);
   std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
   std::cerr.flush();
 //  std::cerr << "Number of children of root task: " << workflow.getReadyTasks()[0]->getNumberOfChildren() << std::endl;

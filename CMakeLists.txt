@@ -75,7 +75,7 @@ set(HEADER_FILES
         include/wrench/simulation/SimulationTrace.h
         include/wrench.h
         include/wrench-dev.h
-        )
+        include/wrench/util/WorkflowUtil.h)
 
 # source files
 set(SOURCE_FILES
@@ -142,7 +142,7 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.h
         src/wrench/services/network_proximity/NetworkDaemons.cpp
-        )
+        src/wrench/util/WorkflowUtil.cpp)
 
 # test files
 set(TEST_FILES

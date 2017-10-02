@@ -46,5 +46,9 @@
 #include "wrench/simulation/SimulationTimestamp.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
+// WorkflowUtil Namespace
+#include "wrench/util/WorkflowUtil.h"
+
+
 
 #endif //WRENCH_WRENCH_H
