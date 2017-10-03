@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
 
   std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
 
-//  wrench::ComputeService *cloud_service = new wrench::CloudService(wms_host, true, true,
+//  wrench::ComputeService *cloud_service = new wrench::CloudService(wms_host, true, true, storage_service,
 //                                                                   {{wrench::CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
   std::vector<std::string> execution_hosts = {executor_host};
 
