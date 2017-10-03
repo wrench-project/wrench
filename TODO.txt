@@ -1,5 +1,4 @@
 SOFTWARE ENGINEERING:
-    - Unify submitJob (with compute_service_specific_arguments)
 
 -----------------------------------
 
@@ -14,9 +13,6 @@ DETAILS:
 -----------------------------------
 
 DATA STORAGE IMPLEMENTATION:
-
-    [DONE] Make is so that the SimpleStorage Service overwrites files without complaining
-      (Wasting time)...
 
     - Decide what to do about "partial failures"
         - How do we report what has completed, and what hasn't upon failure
