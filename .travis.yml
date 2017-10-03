@@ -138,7 +138,7 @@ install:
   - cd pugixml-1.8 && cmake . && make && sudo make install && cd ..
   # install json for modern c++
   - wget https://github.com/nlohmann/json/archive/v2.1.1.tar.gz
-  - tar -xf json-2.1.1.tar.gz
+  - tar -xf v2.1.1.tar.gz
   - cd json-2.1.1 && cmake . && make && sudo make install && cd ..
   # install googletest
   - wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
