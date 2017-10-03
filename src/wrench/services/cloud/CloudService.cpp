@@ -9,13 +9,10 @@
  */
 
 #include "wrench/services/cloud/CloudService.h"
-#include "wrench/services/cloud/CloudServiceProperty.h"
 #include "wrench/services/compute/MulticoreComputeService.h"
 #include "wrench/services/storage/SimpleStorageService.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/workflow/job/StandardJob.h"
 #include "services/ServiceMessage.h"
 #include "services/cloud/CloudServiceMessage.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
@@ -39,6 +36,7 @@ namespace wrench {
     CloudService::CloudService(std::string &hostname,
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
+                               StorageService *default_storage_service,
                                std::map<std::string, std::string> plist = {}) :
             ComputeService("cloud_service", "cloud_service", supports_standard_jobs, supports_pilot_jobs,
                            default_storage_service) {
@@ -108,15 +106,6 @@ namespace wrench {
     }
 
     /**
-     *
-     * @param pm_hostname
-     */
-    void CloudService::turnAllVMsOff(std::string pm_hostname) {
-
-
-    }
-
-    /**
     * @brief Main method of the daemon
     *
     * @return 0 on termination
@@ -129,6 +118,7 @@ namespace wrench {
 
       /** Main loop **/
       while (this->processNextMessage()) {
+        // no specific action
       }
 
       WRENCH_INFO("Cloud Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
@@ -189,6 +179,18 @@ namespace wrench {
         processSubmitStandardJob(msg->answer_mailbox, msg->job);
         return true;
 
+      } else if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        this->terminate();
+        // This is Synchronous
+        try {
+          S4U_Mailbox::putMessage(msg->ack_mailbox,
+                                  new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
+                                          CloudServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          return false;
+        }
+        return false;
+
       } else {
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");
       }
@@ -197,7 +199,9 @@ namespace wrench {
     /**
      * @brief Create a multicore executor VM in a physical machine
      *
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param pm_hostname: the name of the physical machine host
+     * @param vm_hostname: the name of the VM host
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
@@ -211,7 +215,7 @@ namespace wrench {
                                        int num_cores,
                                        bool supports_standard_jobs,
                                        bool supports_pilot_jobs,
-                                       std::map<std::string, std::string> plist) {
+                                       std::map<std::string, std::string> plist = {}) {
 
       WRENCH_INFO("Asked to create a VM on %s with %d cores", pm_hostname.c_str(), num_cores);
 
@@ -224,15 +228,10 @@ namespace wrench {
           this->vm_list[vm_hostname] = new simgrid::s4u::VirtualMachine(vm_hostname.c_str(),
                                                                         simgrid::s4u::Host::by_name(
                                                                                 pm_hostname), num_cores);
-
-          // create a storage service to the VM
-          StorageService *storage_service = this->simulation->add(std::unique_ptr<SimpleStorageService>(
-                  new SimpleStorageService(vm_hostname, 10000000000000.0)));
-
           // create a multicore executor for the VM
           this->cs_list[vm_hostname] = std::unique_ptr<ComputeService>(
                   new MulticoreComputeService(vm_hostname, supports_standard_jobs, supports_pilot_jobs,
-                                              storage_service, plist));
+                                              default_storage_service, plist));
           this->cs_list[vm_hostname]->setSimulation(this->simulation);
 
           S4U_Mailbox::dputMessage(
@@ -324,26 +323,8 @@ namespace wrench {
         return;
       }
 
-      FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
-
       for (auto &cs : cs_list) {
         if (cs.second->getNumIdleCores() >= job->getNumCores()) {
-          // stage in files to VM storage
-          for (auto task : job->getTasks()) {
-            for (auto file : task->getInputFiles()) {
-              std::set<StorageService *> storage_list = file_registry_service->lookupEntry(file);
-              std::cout << "--------- LOOKING FOR FILE: " << file->getId() << std::endl;
-              std::cout << "----------- STORAGE LIST SIZE: " << storage_list.size() << std::endl;
-              if (storage_list.find(cs.second->getDefaultStorageService()) == storage_list.end()) {
-                std::cout << "------------ CREATING REQUEST FROM: " << (*storage_list.begin())->getName() << std::endl;
-                job->pre_file_copies.insert(std::tuple<WorkflowFile *, StorageService *, StorageService *>(
-                        file, (*storage_list.begin()), cs.second->getDefaultStorageService()));
-              }
-            }
-          }
-
-          cs.second->getDefaultStorageService();
-
           cs.second->submitStandardJob(job);
           try {
             S4U_Mailbox::dputMessage(
@@ -351,6 +332,7 @@ namespace wrench {
                     new ComputeServiceSubmitStandardJobAnswerMessage(
                             job, this, true, nullptr, this->getPropertyValueAsDouble(
                                     ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            return;
           } catch (std::shared_ptr<NetworkError> &cause) {
             return;
           }
@@ -376,11 +358,9 @@ namespace wrench {
     void CloudService::terminate() {
       this->setStateToDown();
 
-      //TODO: call terminate for multicore executors
-
-      // destroy VMs
-      for (auto &vm : this->vm_list) {
-        vm.second->destroy();
+      WRENCH_INFO("Stopping VMs Compute Service");
+      for (auto &cs : this->cs_list) {
+        cs.second->stop();
       }
     }
 }

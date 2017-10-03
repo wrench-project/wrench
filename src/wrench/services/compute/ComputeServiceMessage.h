@@ -156,7 +156,8 @@ namespace wrench {
     class ComputeServiceSubmitPilotJobAnswerMessage : public ComputeServiceMessage {
     public:
         ComputeServiceSubmitPilotJobAnswerMessage(PilotJob *, ComputeService *, bool success,
-                                                  std::shared_ptr<FailureCause> cause, double payload);
+                                                  std::shared_ptr<FailureCause> cause,
+                                                  double payload);
 
         /** @brief The submitted pilot job */
         PilotJob *job;

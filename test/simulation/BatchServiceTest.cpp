@@ -113,10 +113,10 @@ private:
                     {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
                                                                                   this->test->storage_service2)});
 
-            std::map<std::string, unsigned long> batch_job_args;
-            batch_job_args["-N"] = 1;
-            batch_job_args["-t"] = 5; //time in minutes
-            batch_job_args["-c"] = 4; //number of cores per node
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "1";
+            batch_job_args["-t"] = "5"; //time in minutes
+            batch_job_args["-c"] = "4"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
             }catch (wrench::WorkflowExecutionException &e){
@@ -249,10 +249,10 @@ private:
             // Create a pilot job
             wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 30);
 
-            std::map<std::string, unsigned long> batch_job_args;
-            batch_job_args["-N"] = 1;
-            batch_job_args["-t"] = 1; //time in minutes
-            batch_job_args["-c"] = 4; //number of cores per node
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "1";
+            batch_job_args["-t"] = "1"; //time in minutes
+            batch_job_args["-c"] = "4"; //number of cores per node
 
             // Submit a pilot job
             try {
@@ -416,10 +416,10 @@ private:
                     {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
                                                                                   this->test->storage_service2)});
 
-            std::map<std::string, unsigned long> batch_job_args;
-            batch_job_args["-N"] = 1;
-            batch_job_args["-t"] = 2; //time in minutes
-            batch_job_args["-c"] = 4; //number of cores per node
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "1";
+            batch_job_args["-t"] = "2"; //time in minutes
+            batch_job_args["-c"] = "4"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
             }catch (wrench::WorkflowExecutionException &e){
@@ -450,10 +450,10 @@ private:
             // Create a pilot job
             wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 30);
 
-            std::map<std::string, unsigned long> batch_job_args;
-            batch_job_args["-N"] = 1;
-            batch_job_args["-t"] = 1; //time in minutes
-            batch_job_args["-c"] = 4; //number of cores per node
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "1";
+            batch_job_args["-t"] = "1"; //time in minutes
+            batch_job_args["-c"] = "4"; //number of cores per node
 
             // Submit a pilot job
             try {
@@ -618,10 +618,10 @@ private:
                     {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
                                                                                   this->test->storage_service2)});
 
-            std::map<std::string, unsigned long> batch_job_args;
-            batch_job_args["-N"] = 1;
-            batch_job_args["-t"] = 2; //time in minutes
-            batch_job_args["-c"] = 12; //number of cores per node
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "1";
+            batch_job_args["-t"] = "2"; //time in minutes
+            batch_job_args["-c"] = "12"; //number of cores per node
             bool success = false;
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
@@ -759,7 +759,7 @@ private:
                     {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
                                                                                   this->test->storage_service2)});
 
-            std::map<std::string, unsigned long> batch_job_args;
+            std::map<std::string, std::string> batch_job_args;
             bool success = false;
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
@@ -1058,10 +1058,10 @@ private:
                     {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
                                                                                   this->test->storage_service2)});
 
-            std::map<std::string, unsigned long> batch_job_args;
-            batch_job_args["-N"] = 1;
-            batch_job_args["-t"] = 2; //time in minutes
-            batch_job_args["-c"] = 8; //number of cores per node
+            std::map<std::string, std::string> batch_job_args;
+            batch_job_args["-N"] = "1";
+            batch_job_args["-t"] = "2"; //time in minutes
+            batch_job_args["-c"] = "8"; //number of cores per node
             try {
                 job_manager->submitJob(job, this->test->compute_service, batch_job_args);
             }catch (wrench::WorkflowExecutionException &e){
@@ -1083,10 +1083,10 @@ private:
                     {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file_1"),
                                                                                   this->test->storage_service2)});
 
-            std::map<std::string, unsigned long> task1_batch_job_args;
-            task1_batch_job_args["-N"] = 1;
-            task1_batch_job_args["-t"] = 2; //time in minutes
-            task1_batch_job_args["-c"] = 9; //number of cores per node
+            std::map<std::string, std::string> task1_batch_job_args;
+            task1_batch_job_args["-N"] = "1";
+            task1_batch_job_args["-t"] = "2"; //time in minutes
+            task1_batch_job_args["-c"] = "9"; //number of cores per node
             try {
                 job_manager->submitJob(job1, this->test->compute_service, task1_batch_job_args);
             }catch (wrench::WorkflowExecutionException &e){
@@ -1108,10 +1108,10 @@ private:
                     {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file_2"),
                                                                                   this->test->storage_service2)});
 
-            std::map<std::string, unsigned long> task2_batch_job_args;
-            task2_batch_job_args["-N"] = 1;
-            task2_batch_job_args["-t"] = 2; //time in minutes
-            task2_batch_job_args["-c"] = 1; //number of cores per node
+            std::map<std::string, std::string> task2_batch_job_args;
+            task2_batch_job_args["-N"] = "1";
+            task2_batch_job_args["-t"] = "2"; //time in minutes
+            task2_batch_job_args["-c"] = "1"; //number of cores per node
             try {
                 job_manager->submitJob(job2, this->test->compute_service, task2_batch_job_args);
             }catch (wrench::WorkflowExecutionException &e){

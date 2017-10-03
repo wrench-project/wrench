@@ -78,7 +78,8 @@ namespace wrench {
         /***********************/
 
         // Running jobs
-        void submitPilotJob(PilotJob *job) override;
+        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> service_specific_args) override;
+        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> service_specific_args) override;
 
         // Terminating jobs
         void terminateStandardJob(StandardJob *job) override;
@@ -100,7 +101,9 @@ namespace wrench {
 
         friend class Simulation;
 
-        MulticoreComputeService();
+        unsigned long job_id = 0;
+
+//        MulticoreComputeService();
 
         // Low-level Constructor
         MulticoreComputeService(std::string hostname,

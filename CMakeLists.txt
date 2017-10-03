@@ -82,6 +82,7 @@ set(HEADER_FILES
         include/wrench/services/batch_service/BatchScheduler.h
         include/wrench/services/batch_service/BatchService.h
         include/wrench/services/batch_service/BatchServiceProperty.h
+        include/wrench/util/WorkflowUtil.h
         )
 
 # source files
@@ -158,6 +159,7 @@ set(SOURCE_FILES
         src/wrench/services/batch_service/BatchScheduler.cpp
         src/wrench/services/batch_service/BatchService.cpp
         src/wrench/services/batch_service/BatchServiceProperty.cpp
+        src/wrench/util/WorkflowUtil.cpp
         )
 
 # test files

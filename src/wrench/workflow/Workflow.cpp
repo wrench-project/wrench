@@ -142,7 +142,7 @@ namespace wrench {
      */
     WorkflowFile *Workflow::addFile(const std::string id, double size) {
 
-      if (size <= 0) {
+      if (size < 0) {
         throw std::invalid_argument("Workflow::addFile(): Invalid arguments");
       }
 

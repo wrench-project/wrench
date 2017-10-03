@@ -28,22 +28,19 @@
 
 // Scheduler
 #include "wrench/wms/scheduler/Scheduler.h"
-
-// Pilot Job Scheduler
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
-//#include "wms/scheduler/pilot_job/CriticalPathScheduler.h"
 
-// Static Optimizations
+// Scheduling Optimizations
 #include "wrench/wms/StaticOptimization.h"
-//#include "wms/optimizations/static/SimplePipelineClustering.h"
-
-// Dynamic Optimizations
 #include "wrench/wms/DynamicOptimization.h"
-//#include "wms/optimizations/dynamic/FailureDynamicClustering.h"
 
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
+
+// WorkflowUtil Namespace
+#include "wrench/util/WorkflowUtil.h"
+
 
 
 #endif //WRENCH_WRENCH_H

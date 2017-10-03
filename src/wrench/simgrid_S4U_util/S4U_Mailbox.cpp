@@ -116,7 +116,7 @@ namespace wrench {
         mailbox->put(msg, (size_t) msg->payload);
       } catch (xbt_ex &e) {
         if ((e.category == network_error) || (e.category == timeout_error)) {
-          WRENCH_INFO("Network error while doing a putMessage)");
+          WRENCH_INFO("Network error while doing a putMessage()");
           throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, mailbox_name));
         } else {
           throw std::runtime_error("S4U_Mailbox::putMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");

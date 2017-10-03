@@ -15,6 +15,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "StandardJobExecutorMessage.h"
 
+//#define S4U_KILL_JOIN_WORKS
 
 namespace wrench {
 

@@ -32,6 +32,7 @@ namespace wrench {
     private:
         std::map<std::string, std::string> default_property_values =
                 {{CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
+                 {CloudServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,              "1024"},
                  {CloudServiceProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD,      "1024"},
                  {CloudServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,       "1024"},
                  {CloudServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD,           "1024"},
@@ -46,6 +47,7 @@ namespace wrench {
         CloudService(std::string &hostname,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
+                     StorageService *default_storage_service,
                      std::map<std::string, std::string> plist);
 
         /***********************/
@@ -56,8 +58,6 @@ namespace wrench {
                       const std::string &vm_hostname,
                       int num_cores,
                       std::map<std::string, std::string> plist = {});
-
-        void turnAllVMsOff(std::string pm_hostname);
 
         /***********************/
         /** \endcond          **/
