@@ -17,7 +17,6 @@
 
 namespace wrench {
 
-
     class Simulation;
 
     class StandardJob;
@@ -37,9 +36,11 @@ namespace wrench {
         /** \cond DEVELOPER   **/
         /***********************/
 
-        void stop();
+        void stop() override;
 
-        void runJob(WorkflowJob *job);
+//        void runJob(WorkflowJob *job);
+
+        void runJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args = {});
 
         void terminateJob(WorkflowJob *job);
 
@@ -47,11 +48,11 @@ namespace wrench {
 
         bool supportsPilotJobs();
 
+        unsigned long getNumCores();
+
+        unsigned long getNumIdleCores();
+
         virtual double getCoreFlopRate();
-
-        virtual unsigned long getNumCores();
-
-        virtual unsigned long getNumIdleCores();
 
         virtual double getTTL();
 
@@ -59,13 +60,15 @@ namespace wrench {
 
         StorageService *getDefaultStorageService();
 
+        virtual void submitStandardJob(StandardJob *job, std::map<std::string, std::string> batch_job_args = {});
+
+        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> batch_job_args = {});
+
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual void submitStandardJob(StandardJob *job);
 
-        virtual void submitPilotJob(PilotJob *job);
 
         virtual void terminateStandardJob(StandardJob *job);
 
@@ -73,29 +76,33 @@ namespace wrench {
 
         ComputeService(std::string service_name,
                        std::string mailbox_name_prefix,
+                       bool supports_standard_jobs,
+                       bool supports_pilot_jobs,
                        StorageService *default_storage_service);
 
     protected:
+
+        virtual void processGetNumCores(std::string &answer_mailbox);
+
+        virtual void processGetNumIdleCores(std::string &answer_mailbox);
+
+        virtual void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job);
 
         /** @brief Whether the compute service supports pilot jobs */
         bool supports_pilot_jobs;
         /** @brief Whether the compute service supports standard jobs */
         bool supports_standard_jobs;
-
         /** @brief The default storage service associated to the compute service (nullptr if none) */
         StorageService *default_storage_service;
 
         /***********************/
         /** \endcond          **/
         /***********************/
-
     };
 
     /***********************/
     /** \endcond           */
     /***********************/
-
 };
-
 
 #endif //SIMULATION_COMPUTESERVICE_H

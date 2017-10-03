@@ -1,4 +1,4 @@
-
+SOFTWARE ENGINEERING:
 
 -----------------------------------
 
@@ -50,6 +50,7 @@ SOFTWARE ENGINEERING / TESTING:
 
     - Test for killing a standard job executor 
 	    - wait on S4U::Actor::kill() to be fixed
+	    - Given recent fixes, we can now implement a message-based workaround
 
     - While implementing a test for the StandardJobExecutor abstraction, Henri noted
       that when one does not create a ComputeService and launch the simulation, we

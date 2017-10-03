@@ -63,7 +63,9 @@ namespace wrench {
 
 				PilotJob *createPilotJob(Workflow *workflow, unsigned int num_cores, double duration);
 
-				void submitJob(WorkflowJob *job, ComputeService *compute_service);
+//				void submitJob(WorkflowJob *job, ComputeService *compute_service);
+
+				void submitJob(WorkflowJob *job, ComputeService *compute_service, std::map<std::string, std::string> service_specific_args = {});
 
 				void terminateJob(WorkflowJob *);
 

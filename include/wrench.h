@@ -20,27 +20,19 @@
 #include "wrench/services/storage/SimpleStorageServiceProperty.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/file_registry/FileRegistryServiceProperty.h"
+#include "wrench/services/cloud/CloudService.h"
+#include "wrench/services/cloud/CloudServiceProperty.h"
 
 // WMS Implementations
 #include "wrench/wms/WMS.h"
 
-// Schedulers
+// Scheduler
 #include "wrench/wms/scheduler/Scheduler.h"
-#include "../examples/simple-wms/scheduler/RandomScheduler.h"
-//#include "wms/scheduler/MinMinScheduler.h"
-//#include "wms/scheduler/MaxMinScheduler.h"
-
-// Pilot Job Schedulers
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
-//#include "wms/scheduler/pilot_job/CriticalPathScheduler.h"
 
-// Static Optimizations
+// Scheduling Optimizations
 #include "wrench/wms/StaticOptimization.h"
-//#include "wms/optimizations/static/SimplePipelineClustering.h"
-
-// Dynamic Optimizations
 #include "wrench/wms/DynamicOptimization.h"
-//#include "wms/optimizations/dynamic/FailureDynamicClustering.h"
 
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"

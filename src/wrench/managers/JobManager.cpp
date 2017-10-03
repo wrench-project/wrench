@@ -219,16 +219,67 @@ namespace wrench {
       return raw_ptr;
     }
 
+//    /**
+//     * @brief Submit a job to a compute service
+//     *
+//     * @param job: a workflow job
+//     * @param compute_service: a compute service
+//     *
+//     * @throw std::invalid_argument
+//     * @throw WorkflowExecutionException
+//     */
+//    void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service) {
+//
+//      if ((job == nullptr) || (compute_service == nullptr)) {
+//        throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
+//      }
+//
+//      // Push back the mailbox of the manager,
+//      // so that it will getMessage the initial callback
+//      job->pushCallbackMailbox(this->mailbox_name);
+//
+//      // Update the job state and insert it into the pending list
+//      switch (job->getType()) {
+//        case WorkflowJob::STANDARD: {
+//          ((StandardJob *) job)->state = StandardJob::PENDING;
+//          for (auto t : ((StandardJob *) job)->tasks) {
+//            t->setState(WorkflowTask::State::PENDING);
+//          }
+//          this->pending_standard_jobs.insert((StandardJob *) job);
+//          break;
+//        }
+//        case WorkflowJob::PILOT: {
+//          ((PilotJob *) job)->state = PilotJob::PENDING;
+//          this->pending_pilot_jobs.insert((PilotJob *) job);
+//          break;
+//        }
+//      }
+//
+//      // Submit the job to the service
+//      try {
+//        compute_service->runJob(job);
+//        job->setParentComputeService(compute_service);
+//      } catch (WorkflowExecutionException &e) {
+//        throw;
+//      }
+//
+//    }
+
     /**
-     * @brief Submit a job to a compute service
+     * @brief Submit a job to batch service
      *
      * @param job: a workflow job
-     * @param compute_service: a compute service
+     * @param compute_service: a batch service
+     * @param service_specific_args: arguments specific for compute services:
+     *      - to a multicore_compute_service: {}
+     *      - to a batch service: {"-t":"<int>","-n":"<int>","-N":"<int>","-c":"<int>"}
+     *      - to a cloud service: {}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
      */
-    void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service) {
+    void JobManager::submitJob(WorkflowJob *job, ComputeService *compute_service,
+                               std::map<std::string, std::string> service_specific_args) {
 
       if ((job == nullptr) || (compute_service == nullptr)) {
         throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
@@ -257,7 +308,7 @@ namespace wrench {
 
       // Submit the job to the service
       try {
-        compute_service->runJob(job);
+        compute_service->runJob(job, service_specific_args);
         job->setParentComputeService(compute_service);
       } catch (WorkflowExecutionException &e) {
         throw;
