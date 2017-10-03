@@ -160,7 +160,7 @@ set(SOURCE_FILES
         src/wrench/services/batch_service/BatchService.cpp
         src/wrench/services/batch_service/BatchServiceProperty.cpp
         src/wrench/util/WorkflowUtil.cpp
-        )
+        src/wrench/services/helpers/Alarm.cpp src/wrench/services/helpers/Alarm.h)
 
 # test files
 set(TEST_FILES
