@@ -32,7 +32,8 @@ public:
     void do_StandardPlusPilotJobTaskTest_test();
     void do_InsufficientCoresTaskTest_test();
     void do_BestFitTaskTest_test();
-    void do_noArgumentsJobSubmissionTest();
+    void do_noArgumentsJobSubmissionTest_test();
+    void do_StandardJobTimeOutTaskTest_test();
 
 
 protected:
@@ -783,11 +784,11 @@ private:
     }
 };
 
-TEST_F(BatchServiceTest, NoArgumentsJobSubmissionTes) {
-    DO_TEST_WITH_FORK(do_noArgumentsJobSubmissionTest);
+TEST_F(BatchServiceTest, NoArgumentsJobSubmissionTest) {
+    DO_TEST_WITH_FORK(do_noArgumentsJobSubmissionTest_test);
 }
 
-void BatchServiceTest::do_noArgumentsJobSubmissionTest() {
+void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
     // Create and initialize a simulation
     wrench::Simulation *simulation = new wrench::Simulation();
@@ -807,6 +808,159 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest() {
     EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
             std::unique_ptr<wrench::WMS>(new NoArgumentsJobSubmissionTestWMS(this, workflow,
                                                                                    std::unique_ptr<wrench::Scheduler>(
+                            new NoopScheduler()), hostname))));
+
+    // Create a Storage Service
+    EXPECT_NO_THROW(storage_service1 = simulation->add(
+            std::unique_ptr<wrench::SimpleStorageService>(
+                    new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+    // Create a Storage Service
+    EXPECT_NO_THROW(storage_service2 = simulation->add(
+            std::unique_ptr<wrench::SimpleStorageService>(
+                    new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+    // Create a Batch Service
+    EXPECT_NO_THROW(compute_service = simulation->add(
+            std::unique_ptr<wrench::BatchService>(
+                    new wrench::BatchService(hostname,simulation->getHostnameList(),
+                                             storage_service1,true,true,{}))));
+
+    std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+            new wrench::FileRegistryService(hostname));
+
+    simulation->setFileRegistryService(std::move(file_registry_service));
+
+    // Create two workflow files
+    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+
+    // Staging the input_file on the storage service
+    EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+
+
+    // Running a "run a single task" simulation
+    // Note that in these tests the WMS creates workflow tasks, which a user would
+    // of course not be likely to do
+    EXPECT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
+
+
+/**********************************************************************/
+/**  STANDARDJOB TIMEOUT TASK SIMULATION TEST ON ONE-ONE HOST                **/
+/**********************************************************************/
+
+class StandardJobTimeoutSubmissionTestWMS : public wrench::WMS {
+
+public:
+    StandardJobTimeoutSubmissionTestWMS(BatchServiceTest *test,
+                                    wrench::Workflow *workflow,
+                                    std::unique_ptr<wrench::Scheduler> scheduler,
+                                    std::string hostname) :
+            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+        // Create a job manager
+        std::unique_ptr<wrench::JobManager> job_manager =
+                std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+        {
+            // Create a sequential task that lasts one min and requires 2 cores
+            wrench::WorkflowTask *task = this->workflow->addTask("task", 61, 1, 1, 1.0);
+            task->addInputFile(workflow->getFileById("input_file"));
+            task->addOutputFile(workflow->getFileById("output_file"));
+
+
+            // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+
+            wrench::StandardJob *job = job_manager->createStandardJob(
+                    {task},
+                    {
+                            {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                            {*(task->getOutputFiles().begin()), this->test->storage_service1}
+                    },
+                    {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                            workflow->getFileById("input_file"), this->test->storage_service1,
+                            this->test->storage_service2)},
+                    {},
+                    {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                                                                                  this->test->storage_service2)});
+
+            std::map<std::string, unsigned long> batch_job_args;
+            batch_job_args["-N"] = 1;
+            batch_job_args["-t"] = 1; //time in minutes
+            batch_job_args["-c"] = 4; //number of cores per node
+            try {
+                job_manager->submitJob(job, this->test->compute_service, batch_job_args);
+            }catch (wrench::WorkflowExecutionException &e){
+                throw std::runtime_error(
+                        "Got some exception"
+                );
+            }
+
+            // Wait for a workflow execution event
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+            try {
+                event = workflow->waitForNextExecutionEvent();
+            } catch (wrench::WorkflowExecutionException &e) {
+                throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+            }
+            switch (event->type) {
+                case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+                    // success, do nothing for now
+                    break;
+                }
+                default: {
+                    throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+                }
+            }
+            workflow->removeTask(task);
+        }
+
+
+        // Terminate everything
+        this->simulation->shutdownAllComputeServices();
+        this->simulation->shutdownAllStorageServices();
+        this->simulation->getFileRegistryService()->stop();
+        return 0;
+    }
+};
+
+TEST_F(BatchServiceTest, StandardJobTimeOutTaskTest) {
+    DO_TEST_WITH_FORK(do_StandardJobTimeOutTaskTest_test);
+}
+
+void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
+
+    // Create and initialize a simulation
+    wrench::Simulation *simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("batch_service_test");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
+
+    // Create a WMS
+    EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+            std::unique_ptr<wrench::WMS>(new StandardJobTimeoutSubmissionTestWMS(this, workflow,
+                                                                             std::unique_ptr<wrench::Scheduler>(
                             new NoopScheduler()), hostname))));
 
     // Create a Storage Service

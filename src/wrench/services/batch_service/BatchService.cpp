@@ -317,11 +317,11 @@ namespace wrench {
         /** Main loop **/
         bool life = true;
         double next_timeout_timestamp = 0;
-        next_timeout_timestamp = S4U_Simulation::getClock()+this->random_interval;
+        next_timeout_timestamp = S4U_Simulation::getClock()+(double)this->random_interval;
         while (life) {
             double job_timeout = next_timeout_timestamp-S4U_Simulation::getClock();
             if (job_timeout>0){
-                life = processNextMessage(this->random_interval);
+                life = processNextMessage(job_timeout);
             }else{
                 //check if some jobs have expired and should be killed
                 if (this->running_jobs.size() > 0) {
@@ -331,6 +331,7 @@ namespace wrench {
                             if((*it)->getWorkflowJob()->getType()==WorkflowJob::STANDARD) {
                                 this->processStandardJobTimeout((StandardJob*)(*it)->getWorkflowJob());
                                 this->udpateResources((*it)->getResourcesAllocated());
+                                this->sendStandardJobCallBackMessage((StandardJob*)(*it)->getWorkflowJob());
                                 it = this->running_jobs.erase(it);
                             }else if((*it)->getWorkflowJob()->getType()==WorkflowJob::PILOT){
                                 this->processPilotJobTimeout((PilotJob*)(*it)->getWorkflowJob());
@@ -345,7 +346,6 @@ namespace wrench {
                         }else{
                             ++it;
                         }
-
                     }
                 }
                 next_timeout_timestamp = S4U_Simulation::getClock()+this->random_interval;
@@ -365,6 +365,17 @@ namespace wrench {
                                      new ComputeServicePilotJobExpiredMessage(job, this,
                                                                               this->getPropertyValueAsDouble(
                                                                                       BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> cause) {
+            return;
+        }
+    }
+
+    void BatchService::sendStandardJobCallBackMessage(StandardJob *job) {
+        try {
+            S4U_Mailbox::putMessage(job->popCallbackMailbox(),
+                                    new ComputeServiceStandardJobFailedMessage(job, this, std::shared_ptr<FailureCause>(new ServiceIsDown(this)),
+                                                                               this->getPropertyValueAsDouble(
+                                                                                       BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {
             return;
         }
@@ -743,8 +754,6 @@ namespace wrench {
             WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
             return false;
         }
-
-
 
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());

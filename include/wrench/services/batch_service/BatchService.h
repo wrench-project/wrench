@@ -149,6 +149,9 @@ namespace wrench {
         //send call back to the pilot job submitters
         void sendPilotJobCallBackMessage(PilotJob* job);
 
+        //send call back to the standard job submitters
+        void sendStandardJobCallBackMessage(StandardJob*job);
+
     };
 }
 
