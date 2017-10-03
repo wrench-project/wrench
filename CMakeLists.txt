@@ -160,7 +160,7 @@ set(SOURCE_FILES
         src/wrench/services/batch_service/BatchService.cpp
         src/wrench/services/batch_service/BatchServiceProperty.cpp
         src/wrench/util/WorkflowUtil.cpp
-        )
+        src/wrench/services/helpers/Alarm.cpp src/wrench/services/helpers/Alarm.h)
 
 # test files
 set(TEST_FILES
@@ -186,6 +186,7 @@ set(TEST_FILES
 find_library(SIMGRID_LIBRARY NAMES simgrid)
 find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(LEMON_LIBRARY NAMES emon)
+find_library(GTEST_LIBRARY NAMES gtest)
 
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
@@ -196,7 +197,7 @@ install(DIRECTORY include/ DESTINATION include)
 
 # generate unit tests
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
-target_link_libraries(unit_tests -lgtest wrench -lpthread -lm)
+target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm)
 set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
 set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
 add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
