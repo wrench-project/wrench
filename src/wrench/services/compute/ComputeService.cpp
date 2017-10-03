@@ -30,52 +30,56 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief Submit a job to the compute service
-     * @param job: the job
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
-    void ComputeService::runJob(WorkflowJob *job) {
-
-      if (job == nullptr) {
-        throw std::invalid_argument("ComputeService::runJob(): invalid argument");
-      }
-
-      if (this->state == ComputeService::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
-
-      try {
-        switch (job->getType()) {
-          case WorkflowJob::STANDARD: {
-            this->submitStandardJob((StandardJob *) job);
-            break;
-          }
-          case WorkflowJob::PILOT: {
-            this->submitPilotJob((PilotJob *) job);
-            break;
-          }
-        }
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      } catch (std::runtime_error &e) {
-        throw;
-      }
-    }
+//    /**
+//     * @brief Submit a job to the compute service
+//     * @param job: the job
+//     *
+//     * @throw WorkflowExecutionException
+//     * @throw std::invalid_argument
+//     * @throw std::runtime_error
+//     */
+//    void ComputeService::runJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args) {
+//
+//      if (job == nullptr) {
+//        throw std::invalid_argument("ComputeService::runJob(): invalid argument");
+//      }
+//
+//      if (this->state == ComputeService::DOWN) {
+//        throw WorkflowExecutionException(new ServiceIsDown(this));
+//      }
+//
+//      try {
+//        switch (job->getType()) {
+//          case WorkflowJob::STANDARD: {
+//            this->submitStandardJob((StandardJob *) job, service_specific_args);
+//            break;
+//          }
+//          case WorkflowJob::PILOT: {
+//            this->submitPilotJob((PilotJob *) job, service_specific_args);
+//            break;
+//          }
+//        }
+//      } catch (WorkflowExecutionException &e) {
+//        throw;
+//      } catch (std::runtime_error &e) {
+//        throw;
+//      }
+//    }
 
     /**
      * @brief Submit a job to the batch service
      * @param job: the job
-     * @param batch_job_args: arguments to the batch job
+     * @param service_specific_arguments: arguments specific to a compute service:
+     * @param service_specific_args: arguments specific for compute services:
+     *      - to a multicore_compute_service: {}
+     *      - to a batch service: {"-t":"<int>","-n":"<int>","-N":"<int>","-c":"<int>"}
+     *      - to a cloud service: {}
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ComputeService::runJob(WorkflowJob *job, std::map<std::string, unsigned long> batch_job_args) {
+    void ComputeService::runJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args) {
 
       if (job == nullptr) {
         throw std::invalid_argument("ComputeService::runJob(): invalid argument");
@@ -88,11 +92,11 @@ namespace wrench {
       try {
         switch (job->getType()) {
           case WorkflowJob::STANDARD: {
-            this->submitStandardJob((StandardJob *) job, batch_job_args);
+            this->submitStandardJob((StandardJob *) job, service_specific_args);
             break;
           }
           case WorkflowJob::PILOT: {
-            this->submitPilotJob((PilotJob *) job, batch_job_args);
+            this->submitPilotJob((PilotJob *) job, service_specific_args);
             break;
           }
         }
@@ -259,50 +263,7 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Submit a standard job to the compute service
-     * @param job: a standard job
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
-    void ComputeService::submitStandardJob(StandardJob *job) {
 
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
-
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
-
-      //  send a "run a standard job" message to the daemon's mailbox
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new ComputeServiceSubmitStandardJobRequestMessage(
-                                        answer_mailbox, job,
-                                        this->getPropertyValueAsDouble(
-                                                ComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      // Get the answer
-      std::unique_ptr<SimulationMessage> message = nullptr;
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
-        // If no success, throw an exception
-        if (not msg->success) {
-          throw WorkflowExecutionException(msg->failure_cause);
-        }
-      } else {
-        throw std::runtime_error(
-                "ComputeService::submitStandardJob(): Received an unexpected [" + message->getName() + "] message!");
-      }
-    }
 
     /**
      * @brief Process a submit standard job request
@@ -345,20 +306,19 @@ namespace wrench {
     *
     * @throw std::runtime_error
     */
-    unsigned long
-    ComputeService::submitStandardJob(StandardJob *job, std::map<std::string, unsigned long> batch_job_args) {
+    void ComputeService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> service_specific_arguments) {
       throw std::runtime_error("ComputeService::submitStandardJob(): Not implemented here");
     }
 
-    /**
-     * @brief Submit a pilot job to the compute service (virtual)
-     * @param job: the job
-     *
-     * @throw std::runtime_error
-     */
-    void ComputeService::submitPilotJob(PilotJob *job) {
-      throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
-    }
+//    /**
+//     * @brief Submit a pilot job to the compute service (virtual)
+//     * @param job: the job
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void ComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> service_specific_arguments) {
+//      throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
+//    }
 
     /**
     * @brief Submit a pilot job to a batch service (virtual)
@@ -367,7 +327,7 @@ namespace wrench {
     *
     * @throw std::runtime_error
     */
-    unsigned long ComputeService::submitPilotJob(PilotJob *job, std::map<std::string, unsigned long> batch_job_args) {
+    void ComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> service_specific_arguments) {
       throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
     }
 

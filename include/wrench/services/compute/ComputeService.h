@@ -38,9 +38,9 @@ namespace wrench {
 
         void stop() override;
 
-        void runJob(WorkflowJob *job);
+//        void runJob(WorkflowJob *job);
 
-        void runJob(WorkflowJob *job, std::map<std::string, unsigned long> batch_job_args);
+        void runJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args = {});
 
         void terminateJob(WorkflowJob *job);
 
@@ -60,17 +60,15 @@ namespace wrench {
 
         StorageService *getDefaultStorageService();
 
-        virtual void submitStandardJob(StandardJob *job);
+        virtual void submitStandardJob(StandardJob *job, std::map<std::string, std::string> batch_job_args = {});
+
+        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> batch_job_args = {});
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual unsigned long submitStandardJob(StandardJob *job, std::map<std::string, unsigned long> batch_job_args);
 
-        virtual void submitPilotJob(PilotJob *job);
-
-        virtual unsigned long submitPilotJob(PilotJob *job, std::map<std::string, unsigned long> batch_job_args);
 
         virtual void terminateStandardJob(StandardJob *job);
 

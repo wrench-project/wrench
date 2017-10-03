@@ -15,7 +15,7 @@ DETAILS:
 
 DATA STORAGE IMPLEMENTATION:
 
-    - Make is so that the SimpleStorage Service overwrites files without complaining
+    [DONE] Make is so that the SimpleStorage Service overwrites files without complaining
       (Wasting time)...
 
     - Decide what to do about "partial failures"

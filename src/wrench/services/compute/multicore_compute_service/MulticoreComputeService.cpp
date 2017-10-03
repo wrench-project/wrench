@@ -24,6 +24,52 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_compute_service, "Log category for Multic
 namespace wrench {
 
     /**
+  * @brief Submit a standard job to the compute service
+  * @param job: a standard job
+  * @param service_specific_args: service specific arguments
+  *
+  * @throw WorkflowExecutionException
+  * @throw std::runtime_error
+  */
+    void MulticoreComputeService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> service_specific_args) {
+
+      if (this->state == Service::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
+
+      //  send a "run a standard job" message to the daemon's mailbox
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new ComputeServiceSubmitStandardJobRequestMessage(
+                                        answer_mailbox, job,
+                                        this->getPropertyValueAsDouble(
+                                                ComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      // Get the answer
+      std::unique_ptr<SimulationMessage> message = nullptr;
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+        // If no success, throw an exception
+        if (not msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        }
+      } else {
+        throw std::runtime_error(
+                "ComputeService::submitStandardJob(): Received an unexpected [" + message->getName() + "] message!");
+      }
+    }
+
+    /**
      * @brief Asynchronously submit a pilot job to the compute service
      *
      * @param job: a pilot job
@@ -31,7 +77,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void MulticoreComputeService::submitPilotJob(PilotJob *job) {
+    void MulticoreComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> service_specific_args = {}) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -62,6 +108,8 @@ namespace wrench {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
+        } else {
+          return;
         }
 
       } else {
@@ -69,6 +117,8 @@ namespace wrench {
                 "MulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
+
+
     }
 
     /**
