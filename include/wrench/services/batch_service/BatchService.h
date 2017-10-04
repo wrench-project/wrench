@@ -23,6 +23,7 @@
 #include "BatchJob.h"
 #include "BatchScheduler.h"
 #include <set>
+#include <wrench/services/helpers/Alarm.h>
 
 namespace wrench {
 
@@ -46,6 +47,8 @@ namespace wrench {
                  {BatchServiceProperty::SUBMIT_BATCH_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
                  {BatchServiceProperty::SUBMIT_BATCH_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
                  {BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
+                 {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,           "1024"},
+                 {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,           "FIRSTFIT"},
                  {BatchServiceProperty::JOB_SELECTION_ALGORITHM,           "FCFS"}
                 };
@@ -72,8 +75,13 @@ namespace wrench {
                      bool supports_pilot_jobs,
                      PilotJob* parent_job,
                      unsigned long reduced_cores,
+                     double ttl,bool has_ttl,
         std::map<std::string, std::string> plist,
         std::string suffix);
+
+        //to check if the batch service is actually a pilot job
+        bool has_ttl;
+        double ttl;
 
         //parent batch job (this is necessary for pilot jobs)
         PilotJob* parent_pilot_job;
@@ -81,6 +89,11 @@ namespace wrench {
         //Configuration to create randomness in measurement period initially
         unsigned long random_interval = 10;
 
+        //create alarms for standardjobs
+        std::vector<Alarm*> standard_job_alarms;
+
+        //alarms for pilot jobs (only one pilot job alarm)
+        std::vector<Alarm*> pilot_job_alarms;
 
         /* Resources information in Batchservice */
         unsigned long total_num_of_nodes;
@@ -108,7 +121,7 @@ namespace wrench {
         void submitPilotJob(PilotJob *job,std::map<std::string, std::string> batch_job_args) override;
 
         int main() override;
-        bool processNextMessage(double);
+        bool processNextMessage();
         bool dispatchNextPendingJob();
         void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
 
@@ -119,6 +132,7 @@ namespace wrench {
         void failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
         void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
         void terminateRunningStandardJob(StandardJob *job);
+        void terminatePilotJob(PilotJob* job) override ;
 
         std::set<std::pair<std::string,unsigned long>> scheduleOnHosts(std::string host_selection_algorithm,
                                                                        unsigned long, unsigned long);
@@ -137,6 +151,9 @@ namespace wrench {
         //Process standardjob timeout
         void processStandardJobTimeout(StandardJob* job);
 
+        //process pilot job termination request
+        void processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox);
+
         //Process standardjob timeout
         void processPilotJobTimeout(PilotJob* job);
 
@@ -144,7 +161,8 @@ namespace wrench {
         void notifyJobSubmitters(PilotJob* job);
 
         //update the resources
-        void udpateResources(std::set<std::pair<std::string,unsigned long>> resources);
+        void updateResources(std::set<std::pair<std::string,unsigned long>> resources);
+        void updateResources(StandardJob* job);
 
         //send call back to the pilot job submitters
         void sendPilotJobCallBackMessage(PilotJob* job);

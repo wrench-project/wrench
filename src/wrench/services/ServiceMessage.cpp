@@ -38,4 +38,17 @@ namespace wrench {
     ServiceDaemonStoppedMessage::ServiceDaemonStoppedMessage(double payload)
             : ServiceMessage("DAEMON_STOPPED", payload) {}
 
+
+    /**
+     * @brief Constructor
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_arguments
+     */
+    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(WorkflowJob* job,double payload)
+            : ServiceMessage("ALARM_STANDARD_JOB_TIMED_OUT", payload) {
+        this->job = job;
+    }
+
+
 };
