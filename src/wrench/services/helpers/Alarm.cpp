@@ -18,7 +18,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
 namespace wrench {
 
     Alarm::Alarm(double date, std::string hostname, std::string reply_mailbox_name,
-                 std::shared_ptr<SimulationMessage> msg, std::string suffix):Service("alarm_service"+suffix,"alarm_service"+suffix) {
+                 std::shared_ptr<SimulationMessage> msg, std::string suffix):Service("alarm_service_"+suffix,"alarm_service_"+suffix) {
 
         //it would be helpful to debug which service this alarm is for if we pass <compute_service_name> in the suffix=
         this->date = date;
@@ -30,7 +30,7 @@ namespace wrench {
         // Start the daemon on the same host
         try {
             WRENCH_INFO("Alarm Service starting...");
-            this->start(hostname);
+            this->start(hostname,true);
         } catch (std::invalid_argument e) {
             throw e;
         }
@@ -54,6 +54,11 @@ namespace wrench {
 
         WRENCH_INFO("Alarm Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
         return 0;
+    }
+
+    void Alarm::kill() {
+        //kill itself
+        this->kill_actor();
     }
 
 };

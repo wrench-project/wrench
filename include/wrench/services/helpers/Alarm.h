@@ -26,6 +26,8 @@ namespace wrench {
         Alarm(double date, std::string hostname, std::string reply_mailbox_name,
               std::shared_ptr<SimulationMessage> msg, std::string suffix);
 
+        void kill();
+
     private:
 
         double date;
