@@ -33,4 +33,17 @@ namespace wrench {
         this->job = job;
         this->answer_mailbox = answer_mailbox;
     }
+
+    /**
+     * @brief Constructor
+     * @param job: a workflow job
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_arguments
+     */
+    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(WorkflowJob* job,double payload)
+            : ServiceMessage("ALARM_JOB_TIMED_OUT", payload) {
+        this->job = job;
+    }
+
 }

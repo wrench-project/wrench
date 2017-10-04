@@ -34,6 +34,18 @@ namespace wrench{
         /** @brief The batch job */
         BatchJob *job;
     };
+
+    /**
+     * @brief AlarmJobTimeOutMessage class
+     */
+    class AlarmJobTimeOutMessage : public ServiceMessage {
+    public:
+        AlarmJobTimeOutMessage(WorkflowJob* job,double payload);
+        WorkflowJob* job;
+    };
+
+
+
 }
 
 

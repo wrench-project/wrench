@@ -16,7 +16,7 @@
 #include <string>
 #include <memory>
 #include <wrench/services/Service.h>
-#include "AlarmServiceProperty.h"
+#include <simulation/SimulationMessage.h>
 
 namespace wrench {
 
@@ -24,17 +24,13 @@ namespace wrench {
 
     public:
         Alarm(double date, std::string hostname, std::string reply_mailbox_name,
-              WorkflowJob* job, std::string suffix);
+              std::shared_ptr<SimulationMessage> msg, std::string suffix);
 
     private:
-        //private parameters
-        std::map<std::string, std::string> default_property_values =
-                {{AlarmServiceProperty::ALARM_TIMEOUT_MESSAGE_PAYLOAD,          "1024"}
-                };
 
         double date;
         std::string reply_mailbox_name;
-        WorkflowJob* job;
+        std::shared_ptr<SimulationMessage> msg;
 
         int main() override;
 

@@ -49,14 +49,6 @@ namespace wrench {
         ServiceDaemonStoppedMessage(double payload);
     };
 
-    /**
-     * @brief AlarmTimeOutMessage class
-     */
-    class AlarmJobTimeOutMessage : public ServiceMessage {
-    public:
-        AlarmJobTimeOutMessage(WorkflowJob* job,double payload);
-        WorkflowJob* job;
-    };
 
 
 
