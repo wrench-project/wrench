@@ -109,7 +109,7 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
 }
 
 TEST_F(WorkflowTest, WorkflowFile) {
-  EXPECT_THROW(workflow->addFile("file-error-00", 0), std::invalid_argument);
+  EXPECT_THROW(workflow->addFile("file-error-00", -1), std::invalid_argument);
   EXPECT_THROW(workflow->addFile("file-01", 10), std::invalid_argument);
 
   EXPECT_THROW(workflow->getWorkflowFileByID("file-nonexist"), std::invalid_argument);
