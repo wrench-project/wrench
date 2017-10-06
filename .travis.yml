@@ -124,7 +124,7 @@ before_install:
 install:
   # install SimGrid
   # cloning SimGrid from specific commit (temporary while using unstable SimGrid version)
-  - git clone git://scm.gforge.inria.fr/simgrid/simgrid.git
+  - git clone https://github.com/simgrid/simgrid.git
   - cd simgrid && git reset --hard a3bd734d0a2fdda1ef73434c529c938b773bb127 # Oct 5, 2017, 2:02 PM PDT
   - cmake . && make && sudo make install && cd ..
   # install Lemon
