@@ -112,7 +112,7 @@ namespace wrench {
      * @throw std::runtime_error
      *
      */
-    void BatchService::submitStandardJob(StandardJob *job,std::map<std::string, std::string> batch_job_args) {
+    void BatchService::submitStandardJob(StandardJob *job,std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -231,7 +231,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void BatchService::submitPilotJob(PilotJob *job,std::map<std::string,std::string> batch_job_args) {
+    void BatchService::submitPilotJob(PilotJob *job,std::map<std::string,std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));

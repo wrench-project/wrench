@@ -24,14 +24,15 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(multicore_compute_service, "Log category for Multic
 namespace wrench {
 
     /**
-  * @brief Submit a standard job to the compute service
-  * @param job: a standard job
-  * @param service_specific_args: service specific arguments
-  *
-  * @throw WorkflowExecutionException
-  * @throw std::runtime_error
-  */
-    void MulticoreComputeService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> service_specific_args) {
+     * @brief Submit a standard job to the compute service
+     * @param job: a standard job
+     * @param service_specific_args: service specific arguments
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void MulticoreComputeService::submitStandardJob(StandardJob *job,
+                                                    std::map<std::string, std::string> &service_specific_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -43,7 +44,7 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceSubmitStandardJobRequestMessage(
-                                        answer_mailbox, job,
+                                        answer_mailbox, job, service_specific_args,
                                         this->getPropertyValueAsDouble(
                                                 ComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -73,11 +74,13 @@ namespace wrench {
      * @brief Asynchronously submit a pilot job to the compute service
      *
      * @param job: a pilot job
+     * @param service_specific_args: service specific arguments
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void MulticoreComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> service_specific_args = {}) {
+    void
+    MulticoreComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -87,11 +90,12 @@ namespace wrench {
 
       // Send a "run a pilot job" message to the daemon's mailbox
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new ComputeServiceSubmitPilotJobRequestMessage(answer_mailbox, job,
-                                                                               this->getPropertyValueAsDouble(
-                                                                                       MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+        S4U_Mailbox::putMessage(
+                this->mailbox_name,
+                new ComputeServiceSubmitPilotJobRequestMessage(
+                        answer_mailbox, job, this->getPropertyValueAsDouble(
+                                MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -100,11 +104,11 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
-      if (ComputeServiceSubmitPilotJobAnswerMessage *msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
+      if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -117,8 +121,6 @@ namespace wrench {
                 "MulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
-
-
     }
 
     /**
@@ -186,7 +188,7 @@ namespace wrench {
                                          answer_mailbox,
                                          this->getPropertyValueAsDouble(
                                                  MulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -194,11 +196,11 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
-      if (MulticoreComputeServiceFlopRateAnswerMessage *msg = dynamic_cast<MulticoreComputeServiceFlopRateAnswerMessage *>(message.get())) {
+      if (auto *msg = dynamic_cast<MulticoreComputeServiceFlopRateAnswerMessage *>(message.get())) {
         return msg->flop_rate;
       } else {
         throw std::runtime_error(
@@ -476,7 +478,7 @@ namespace wrench {
         return false;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
-        processSubmitStandardJob(msg->answer_mailbox, msg->job);
+        processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
@@ -1144,10 +1146,12 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param job: the job
+     * @param service_specific_args: service specific arguments
      *
      * @throw std::runtime_error
      */
-    void MulticoreComputeService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job) {
+    void MulticoreComputeService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+                                                           std::map<std::string, std::string> &service_specific_arguments) {
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
       if (not this->supportsStandardJobs()) {
         try {

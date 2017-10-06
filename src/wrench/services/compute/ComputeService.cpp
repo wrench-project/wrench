@@ -263,17 +263,40 @@ namespace wrench {
       }
     }
 
+    /**
+     * @brief Submit a standard job to a batch service (virtual)
+     * @param job: the job
+     * @param service_specific_arguments: arguments specific for the compute service
+     *
+     * @throw std::runtime_error
+     */
+    void ComputeService::submitStandardJob(StandardJob *job,
+                                           std::map<std::string, std::string> &service_specific_arguments) {
+      throw std::runtime_error("ComputeService::submitStandardJob(): Not implemented here");
+    }
 
+    /**
+    * @brief Submit a pilot job to a batch service (virtual)
+    * @param job: the job
+    * @param service_specific_arguments: arguments specific for the compute service
+    *
+    * @throw std::runtime_error
+    */
+    void ComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) {
+      throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
+    }
 
     /**
      * @brief Process a submit standard job request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param job: the job
+     * @param service_specific_arguments: arguments specific for the compute service
      *
      * @throw std::runtime_error
      */
-    void ComputeService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job) {
+    void ComputeService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+                                                  std::map<std::string, std::string> &service_specific_args) {
       throw std::runtime_error("ComputeService::processSubmitStandardJob(): Not implemented here");
     }
 
@@ -297,38 +320,6 @@ namespace wrench {
      */
     void ComputeService::processGetNumIdleCores(std::string &answer_mailbox) {
       throw std::runtime_error("ComputeService::processGetNumIdleCores(): Not implemented here");
-    }
-
-    /**
-    * @brief Submit a standard job to a batch service (virtual)
-    * @param job: the job
-    * @param batch_job_args: arguments to the batch job
-    *
-    * @throw std::runtime_error
-    */
-    void ComputeService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> service_specific_arguments) {
-      throw std::runtime_error("ComputeService::submitStandardJob(): Not implemented here");
-    }
-
-//    /**
-//     * @brief Submit a pilot job to the compute service (virtual)
-//     * @param job: the job
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void ComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> service_specific_arguments) {
-//      throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
-//    }
-
-    /**
-    * @brief Submit a pilot job to a batch service (virtual)
-    * @param job: the job
-    * @param batch_job_args: arguments to the batch job
-    *
-    * @throw std::runtime_error
-    */
-    void ComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> service_specific_arguments) {
-      throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
     }
 
     /**

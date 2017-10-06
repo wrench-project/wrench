@@ -49,7 +49,7 @@ namespace wrench {
                                        const std::set<ComputeService *> &compute_services) {
 
       if (compute_services.find(cloud_service) == compute_services.end()) {
-        throw std::runtime_error("The provided cloud service is not listed as a compute service.");
+        throw std::runtime_error("The default cloud service is not listed as a compute service.");
       }
       auto *cs = (CloudService *) this->cloud_service;
 
