@@ -31,11 +31,6 @@ DETAILS:
 
 MULTICORECOMPUTESERVICE:
     - Add Tests
-    - Rename
-    - Propagate
-    - Add properties to the MultiCore compute service that corresponds to the
-      underlying properties of the StandardJobExecutors it will use
-            - Make sure those properties are passed
 
 -----------------------------------
 

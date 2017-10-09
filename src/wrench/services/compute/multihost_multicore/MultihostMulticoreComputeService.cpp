@@ -560,7 +560,6 @@ namespace wrench {
                {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}});
 
 
-
       this->standard_job_executors.insert(executor);
       this->running_jobs.insert(job);
 
