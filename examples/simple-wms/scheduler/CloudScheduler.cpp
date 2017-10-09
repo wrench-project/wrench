@@ -76,7 +76,7 @@ namespace wrench {
           try {
             std::string vm_host = "vm" + std::to_string(VM_ID++) + "_" + execution_hosts[0];
 
-            cs->createVM(execution_hosts[0], vm_host, job->getNumCores());
+            cs->createVM(execution_hosts[0], vm_host, ((StandardJob *)(job))->getMinimumRequiredNumCores());
 
           } catch (WorkflowExecutionException &e) {
             //TODO launch error

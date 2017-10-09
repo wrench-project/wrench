@@ -68,7 +68,7 @@ namespace wrench {
      */
     bool CloudService::createVM(const std::string &pm_hostname,
                                 const std::string &vm_hostname,
-                                int num_cores,
+                                unsigned long num_cores,
                                 std::map<std::string, std::string> plist) {
 
       if (this->state == Service::DOWN) {
