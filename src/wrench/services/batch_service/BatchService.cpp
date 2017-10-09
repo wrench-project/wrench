@@ -92,12 +92,6 @@ namespace wrench {
       this->has_ttl = has_ttl;
       this->ttl = ttl;
 
-      if(this->has_ttl){
-        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new AlarmJobTimeOutMessage(this->parent_pilot_job, 0));
-
-        this->pilot_job_alarms.push_back(std::move(new Alarm(this->ttl,this->hostname,this->mailbox_name, msg,"batch_pilot")));
-      }
-
       this->generateUniqueJobId();
 
       // Start the daemon on the same host
@@ -118,7 +112,7 @@ namespace wrench {
      * @throw std::runtime_error
      *
      */
-    void BatchService::submitStandardJob(StandardJob *job,std::map<std::string, std::string> batch_job_args) {
+    void BatchService::submitStandardJob(StandardJob *job,std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -237,7 +231,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void BatchService::submitPilotJob(PilotJob *job,std::map<std::string,std::string> batch_job_args) {
+    void BatchService::submitPilotJob(PilotJob *job,std::map<std::string,std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -721,6 +715,9 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
           }
 
+            std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new AlarmJobTimeOutMessage(job, 0));
+            this->pilot_job_alarms.push_back(std::move(new Alarm(batch_job->getEndingTimeStamp(),host_to_run_on,cs->mailbox_name, msg,"batch_pilot")));
+
           // Push my own mailbox onto the pilot job!
           job->pushCallbackMailbox(this->mailbox_name);
 
@@ -829,10 +826,18 @@ namespace wrench {
       WRENCH_INFO("Failing current standard jobs");
       this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
 
-      //remove standard job alarms
+      //kill and then remove standard job alarms
+        for (auto sj_alarm: this->standard_job_alarms){
+            WRENCH_INFO("Killing the standard job alarms");
+            sj_alarm->kill();
+        }
       this->standard_job_alarms.clear();
 
-      //remove pilot job alarms
+      //kill and then remove pilot job alarms
+        for (auto pj_alarm: this->pilot_job_alarms){
+            WRENCH_INFO("Killing the pilot job alarms");
+            pj_alarm->kill();
+        }
       this->pilot_job_alarms.clear();
 
       if(this->supports_pilot_jobs){

@@ -50,11 +50,13 @@ namespace wrench {
     * @throw std::invalid_arguments
     */
     ComputeServiceSubmitStandardJobRequestMessage::ComputeServiceSubmitStandardJobRequestMessage(
-            std::string answer_mailbox,
+            std::string &answer_mailbox,
             StandardJob *job,
+            std::map<std::string, std::string> &service_specific_args,
             double payload) :
-            ComputeServiceMessage("SUBMIT_STANDARD_JOB_REQUEST", payload) {
-      if ((answer_mailbox == "") || (job == nullptr)) {
+            ComputeServiceMessage("SUBMIT_STANDARD_JOB_REQUEST", payload),
+            service_specific_args(service_specific_args) {
+      if ((answer_mailbox.empty()) || (job == nullptr)) {
         throw std::invalid_argument(
                 "ComputeServiceSubmitStandardJobRequestMessage::ComputeServiceSubmitStandardJobRequestMessage(): Invalid arguments");
       }

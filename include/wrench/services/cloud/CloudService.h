@@ -59,6 +59,11 @@ namespace wrench {
                       int num_cores,
                       std::map<std::string, std::string> plist = {});
 
+        // Running jobs
+        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
+
+        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
+
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -82,13 +87,13 @@ namespace wrench {
                              bool supports_pilot_jobs,
                              std::map<std::string, std::string> plist);
 
-        void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job) override;
+        void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+                                      std::map<std::string, std::string> &service_specific_args) override;
 
         void terminate();
 
-        std::map<std::string, simgrid::s4u::VirtualMachine *> vm_list;
-
-        std::map<std::string, std::unique_ptr<ComputeService>> cs_list;
+        /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
+        std::map<std::string, std::tuple<simgrid::s4u::VirtualMachine *, std::unique_ptr<ComputeService>, int>> vm_list;
     };
 
 }

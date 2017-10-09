@@ -32,13 +32,13 @@ namespace wrench {
         Alarm(double date, std::string hostname, std::string reply_mailbox_name,
               std::shared_ptr<SimulationMessage> msg, std::string suffix);
 
-            private:
-
         double date;
         std::string reply_mailbox_name;
         std::shared_ptr<SimulationMessage> msg;
 
         int main() override;
+
+        void kill();
 
     };
 
@@ -46,7 +46,7 @@ namespace wrench {
     /** \endcond           */
     /***********************/
 
-};
+}
 
 
 #endif //WRENCH_ALARM_H

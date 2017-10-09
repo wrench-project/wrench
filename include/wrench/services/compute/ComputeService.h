@@ -60,15 +60,14 @@ namespace wrench {
 
         StorageService *getDefaultStorageService();
 
-        virtual void submitStandardJob(StandardJob *job, std::map<std::string, std::string> batch_job_args = {});
+        virtual void
+        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments);
 
-        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> batch_job_args = {});
+        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments);
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
-
-
 
         virtual void terminateStandardJob(StandardJob *job);
 
@@ -86,7 +85,8 @@ namespace wrench {
 
         virtual void processGetNumIdleCores(std::string &answer_mailbox);
 
-        virtual void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job);
+        virtual void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+                                              std::map<std::string, std::string> &service_specific_args);
 
         /** @brief Whether the compute service supports pilot jobs */
         bool supports_pilot_jobs;

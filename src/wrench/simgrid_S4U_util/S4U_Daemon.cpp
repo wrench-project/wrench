@@ -43,7 +43,7 @@ namespace wrench {
      *
      * @param hostname: the name of the host on which to start the daemon
      */
-    void S4U_Daemon::start(std::string hostname) {
+    void S4U_Daemon::start(std::string hostname, bool daemonized) {
 
       // Check that the host exists, and if not throw an exceptions
       if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
@@ -59,6 +59,8 @@ namespace wrench {
         // Some internal SimGrid exceptions...
         std::abort();
       }
+        if(daemonized)
+        this->s4u_actor->daemonize();
 
       // Set the mailbox receiver
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);

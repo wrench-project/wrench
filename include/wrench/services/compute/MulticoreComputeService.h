@@ -81,8 +81,9 @@ namespace wrench {
         /***********************/
 
         // Running jobs
-        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> service_specific_args) override;
-        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> service_specific_args) override;
+        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
+
+        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
         // Terminating jobs
         void terminateStandardJob(StandardJob *job) override;
@@ -185,7 +186,8 @@ namespace wrench {
 
         void processGetNumIdleCores(std::string &answer_mailbox) override;
 
-        void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job) override;
+        void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+                                      std::map<std::string, std::string> &service_specific_arguments) override;
     };
 };
 

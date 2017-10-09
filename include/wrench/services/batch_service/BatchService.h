@@ -114,11 +114,11 @@ namespace wrench {
 
         //submits the standard job
         //overriden function of parent Compute Service
-        void submitStandardJob(StandardJob *job,std::map<std::string, std::string> batch_job_args) override;
+        void submitStandardJob(StandardJob *job,std::map<std::string, std::string> &batch_job_args) override;
 
         //submits the standard job
         //overriden function of parent Compute Service
-        void submitPilotJob(PilotJob *job,std::map<std::string, std::string> batch_job_args) override;
+        void submitPilotJob(PilotJob *job,std::map<std::string, std::string> &batch_job_args) override;
 
         int main() override;
         bool processNextMessage();

@@ -51,12 +51,16 @@ namespace wrench {
      */
     class ComputeServiceSubmitStandardJobRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceSubmitStandardJobRequestMessage(std::string answer_mailbox, StandardJob *, double payload);
+        ComputeServiceSubmitStandardJobRequestMessage(std::string &answer_mailbox, StandardJob *,
+                                                      std::map<std::string, std::string> &service_specific_args,
+                                                      double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The submitted job */
         StandardJob *job;
+        /** @brief Service specific arguments */
+        std::map<std::string, std::string> service_specific_args;
     };
 
     /**

@@ -106,6 +106,104 @@ namespace wrench {
     }
 
     /**
+     * @brief Submit a standard job to the cloud service
+     *
+     * @param job: a standard job
+     * @param service_specific_args: service specific arguments
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void CloudService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) {
+
+      if (this->state == Service::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
+
+      //  send a "run a standard job" message to the daemon's mailbox
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new ComputeServiceSubmitStandardJobRequestMessage(
+                                        answer_mailbox, job, service_specific_args,
+                                        this->getPropertyValueAsDouble(
+                                                ComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      // Get the answer
+      std::unique_ptr<SimulationMessage> message = nullptr;
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+        // If no success, throw an exception
+        if (not msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        }
+      } else {
+        throw std::runtime_error(
+                "ComputeService::submitStandardJob(): Received an unexpected [" + message->getName() + "] message!");
+      }
+    }
+
+    /**
+     * @brief Asynchronously submit a pilot job to the cloud service
+     *
+     * @param job: a pilot job
+     * @param service_specific_args: service specific arguments
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void CloudService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
+
+      if (this->state == Service::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
+
+      // Send a "run a pilot job" message to the daemon's mailbox
+      try {
+        S4U_Mailbox::putMessage(
+                this->mailbox_name,
+                new ComputeServiceSubmitPilotJobRequestMessage(
+                        answer_mailbox, job, this->getPropertyValueAsDouble(
+                                CloudServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      // Wait for a reply
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
+        // If no success, throw an exception
+        if (not msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        } else {
+          return;
+        }
+
+      } else {
+        throw std::runtime_error(
+                "CloudService::submitPilotJob(): Received an unexpected [" + message->getName() + "] message!");
+      }
+    }
+
+    /**
     * @brief Main method of the daemon
     *
     * @return 0 on termination
@@ -176,7 +274,7 @@ namespace wrench {
         return true;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
-        processSubmitStandardJob(msg->answer_mailbox, msg->job);
+        processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
 
       } else if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
@@ -225,15 +323,19 @@ namespace wrench {
           if (num_cores <= 0) {
             num_cores = S4U_Simulation::getNumCores(hostname);
           }
-          this->vm_list[vm_hostname] = new simgrid::s4u::VirtualMachine(vm_hostname.c_str(),
-                                                                        simgrid::s4u::Host::by_name(
-                                                                                pm_hostname), num_cores);
+
+          simgrid::s4u::VirtualMachine *vm = new simgrid::s4u::VirtualMachine(vm_hostname.c_str(),
+                                                                              simgrid::s4u::Host::by_name(
+                                                                                      pm_hostname), num_cores);
+
           // create a multicore executor for the VM
-          this->cs_list[vm_hostname] = std::unique_ptr<ComputeService>(
-                  new MulticoreComputeService(vm_hostname, supports_standard_jobs, supports_pilot_jobs,
-                                              {std::pair<std::string, unsigned long>(vm_hostname, num_cores)},
-                                              default_storage_service, plist));
-          this->cs_list[vm_hostname]->setSimulation(this->simulation);
+          std::unique_ptr<ComputeService> cs(new MulticoreComputeService(vm_hostname, supports_standard_jobs,
+                                                                         supports_pilot_jobs,
+									  {std::pair<std::string, unsigned long>(vm_hostname, num_cores)},
+                                                                         default_storage_service, plist));
+          cs->setSimulation(this->simulation);
+
+          this->vm_list[vm_hostname] = std::make_tuple(vm, std::move(cs), num_cores);
 
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
@@ -261,8 +363,9 @@ namespace wrench {
      */
     void CloudService::processGetNumCores(std::string &answer_mailbox) {
       unsigned int total_num_cores = 0;
-      for (auto &cs : this->cs_list) {
-        total_num_cores += cs.second->getNumCores();
+
+      for (auto &vm : this->vm_list) {
+        total_num_cores += std::get<2>(vm.second);
       }
 
       ComputeServiceNumCoresAnswerMessage *answer_message = new ComputeServiceNumCoresAnswerMessage(
@@ -285,8 +388,8 @@ namespace wrench {
      */
     void CloudService::processGetNumIdleCores(std::string &answer_mailbox) {
       unsigned int total_num_available_cores = 0;
-      for (auto &cs : this->cs_list) {
-        total_num_available_cores += cs.second->getNumIdleCores();
+      for (auto &vm : this->vm_list) {
+        total_num_available_cores += std::get<1>(vm.second)->getNumIdleCores();
       }
 
       ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
@@ -305,10 +408,12 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param job: the job
+     * @param service_specific_args: service specific arguments
      *
      * @throw std::runtime_error
      */
-    void CloudService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job) {
+    void CloudService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+                                                std::map<std::string, std::string> &service_specific_args) {
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
       if (not this->supportsStandardJobs()) {
         try {
@@ -324,9 +429,10 @@ namespace wrench {
         return;
       }
 
-      for (auto &cs : cs_list) {
-        if (cs.second->getNumIdleCores() >= job->getMinimumRequiredNumCores()) {
-          cs.second->submitStandardJob(job);
+      for (auto &vm : vm_list) {
+        ComputeService *cs = std::get<1>(vm.second).get();
+        if (std::get<2>(vm.second) >= job->getMinimumRequiredNumCores() && cs->getNumIdleCores() >= job->getMinimumRequiredNumCores()) {
+          cs->submitStandardJob(job, service_specific_args);
           try {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
@@ -360,8 +466,8 @@ namespace wrench {
       this->setStateToDown();
 
       WRENCH_INFO("Stopping VMs Compute Service");
-      for (auto &cs : this->cs_list) {
-        cs.second->stop();
+      for (auto &vm : this->vm_list) {
+        std::get<1>(vm.second)->stop();
       }
     }
 }
