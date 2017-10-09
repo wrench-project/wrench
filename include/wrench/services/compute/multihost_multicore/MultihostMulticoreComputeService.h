@@ -62,8 +62,12 @@ namespace wrench {
                 {MultihostMulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD,               "1024"},
                 {MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                        "0.0"},
                 {MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                           "FCFS"},
-                {MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                     "aggressive"}
+                {MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                     "aggressive"},
+                {MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM,      "maximum"},
+                {MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM,       "maximum_flops"},
+                {MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM,       "best_fit"},
         };
+
 
     public:
 

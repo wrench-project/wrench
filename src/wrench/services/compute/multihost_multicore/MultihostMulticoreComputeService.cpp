@@ -554,8 +554,12 @@ namespace wrench {
               job,
               compute_resources,
               this->default_storage_service,
-              {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
-                       this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)}});
+              {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
+               {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM)},
+               {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM, this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM)},
+               {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}});
+
+
 
       this->standard_job_executors.insert(executor);
       this->running_jobs.insert(job);
