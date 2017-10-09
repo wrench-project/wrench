@@ -515,7 +515,7 @@ namespace wrench {
         }
       }
       if (executor == nullptr) {
-        throw std::runtime_error("MulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
+        throw std::runtime_error("MultihostMulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
       }
 
       // Terminate the executor
@@ -811,7 +811,7 @@ namespace wrench {
 
       } else {
         throw std::runtime_error(
-                "MulticoreComputeService::terminatePilotJob(): Received an unexpected [" + message->getName() +
+                "MultihostMulticoreComputeService::terminatePilotJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
     }
@@ -906,7 +906,7 @@ namespace wrench {
         }
         return false;
 
-      }else if (BatchServiceJobRequestMessage *msg = dynamic_cast<BatchServiceJobRequestMessage *>(message.get())) {
+      } else if (BatchServiceJobRequestMessage *msg = dynamic_cast<BatchServiceJobRequestMessage *>(message.get())) {
         WRENCH_INFO("Asked to run a batch job using batchservice with jobid %ld",msg->job->getJobID());
         if (msg->job->getWorkflowJob()->getType()==WorkflowJob::STANDARD) {
           if (not this->supports_standard_jobs) {
@@ -925,7 +925,7 @@ namespace wrench {
             }
             return true;
           }
-        }else if(msg->job->getWorkflowJob()->getType()==WorkflowJob::PILOT){
+        } else if(msg->job->getWorkflowJob()->getType()==WorkflowJob::PILOT){
           if (not this->supports_pilot_jobs) {
             try {
               S4U_Mailbox::dputMessage(msg->answer_mailbox,
@@ -1004,6 +1004,7 @@ namespace wrench {
         throw std::runtime_error(
                 "BatchService::waitForNextMessage(): Unknown message type: " + std::to_string(message->payload));
       }
+
     }
 
 
@@ -1178,7 +1179,7 @@ namespace wrench {
 
       // Remove the executor from the executor list
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
-        throw std::runtime_error("MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
+        throw std::runtime_error("MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
       this->standard_job_executors.erase(executor);
 

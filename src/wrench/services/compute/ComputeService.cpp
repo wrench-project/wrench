@@ -259,7 +259,7 @@ namespace wrench {
         return msg->num_idle_cores;
       } else {
         throw std::runtime_error(
-                "MulticoreComputeService::getNumIdleCores(): unexpected [" + msg->getName() + "] message");
+                "MultihostMulticoreComputeService::getNumIdleCores(): unexpected [" + msg->getName() + "] message");
       }
     }
 

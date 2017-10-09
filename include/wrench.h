@@ -14,8 +14,8 @@
 #include "wrench/workflow/Workflow.h"
 
 // Services and Service Properties
-#include "wrench/services/compute/multihost_multicore/MulticoreComputeService.h"
-#include "wrench/services/compute/multihost_multicore/MulticoreComputeServiceProperty.h"
+#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
+#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h"
 #include "wrench/services/storage/SimpleStorageService.h"
 #include "wrench/services/storage/SimpleStorageServiceProperty.h"
 #include "wrench/services/file_registry/FileRegistryService.h"

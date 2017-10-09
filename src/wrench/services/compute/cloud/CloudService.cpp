@@ -9,7 +9,7 @@
  */
 
 #include "wrench/services/compute/cloud/CloudService.h"
-#include "wrench/services/compute/multihost_multicore/MulticoreComputeService.h"
+#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
 #include "wrench/services/storage/SimpleStorageService.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
@@ -329,7 +329,7 @@ namespace wrench {
                                                                                       pm_hostname), num_cores);
 
           // create a multicore executor for the VM
-          std::unique_ptr<ComputeService> cs(new MulticoreComputeService(vm_hostname, supports_standard_jobs,
+          std::unique_ptr<ComputeService> cs(new MultihostMulticoreComputeService(vm_hostname, supports_standard_jobs,
                                                                          supports_pilot_jobs,
 									  {std::pair<std::string, unsigned long>(vm_hostname, num_cores)},
                                                                          default_storage_service, plist));
@@ -395,7 +395,7 @@ namespace wrench {
       ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
               total_num_available_cores,
               this->getPropertyValueAsDouble(
-                      MulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
+                      MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {

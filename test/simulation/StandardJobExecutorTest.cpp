@@ -232,8 +232,8 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       nullptr,
                                                       {}))));
@@ -394,8 +394,8 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskNotEnoughCoresTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       nullptr,
                                                       {}))));
@@ -581,8 +581,8 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       nullptr,
                                                       {}))));
@@ -764,8 +764,8 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       nullptr,
                                                       {}))));
@@ -1062,8 +1062,8 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       nullptr,
                                                       {}))));
@@ -1414,8 +1414,8 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       nullptr,
                                                       {}))));
@@ -1688,8 +1688,8 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       nullptr,
                                                       {}))));
@@ -1851,8 +1851,8 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService("Host3", true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService("Host3", true, true,
                                                       {std::pair<std::string, unsigned long>("Host3",0)},
                                                       nullptr,
                                                       {}))));
@@ -2015,8 +2015,8 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService("Host3", true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService("Host3", true, true,
                                                       {std::pair<std::string, unsigned long>("Host3",0)},
                                                       nullptr,
                                                       {}))));
@@ -2191,8 +2191,8 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService("Host3", true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService("Host3", true, true,
                                                       {std::pair<std::string, unsigned long>("Host3",0)},
                                                       nullptr,
                                                       {}))));

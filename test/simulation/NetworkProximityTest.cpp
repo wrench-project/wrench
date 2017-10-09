@@ -148,8 +148,8 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       nullptr,
                                                       {}))));

@@ -175,8 +175,8 @@ void MulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, false,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, false,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       storage_service, {}))));
 
@@ -349,8 +349,8 @@ void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitForExpirat
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       storage_service, {}))));
 
@@ -505,8 +505,8 @@ void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutdownServic
   // Create a Compute Service
 
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       storage_service, {}))));
 
@@ -620,8 +620,8 @@ void MulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermination_te
   // Create a Compute Service
 
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       storage_service, {}))));
 
@@ -783,8 +783,8 @@ void MulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_test() {
   // Create a Compute Service
 
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       storage_service, {}))));
 
@@ -953,8 +953,8 @@ void MulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTermination_test() 
   // Create a Compute Service
 
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true,
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                       {std::pair<std::string, unsigned long>(hostname,0)},
                                                       storage_service, {}))));
 

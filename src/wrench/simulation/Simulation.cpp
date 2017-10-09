@@ -12,7 +12,7 @@
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/Service.h"
-#include "wrench/services/compute/multihost_multicore/MulticoreComputeService.h"
+#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"

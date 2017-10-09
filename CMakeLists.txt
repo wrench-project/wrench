@@ -57,8 +57,8 @@ set(HEADER_FILES
         include/wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h
-        include/wrench/services/compute/multihost_multicore/MulticoreComputeService.h
-        include/wrench/services/compute/multihost_multicore/MulticoreComputeServiceProperty.h
+        include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h
+        include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h
         include/wrench/services/compute/cloud/CloudService.h
         include/wrench/services/compute/cloud/CloudServiceProperty.h
         include/wrench/services/storage/StorageService.h
@@ -104,7 +104,7 @@ set(SOURCE_FILES
         src/wrench/wms/WMS.cpp
         src/wrench/wms/Scheduler.cpp
         src/wrench/services/compute/ComputeService.cpp
-        src/wrench/services/compute/multihost_multicore/MulticoreComputeService.cpp
+        src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.cpp
         src/wrench/workflow/job/PilotJob.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/simulation/Simulation.cpp
@@ -122,7 +122,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/ComputeServiceProperty.cpp
         src/wrench/services/storage/StorageServiceProperty.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
-        src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceProperty.cpp
+        src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.cpp
         src/wrench/services/storage/simple_storage/SimpleStorageServiceProperty.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp

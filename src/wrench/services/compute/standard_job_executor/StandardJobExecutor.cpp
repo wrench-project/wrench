@@ -437,7 +437,7 @@ namespace wrench {
             // Make the child ready!
             if (this->non_ready_workunits.find(child) == this->non_ready_workunits.end()) {
               throw std::runtime_error(
-                      "MulticoreComputeService::processWorkCompletion(): can't find non-ready child in non-ready set!");
+                      "MultihostMulticoreComputeService::processWorkCompletion(): can't find non-ready child in non-ready set!");
             }
             this->non_ready_workunits.erase(child);
             this->ready_workunits.insert(child);

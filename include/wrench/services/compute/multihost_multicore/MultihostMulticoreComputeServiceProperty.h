@@ -20,7 +20,7 @@ namespace wrench {
    /**
     * @brief Properties for a MulticoreComputeService
     */
-    class MulticoreComputeServiceProperty : public ComputeServiceProperty {
+    class MultihostMulticoreComputeServiceProperty : public ComputeServiceProperty {
 
     public:
 

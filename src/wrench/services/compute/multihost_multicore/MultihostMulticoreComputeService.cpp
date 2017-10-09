@@ -16,7 +16,7 @@
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/multihost_multicore/MulticoreComputeService.h"
+#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/workflow/job/PilotJob.h"
@@ -34,7 +34,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void MulticoreComputeService::submitStandardJob(StandardJob *job,
+    void MultihostMulticoreComputeService::submitStandardJob(StandardJob *job,
                                                     std::map<std::string, std::string> &service_specific_args) {
 
       if (this->state == Service::DOWN) {
@@ -83,7 +83,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void
-    MulticoreComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
+    MultihostMulticoreComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -97,7 +97,7 @@ namespace wrench {
                 this->mailbox_name,
                 new ComputeServiceSubmitPilotJobRequestMessage(
                         answer_mailbox, job, this->getPropertyValueAsDouble(
-                                MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -121,7 +121,7 @@ namespace wrench {
 
       } else {
         throw std::runtime_error(
-                "MulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
+                "MultihostMulticoreComputeService::submitPilotJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
     }
@@ -134,7 +134,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    double MulticoreComputeService::getTTL() {
+    double MultihostMulticoreComputeService::getTTL() {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -148,7 +148,7 @@ namespace wrench {
                                  new MulticoreComputeServiceTTLRequestMessage(
                                          answer_mailbox,
                                          this->getPropertyValueAsDouble(
-                                                 MulticoreComputeServiceProperty::TTL_REQUEST_MESSAGE_PAYLOAD)));
+                                                 MultihostMulticoreComputeServiceProperty::TTL_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -165,7 +165,7 @@ namespace wrench {
       if (MulticoreComputeServiceTTLAnswerMessage *msg = dynamic_cast<MulticoreComputeServiceTTLAnswerMessage *>(message.get())) {
         return msg->ttl;
       } else {
-        throw std::runtime_error("MulticoreComputeService::getTTL(): Unexpected [" + msg->getName() + "] message");
+        throw std::runtime_error("MultihostMulticoreComputeService::getTTL(): Unexpected [" + msg->getName() + "] message");
       }
     }
 
@@ -177,7 +177,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    double MulticoreComputeService::getCoreFlopRate() {
+    double MultihostMulticoreComputeService::getCoreFlopRate() {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -190,7 +190,7 @@ namespace wrench {
                                  new MulticoreComputeServiceFlopRateRequestMessage(
                                          answer_mailbox,
                                          this->getPropertyValueAsDouble(
-                                                 MulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD)));
+                                                 MultihostMulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -207,7 +207,7 @@ namespace wrench {
         return msg->flop_rate;
       } else {
         throw std::runtime_error(
-                "MulticoreComputeService::getCoreFLopRate(): unexpected [" + msg->getName() + "] message");
+                "MultihostMulticoreComputeService::getCoreFLopRate(): unexpected [" + msg->getName() + "] message");
       }
     }
 
@@ -224,13 +224,13 @@ namespace wrench {
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list
      */
-    MulticoreComputeService::MulticoreComputeService(std::string hostname,
+    MultihostMulticoreComputeService::MultihostMulticoreComputeService(std::string hostname,
                                                      bool supports_standard_jobs,
                                                      bool supports_pilot_jobs,
                                                      std::set<std::pair<std::string, unsigned long>> compute_resources,
                                                      StorageService *default_storage_service,
                                                      std::map<std::string, std::string> plist) :
-            MulticoreComputeService::MulticoreComputeService(hostname,
+            MultihostMulticoreComputeService::MultihostMulticoreComputeService(hostname,
                                                              supports_standard_jobs,
                                                              supports_pilot_jobs,
                                                              compute_resources,
@@ -257,7 +257,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MulticoreComputeService::MulticoreComputeService(
+    MultihostMulticoreComputeService::MultihostMulticoreComputeService(
             std::string hostname,
             bool supports_standard_jobs,
             bool supports_pilot_jobs,
@@ -287,7 +287,7 @@ namespace wrench {
           requested_cores = available_cores;
         }
         if (requested_cores > available_cores) {
-          throw std::invalid_argument("MulticoreComputeService::MulticoreComputeService(): host " + hname + "only has " +
+          throw std::invalid_argument("MultihostMulticoreComputeService::MultihostMulticoreComputeService(): host " + hname + "only has " +
                                       std::to_string(available_cores) + " but " +
                                       std::to_string(requested_cores) + " are requested");
         }
@@ -319,7 +319,7 @@ namespace wrench {
  *
  * @return 0 on termination
  */
-    int MulticoreComputeService::main() {
+    int MultihostMulticoreComputeService::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
 
@@ -352,7 +352,7 @@ namespace wrench {
  * @brief Dispatch one pending job, if possible
  * @return true if a job was dispatched, false otherwise
  */
-    bool MulticoreComputeService::dispatchNextPendingJob() {
+    bool MultihostMulticoreComputeService::dispatchNextPendingJob() {
 
       WRENCH_INFO("IN DISPATCH");
       if (this->pending_jobs.size() == 0) {
@@ -362,12 +362,12 @@ namespace wrench {
       WorkflowJob *picked_job = nullptr;
 
       std::string job_selection_policy =
-              this->getPropertyValueAsString(MulticoreComputeServiceProperty::JOB_SELECTION_POLICY);
+              this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY);
       if (job_selection_policy == "FCFS") {
         picked_job = this->pending_jobs.front();
       } else {
         throw std::runtime_error(
-                "MulticoreComputeService::dispatchNextPendingJob(): Unsupported JOB_SELECTION_POLICY '" +
+                "MultihostMulticoreComputeService::dispatchNextPendingJob(): Unsupported JOB_SELECTION_POLICY '" +
                 job_selection_policy + "'");
       }
 
@@ -396,15 +396,15 @@ namespace wrench {
      * @param job: the job
      * @return the resource allocation
      */
-    std::set<std::pair<std::string, unsigned long>> MulticoreComputeService::computeResourceAllocation(StandardJob *job) {
+    std::set<std::pair<std::string, unsigned long>> MultihostMulticoreComputeService::computeResourceAllocation(StandardJob *job) {
 
       std::string resource_allocation_policy =
-              this->getPropertyValueAsString(MulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY);
+              this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY);
 
       if (resource_allocation_policy == "aggressive") {
         return computeResourceAllocationAggressive(job);
       } else {
-        throw std::runtime_error("MulticoreComputeService::computeResourceAllocation():"
+        throw std::runtime_error("MultihostMulticoreComputeService::computeResourceAllocation():"
                                          " Unsupported resource allocation policy '" +
                                  resource_allocation_policy + "'");
       }
@@ -416,7 +416,7 @@ namespace wrench {
      * @param job: the job
      * @return the resource allocation
      */
-    std::set<std::pair<std::string, unsigned long>> MulticoreComputeService::computeResourceAllocationAggressive(StandardJob *job) {
+    std::set<std::pair<std::string, unsigned long>> MultihostMulticoreComputeService::computeResourceAllocationAggressive(StandardJob *job) {
 
 
       // Make a copy of core_availabilities
@@ -500,7 +500,7 @@ namespace wrench {
      * @param job: the job
      * @return true is the job was dispatched, false otherwise
      */
-    bool MulticoreComputeService::dispatchStandardJob(StandardJob *job) {
+    bool MultihostMulticoreComputeService::dispatchStandardJob(StandardJob *job) {
 
       WRENCH_INFO("IN DISPATCH STANDARD");
 
@@ -555,7 +555,7 @@ namespace wrench {
               compute_resources,
               this->default_storage_service,
               {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
-                       this->getPropertyValueAsString(MulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)}});
+                       this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)}});
 
       this->standard_job_executors.insert(executor);
       this->running_jobs.insert(job);
@@ -570,7 +570,7 @@ namespace wrench {
      * @param job: the job
      * @return true is the job was dispatched, false otherwise
      */
-    bool MulticoreComputeService::dispatchPilotJob(PilotJob *job) {
+    bool MultihostMulticoreComputeService::dispatchPilotJob(PilotJob *job) {
 
       // Find a list of hosts with the required number of cores
       std::vector<std::string> chosen_hosts;
@@ -603,7 +603,7 @@ namespace wrench {
       }
 
       ComputeService *cs =
-              new MulticoreComputeService(this->hostname,
+              new MultihostMulticoreComputeService(this->hostname,
                                           true, false,
                                           compute_resources,
                                           this->property_list,
@@ -626,7 +626,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(job->getCallbackMailbox(),
                                  new ComputeServicePilotJobStartedMessage(job, this,
                                                                           this->getPropertyValueAsDouble(
-                                                                                  MulticoreComputeServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+                                                                                  MultihostMulticoreComputeServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -648,7 +648,7 @@ namespace wrench {
  *
  * @throw std::runtime_error
  */
-    bool MulticoreComputeService::processNextMessage() {
+    bool MultihostMulticoreComputeService::processNextMessage() {
 
       // Wait for a message
       std::unique_ptr<SimulationMessage> message;
@@ -678,7 +678,7 @@ namespace wrench {
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
                                   new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                          MulticoreComputeServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                          MultihostMulticoreComputeServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
@@ -704,7 +704,7 @@ namespace wrench {
                                             msg->job,
                                             this)),
                             this->getPropertyValueAsDouble(
-                                    MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                    MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
           }
@@ -730,7 +730,7 @@ namespace wrench {
                                             msg->job,
                                             this)),
                             this->getPropertyValueAsDouble(
-                                    MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                    MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
           }
@@ -744,7 +744,7 @@ namespace wrench {
                   msg->answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
                           msg->job, this, true, nullptr,
                           this->getPropertyValueAsDouble(
-                                  MulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                                  MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
@@ -766,7 +766,7 @@ namespace wrench {
         MulticoreComputeServiceTTLAnswerMessage *answer_message = new MulticoreComputeServiceTTLAnswerMessage(
                 this->death_date - S4U_Simulation::getClock(),
                 this->getPropertyValueAsDouble(
-                        MulticoreComputeServiceProperty::TTL_ANSWER_MESSAGE_PAYLOAD));
+                        MultihostMulticoreComputeServiceProperty::TTL_ANSWER_MESSAGE_PAYLOAD));
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -777,7 +777,7 @@ namespace wrench {
         MulticoreComputeServiceFlopRateAnswerMessage *answer_message = new MulticoreComputeServiceFlopRateAnswerMessage(
                 S4U_Simulation::getFlopRate(this->hostname),
                 this->getPropertyValueAsDouble(
-                        MulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD));
+                        MultihostMulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD));
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -811,7 +811,7 @@ namespace wrench {
     /**
      * @brief Terminate all pilot job compute services
      */
-    void MulticoreComputeService::terminateAllPilotJobs() {
+    void MultihostMulticoreComputeService::terminateAllPilotJobs() {
       for (auto job : this->running_jobs) {
         if (job->getType() == WorkflowJob::PILOT) {
           PilotJob *pj = (PilotJob *) job;
@@ -826,7 +826,7 @@ namespace wrench {
      * @param job: the job
      * @param cause: the failure cause
      */
-    void MulticoreComputeService::failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
+    void MultihostMulticoreComputeService::failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
       WRENCH_INFO("Failing pending job %s", job->getName().c_str());
       // Set all tasks back to the READY state and wipe out output files
       for (auto failed_task: job->getTasks()) {
@@ -846,7 +846,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                 new ComputeServiceStandardJobFailedMessage(job, this, cause,
                                                                            this->getPropertyValueAsDouble(
-                                                                                   MulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                                                                   MultihostMulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -857,7 +857,7 @@ namespace wrench {
      * @param job: the job
      * @param cause: the failure cause
      */
-    void MulticoreComputeService::failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
+    void MultihostMulticoreComputeService::failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
 
       WRENCH_INFO("Failing running job %s", job->getName().c_str());
 
@@ -870,7 +870,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                 new ComputeServiceStandardJobFailedMessage(job, this, cause,
                                                                            this->getPropertyValueAsDouble(
-                                                                                   MulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                                                                   MultihostMulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -880,7 +880,7 @@ namespace wrench {
     * @brief terminate a running standard job
     * @param job: the job
     */
-    void MulticoreComputeService::terminateRunningStandardJob(StandardJob *job) {
+    void MultihostMulticoreComputeService::terminateRunningStandardJob(StandardJob *job) {
 
       StandardJobExecutor *executor = nullptr;
       for (auto e : this->standard_job_executors) {
@@ -890,7 +890,7 @@ namespace wrench {
       }
       if (executor == nullptr) {
         throw std::runtime_error(
-                "MulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
+                "MultihostMulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
       }
 
       // Terminate the executor
@@ -925,7 +925,7 @@ namespace wrench {
             break;
           }
           default: {
-            throw std::runtime_error("MulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
+            throw std::runtime_error("MultihostMulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
           }
         }
       }
@@ -939,14 +939,14 @@ namespace wrench {
  *
  * @throw std::runtime_error
  */
-    void MulticoreComputeService::terminateRunningPilotJob(PilotJob *job) {
+    void MultihostMulticoreComputeService::terminateRunningPilotJob(PilotJob *job) {
 
       // Get the associated compute service
-      MulticoreComputeService *compute_service = (MulticoreComputeService *)(job->getComputeService());
+      MultihostMulticoreComputeService *compute_service = (MultihostMulticoreComputeService *)(job->getComputeService());
 
       if (compute_service == nullptr) {
         throw std::runtime_error(
-                "MulticoreComputeService::terminateRunningPilotJob(): can't find compute service associated to pilot job");
+                "MultihostMulticoreComputeService::terminateRunningPilotJob(): can't find compute service associated to pilot job");
       }
 
       // Stop it
@@ -970,7 +970,7 @@ namespace wrench {
 * @brief Declare all current jobs as failed (likely because the daemon is being terminated
 * or has timed out (because it's in fact a pilot job))
 */
-    void MulticoreComputeService::failCurrentStandardJobs(std::shared_ptr<FailureCause> cause) {
+    void MultihostMulticoreComputeService::failCurrentStandardJobs(std::shared_ptr<FailureCause> cause) {
 
       for (auto workflow_job : this->running_jobs) {
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
@@ -997,20 +997,20 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void MulticoreComputeService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
+    void MultihostMulticoreComputeService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
 
       // Remove the executor from the executor list
       WRENCH_INFO("====> %ld", this->standard_job_executors.size());
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
         throw std::runtime_error(
-                "MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
+                "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
       this->standard_job_executors.erase(executor);
 
       // Remove the job from the running job list
       if (this->running_jobs.find(job) == this->running_jobs.end()) {
         throw std::runtime_error(
-                "MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
+                "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
       }
       this->running_jobs.erase(job);
 
@@ -1021,7 +1021,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 job->popCallbackMailbox(), new ComputeServiceStandardJobDoneMessage(
                         job, this, this->getPropertyValueAsDouble(
-                                MulticoreComputeServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+                                MultihostMulticoreComputeServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -1034,21 +1034,21 @@ namespace wrench {
      * @param work: the work
      * @param cause: the cause of the failure
      */
-    void MulticoreComputeService::processStandardJobFailure(StandardJobExecutor *executor,
+    void MultihostMulticoreComputeService::processStandardJobFailure(StandardJobExecutor *executor,
                                                             StandardJob *job,
                                                             std::shared_ptr<FailureCause> cause) {
 
       // Remove the executor from the executor list
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
         throw std::runtime_error(
-                "MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
+                "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
       this->standard_job_executors.erase(executor);
 
       // Remove the job from the running job list
       if (this->running_jobs.find(job) == this->running_jobs.end()) {
         throw std::runtime_error(
-                "MulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
+                "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
       }
       this->running_jobs.erase(job);
 
@@ -1064,7 +1064,7 @@ namespace wrench {
      *
      * @param notify_pilot_job_submitters:
      */
-    void MulticoreComputeService::terminate(bool notify_pilot_job_submitters) {
+    void MultihostMulticoreComputeService::terminate(bool notify_pilot_job_submitters) {
 
       this->setStateToDown();
 
@@ -1084,7 +1084,7 @@ namespace wrench {
           S4U_Mailbox::putMessage(this->containing_pilot_job->popCallbackMailbox(),
                                   new ComputeServicePilotJobExpiredMessage(this->containing_pilot_job, this,
                                                                            this->getPropertyValueAsDouble(
-                                                                                   MulticoreComputeServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+                                                                                   MultihostMulticoreComputeServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -1096,12 +1096,12 @@ namespace wrench {
      *
      * @param job: the pilot job
      */
-    void MulticoreComputeService::processPilotJobCompletion(PilotJob *job) {
+    void MultihostMulticoreComputeService::processPilotJobCompletion(PilotJob *job) {
 
       // Remove the job from the running list
       this->running_jobs.erase(job);
 
-      MulticoreComputeService *cs = (MulticoreComputeService *)job->getComputeService();
+      MultihostMulticoreComputeService *cs = (MultihostMulticoreComputeService *)job->getComputeService();
 
       // Update core availabilities
       for (auto r : cs->compute_resources) {
@@ -1116,7 +1116,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                  new ComputeServicePilotJobExpiredMessage(job, this,
                                                                           this->getPropertyValueAsDouble(
-                                                                                  MulticoreComputeServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+                                                                                  MultihostMulticoreComputeServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -1134,7 +1134,7 @@ namespace wrench {
  * @throw std::runtime_error
  *
  */
-    void MulticoreComputeService::terminateStandardJob(StandardJob *job) {
+    void MultihostMulticoreComputeService::terminateStandardJob(StandardJob *job) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -1147,7 +1147,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceTerminateStandardJobRequestMessage(answer_mailbox, job,
                                                                                      this->getPropertyValueAsDouble(
-                                                                                             MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                                                                             MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -1167,7 +1167,7 @@ namespace wrench {
         }
       } else {
         throw std::runtime_error(
-                "MulticoreComputeService::terminateStandardJob(): Received an unexpected [" + message->getName() +
+                "MultihostMulticoreComputeService::terminateStandardJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
 
@@ -1181,7 +1181,7 @@ namespace wrench {
  * @throw WorkflowExecutionException
  * @throw std::runtime_error
  */
-    void MulticoreComputeService::terminatePilotJob(PilotJob *job) {
+    void MultihostMulticoreComputeService::terminatePilotJob(PilotJob *job) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -1194,7 +1194,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceTerminatePilotJobRequestMessage(answer_mailbox, job,
                                                                                   this->getPropertyValueAsDouble(
-                                                                                          MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                                                                          MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -1216,7 +1216,7 @@ namespace wrench {
 
       } else {
         throw std::runtime_error(
-                "MulticoreComputeService::terminatePilotJob(): Received an unexpected [" + message->getName() +
+                "MultihostMulticoreComputeService::terminatePilotJob(): Received an unexpected [" + message->getName() +
                 "] message!");
       }
     }
@@ -1228,7 +1228,7 @@ namespace wrench {
  * @param job: the job to terminate
  * @param answer_mailbox: the mailbox to which the answer message should be sent
  */
-    void MulticoreComputeService::processStandardJobTerminationRequest(StandardJob *job, std::string answer_mailbox) {
+    void MultihostMulticoreComputeService::processStandardJobTerminationRequest(StandardJob *job, std::string answer_mailbox) {
 
       // Check whether job is pending
       for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
@@ -1237,7 +1237,7 @@ namespace wrench {
           ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                   job, this, true, nullptr,
                   this->getPropertyValueAsDouble(
-                          MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+                          MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
           try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
           } catch (std::shared_ptr<NetworkError> cause) {
@@ -1257,7 +1257,7 @@ namespace wrench {
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                 job, this, true, nullptr,
                 this->getPropertyValueAsDouble(
-                        MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+                        MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
           S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
         } catch (std::shared_ptr<NetworkError> cause) {
@@ -1271,7 +1271,7 @@ namespace wrench {
       ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
               job, this, false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
               this->getPropertyValueAsDouble(
-                      MulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+                      MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> cause) {
@@ -1286,7 +1286,7 @@ namespace wrench {
      * @param job: the job to terminate
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      */
-    void MulticoreComputeService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
+    void MultihostMulticoreComputeService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
 
       // Check whether job is pending
       for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
@@ -1295,7 +1295,7 @@ namespace wrench {
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                   job, this, true, nullptr,
                   this->getPropertyValueAsDouble(
-                          MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
+                          MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
           try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
           } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1312,7 +1312,7 @@ namespace wrench {
         ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                 job, this, true, nullptr,
                 this->getPropertyValueAsDouble(
-                        MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
+                        MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
           S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1326,7 +1326,7 @@ namespace wrench {
       ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
               job, this, false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
               this->getPropertyValueAsDouble(
-                      MulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
+                      MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1341,7 +1341,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void MulticoreComputeService::processGetNumCores(std::string &answer_mailbox) {
+    void MultihostMulticoreComputeService::processGetNumCores(std::string &answer_mailbox) {
       ComputeServiceNumCoresAnswerMessage *answer_message = new ComputeServiceNumCoresAnswerMessage(
               this->total_num_cores,
               this->getPropertyValueAsDouble(
@@ -1358,7 +1358,7 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      */
-    void MulticoreComputeService::processGetNumIdleCores(std::string &answer_mailbox) {
+    void MultihostMulticoreComputeService::processGetNumIdleCores(std::string &answer_mailbox) {
       unsigned long num_available_cores = 0;
       for (auto r : this->core_availabilities) {
         num_available_cores += r.second;
@@ -1366,7 +1366,7 @@ namespace wrench {
       ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
               num_available_cores,
               this->getPropertyValueAsDouble(
-                      MulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
+                      MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1383,7 +1383,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void MulticoreComputeService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+    void MultihostMulticoreComputeService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
                                                            std::map<std::string, std::string> &service_specific_arguments) {
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
       if (not this->supportsStandardJobs()) {
