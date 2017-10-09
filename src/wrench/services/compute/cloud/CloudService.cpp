@@ -8,13 +8,13 @@
  *
  */
 
-#include "wrench/services/cloud/CloudService.h"
-#include "wrench/services/compute/MulticoreComputeService.h"
+#include "wrench/services/compute/cloud/CloudService.h"
+#include "wrench/services/compute/multihost_multicore/MulticoreComputeService.h"
 #include "wrench/services/storage/SimpleStorageService.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "services/ServiceMessage.h"
-#include "services/cloud/CloudServiceMessage.h"
+#include "CloudServiceMessage.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 
 

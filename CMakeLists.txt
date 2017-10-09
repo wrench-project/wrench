@@ -57,10 +57,10 @@ set(HEADER_FILES
         include/wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h
-        include/wrench/services/compute/MulticoreComputeService.h
-        include/wrench/services/compute/MulticoreComputeServiceProperty.h
-        include/wrench/services/cloud/CloudService.h
-        include/wrench/services/cloud/CloudServiceProperty.h
+        include/wrench/services/compute/multihost_multicore/MulticoreComputeService.h
+        include/wrench/services/compute/multihost_multicore/MulticoreComputeServiceProperty.h
+        include/wrench/services/compute/cloud/CloudService.h
+        include/wrench/services/compute/cloud/CloudServiceProperty.h
         include/wrench/services/storage/StorageService.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/SimpleStorageService.h
@@ -77,11 +77,11 @@ set(HEADER_FILES
         include/wrench/simulation/SimulationTrace.h
         include/wrench.h
         include/wrench-dev.h
-        include/wrench/services/batch_service/BatchJob.h
-        include/wrench/services/batch_service/BatchServiceMessage.h
-        include/wrench/services/batch_service/BatchScheduler.h
-        include/wrench/services/batch_service/BatchService.h
-        include/wrench/services/batch_service/BatchServiceProperty.h
+        include/wrench/services/compute/batch/BatchJob.h
+        include/wrench/services/compute/batch/BatchServiceMessage.h
+        include/wrench/services/compute/batch/BatchScheduler.h
+        include/wrench/services/compute/batch/BatchService.h
+        include/wrench/services/compute/batch/BatchServiceProperty.h
         include/wrench/util/WorkflowUtil.h
         include/wrench/services/helpers/Alarm.h
         )
@@ -104,7 +104,7 @@ set(SOURCE_FILES
         src/wrench/wms/WMS.cpp
         src/wrench/wms/Scheduler.cpp
         src/wrench/services/compute/ComputeService.cpp
-        src/wrench/services/compute/multicore_compute_service/MulticoreComputeService.cpp
+        src/wrench/services/compute/multihost_multicore/MulticoreComputeService.cpp
         src/wrench/workflow/job/PilotJob.cpp
         src/wrench/managers/JobManager.cpp
         src/wrench/simulation/Simulation.cpp
@@ -122,23 +122,23 @@ set(SOURCE_FILES
         src/wrench/services/compute/ComputeServiceProperty.cpp
         src/wrench/services/storage/StorageServiceProperty.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
-        src/wrench/services/compute/multicore_compute_service/MulticoreComputeServiceProperty.cpp
+        src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceProperty.cpp
         src/wrench/services/storage/simple_storage/SimpleStorageServiceProperty.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessage.h
         src/wrench/services/compute/ComputeServiceMessage.cpp
         src/wrench/services/compute/ComputeServiceMessage.h
-        src/wrench/services/compute/multicore_compute_service/MulticoreComputeServiceMessage.cpp
-        src/wrench/services/compute/multicore_compute_service/MulticoreComputeServiceMessage.h
+        src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.cpp
+        src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.h
         src/wrench/services/storage/StorageServiceMessage.cpp
         src/wrench/services/storage/StorageServiceMessage.h
         src/wrench/services/file_registry/FileRegistryMessage.cpp
         src/wrench/services/file_registry/FileRegistryMessage.h
-        src/wrench/services/cloud/CloudService.cpp
-        src/wrench/services/cloud/CloudServiceProperty.cpp
-        src/wrench/services/cloud/CloudServiceMessage.h
-        src/wrench/services/cloud/CloudServiceMessage.cpp
+        src/wrench/services/compute/cloud/CloudService.cpp
+        src/wrench/services/compute/cloud/CloudServiceProperty.cpp
+        src/wrench/services/compute/cloud/CloudServiceMessage.h
+        src/wrench/services/compute/cloud/CloudServiceMessage.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/services/storage/simple_storage/IncomingFile.cpp
         src/wrench/services/storage/simple_storage/IncomingFile.h
@@ -155,11 +155,11 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.h
         src/wrench/services/network_proximity/NetworkDaemons.cpp
-        src/wrench/services/batch_service/BatchJob.cpp
-        src/wrench/services/batch_service/BatchServiceMessage.cpp
-        src/wrench/services/batch_service/BatchScheduler.cpp
-        src/wrench/services/batch_service/BatchService.cpp
-        src/wrench/services/batch_service/BatchServiceProperty.cpp
+        src/wrench/services/compute/batch/BatchJob.cpp
+        src/wrench/services/compute/batch/BatchServiceMessage.cpp
+        src/wrench/services/compute/batch/BatchScheduler.cpp
+        src/wrench/services/compute/batch/BatchService.cpp
+        src/wrench/services/compute/batch/BatchServiceProperty.cpp
         src/wrench/util/WorkflowUtil.cpp
         src/wrench/services/helpers/Alarm.cpp
         )

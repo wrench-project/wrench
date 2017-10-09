@@ -7,7 +7,7 @@
 
 
 #include "services/compute/ComputeServiceMessage.h"
-#include "wrench/services/batch_service/BatchJob.h"
+#include "BatchJob.h"
 
 namespace wrench{
     /***********************/

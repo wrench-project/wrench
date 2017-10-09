@@ -7,7 +7,7 @@
  * (at your option) any later version.
  */
 
-#include "wrench/services/compute/MulticoreComputeServiceProperty.h"
+#include "wrench/services/compute/multihost_multicore/MulticoreComputeServiceProperty.h"
 
 namespace wrench {
 

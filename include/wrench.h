@@ -14,14 +14,14 @@
 #include "wrench/workflow/Workflow.h"
 
 // Services and Service Properties
-#include "wrench/services/compute/MulticoreComputeService.h"
-#include "wrench/services/compute/MulticoreComputeServiceProperty.h"
+#include "wrench/services/compute/multihost_multicore/MulticoreComputeService.h"
+#include "wrench/services/compute/multihost_multicore/MulticoreComputeServiceProperty.h"
 #include "wrench/services/storage/SimpleStorageService.h"
 #include "wrench/services/storage/SimpleStorageServiceProperty.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/file_registry/FileRegistryServiceProperty.h"
-#include "wrench/services/cloud/CloudService.h"
-#include "wrench/services/cloud/CloudServiceProperty.h"
+#include "wrench/services/compute/cloud/CloudService.h"
+#include "wrench/services/compute/cloud/CloudServiceProperty.h"
 
 // WMS Implementations
 #include "wrench/wms/WMS.h"

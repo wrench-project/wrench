@@ -2,7 +2,7 @@
 // Created by suraj on 8/29/17.
 //
 
-#include "wrench/services/batch_service/BatchServiceProperty.h"
+#include "wrench/services/compute/batch/BatchServiceProperty.h"
 
 namespace wrench {
     SET_PROPERTY_NAME(BatchServiceProperty, THREAD_STARTUP_OVERHEAD);

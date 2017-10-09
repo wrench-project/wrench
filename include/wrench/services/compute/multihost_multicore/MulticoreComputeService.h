@@ -15,7 +15,7 @@
 
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
-#include "wrench/services/compute/MulticoreComputeServiceProperty.h"
+#include "MulticoreComputeServiceProperty.h"
 
 namespace wrench {
 

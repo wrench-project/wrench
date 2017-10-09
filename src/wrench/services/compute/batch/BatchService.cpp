@@ -10,7 +10,7 @@
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/services/batch_service/BatchService.h"
+#include "wrench/services/compute/batch/BatchService.h"
 #include <simulation/SimulationMessage.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
@@ -21,7 +21,7 @@
 #include "wrench/simulation/Simulation.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/workflow/job/PilotJob.h"
-#include "wrench/services/batch_service/BatchServiceMessage.h"
+#include "wrench/services/compute/batch/BatchServiceMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
@@ -64,8 +64,8 @@ namespace wrench {
                                double ttl,
                                bool has_ttl,
                                std::map<std::string, std::string> plist, std::string suffix) :
-            ComputeService("batch_service" + suffix,
-                           "batch_service" + suffix,
+            ComputeService("batch" + suffix,
+                           "batch" + suffix,
                            supports_standard_jobs,
                            supports_pilot_jobs,
                            default_storage_service) {

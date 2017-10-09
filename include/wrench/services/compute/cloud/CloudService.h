@@ -15,7 +15,7 @@
 
 #include "wrench/services/Service.h"
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/cloud/CloudServiceProperty.h"
+#include "CloudServiceProperty.h"
 #include "wrench/simulation/Simulation.h"
 
 namespace wrench {

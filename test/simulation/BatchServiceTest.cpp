@@ -12,7 +12,7 @@
 #include <simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>
-#include <wrench/services/batch_service/BatchService.h>
+#include <wrench/services/compute/batch/BatchService.h>
 #include "NoopScheduler.h"
 #include "wrench/workflow/job/PilotJob.h"
 

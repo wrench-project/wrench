@@ -11,12 +11,12 @@
 
 #include "services/ServiceMessage.h"
 #include "services/compute/ComputeServiceMessage.h"
-#include "services/compute/multicore_compute_service/MulticoreComputeServiceMessage.h"
+#include "services/compute/multihost_multicore/MulticoreComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/MulticoreComputeService.h"
+#include "wrench/services/compute/multihost_multicore/MulticoreComputeService.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/workflow/job/PilotJob.h"
@@ -267,8 +267,8 @@ namespace wrench {
             PilotJob *pj,
             std::string suffix,
             StorageService *default_storage_service) :
-            ComputeService("multicore_compute_service" + suffix,
-                           "multicore_compute_service" + suffix,
+            ComputeService("multihost_multicore" + suffix,
+                           "multihost_multicore" + suffix,
                            supports_standard_jobs,
                            supports_pilot_jobs,
                            default_storage_service) {
