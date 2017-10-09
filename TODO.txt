@@ -1,5 +1,22 @@
 SOFTWARE ENGINEERING:
 
+    - Factorize code into ComputeService
+
+    - Chase memory leaks
+        - CauseType/Exception unique_ptr?
+
+    - Add missing "const"
+
+    - No more timeout in MulticoreJobService
+
+    - While implementing a test for the StandardJobExecutor abstraction, Henri noted
+      that when one does not create a ComputeService and launch the simulation, we
+      get a strange behavior that's not clear. Clearly this needs to be tested in the
+      most basic OneTaskTest thingy. (Henri will do it)
+
+    - Track all task change updates and make sure they're all in the JobManager...
+        - They likely cannot, but the task life cycle is confusing right now
+
 -----------------------------------
 
 DETAILS:
@@ -12,11 +29,17 @@ DETAILS:
 
 -----------------------------------
 
-DATA STORAGE IMPLEMENTATION:
+MULTICORECOMPUTESERVICE:
+    - Add Tests
+    - Rename
+    - Propagate
+    - Add properties to the MultiCore compute service that corresponds to the
+      underlying properties of the StandardJobExecutors it will use
+            - Make sure those properties are passed
 
-    - Decide what to do about "partial failures"
-        - How do we report what has completed, and what hasn't upon failure
-        - Or do we leave it as is and the WMS has to inspect things?
+-----------------------------------
+
+DATA STORAGE IMPLEMENTATION:
 
     - SIMULATION OF STORAGE RESOURCE WITH S4U!!!
 
@@ -33,37 +56,16 @@ COMPUTE SERVICE: IMPLEMENT A SIMPLE FIFO BATCH  (WOULD BE GREAT FOR THE UPCOMING
     - Really close to Condor...
     - Will need to connect to BATSIM to do a batch, or SLURM?
 
+
+
 ---------------------------------------------------------------------
 
 NEW FEATURES FOR EDDY:
 	- New workflows arrive on the fly
-		- Requirement: a synamic workflow submitter abstraction
+		- Requirement: a dynamic workflow submitter abstraction
 
 	- Implement a notion of "what time is it?"
 		- And of a Cron job that triggers a callback...
-
----------------------------------------------------------------------
-
-SOFTWARE ENGINEERING / TESTING:
-    - Add properties to the MultiCore compute service that corresponds to the
-      underlying properties of the StandardJobExecutors it will use
-
-    - Test for killing a standard job executor 
-	    - wait on S4U::Actor::kill() to be fixed
-	    - Given recent fixes, we can now implement a message-based workaround
-
-    - While implementing a test for the StandardJobExecutor abstraction, Henri noted
-      that when one does not create a ComputeService and launch the simulation, we
-      get a strange behavior that's not clear. Clearly this needs to be tested in the
-      most basic OneTaskTest thingy. (Henri will do it)
-
-    - Track all task change updates and make sure they're all in the JobManager...
-        - They likely cannot, but the task life cycle is confusing right now
-
-    - Chase memory leaks
-        - CauseType/Exception unique_ptr?
-
-    - Add missing "const"
 
 ---------------------------------------------------------------------
 
@@ -147,8 +149,6 @@ ICS632:
         - What will it look like?
         - How to deal with pipelining of network/disk when remote putMessage()/getMessage()?
                - How does MSG do it?
-
-   - MulticoreExecute: available in low-levels, Mt is propagating up to S4U
 
    - ActorDaemonize: available in low-level, FS is propagating up to S4U
 

@@ -203,17 +203,21 @@ namespace wrench {
      * @brief Create a pilot job
      *
      * @param workflow: a workflow
-     * @param num_cores: the number of cores required by the pilot job
+     * @param num_hosts: the number of hosts required by the pilot job
+     * @param num_cores_per_host: the number of cores per host required by the pilot job
      * @param duration: the pilot job's duration in seconds
-     * @return athe pilot job
+     * @return the pilot job
      *
      * @throw std::invalid_argument
      */
-    PilotJob *JobManager::createPilotJob(Workflow *workflow, unsigned int num_cores, double duration) {
-      if ((workflow == nullptr) || (num_cores < 1) || (duration <= 0.0)) {
+    PilotJob *JobManager::createPilotJob(Workflow *workflow,
+                                         unsigned long num_hosts,
+                                         unsigned long num_cores_per_host,
+                                         double duration) {
+      if ((workflow == nullptr) ||  (duration <= 0.0)) {
         throw std::invalid_argument("JobManager::createPilotJob(): Invalid arguments");
       }
-      PilotJob *raw_ptr = new PilotJob(workflow, num_cores, duration);
+      PilotJob *raw_ptr = new PilotJob(workflow, num_hosts, num_cores_per_host, duration);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
       this->jobs[raw_ptr] = std::move(job);
       return raw_ptr;

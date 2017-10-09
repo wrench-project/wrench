@@ -33,7 +33,7 @@ namespace wrench {
      * @param simulation: the simulation
      * @param hostname: the hostname of the host that should run this executor (could be the first compute resources - see below)
      * @param job: the job to execute
-     * @param compute_resources: a list of <hostname, num_cores> tuples, which represent
+     * @param compute_resources: a list of <hostname, num_cores> pairs, which represent
      *           the compute resources the job should execute on
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list

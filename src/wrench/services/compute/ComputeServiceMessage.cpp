@@ -354,7 +354,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServiceNumCoresAnswerMessage::ComputeServiceNumCoresAnswerMessage(unsigned int num, double payload)
+    ComputeServiceNumCoresAnswerMessage::ComputeServiceNumCoresAnswerMessage(unsigned long num, double payload)
             : ComputeServiceMessage("NUM_CORES_ANSWER", payload), num_cores(num) {}
 
     /**

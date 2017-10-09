@@ -44,8 +44,6 @@ namespace wrench {
 
         std::string getName();
 
-        unsigned long getNumCores();
-
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -64,7 +62,7 @@ namespace wrench {
 
     protected:
 
-        WorkflowJob(Type type, unsigned long num_cores);
+        WorkflowJob(Type type);
 
         unsigned long getNewUniqueNumber();
 
@@ -76,8 +74,6 @@ namespace wrench {
         Type type;
         /** @brief The job's name */
         std::string name;
-        /** @brief The job's number of cores */
-        unsigned long num_cores;
         /** @brief The compute service to which the job was submitted */
         ComputeService *parent_compute_service;
 

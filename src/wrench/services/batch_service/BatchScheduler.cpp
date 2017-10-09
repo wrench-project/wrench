@@ -11,5 +11,6 @@ namespace wrench{
     BatchJob* BatchScheduler::schedule_job() {
         //We currently only support FCFS
 //        if(BatchService::);
+        return nullptr;
     }
 }

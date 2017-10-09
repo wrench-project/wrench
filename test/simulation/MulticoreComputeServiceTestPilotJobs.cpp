@@ -116,7 +116,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
 
       // Submit a pilot job
       bool success = true;
@@ -176,7 +176,9 @@ void MulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, false, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, false,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -228,7 +230,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
 
       // Submit a pilot job
       try {
@@ -348,7 +350,9 @@ void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitForExpirat
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, false, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -398,7 +402,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
 
       // Submit a pilot job
       try {
@@ -502,7 +506,9 @@ void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutdownServic
 
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, false, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -553,7 +559,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
 
       // Try to terminate it right now, which is stupid
 //      bool success = true;
@@ -615,7 +621,9 @@ void MulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermination_te
 
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, false, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -666,7 +674,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
 
       // Submit a pilot job
       try {
@@ -776,7 +784,9 @@ void MulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_test() {
 
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, false, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -827,7 +837,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
 
       // Submit a pilot job
       try {
@@ -944,7 +954,9 @@ void MulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTermination_test() 
 
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, false, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(

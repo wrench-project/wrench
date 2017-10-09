@@ -71,7 +71,7 @@ namespace wrench {
      * @brief Kill the daemon/actor.
      */
     void S4U_Daemon::kill_actor() {
-      if (not this->terminated) {
+      if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         this->s4u_actor->kill();
         this->terminated = true;
       }

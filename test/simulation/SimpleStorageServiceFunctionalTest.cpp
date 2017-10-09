@@ -347,7 +347,9 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, nullptr, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                          {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      nullptr, {}))));
 
   // Create Three Storage Services
   EXPECT_NO_THROW(storage_service_100 = simulation->add(
@@ -487,7 +489,9 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, nullptr, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      nullptr, {}))));
 
   simulation->setFileRegistryService(std::move(file_registry_service));
 
@@ -645,7 +649,9 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, nullptr, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      nullptr, {}))));
 
   simulation->setFileRegistryService(std::move(file_registry_service));
 
@@ -864,7 +870,9 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, nullptr, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      nullptr, {}))));
 
   simulation->setFileRegistryService(std::move(file_registry_service));
 
@@ -1096,7 +1104,9 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, nullptr, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      nullptr, {}))));
 
   simulation->setFileRegistryService(std::move(file_registry_service));
 

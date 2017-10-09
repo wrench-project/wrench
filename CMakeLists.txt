@@ -24,7 +24,7 @@ if (NOT ${WRENCH_VERSION_EXTRA} EQUAL "")
 endif ()
 
 
-include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include)
+include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include /usr/local/include/nlohmann)
 
 
 # library header files

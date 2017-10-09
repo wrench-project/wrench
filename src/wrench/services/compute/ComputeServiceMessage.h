@@ -256,10 +256,10 @@ namespace wrench {
      */
     class ComputeServiceNumCoresAnswerMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceNumCoresAnswerMessage(unsigned int num, double payload);
+        ComputeServiceNumCoresAnswerMessage(unsigned long num, double payload);
 
         /** @brief The number of cores */
-        unsigned int num_cores;
+        unsigned long num_cores;
     };
 
     /**
@@ -274,7 +274,7 @@ namespace wrench {
     };
 
     /**
-     * @brief MulticoreComputeServiceNumIdleCoresAnswerMessage class
+     * @brief ComputeServiceNumIdleCoresAnswerMessage class
      */
     class ComputeServiceNumIdleCoresAnswerMessage : public ComputeServiceMessage {
     public:
@@ -283,6 +283,7 @@ namespace wrench {
         /** @brief The number of idle cores */
         unsigned long num_idle_cores;
     };
+
 
     /***********************/
     /** \endcond           */

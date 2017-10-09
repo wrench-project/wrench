@@ -231,6 +231,7 @@ namespace wrench {
           // create a multicore executor for the VM
           this->cs_list[vm_hostname] = std::unique_ptr<ComputeService>(
                   new MulticoreComputeService(vm_hostname, supports_standard_jobs, supports_pilot_jobs,
+                                              {std::pair<std::string, unsigned long>(vm_hostname, num_cores)},
                                               default_storage_service, plist));
           this->cs_list[vm_hostname]->setSimulation(this->simulation);
 
@@ -324,7 +325,7 @@ namespace wrench {
       }
 
       for (auto &cs : cs_list) {
-        if (cs.second->getNumIdleCores() >= job->getNumCores()) {
+        if (cs.second->getNumIdleCores() >= job->getMinimumRequiredNumCores()) {
           cs.second->submitStandardJob(job);
           try {
             S4U_Mailbox::dputMessage(
@@ -344,7 +345,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
-                        job, this, false, std::shared_ptr<FailureCause>(new NotEnoughCores(job, this)),
+                        job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
                         this->getPropertyValueAsDouble(
                                 ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {

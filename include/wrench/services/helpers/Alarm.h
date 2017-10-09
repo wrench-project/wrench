@@ -20,13 +20,19 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     class Alarm: public Service {
+
+        friend class S4U_Daemon;
 
     public:
         Alarm(double date, std::string hostname, std::string reply_mailbox_name,
               std::shared_ptr<SimulationMessage> msg, std::string suffix);
 
-    private:
+            private:
 
         double date;
         std::string reply_mailbox_name;
@@ -35,6 +41,10 @@ namespace wrench {
         int main() override;
 
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
 

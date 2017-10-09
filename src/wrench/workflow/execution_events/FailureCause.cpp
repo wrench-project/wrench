@@ -192,7 +192,7 @@ namespace wrench {
      * @param job: the job that could not be executed
      * @param compute_service: the compute service that didn't have enough cores
      */
-    NotEnoughCores::NotEnoughCores(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
+    NotEnoughComputeResources::NotEnoughComputeResources(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
             NOT_ENOUGH_CORES) {
       this->job = job;
       this->compute_service = compute_service;
@@ -202,7 +202,7 @@ namespace wrench {
      * @brief Getter
      * @return the job
      */
-    WorkflowJob *NotEnoughCores::getJob() {
+    WorkflowJob *NotEnoughComputeResources::getJob() {
       return this->job;
     }
 
@@ -210,7 +210,7 @@ namespace wrench {
      * @brief Getter
      * @return the compute service
      */
-    ComputeService *NotEnoughCores::getComputeService() {
+    ComputeService *NotEnoughComputeResources::getComputeService() {
       return this->compute_service;
     }
 
@@ -218,7 +218,7 @@ namespace wrench {
      * @brief Get the human-readable failure message
      * @return the message
      */
-    std::string NotEnoughCores::toString() {
+    std::string NotEnoughComputeResources::toString() {
       return "Compute service " + this->compute_service->getName() + " on host " +
              this->compute_service->getHostname() + " does not have enough cores to support job " + job->getName();
     }

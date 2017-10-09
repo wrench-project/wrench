@@ -205,7 +205,9 @@ void MulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, false, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, false, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -333,7 +335,9 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -463,7 +467,9 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -598,7 +604,9 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -715,7 +723,9 @@ void MulticoreComputeServiceTestStandardJobs::do_JobTermination_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -849,7 +859,9 @@ void MulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -994,7 +1006,9 @@ void MulticoreComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -1138,7 +1152,9 @@ void MulticoreComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobI
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -1282,7 +1298,9 @@ void MulticoreComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJob
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MulticoreComputeService>(
-                  new wrench::MulticoreComputeService(hostname, true, true, storage_service, {}))));
+                  new wrench::MulticoreComputeService(hostname, true, true,
+                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      storage_service, {}))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(

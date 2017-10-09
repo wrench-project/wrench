@@ -31,14 +31,22 @@ namespace wrench {
         /** @brief The number of bytes in the control message sent by the daemon to state its per-core flop rate **/
         DECLARE_PROPERTY_NAME(FLOP_RATE_ANSWER_MESSAGE_PAYLOAD);
 
-        /** @brief The core allocation policy:
-         *      - aggressive: always given a job as much as it might need up to the number
-         *                    of available cores (default)
-         */
-        DECLARE_PROPERTY_NAME(CORE_ALLOCATION_POLICY);
-
         /** @brief The overhead to start a thread execution, in seconds **/
         DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
+
+        /** @brief The job selection policy:
+         *      - FCFS: serve jobs in First-Come-First-Serve manner
+         */
+        DECLARE_PROPERTY_NAME(JOB_SELECTION_POLICY);
+
+        /** @brief The resource allocation policy:
+         *      - aggressive_greedy:
+         *                      always given a job as much as it might need (hosts and cores)
+         *                    assuming that all computational tasks can run in parallel and
+         *                    can use as many cores as possible. Consider tasks in order.
+         */
+        DECLARE_PROPERTY_NAME(RESOURCE_ALLOCATION_POLICY);
+
 
     };
 

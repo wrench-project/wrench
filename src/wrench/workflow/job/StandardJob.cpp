@@ -34,7 +34,7 @@ namespace wrench {
                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                              std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                              std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) :
-            WorkflowJob(WorkflowJob::STANDARD, 1),
+            WorkflowJob(WorkflowJob::STANDARD),
             num_completed_tasks(0),
             file_locations(file_locations),
             pre_file_copies(pre_file_copies),
@@ -64,6 +64,20 @@ namespace wrench {
      */
     StandardJob::~StandardJob() {
       std::cerr << "STANDARD_JOB DESTRUCTOR\n";
+    }
+
+    /**
+     * @brief Returns the minimum number of cores that the job needs to run
+     * @return the number of cores
+     */
+    unsigned long StandardJob::getMinimumRequiredNumCores() {
+      unsigned long min_num_cores = 1;
+      for (auto t : tasks) {
+        if (min_num_cores < t->getMinNumCores()) {
+          min_num_cores = t->getMinNumCores();
+        }
+      }
+      return min_num_cores;
     }
 
     /**

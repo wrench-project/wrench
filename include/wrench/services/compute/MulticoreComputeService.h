@@ -25,8 +25,10 @@ namespace wrench {
 
     class FailureCause;
 
-    /**  @brief A ComputeService implementation that
-     *   runs on a multi-core host and can execute sets of independent SINGLE-CORE tasks
+    class Alarm;
+
+    /**  @brief A ComputeService runs standard and pilot jobs on a set of
+     *   multi-core hosts
      */
     class MulticoreComputeService : public ComputeService {
 
@@ -59,7 +61,8 @@ namespace wrench {
                 {MulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD,              "1024"},
                 {MulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD,               "1024"},
                 {MulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                        "0.0"},
-                {MulticoreComputeServiceProperty::CORE_ALLOCATION_POLICY,                         "aggressive"}
+                {MulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                           "FCFS"},
+                {MulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                     "aggressive"}
         };
 
     public:
@@ -68,9 +71,9 @@ namespace wrench {
         MulticoreComputeService(std::string hostname,
                                 bool supports_standard_jobs,
                                 bool supports_pilot_jobs,
+                                std::set<std::pair<std::string, unsigned long>> compute_resources,
                                 StorageService *default_storage_service,
                                 std::map<std::string, std::string> plist = {});
-
 
 
         /***********************/
@@ -101,27 +104,28 @@ namespace wrench {
 
         friend class Simulation;
 
-        unsigned long job_id = 0;
-
-//        MulticoreComputeService();
-
         // Low-level Constructor
         MulticoreComputeService(std::string hostname,
                                 bool supports_standard_jobs,
                                 bool supports_pilot_jobs,
-                                std::map<std::string, std::string>,
-                                unsigned long num_cores,
+                                std::set<std::pair<std::string, unsigned long>> compute_resources,
+                                std::map<std::string, std::string> plist,
                                 double ttl,
                                 PilotJob *pj, std::string suffix,
                                 StorageService *default_storage_service);
 
         std::string hostname;
-        unsigned long num_available_cores;
+        std::set<std::pair<std::string, unsigned long>> compute_resources;
+        // Core availabilities (for each hosts, how many cores are currently available on it)
+        std::map<std::string, unsigned long> core_availabilities;
+        unsigned long total_num_cores;
 
         double ttl;
         bool has_ttl;
         double death_date;
-        PilotJob *containing_pilot_job;
+        Alarm *death_alarm = nullptr;
+
+        PilotJob *containing_pilot_job; // In case this service is in fact a pilot job
 
         // Vector of standard job executors
         std::set<StandardJobExecutor *> standard_job_executors;
@@ -155,11 +159,19 @@ namespace wrench {
 
         void processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox);
 
-        bool processNextMessage(double timeout);
+        bool processNextMessage();
 
         bool dispatchNextPendingJob();
 
-        void createWorkForNewlyDispatchedJob(StandardJob *job);
+        bool dispatchStandardJob(StandardJob *job);
+
+        bool dispatchPilotJob(PilotJob *job);
+
+        std::set<std::pair<std::string, unsigned long>> computeResourceAllocation(StandardJob *job);
+        std::set<std::pair<std::string, unsigned long>> computeResourceAllocationAggressive(StandardJob *job);
+
+
+//        void createWorkForNewlyDispatchedJob(StandardJob *job);
 
         void terminateRunningStandardJob(StandardJob *job);
 

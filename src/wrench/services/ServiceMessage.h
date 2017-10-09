@@ -50,6 +50,15 @@ namespace wrench {
     };
 
 
+    /**
+    * @brief ServiceTTLExpiredMessage class
+    */
+    class ServiceTTLExpiredMessage : public ServiceMessage {
+    public:
+        ServiceTTLExpiredMessage(double payload);
+    };
+
+
 
 
     /***********************/

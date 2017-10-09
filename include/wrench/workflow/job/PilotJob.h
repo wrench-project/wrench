@@ -47,12 +47,15 @@ namespace wrench {
 
         ComputeService *getComputeService();
 
-        double getDuration();
-
         PilotJob::State getState();
 
-        /** @brief The job's duration (in seconds) */
-        double duration;
+        unsigned long getNumHosts() const;
+
+        unsigned long getNumCoresPerHost() const;
+
+        double getDuration() const;
+
+
 
         /***********************/
         /** \cond INTERNAL     */
@@ -69,7 +72,12 @@ namespace wrench {
 
         friend class JobManager;
 
-        PilotJob(Workflow *workflow, unsigned long num_cores, double duration);
+        PilotJob(Workflow *workflow, unsigned long num_hosts, unsigned long num_cores_per_host, double duration);
+
+        unsigned long num_hosts;
+        unsigned long num_cores_per_host;
+        double duration;
+
 
         State state;
         std::unique_ptr<ComputeService> compute_service; // Associated compute service, i.e., the running pilot job

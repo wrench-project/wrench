@@ -61,7 +61,8 @@ namespace wrench {
 				                               std::map<WorkflowFile *,
 								                               StorageService *> file_locations);
 
-				PilotJob *createPilotJob(Workflow *workflow, unsigned int num_cores, double duration);
+				PilotJob *createPilotJob(Workflow *workflow, unsigned long num_hosts,
+				                         unsigned long num_cores_per_hosts, double duration);
 
 //				void submitJob(WorkflowJob *job, ComputeService *compute_service);
 

@@ -172,9 +172,9 @@ namespace wrench {
     /**
      * @brief A "compute service doesn't have enough cores" failure cause
      */
-    class NotEnoughCores : public FailureCause {
+    class NotEnoughComputeResources : public FailureCause {
     public:
-        NotEnoughCores(WorkflowJob *job, ComputeService *compute_service);
+        NotEnoughComputeResources(WorkflowJob *job, ComputeService *compute_service);
         WorkflowJob *getJob();
         ComputeService *getComputeService();
         std::string toString();

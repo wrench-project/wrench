@@ -15,15 +15,16 @@ namespace wrench {
      * @brief Constructor
      *
      * @param workflow: a workflow
-     * @param num_cores: the number of cores required by the pilot job
-     * @param duration: duration of the pilot job, in seconds
      */
-    PilotJob::PilotJob(Workflow *workflow, unsigned long num_cores, double duration) :
-            WorkflowJob(WorkflowJob::PILOT, num_cores), state(PilotJob::State::NOT_SUBMITTED) {
+    PilotJob::PilotJob(Workflow *workflow, unsigned long num_hosts, unsigned long num_cores_per_host, double duration) :
+            WorkflowJob(WorkflowJob::PILOT), state(PilotJob::State::NOT_SUBMITTED) {
 
       this->workflow = workflow;
-      this->duration = duration;
       this->name = "pilot_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
+
+      this->num_hosts = num_hosts;
+      this->num_cores_per_host = num_cores_per_host;
+      this->duration = duration;
     }
 
     /**
@@ -51,12 +52,28 @@ namespace wrench {
       this->compute_service = std::unique_ptr<ComputeService>(cs);
     }
 
-    /** @brief Get the job's duration
-     *
-     * @return the duration in seconds
+    /**
+     * @brief Get the pilot job's number of hosts
+     * @return the number of hosts
      */
-    double PilotJob::getDuration() {
-      return this->duration;
+    unsigned long PilotJob::getNumHosts() const {
+      return num_hosts;
+    }
+
+    /**
+     * @brief Get the pilot job's number of cores per host
+     * @return the number of cores
+     */
+    unsigned long PilotJob::getNumCoresPerHost() const {
+      return num_cores_per_host;
+    }
+
+    /**
+     * @brief Get the pilot job's duration
+     * @return the duration
+     */
+    double PilotJob::getDuration() const {
+      return duration;
     }
 
 };

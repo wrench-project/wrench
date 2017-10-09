@@ -40,22 +40,24 @@ namespace wrench {
         /** @brief Standad job states */
         enum State {
             /** @brief Not submitted yet */
-            NOT_SUBMITTED,
+                    NOT_SUBMITTED,
             /** @brief Submitted but not running yet */
-            PENDING,
+                    PENDING,
             /** @brief Running */
-            RUNNING,
+                    RUNNING,
             /** @brief Completed successfully */
-            COMPLETED,
+                    COMPLETED,
             /** @brief Failed */
-            FAILED,
+                    FAILED,
             /** @brief Terminated by submitter */
-            TERMINATED
+                    TERMINATED
         };
 
         std::vector<WorkflowTask *> getTasks();
 
         void incrementNumCompletedTasks();
+
+        unsigned long getMinimumRequiredNumCores();
 
         unsigned long getNumCompletedTasks();
 
@@ -64,6 +66,7 @@ namespace wrench {
         StandardJob::State getState();
 
         std::map<WorkflowFile *, StorageService *> getFileLocations();
+
 
         // Tasks to run
         /** @brief The job's computational tasks */

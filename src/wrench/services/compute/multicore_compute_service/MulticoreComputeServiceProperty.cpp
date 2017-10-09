@@ -14,8 +14,10 @@ namespace wrench {
     SET_PROPERTY_NAME(MulticoreComputeServiceProperty, NOT_ENOUGH_CORES_MESSAGE_PAYLOAD);
     SET_PROPERTY_NAME(MulticoreComputeServiceProperty, FLOP_RATE_REQUEST_MESSAGE_PAYLOAD);
     SET_PROPERTY_NAME(MulticoreComputeServiceProperty, FLOP_RATE_ANSWER_MESSAGE_PAYLOAD);
-    SET_PROPERTY_NAME(MulticoreComputeServiceProperty, CORE_ALLOCATION_POLICY);
+
     SET_PROPERTY_NAME(MulticoreComputeServiceProperty, THREAD_STARTUP_OVERHEAD);
+    SET_PROPERTY_NAME(MulticoreComputeServiceProperty, JOB_SELECTION_POLICY);
+    SET_PROPERTY_NAME(MulticoreComputeServiceProperty, RESOURCE_ALLOCATION_POLICY);
 
 };
 
