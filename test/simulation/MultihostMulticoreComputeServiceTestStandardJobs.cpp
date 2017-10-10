@@ -18,7 +18,7 @@
 
 #define EPSILON 0.05
 
-class MulticoreComputeServiceTestStandardJobs : public ::testing::Test {
+class MultihostMulticoreComputeServiceTestStandardJobs : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
@@ -56,7 +56,7 @@ public:
 
 
 protected:
-    MulticoreComputeServiceTestStandardJobs() {
+    MultihostMulticoreComputeServiceTestStandardJobs() {
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -120,7 +120,7 @@ protected:
 class MulticoreComputeServiceUnsupportedJobTypeTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceUnsupportedJobTypeTestWMS(MulticoreComputeServiceTestStandardJobs *test,
+    MulticoreComputeServiceUnsupportedJobTypeTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                      wrench::Workflow *workflow,
                                                      std::unique_ptr<wrench::Scheduler> scheduler,
                                                      std::string hostname) :
@@ -130,7 +130,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestStandardJobs *test;
+    MultihostMulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -171,11 +171,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestStandardJobs, UnsupportedStandardJobs) {
+TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, UnsupportedStandardJobs) {
   DO_TEST_WITH_FORK(do_UnsupportedStandardJobs_test);
 }
 
-void MulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() {
+void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -232,7 +232,7 @@ void MulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJobs_test() 
 class MulticoreComputeServiceTwoSingleCoreTasksTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceTwoSingleCoreTasksTestWMS(MulticoreComputeServiceTestStandardJobs *test,
+    MulticoreComputeServiceTwoSingleCoreTasksTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                      wrench::Workflow *workflow,
                                                      std::unique_ptr<wrench::Scheduler> scheduler,
                                                      std::string hostname) :
@@ -242,7 +242,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestStandardJobs *test;
+    MultihostMulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -302,11 +302,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestStandardJobs, TwoSingleCoreTasks) {
+TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, TwoSingleCoreTasks) {
   DO_TEST_WITH_FORK(do_TwoSingleCoreTasks_test);
 }
 
-void MulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
+void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -362,7 +362,7 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_test() {
 class MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(MulticoreComputeServiceTestStandardJobs *test,
+    MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                         wrench::Workflow *workflow,
                                                         std::unique_ptr<wrench::Scheduler> scheduler,
                                                         std::string hostname) :
@@ -372,7 +372,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestStandardJobs *test;
+    MultihostMulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -433,11 +433,11 @@ private:
 };
 
 
-TEST_F(MulticoreComputeServiceTestStandardJobs, TwoDualCoreTasksCase1) {
+TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, TwoDualCoreTasksCase1) {
   DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase1_test);
 }
 
-void MulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
+void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -495,7 +495,7 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_test() {
 class MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(MulticoreComputeServiceTestStandardJobs *test,
+    MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                         wrench::Workflow *workflow,
                                                         std::unique_ptr<wrench::Scheduler> scheduler,
                                                         std::string hostname) :
@@ -505,7 +505,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestStandardJobs *test;
+    MultihostMulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -570,11 +570,11 @@ private:
 };
 
 
-TEST_F(MulticoreComputeServiceTestStandardJobs, TwoDualCoreTasksCase2) {
+TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, TwoDualCoreTasksCase2) {
   DO_TEST_WITH_FORK(do_TwoDualCoreTasksCase2_test);
 }
 
-void MulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
+void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -632,7 +632,7 @@ void MulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_test() {
 class MulticoreComputeServiceJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceJobTerminationTestWMS(MulticoreComputeServiceTestStandardJobs *test,
+    MulticoreComputeServiceJobTerminationTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                  wrench::Workflow *workflow,
                                                  std::unique_ptr<wrench::Scheduler> scheduler,
                                                  std::string hostname) :
@@ -642,7 +642,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestStandardJobs *test;
+    MultihostMulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -689,11 +689,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestStandardJobs, JobTermination) {
+TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, JobTermination) {
   DO_TEST_WITH_FORK(do_JobTermination_test);
 }
 
-void MulticoreComputeServiceTestStandardJobs::do_JobTermination_test() {
+void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -769,7 +769,7 @@ void MulticoreComputeServiceTestStandardJobs::do_JobTermination_test() {
 class MulticoreComputeServiceNonSubmittedJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(MulticoreComputeServiceTestStandardJobs *test,
+    MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                              wrench::Workflow *workflow,
                                                              std::unique_ptr<wrench::Scheduler> scheduler,
                                                              std::string hostname) :
@@ -779,7 +779,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestStandardJobs *test;
+    MultihostMulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -825,11 +825,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestStandardJobs, NonSubmittedJobTermination) {
+TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, NonSubmittedJobTermination) {
   DO_TEST_WITH_FORK(do_NonSubmittedJobTermination_test);
 }
 
-void MulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test() {
+void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -905,7 +905,7 @@ void MulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test
 class MulticoreComputeServiceCompletedJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceCompletedJobTerminationTestWMS(MulticoreComputeServiceTestStandardJobs *test,
+    MulticoreComputeServiceCompletedJobTerminationTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                           wrench::Workflow *workflow,
                                                           std::unique_ptr<wrench::Scheduler> scheduler,
                                                           std::string hostname) :
@@ -915,7 +915,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestStandardJobs *test;
+    MultihostMulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -972,11 +972,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestStandardJobs, CompletedJobTermination) {
+TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, CompletedJobTermination) {
   DO_TEST_WITH_FORK(do_CompletedJobTermination_test);
 }
 
-void MulticoreComputeServiceTestStandardJobs::do_CompletedJobTermination_test() {
+void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTermination_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -1052,7 +1052,7 @@ void MulticoreComputeServiceTestStandardJobs::do_CompletedJobTermination_test() 
 class MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(MulticoreComputeServiceTestStandardJobs *test,
+    MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                                           wrench::Workflow *workflow,
                                                                           std::unique_ptr<wrench::Scheduler> scheduler,
                                                                           std::string hostname) :
@@ -1062,7 +1062,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestStandardJobs *test;
+    MultihostMulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -1117,11 +1117,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestStandardJobs, ShutdownComputeServiceWhileJobIsRunning) {
+TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, ShutdownComputeServiceWhileJobIsRunning) {
   DO_TEST_WITH_FORK(do_ShutdownComputeServiceWhileJobIsRunning_test);
 }
 
-void MulticoreComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobIsRunning_test() {
+void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobIsRunning_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -1198,7 +1198,7 @@ class MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS :
 
 public:
     MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
-            MulticoreComputeServiceTestStandardJobs *test,
+            MultihostMulticoreComputeServiceTestStandardJobs *test,
             wrench::Workflow *workflow,
             std::unique_ptr<wrench::Scheduler> scheduler,
             std::string hostname) :
@@ -1208,7 +1208,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestStandardJobs *test;
+    MultihostMulticoreComputeServiceTestStandardJobs *test;
 
     int main() {
 
@@ -1263,11 +1263,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestStandardJobs, ShutdownStorageServiceBeforeJobIsSubmitted) {
+TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, ShutdownStorageServiceBeforeJobIsSubmitted) {
   DO_TEST_WITH_FORK(do_ShutdownStorageServiceBeforeJobIsSubmitted_test);
 }
 
-void MulticoreComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJobIsSubmitted_test() {
+void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJobIsSubmitted_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();

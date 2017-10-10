@@ -176,8 +176,9 @@ set(TEST_FILES
         test/simulation/OneTaskTest.cpp
         test/simulation/SimpleStorageServiceFunctionalTest.cpp
         test/simulation/SimpleStorageServicePerformanceTest.cpp
-        test/simulation/MulticoreComputeServiceTestStandardJobs.cpp
-        test/simulation/MulticoreComputeServiceTestPilotJobs.cpp
+        test/simulation/MultihostMulticoreComputeServiceTestStandardJobs.cpp
+        test/simulation/MultihostMulticoreComputeServiceTestPilotJobs.cpp
+        test/simulation/MultihostMulticoreComputeServiceSchedulingTest.cpp
         test/simulation/TestWithFork.h
         test/simulation/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp

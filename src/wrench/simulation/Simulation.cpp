@@ -139,6 +139,7 @@ namespace wrench {
      * @throw std::runtime_error
 		 */
     void Simulation::launch() {
+
       // Check that the simulation is initialized
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::launch(): Simulation is not initialized");
@@ -180,11 +181,15 @@ namespace wrench {
                 "Simulation::launch(): At least one StorageService should have been instantiated add passed to Simulation.add()");
       }
 
-      // Check that a FileRegistryService is running
-      if (not this->file_registry_service) {
-        throw std::runtime_error(
-                "Simulation::launch(): A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()");
+      // Check that a FileRegistryService is running if needed
+      if (this->wms->workflow->getInputFiles().size() > 0) {
+        if (not this->file_registry_service) {
+          throw std::runtime_error(
+                  "Simulation::launch(): A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()"
+                   "because there are workflow input files to be staged.");
+        }
       }
+
       // Check that each input file is staged somewhere
       for (auto f : this->wms->workflow->getInputFiles()) {
         if (this->file_registry_service->entries.find(f) == this->file_registry_service->entries.end()) {

@@ -17,7 +17,7 @@
 #include "TestWithFork.h"
 
 
-class MulticoreComputeServiceTestPilotJobs : public ::testing::Test {
+class MultihostMulticoreComputeServiceTestPilotJobs : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
@@ -47,7 +47,7 @@ public:
 
 
 protected:
-    MulticoreComputeServiceTestPilotJobs() {
+    MultihostMulticoreComputeServiceTestPilotJobs() {
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -88,10 +88,10 @@ protected:
 /**  UNSUPPORTED PILOT JOB                                           **/
 /**********************************************************************/
 
-class MulticoreComputeServiceUnsupportedPilotJobsTestWMS : public wrench::WMS {
+class MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceUnsupportedPilotJobsTestWMS(MulticoreComputeServiceTestPilotJobs *test,
+    MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS(MultihostMulticoreComputeServiceTestPilotJobs *test,
                                                        wrench::Workflow *workflow,
                                                        std::unique_ptr<wrench::Scheduler> scheduler,
                                                        std::string hostname) :
@@ -101,7 +101,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestPilotJobs *test;
+    MultihostMulticoreComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -142,11 +142,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestPilotJobs, UnsupportedPilotJobs) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, UnsupportedPilotJobs) {
   DO_TEST_WITH_FORK(do_UnsupportedPilotJobs_test);
 }
 
-void MulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
+void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -164,7 +164,7 @@ void MulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceUnsupportedPilotJobsTestWMS(this, workflow,
+          std::unique_ptr<wrench::WMS>(new MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS(this, workflow,
                                                                                               std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 
@@ -202,10 +202,10 @@ void MulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test() {
 /**  ONE PILOT JOB, NO TIMEOUT, WAIT FOR EXPIRATION                  **/
 /**********************************************************************/
 
-class MulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS : public wrench::WMS {
+class MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(MulticoreComputeServiceTestPilotJobs *test,
+    MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(MultihostMulticoreComputeServiceTestPilotJobs *test,
                                                                         wrench::Workflow *workflow,
                                                                         std::unique_ptr<wrench::Scheduler> scheduler,
                                                                         std::string hostname) :
@@ -215,7 +215,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestPilotJobs *test;
+    MultihostMulticoreComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -315,11 +315,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestPilotJobs, OnePilotJobNoTimeoutWaitForExpiration) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, OnePilotJobNoTimeoutWaitForExpiration) {
   DO_TEST_WITH_FORK(do_OnePilotJobNoTimeoutWaitForExpiration_test);
 }
 
-void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitForExpiration_test() {
+void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitForExpiration_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -338,7 +338,7 @@ void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitForExpirat
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(
-                  new MulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(this, workflow,
+                  new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(this, workflow,
                                                                                           std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 
@@ -374,10 +374,10 @@ void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitForExpirat
 /**  ONE PILOT JOB, NO TIMEOUT, SHUTDOWN SERVICE                     **/
 /**********************************************************************/
 
-class MulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS : public wrench::WMS {
+class MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(MulticoreComputeServiceTestPilotJobs *test,
+    MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(MultihostMulticoreComputeServiceTestPilotJobs *test,
                                                                       wrench::Workflow *workflow,
                                                                       std::unique_ptr<wrench::Scheduler> scheduler,
                                                                       std::string hostname) :
@@ -387,7 +387,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestPilotJobs *test;
+    MultihostMulticoreComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -470,11 +470,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestPilotJobs, OnePilotJobNoTimeoutShutdownService) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, OnePilotJobNoTimeoutShutdownService) {
   DO_TEST_WITH_FORK(do_OnePilotJobNoTimeoutShutdownService_test);
 }
 
-void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutdownService_test() {
+void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutdownService_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -493,7 +493,7 @@ void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutdownServic
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(
-                  new MulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(this, workflow,
+                  new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(this, workflow,
                                                                                         std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 
@@ -531,10 +531,10 @@ void MulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutdownServic
 /**  TERMINATE NON-SUBMITTED PILOT JOB                               **/
 /**********************************************************************/
 
-class MulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS : public wrench::WMS {
+class MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(MulticoreComputeServiceTestPilotJobs *test,
+    MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(MultihostMulticoreComputeServiceTestPilotJobs *test,
                                                                   wrench::Workflow *workflow,
                                                                   std::unique_ptr<wrench::Scheduler> scheduler,
                                                                   std::string hostname) :
@@ -544,7 +544,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestPilotJobs *test;
+    MultihostMulticoreComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -586,11 +586,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestPilotJobs, NonSubmittedPilotJobTermination) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, NonSubmittedPilotJobTermination) {
   DO_TEST_WITH_FORK(do_NonSubmittedPilotJobTermination_test);
 }
 
-void MulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermination_test() {
+void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermination_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -608,7 +608,7 @@ void MulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermination_te
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(this, workflow,
+          std::unique_ptr<wrench::WMS>(new MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(this, workflow,
                                                                                                          std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 
@@ -646,10 +646,10 @@ void MulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermination_te
 /**  TERMINATE IDLE PILOT JOB                                        **/
 /**********************************************************************/
 
-class MulticoreComputeServiceIdlePilotJobTerminationTestWMS : public wrench::WMS {
+class MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceIdlePilotJobTerminationTestWMS(MulticoreComputeServiceTestPilotJobs *test,
+    MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS(MultihostMulticoreComputeServiceTestPilotJobs *test,
                                                           wrench::Workflow *workflow,
                                                           std::unique_ptr<wrench::Scheduler> scheduler,
                                                           std::string hostname) :
@@ -659,7 +659,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestPilotJobs *test;
+    MultihostMulticoreComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -749,11 +749,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestPilotJobs, IdlePilotJobTermination) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, IdlePilotJobTermination) {
   DO_TEST_WITH_FORK(do_IdlePilotJobTermination_test);
 }
 
-void MulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_test() {
+void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -771,7 +771,7 @@ void MulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_test() {
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceIdlePilotJobTerminationTestWMS(this, workflow,
+          std::unique_ptr<wrench::WMS>(new MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS(this, workflow,
                                                                                                  std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 
@@ -809,10 +809,10 @@ void MulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_test() {
 /**  TERMINATE NON-IDLE PILOT JOB                                    **/
 /**********************************************************************/
 
-class MulticoreComputeServiceNonIdlePilotJobTerminationTestWMS : public wrench::WMS {
+class MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(MulticoreComputeServiceTestPilotJobs *test,
+    MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(MultihostMulticoreComputeServiceTestPilotJobs *test,
                                                              wrench::Workflow *workflow,
                                                              std::unique_ptr<wrench::Scheduler> scheduler,
                                                              std::string hostname) :
@@ -822,7 +822,7 @@ public:
 
 private:
 
-    MulticoreComputeServiceTestPilotJobs *test;
+    MultihostMulticoreComputeServiceTestPilotJobs *test;
 
     int main() {
 
@@ -919,11 +919,11 @@ private:
     }
 };
 
-TEST_F(MulticoreComputeServiceTestPilotJobs, NonIdlePilotJobTermination) {
+TEST_F(MultihostMulticoreComputeServiceTestPilotJobs, NonIdlePilotJobTermination) {
   DO_TEST_WITH_FORK(do_NonIdlePilotJobTermination_test);
 }
 
-void MulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTermination_test() {
+void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTermination_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -941,7 +941,7 @@ void MulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTermination_test() 
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(this, workflow,
+          std::unique_ptr<wrench::WMS>(new MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(this, workflow,
                                                                                                     std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 
