@@ -64,6 +64,9 @@ namespace wrench {
 
         std::vector<WorkflowTask *> getTasks();
 
+        std::vector<WorkflowFile *> getFiles();
+
+
         std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
 
         std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);

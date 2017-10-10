@@ -342,10 +342,23 @@ namespace wrench {
      */
     std::vector<WorkflowTask *> Workflow::getTasks() {
       std::vector<WorkflowTask *> all_tasks;
-      for (auto &it : tasks) {
+      for (auto &it : this->tasks) {
         all_tasks.push_back(it.second.get());
       }
       return all_tasks;
+    };
+
+    /**
+     * @brief Get a list of all files in the workflow
+     *
+     * @return a vector of workflow files
+     */
+    std::vector<WorkflowFile *> Workflow::getFiles() {
+      std::vector<WorkflowFile *> all_files;
+      for (auto &it : this->files) {
+        all_files.push_back(it.second.get());
+      }
+      return all_files;
     };
 
     /**

@@ -22,17 +22,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(test, "Log category for test");
 class MultihostMulticoreComputeServiceTestScheduling : public ::testing::Test {
 
 public:
-    wrench::WorkflowFile *input_file;
-    wrench::StorageService *storage_service1 = nullptr;
-//    wrench::WorkflowFile *output_file1;
-//    wrench::WorkflowFile *output_file2;
-//    wrench::WorkflowFile *output_file3;
-//    wrench::WorkflowFile *output_file4;
-//    wrench::WorkflowTask *task1;
-//    wrench::WorkflowTask *task2;
-//    wrench::WorkflowTask *task3;
-//    wrench::WorkflowTask *task4;
-
     wrench::ComputeService *compute_service = nullptr;
 
     void do_Noop_test();
@@ -44,19 +33,6 @@ protected:
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
-
-      // Create the files
-//      input_file = workflow->addFile("input_file", 10.0);
-//      output_file1 = workflow->addFile("output_file1", 10.0);
-
-//      // Create one task
-//      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0);
-
-      // Add file-task dependencies
-//      task1->addInputFile(input_file);
-//
-//      task1->addOutputFile(output_file1);
-
 
       // Create a two-host quad-core platform file
       std::string xml = "<?xml version='1.0'?>"
@@ -100,16 +76,24 @@ private:
 
     int main() {
 
+      // Create a job manager
+      std::unique_ptr<wrench::JobManager> job_manager =
+              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
 
-//      // Create a job manager
-//      std::unique_ptr<wrench::JobManager> job_manager =
-//              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
-//
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
-//
-//      // Terminate
+      // Create a job with 3
+      wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60, 2, 4, 1.0);
+      wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60, 2, 4, 1.0);
+      wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60, 4, 4, 1.0);
+
+      std::vector<wrench::WorkflowTask *> tasks;
+
+      tasks.push_back(t1);
+      tasks.push_back(t2);
+      tasks.push_back(t3);
+      job_manager->createStandardJob(tasks, {}, {}, {}, {});
+
+
+      // Terminate
       this->simulation->shutdownAllComputeServices();
       this->simulation->shutdownAllStorageServices();
       return 0;
@@ -150,11 +134,6 @@ void MultihostMulticoreComputeServiceTestScheduling::do_Noop_test() {
                                                                {std::pair<std::string, unsigned long>(hostname, 0)},
                                                                nullptr,
                                                                {}))));
-
-  // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   EXPECT_NO_THROW(simulation->launch());
 

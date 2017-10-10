@@ -169,16 +169,18 @@ namespace wrench {
                 "Simulation::launch(): At least one ComputeService should have been instantiated add passed to Simulation.add()");
       }
 
-      // Check that at least one StorageService is running
-      bool one_storage_service_running = false;
-      for (auto it = this->storage_services.begin(); it != this->storage_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          one_storage_service_running = true;
+      // Check that at least one StorageService is running (only needed if there are files in the workflow)
+      if (this->wms->workflow->getFiles().size() > 0) {
+        bool one_storage_service_running = false;
+        for (auto it = this->storage_services.begin(); it != this->storage_services.end(); it++) {
+          if ((*it)->state == Service::UP) {
+            one_storage_service_running = true;
+          }
         }
-      }
-      if (!one_storage_service_running) {
-        throw std::runtime_error(
-                "Simulation::launch(): At least one StorageService should have been instantiated add passed to Simulation.add()");
+        if (!one_storage_service_running) {
+          throw std::runtime_error(
+                  "Simulation::launch(): At least one StorageService should have been instantiated add passed to Simulation.add()");
+        }
       }
 
       // Check that a FileRegistryService is running if needed
