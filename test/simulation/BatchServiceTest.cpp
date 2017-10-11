@@ -279,7 +279,6 @@ private:
             }
             switch (event->type) {
                 case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-                    std::cout<<"Got the pilot job started message\n";
                     // success, do nothing for now
                     break;
                 }
@@ -1859,7 +1858,7 @@ private:
             bool success = false;
             try {
                 job_manager->submitJob(job, pilot_job->getComputeService(), standard_batch_job_args);
-            }catch (std::runtime_error e){
+            }catch (wrench::WorkflowExecutionException e){
                 success = true;
             }
 
@@ -1881,7 +1880,7 @@ private:
     }
 };
 
-TEST_F(BatchServiceTest, DISABLED_InsufficientCoresInsidePilotJobTaskTest) {
+TEST_F(BatchServiceTest, InsufficientCoresInsidePilotJobTaskTest) {
     DO_TEST_WITH_FORK(do_InsufficientCoresInsidePilotJobTaskTest_test);
 }
 

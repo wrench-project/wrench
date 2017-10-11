@@ -982,7 +982,6 @@ namespace wrench {
         return true;
 
       } else if (ComputeServicePilotJobExpiredMessage *msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
-          std::cout<<"Termination in pilot job batchservice\n";
         processPilotJobCompletion(msg->job);
         return true;
       } else if (auto *msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
