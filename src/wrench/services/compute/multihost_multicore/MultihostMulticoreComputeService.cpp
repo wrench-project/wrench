@@ -35,7 +35,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void MultihostMulticoreComputeService::submitStandardJob(StandardJob *job,
-                                                    std::map<std::string, std::string> &service_specific_args) {
+                                                             std::map<std::string, std::string> &service_specific_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -225,17 +225,17 @@ namespace wrench {
      * @param plist: a property list
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(std::string hostname,
-                                                     bool supports_standard_jobs,
-                                                     bool supports_pilot_jobs,
-                                                     std::set<std::pair<std::string, unsigned long>> compute_resources,
-                                                     StorageService *default_storage_service,
-                                                     std::map<std::string, std::string> plist) :
+                                                                       bool supports_standard_jobs,
+                                                                       bool supports_pilot_jobs,
+                                                                       std::set<std::pair<std::string, unsigned long>> compute_resources,
+                                                                       StorageService *default_storage_service,
+                                                                       std::map<std::string, std::string> plist) :
             MultihostMulticoreComputeService::MultihostMulticoreComputeService(hostname,
-                                                             supports_standard_jobs,
-                                                             supports_pilot_jobs,
-                                                             compute_resources,
-                                                             plist, -1, nullptr, "",
-                                                             default_storage_service) {
+                                                                               supports_standard_jobs,
+                                                                               supports_pilot_jobs,
+                                                                               compute_resources,
+                                                                               plist, -1, nullptr, "",
+                                                                               default_storage_service) {
 
     }
 
@@ -354,7 +354,6 @@ namespace wrench {
  */
     bool MultihostMulticoreComputeService::dispatchNextPendingJob() {
 
-      WRENCH_INFO("IN DISPATCH");
       if (this->pending_jobs.size() == 0) {
         return false;
       }
@@ -419,6 +418,7 @@ namespace wrench {
     std::set<std::pair<std::string, unsigned long>> MultihostMulticoreComputeService::computeResourceAllocationAggressive(StandardJob *job) {
 
 
+      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION: %ld", this->core_availabilities.size());
       // Make a copy of core_availabilities
       std::map<std::string, unsigned long> tentative_availabilities;
       for (auto r : this->core_availabilities) {
@@ -441,14 +441,18 @@ namespace wrench {
         unsigned long picked_picked_num_cores = 0;
 
         for (auto t : tasks) {
+          WRENCH_INFO("LOOKING AT TASK %s", t->getId().c_str());
           std::string picked_host;
           unsigned long picked_num_cores = 0;
 
+          WRENCH_INFO("---> %ld", tentative_availabilities.size());
           for (auto r : tentative_availabilities) {
+            WRENCH_INFO("   LOOKING AT HOST %s", r.first.c_str());
             std::string hostname = r.first;
             unsigned long num_available_cores = r.second;
 
             if (num_available_cores < t->getMinNumCores()) {
+              WRENCH_INFO("      NO DICE");
               continue;
             }
 
@@ -459,10 +463,13 @@ namespace wrench {
           }
 
           if (picked_num_cores == 0) {
+            WRENCH_INFO("NOPE");
             continue;
           }
 
           if (picked_num_cores > picked_picked_num_cores) {
+            WRENCH_INFO("PICKED TASK %s on HOST %s with %ld cores",
+                        t->getId().c_str(), picked_host.c_str(), picked_num_cores);
             picked_task = t;
             picked_picked_num_cores = picked_num_cores;
             picked_picked_host = picked_host;
@@ -479,13 +486,16 @@ namespace wrench {
         }
       }
 
-      // Come up with allocation based on tentative availabities!
+      WRENCH_INFO("HERE");
+
+      // Come up with allocation based on tentative availabilities!
       std::set<std::pair<std::string, unsigned long>> allocation;
       for (auto r : tentative_availabilities) {
         std::string hostname = r.first;
         unsigned long num_cores = r.second;
 
         if (num_cores < this->core_availabilities[hostname]) {
+          WRENCH_INFO("ALLOCATION %s/%ld", hostname.c_str(), this->core_availabilities[hostname] - num_cores);
           allocation.insert(std::make_pair(hostname, this->core_availabilities[hostname] - num_cores));
         }
       }
@@ -502,16 +512,12 @@ namespace wrench {
      */
     bool MultihostMulticoreComputeService::dispatchStandardJob(StandardJob *job) {
 
-      WRENCH_INFO("IN DISPATCH STANDARD");
-
       // Compute the required minimum number of cores
       unsigned long minimum_required_num_cores = 1;
 
       for (auto t : (job)->getTasks()) {
         minimum_required_num_cores = MAX(minimum_required_num_cores, t->getMinNumCores());
       }
-
-      WRENCH_INFO("MIN NUM CORES = %ld", minimum_required_num_cores);
 
       // Find the list of hosts with the required number of cores
       std::set<std::string> possible_hosts;
@@ -607,13 +613,13 @@ namespace wrench {
 
       ComputeService *cs =
               new MultihostMulticoreComputeService(this->hostname,
-                                          true, false,
-                                          compute_resources,
-                                          this->property_list,
-                                          job->getDuration(),
-                                          job,
-                                          "_pilot",
-                                          this->default_storage_service);
+                                                   true, false,
+                                                   compute_resources,
+                                                   this->property_list,
+                                                   job->getDuration(),
+                                                   job,
+                                                   "_pilot",
+                                                   this->default_storage_service);
 
       cs->setSimulation(this->simulation);
       job->setComputeService(cs);
@@ -1003,7 +1009,6 @@ namespace wrench {
     void MultihostMulticoreComputeService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
 
       // Remove the executor from the executor list
-      WRENCH_INFO("====> %ld", this->standard_job_executors.size());
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
         throw std::runtime_error(
                 "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
@@ -1038,8 +1043,8 @@ namespace wrench {
      * @param cause: the cause of the failure
      */
     void MultihostMulticoreComputeService::processStandardJobFailure(StandardJobExecutor *executor,
-                                                            StandardJob *job,
-                                                            std::shared_ptr<FailureCause> cause) {
+                                                                     StandardJob *job,
+                                                                     std::shared_ptr<FailureCause> cause) {
 
       // Remove the executor from the executor list
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
@@ -1387,8 +1392,10 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void MultihostMulticoreComputeService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
-                                                           std::map<std::string, std::string> &service_specific_arguments) {
+                                                                    std::map<std::string, std::string> &service_specific_arguments) {
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
+
+      // Do we support standard jobs?
       if (not this->supportsStandardJobs()) {
         try {
           S4U_Mailbox::dputMessage(
@@ -1403,6 +1410,34 @@ namespace wrench {
         return;
       }
 
+      // Can we run this job assuming the whole set of resources is available?
+      unsigned long max_min_num_cores = 0;
+      for (auto t : job->getTasks()) {
+        max_min_num_cores = MAX(max_min_num_cores, t->getMinNumCores());
+      }
+      bool enough_resources = false;
+      for (auto r : this->compute_resources) {
+        unsigned long num_cores = r.second;
+        if (num_cores >= max_min_num_cores) {
+          enough_resources = true;
+        }
+      }
+
+      if (!enough_resources) {
+        try {
+          S4U_Mailbox::dputMessage(
+                  answer_mailbox,
+                  new ComputeServiceSubmitStandardJobAnswerMessage(
+                          job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
+                          this->getPropertyValueAsDouble(
+                                  MultihostMulticoreComputeServiceProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          return;
+        }
+        return;
+      }
+
+      // Since we can run, add the job to the list of pending jobs
       this->pending_jobs.push_front((WorkflowJob *) job);
 
       try {

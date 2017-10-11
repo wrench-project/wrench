@@ -100,6 +100,8 @@ protected:
               "   <AS id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
               "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+              "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
               "   </AS> "
               "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");

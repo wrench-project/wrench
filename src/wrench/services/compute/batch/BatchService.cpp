@@ -1124,7 +1124,6 @@ namespace wrench {
      */
     void BatchService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
       // Remove the executor from the executor list
-      WRENCH_INFO("====> %ld", this->standard_job_executors.size());
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
         throw std::runtime_error("BatchService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }

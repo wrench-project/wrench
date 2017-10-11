@@ -41,6 +41,8 @@ protected:
               "   <AS id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"Host1\" speed=\"1f\" core=\"4\"/> "
               "       <host id=\"Host2\" speed=\"1f\" core=\"4\"/> "
+              "        <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+              "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
               "   </AS> "
               "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -90,7 +92,45 @@ private:
       tasks.push_back(t1);
       tasks.push_back(t2);
       tasks.push_back(t3);
-      job_manager->createStandardJob(tasks, {}, {}, {}, {});
+      wrench::StandardJob *job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
+
+      job_manager->submitJob(job, this->test->compute_service);
+
+      // Wait for a workflow execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+      try {
+        event = workflow->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
+      }
+
+      // Check completion states and times
+      if ((t1->getState() != wrench::WorkflowTask::COMPLETED) ||
+          (t2->getState() != wrench::WorkflowTask::COMPLETED) ||
+          (t3->getState() != wrench::WorkflowTask::COMPLETED)) {
+        throw std::runtime_error("Unexpected task states");
+      }
+
+      double task1_end_date = t1->getEndDate();
+      double task2_end_date = t2->getEndDate();
+      double task3_end_date = t3->getEndDate();
+
+      WRENCH_INFO("t1:%lf t2:%lf t3:%lf", task1_end_date, task2_end_date, task3_end_date);
+
+//      double delta = fabs(task1_end_date - task2_end_date);
+//      if (delta > 0.1) {
+//        throw std::runtime_error("Task completion times should be about 0.0 seconds apart but they are " +
+//                                 std::to_string(delta) + " apart.");
+//      }
 
 
       // Terminate
@@ -117,21 +157,19 @@ void MultihostMulticoreComputeServiceTestScheduling::do_Noop_test() {
   // Setting up the platform
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-  // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
-
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
           std::unique_ptr<wrench::WMS>(new XNoopTestWMS(this, workflow,
                                                        std::unique_ptr<wrench::Scheduler>(
                                                                new NoopScheduler()),
-                          hostname))));
+                          "Host1"))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::pair<std::string, unsigned long>(hostname, 0)},
+                  new wrench::MultihostMulticoreComputeService("Host1", true, true,
+                                                               {std::make_pair("Host1", 0),
+                                                                std::make_pair("Host2", 0)},
                                                                nullptr,
                                                                {}))));
 
