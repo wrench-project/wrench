@@ -292,7 +292,7 @@ namespace wrench {
                                       std::to_string(requested_cores) + " are requested");
         }
 
-        this->compute_resources.insert(std::pair<std::string, unsigned long>(hname, requested_cores));
+        this->compute_resources.insert(std::make_pair(hname, requested_cores));
       }
 
       // Compute the total number of cores and set initial core availabilities
@@ -608,7 +608,7 @@ namespace wrench {
       // Creates a compute service (that does not support pilot jobs!!)
       std::set<std::pair<std::string, unsigned long>> compute_resources;
       for (auto h : chosen_hosts) {
-        compute_resources.insert(std::pair<std::string, unsigned long>(h, job->getNumCoresPerHost()));
+        compute_resources.insert(std::make_pair(h, job->getNumCoresPerHost()));
       }
 
       ComputeService *cs =

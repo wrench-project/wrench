@@ -144,7 +144,7 @@ void OneTaskTest::do_Noop_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname, 0)},
+                                                      {std::make_pair(hostname, 0)},
                                                       nullptr,
                                                       {}))));
 
@@ -263,7 +263,7 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       nullptr,
                                                       {}))));
 
@@ -394,7 +394,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service1,
                                                       {}))));
 
@@ -552,7 +552,7 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service2,
                                                       {}))));
 

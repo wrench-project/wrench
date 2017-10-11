@@ -348,7 +348,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                          {std::pair<std::string, unsigned long>(hostname,0)},
+                                          {std::make_pair(hostname,0)},
                                                       nullptr, {}))));
 
   // Create Three Storage Services
@@ -490,7 +490,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       nullptr, {}))));
 
   simulation->setFileRegistryService(std::move(file_registry_service));
@@ -650,7 +650,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       nullptr, {}))));
 
   simulation->setFileRegistryService(std::move(file_registry_service));
@@ -871,7 +871,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       nullptr, {}))));
 
   simulation->setFileRegistryService(std::move(file_registry_service));
@@ -1105,7 +1105,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       nullptr, {}))));
 
   simulation->setFileRegistryService(std::move(file_registry_service));

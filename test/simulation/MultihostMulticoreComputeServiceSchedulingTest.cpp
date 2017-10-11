@@ -83,9 +83,9 @@ private:
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
 
       // Create a job with 3
-      wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60, 2, 4, 1.0);
-      wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60, 2, 4, 1.0);
-      wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60, 4, 4, 1.0);
+      wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60, 2, 3, 1.0);
+      wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60, 2, 2, 1.0);
+      wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60, 2, 4, 1.0);
 
       std::vector<wrench::WorkflowTask *> tasks;
 

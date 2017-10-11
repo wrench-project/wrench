@@ -208,7 +208,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service, {}))));
 
   // Create a file registry
@@ -338,7 +338,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service, {}))));
 
   // Create a file registry
@@ -470,7 +470,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service, {}))));
 
   // Create a file registry
@@ -607,7 +607,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service, {}))));
 
   // Create a file registry
@@ -726,7 +726,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service, {}))));
 
   // Create a file registry
@@ -862,7 +862,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service, {}))));
 
   // Create a file registry
@@ -1009,7 +1009,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service, {}))));
 
   // Create a file registry
@@ -1155,7 +1155,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service, {}))));
 
   // Create a file registry
@@ -1301,7 +1301,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::pair<std::string, unsigned long>(hostname,0)},
+                                                      {std::make_pair(hostname,0)},
                                                       storage_service, {}))));
 
   // Create a file registry

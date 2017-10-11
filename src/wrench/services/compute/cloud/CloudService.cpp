@@ -331,7 +331,7 @@ namespace wrench {
           // create a multicore executor for the VM
           std::unique_ptr<ComputeService> cs(new MultihostMulticoreComputeService(vm_hostname, supports_standard_jobs,
                                                                          supports_pilot_jobs,
-									  {std::pair<std::string, unsigned long>(vm_hostname, num_cores)},
+									  {std::make_pair(vm_hostname, num_cores)},
                                                                          default_storage_service, plist));
           cs->setSimulation(this->simulation);
 

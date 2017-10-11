@@ -530,7 +530,7 @@ namespace wrench {
             //Remove that many cores from the available_nodes_to_core
             (*it).second-=cores_per_node;
             hosts_assigned.push_back((*it).first);
-            resources.insert(std::pair<std::string,unsigned long>((*it).first,cores_per_node));
+            resources.insert(std::make_pair((*it).first,cores_per_node));
             if(++host_count>=num_nodes){
               break;
             }
@@ -577,7 +577,7 @@ namespace wrench {
           }
           this->available_nodes_to_cores[target_host] -= cores_per_node;
           hosts_assigned.push_back(target_host);
-          resources.insert(std::pair<std::string,unsigned long>(target_host,cores_per_node));
+          resources.insert(std::make_pair(target_host,cores_per_node));
         }
       }else{
         throw std::invalid_argument(

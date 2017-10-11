@@ -184,7 +184,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("WMSHost", true, true,
-                                                      {std::pair<std::string, unsigned long>("WMSHost",0)},
+                                                      {std::make_pair("WMSHost",0)},
                                                       nullptr, {}))));
 
   // Create Two Storage Services
