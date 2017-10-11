@@ -18,15 +18,21 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(test, "Log category for test");
 
+#define EPSILON 0.05
+
 
 class MultihostMulticoreComputeServiceTestScheduling : public ::testing::Test {
+
 
 public:
     wrench::ComputeService *compute_service = nullptr;
 
-    void do_Noop_test();
+    void do_OneJob_test();
 
 
+    static bool isJustABitGreater(double base, double variable) {
+      return ((variable > base) && (variable < base + EPSILON));
+    }
 
 protected:
     MultihostMulticoreComputeServiceTestScheduling() {
@@ -60,13 +66,13 @@ protected:
 /**  NOOP SIMULATION TEST                                            **/
 /**********************************************************************/
 
-class XNoopTestWMS : public wrench::WMS {
+class OneJobTestWMS : public wrench::WMS {
 
 public:
-    XNoopTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
-                wrench::Workflow *workflow,
-                std::unique_ptr<wrench::Scheduler> scheduler,
-                std::string hostname) :
+    OneJobTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
+                  wrench::Workflow *workflow,
+                  std::unique_ptr<wrench::Scheduler> scheduler,
+                  std::string hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -82,55 +88,133 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
 
-      // Create a job with 3
-      wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60, 2, 3, 1.0);
-      wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60, 2, 2, 1.0);
-      wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60, 2, 4, 1.0);
+      /**********************************************/
+      /** CASE 1                                   **/
+      /**********************************************/
+      {
 
-      std::vector<wrench::WorkflowTask *> tasks;
+        double now = wrench::S4U_Simulation::getClock();
 
-      tasks.push_back(t1);
-      tasks.push_back(t2);
-      tasks.push_back(t3);
-      wrench::StandardJob *job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
+        // Create a job with 3 tasks
+        wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0000, 2, 3, 1.0);
+        wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 1, 2, 1.0);
+        wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60.0002, 2, 4, 1.0);
 
-      job_manager->submitJob(job, this->test->compute_service);
+        std::vector<wrench::WorkflowTask *> tasks;
 
-      // Wait for a workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
-      try {
-        event = workflow->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
-      }
-      switch (event->type) {
-        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-          // success, do nothing for now
-          break;
+        tasks.push_back(t1);
+        tasks.push_back(t2);
+        tasks.push_back(t3);
+        wrench::StandardJob *job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
+
+        job_manager->submitJob(job, this->test->compute_service);
+
+        // Wait for a workflow execution event
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = workflow->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
-        default: {
-          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        switch (event->type) {
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+            // success, do nothing for now
+            break;
+          }
+          default: {
+            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+          }
+        }
+
+        // Check completion states and times
+        if ((t1->getState() != wrench::WorkflowTask::COMPLETED) ||
+            (t2->getState() != wrench::WorkflowTask::COMPLETED) ||
+            (t3->getState() != wrench::WorkflowTask::COMPLETED)) {
+          throw std::runtime_error("Unexpected task states");
+        }
+
+        double task1_makespan = t1->getEndDate() - now;
+        double task2_makespan = t2->getEndDate() - now;
+        double task3_makespan = t3->getEndDate() - now;
+
+//        WRENCH_INFO("t1:%lf t2:%lf t3:%lf", task1_makespan, task2_makespan, task3_makespan);
+
+        if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(now + 30, task1_makespan) ||
+            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(now + 30, task2_makespan) ||
+            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(now + 15, task3_makespan)) {
+          throw std::runtime_error("CASE 1: Unexpected task execution times "
+                                           "t1: " + std::to_string(task1_makespan) +
+                                   " t2: " + std::to_string(task2_makespan) +
+                                   " t3: " + std::to_string(task3_makespan));
+        }
+
+        workflow->removeTask(t1);
+        workflow->removeTask(t2);
+        workflow->removeTask(t3);
+      }
+
+      /**********************************************/
+      /** CASE 2                                   **/
+      /**********************************************/
+      {
+
+        double now = wrench::S4U_Simulation::getClock();
+        WRENCH_INFO("NOW = %lf", now);
+
+        // Create a job with 3 tasks
+        wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0001, 2, 3, 1.0);
+        wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0000, 1, 2, 1.0);
+        wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60.0002, 2, 4, 1.0);
+
+        std::vector<wrench::WorkflowTask *> tasks;
+
+        tasks.push_back(t1);
+        tasks.push_back(t2);
+        tasks.push_back(t3);
+        wrench::StandardJob *job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
+
+        job_manager->submitJob(job, this->test->compute_service);
+
+        // Wait for a workflow execution event
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = workflow->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        }
+        switch (event->type) {
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+            // success, do nothing for now
+            break;
+          }
+          default: {
+            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+          }
+        }
+
+        // Check completion states and times
+        if ((t1->getState() != wrench::WorkflowTask::COMPLETED) ||
+            (t2->getState() != wrench::WorkflowTask::COMPLETED) ||
+            (t3->getState() != wrench::WorkflowTask::COMPLETED)) {
+          throw std::runtime_error("Unexpected task states");
+        }
+
+        double task1_makespan = t1->getEndDate() - now;
+        double task2_makespan = t2->getEndDate() - now;
+        double task3_makespan = t3->getEndDate() - now;
+
+//        WRENCH_INFO("t1:%lf t2:%lf t3:%lf", task1_makespan, task2_makespan, task3_makespan);
+
+        if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(20, task1_makespan) ||
+            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(60, task2_makespan) ||
+            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(15, task3_makespan)) {
+          throw std::runtime_error("CASE 2: Unexpected task execution times "
+                                           "t1: " + std::to_string(task1_makespan) +
+                                   " t2: " + std::to_string(task2_makespan) +
+                                   " t3: " + std::to_string(task3_makespan));
         }
       }
 
-      // Check completion states and times
-      if ((t1->getState() != wrench::WorkflowTask::COMPLETED) ||
-          (t2->getState() != wrench::WorkflowTask::COMPLETED) ||
-          (t3->getState() != wrench::WorkflowTask::COMPLETED)) {
-        throw std::runtime_error("Unexpected task states");
-      }
-
-      double task1_end_date = t1->getEndDate();
-      double task2_end_date = t2->getEndDate();
-      double task3_end_date = t3->getEndDate();
-
-      WRENCH_INFO("t1:%lf t2:%lf t3:%lf", task1_end_date, task2_end_date, task3_end_date);
-
-//      double delta = fabs(task1_end_date - task2_end_date);
-//      if (delta > 0.1) {
-//        throw std::runtime_error("Task completion times should be about 0.0 seconds apart but they are " +
-//                                 std::to_string(delta) + " apart.");
-//      }
 
 
       // Terminate
@@ -141,10 +225,10 @@ private:
 };
 
 TEST_F(MultihostMulticoreComputeServiceTestScheduling, Noop) {
-  DO_TEST_WITH_FORK(do_Noop_test);
+  DO_TEST_WITH_FORK(do_OneJob_test);
 }
 
-void MultihostMulticoreComputeServiceTestScheduling::do_Noop_test() {
+void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -159,9 +243,9 @@ void MultihostMulticoreComputeServiceTestScheduling::do_Noop_test() {
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new XNoopTestWMS(this, workflow,
-                                                       std::unique_ptr<wrench::Scheduler>(
-                                                               new NoopScheduler()),
+          std::unique_ptr<wrench::WMS>(new OneJobTestWMS(this, workflow,
+                                                         std::unique_ptr<wrench::Scheduler>(
+                                                                 new NoopScheduler()),
                           "Host1"))));
 
   // Create a Compute Service
@@ -171,7 +255,9 @@ void MultihostMulticoreComputeServiceTestScheduling::do_Noop_test() {
                                                                {std::make_pair("Host1", 0),
                                                                 std::make_pair("Host2", 0)},
                                                                nullptr,
-                                                               {}))));
+                                                               {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY, "FCFS"},
+                                                                {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY, "aggressive"},
+                                                               }))));
 
   EXPECT_NO_THROW(simulation->launch());
 
