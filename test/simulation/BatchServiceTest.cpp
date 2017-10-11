@@ -279,6 +279,7 @@ private:
             }
             switch (event->type) {
                 case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
+                    std::cout<<"Got the pilot job started message\n";
                     // success, do nothing for now
                     break;
                 }
@@ -1800,8 +1801,8 @@ private:
             // Create a pilot job
             wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 90);
 
-            // Create a sequential task that lasts one min and requires 2 cores
-            wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
+            // Create a sequential task that lasts one min and requires 5 cores
+            wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 5, 5, 1.0);
             task->addInputFile(workflow->getFileById("input_file"));
             task->addOutputFile(workflow->getFileById("output_file"));
 
@@ -1880,7 +1881,7 @@ private:
     }
 };
 
-TEST_F(BatchServiceTest, InsufficientCoresInsidePilotJobTaskTest) {
+TEST_F(BatchServiceTest, DISABLED_InsufficientCoresInsidePilotJobTaskTest) {
     DO_TEST_WITH_FORK(do_InsufficientCoresInsidePilotJobTaskTest_test);
 }
 

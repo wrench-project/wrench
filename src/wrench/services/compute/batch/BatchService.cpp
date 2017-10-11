@@ -14,6 +14,7 @@
 #include <simulation/SimulationMessage.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
+#include <wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h>
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "services/compute/ComputeServiceMessage.h"
@@ -346,14 +347,10 @@ namespace wrench {
 
       /** Main loop **/
       bool life = true;
-      double next_timeout_timestamp = 0;
-      next_timeout_timestamp = S4U_Simulation::getClock()+this->random_interval;
+//      double next_timeout_timestamp = 0;
+//      next_timeout_timestamp = S4U_Simulation::getClock()+this->random_interval;
       while (life) {
-//        double job_timeout = next_timeout_timestamp-S4U_Simulation::getClock();
-//        if (job_timeout>0){
         life = processNextMessage();
-//        }else{
-        //check if some jobs have expired and should be killed
         if (this->running_jobs.size() > 0) {
           std::set<BatchJob*>::iterator it;
           for (it = this->running_jobs.begin(); it != this->running_jobs.end();) {
@@ -363,10 +360,6 @@ namespace wrench {
                 this->updateResources((*it)->getResourcesAllocated());
                 it = this->running_jobs.erase(it);
               }else if((*it)->getWorkflowJob()->getType()==WorkflowJob::PILOT){
-//                  this->processPilotJobTimeout((PilotJob*)(*it)->getWorkflowJob());
-//                  this->udpateResources((*it)->getResourcesAllocated());
-//                  this->sendPilotJobCallBackMessage((PilotJob*)(*it)->getWorkflowJob());
-//                  it = this->running_jobs.erase(it);
               }else{
                 throw std::runtime_error(
                         "BatchService::main(): Received a JOB type other than Standard and Pilot jobs"
@@ -378,8 +371,6 @@ namespace wrench {
 
           }
         }
-//          next_timeout_timestamp = S4U_Simulation::getClock()+this->random_interval;
-//        }
         if(life) {
           while (this->dispatchNextPendingJob());
         }
@@ -684,15 +675,21 @@ namespace wrench {
           double timeout_timestamp = std::min(job->getDuration(),time_in_minutes*60*1.0);
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock()+timeout_timestamp);
 
+//          ComputeService *cs =
+//                  new wrench::BatchService(host_to_run_on,nodes_for_pilot_job,
+//                                           this->default_storage_service,true,false,job,cores_per_node_asked_for,batch_job->getEndingTimeStamp(),true,
+//                                           {},"_pilot");
+
           ComputeService *cs =
-                  new wrench::BatchService(host_to_run_on,nodes_for_pilot_job,
-                                           this->default_storage_service,true,false,job,cores_per_node_asked_for,batch_job->getEndingTimeStamp(),true,
-                                           {},"_pilot");
+                  new MultihostMulticoreComputeService(host_to_run_on,
+                                                       true, false,
+                                                       resources,
+                                                       this->default_storage_service
+                                                       );
           cs->setSimulation(this->simulation);
 
           // Create and launch a compute service for the pilot job
           job->setComputeService(cs);
-
 
 
           // Put the job in the running queue
@@ -715,11 +712,13 @@ namespace wrench {
             throw WorkflowExecutionException(cause);
           }
 
+
             std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new AlarmJobTimeOutMessage(job, 0));
-            this->pilot_job_alarms.push_back(std::move(new Alarm(batch_job->getEndingTimeStamp(),host_to_run_on,cs->mailbox_name, msg,"batch_pilot")));
+//            std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
+            this->pilot_job_alarms.push_back(std::move(new Alarm(batch_job->getEndingTimeStamp(),host_to_run_on,this->mailbox_name, msg,"batch_pilot")));
 
           // Push my own mailbox onto the pilot job!
-          job->pushCallbackMailbox(this->mailbox_name);
+//          job->pushCallbackMailbox(this->mailbox_name);
 
           return true;
         }
@@ -983,9 +982,9 @@ namespace wrench {
         return true;
 
       } else if (ComputeServicePilotJobExpiredMessage *msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+          std::cout<<"Termination in pilot job batchservice\n";
         processPilotJobCompletion(msg->job);
         return true;
-
       } else if (auto *msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
         processPilotJobTerminationRequest(msg->job, msg->answer_mailbox);
         return true;
@@ -996,13 +995,22 @@ namespace wrench {
           this->updateResources((StandardJob *) msg->job);
           this->sendStandardJobCallBackMessage((StandardJob *) msg->job);
           return true;
-        }else if(msg->job->getType()==WorkflowJob::PILOT){
-          this->terminate(true);
-          return false;
+        }else if(msg->job->getType()==WorkflowJob::PILOT) {
+            PilotJob* job = (PilotJob*)msg->job;
+            ComputeService* cs = job->getComputeService();
+            try {
+                cs->stop();
+            }catch (wrench::WorkflowExecutionException &e){
+                throw std::runtime_error(
+                        "BatchService::processNextMessage(): Not able to terminate the pilot job"
+                );
+            }
+            this->processPilotJobCompletion(job);
+            return true;
         }
       }  else {
         throw std::runtime_error(
-                "BatchService::waitForNextMessage(): Unknown message type: " + std::to_string(message->payload));
+                "BatchService::processNextMessage(): Unknown message type: " + std::to_string(message->payload));
       }
 
     }
@@ -1014,6 +1022,8 @@ namespace wrench {
      * @param job: the pilot job
      */
     void BatchService::processPilotJobCompletion(PilotJob *job) {
+
+
 
       // Remove the job from the running job list
       bool job_on_the_list = false;
@@ -1037,6 +1047,8 @@ namespace wrench {
         throw std::runtime_error("BatchService::processPilotJobCompletion():  Pilot job completion message recevied but no such pilot jobs found in queue"
         );
       }
+
+
 
       // Forward the notification
       try {
