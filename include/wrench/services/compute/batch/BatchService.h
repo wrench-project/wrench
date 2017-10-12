@@ -111,7 +111,7 @@ namespace wrench {
         //Queue of pending batch jobs
         std::deque<std::unique_ptr<BatchJob>> pending_jobs;
         //A set of running batch jobs
-        std::set<BatchJob*> running_jobs;
+        std::set<std::unique_ptr<BatchJob>> running_jobs;
 
         unsigned long generateUniqueJobId();
 
