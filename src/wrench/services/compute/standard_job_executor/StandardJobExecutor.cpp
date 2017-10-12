@@ -23,6 +23,7 @@
 #include "wrench/workflow/job/PilotJob.h"
 #include "StandardJobExecutorMessage.h"
 
+#include "wrench/util/PointerUtil.h"
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard Job Executor");
 
 namespace wrench {
@@ -130,9 +131,11 @@ namespace wrench {
       this->kill_actor();
 
       // Kill all workunit executors
-      for (auto workunit_executor :  this->workunit_executors)  {
+      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
+      for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
+//      for (auto workunit_executor :  this->running_workunit_executors)  {
 //        WRENCH_INFO("Killing a workunit executor!");
-        workunit_executor->kill();
+        (*it)->kill();
       }
 //      this->kill_actor();
     }
@@ -296,7 +299,7 @@ namespace wrench {
 
 //        std::cerr << "CREATING A WORKUNIT EXECUTOR\n";
 
-        WorkunitMulticoreExecutor *workunit_executor =
+        std::unique_ptr<WorkunitMulticoreExecutor> workunit_executor = std::unique_ptr<WorkunitMulticoreExecutor>(
                 new WorkunitMulticoreExecutor(this->simulation,
                                               target_host,
                                               target_num_cores,
@@ -304,14 +307,14 @@ namespace wrench {
                                               wu,
                                               this->default_storage_service,
                                               this->getPropertyValueAsDouble(
-                                                      StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD));
+                                                      StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD)));
 
         // Update core availabilities
         this->core_availabilities[target_host] -= target_num_cores;
 
 
         // Update data structures
-        this->workunit_executors.insert(workunit_executor);
+        this->running_workunit_executors.insert(std::move(workunit_executor));
         this->ready_workunits.erase(wu);
         this->running_workunits.insert(wu);
 
@@ -376,16 +379,23 @@ namespace wrench {
             WorkunitMulticoreExecutor *workunit_executor,
             std::shared_ptr<Workunit> workunit) {
 
+
+      // Update core availabilities
+      this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
+
       // Remove the workunit executor from the workunit executor list
-      for (auto e : this->workunit_executors) {
-        if (e == workunit_executor) {
-          this->workunit_executors.erase(e);
+      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
+      for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
+//      for (auto e : this->running_workunit_executors) {
+        if ((*it).get() == workunit_executor) {
+//          auto tmp = const_cast<std::unique_ptr<WorkunitMulticoreExecutor>&&>(*it);
+//          this->running_workunit_executors.erase(it);
+//          this->finished_workunit_executors.insert(std::move(tmp));
+          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunit_executors), &(this->finished_workunit_executors));
           break;
         }
       }
 
-      // Update core availabilities
-      this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
 
       // Remove the work from the running work queue
       if (this->running_workunits.find(workunit) == this->running_workunits.end()) {
@@ -459,9 +469,11 @@ namespace wrench {
       WRENCH_INFO("A workunit executor has failed to complete a workunit on behalf of job '%s'", this->job->getName().c_str());
 
       // Remove the workunit executor from the workunit executor list
-      for (auto wt : this->workunit_executors) {
-        if (wt == workunit_executor) {
-          this->workunit_executors.erase(wt);
+      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
+      for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
+//      for (auto wt : this->running_workunit_executors) {
+        if ((*it).get() == workunit_executor) {
+          this->running_workunit_executors.erase((it));
           break;
         }
       }
@@ -489,9 +501,11 @@ namespace wrench {
                   "StandardJobExecutor::processWorkunitExecutorFailure(): trying to cancel a running workunit that's doing some file copy operations - not supported (for now)");
         }
         // find the workunit executor  that's doing the work (lame iteration)
-        for (auto wt :  this->workunit_executors) {
-          if (wt->workunit == w) {
-            wt->kill();
+        std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
+        for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
+//        for (auto wt :  this->running_workunit_executors) {
+          if ((*it)->workunit == w) {
+            (*it)->kill();
             break;
           }
         }
@@ -704,6 +718,14 @@ namespace wrench {
      */
     StandardJob *StandardJobExecutor::getJob() {
       return this->job;
+    }
+
+    /**
+     * @brief Retrieve the executor's compute resources
+     * @return a a set of compute resources
+     */
+    std::set<std::pair<std::string, unsigned long>>  StandardJobExecutor::getComputeResources() {
+      return this->compute_resources;
     }
 
 

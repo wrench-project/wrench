@@ -279,7 +279,7 @@ private:
             }
             switch (event->type) {
                 case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
-                    std::cout<<"Got the pilot job started message\n";
+                    //std::cout<<"Got the pilot job started message\n";
                     // success, do nothing for now
                     break;
                 }

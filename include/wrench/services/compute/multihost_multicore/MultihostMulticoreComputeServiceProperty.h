@@ -46,7 +46,6 @@ namespace wrench {
          */
         DECLARE_PROPERTY_NAME(RESOURCE_ALLOCATION_POLICY);
 
-
         /** @brief The algorithm that, once a resource allocation has been determined
          *         for a job, decides how many cores are given to
          *         a computational task. Possible values are:

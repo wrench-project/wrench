@@ -515,6 +515,12 @@ namespace wrench {
       // Compute the required minimum number of cores
       unsigned long minimum_required_num_cores = 1;
 
+
+      WRENCH_INFO("IN DISPATCH");
+      for (auto r : this->core_availabilities) {
+        WRENCH_INFO("   --> %s %ld", std::get<0>(r).c_str(), std::get<1>(r));
+      }
+
       for (auto t : (job)->getTasks()) {
         minimum_required_num_cores = MAX(minimum_required_num_cores, t->getMinNumCores());
       }
@@ -530,8 +536,11 @@ namespace wrench {
 
       // If not even one host, give up
       if (possible_hosts.size() == 0) {
+      WRENCH_INFO("*** THERE ARE NOT ENOUGH RESOURCES FOR THIS JOB!!");
         return false;
       }
+
+      WRENCH_INFO("*** THERE ARE POSSIBLE HOSTS FOR THIS JOB!!");
 
       // Compute the max num cores usable by a job task
       unsigned long maximum_num_cores = 0;
@@ -543,15 +552,15 @@ namespace wrench {
       std::set<std::pair<std::string, unsigned long>> compute_resources;
       compute_resources = computeResourceAllocation(job);
 
-      // Compute total number of cores for printing
+      // Update core availabilities (and compute total number of cores for printing)
       unsigned long total_cores = 0;
       for (auto r : compute_resources) {
+        this->core_availabilities[std::get<0>(r)] -= std::get<1>(r);
         total_cores += std::get<1>(r);
       }
 
       WRENCH_INFO("Creating a StandardJobExecutor on %ld hosts (%ld cores in total) for a standard job",
                   compute_resources.size(), total_cores);
-
       // Create a standard job executor
       StandardJobExecutor *executor = new StandardJobExecutor(
               this->simulation,
@@ -1008,6 +1017,12 @@ namespace wrench {
      */
     void MultihostMulticoreComputeService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
 
+      // Update core availabilities
+      for (auto r : executor->getComputeResources()) {
+        this->core_availabilities[r.first] += r.second;
+
+      }
+
       // Remove the executor from the executor list
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
         throw std::runtime_error(
@@ -1023,6 +1038,7 @@ namespace wrench {
       this->running_jobs.erase(job);
 
       WRENCH_INFO("A standard job executor has completed job %s", job->getName().c_str());
+
 
       // Send the callback to the originator
       try {
@@ -1045,6 +1061,12 @@ namespace wrench {
     void MultihostMulticoreComputeService::processStandardJobFailure(StandardJobExecutor *executor,
                                                                      StandardJob *job,
                                                                      std::shared_ptr<FailureCause> cause) {
+
+      // Update core availabilities
+      for (auto r : executor->getComputeResources()) {
+        this->core_availabilities[r.first] += r.second;
+
+      }
 
       // Remove the executor from the executor list
       if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
@@ -1116,7 +1138,7 @@ namespace wrench {
         std::string hostname = std::get<0>(r);
         unsigned long num_cores = std::get<1>(r);
 
-        this->core_availabilities[hostname] -= num_cores;
+        this->core_availabilities[hostname] += num_cores;
       }
 
       // Forward the notification

@@ -84,6 +84,7 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchServiceProperty.h
         include/wrench/util/WorkflowUtil.h
         include/wrench/services/helpers/Alarm.h
+        include/wrench/util/PointerUtil.h
         )
 
 # source files
@@ -162,6 +163,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchServiceProperty.cpp
         src/wrench/util/WorkflowUtil.cpp
         src/wrench/services/helpers/Alarm.cpp
+        src/wrench/util/PointerUtil.cpp
         )
 
 # test files

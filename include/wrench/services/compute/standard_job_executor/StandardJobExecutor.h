@@ -52,6 +52,7 @@ namespace wrench {
         void kill();
 
         StandardJob *getJob();
+        std::set<std::pair<std::string, unsigned long>> getComputeResources();
 
     private:
 
@@ -67,8 +68,9 @@ namespace wrench {
         // Core availabilities (for each hosts, how many cores are currently available on it)
         std::map<std::string, unsigned long> core_availabilities;
 
-        // Vector of worker threads
-        std::set<WorkunitMulticoreExecutor *> workunit_executors;
+        // Sets of workunit executors
+        std::set<std::unique_ptr<WorkunitMulticoreExecutor>> running_workunit_executors;
+        std::set<std::unique_ptr<WorkunitMulticoreExecutor>> finished_workunit_executors;
 
         // Work units
         std::set<std::shared_ptr<Workunit>> non_ready_workunits;
