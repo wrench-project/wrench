@@ -131,6 +131,7 @@ private:
                 );
             }
 
+
             // Wait for a workflow execution event
             std::unique_ptr<wrench::WorkflowExecutionEvent> event;
             try {
@@ -149,8 +150,6 @@ private:
             }
             workflow->removeTask(task);
         }
-
-
 
         // Terminate everything
         this->simulation->shutdownAllComputeServices();

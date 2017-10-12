@@ -103,10 +103,13 @@ namespace wrench {
         /*End Resources information in Batchservice */
 
         // Vector of standard job executors
-        std::set<StandardJobExecutor *> standard_job_executors;
+        std::set<std::unique_ptr<StandardJobExecutor>> running_standard_job_executors;
+
+        // Vector of standard job executors
+        std::set<std::unique_ptr<StandardJobExecutor>> finished_standard_job_executors;
 
         //Queue of pending batch jobs
-        std::deque<BatchJob*> pending_jobs;
+        std::deque<std::unique_ptr<BatchJob>> pending_jobs;
         //A set of running batch jobs
         std::set<BatchJob*> running_jobs;
 
@@ -137,7 +140,7 @@ namespace wrench {
         std::set<std::pair<std::string,unsigned long>> scheduleOnHosts(std::string host_selection_algorithm,
                                                                        unsigned long, unsigned long);
 
-        BatchJob* scheduleJob(std::string);
+        std::unique_ptr<BatchJob> scheduleJob(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void terminate(bool);
