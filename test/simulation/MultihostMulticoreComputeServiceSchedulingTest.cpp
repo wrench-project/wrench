@@ -604,40 +604,17 @@ private:
               throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
             }
           }
-        }
 
-        // TODO
-//
-//        // Check completion states and times
-//        if ((t1->getState() != wrench::WorkflowTask::COMPLETED) ||
-//            (t2->getState() != wrench::WorkflowTask::COMPLETED) ||
-//            (t3->getState() != wrench::WorkflowTask::COMPLETED)) {
-//          throw std::runtime_error("Unexpected task states");
-//        }
-//
-//        double task1_makespan = t1->getEndDate() - now;
-//        double task2_makespan = t2->getEndDate() - now;
-//        double task3_makespan = t3->getEndDate() - now;
-//
-////        WRENCH_INFO("t1:%lf t2:%lf t3:%lf", task1_makespan, task2_makespan, task3_makespan);
-//
-//        if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(30, task1_makespan) ||
-//            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(30, task2_makespan) ||
-//            !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(15, task3_makespan)) {
-//          throw std::runtime_error("DEFAULT PROPERTIES / CASE 1: Unexpected task execution times "
-//                                           "t1: " + std::to_string(task1_makespan) +
-//                                   " t2: " + std::to_string(task2_makespan) +
-//                                   " t3: " + std::to_string(task3_makespan));
-//        }
+          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(4000, wrench::S4U_Simulation::getClock())) {
+            throw std::runtime_error("Standard job #1 should complete at time 4000");
+          }
+        }
 
         workflow->removeTask(t1_1);
         workflow->removeTask(t1_2);
         workflow->removeTask(t2_1);
         workflow->removeTask(t2_2);
       }
-
-
-
 
       // Terminate
       this->simulation->shutdownAllComputeServices();

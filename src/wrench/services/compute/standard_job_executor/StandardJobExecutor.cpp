@@ -386,16 +386,11 @@ namespace wrench {
       // Remove the workunit executor from the workunit executor list
       std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
       for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
-//      for (auto e : this->running_workunit_executors) {
         if ((*it).get() == workunit_executor) {
-//          auto tmp = const_cast<std::unique_ptr<WorkunitMulticoreExecutor>&&>(*it);
-//          this->running_workunit_executors.erase(it);
-//          this->finished_workunit_executors.insert(std::move(tmp));
           PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunit_executors), &(this->finished_workunit_executors));
           break;
         }
       }
-
 
       // Remove the work from the running work queue
       if (this->running_workunits.find(workunit) == this->running_workunits.end()) {
