@@ -13,6 +13,15 @@
 
 namespace wrench {
     namespace WorkflowUtil {
+
+        /**
+        * @brief Create a workflow based on a DAX file
+        *
+        * @param filename: the path to the DAX file
+        * @param workflow: workflow to load information to
+        *
+        * @throw std::invalid_argument
+        */
         void loadFromDAX(const std::string &filename, Workflow *workflow) {
             pugi::xml_document dax_tree;
 
@@ -65,6 +74,14 @@ namespace wrench {
             }
         }
 
+        /**
+        * @brief Create a workflow based on a Json file
+        *
+        * @param filename: the path to the Json file
+        * @param workflow: workflow to load information to
+        *
+        * @throw std::invalid_argument
+        */
         void loadFromJson(const std::string &filename, Workflow *workflow) {
             ///make workflow task
             wrench::WorkflowTask *task;
