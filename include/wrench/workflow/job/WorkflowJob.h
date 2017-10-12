@@ -60,6 +60,8 @@ namespace wrench {
 
         ComputeService *getParentComputeService();
 
+        virtual ~WorkflowJob();
+
     protected:
 
         WorkflowJob(Type type);

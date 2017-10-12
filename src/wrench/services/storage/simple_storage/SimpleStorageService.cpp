@@ -322,8 +322,8 @@ namespace wrench {
         return true;
       }
 
-      // Create an "incoming file" record
-      this->incoming_files[pending_comm.get()] = new IncomingFile(file, false, "");
+      // Create an "incoming file" record: TODO   RAW POINTER HERE FOR INCOMING FILE!!
+      this->incoming_files.insert(std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(new IncomingFile(file, false, ""))));
 
       // Add the communication to the list of pending_communications
       this->pending_communications.push_back(std::move(pending_comm));
@@ -458,7 +458,7 @@ namespace wrench {
 
 
       // Create an "incoming file" record
-      this->incoming_files[pending_comm.get()] = new IncomingFile(file, true, answer_mailbox);
+      this->incoming_files.insert(std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(new IncomingFile(file, true, answer_mailbox))));
 
       // Add the communication to the list of pending_communications
       this->pending_communications.push_back(std::move(pending_comm));
@@ -484,7 +484,10 @@ namespace wrench {
                 "SimpleStorageService::processDataMessage(): Cannot find incoming file record for communications...");
       }
 
-      IncomingFile *incoming_file = this->incoming_files[comm.get()];
+      IncomingFile *incoming_file = this->incoming_files[comm.get()].get();
+      WorkflowFile *file = incoming_file->file;
+      std::string ack_mailbox = incoming_file->ack_mailbox;
+      bool send_file_copy_ack = incoming_file->send_file_copy_ack;
       this->incoming_files.erase(comm.get());
 
       // Get the message
@@ -493,17 +496,17 @@ namespace wrench {
         message = comm->wait();
       } catch (std::shared_ptr<NetworkError> cause) {
         WRENCH_INFO("SimpleStorageService::processDataMessage(): Communication failure when receiving file '%s",
-                    incoming_file->file->getId().c_str());
+                    file->getId().c_str());
         // Process the failure, meaning, just re-decrease the occupied space
-        this->occupied_space -= incoming_file->file->getSize();
+        this->occupied_space -= file->getSize();
         // And if this was an overwrite, now we lost the file!!!
-        this->stored_files.erase(incoming_file->file);
+        this->stored_files.erase(file);
 
         WRENCH_INFO(
                 "Sending back an ack since this was a file copy and some client is waiting for me to say something");
         try {
-          S4U_Mailbox::putMessage(incoming_file->ack_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(incoming_file->file, this, false, cause,
+          S4U_Mailbox::putMessage(ack_mailbox,
+                                  new StorageServiceFileCopyAnswerMessage(file, this, false, cause,
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {
@@ -521,21 +524,21 @@ namespace wrench {
 
       if (StorageServiceFileContentMessage *msg = dynamic_cast<StorageServiceFileContentMessage *>(message.get())) {
 
-        if (msg->file != incoming_file->file) {
+        if (msg->file != file) {
           throw std::runtime_error(
                   "SimpleStorageService::processDataMessage(): Mismatch between received file and expected file... a bug in SimpleStorageService");
         }
 
         // Add the file to my storage (this will not add a duplicate in case of an overwrite, because it's a set)
-        this->stored_files.insert(incoming_file->file);
+        this->stored_files.insert(file);
 
         // Send back the corresponding ack?
-        if (incoming_file->send_file_copy_ack) {
+        if (send_file_copy_ack) {
           WRENCH_INFO(
                   "Sending back an ack since this was a file copy and some client is waiting for me to say something");
           try {
-            S4U_Mailbox::putMessage(incoming_file->ack_mailbox,
-                                    new StorageServiceFileCopyAnswerMessage(incoming_file->file, this, true, nullptr,
+            S4U_Mailbox::putMessage(ack_mailbox,
+                                    new StorageServiceFileCopyAnswerMessage(file, this, true, nullptr,
                                                                             this->getPropertyValueAsDouble(
                                                                                     SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::shared_ptr<NetworkError> cause) {

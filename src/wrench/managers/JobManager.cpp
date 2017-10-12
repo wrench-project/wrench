@@ -150,7 +150,7 @@ namespace wrench {
                                              cleanup_file_deletions);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<StandardJob>(raw_ptr);
 
-      this->jobs[raw_ptr] = std::move(job);
+      this->jobs.insert(std::make_pair(raw_ptr, std::move(job)));
       return raw_ptr;
     }
 
