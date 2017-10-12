@@ -299,7 +299,8 @@ namespace wrench {
       this->total_num_cores = 0;
       for (auto host : this->compute_resources) {
         this->total_num_cores += std::get<1>(host);
-        this->core_availabilities[std::get<0>(host)] = std::get<1>(host);
+        this->core_availabilities.insert(std::make_pair(std::get<0>(host), std::get<1>(host)));
+//        this->core_availabilities[std::get<0>(host)] = std::get<1>(host);
       }
 
       this->ttl = ttl;
