@@ -91,6 +91,14 @@ namespace wrench {
     void S4U_Daemon::kill_actor() {
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         try {
+          // Sleeping a tiny bit to avoid the following behavior:
+          // Actor A creates Actor B.
+          // Actor C kills actor A at the same time
+          // At that point, all references to Actor B are lost
+          // (Actor A could have set a reference to B, and that reference
+          // would be available on A's object, which then C can look at to
+          // say "since I killed A, I should kill at its children as well"
+          S4U_Simulation::sleep(0.0001);
           this->s4u_actor->kill();
         } catch (std::exception &e) {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());

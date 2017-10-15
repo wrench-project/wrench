@@ -877,9 +877,6 @@ private:
 
       // Terminate the pilot job while it's running a standard job
       try {
-        // TODO: IF ONE REMOVED THE SLEEP BELOW, THEN ONE KILLS WHILE COMPUTE THREADS
-        // TODO: ARE BEING CREATED, AND THERE ARE WEIRD EXCEPTIONS :(
-        wrench::S4U_Simulation::sleep(0.0001);
         job_manager->terminateJob(pilot_job);
       } catch (std::exception &e) {
         throw std::runtime_error("Unexpected exception while terminating pilot job: " + std::string(e.what()));
