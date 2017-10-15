@@ -11,10 +11,10 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/services/compute/batch/BatchService.h"
-#include <simulation/SimulationMessage.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
 #include <wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h>
+#include <wrench/util/PointerUtil.h>
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "services/compute/ComputeServiceMessage.h"
@@ -40,9 +40,9 @@ namespace wrench {
                                StorageService *default_storage_service,
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
-                               std::map<std::string, std::string> plist):
+                               std::map<std::string, std::string> plist) :
             BatchService(hostname, nodes_in_network, default_storage_service, supports_standard_jobs,
-                         supports_pilot_jobs, nullptr,0,0,false,plist,"") {
+                         supports_pilot_jobs, nullptr, 0, 0, false, plist, "") {
 
     }
 
@@ -60,7 +60,7 @@ namespace wrench {
                                StorageService *default_storage_service,
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
-                               PilotJob* parent_pilot_job,
+                               PilotJob *parent_pilot_job,
                                unsigned long reduced_cores,
                                double ttl,
                                bool has_ttl,
@@ -76,11 +76,11 @@ namespace wrench {
 
       //create a map for host to cores
       std::vector<std::string>::iterator it;
-      for (it=nodes_in_network.begin();it!=nodes_in_network.end();it++){
-        if(reduced_cores>0 && not this->supports_pilot_jobs){
+      for (it = nodes_in_network.begin(); it != nodes_in_network.end(); it++) {
+        if (reduced_cores > 0 && not this->supports_pilot_jobs) {
           this->nodes_to_cores_map.insert({*it, reduced_cores});
           this->available_nodes_to_cores.insert({*it, reduced_cores});
-        }else {
+        } else {
           this->nodes_to_cores_map.insert({*it, S4U_Simulation::getNumCores(*it)});
           this->available_nodes_to_cores.insert({*it, S4U_Simulation::getNumCores(*it)});
         }
@@ -113,7 +113,7 @@ namespace wrench {
      * @throw std::runtime_error
      *
      */
-    void BatchService::submitStandardJob(StandardJob *job,std::map<std::string, std::string> &batch_job_args) {
+    void BatchService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -123,16 +123,16 @@ namespace wrench {
       unsigned long nodes_asked_for = 0;
       std::map<std::string, std::string>::iterator it;
       it = batch_job_args.find("-N");
-      if (it != batch_job_args.end()){
+      if (it != batch_job_args.end()) {
         if (sscanf((*it).second.c_str(), "%lu", &nodes_asked_for) != 1) {
           throw std::invalid_argument(
                   "BatchService::submitStandardJob(): Invalid -N value '" + (*it).second + "'");
         }
-        if (nodes_asked_for > this->total_num_of_nodes){
+        if (nodes_asked_for > this->total_num_of_nodes) {
           throw std::runtime_error(
                   "BatchService::submitStandardJob(): There are not enough hosts");
         }
-      }else{
+      } else {
         throw std::invalid_argument(
                 "BatchService::submitStandardJob(): Batch Service requires -N(number of nodes) to be specified "
         );
@@ -141,24 +141,26 @@ namespace wrench {
       //check if there are enough cores per node
       unsigned long nodes_with_c_cores = 0;
       it = batch_job_args.find("-c");
-      if (it != batch_job_args.end()){
-        std::map<std::string,unsigned long>::iterator nodes_to_core_iterator;
-        for(nodes_to_core_iterator=this->nodes_to_cores_map.begin();nodes_to_core_iterator!=this->nodes_to_cores_map.end();nodes_to_core_iterator++){
+      if (it != batch_job_args.end()) {
+        std::map<std::string, unsigned long>::iterator nodes_to_core_iterator;
+        for (nodes_to_core_iterator = this->nodes_to_cores_map.begin();
+             nodes_to_core_iterator != this->nodes_to_cores_map.end(); nodes_to_core_iterator++) {
           unsigned long num;
           if (sscanf((*it).second.c_str(), "%lu", &num) != 1) {
             throw std::invalid_argument(
-                    "BatchService::submitStandardJob(): Invalid -c value '" + (*it).second + "'");
+                    "BatchService::submitStandardJob(): Invalid -c value '" + (*it).second +
+                    "'");
           }
-          if (num <= (*nodes_to_core_iterator).second){
+          if (num <= (*nodes_to_core_iterator).second) {
             nodes_with_c_cores++;
           }
         }
-      }else{
+      } else {
         throw std::invalid_argument(
                 "BatchService::submitStandardJob(): Batch Service requires -c(cores per node) to be specified "
         );
       }
-      if (nodes_asked_for > nodes_with_c_cores){
+      if (nodes_asked_for > nodes_with_c_cores) {
         throw std::runtime_error(
                 "BatchService::submitStandardJob(): There are not enough hosts with those amount of cores per host");
       }
@@ -172,12 +174,12 @@ namespace wrench {
       //get job time
       unsigned long time_asked_for = 0;
       it = batch_job_args.find("-t");
-      if (it != batch_job_args.end()){
+      if (it != batch_job_args.end()) {
         if (sscanf((*it).second.c_str(), "%lu", &time_asked_for) != 1) {
           throw std::invalid_argument(
                   "BatchService::submitStandardJob(): Invalid -t value '" + (*it).second + "'");
         }
-      }else{
+      } else {
         throw std::invalid_argument(
                 "BatchService::submitStandardJob(): Batch Service requires -t to be specified "
         );
@@ -185,13 +187,13 @@ namespace wrench {
 
       //Create a Batch Job
       unsigned long jobid = this->generateUniqueJobId();
-      BatchJob* batch_job = new BatchJob(job,jobid,time_asked_for,nodes_asked_for,cores_asked_for,-1);
+      BatchJob *batch_job = new BatchJob(job, jobid, time_asked_for, nodes_asked_for, cores_asked_for, -1);
 
       //  send a "run a batch job" message to the daemon's mailbox
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
-                                new BatchServiceJobRequestMessage(answer_mailbox, batch_job,
+                                new BatchServiceJobRequestMessage(answer_mailbox, std::move(batch_job),
                                                                   this->getPropertyValueAsDouble(
                                                                           BatchServiceProperty::SUBMIT_BATCH_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
@@ -232,7 +234,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    void BatchService::submitPilotJob(PilotJob *job,std::map<std::string,std::string> &batch_job_args) {
+    void BatchService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -242,16 +244,16 @@ namespace wrench {
       unsigned long nodes_asked_for = 0;
       std::map<std::string, std::string>::iterator it;
       it = batch_job_args.find("-N");
-      if (it != batch_job_args.end()){
+      if (it != batch_job_args.end()) {
         if (sscanf((*it).second.c_str(), "%lu", &nodes_asked_for) != 1) {
           throw std::runtime_error(
                   "BatchService::submitPilotJob(): Invalid -N value '" + (*it).second + "'");
         }
-        if (nodes_asked_for > this->total_num_of_nodes){
+        if (nodes_asked_for > this->total_num_of_nodes) {
           throw std::runtime_error(
                   "BatchService::submitPilotJob(): There are not enough hosts");
         }
-      }else{
+      } else {
         throw std::invalid_argument(
                 "BatchService::submitPilotJob(): Batch Service requires -N(number of nodes) to be specified "
         );
@@ -261,14 +263,15 @@ namespace wrench {
       unsigned long nodes_with_c_cores = 0;
       unsigned long cores_asked_for = 0;
       it = batch_job_args.find("-c");
-      if (it != batch_job_args.end()){
-        std::map<std::string,unsigned long>::iterator nodes_to_core_iterator;
+      if (it != batch_job_args.end()) {
+        std::map<std::string, unsigned long>::iterator nodes_to_core_iterator;
         if (sscanf((*it).second.c_str(), "%lu", &cores_asked_for) != 1) {
           throw std::invalid_argument(
-                  "BatchService::submitPilotJob(): Invalid -c value '" + (*it).second +"'");
+                  "BatchService::submitPilotJob(): Invalid -c value '" + (*it).second + "'");
         }
-        for(nodes_to_core_iterator=this->nodes_to_cores_map.begin();nodes_to_core_iterator!=this->nodes_to_cores_map.end();nodes_to_core_iterator++){
-          if (cores_asked_for <= (*nodes_to_core_iterator).second){
+        for (nodes_to_core_iterator = this->nodes_to_cores_map.begin();
+             nodes_to_core_iterator != this->nodes_to_cores_map.end(); nodes_to_core_iterator++) {
+          if (cores_asked_for <= (*nodes_to_core_iterator).second) {
             nodes_with_c_cores++;
           }
         }
@@ -277,7 +280,7 @@ namespace wrench {
                 "BatchService::submitPilotJob(): Batch Service requires -c(cores per node) to be specified "
         );
       }
-      if (nodes_asked_for > nodes_with_c_cores){
+      if (nodes_asked_for > nodes_with_c_cores) {
         throw std::runtime_error(
                 "BatchService::submitPilotJob(): There are not enough hosts with those amount of cores per host");
       }
@@ -285,10 +288,10 @@ namespace wrench {
       //get job time
       unsigned long time_asked_for = 0;
       it = batch_job_args.find("-t");
-      if (it != batch_job_args.end()){
+      if (it != batch_job_args.end()) {
         if (sscanf((*it).second.c_str(), "%lu", &time_asked_for) != 1) {
           throw std::invalid_argument(
-                  "BatchService::submitPilotJob(): Invalid -t argiment '" + (*it).second +"'");
+                  "BatchService::submitPilotJob(): Invalid -t argiment '" + (*it).second + "'");
         }
       } else {
         throw std::invalid_argument(
@@ -298,7 +301,7 @@ namespace wrench {
 
       //Create a Batch Job
       unsigned long jobid = this->generateUniqueJobId();
-      BatchJob* batch_job = new BatchJob(job,jobid,time_asked_for,nodes_asked_for,cores_asked_for,-1);
+      BatchJob *batch_job = new BatchJob(job, jobid, time_asked_for, nodes_asked_for, cores_asked_for, -1);
 
       //  send a "run a batch job" message to the daemon's mailbox
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_pilot_job_mailbox");
@@ -347,31 +350,30 @@ namespace wrench {
 
       /** Main loop **/
       bool life = true;
-//      double next_timeout_timestamp = 0;
-//      next_timeout_timestamp = S4U_Simulation::getClock()+this->random_interval;
       while (life) {
         life = processNextMessage();
         if (this->running_jobs.size() > 0) {
-          std::set<BatchJob*>::iterator it;
+          std::set<std::unique_ptr<BatchJob>>::iterator it;
           for (it = this->running_jobs.begin(); it != this->running_jobs.end();) {
             if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
-              if((*it)->getWorkflowJob()->getType()==WorkflowJob::STANDARD) {
-                this->processStandardJobTimeout((StandardJob*)(*it)->getWorkflowJob());
+              if ((*it)->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
+                this->processStandardJobTimeout(
+                        (StandardJob *) (*it)->getWorkflowJob());
                 this->updateResources((*it)->getResourcesAllocated());
                 it = this->running_jobs.erase(it);
-              }else if((*it)->getWorkflowJob()->getType()==WorkflowJob::PILOT){
-              }else{
+              } else if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+              } else {
                 throw std::runtime_error(
                         "BatchService::main(): Received a JOB type other than Standard and Pilot jobs"
                 );
               }
-            }else{
+            } else {
               ++it;
             }
 
           }
         }
-        if(life) {
+        if (life) {
           while (this->dispatchNextPendingJob());
         }
       }
@@ -380,7 +382,7 @@ namespace wrench {
       return 0;
     }
 
-    void BatchService::sendPilotJobCallBackMessage(PilotJob* job){
+    void BatchService::sendPilotJobCallBackMessage(PilotJob *job) {
       try {
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                  new ComputeServicePilotJobExpiredMessage(job, this,
@@ -395,7 +397,9 @@ namespace wrench {
       WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
       try {
         S4U_Mailbox::putMessage(job->popCallbackMailbox(),
-                                new ComputeServiceStandardJobFailedMessage(job, this, std::shared_ptr<FailureCause>(new ServiceIsDown(this)),
+                                new ComputeServiceStandardJobFailedMessage(job, this,
+                                                                           std::shared_ptr<FailureCause>(
+                                                                                   new ServiceIsDown(this)),
                                                                            this->getPropertyValueAsDouble(
                                                                                    BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
@@ -403,70 +407,73 @@ namespace wrench {
       }
     }
 
-    void BatchService::updateResources(std::set<std::pair<std::string,unsigned long>> resources){
-      if(resources.empty()){
+    void BatchService::updateResources(std::set<std::pair<std::string, unsigned long>> resources) {
+      if (resources.empty()) {
         return;
       }
-      std::set<std::pair<std::string,unsigned long>>::iterator resource_it;
-      for(resource_it=resources.begin();resource_it!=resources.end();resource_it++){
+      std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
+      for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
         this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
       }
     }
 
-    void BatchService::updateResources(StandardJob* job){
+    void BatchService::updateResources(StandardJob *job) {
       // Remove the job from the running job list
       bool job_on_the_list = false;
 
-      for(auto it=this->running_jobs.begin();it!=this->running_jobs.end();it++){
-        if((*it)->getWorkflowJob()==job){
+      std::set<std::unique_ptr<BatchJob>>::iterator it;
+      for (it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
+        if ((*it)->getWorkflowJob() == job) {
           job_on_the_list = true;
-          this->running_jobs.erase(it);
           // Update the cores count in the available resources
-          std::set<std::pair<std::string,unsigned long>> resources = (*it)->getResourcesAllocated();
-          std::set<std::pair<std::string,unsigned long>>::iterator resource_it;
-          for(resource_it=resources.begin();resource_it!=resources.end();resource_it++){
+          std::set<std::pair<std::string, unsigned long>> resources = (*it)->getResourcesAllocated();
+          std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
+          for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
             this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
           }
+          this->running_jobs.erase(it);
           break;
         }
       }
 
-      if(!job_on_the_list){
-        throw std::runtime_error("BatchService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
+      if (!job_on_the_list) {
+        throw std::runtime_error(
+                "BatchService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
       }
 
       return;
     }
 
 
-    void BatchService::processPilotJobTimeout(PilotJob* job){
-      BatchService* cs = (BatchService*)job->getComputeService();
+    void BatchService::processPilotJobTimeout(PilotJob *job) {
+      BatchService *cs = (BatchService *) job->getComputeService();
       if (cs == nullptr) {
-        throw std::runtime_error("BatchService::terminate(): can't find compute service associated to pilot job");
+        throw std::runtime_error(
+                "BatchService::terminate(): can't find compute service associated to pilot job");
       }
       try {
         cs->stop();
-      }catch (wrench::WorkflowExecutionException &e){
+      } catch (wrench::WorkflowExecutionException &e) {
         return;
       }
     }
 
     void BatchService::processStandardJobTimeout(StandardJob *job) {
-      StandardJobExecutor *executor = nullptr;
-      for (auto e : this->standard_job_executors) {
-        if (e->getJob() == job) {
-          executor = e;
+      std::set<std::unique_ptr<StandardJobExecutor>>::iterator it;
+
+      bool terminated = false;
+      for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
+        if (((*it).get())->getJob() == job) {
+          ((*it).get())->kill();
+          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_standard_job_executors), &(this->finished_standard_job_executors));
+          terminated = true;
+          break;
         }
       }
-      if (executor == nullptr) {
-        throw std::runtime_error("BatchService::processStandardJobTimeout(): Cannot find standard job executor corresponding to job being timedout");
+      if (not terminated) {
+        throw std::runtime_error(
+                "BatchService::processStandardJobTimeout(): Cannot find standard job executor corresponding to job being timedout");
       }
-
-      // Terminate the executor
-      WRENCH_INFO("Terminating a standard job executor");
-      executor->kill();
-
-      this->standard_job_executors.erase(executor);
     }
 
     /**
@@ -500,13 +507,16 @@ namespace wrench {
     void BatchService::terminateRunningStandardJob(StandardJob *job) {
 
       StandardJobExecutor *executor = nullptr;
-      for (auto e : this->standard_job_executors) {
-        if (e->getJob() == job) {
-          executor = e;
+      std::set<std::unique_ptr<StandardJobExecutor>>::iterator it;
+      for (it = this->running_standard_job_executors.begin();
+           it != this->running_standard_job_executors.end(); it++) {
+        if (((*it).get())->getJob() == job) {
+          executor = (it->get());
         }
       }
       if (executor == nullptr) {
-        throw std::runtime_error("MultihostMulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
+        throw std::runtime_error(
+                "MultihostMulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
       }
 
       // Terminate the executor
@@ -518,33 +528,35 @@ namespace wrench {
       return;
     }
 
-    std::set<std::pair<std::string,unsigned long>> BatchService::scheduleOnHosts(std::string host_selection_algorithm,
-                                                                                 unsigned long num_nodes, unsigned long cores_per_node) {
-      std::set<std::pair<std::string,unsigned long>> resources = {};
+    std::set<std::pair<std::string, unsigned long>> BatchService::scheduleOnHosts(std::string host_selection_algorithm,
+                                                                                  unsigned long num_nodes,
+                                                                                  unsigned long cores_per_node) {
+      std::set<std::pair<std::string, unsigned long>> resources = {};
       std::vector<std::string> hosts_assigned = {};
-      if (host_selection_algorithm=="FIRSTFIT"){
-        std::map<std::string,unsigned long>::iterator it;
+      if (host_selection_algorithm == "FIRSTFIT") {
+        std::map<std::string, unsigned long>::iterator it;
         unsigned long host_count = 0;
-        for(it=this->available_nodes_to_cores.begin();it!=this->available_nodes_to_cores.end();it++){
-          if((*it).second>=cores_per_node){
+        for (it = this->available_nodes_to_cores.begin();
+             it != this->available_nodes_to_cores.end(); it++) {
+          if ((*it).second >= cores_per_node) {
             //Remove that many cores from the available_nodes_to_core
-            (*it).second-=cores_per_node;
+            (*it).second -= cores_per_node;
             hosts_assigned.push_back((*it).first);
-            resources.insert(std::make_pair((*it).first,cores_per_node));
-            if(++host_count>=num_nodes){
+            resources.insert(std::make_pair((*it).first, cores_per_node));
+            if (++host_count >= num_nodes) {
               break;
             }
           }
         }
-        if(resources.size()<num_nodes){
+        if (resources.size() < num_nodes) {
           resources = {};
           std::vector<std::string>::iterator it;
-          for(it=hosts_assigned.begin();it!=hosts_assigned.end();it++) {
+          for (it = hosts_assigned.begin(); it != hosts_assigned.end(); it++) {
             available_nodes_to_cores[*it] += cores_per_node;
           }
         }
-      }else if (host_selection_algorithm=="BESTFIT"){
-        while(resources.size()<num_nodes) {
+      } else if (host_selection_algorithm == "BESTFIT") {
+        while (resources.size() < num_nodes) {
           unsigned long target_slack = 0;
           std::string target_host = "";
           unsigned long target_num_cores = 0;
@@ -556,11 +568,13 @@ namespace wrench {
               continue;
             }
             unsigned long tentative_target_num_cores = MIN(num_available_cores, cores_per_node);
-            unsigned long tentative_target_slack = num_available_cores - tentative_target_num_cores;
+            unsigned long tentative_target_slack =
+                    num_available_cores - tentative_target_num_cores;
 
             if ((target_host == "") ||
                 (tentative_target_num_cores > target_num_cores) ||
-                ((tentative_target_num_cores == target_num_cores) && (target_slack > tentative_target_slack))) {
+                ((tentative_target_num_cores == target_num_cores) &&
+                 (target_slack > tentative_target_slack))) {
               target_host = hostname;
               target_num_cores = tentative_target_num_cores;
               target_slack = tentative_target_slack;
@@ -577,22 +591,23 @@ namespace wrench {
           }
           this->available_nodes_to_cores[target_host] -= cores_per_node;
           hosts_assigned.push_back(target_host);
-          resources.insert(std::make_pair(target_host,cores_per_node));
+          resources.insert(std::make_pair(target_host, cores_per_node));
         }
-      }else{
+      } else {
         throw std::invalid_argument(
-                "BatchService::scheduleOnHosts(): We don't support "+host_selection_algorithm +" as host selection algorithm"
+                "BatchService::scheduleOnHosts(): We don't support " + host_selection_algorithm +
+                " as host selection algorithm"
         );
       }
 
       return resources;
     }
 
-    BatchJob* BatchService::scheduleJob(std::string job_selection_algorithm) {
-      if (job_selection_algorithm=="FCFS"){
-        BatchJob* batch_job = this->pending_jobs.front();
+    std::unique_ptr<BatchJob> BatchService::scheduleJob(std::string job_selection_algorithm) {
+      if (job_selection_algorithm == "FCFS") {
+        std::unique_ptr<BatchJob> batch_job_ptr = std::move(this->pending_jobs.front());
         this->pending_jobs.pop_front();
-        return batch_job;
+        return batch_job_ptr;
       }
       return nullptr;
     }
@@ -603,89 +618,97 @@ namespace wrench {
      */
     bool BatchService::dispatchNextPendingJob() {
 
-      if (this->pending_jobs.size() == 0) {
+      if (this->pending_jobs.size()==0) {
         return false;
       }
 
       //Currently we have only FCFS scheduling
-      BatchJob* batch_job = this->scheduleJob(this->getPropertyValueAsString(BatchServiceProperty::JOB_SELECTION_ALGORITHM));
-      if(batch_job== nullptr){
+      std::unique_ptr<BatchJob>batch_job_ptr = this->scheduleJob(
+              this->getPropertyValueAsString(BatchServiceProperty::JOB_SELECTION_ALGORITHM));
+
+      if (batch_job_ptr == nullptr) {
         throw std::runtime_error(
                 "BatchService::dispatchNextPendingJob(): Got no such job in pending queue to dispatch"
         );
       }
 
+      BatchJob* batch_job = batch_job_ptr.get();
       WorkflowJob *next_job = batch_job->getWorkflowJob();
 
 
       /* Get the nodes and cores per nodes asked for */
       unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
       unsigned long num_nodes_asked_for = batch_job->getNumNodes();
+      unsigned long time_in_minutes = batch_job->getAllocatedTime();
+
+
 
       //Try to schedule hosts based on FIRSTFIT OR BESTFIT
-      std::set<std::pair<std::string,unsigned long>> resources = this->scheduleOnHosts(this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
-                                                                                       num_nodes_asked_for,cores_per_node_asked_for);
+      std::set<std::pair<std::string, unsigned long>> resources = this->scheduleOnHosts(
+              this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
+              num_nodes_asked_for, cores_per_node_asked_for);
 
-      if(resources.empty()){
+      if (resources.empty()) {
         return false;
       }
 
 
       switch (next_job->getType()) {
         case WorkflowJob::STANDARD: {
-          WRENCH_INFO("Creating a StandardJobExecutor on %ld cores for a standard job on %ld nodes", cores_per_node_asked_for,num_nodes_asked_for);
+          WRENCH_INFO("Creating a StandardJobExecutor on %ld cores for a standard job on %ld nodes",
+                      cores_per_node_asked_for, num_nodes_asked_for);
           // Create a standard job executor
-          unsigned long time_in_minutes = batch_job->getAllocatedTime();
           StandardJobExecutor *executor = new StandardJobExecutor(
                   this->simulation,
                   this->mailbox_name,
                   std::get<0>(*resources.begin()),
-                  (StandardJob *)next_job,
+                  (StandardJob *) next_job,
                   resources,
                   this->default_storage_service,
                   {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
-                           this->getPropertyValueAsString(BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}});
-
-          this->standard_job_executors.insert(executor);
-          batch_job->setEndingTimeStamp(S4U_Simulation::getClock()+time_in_minutes*60);
-          this->running_jobs.insert(batch_job);
+                           this->getPropertyValueAsString(
+                                   BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}});
+          this->running_standard_job_executors.insert(std::unique_ptr<StandardJobExecutor>(std::move(executor)));
+          batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
+          this->running_jobs.insert(std::move(batch_job_ptr));
           this->timeslots.push_back(batch_job->getEndingTimeStamp());
           //remember the allocated resources for the job
           batch_job->setAllocatedResources(resources);
 
-          std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new AlarmJobTimeOutMessage((StandardJob*)batch_job->getWorkflowJob(), 0));
+          std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(
+                  new AlarmJobTimeOutMessage((StandardJob *) batch_job->getWorkflowJob(), 0));
 
-          standard_job_alarms.push_back(std::move(new Alarm(batch_job->getEndingTimeStamp(),this->hostname,this->mailbox_name,msg,"batch_standard")));
+          standard_job_alarms.push_back(std::move(
+                  new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+                            "batch_standard")));
+
+
           return true;
         }
           break;
 
         case WorkflowJob::PILOT: {
           PilotJob *job = (PilotJob *) next_job;
-          WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job", num_nodes_asked_for, cores_per_node_asked_for);
+          WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job",
+                      num_nodes_asked_for, cores_per_node_asked_for);
 
           std::string host_to_run_on = resources.begin()->first;
           std::vector<std::string> nodes_for_pilot_job = {};
-          for(auto it=resources.begin();it!=resources.end();it++){
+          for (auto it = resources.begin(); it != resources.end(); it++) {
             nodes_for_pilot_job.push_back(it->first);
           }
 
           //set the ending timestamp of the batchjob (pilotjob)
-          unsigned long time_in_minutes = batch_job->getAllocatedTime();
-          double timeout_timestamp = std::min(job->getDuration(),time_in_minutes*60*1.0);
-          batch_job->setEndingTimeStamp(S4U_Simulation::getClock()+timeout_timestamp);
 
-//          ComputeService *cs =
-//                  new wrench::BatchService(host_to_run_on,nodes_for_pilot_job,
-//                                           this->default_storage_service,true,false,job,cores_per_node_asked_for,batch_job->getEndingTimeStamp(),true,
-//                                           {},"_pilot");
+          double timeout_timestamp = std::min(job->getDuration(), time_in_minutes * 60 * 1.0);
+          batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
 
           ComputeService *cs =
                   new MultihostMulticoreComputeService(host_to_run_on,
                                                        true, false,
                                                        resources,
                                                        this->default_storage_service
-                                                       );
+                  );
           cs->setSimulation(this->simulation);
 
           // Create and launch a compute service for the pilot job
@@ -693,7 +716,7 @@ namespace wrench {
 
 
           // Put the job in the running queue
-          this->running_jobs.insert(batch_job);
+          this->running_jobs.insert(std::move(batch_job_ptr));
           this->timeslots.push_back(batch_job->getEndingTimeStamp());
 
           //remember the allocated resources for the job
@@ -713,9 +736,11 @@ namespace wrench {
           }
 
 
-            std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new AlarmJobTimeOutMessage(job, 0));
-//            std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
-            this->pilot_job_alarms.push_back(std::move(new Alarm(batch_job->getEndingTimeStamp(),host_to_run_on,this->mailbox_name, msg,"batch_pilot")));
+          std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(
+                  new AlarmJobTimeOutMessage(job, 0));
+          this->pilot_job_alarms.push_back(std::move(
+                  new Alarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
+                            "batch_pilot")));
 
           // Push my own mailbox onto the pilot job!
 //          job->pushCallbackMailbox(this->mailbox_name);
@@ -731,20 +756,25 @@ namespace wrench {
     * or has timed out (because it's in fact a pilot job))
     */
     void BatchService::failCurrentStandardJobs(std::shared_ptr<FailureCause> cause) {
-      for (auto workflow_job : this->running_jobs) {
-        if (workflow_job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-          StandardJob *job = (StandardJob*) workflow_job->getWorkflowJob();
+
+
+      std::set<std::unique_ptr<BatchJob>>::iterator it;
+      for(it=this->running_jobs.begin();it!=this->running_jobs.end();it++){
+        WorkflowJob* workflow_job = it->get()->getWorkflowJob();
+        if (workflow_job->getType() == WorkflowJob::STANDARD) {
+          StandardJob *job = (StandardJob *) workflow_job;
           this->failRunningStandardJob(job, cause);
         }
       }
 
-      while (not this->pending_jobs.empty()) {
-        WorkflowJob *workflow_job = this->pending_jobs.front()->getWorkflowJob();
-        this->pending_jobs.pop_back();
+      std::deque<std::unique_ptr<BatchJob>>::iterator it1;
+      for(it1=this->pending_jobs.begin();it1!=this->pending_jobs.end();it1++){
+        WorkflowJob* workflow_job = it1->get()->getWorkflowJob();
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           StandardJob *job = (StandardJob *) workflow_job;
           this->failPendingStandardJob(job, cause);
         }
+        this->pending_jobs.erase(it1);
       }
     }
 
@@ -752,7 +782,7 @@ namespace wrench {
     /**
      * @brief Notify upper level job submitters
      */
-    void BatchService::notifyJobSubmitters(PilotJob* job) {
+    void BatchService::notifyJobSubmitters(PilotJob *job) {
 
       WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox %s",
                   job->getCallbackMailbox().c_str());
@@ -810,7 +840,8 @@ namespace wrench {
 
       } else {
         throw std::runtime_error(
-                "MultihostMulticoreComputeService::terminatePilotJob(): Received an unexpected [" + message->getName() +
+                "MultihostMulticoreComputeService::terminatePilotJob(): Received an unexpected [" +
+                message->getName() +
                 "] message!");
       }
     }
@@ -826,30 +857,34 @@ namespace wrench {
       this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
 
       //kill and then remove standard job alarms
-        for (auto sj_alarm: this->standard_job_alarms){
-            WRENCH_INFO("Killing the standard job alarms");
-            sj_alarm->kill();
-        }
+      for (auto sj_alarm: this->standard_job_alarms) {
+        WRENCH_INFO("Killing the standard job alarms");
+        sj_alarm->kill();
+      }
       this->standard_job_alarms.clear();
 
       //kill and then remove pilot job alarms
-        for (auto pj_alarm: this->pilot_job_alarms){
-            WRENCH_INFO("Killing the pilot job alarms");
-            pj_alarm->kill();
-        }
+      for (auto pj_alarm: this->pilot_job_alarms) {
+        WRENCH_INFO("Killing the pilot job alarms");
+        pj_alarm->kill();
+      }
       this->pilot_job_alarms.clear();
 
-      if(this->supports_pilot_jobs){
-        for(auto workflow_job:this->running_jobs){
-          if(workflow_job->getWorkflowJob()->getType()==WorkflowJob::PILOT){
-            PilotJob* p_job = (PilotJob*) (workflow_job->getWorkflowJob());
-            BatchService* cs = (BatchService*)p_job->getComputeService();
+
+
+      if (this->supports_pilot_jobs) {
+        std::set<std::unique_ptr<BatchJob>>::iterator it;
+        for (it=this->running_jobs.begin();it!=this->running_jobs.end();it++) {
+          if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+            PilotJob *p_job = (PilotJob *) ((*it)->getWorkflowJob());
+            BatchService *cs = (BatchService *) p_job->getComputeService();
             if (cs == nullptr) {
-              throw std::runtime_error("BatchService::terminate(): can't find compute service associated to pilot job");
+              throw std::runtime_error(
+                      "BatchService::terminate(): can't find compute service associated to pilot job");
             }
             try {
               cs->stop();
-            }catch (wrench::WorkflowExecutionException &e){
+            } catch (wrench::WorkflowExecutionException &e) {
               return;
             }
           }
@@ -862,7 +897,8 @@ namespace wrench {
                     this->parent_pilot_job->getCallbackMailbox().c_str());
         try {
           S4U_Mailbox::putMessage(this->parent_pilot_job->popCallbackMailbox(),
-                                  new ComputeServicePilotJobExpiredMessage(this->parent_pilot_job, this,
+                                  new ComputeServicePilotJobExpiredMessage(this->parent_pilot_job,
+                                                                           this,
                                                                            this->getPropertyValueAsDouble(
                                                                                    BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {
@@ -906,17 +942,19 @@ namespace wrench {
         return false;
 
       } else if (BatchServiceJobRequestMessage *msg = dynamic_cast<BatchServiceJobRequestMessage *>(message.get())) {
-        WRENCH_INFO("Asked to run a batch job using batchservice with jobid %ld",msg->job->getJobID());
-        if (msg->job->getWorkflowJob()->getType()==WorkflowJob::STANDARD) {
+        WRENCH_INFO("Asked to run a batch job using batchservice with jobid %ld", msg->job->getJobID());
+        if (msg->job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
           if (not this->supports_standard_jobs) {
             try {
               S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                        new ComputeServiceSubmitStandardJobAnswerMessage(
-                                               (StandardJob *) msg->job->getWorkflowJob(), this,
+                                               (StandardJob *) msg->job->getWorkflowJob(),
+                                               this,
                                                false,
                                                std::shared_ptr<FailureCause>(
-                                                       new JobTypeNotSupported(msg->job->getWorkflowJob(),
-                                                                               this)),
+                                                       new JobTypeNotSupported(
+                                                               msg->job->getWorkflowJob(),
+                                                               this)),
                                                this->getPropertyValueAsDouble(
                                                        BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> cause) {
@@ -924,16 +962,18 @@ namespace wrench {
             }
             return true;
           }
-        } else if(msg->job->getWorkflowJob()->getType()==WorkflowJob::PILOT){
+        } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
           if (not this->supports_pilot_jobs) {
             try {
               S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                        new ComputeServiceSubmitPilotJobAnswerMessage(
-                                               (PilotJob *) msg->job->getWorkflowJob(), this,
+                                               (PilotJob *) msg->job->getWorkflowJob(),
+                                               this,
                                                false,
                                                std::shared_ptr<FailureCause>(
-                                                       new JobTypeNotSupported(msg->job->getWorkflowJob(),
-                                                                               this)),
+                                                       new JobTypeNotSupported(
+                                                               msg->job->getWorkflowJob(),
+                                                               this)),
                                                this->getPropertyValueAsDouble(
                                                        BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> cause) {
@@ -943,9 +983,9 @@ namespace wrench {
           }
         }
 
-        this->pending_jobs.push_back(msg->job);
+        this->pending_jobs.push_back(std::unique_ptr<BatchJob>(std::move(msg->job)));
 
-        if (msg->job->getWorkflowJob()->getType()==WorkflowJob::STANDARD) {
+        if (msg->job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
 
           try {
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
@@ -958,7 +998,7 @@ namespace wrench {
           } catch (std::shared_ptr<NetworkError> cause) {
             return true;
           }
-        }else if(msg->job->getWorkflowJob()->getType()==WorkflowJob::PILOT){
+        } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
           try {
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                      new ComputeServiceSubmitPilotJobAnswerMessage(
@@ -989,27 +1029,33 @@ namespace wrench {
         return true;
 
       } else if (AlarmJobTimeOutMessage *msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
-        if(msg->job->getType()==WorkflowJob::STANDARD) {
+        if (msg->job->getType() == WorkflowJob::STANDARD) {
           this->processStandardJobTimeout((StandardJob *) (msg->job));
           this->updateResources((StandardJob *) msg->job);
           this->sendStandardJobCallBackMessage((StandardJob *) msg->job);
           return true;
-        }else if(msg->job->getType()==WorkflowJob::PILOT) {
-            PilotJob* job = (PilotJob*)msg->job;
-            ComputeService* cs = job->getComputeService();
-            try {
-                cs->stop();
-            }catch (wrench::WorkflowExecutionException &e){
-                throw std::runtime_error(
-                        "BatchService::processNextMessage(): Not able to terminate the pilot job"
-                );
-            }
-            this->processPilotJobCompletion(job);
-            return true;
+        } else if (msg->job->getType() == WorkflowJob::PILOT) {
+          PilotJob *job = (PilotJob *) msg->job;
+          ComputeService *cs = job->getComputeService();
+          try {
+            cs->stop();
+          } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error(
+                    "BatchService::processNextMessage(): Not able to terminate the pilot job"
+            );
+          }
+          this->processPilotJobCompletion(job);
+          return true;
+        }else{
+          throw std::runtime_error(
+                  "BatchService::processNextMessage(): Alarm about unknown job type"
+          );
         }
-      }  else {
+      } else {
         throw std::runtime_error(
-                "BatchService::processNextMessage(): Unknown message type: " + std::to_string(message->payload));
+                "BatchService::processNextMessage(): Unknown message type: " +
+                std::to_string(message->payload));
+        return false;
       }
 
     }
@@ -1026,28 +1072,28 @@ namespace wrench {
 
       // Remove the job from the running job list
       bool job_on_the_list = false;
-      for(auto it=this->running_jobs.begin();it!=this->running_jobs.end();){
-        if((*it)->getWorkflowJob()==job){
+      std::set<std::unique_ptr<BatchJob>>::iterator it;
+      for (it = this->running_jobs.begin(); it != this->running_jobs.end();) {
+        if ((*it)->getWorkflowJob() == job) {
           job_on_the_list = true;
-          this->running_jobs.erase(it);
           // Update the cores count in the available resources
-          std::set<std::pair<std::string,unsigned long>> resources = (*it)->getResourcesAllocated();
-          std::set<std::pair<std::string,unsigned long>>::iterator resource_it;
-          for(resource_it=resources.begin();resource_it!=resources.end();resource_it++){
+          std::set<std::pair<std::string, unsigned long>> resources = (*it)->getResourcesAllocated();
+          std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
+          for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
             this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
           }
+          this->running_jobs.erase(it);
           break;
-        }else{
+        } else {
           ++it;
         }
       }
 
-      if(!job_on_the_list){
-        throw std::runtime_error("BatchService::processPilotJobCompletion():  Pilot job completion message recevied but no such pilot jobs found in queue"
+      if (!job_on_the_list) {
+        throw std::runtime_error(
+                "BatchService::processPilotJobCompletion():  Pilot job completion message recevied but no such pilot jobs found in queue"
         );
       }
-
-
 
       // Forward the notification
       try {
@@ -1058,6 +1104,8 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> cause) {
         return;
       }
+
+
 
       return;
     }
@@ -1071,9 +1119,10 @@ namespace wrench {
      */
     void BatchService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
 
-      // Check whether job is pending
-      for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
-        if ((*it)->getWorkflowJob() == job) {
+
+      std::deque<std::unique_ptr<BatchJob>>::iterator it;
+      for(it=this->pending_jobs.begin();it!=this->pending_jobs.end();it++){
+        if(it->get()->getWorkflowJob()==job){
           this->pending_jobs.erase(it);
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                   job, this, true, nullptr,
@@ -1088,14 +1137,15 @@ namespace wrench {
         }
       }
 
-      for(auto it=this->running_jobs.begin();it!=this->running_jobs.end();){
-        if((*it)->getWorkflowJob()==job){
-          this->running_jobs.erase(it);
-          this->processPilotJobTimeout((PilotJob*)(*it)->getWorkflowJob());
+
+      std::set<std::unique_ptr<BatchJob>>::iterator it1;
+      for (it1 = this->running_jobs.begin(); it1 != this->running_jobs.end();) {
+        if ((*it1)->getWorkflowJob() == job) {
+          this->processPilotJobTimeout((PilotJob *) (*it1)->getWorkflowJob());
           // Update the cores count in the available resources
-          std::set<std::pair<std::string,unsigned long>> resources = (*it)->getResourcesAllocated();
-          std::set<std::pair<std::string,unsigned long>>::iterator resource_it;
-          for(resource_it=resources.begin();resource_it!=resources.end();resource_it++){
+          std::set<std::pair<std::string, unsigned long>> resources = (*it1)->getResourcesAllocated();
+          std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
+          for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
             this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
           }
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
@@ -1107,9 +1157,10 @@ namespace wrench {
           } catch (std::shared_ptr<NetworkError> &cause) {
             return;
           }
+          this->running_jobs.erase(it1);
           return;
-        }else{
-          ++it;
+        } else {
+          ++it1;
         }
       }
 
@@ -1135,30 +1186,35 @@ namespace wrench {
      */
     void BatchService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
       // Remove the executor from the executor list
-      if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
-        throw std::runtime_error("BatchService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
+      std::unique_ptr<StandardJobExecutor> executor_ptr = std::unique_ptr<StandardJobExecutor>(std::move(executor));
+      if (this->running_standard_job_executors.find(executor_ptr) == this->running_standard_job_executors.end()) {
+        throw std::runtime_error(
+                "BatchService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
-      this->standard_job_executors.erase(executor);
+      PointerUtil::moveSingleSeparateUniquePtrFromSeToSet(&executor_ptr, &(this->running_standard_job_executors), &(this->finished_standard_job_executors));
 
       // Remove the job from the running job list
       bool job_on_the_list = false;
 
-      for(auto it=this->running_jobs.begin();it!=this->running_jobs.end();it++){
-        if((*it)->getWorkflowJob()==job){
+      std::set<std::unique_ptr<BatchJob>>::iterator it;
+      for (it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
+        if ((*it)->getWorkflowJob() == (WorkflowJob*)job) {
           job_on_the_list = true;
-          this->running_jobs.erase(it);
+
           // Update the cores count in the available resources
-          std::set<std::pair<std::string,unsigned long>> resources = (*it)->getResourcesAllocated();
-          std::set<std::pair<std::string,unsigned long>>::iterator resource_it;
-          for(resource_it=resources.begin();resource_it!=resources.end();resource_it++){
+          std::set<std::pair<std::string, unsigned long>> resources = (*it)->getResourcesAllocated();
+          std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
+          for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
             this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
           }
+          this->running_jobs.erase(it);
           break;
         }
       }
 
-      if(!job_on_the_list){
-        throw std::runtime_error("BatchService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
+      if (!job_on_the_list) {
+        throw std::runtime_error(
+                "BatchService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
       }
 
 
@@ -1187,30 +1243,34 @@ namespace wrench {
                                                  StandardJob *job,
                                                  std::shared_ptr<FailureCause> cause) {
 
+      std::unique_ptr<StandardJobExecutor> executor_ptr = std::unique_ptr<StandardJobExecutor>(std::move(executor));
       // Remove the executor from the executor list
-      if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
-        throw std::runtime_error("MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
+      if (this->running_standard_job_executors.find(executor_ptr) == this->running_standard_job_executors.end()) {
+        throw std::runtime_error(
+                "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
-      this->standard_job_executors.erase(executor);
+      PointerUtil::moveSingleSeparateUniquePtrFromSeToSet(&executor_ptr, &(this->running_standard_job_executors), &(this->finished_standard_job_executors));
+//      this->running_standard_job_executors.erase(executor_ptr);
 
       // Remove the job from the running job list
       bool job_on_the_list = false;
-      std::set<BatchJob*>::iterator it;
-      for(it=this->running_jobs.begin();it!=this->running_jobs.end();it++){
-        if((*it)->getWorkflowJob()==job){
+      std::set<std::unique_ptr<BatchJob>>::iterator it;
+      for (it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
+        if ((*it)->getWorkflowJob() == job) {
           job_on_the_list = true;
           this->running_jobs.erase(*it);
           // Update the cores count in the available resources
-          std::set<std::pair<std::string,unsigned long>> resources = (*it)->getResourcesAllocated();
-          std::set<std::pair<std::string,unsigned long>>::iterator resource_it;
-          for(resource_it=resources.begin();resource_it!=resources.end();resource_it++){
+          std::set<std::pair<std::string, unsigned long>> resources = (*it)->getResourcesAllocated();
+          std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
+          for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
             this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
           }
           break;
         }
       }
-      if(!job_on_the_list){
-        throw std::runtime_error("BatchService::processStandardJobFailure(): Received a standard job completion, but the job is not in the running job list");
+      if (!job_on_the_list) {
+        throw std::runtime_error(
+                "BatchService::processStandardJobFailure(): Received a standard job completion, but the job is not in the running job list");
       }
 
       WRENCH_INFO("A standard job executor has failed to perform job %s", job->getName().c_str());
@@ -1240,7 +1300,7 @@ namespace wrench {
       }
     }
 
-    unsigned long BatchService::generateUniqueJobId(){
+    unsigned long BatchService::generateUniqueJobId() {
       static unsigned long jobid = 1;
       return jobid++;
     }

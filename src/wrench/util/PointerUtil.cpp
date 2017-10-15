@@ -8,6 +8,7 @@
  */
 
 
+#include <wrench/services/compute/standard_job_executor/StandardJobExecutor.h>
 #include "wrench/util/PointerUtil.h"
 
 namespace wrench {
@@ -24,6 +25,19 @@ namespace wrench {
 //      (*to).insert(std::move(tmp));
 //
 //    }
+
+    template <class T>
+    void PointerUtil::moveSingleSeparateUniquePtrFromSeToSet(std::unique_ptr<T>* ptr,
+                                                       std::set<std::unique_ptr<T>> *from,
+                                                       std::set<std::unique_ptr<T>> *to){
+      auto tmp = const_cast<std::unique_ptr<T>&&>(*ptr);
+      (*from).erase(*ptr);
+      (*to).insert(std::move(tmp));
+    };
+
+    template void PointerUtil::moveSingleSeparateUniquePtrFromSeToSet<StandardJobExecutor>(std::unique_ptr<StandardJobExecutor> *ptr,
+                                                                      std::set<std::unique_ptr<StandardJobExecutor>> *from,
+                                                                      std::set<std::unique_ptr<StandardJobExecutor>> *to);
 
 
 };
