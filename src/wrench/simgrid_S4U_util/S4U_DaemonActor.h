@@ -12,7 +12,6 @@
 #ifndef WRENCH_SIM4U_DAEMONACTOR_H
 #define WRENCH_SIM4U_DAEMONACTOR_H
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(S4U_DaemonWithMailboxActor, "S4U_DaemonActor");
 
 #include <xbt.h>
 #include <string>

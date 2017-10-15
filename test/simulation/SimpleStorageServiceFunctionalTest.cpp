@@ -129,6 +129,7 @@ private:
                 "Should not be able to store a file to a storage service that doesn't have enough capacity");
       }
 
+
       // Make sure the copy didn't happen
       success = false;
       if (this->test->storage_service_100->lookupFile(this->test->file_500)) {
@@ -148,6 +149,7 @@ private:
       if (!success) {
         throw std::runtime_error("Should be able to store a file to a storage service that has enough capacity");
       }
+
 
       // TODO: Make sure that the file registry service has been updated?
 
@@ -420,23 +422,9 @@ private:
                                                      this->test->storage_service_500);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
-        if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_ALREADY_THERE) {
-          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
-                                   std::to_string(e.getCause()->getCauseType()));
-        }
-        // Check Exception details
-        wrench::StorageServiceFileAlreadyThere *real_cause = (wrench::StorageServiceFileAlreadyThere *) e.getCause().get();
-        if (real_cause->getFile() != this->test->file_500) {
-          throw std::runtime_error(
-                  "Got the expected 'file already there' exception, but the failure cause does not point to the correct file");
-        }
-        if (real_cause->getStorageService() != this->test->storage_service_500) {
-          throw std::runtime_error(
-                  "Got the expected 'file already there' exception, but the failure cause does not point to the correct storage service");
-        }
       }
-      if (success) {
-        throw std::runtime_error("Should no be able fo write a file that's already there");
+      if (!success) {
+        throw std::runtime_error("Should be able fo write a file that's already there");
       }
 
       this->simulation->shutdownAllStorageServices();
@@ -575,20 +563,20 @@ private:
 
 
       switch (event->type) {
-        case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::FILE_ALREADY_THERE) {
-            throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
-                                     std::to_string(event->failure_cause->getCauseType()));
-          }
-          wrench::StorageServiceFileAlreadyThere *real_cause = (wrench::StorageServiceFileAlreadyThere *) event->failure_cause.get();
-          if (real_cause->getFile() != this->test->file_500) {
-            throw std::runtime_error(
-                    "Got the expected 'file already there' exception, but the failure cause does not point to the correct file");
-          }
-          if (real_cause->getStorageService() != this->test->storage_service_500) {
-            throw std::runtime_error(
-                    "Got the expected 'file already there' exception, but the failure cause does not point to the correct storage service");
-          }
+        case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
+//          if (event->failure_cause->getCauseType() != wrench::FailureCause::FILE_ALREADY_THERE) {
+//            throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
+//                                     std::to_string(event->failure_cause->getCauseType()));
+//          }
+//          wrench::StorageServiceFileAlreadyThere *real_cause = (wrench::StorageServiceFileAlreadyThere *) event->failure_cause.get();
+//          if (real_cause->getFile() != this->test->file_500) {
+//            throw std::runtime_error(
+//                    "Got the expected 'file already there' exception, but the failure cause does not point to the correct file");
+//          }
+//          if (real_cause->getStorageService() != this->test->storage_service_500) {
+//            throw std::runtime_error(
+//                    "Got the expected 'file already there' exception, but the failure cause does not point to the correct storage service");
+//          }
 
           break;
         }

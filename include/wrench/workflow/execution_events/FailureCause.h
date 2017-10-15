@@ -36,6 +36,8 @@ namespace wrench {
 
         /** @brief Types of failure causes */
         enum CauseType {
+            /** @brief Unknown cause */
+                    FATAL_FAILURE,
             /** @brief The file cannot be found anywhere */
                     NO_STORAGE_SERVICE_FOR_FILE,
             /** @brief The file was not found where it was supposed to be found */
@@ -57,7 +59,10 @@ namespace wrench {
             /** @brief The job cannot be terminated because it's neither pending nor running */
                     JOB_CANNOT_BE_TERMINATED,
             /** @brief The job cannot be forgotten because it's not completed */
-                    JOB_CANNOT_BE_FORGOTTEN
+                    JOB_CANNOT_BE_FORGOTTEN,
+            /** @brief A compute thread has died */
+                    COMPUTE_THREAD_HAS_DIED
+
         };
 
         FailureCause(CauseType cause);
@@ -253,6 +258,29 @@ namespace wrench {
     private:
         WorkflowJob *job;
     };
+
+    /**
+   * @brief A "compute thread has died" failure cause
+   */
+    class ComputeThreadHasDied : public FailureCause {
+    public:
+        ComputeThreadHasDied();
+        std::string toString();
+
+    private:
+    };
+
+    /**
+   * @brief Unknown failure cause
+   */
+    class FatalFailure : public FailureCause {
+    public:
+        FatalFailure();
+        std::string toString();
+
+    private:
+    };
+
 
     /***********************/
     /** \endcond           */

@@ -78,8 +78,6 @@ namespace wrench {
      */
     std::set<StorageService *> FileRegistryService::lookupEntry(WorkflowFile *file) {
 
-      WRENCH_INFO("IN lookupEntry()");
-
       if (file == nullptr) {
         throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
       }

@@ -25,6 +25,7 @@ endif ()
 
 
 include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include /usr/local/include/nlohmann)
+#include_directories(src/wrench/ include/ /usr/include /usr/local/include /Users/casanova/Home/PROJECTS/SIMGRID/simgrid /opt/local/include /usr/local/include/nlohmann)
 
 
 # library header files
@@ -63,8 +64,8 @@ set(HEADER_FILES
         include/wrench/services/compute/cloud/CloudServiceProperty.h
         include/wrench/services/storage/StorageService.h
         include/wrench/services/storage/StorageServiceProperty.h
-        include/wrench/services/storage/SimpleStorageService.h
-        include/wrench/services/storage/SimpleStorageServiceProperty.h
+        include/wrench/services/storage/simple/SimpleStorageService.h
+        include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
         include/wrench/services/file_registry/FileRegistryService.h
         include/wrench/services/file_registry/FileRegistryServiceProperty.h
         include/wrench/services/network_proximity/NetworkProximityService.h
@@ -116,7 +117,7 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationOutput.cpp
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/storage/StorageService.cpp
-        src/wrench/services/storage/simple_storage/SimpleStorageService.cpp
+        src/wrench/services/storage/simple/SimpleStorageService.cpp
         src/wrench/managers/DataMovementManager.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
@@ -124,7 +125,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceProperty.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
         src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.cpp
-        src/wrench/services/storage/simple_storage/SimpleStorageServiceProperty.cpp
+        src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessage.h
@@ -141,8 +142,8 @@ set(SOURCE_FILES
         src/wrench/services/compute/cloud/CloudServiceMessage.h
         src/wrench/services/compute/cloud/CloudServiceMessage.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
-        src/wrench/services/storage/simple_storage/IncomingFile.cpp
-        src/wrench/services/storage/simple_storage/IncomingFile.h
+        src/wrench/services/storage/simple/IncomingFile.cpp
+        include/wrench/services/storage/simple/IncomingFile.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp

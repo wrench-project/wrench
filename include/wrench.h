@@ -16,8 +16,8 @@
 // Services and Service Properties
 #include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
 #include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h"
-#include "wrench/services/storage/SimpleStorageService.h"
-#include "wrench/services/storage/SimpleStorageServiceProperty.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
+#include "wrench/services/storage/simple/SimpleStorageServiceProperty.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudService.h"

@@ -10,7 +10,7 @@
 
 #include "wrench/services/compute/cloud/CloudService.h"
 #include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
-#include "wrench/services/storage/SimpleStorageService.h"
+#include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "services/ServiceMessage.h"

@@ -17,6 +17,8 @@ SOFTWARE ENGINEERING:
     - Track all task change updates and make sure they're all in the JobManager...
         - They likely cannot, but the task life cycle is confusing right now
 
+    - The TerminateJobAtRandomTimes test fails once ina  blue moon for a few random numbers!!!
+
 -----------------------------------
 
 DETAILS:

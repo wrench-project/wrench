@@ -46,6 +46,7 @@ namespace wrench {
 
 		protected:
 				void kill_actor();
+				void join_actor();
 
 		private:
 				bool terminated;

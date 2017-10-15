@@ -442,18 +442,18 @@ namespace wrench {
         unsigned long picked_picked_num_cores = 0;
 
         for (auto t : tasks) {
-          WRENCH_INFO("LOOKING AT TASK %s", t->getId().c_str());
+//          WRENCH_INFO("LOOKING AT TASK %s", t->getId().c_str());
           std::string picked_host;
           unsigned long picked_num_cores = 0;
 
-          WRENCH_INFO("---> %ld", tentative_availabilities.size());
+//          WRENCH_INFO("---> %ld", tentative_availabilities.size());
           for (auto r : tentative_availabilities) {
-            WRENCH_INFO("   LOOKING AT HOST %s", r.first.c_str());
+//            WRENCH_INFO("   LOOKING AT HOST %s", r.first.c_str());
             std::string hostname = r.first;
             unsigned long num_available_cores = r.second;
 
             if (num_available_cores < t->getMinNumCores()) {
-              WRENCH_INFO("      NO DICE");
+//              WRENCH_INFO("      NO DICE");
               continue;
             }
 
@@ -464,13 +464,13 @@ namespace wrench {
           }
 
           if (picked_num_cores == 0) {
-            WRENCH_INFO("NOPE");
+//            WRENCH_INFO("NOPE");
             continue;
           }
 
           if (picked_num_cores > picked_picked_num_cores) {
-            WRENCH_INFO("PICKED TASK %s on HOST %s with %ld cores",
-                        t->getId().c_str(), picked_host.c_str(), picked_num_cores);
+//            WRENCH_INFO("PICKED TASK %s on HOST %s with %ld cores",
+//                        t->getId().c_str(), picked_host.c_str(), picked_num_cores);
             picked_task = t;
             picked_picked_num_cores = picked_num_cores;
             picked_picked_host = picked_host;
@@ -487,8 +487,6 @@ namespace wrench {
         }
       }
 
-      WRENCH_INFO("HERE");
-
       // Come up with allocation based on tentative availabilities!
       std::set<std::pair<std::string, unsigned long>> allocation;
       for (auto r : tentative_availabilities) {
@@ -496,13 +494,11 @@ namespace wrench {
         unsigned long num_cores = r.second;
 
         if (num_cores < this->core_availabilities[hostname]) {
-          WRENCH_INFO("ALLOCATION %s/%ld", hostname.c_str(), this->core_availabilities[hostname] - num_cores);
+//          WRENCH_INFO("ALLOCATION %s/%ld", hostname.c_str(), this->core_availabilities[hostname] - num_cores);
           allocation.insert(std::make_pair(hostname, this->core_availabilities[hostname] - num_cores));
         }
       }
 
-
-      // This shouldn't happen
       return allocation;
     }
 
@@ -517,10 +513,10 @@ namespace wrench {
       unsigned long minimum_required_num_cores = 1;
 
 
-      WRENCH_INFO("IN DISPATCH");
-      for (auto r : this->core_availabilities) {
-        WRENCH_INFO("   --> %s %ld", std::get<0>(r).c_str(), std::get<1>(r));
-      }
+//      WRENCH_INFO("IN DISPATCH");
+//      for (auto r : this->core_availabilities) {
+//        WRENCH_INFO("   --> %s %ld", std::get<0>(r).c_str(), std::get<1>(r));
+//      }
 
       for (auto t : (job)->getTasks()) {
         minimum_required_num_cores = MAX(minimum_required_num_cores, t->getMinNumCores());
@@ -537,11 +533,11 @@ namespace wrench {
 
       // If not even one host, give up
       if (possible_hosts.size() == 0) {
-      WRENCH_INFO("*** THERE ARE NOT ENOUGH RESOURCES FOR THIS JOB!!");
+//      WRENCH_INFO("*** THERE ARE NOT ENOUGH RESOURCES FOR THIS JOB!!");
         return false;
       }
 
-      WRENCH_INFO("*** THERE ARE POSSIBLE HOSTS FOR THIS JOB!!");
+//      WRENCH_INFO("*** THERE ARE POSSIBLE HOSTS FOR THIS JOB!!");
 
       // Compute the max num cores usable by a job task
       unsigned long maximum_num_cores = 0;

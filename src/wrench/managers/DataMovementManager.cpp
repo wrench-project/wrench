@@ -148,6 +148,8 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
       } catch (std::shared_ptr<NetworkError> cause) {
         return true;
+      }  catch (std::shared_ptr<FatalFailure> cause) {
+        return true;
       }
 
       if (message == nullptr) {

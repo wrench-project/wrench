@@ -39,6 +39,8 @@ namespace wrench {
 
     public:
 
+        ~StandardJobExecutor();
+
         // Public Constructor
         StandardJobExecutor (
                 Simulation *simulation,

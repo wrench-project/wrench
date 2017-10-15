@@ -15,7 +15,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "StandardJobExecutorMessage.h"
 
-//#define S4U_KILL_JOIN_WORKS
+
 
 namespace wrench {
 
@@ -24,42 +24,25 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief The actor for the S4U_DaemonWithMailbox abstraction
+     * @brief A compute thread
      */
-    class ComputeThread {
+    class ComputeThread : public S4U_Daemon {
 
     public:
 
-        /**
-         * @brief Constructor
-         * @param flops: the number of flops to perform
-         */
-        explicit ComputeThread(double flops, std::string reply_mailbox) {
-          this->flops = flops;
-          this->reply_mailbox = reply_mailbox;
-        }
+        ~ComputeThread();
 
-        /**
-         * @brief The S4U way of doing things
-         */
-        void operator()() {
-          this->compute(this->flops);
-          #ifndef S4U_KILL_JOIN_WORKS
-          try {
-            S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
-          } catch (std::exception &e) {
-            // Nothing, perhaps my parent has died
+        ComputeThread(double flops, std::string reply_mailbox);
 
-          }
-          #endif
-        }
+        int main();
+
+        void kill();
+        void join();
 
 
     private:
         double flops;
         std::string reply_mailbox;
-
-        void compute(double flops);
 
     };
 

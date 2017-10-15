@@ -220,7 +220,9 @@ namespace wrench {
                                                                          file,
                                                                          this->getPropertyValueAsDouble(
                                                                                  StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (FailureCause *cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<FatalFailure> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -229,7 +231,9 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (FailureCause *cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<FatalFailure> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -243,7 +247,11 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> file_content_message = nullptr;
         try {
           file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
-        } catch (FailureCause *cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          WRENCH_INFO("Network Error while getting a file content");
+          throw WorkflowExecutionException(cause);
+        } catch (std::shared_ptr<FatalFailure> &cause) {
+           WRENCH_INFO("Unknown Error while getting a file content.... means we should just die. but throwing");
           throw WorkflowExecutionException(cause);
         }
 
@@ -290,7 +298,8 @@ namespace wrench {
       } catch (FailureCause *cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::exception &e) {
-        WRENCH_INFO("HOLY CRAP");
+        WRENCH_INFO("Got a weird exception..... returning");
+        return;
       }
 
       // Wait for a reply
@@ -400,7 +409,7 @@ namespace wrench {
           try {
             WRENCH_INFO("Reading file %s", f->getId().c_str());
             storage_service->readFile(f);
-//            WRENCH_INFO("File %s read", f->getId().c_str());
+            WRENCH_INFO("File %s read", f->getId().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -411,7 +420,7 @@ namespace wrench {
           try {
             WRENCH_INFO("Writing file %s", f->getId().c_str());
             storage_service->writeFile(f);
-//            WRENCH_INFO("Wrote file %s", f->getId().c_str());
+            WRENCH_INFO("Wrote file %s", f->getId().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -542,7 +551,9 @@ namespace wrench {
                 file,
                 src,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (FailureCause *cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<FatalFailure> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -551,7 +562,9 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (FailureCause *cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<FatalFailure> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -599,7 +612,9 @@ namespace wrench {
                 file,
                 src,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (FailureCause *cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<FatalFailure> &cause) {
         throw WorkflowExecutionException(cause);
       }
 

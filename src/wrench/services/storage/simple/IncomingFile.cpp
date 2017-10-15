@@ -8,7 +8,7 @@
  */
 
 
-#include "IncomingFile.h"
+#include "wrench/services/storage/simple/IncomingFile.h"
 
 namespace wrench {
 

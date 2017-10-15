@@ -11,6 +11,14 @@
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "simgrid_S4U_util/S4U_DaemonActor.h"
 #include "simgrid_S4U_util/S4U_Mailbox.h"
+#include <wrench/logging/TerminalOutput.h>
+
+#include <xbt/ex.hpp>
+
+
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon, "Log category for S4U_Daemon");
+
 
 namespace wrench {
 
@@ -37,6 +45,10 @@ namespace wrench {
       this->terminated = false;
     }
 
+    int daemonGoodbye(void *x, void*y) {
+      WRENCH_INFO("Terminating");
+      return 0;
+    }
 
     /**
      * @brief Start the daemon
@@ -59,8 +71,12 @@ namespace wrench {
         // Some internal SimGrid exceptions...
         std::abort();
       }
-        if(daemonized)
+
+      if (daemonized)
         this->s4u_actor->daemonize();
+
+      this->s4u_actor->onExit(daemonGoodbye, (void *)(this->process_name.c_str()));
+
 
       // Set the mailbox receiver
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
@@ -74,10 +90,32 @@ namespace wrench {
      */
     void S4U_Daemon::kill_actor() {
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
-        this->s4u_actor->kill();
+        try {
+          this->s4u_actor->kill();
+        } catch (std::exception &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        } catch (xbt_ex &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        }
         this->terminated = true;
       }
     }
+
+    /**
+     * @brief Kill the daemon/actor.
+     */
+    void S4U_Daemon::join_actor() {
+      if ((this->s4u_actor != nullptr) && (not this->terminated)) {
+        try {
+          this->s4u_actor->join();
+        } catch (std::exception &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        } catch (xbt_ex &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        }
+      }
+    }
+
 
     /**
      * @brief Set the terminated status of the daemon/actor

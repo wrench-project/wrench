@@ -407,4 +407,38 @@ namespace wrench {
     }
 
 
+    /**
+   * @brief Constructor
+   *
+   */
+    ComputeThreadHasDied::ComputeThreadHasDied() : FailureCause(
+            COMPUTE_THREAD_HAS_DIED) {
+    }
+
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string ComputeThreadHasDied::toString() {
+      return "A compute thread has died";
+    };
+
+    /**
+  * @brief Constructor
+  *
+  */
+    FatalFailure::FatalFailure() : FailureCause(
+            FATAL_FAILURE) {
+    }
+
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string FatalFailure::toString() {
+      return "Unknown Failure Cause";
+    };
+
 };

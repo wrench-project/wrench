@@ -28,6 +28,11 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard J
 
 namespace wrench {
 
+
+    StandardJobExecutor::~StandardJobExecutor() {
+//      WRENCH_INFO("IN STANDARD_JOB_EXECUTOR_DESTRUCTOR");
+    }
+
     /**
      * @brief Constructor
      *
@@ -62,6 +67,7 @@ namespace wrench {
         }
       }
 
+
       // Check that there are enough cores to run the computational tasks
       unsigned long min_required_num_cores = 0;
       for (auto task : job->tasks) {
@@ -80,12 +86,14 @@ namespace wrench {
         throw std::runtime_error("StandardJobExecutor::StandardJobExecutor(): insufficient resources to run jobs");
       }
 
+
       // Set instance variables
       this->simulation = simulation;
       this->callback_mailbox = callback_mailbox;
       this->job = job;
       this->compute_resources = compute_resources;
       this->default_storage_service = default_storage_service;
+
 
       // Set properties
       // Set default properties
@@ -97,6 +105,7 @@ namespace wrench {
       for (auto p : plist) {
         this->setProperty(p.first, p.second);
       }
+
 
       // Compute the total number of cores and set initial core availabilities
       this->total_num_cores = 0;
@@ -119,25 +128,19 @@ namespace wrench {
      */
     void StandardJobExecutor::kill() {
 
-      // THE ORDER IN WHICH WE KILL THINGS IS VERY IMPORTANT
-      // WEIRDLY, KILLING IN THIS ORDER WORKS....
-      // TODO: INVESTIGATE
-      // IF WE SWAP THE ORDER, THEN THE WORKUNITEXECUTORS
-      // SOMEHOW DON'T SUCCEED IN KILLING THEIR COMPUTE THREADS,
-      // EVEN THOUGH THOSE COMPUTE THREADS CALL THEIR onExit()
-      // FUNCTION. LIKELY A WEIRD BUG IN SimGrid...
+      // THE ORDER IN WHICH WE KILL THINGS IS  IMPORTANT
+      // WEIRDLY, KILLING IN THIS ORDER WORKS BETTER IT SEEMS....
+      // TODO: INVESTIGATE?
 
-//      WRENCH_INFO("In StandardJobExecutor::kill()");
-      this->kill_actor();
 
-      // Kill all workunit executors
+      // Kill all Workunit executors
       std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
       for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
-//      for (auto workunit_executor :  this->running_workunit_executors)  {
-//        WRENCH_INFO("Killing a workunit executor!");
         (*it)->kill();
       }
-//      this->kill_actor();
+
+      // Kill the StandardJobExecutor
+      this->kill_actor();
     }
 
     /**
@@ -164,7 +167,9 @@ namespace wrench {
         dispatchReadyWorkunits();
 
         /** Process workunit completions **/
-        processNextMessage();
+        if (!processNextMessage()) {
+          break;
+        }
 
         /** Detect Termination **/
         if (non_ready_workunits.size() + ready_workunits.size() +  running_workunits.size() == 0) {
@@ -255,7 +260,7 @@ namespace wrench {
           unsigned long target_slack = 0;
 
           for (auto h : this->compute_resources) {
-            std::string hostname = std::get<0>(h);
+            std::string hostname = h.first;
             unsigned long num_available_cores = this->core_availabilities[hostname];
 //              WRENCH_INFO("Looking at host %s", hostname.c_str());
 
@@ -342,8 +347,11 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
       } catch (std::shared_ptr<NetworkError> cause) {
-        // TODO: Send an exception above, and then send some "I failed" message to the service that created me
+        // TODO: Send an exception above, and then send some "I failed" message to the service that created me?
         return true;
+      } catch (std::shared_ptr<FatalFailure> cause) {
+        WRENCH_INFO("Got a Unknown Failure during a communication... likely this means we're all done. Aborting");
+        return false;
       }
 
       if (message == nullptr) {
@@ -509,6 +517,7 @@ namespace wrench {
 
       // Deal with completed workunits
       this->completed_workunits.clear();
+
 
       // Send the notification back
       try {

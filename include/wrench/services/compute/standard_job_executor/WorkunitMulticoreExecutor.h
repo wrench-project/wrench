@@ -24,6 +24,7 @@ namespace wrench {
     class StandardJob;
     class WorkerThreadWork;
     class Workunit;
+    class ComputeThread;
 
     /***********************/
     /** \cond INTERNAL     */
@@ -35,6 +36,8 @@ namespace wrench {
     class WorkunitMulticoreExecutor : public S4U_Daemon {
 
     public:
+
+        ~WorkunitMulticoreExecutor();
 
         WorkunitMulticoreExecutor(
                      Simulation *simulation,
@@ -69,7 +72,7 @@ namespace wrench {
 
         StorageService *default_storage_service;
 
-        std::vector<simgrid::s4u::ActorPtr> compute_threads;
+        std::vector<ComputeThread *> compute_threads;
 
     };
 
