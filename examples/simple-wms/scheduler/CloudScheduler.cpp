@@ -9,6 +9,7 @@
  */
 
 #include "CloudScheduler.h"
+#include <climits>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_scheduler, "Log category for Cloud Scheduler");
 
