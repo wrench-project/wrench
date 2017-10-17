@@ -57,11 +57,11 @@ namespace wrench {
      */
     class CloudServiceCreateVMAnswerMessage : public CloudServiceMessage {
     public:
-        CloudServiceCreateVMAnswerMessage(const std::string &vm_hostname, double payload);
+        CloudServiceCreateVMAnswerMessage(bool success, double payload);
 
-        std::string vm_hostname;
+        bool success;
     };
-
+    
     /***********************/
     /** \endcond           */
     /***********************/

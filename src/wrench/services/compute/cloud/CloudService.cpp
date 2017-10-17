@@ -66,10 +66,10 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      */
-    std::string CloudService::createVM(const std::string &pm_hostname,
-                                       const std::string &vm_hostname,
-                                       unsigned long num_cores,
-                                       std::map<std::string, std::string> plist) {
+    bool CloudService::createVM(const std::string &pm_hostname,
+                                const std::string &vm_hostname,
+                                unsigned long num_cores,
+                                std::map<std::string, std::string> plist) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -99,7 +99,7 @@ namespace wrench {
       }
 
       if (auto *msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(message.get())) {
-        return msg->vm_hostname;
+        return msg->success;
       } else {
         throw std::runtime_error("CloudService::createVM(): Unexpected [" + msg->getName() + "] message");
       }
@@ -340,13 +340,14 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new CloudServiceCreateVMAnswerMessage(
-                          vm_hostname,
+                          true,
                           this->getPropertyValueAsDouble(CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
         } else {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new CloudServiceCreateVMAnswerMessage(
-                          "", this->getPropertyValueAsDouble(CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+                          false,
+                          this->getPropertyValueAsDouble(CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
         }
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;

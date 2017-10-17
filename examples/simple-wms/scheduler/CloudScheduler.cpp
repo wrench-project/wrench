@@ -79,11 +79,9 @@ namespace wrench {
           try {
             std::string pm_host = choosePMHostname();
             std::string vm_host = "vm" + std::to_string(VM_ID++) + "_" + pm_host;
-            std::string vm_hostname = cs->createVM(pm_host, vm_host,
-                                                   ((StandardJob *) (job))->getMinimumRequiredNumCores());
 
-            if (not vm_hostname.empty()) {
-              this->vm_list[pm_host].push_back(vm_hostname);
+            if (cs->createVM(pm_host, vm_host, ((StandardJob *) (job))->getMinimumRequiredNumCores())) {
+              this->vm_list[pm_host].push_back(vm_host);
             }
 
           } catch (WorkflowExecutionException &e) {
@@ -98,7 +96,7 @@ namespace wrench {
     }
 
     /**
-     * Select a physical host (PM) with the least number of VMs.
+     * @brief Select a physical host (PM) with the least number of VMs.
      *
      * @return a physical hostname
      */

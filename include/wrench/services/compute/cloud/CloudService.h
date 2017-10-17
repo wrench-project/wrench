@@ -54,10 +54,10 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        std::string createVM(const std::string &pm_hostname,
-                             const std::string &vm_hostname,
-                             unsigned long num_cores,
-                             std::map<std::string, std::string> plist = {});
+        bool createVM(const std::string &pm_hostname,
+                      const std::string &vm_hostname,
+                      unsigned long num_cores,
+                      std::map<std::string, std::string> plist = {});
 
         // Running jobs
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
