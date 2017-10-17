@@ -81,11 +81,11 @@ namespace wrench {
 
     protected:
 
-        virtual void processGetNumCores(std::string &answer_mailbox);
+        virtual void processGetNumCores(const std::string &answer_mailbox);
 
-        virtual void processGetNumIdleCores(std::string &answer_mailbox);
+        virtual void processGetNumIdleCores(const std::string &answer_mailbox);
 
-        virtual void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+        virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                               std::map<std::string, std::string> &service_specific_args);
 
         /** @brief Whether the compute service supports pilot jobs */

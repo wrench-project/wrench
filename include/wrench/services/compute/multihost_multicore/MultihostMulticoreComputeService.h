@@ -186,11 +186,11 @@ namespace wrench {
 
         void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
 
-        void processGetNumCores(std::string &answer_mailbox) override;
+        void processGetNumCores(const std::string &answer_mailbox) override;
 
-        void processGetNumIdleCores(std::string &answer_mailbox) override;
+        void processGetNumIdleCores(const std::string &answer_mailbox) override;
 
-        void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+        void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                       std::map<std::string, std::string> &service_specific_arguments) override;
     };
 };

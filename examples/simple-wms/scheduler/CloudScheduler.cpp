@@ -20,18 +20,21 @@ namespace wrench {
      * @brief Constructor
      *
      * @param cloud_service: a pointer to a cloud service
-     * @param execution_hosts: list of execution hosts to run VMs
+     * @param execution_hosts: list of physical execution hosts to run VMs
      * @param simulation: a pointer to the simulation object
      *
      * @throw std::runtime_error
      */
     CloudScheduler::CloudScheduler(ComputeService *cloud_service, std::vector<std::string> &execution_hosts,
-                                   Simulation *simulation)
-            : execution_hosts(execution_hosts), simulation(simulation) {
+                                   Simulation *simulation) : simulation(simulation) {
 
       if (typeid(cloud_service) == typeid(CloudService)) {
         throw std::runtime_error("The provided cloud service is not a CloudService object.");
       }
+      if (execution_hosts.empty()) {
+        throw std::runtime_error("At least one execution host should be provided");
+      }
+      this->execution_hosts = execution_hosts;
       this->cloud_service = cloud_service;
     }
 
@@ -54,37 +57,66 @@ namespace wrench {
       auto *cs = (CloudService *) this->cloud_service;
 
       WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
-      int scheduled = 0;
+      long scheduled = 0;
 
       for (auto itc : ready_tasks) {
-
         //TODO add support to pilot jobs
 
-        unsigned long num_idle_cores = 0;
+        long num_idle_cores = 0;
 
         // Check that it can run it right now in terms of idle cores
         try {
           num_idle_cores = cs->getNumIdleCores();
         } catch (WorkflowExecutionException &e) {
           // The service has some problem, forget it
-          // TODO launch error
+          throw std::runtime_error("Unable to get the number of idle cores.");
         }
 
         // Decision making
         WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
-        if ((num_idle_cores - scheduled) <= 0) {
+        if (num_idle_cores - scheduled <= 0) {
           try {
-            std::string vm_host = "vm" + std::to_string(VM_ID++) + "_" + execution_hosts[0];
+            std::string pm_host = choosePMHostname();
+            std::string vm_host = "vm" + std::to_string(VM_ID++) + "_" + pm_host;
+            std::string vm_hostname = cs->createVM(pm_host, vm_host,
+                                                   ((StandardJob *) (job))->getMinimumRequiredNumCores());
 
-            cs->createVM(execution_hosts[0], vm_host, ((StandardJob *)(job))->getMinimumRequiredNumCores());
+            if (not vm_hostname.empty()) {
+              this->vm_list[pm_host].push_back(vm_hostname);
+            }
 
           } catch (WorkflowExecutionException &e) {
-            //TODO launch error
+            // unable to create a new VM, tasks won't be scheduled in this iteration.
+            return;
           }
         }
         job_manager->submitJob(job, cs);
         scheduled++;
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
+    }
+
+    /**
+     * Select a physical host (PM) with the least number of VMs.
+     *
+     * @return a physical hostname
+     */
+    std::string CloudScheduler::choosePMHostname() {
+
+      std::pair<std::string, unsigned long> min_pm("", ULONG_MAX);
+
+      for (auto &host : this->execution_hosts) {
+        auto entry = this->vm_list.find(host);
+
+        if (entry == this->vm_list.end()) {
+          return host;
+        }
+        if (entry->second.size() < min_pm.second) {
+          min_pm.first = entry->first;
+          min_pm.second = entry->second.size();
+        }
+      }
+
+      return min_pm.first;
     }
 }

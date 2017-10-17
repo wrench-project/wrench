@@ -18,7 +18,7 @@ namespace wrench {
      * @param name: the message name
      * @param payload: the message size in bytes
      */
-    CloudServiceMessage::CloudServiceMessage(std::string name, double payload) :
+    CloudServiceMessage::CloudServiceMessage(const std::string &name, double payload) :
             ComputeServiceMessage("CloudServiceMessage::" + name, payload) {
     }
 
@@ -59,10 +59,10 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param success: whether the VM creation succeeded
+     * @param vm_hostname: the new VM hostname
      * @param payload: the message size in bytes
      */
     CloudServiceCreateVMAnswerMessage::CloudServiceCreateVMAnswerMessage(
-            bool success, double payload) :
-            CloudServiceMessage("CREATE_VM_ANSWER", payload), success(success) {}
+            const std::string &vm_hostname, double payload) :
+            CloudServiceMessage("CREATE_VM_ANSWER", payload), vm_hostname(vm_hostname) {}
 }

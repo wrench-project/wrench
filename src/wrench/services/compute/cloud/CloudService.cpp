@@ -33,7 +33,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    CloudService::CloudService(std::string &hostname,
+    CloudService::CloudService(const std::string &hostname,
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
                                StorageService *default_storage_service,
@@ -66,10 +66,10 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      */
-    bool CloudService::createVM(const std::string &pm_hostname,
-                                const std::string &vm_hostname,
-                                unsigned long num_cores,
-                                std::map<std::string, std::string> plist) {
+    std::string CloudService::createVM(const std::string &pm_hostname,
+                                       const std::string &vm_hostname,
+                                       unsigned long num_cores,
+                                       std::map<std::string, std::string> plist) {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -99,7 +99,7 @@ namespace wrench {
       }
 
       if (auto *msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(message.get())) {
-        return msg->success;
+        return msg->vm_hostname;
       } else {
         throw std::runtime_error("CloudService::createVM(): Unexpected [" + msg->getName() + "] message");
       }
@@ -329,10 +329,10 @@ namespace wrench {
                                                                                       pm_hostname), num_cores);
 
           // create a multicore executor for the VM
-          std::unique_ptr<ComputeService> cs(new MultihostMulticoreComputeService(vm_hostname, supports_standard_jobs,
-                                                                         supports_pilot_jobs,
-									  {std::make_pair(vm_hostname, num_cores)},
-                                                                         default_storage_service, plist));
+          std::unique_ptr<ComputeService> cs(
+                  new MultihostMulticoreComputeService(vm_hostname, supports_standard_jobs, supports_pilot_jobs,
+                                                       {std::make_pair(vm_hostname, num_cores)},
+                                                       default_storage_service, plist));
           cs->setSimulation(this->simulation);
 
           this->vm_list[vm_hostname] = std::make_tuple(vm, std::move(cs), num_cores);
@@ -340,14 +340,13 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new CloudServiceCreateVMAnswerMessage(
-                          true,
+                          vm_hostname,
                           this->getPropertyValueAsDouble(CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
         } else {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new CloudServiceCreateVMAnswerMessage(
-                          false,
-                          this->getPropertyValueAsDouble(CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+                          "", this->getPropertyValueAsDouble(CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
         }
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
@@ -361,9 +360,9 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudService::processGetNumCores(std::string &answer_mailbox) {
-      unsigned int total_num_cores = 0;
+    void CloudService::processGetNumCores(const std::string &answer_mailbox) {
 
+      unsigned int total_num_cores = 0;
       for (auto &vm : this->vm_list) {
         total_num_cores += std::get<2>(vm.second);
       }
@@ -386,7 +385,8 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudService::processGetNumIdleCores(std::string &answer_mailbox) {
+    void CloudService::processGetNumIdleCores(const std::string &answer_mailbox) {
+
       unsigned int total_num_available_cores = 0;
       for (auto &vm : this->vm_list) {
         total_num_available_cores += std::get<1>(vm.second)->getNumIdleCores();
@@ -412,7 +412,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void CloudService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+    void CloudService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                                 std::map<std::string, std::string> &service_specific_args) {
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
       if (not this->supportsStandardJobs()) {
@@ -431,7 +431,8 @@ namespace wrench {
 
       for (auto &vm : vm_list) {
         ComputeService *cs = std::get<1>(vm.second).get();
-        if (std::get<2>(vm.second) >= job->getMinimumRequiredNumCores() && cs->getNumIdleCores() >= job->getMinimumRequiredNumCores()) {
+        if (std::get<2>(vm.second) >= job->getMinimumRequiredNumCores() &&
+            cs->getNumIdleCores() >= job->getMinimumRequiredNumCores()) {
           cs->submitStandardJob(job, service_specific_args);
           try {
             S4U_Mailbox::dputMessage(

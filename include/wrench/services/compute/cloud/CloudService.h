@@ -44,7 +44,7 @@ namespace wrench {
                 };
 
     public:
-        CloudService(std::string &hostname,
+        CloudService(const std::string &hostname,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
                      StorageService *default_storage_service,
@@ -54,10 +54,10 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        bool createVM(const std::string &pm_hostname,
-                      const std::string &vm_hostname,
-                      unsigned long num_cores,
-                      std::map<std::string, std::string> plist = {});
+        std::string createVM(const std::string &pm_hostname,
+                             const std::string &vm_hostname,
+                             unsigned long num_cores,
+                             std::map<std::string, std::string> plist = {});
 
         // Running jobs
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
@@ -75,9 +75,9 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processGetNumCores(std::string &answer_mailbox) override;
+        void processGetNumCores(const std::string &answer_mailbox) override;
 
-        void processGetNumIdleCores(std::string &answer_mailbox) override;
+        void processGetNumIdleCores(const std::string &answer_mailbox) override;
 
         void processCreateVM(const std::string &answer_mailbox,
                              const std::string &pm_hostname,
@@ -87,7 +87,7 @@ namespace wrench {
                              bool supports_pilot_jobs,
                              std::map<std::string, std::string> plist);
 
-        void processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+        void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                       std::map<std::string, std::string> &service_specific_args) override;
 
         void terminate();

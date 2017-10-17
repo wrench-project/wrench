@@ -26,7 +26,7 @@ namespace wrench {
      */
     class CloudServiceMessage : public ComputeServiceMessage {
     protected:
-        CloudServiceMessage(std::string name, double payload);
+        CloudServiceMessage(const std::string &name, double payload);
     };
 
     /**
@@ -57,9 +57,9 @@ namespace wrench {
      */
     class CloudServiceCreateVMAnswerMessage : public CloudServiceMessage {
     public:
-        CloudServiceCreateVMAnswerMessage(bool success, double payload);
+        CloudServiceCreateVMAnswerMessage(const std::string &vm_hostname, double payload);
 
-        bool success;
+        std::string vm_hostname;
     };
 
     /***********************/

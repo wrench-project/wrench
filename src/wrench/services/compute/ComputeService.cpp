@@ -295,7 +295,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void ComputeService::processSubmitStandardJob(std::string &answer_mailbox, StandardJob *job,
+    void ComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                                   std::map<std::string, std::string> &service_specific_args) {
       throw std::runtime_error("ComputeService::processSubmitStandardJob(): Not implemented here");
     }
@@ -307,7 +307,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void ComputeService::processGetNumCores(std::string &answer_mailbox) {
+    void ComputeService::processGetNumCores(const std::string &answer_mailbox) {
       throw std::runtime_error("ComputeService::processGetNumCores(): Not implemented here");
     }
 
@@ -318,7 +318,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void ComputeService::processGetNumIdleCores(std::string &answer_mailbox) {
+    void ComputeService::processGetNumIdleCores(const std::string &answer_mailbox) {
       throw std::runtime_error("ComputeService::processGetNumIdleCores(): Not implemented here");
     }
 

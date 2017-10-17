@@ -24,7 +24,7 @@ namespace wrench {
 
     public:
         CloudScheduler(ComputeService *cloud_service, std::vector<std::string> &execution_hosts,
-                                Simulation *simulation);
+                       Simulation *simulation);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -39,8 +39,11 @@ namespace wrench {
         /***********************/
 
     private:
+        std::string choosePMHostname();
+
         ComputeService *cloud_service;
         std::vector<std::string> execution_hosts;
+        std::map<std::string, std::vector<std::string>> vm_list;
         Simulation *simulation;
     };
 }
