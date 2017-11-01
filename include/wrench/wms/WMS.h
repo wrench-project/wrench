@@ -62,8 +62,6 @@ namespace wrench {
         void waitForAndProcessNextEvent();
 
         // workflow execution event processors
-        virtual void processEventUnsupportedJobType(std::unique_ptr<WorkflowExecutionEvent>);
-
         virtual void processEventStandardJobCompletion(std::unique_ptr<WorkflowExecutionEvent>);
 
         virtual void processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent>);

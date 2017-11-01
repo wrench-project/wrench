@@ -93,10 +93,6 @@ namespace wrench {
       std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
 
       switch (event->type) {
-        case WorkflowExecutionEvent::UNSUPPORTED_JOB_TYPE: {
-          processEventUnsupportedJobType(std::move(event));
-          break;
-        }
         case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
           processEventStandardJobCompletion(std::move(event));
           break;
@@ -128,15 +124,6 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Process a WorkflowExecutionEvent::UNSUPPORTED_JOB_TYPE
-     *
-     * @param event: a workflow execution event
-     */
-    void WMS::processEventUnsupportedJobType(std::unique_ptr<WorkflowExecutionEvent> event) {
-      WRENCH_INFO("Notified that job '%s' was submitted to a service that does not support its job type",
-                  event->job->getName().c_str());
-    }
 
     /**
      * @brief Process a WorkflowExecutionEvent::STANDARD_JOB_COMPLETION

@@ -7,7 +7,7 @@ SOFTWARE ENGINEERING:
 
     - Add missing "const"
 
-    - No more timeout in MulticoreJobService
+    - Decouple "create and start" for services
 
     - While implementing a test for the StandardJobExecutor abstraction, Henri noted
       that when one does not create a ComputeService and launch the simulation, we
@@ -17,22 +17,17 @@ SOFTWARE ENGINEERING:
     - Track all task change updates and make sure they're all in the JobManager...
         - They likely cannot, but the task life cycle is confusing right now
 
-    - The TerminateJobAtRandomTimes test fails once ina  blue moon for a few random numbers!!!
 
 -----------------------------------
 
 DETAILS:
-    - Is the UNSUPPORTED_JOB_TYPE Workflow Execution event useful since
-      the submitJob() method throws an exception.... Or should it be
-      part of the event flow? (I doubt it)
 
     - Henri thought that the "number of bytes in message" was now a double in S4U....  But it seems
       to be back to 64-bit integers... something to look at in simgrid_S4U_util/S4U_Mailbox.cpp
 
 -----------------------------------
 
-MULTICORECOMPUTESERVICE:
-    - Add Tests
+Take Host RAM into account in the simulation
 
 -----------------------------------
 

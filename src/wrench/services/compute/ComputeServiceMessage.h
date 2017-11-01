@@ -33,18 +33,6 @@ namespace wrench {
         ComputeServiceMessage(std::string name, double payload);
     };
 
-    /**
-     * @brief ComputeServiceJobTypeNotSupportedMessage class
-     */
-    class ComputeServiceJobTypeNotSupportedMessage : public ComputeServiceMessage {
-    public:
-        ComputeServiceJobTypeNotSupportedMessage(WorkflowJob *, ComputeService *, double payload);
-
-        /** @brief The job that's not supported */
-        WorkflowJob *job;
-        /** @brief The compute service that does not support it */
-        ComputeService *compute_service;
-    };
 
     /**
      * @brief ComputeServiceSubmitStandardJobRequestMessage class

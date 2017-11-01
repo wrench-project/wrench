@@ -444,33 +444,33 @@ namespace wrench {
         if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
           // There shouldn't be any need to clean any state up
           keep_going = false;
-        } else if (ComputeServiceJobTypeNotSupportedMessage *msg = dynamic_cast<ComputeServiceJobTypeNotSupportedMessage *>(message.get())) {
-
-          // update job state and remove from list
-          if (msg->job->getType() == WorkflowJob::STANDARD) {
-            StandardJob *job = (StandardJob *) msg->job;
-            job->state = StandardJob::State::NOT_SUBMITTED;
-            this->pending_standard_jobs.erase(job);
-
-            // update the task states
-            for (auto t: job->getTasks()) {
-              t->setState(WorkflowTask::State::READY);
-            }
-          }
-
-          if (msg->job->getType() == WorkflowJob::STANDARD) {
-            PilotJob *job = (PilotJob *) msg->job;
-            job->state = PilotJob::State::NOT_SUBMITTED;
-            this->pending_pilot_jobs.erase(job);
-          }
-
-          // Forward the notification along the notification chain
-          try {
-            S4U_Mailbox::dputMessage(msg->job->popCallbackMailbox(),
-                                     new ComputeServiceJobTypeNotSupportedMessage(msg->job, msg->compute_service, 0));
-          } catch (std::shared_ptr<NetworkError> cause) {
-            keep_going = true;
-          }
+//        } else if (ComputeServiceJobTypeNotSupportedMessage *msg = dynamic_cast<ComputeServiceJobTypeNotSupportedMessage *>(message.get())) {
+//
+//          // update job state and remove from list
+//          if (msg->job->getType() == WorkflowJob::STANDARD) {
+//            StandardJob *job = (StandardJob *) msg->job;
+//            job->state = StandardJob::State::NOT_SUBMITTED;
+//            this->pending_standard_jobs.erase(job);
+//
+//            // update the task states
+//            for (auto t: job->getTasks()) {
+//              t->setState(WorkflowTask::State::READY);
+//            }
+//          }
+//
+//          if (msg->job->getType() == WorkflowJob::STANDARD) {
+//            PilotJob *job = (PilotJob *) msg->job;
+//            job->state = PilotJob::State::NOT_SUBMITTED;
+//            this->pending_pilot_jobs.erase(job);
+//          }
+//
+//          // Forward the notification along the notification chain
+//          try {
+//            S4U_Mailbox::dputMessage(msg->job->popCallbackMailbox(),
+//                                     new ComputeServiceJobTypeNotSupportedMessage(msg->job, msg->compute_service, 0));
+//          } catch (std::shared_ptr<NetworkError> cause) {
+//            keep_going = true;
+//          }
 
         } else if (ComputeServiceStandardJobDoneMessage *msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
           // update job state

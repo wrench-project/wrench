@@ -62,10 +62,6 @@ namespace wrench {
         event->type = WorkflowExecutionEvent::PILOT_JOB_EXPIRATION;
         event->job = (WorkflowJob *) m->job;
         event->compute_service = m->compute_service;
-      } else if (ComputeServiceJobTypeNotSupportedMessage *m = dynamic_cast<ComputeServiceJobTypeNotSupportedMessage *>(message.get())) {
-        event->type = WorkflowExecutionEvent::UNSUPPORTED_JOB_TYPE;
-        event->job = m->job;
-        event->compute_service = m->compute_service;
       } else if (StorageServiceFileCopyAnswerMessage *m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (m->success) {
           event->type = WorkflowExecutionEvent::FILE_COPY_COMPLETION;

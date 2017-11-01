@@ -46,8 +46,6 @@ namespace wrench {
         enum EventType {
             /** @brief An error type */
             UNDEFINED,
-            /** @brief A job was submitted to a compute service that does not support its type */
-            UNSUPPORTED_JOB_TYPE,
             /** @brief A standard job successfully completed */
             STANDARD_JOB_COMPLETION,
             /** @brief A standard job failed */
