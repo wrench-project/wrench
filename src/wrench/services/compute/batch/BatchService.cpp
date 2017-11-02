@@ -42,7 +42,7 @@ namespace wrench {
                                bool supports_pilot_jobs,
                                std::map<std::string, std::string> plist) :
             BatchService(hostname, nodes_in_network, default_storage_service, supports_standard_jobs,
-                         supports_pilot_jobs, nullptr, 0, 0, false, plist, "") {
+                         supports_pilot_jobs, nullptr, 0, plist, "") {
 
     }
 
@@ -62,8 +62,6 @@ namespace wrench {
                                bool supports_pilot_jobs,
                                PilotJob *parent_pilot_job,
                                unsigned long reduced_cores,
-                               double ttl,
-                               bool has_ttl,
                                std::map<std::string, std::string> plist, std::string suffix) :
             ComputeService("batch" + suffix,
                            "batch" + suffix,
@@ -89,9 +87,6 @@ namespace wrench {
       this->total_num_of_nodes = nodes_in_network.size();
       this->parent_pilot_job = parent_pilot_job;
       this->hostname = hostname;
-
-      this->has_ttl = has_ttl;
-      this->ttl = ttl;
 
       this->generateUniqueJobId();
 
@@ -490,14 +485,7 @@ namespace wrench {
       // Send back a job failed message (Not that it can be a partial fail)
       WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
       // NOTE: This is synchronous so that the process doesn't fall off the end
-      try {
-        S4U_Mailbox::putMessage(job->popCallbackMailbox(),
-                                new ComputeServiceStandardJobFailedMessage(job, this, cause,
-                                                                           this->getPropertyValueAsDouble(
-                                                                                   BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
-        return;
-      }
+      this->sendStandardJobCallBackMessage(job);
     }
 
     /**
@@ -742,8 +730,6 @@ namespace wrench {
                   new Alarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
                             "batch_pilot")));
 
-          // Push my own mailbox onto the pilot job!
-//          job->pushCallbackMailbox(this->mailbox_name);
 
           return true;
         }
@@ -778,23 +764,6 @@ namespace wrench {
       }
     }
 
-
-    /**
-     * @brief Notify upper level job submitters
-     */
-    void BatchService::notifyJobSubmitters(PilotJob *job) {
-
-      WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox %s",
-                  job->getCallbackMailbox().c_str());
-      try {
-        S4U_Mailbox::putMessage(job->popCallbackMailbox(),
-                                new ComputeServicePilotJobExpiredMessage(job, this,
-                                                                         this->getPropertyValueAsDouble(
-                                                                                 BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
-        return;
-      }
-    }
 
 
     /**
@@ -895,15 +864,8 @@ namespace wrench {
 
         WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox %s",
                     this->parent_pilot_job->getCallbackMailbox().c_str());
-        try {
-          S4U_Mailbox::putMessage(this->parent_pilot_job->popCallbackMailbox(),
-                                  new ComputeServicePilotJobExpiredMessage(this->parent_pilot_job,
-                                                                           this,
-                                                                           this->getPropertyValueAsDouble(
-                                                                                   BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
-          return;
-        }
+
+        this->sendPilotJobCallBackMessage(this->parent_pilot_job);
       }
     }
 
@@ -1067,9 +1029,6 @@ namespace wrench {
      * @param job: the pilot job
      */
     void BatchService::processPilotJobCompletion(PilotJob *job) {
-
-
-
       // Remove the job from the running job list
       bool job_on_the_list = false;
       std::set<std::unique_ptr<BatchJob>>::iterator it;
@@ -1096,16 +1055,7 @@ namespace wrench {
       }
 
       // Forward the notification
-      try {
-        S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                 new ComputeServicePilotJobExpiredMessage(job, this,
-                                                                          this->getPropertyValueAsDouble(
-                                                                                  BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
-        return;
-      }
-
-
+      this->sendPilotJobCallBackMessage(job);
 
       return;
     }
@@ -1118,7 +1068,6 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      */
     void BatchService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
-
 
       std::deque<std::unique_ptr<BatchJob>>::iterator it;
       for(it=this->pending_jobs.begin();it!=this->pending_jobs.end();it++){
@@ -1250,7 +1199,6 @@ namespace wrench {
                 "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
       PointerUtil::moveSingleSeparateUniquePtrFromSeToSet(&executor_ptr, &(this->running_standard_job_executors), &(this->finished_standard_job_executors));
-//      this->running_standard_job_executors.erase(executor_ptr);
 
       // Remove the job from the running job list
       bool job_on_the_list = false;
@@ -1290,14 +1238,7 @@ namespace wrench {
       // Send back a job failed message
       WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
       // NOTE: This is synchronous so that the process doesn't fall off the end
-      try {
-        S4U_Mailbox::putMessage(job->popCallbackMailbox(),
-                                new ComputeServiceStandardJobFailedMessage(job, this, cause,
-                                                                           this->getPropertyValueAsDouble(
-                                                                                   BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
-        return;
-      }
+      this->sendStandardJobCallBackMessage(job);
     }
 
     unsigned long BatchService::generateUniqueJobId() {

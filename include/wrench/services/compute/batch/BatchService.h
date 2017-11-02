@@ -75,13 +75,8 @@ namespace wrench {
                      bool supports_pilot_jobs,
                      PilotJob* parent_job,
                      unsigned long reduced_cores,
-                     double ttl,bool has_ttl,
         std::map<std::string, std::string> plist,
         std::string suffix);
-
-        //to check if the batch service is actually a pilot job
-        bool has_ttl;
-        double ttl;
 
         //parent batch job (this is necessary for pilot jobs)
         PilotJob* parent_pilot_job;
@@ -159,9 +154,6 @@ namespace wrench {
 
         //Process standardjob timeout
         void processPilotJobTimeout(PilotJob* job);
-
-        //notify upper level job submitters (about pilot job termination)
-        void notifyJobSubmitters(PilotJob* job);
 
         //update the resources
         void updateResources(std::set<std::pair<std::string,unsigned long>> resources);
