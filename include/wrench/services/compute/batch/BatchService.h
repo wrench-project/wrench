@@ -110,6 +110,8 @@ namespace wrench {
 
         unsigned long generateUniqueJobId();
 
+        bool foundRunningJobOnTheList(WorkflowJob* job);
+
         //submits the standard job
         //overriden function of parent Compute Service
         void submitStandardJob(StandardJob *job,std::map<std::string, std::string> &batch_job_args) override;
