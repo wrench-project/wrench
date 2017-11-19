@@ -483,3 +483,19 @@ span.SRScope {
     display:inline;
   }
 }
+
+.doc-type {
+    float: right;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: #666;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    /*margin:10px;*/
+    color: #fff;
+    padding: 15px;
+    font: italic 16px Helvetica;
+}
+

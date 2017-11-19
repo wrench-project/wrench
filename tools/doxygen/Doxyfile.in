@@ -238,7 +238,13 @@ TAB_SIZE               = 4
 # "Side Effects:". You can put \n's in the value part of an alias to insert
 # newlines.
 
-ALIASES                =
+ALIASES                = "WRENCHRelease=wrench-@WRENCH_RELEASE_VERSION@" \
+                         "WRENCHUserDoc=\if USER" \
+                         "endWRENCHUserDoc=\endif" \
+                         "WRENCHDeveloperDoc=\if DEVELOPER" \
+                         "endWRENCHDeveloperDoc=\endif" \
+                         "WRENCHInternalDoc=\if INTERNAL" \
+                         "endWRENCHInternalDoc=\endif"
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -791,6 +797,7 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = @CMAKE_HOME_DIRECTORY@/doc/index.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/install.md \
                          @CMAKE_HOME_DIRECTORY@/src \
                          @CMAKE_HOME_DIRECTORY@/include
 
@@ -1447,7 +1454,7 @@ ECLIPSE_DOC_ID         = org.doxygen.Project
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-DISABLE_INDEX          = NO
+DISABLE_INDEX          = YES
 
 # The GENERATE_TREEVIEW tag is used to specify whether a tree-like index
 # structure should be generated to display hierarchical information. If the tag

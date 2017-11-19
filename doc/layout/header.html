@@ -32,6 +32,7 @@
     <!-- SmartMenus jQuery plugin -->
 </head>
 <body>
+
 <nav class="navbar navbar-default" role="navigation">
     <div class="container">
         <div class="navbar-header">
@@ -40,8 +41,19 @@
                 $projectnumber
             </a>
         </div>
+        <div id="main-nav" class="nav navbar-nav navbar-right">
+            <ul class="sm sm-dox nav navbar-nav navbar-right" id="main-menu">
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="install.html">Installation</a></li>
+                <li><a href="annotated.html">API Reference</a></li>
+                <li style="float: right">
+                    <input type="hidden" id="MSearchField">
+                </li>
+            </ul>
+        </div>
     </div>
 </nav>
+
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
     <div class="content" id="content">
         <div class="container">

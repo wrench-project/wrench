@@ -1,6 +1,10 @@
 Overview                        {#mainpage}
 ============
 
+@WRENCHUserDoc <div class="doc-type">User Documentation</div> @endWRENCHUserDoc
+@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div> @endWRENCHDeveloperDoc
+@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div> @endWRENCHInternalDoc
+
 [TOC]
 
 ![Workflow Management System Simulation Workbench](images/logo-vertical.png)
