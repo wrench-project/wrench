@@ -1,9 +1,9 @@
 Installing WRENCH                  {#install}
 ============
 
-@WRENCHUserDoc <div class="doc-type">User Documentation</div> @endWRENCHUserDoc
-@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div> @endWRENCHDeveloperDoc
-@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div> @endWRENCHInternalDoc
+@WRENCHUserDoc <div class="doc-type">User Documentation</div> @endWRENCHDoc
+@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div> @endWRENCHDoc
+@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div> @endWRENCHDoc
 
 [TOC]
 

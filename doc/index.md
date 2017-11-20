@@ -1,9 +1,9 @@
 Overview                        {#mainpage}
 ============
 
-@WRENCHUserDoc <div class="doc-type">User Documentation</div> @endWRENCHUserDoc
-@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div> @endWRENCHDeveloperDoc
-@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div> @endWRENCHInternalDoc
+@WRENCHUserDoc <div class="doc-type">User Documentation</div> @endWRENCHDoc
+@WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div> @endWRENCHDoc
+@WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div> @endWRENCHDoc
 
 [TOC]
 
@@ -74,14 +74,20 @@ The WRENCH library provides three _incremental_ levels of documentation.
 **User:** targets _scientists_ who want to use WRENCH for running scientific workflows 
 in different simulated scenarios. _Users_ are NOT expected to develop novel algorithms, 
 services, or computing abstractions for WRENCH, instead they use the set of available 
-simulation components to build a WMS simulator to run their workflows.  
+simulation components to build a WMS simulator to run their workflows. 
+@WRENCHNotUserDoc ([See User Documentation](../../user/html/index.html)) @endWRENCHDoc
+
 
 **Developer:** targets _software developers_ and _researchers_ aiming the development 
 of novel algorithms, services, or computing environments. In addition to documentation 
 for all simulation components provided in the _User_ level, here it is also provided
 detailed documentation for all abstract classes for creating your own algorithms, 
 services, or computing environments.
+@WRENCHNotDeveloperDoc ([See Developer Documentation](../../developer/html/index.html)) @endWRENCHDoc
+
 
 **Internal:** targets users who want to contribute code for WRENCH. The _internal_ level
 provides, in addition to all levels above, a detailed documentation for all WRENCH classes
 including binders to SimGrid, and workflow-specific classes (e.g., job types, parsers, etc.).
+@WRENCHNotInternalDoc ([See Internal Documentation](../../internal/html/index.html)) @endWRENCHDoc
+
