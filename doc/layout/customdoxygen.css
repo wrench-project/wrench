@@ -499,3 +499,20 @@ span.SRScope {
     font: italic 16px Helvetica;
 }
 
+.contents h1 {
+    font-size: 22px;
+    font-weight: 700 !important;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ddd;
+}
+
+.contents h2 {
+    font-size: 18px;
+    font-weight: 700 !important;
+}
+
+.contents h3 {
+    font-size: 16px;
+    font-weight: 700 !important;
+    font-style: italic;
+}

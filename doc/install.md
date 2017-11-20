@@ -8,27 +8,29 @@ Installing WRENCH                  {#install}
 [TOC]
 
 # Prerequisites #                 {#install-prerequisites}
-_______
 
-- **CMake** - version 3.2.3 or superior
+WRENCH is fully developed in C++. The code follows the C++11 standard, and thus older 
+compilers tend to fail the compilation process. Therefore, we strongly recommend
+users to satisfy the following requirements:
+
+- **CMake** - version 3.2.3 or higher
   
 And, one of the following:
-- **g++** - version 5 or superior
-- **clang** - version 3.6 or superior
+- **g++** - version 5.0 or higher
+- **clang** - version 3.6 or higher
 
 
 ## Dependencies ##                  {#install-prerequisites-dependencies}
 
-- [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.17 or superior
-- [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or superior 
-- [PugiXML](http://pugixml.org/) - version 1.8 or superior 
-- [JSON for Modern C++](https://github.com/nlohmann/json) - version 2.1.1 or superior 
-- [Google Test](https://github.com/google/googletest) - version 1.8 or superior (only required for running test cases)
-- [Doxygen](http://www.doxygen.org) - version 1.8 or superior (only required for generating documentation)
+- [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.17 or higher
+- [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
+- [PugiXML](http://pugixml.org/) - version 1.8 or higher 
+- [JSON for Modern C++](https://github.com/nlohmann/json) - version 2.1.1 or higher 
+- [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
+- [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
 
 
 # Source Install #                  {#install-source}
-_______
 
 
 ## Building WRENCH ##               {#install-source-build}

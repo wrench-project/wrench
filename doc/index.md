@@ -36,7 +36,6 @@ Through the use of SIMGRID, WRENCH provides the ability to:
 <br />
 
 # Architecture #                        {#overview-architecture}
-________
 
 Technically speaking, WRENCH is an _open-source library_. It is neither a graphical 
 interface nor a command-line simulator running user scripts. As in SimGrid, the 
@@ -58,7 +57,6 @@ blocks**):
 <br />
 
 # Classes of Users #                       {#overview-users}
-________
 
 WRENCH is designed for supporting three different classes of users:
 
