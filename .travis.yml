@@ -125,9 +125,11 @@ before_install:
 install:
   # install SimGrid
   # cloning SimGrid from specific commit (temporary while using unstable SimGrid version)
-  - git clone https://github.com/simgrid/simgrid.git
-  - cd simgrid && git reset --hard a3bd734d0a2fdda1ef73434c529c938b773bb127 # Oct 5, 2017, 2:02 PM PDT
-  - cmake . && make && sudo make install && cd ..
+#  - git clone https://github.com/simgrid/simgrid.git
+#  - cd simgrid && git reset --hard a3bd734d0a2fdda1ef73434c529c938b773bb127 # Oct 5, 2017, 2:02 PM PDT
+  - wget https://gforge.inria.fr/frs/download.php/file/37148/SimGrid-3.17.tar.gz
+  - tar -xf SimGrid-3.17.tar.gz
+  - cd SimGrid-3.17 && cmake . && make && sudo make install && cd ..
   # install Lemon
   - wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
   - tar -xf lemon-1.3.1.tar.gz

@@ -8,11 +8,12 @@
 
 ### Prerequisites
 
-  - Install **SimGrid** - unstable S4U-enabled version (http://simgrid.gforge.inria.fr/)
-  - Install **Lemon C++** library - version 1.3.1 or superior (http://lemon.cs.elte.hu/)
-  - Install **PugiXML** - version 1.8 or superior (http://pugixml.org/)
-  - Install **JSON for Modern C++** - version 2.1.1 or superior (https://github.com/nlohmann/json)
-  - Install **Google Test** - version 1.8 or superior (https://github.com/google/googletest) _(only required for running test cases)_
+  - [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.17 or superior
+  - [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or superior 
+  - [PugiXML](http://pugixml.org/) - version 1.8 or superior 
+  - [JSON for Modern C++](https://github.com/nlohmann/json) - version 2.1.1 or superior 
+  - [Google Test](https://github.com/google/googletest) - version 1.8 or superior (only required for running test cases)
+  - [Doxygen](http://www.doxygen.org) - version 1.8 or superior (only required for generating documentation)
 
 #### Compiler
 
