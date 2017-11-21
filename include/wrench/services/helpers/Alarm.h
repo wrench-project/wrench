@@ -29,12 +29,15 @@ namespace wrench {
         friend class S4U_Daemon;
 
     public:
+
+        ~Alarm();
+
         Alarm(double date, std::string hostname, std::string reply_mailbox_name,
-              std::shared_ptr<SimulationMessage> msg, std::string suffix);
+              SimulationMessage* msg, std::string suffix);
 
         double date;
         std::string reply_mailbox_name;
-        std::shared_ptr<SimulationMessage> msg;
+        SimulationMessage* msg;
 
         int main() override;
 
