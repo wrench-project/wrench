@@ -27,12 +27,12 @@ namespace wrench{
      */
     class BatchServiceJobRequestMessage : public BatchServiceMessage {
     public:
-        BatchServiceJobRequestMessage(std::string answer_mailbox, BatchJob* job , double payload);
+        BatchServiceJobRequestMessage(std::string answer_mailbox, std::unique_ptr<BatchJob> job , double payload);
 
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
         /** @brief The batch job */
-        BatchJob *job;
+        std::unique_ptr<BatchJob> job;
     };
 
     /**

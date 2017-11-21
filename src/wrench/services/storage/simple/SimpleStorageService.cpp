@@ -129,6 +129,14 @@ namespace wrench {
         }
       }
 
+      //probably we have to remove everything leftover on the pending communications
+      std::vector<std::unique_ptr<S4U_PendingCommunication>>::iterator it;
+      for(it=this->pending_communications.begin();it!=this->pending_communications.end();it++){
+        if(it->get()!= nullptr){
+          it->reset();
+        }
+      }
+
       WRENCH_INFO("Simple Storage Service %s on host %s terminated!",
                   this->getName().c_str(),
                   S4U_Simulation::getHostName().c_str());

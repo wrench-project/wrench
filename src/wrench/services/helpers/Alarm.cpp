@@ -17,8 +17,12 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
 
 namespace wrench {
 
+    Alarm::~Alarm() {
+        WRENCH_INFO("Alarm::~Alarm()::In the destructor of Alarm");
+    }
+
     Alarm::Alarm(double date, std::string hostname, std::string reply_mailbox_name,
-                 std::shared_ptr<SimulationMessage> msg, std::string suffix):Service("alarm_service_"+suffix,"alarm_service_"+suffix) {
+                 SimulationMessage* msg, std::string suffix):Service("alarm_service_"+suffix,"alarm_service_"+suffix) {
 
         //it would be helpful to debug which service this alarm is for if we pass <compute_service_name> in the suffix=
         this->date = date;
@@ -46,13 +50,14 @@ namespace wrench {
             S4U_Simulation::sleep(time_to_sleep);
                 try {
                     S4U_Mailbox::putMessage(this->reply_mailbox_name,
-                                            msg.get());
+                                            msg);
                 } catch (std::shared_ptr<NetworkError> cause) {
                     WRENCH_WARN("AlarmService was not able to send the trigger to its upper service");
                 }
         }
 
         WRENCH_INFO("Alarm Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+        this->setStateToDown();
         return 0;
     }
 
