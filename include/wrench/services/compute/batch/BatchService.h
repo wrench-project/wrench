@@ -61,7 +61,7 @@ namespace wrench {
                      bool supports_pilot_jobs,
                 std::map<std::string, std::string> plist = {});
 
-       ~BatchService();
+       ~BatchService() override ;
 
         //cancels the job
         void cancelJob(unsigned long jobid);
@@ -80,7 +80,7 @@ namespace wrench {
         std::string suffix);
 
         //Configuration to create randomness in measurement period initially
-        unsigned long random_interval = 10;
+//        unsigned long random_interval = 10;
 
         //create alarms for standardjobs
         std::vector<std::unique_ptr<Alarm>> standard_job_alarms;

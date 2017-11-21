@@ -130,6 +130,14 @@ namespace wrench {
 
                     time_for_next_measurement = S4U_Simulation::getClock()+measurement_period+
                                                 (rand()%((this->noise)-(-this->noise) + 1) + (this->noise));
+                }else{
+                    time_for_next_measurement = S4U_Simulation::getClock()+measurement_period+
+                                                (rand()%((this->noise)-(-this->noise) + 1) + (this->noise));
+
+                    S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+                                             new NextContactDaemonRequestMessage(this->mailbox_name,
+                                                                                 this->getPropertyValueAsDouble(
+                                                                                         NetworkQueryServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
                 }
 
             }

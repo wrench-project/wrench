@@ -31,6 +31,9 @@ namespace wrench{
                 };
 
     public:
+
+        ~NetworkProximityService();
+
         NetworkProximityService(std::string db_hostname,
                                 std::vector<std::string> hosts_in_network,
                                 int message_size, double measurement_period, int noise,
@@ -49,7 +52,7 @@ namespace wrench{
                                 int noise,std::map<std::string, std::string>,
                                 std::string suffix = "");
 
-        std::vector<NetworkDaemons*> network_daemons;
+        std::vector<std::unique_ptr<NetworkDaemons>> network_daemons;
         std::vector<std::string> hosts_in_network;
 
         int main();

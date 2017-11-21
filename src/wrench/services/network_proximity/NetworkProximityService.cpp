@@ -17,10 +17,20 @@
 #include "wrench/services/network_proximity/NetworkDaemons.h"
 
 #include <wrench/exceptions/WorkflowExecutionException.h>
+#include <random>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service, "Log category for Network Proximity Service");
 
 namespace wrench {
+
+
+    /**
+     * @brief Destructor
+     */
+
+    NetworkProximityService::~NetworkProximityService() {
+        WRENCH_INFO("In the NetworkProximity Destructor");
+    }
 
     /**
      * @brief Constructor
@@ -32,7 +42,7 @@ namespace wrench {
                                                      std::vector<std::string> hosts_in_network,
                                                      int message_size, double measurement_period, int noise,
                                                      std::map<std::string, std::string> plist):
-    NetworkProximityService(hostname, hosts_in_network, message_size, measurement_period, noise, plist,"") {
+    NetworkProximityService(std::move(hostname), std::move(hosts_in_network), message_size, measurement_period, noise, std::move(plist),"") {
 
     }
 
@@ -66,12 +76,12 @@ namespace wrench {
         //Start the network daemons
         std::vector<std::string>::iterator it;
         for (it=this->hosts_in_network.begin();it!=this->hosts_in_network.end();it++){
-            this->network_daemons.push_back(new NetworkDaemons(*it,this->mailbox_name, message_size,measurement_period,noise));
+            this->network_daemons.push_back(std::unique_ptr<NetworkDaemons>(new NetworkDaemons(*it,this->mailbox_name, message_size,measurement_period,noise)));
         }
 
         // Start the daemon on the same host
         try {
-            this->start(hostname);
+            this->start(std::move(hostname));
         } catch (std::invalid_argument e) {
             throw e;
         }
@@ -94,7 +104,7 @@ namespace wrench {
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_query_entry");
 
         try {
-            S4U_Mailbox::putMessage(this->mailbox_name, new NetworkProximityLookupRequestMessage(answer_mailbox, hosts,
+            S4U_Mailbox::putMessage(this->mailbox_name, new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
                                                                                                  this->getPropertyValueAsDouble(
                                                                                                          NetworkQueryServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {
@@ -175,10 +185,12 @@ namespace wrench {
                                                 NetworkQueryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 
                 //Stop the network daemons
-                std::vector<NetworkDaemons*>::iterator it;
+                std::vector<std::unique_ptr<NetworkDaemons>>::iterator it;
                 for (it=this->network_daemons.begin();it!=this->network_daemons.end();it++){
                     (*it)->stop();
                 }
+                this->network_daemons.clear();
+                this->hosts_in_network.clear();
             } catch (std::shared_ptr<NetworkError> cause) {
                 return false;
             }
@@ -205,6 +217,7 @@ namespace wrench {
 
         } else if (NetworkProximityComputeAnswerMessage *msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get())) {
             try {
+                WRENCH_INFO("NetworkProximityService::processNextMessage()::Adding proximity value between %s and %s into the database",msg->hosts.first.c_str(),msg->hosts.second.c_str());
                 this->addEntryToDatabase(msg->hosts,msg->proximityValue);
             }
             catch (std::shared_ptr<NetworkError> cause) {
@@ -215,17 +228,22 @@ namespace wrench {
         }else if (NextContactDaemonRequestMessage *msg = dynamic_cast<NextContactDaemonRequestMessage *>(message.get())) {
 
 
-            int randNum = (rand()%(this->hosts_in_network.size()));
+            std::random_device rdev;
+            std::mt19937 rgen(rdev());
+            std::uniform_int_distribution<int> idist(0,this->hosts_in_network.size()-1);
+            int random_number = idist(rgen);
+
+//            unsigned long randNum = (std::rand()%(this->hosts_in_network.size()));
 
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                     new NextContactDaemonAnswerMessage(network_daemons.at(randNum)->getHostname(),network_daemons.at(randNum)->mailbox_name,
+                                     new NextContactDaemonAnswerMessage(network_daemons.at(random_number)->getHostname(),network_daemons.at(random_number)->mailbox_name,
                                                                         this->getPropertyValueAsDouble(
                                                                                 NetworkQueryServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
 
         }  else {
             throw std::runtime_error(
-                    "NetworkProximityService::waitForNextMessage(): Unknown message type: " + std::to_string(message->payload));
+                    "NetworkProximityService::processNextMessage(): Unknown message type: " + std::to_string(message->payload));
         }
     }
 }

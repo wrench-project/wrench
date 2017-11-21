@@ -46,8 +46,8 @@ namespace wrench {
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
                                std::map<std::string, std::string> plist) :
-            BatchService(hostname, nodes_in_network, default_storage_service, supports_standard_jobs,
-                         supports_pilot_jobs, 0, plist, "") {
+            BatchService(std::move(hostname),std::move(nodes_in_network), default_storage_service, supports_standard_jobs,
+                         supports_pilot_jobs, 0, std::move(plist), "") {
 
     }
 
@@ -74,7 +74,7 @@ namespace wrench {
                            default_storage_service) {
 
       // Set default and specified properties
-      this->setProperties(this->default_property_values, plist);
+      this->setProperties(this->default_property_values, std::move(plist));
 
       //create a map for host to cores
       std::vector<std::string>::iterator it;
@@ -220,8 +220,6 @@ namespace wrench {
                 "] message!");
       }
 
-      return;
-
     }
 
 
@@ -352,7 +350,7 @@ namespace wrench {
       bool life = true;
       while (life) {
         life = processNextMessage();
-        if (this->running_jobs.size() > 0) {
+        if (this->running_jobs.empty()) {
           std::set<std::unique_ptr<BatchJob>>::iterator it;
           for (it = this->running_jobs.begin(); it != this->running_jobs.end();) {
             if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
@@ -417,7 +415,7 @@ namespace wrench {
           unsigned long target_num_cores = 0;
 
           for (auto h : this->available_nodes_to_cores) {
-            std::string hostname = std::get<0>(h);
+            const std::string hostname = std::get<0>(h);
             unsigned long num_available_cores = std::get<1>(h);
             if (num_available_cores < cores_per_node) {
               continue;
@@ -426,7 +424,7 @@ namespace wrench {
             unsigned long tentative_target_slack =
                     num_available_cores - tentative_target_num_cores;
 
-            if ((target_host == "") ||
+            if ((target_host.empty()) ||
                 (tentative_target_num_cores > target_num_cores) ||
                 ((tentative_target_num_cores == target_num_cores) &&
                  (target_slack > tentative_target_slack))) {
@@ -435,7 +433,7 @@ namespace wrench {
               target_slack = tentative_target_slack;
             }
           }
-          if (target_host == "") {
+          if (target_host.empty()) {
             WRENCH_INFO("Didn't find a suitable host");
             resources = {};
             std::vector<std::string>::iterator it;
@@ -473,7 +471,7 @@ namespace wrench {
      */
     bool BatchService::dispatchNextPendingJob() {
 
-      if (this->pending_jobs.size()==0) {
+      if (this->pending_jobs.empty()) {
         return false;
       }
 
@@ -525,7 +523,7 @@ namespace wrench {
                                    BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}});
           this->running_standard_job_executors.insert(std::unique_ptr<StandardJobExecutor>(executor));
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
-          this->running_jobs.insert(std::move(batch_job_ptr));
+
 //          this->timeslots.push_back(batch_job->getEndingTimeStamp());
           //remember the allocated resources for the job
           batch_job->setAllocatedResources(resources);
@@ -539,6 +537,7 @@ namespace wrench {
 
 //            this->sent_alrm_msgs.push_back(msg);
 //
+            this->running_jobs.insert(std::move(batch_job_ptr));
           standard_job_alarms.push_back(std::move(ptr));
 
 
@@ -547,15 +546,11 @@ namespace wrench {
           break;
 
         case WorkflowJob::PILOT: {
-          PilotJob *job = (PilotJob *) next_job;
+          auto job = (PilotJob *) next_job;
           WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job",
                       num_nodes_asked_for, cores_per_node_asked_for);
 
           std::string host_to_run_on = resources.begin()->first;
-          std::vector<std::string> nodes_for_pilot_job = {};
-          for (auto it = resources.begin(); it != resources.end(); it++) {
-            nodes_for_pilot_job.push_back(it->first);
-          }
 
           //set the ending timestamp of the batchjob (pilotjob)
 
@@ -646,18 +641,18 @@ namespace wrench {
         return false;
 
       } else if (BatchServiceJobRequestMessage *msg = dynamic_cast<BatchServiceJobRequestMessage *>(message.get())) {
-        WRENCH_INFO("Asked to run a batch job using batchservice with jobid %ld", msg->job.get()->getJobID());
-        if (msg->job.get()->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
+        WRENCH_INFO("Asked to run a batch job using batchservice with jobid %ld", msg->job->getJobID());
+        if (msg->job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
           if (not this->supports_standard_jobs) {
             try {
               S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                        new ComputeServiceSubmitStandardJobAnswerMessage(
-                                               (StandardJob *) msg->job.get()->getWorkflowJob(),
+                                               (StandardJob *) msg->job->getWorkflowJob(),
                                                this,
                                                false,
                                                std::shared_ptr<FailureCause>(
                                                        new JobTypeNotSupported(
-                                                               msg->job.get()->getWorkflowJob(),
+                                                               msg->job->getWorkflowJob(),
                                                                this)),
                                                this->getPropertyValueAsDouble(
                                                        BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
@@ -666,17 +661,17 @@ namespace wrench {
             }
             return true;
           }
-        } else if (msg->job.get()->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+        } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
           if (not this->supports_pilot_jobs) {
             try {
               S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                        new ComputeServiceSubmitPilotJobAnswerMessage(
-                                               (PilotJob *) msg->job.get()->getWorkflowJob(),
+                                               (PilotJob *) msg->job->getWorkflowJob(),
                                                this,
                                                false,
                                                std::shared_ptr<FailureCause>(
                                                        new JobTypeNotSupported(
-                                                               msg->job.get()->getWorkflowJob(),
+                                                               msg->job->getWorkflowJob(),
                                                                this)),
                                                this->getPropertyValueAsDouble(
                                                        BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
@@ -689,12 +684,12 @@ namespace wrench {
 
 
 
-        if (msg->job.get()->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
+        if (msg->job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
 
           try {
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                      new ComputeServiceSubmitStandardJobAnswerMessage(
-                                             (StandardJob *) msg->job.get()->getWorkflowJob(), this,
+                                             (StandardJob *) msg->job->getWorkflowJob(), this,
                                              true,
                                              nullptr,
                                              this->getPropertyValueAsDouble(
@@ -702,11 +697,11 @@ namespace wrench {
           } catch (std::shared_ptr<NetworkError> cause) {
             return true;
           }
-        } else if (msg->job.get()->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+        } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
           try {
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                      new ComputeServiceSubmitPilotJobAnswerMessage(
-                                             (PilotJob *) msg->job.get()->getWorkflowJob(), this,
+                                             (PilotJob *) msg->job->getWorkflowJob(), this,
                                              true,
                                              nullptr,
                                              this->getPropertyValueAsDouble(
@@ -740,7 +735,7 @@ namespace wrench {
           this->sendStandardJobCallBackMessage((StandardJob *) msg->job);
           return true;
         } else if (msg->job->getType() == WorkflowJob::PILOT) {
-          PilotJob *job = (PilotJob *) msg->job;
+          auto job = (PilotJob *) msg->job;
           ComputeService *cs = job->getComputeService();
           try {
             cs->stop();
@@ -822,8 +817,6 @@ namespace wrench {
             throw std::runtime_error(
                     "BatchService::updateResources(): Received a standard job completion, but the job is not in the running job list");
         }
-
-        return;
     }
 
 
@@ -899,8 +892,6 @@ namespace wrench {
         executor->kill();
 
         //TODO: Restore the allocated resources
-
-        return;
     }
 
 
@@ -914,7 +905,7 @@ namespace wrench {
         for(it=this->running_jobs.begin();it!=this->running_jobs.end();it++){
             WorkflowJob* workflow_job = it->get()->getWorkflowJob();
             if (workflow_job->getType() == WorkflowJob::STANDARD) {
-                StandardJob *job = (StandardJob *) workflow_job;
+                auto job = (StandardJob *) workflow_job;
                 this->failRunningStandardJob(job, cause);
             }
         }
@@ -923,7 +914,7 @@ namespace wrench {
         for(it1=this->pending_jobs.begin();it1!=this->pending_jobs.end();it1++){
             WorkflowJob* workflow_job = it1->get()->getWorkflowJob();
             if (workflow_job->getType() == WorkflowJob::STANDARD) {
-                StandardJob *job = (StandardJob *) workflow_job;
+                auto job = (StandardJob *) workflow_job;
                 this->failPendingStandardJob(job, cause);
             }
             it1 = this->pending_jobs.erase(it1);
@@ -1014,8 +1005,8 @@ namespace wrench {
             std::set<std::unique_ptr<BatchJob>>::iterator it;
             for (it=this->running_jobs.begin();it!=this->running_jobs.end();it++) {
                 if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-                    PilotJob *p_job = (PilotJob *) ((*it)->getWorkflowJob());
-                    BatchService *cs = (BatchService *) p_job->getComputeService();
+                    auto p_job = (PilotJob *) ((*it)->getWorkflowJob());
+                    auto cs = (BatchService *) p_job->getComputeService();
                     if (cs == nullptr) {
                         throw std::runtime_error(
                                 "BatchService::terminate(): can't find compute service associated to pilot job");
@@ -1055,8 +1046,6 @@ namespace wrench {
 
       // Forward the notification
       this->sendPilotJobCallBackMessage(job);
-
-      return;
     }
 
 
@@ -1164,8 +1153,6 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> cause) {
         return;
       }
-
-      return;
     }
 
     /**
@@ -1202,7 +1189,7 @@ namespace wrench {
       WRENCH_INFO("A standard job executor has failed to perform job %s", job->getName().c_str());
 
       // Fail the job
-      this->failPendingStandardJob(job, cause);
+      this->failPendingStandardJob(job, move(cause));
 
     }
 
