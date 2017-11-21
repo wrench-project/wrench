@@ -100,9 +100,10 @@ namespace wrench {
           // say "since I killed A, I should kill at its children as well"
           S4U_Simulation::sleep(0.0001);
           this->s4u_actor->kill();
-        } catch (std::exception &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+
         } catch (xbt_ex &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        } catch (std::exception &e) {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
         }
         this->terminated = true;
@@ -116,9 +117,10 @@ namespace wrench {
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         try {
           this->s4u_actor->join();
-        } catch (std::exception &e) {
-          throw std::shared_ptr<FatalFailure>(new FatalFailure());
         } catch (xbt_ex &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        } catch (std::exception &e)
+        {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
         }
       }
