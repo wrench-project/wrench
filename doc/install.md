@@ -9,15 +9,15 @@ Installing WRENCH                  {#install}
 
 # Prerequisites #                 {#install-prerequisites}
 
-WRENCH is fully developed in C++. The code follows the C++11 standard, and thus older 
-compilers tend to fail the compilation process. Therefore, we strongly recommend
+WRENCH is developed in C++. The code follows the C++11 standard, and thus older 
+compilers may fail to compile it. Therefore, we strongly recommend
 users to satisfy the following requirements:
 
 - **CMake** - version 3.2.3 or higher
   
 And, one of the following:
-- **g++** - version 5.0 or higher
-- **clang** - version 3.6 or higher
+- <b>g++</b> - version 5.0 or higher
+- <b>clang</b> - version 3.6 or higher
 
 
 ## Dependencies ##                  {#install-prerequisites-dependencies}
@@ -36,7 +36,7 @@ And, one of the following:
 ## Building WRENCH ##               {#install-source-build}
 
 You can download the _@WRENCHRelease.tar.gz_ archive from the 
-[GitHub releases](https://github.com/wrench-project/wrench/releases) page. 
+[GitHub releases](https://github.com/wrench-project/wrench/releases) page and install it as follows:
 
 ~~~~~~~~~~~~~{.sh}
 tar xf @WRENCHRelease.tar.gz
@@ -46,7 +46,7 @@ make
 make install
 ~~~~~~~~~~~~~
 
-If you want to stay on the bleeding edge, you should get the latest git version, and recompile it as you would do for an official archive.
+If you want to stay on the bleeding edge, you should get the latest git version, and recompile it as you would do for an official archive:
 
 ~~~~~~~~~~~~~{.sh}
 git clone https://github.com/wrench-project/wrench
@@ -62,7 +62,7 @@ make
 make install # try "sudo make install" if you don't have the permission to write
 ~~~~~~~~~~~~~
 
-In addition, several compilation targets are provided in WRENCH.
+In addition, several compilation targets are provided in WRENCH:
 
 ~~~~~~~~~~~~~{.sh}
 make doc               # Builds WRENCH documentation
@@ -70,7 +70,7 @@ make unit_tests        # Builds WRENCH unit tests
 ~~~~~~~~~~~~~
  
 
-If you want to see what is really happening, try adding VERBOSE=1 to your compilation requests:
+If you want to see actual compiler and linker invocations, add VERBOSE=1 to your compilation command:
 
 ~~~~~~~~~~~~~{.sh}
 make VERBOSE=1

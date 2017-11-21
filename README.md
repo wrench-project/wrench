@@ -4,24 +4,47 @@
 [![Coverage Status][coveralls-badge]][coveralls-link]
 [![Codacy Badge][codacy-badge]][codacy-link]
 
-# WRENCH source repo
+<img src="doc/images/logo-vertical.png" width="100" />
 
-### Prerequisites
+**_Workflow Management System Simulation Workbench_**
 
-  - [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.17 or superior
-  - [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or superior 
-  - [PugiXML](http://pugixml.org/) - version 1.8 or superior 
-  - [JSON for Modern C++](https://github.com/nlohmann/json) - version 2.1.1 or superior 
-  - [Google Test](https://github.com/google/googletest) - version 1.8 or superior (only required for running test cases)
-  - [Doxygen](http://www.doxygen.org) - version 1.8 or superior (only required for generating documentation)
+WRENCH is an _open-source library_ for developing workflow simulators. WRENCH exposes several high-level simulation 
+abstractions to provide the **building blocks** for developing custom simulators.
 
-#### Compiler
+More information: [WRENCH Project Website](http://wrench-project.org)
 
-  - **CMake** - version 3.2.3 or superior
+## Prerequisites
+
+WRENCH is fully developed in C++. The code follows the C++11 standard, and thus older 
+compilers tend to fail the compilation process. Therefore, we strongly recommend
+users to satisfy the following requirements:
+
+- **CMake** - version 3.2.3 or higher
   
 And, one of the following:
-  - **g++** - version 5 or superior
-  - **clang** - version 3.6 or superior
+- **g++** - version 5.0 or higher
+- **clang** - version 3.6 or higher
+
+## Dependencies
+
+- [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.17 or higher
+- [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
+- [PugiXML](http://pugixml.org/) - version 1.8 or higher 
+- [JSON for Modern C++](https://github.com/nlohmann/json) - version 2.1.1 or higher 
+- [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
+- [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
+
+
+## Building From Source
+
+If all dependencies are installed, compiling and installing WRENCH is as simple as running:
+
+```bash
+cmake .
+make
+make install
+```
+
 
 
 [travis-badge]:    https://travis-ci.org/wrench-project/wrench.svg?branch=master
