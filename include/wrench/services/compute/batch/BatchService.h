@@ -61,6 +61,8 @@ namespace wrench {
                      bool supports_pilot_jobs,
                 std::map<std::string, std::string> plist = {});
 
+       ~BatchService();
+
         //cancels the job
         void cancelJob(unsigned long jobid);
         //returns jobid,started time, running time
@@ -73,27 +75,25 @@ namespace wrench {
         StorageService *default_storage_service,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
-                     PilotJob* parent_job,
                      unsigned long reduced_cores,
         std::map<std::string, std::string> plist,
         std::string suffix);
-
-        //parent batch job (this is necessary for pilot jobs)
-        PilotJob* parent_pilot_job;
 
         //Configuration to create randomness in measurement period initially
         unsigned long random_interval = 10;
 
         //create alarms for standardjobs
-        std::vector<Alarm*> standard_job_alarms;
+        std::vector<std::unique_ptr<Alarm>> standard_job_alarms;
 
         //alarms for pilot jobs (only one pilot job alarm)
-        std::vector<Alarm*> pilot_job_alarms;
+        std::vector<std::unique_ptr<Alarm>> pilot_job_alarms;
+
+//        std::vector<std::shared_ptr<SimulationMessage>> sent_alrm_msgs;
 
         /* Resources information in Batchservice */
         unsigned long total_num_of_nodes;
         std::map<std::string,unsigned long> nodes_to_cores_map;
-        std::vector<double> timeslots;
+//        std::vector<double> timeslots;
         std::map<std::string,unsigned long> available_nodes_to_cores;
         /*End Resources information in Batchservice */
 

@@ -25,12 +25,12 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(std::string answer_mailbox,
-                                                                 BatchJob* job,double payload)
+                                                                 std::unique_ptr<BatchJob> job,double payload)
             : BatchServiceMessage("SUBMIT_BATCH_JOB_REQUEST", payload) {
         if (job == nullptr) {
             throw std::invalid_argument("BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(): Invalid arguments");
         }
-        this->job = job;
+        this->job = std::move(job);
         this->answer_mailbox = answer_mailbox;
     }
 

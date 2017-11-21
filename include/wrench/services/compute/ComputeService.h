@@ -12,6 +12,8 @@
 
 #include <map>
 
+#include <iostream>
+
 #include "wrench/services/Service.h"
 #include "wrench/workflow/job/WorkflowJob.h"
 
@@ -35,6 +37,9 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
+
+
+        virtual ~ComputeService(){}
 
         void stop() override;
 

@@ -334,7 +334,8 @@ namespace wrench {
       if (this->has_ttl) {
         this->death_date = S4U_Simulation::getClock() + this->ttl;
         WRENCH_INFO("Will be terminating at date %lf", this->death_date);
-        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
+//        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
+        SimulationMessage* msg = new ServiceTTLExpiredMessage(0);
         this->death_alarm = new Alarm(death_date, this->hostname, this->mailbox_name, msg, "service_string");
       } else {
         this->death_date = -1.0;
