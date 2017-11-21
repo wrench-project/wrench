@@ -15,8 +15,8 @@ follow the instructions to [install it](@ref install).
 @WRENCHNotInternalDoc
 ## Importing WRENCH ##                {#getting-started-prep-import}
 
-In order to facilitate WRENCH usage, WRENCH encapsulates all services, algorithms,
-and interfaces in a single include statement:
+For ease of use, all WRENCH abstractions are accessed via a single 
+include statement:
 
 @WRENCHUserDoc
 ~~~~~~~~~~~~~{.cpp}
@@ -38,8 +38,8 @@ your own algorithms and services.
 
 ## Building Your CMakeLists.txt File ##                {#getting-started-prep-cmakelists}
 
-Find below an example of a `CMakeLists.txt` file that can be used as a starting 
-template for building the CMake file for your application.
+Below is an example of a `CMakeLists.txt` file that can be used as a starting 
+template for developing a WRENCH application compiled using cmake:
 
 ~~~~~~~~~~~~~{.cmake}
 cmake_minimum_required(VERSION 3.2)
