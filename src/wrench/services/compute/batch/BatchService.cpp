@@ -195,7 +195,7 @@ namespace wrench {
                                         answer_mailbox,
                                                                   std::move(batch_job),
                                                                   this->getPropertyValueAsDouble(
-                                                                          BatchServiceProperty::SUBMIT_BATCH_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                                                          BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -307,7 +307,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new BatchServiceJobRequestMessage(answer_mailbox, std::move(batch_job),
                                                                   this->getPropertyValueAsDouble(
-                                                                          BatchServiceProperty::SUBMIT_BATCH_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                                                          BatchServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }

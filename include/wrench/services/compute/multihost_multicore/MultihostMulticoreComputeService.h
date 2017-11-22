@@ -27,7 +27,7 @@ namespace wrench {
 
     class Alarm;
 
-    /**  @brief A ComputeService runs standard and pilot jobs on a set of
+    /**  @brief A ComputeService that runs on a set of
      *   multi-core hosts
      */
     class MultihostMulticoreComputeService : public ComputeService {

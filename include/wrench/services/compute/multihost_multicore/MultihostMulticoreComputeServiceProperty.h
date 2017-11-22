@@ -8,8 +8,8 @@
  */
 
 
-#ifndef WRENCH_MULTICORECOMPUTESERVICEPROPERTY_H
-#define WRENCH_MULTICORECOMPUTESERVICEPROPERTY_H
+#ifndef WRENCH_MULTIHOSTMULTICORECOMPUTESERVICEPROPERTY_H
+#define WRENCH_MULTIHOSTMULTICORECOMPUTESERVICEPROPERTY_H
 
 #include <map>
 
@@ -18,7 +18,7 @@
 namespace wrench {
 
    /**
-    * @brief Properties for a MulticoreComputeService
+    * @brief Properties for a MultiHostMulticoreComputeService
     */
     class MultihostMulticoreComputeServiceProperty : public ComputeServiceProperty {
 
@@ -74,4 +74,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_MULTICORECOMPUTESERVICEPROPERTY_H
+#endif //WRENCH_MULTIHOSTMULTICORECOMPUTESERVICEPROPERTY_H

@@ -29,7 +29,7 @@ namespace wrench {
 
 
     /**
-     * @brief A batch-scheduled compute service
+     * @brief A batch-scheduled ComputeService
      */
     class BatchService: public ComputeService {
 
@@ -46,8 +46,6 @@ namespace wrench {
                  {BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,        "1024"},
                  {BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,  "1024"},
                  {BatchServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,    "1024"},
-                 {BatchServiceProperty::SUBMIT_BATCH_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
-                 {BatchServiceProperty::SUBMIT_BATCH_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
                  {BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,           "1024"},
