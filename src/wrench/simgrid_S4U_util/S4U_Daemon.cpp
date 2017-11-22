@@ -45,6 +45,10 @@ namespace wrench {
       this->terminated = false;
     }
 
+    S4U_Daemon::~S4U_Daemon() {
+        WRENCH_INFO("In the Daemon Constructor");
+    }
+
     int daemonGoodbye(void *x, void*y) {
       WRENCH_INFO("Terminating");
       return 0;
