@@ -32,7 +32,15 @@ namespace wrench{
 
     public:
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
         ~NetworkProximityService();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
         NetworkProximityService(std::string db_hostname,
                                 std::vector<std::string> hosts_in_network,

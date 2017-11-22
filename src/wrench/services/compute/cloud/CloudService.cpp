@@ -28,7 +28,7 @@ namespace wrench {
      * @param hostname: the hostname on which to start the service
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param default_storage_service: a storage service
+     * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      *
      * @throw std::invalid_argument

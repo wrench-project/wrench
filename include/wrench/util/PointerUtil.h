@@ -17,6 +17,9 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
     class PointerUtil {
 
@@ -40,6 +43,10 @@ namespace wrench {
                                                            std::set<std::unique_ptr<T1>> *from,
                                                            std::set<std::unique_ptr<T1>> *to);
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
 };

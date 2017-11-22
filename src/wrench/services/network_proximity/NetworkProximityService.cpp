@@ -90,9 +90,9 @@ namespace wrench {
 
 
     /**
-     * @brief Lookup for the proximity value in database
+     * @brief Look up for the proximity value in database
      * @param hosts: the pair of hosts to look for the proximity value
-     * @return The proximity value between those pair of hosts
+     * @return The proximity value between the pair of hosts
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -127,7 +127,7 @@ namespace wrench {
     }
 
     /**
-     * Internal method to add an entry to the database
+     * @brief Internal method to add an entry to the database
      * @param pair: a pair of hosts
      * @param proximity_value: proximity value between the pair
      */
