@@ -119,7 +119,7 @@ private:
 
       while (proximity < 0 && count < max_count) {
         count++;
-        wrench::S4U_Simulation::sleep(1);
+        wrench::S4U_Simulation::sleep(10);
         proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
       }
 
