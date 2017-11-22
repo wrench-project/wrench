@@ -54,7 +54,21 @@ namespace wrench {
                              double capacity,
                              std::map<std::string, std::string> = {});
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
+        ~SimpleStorageService() {
+            this->default_property_values.clear();
+        }
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
     private:
+
+
 
         friend class Simulation;
 

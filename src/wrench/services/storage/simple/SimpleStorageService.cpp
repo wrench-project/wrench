@@ -86,6 +86,7 @@ namespace wrench {
      */
     int SimpleStorageService::main() {
 
+
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
 
       WRENCH_INFO("Simple Storage Service %s starting on host %s (capacity: %lf, holding %ld files, listening on %s)",
@@ -140,6 +141,7 @@ namespace wrench {
       WRENCH_INFO("Simple Storage Service %s on host %s terminated!",
                   this->getName().c_str(),
                   S4U_Simulation::getHostName().c_str());
+
       return 0;
     }
 
