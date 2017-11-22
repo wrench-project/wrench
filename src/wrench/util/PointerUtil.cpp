@@ -13,6 +13,9 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
 
 //    template <class T>
 //    void PointerUtil::moveUniquePtrFromSetToSet(
@@ -39,5 +42,8 @@ namespace wrench {
                                                                       std::set<std::unique_ptr<StandardJobExecutor>> *from,
                                                                       std::set<std::unique_ptr<StandardJobExecutor>> *to);
 
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
