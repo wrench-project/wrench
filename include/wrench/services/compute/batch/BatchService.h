@@ -27,11 +27,13 @@
 
 namespace wrench {
 
-    class BatchService: public ComputeService {
 
     /**
-     * @brief A Batch Service
+     * @brief A Batch-scheduled compute service
      */
+    class BatchService: public ComputeService {
+
+
 
 
     private:
@@ -54,6 +56,8 @@ namespace wrench {
                 };
 
     public:
+
+        /* Public constructor */
         BatchService(std::string hostname,
         std::vector<std::string> nodes_in_network,
                      StorageService *default_storage_service,
@@ -61,12 +65,21 @@ namespace wrench {
                      bool supports_pilot_jobs,
                 std::map<std::string, std::string> plist = {});
 
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+
        ~BatchService();
 
         //cancels the job
-        void cancelJob(unsigned long jobid);
+//        void cancelJob(unsigned long jobid);
+
         //returns jobid,started time, running time
         std::vector<std::tuple<unsigned long,double,double>> getJobsInQueue();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
 
     private:

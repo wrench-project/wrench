@@ -8,6 +8,15 @@
 #include "wrench/workflow/job/StandardJob.h"
 
 namespace wrench {
+
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
+
+    /**
+     * @brief A batch job, which encapsulates a WorkflowJob and additional information
+     *        used be a BatchService
+     */
     class BatchJob {
     public:
         //job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
@@ -34,7 +43,14 @@ namespace wrench {
         double ending_time_stamp;
         std::set<std::pair<std::string,unsigned long>> resources_allocated;
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }
+
+
 
 
 #endif //WRENCH_BATCHJOB_H

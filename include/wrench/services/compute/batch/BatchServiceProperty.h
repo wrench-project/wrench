@@ -9,6 +9,9 @@
 
 namespace wrench {
 
+    /**
+     * @brief Properties for a BatchService
+     */
     class BatchServiceProperty: public ComputeServiceProperty {
 
     public:
