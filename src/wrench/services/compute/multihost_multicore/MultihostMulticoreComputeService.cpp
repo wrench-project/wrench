@@ -224,7 +224,7 @@ namespace wrench {
      *        the compute resources available to this service. A number of cores equal to 0 means
      *        that all cores on the host are used.
      * @param default_storage_service: a storage service (or nullptr)
-     * @param plist: a property list
+     * @param plist: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(std::string hostname,
                                                                        bool supports_standard_jobs,

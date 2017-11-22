@@ -15,6 +15,10 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     /**
      * @brief A network daemon running (proximity is computed between two such running daemons)
      */
@@ -65,6 +69,10 @@ namespace wrench {
 
         bool processNextMessage(double timeout);
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 }
 
 

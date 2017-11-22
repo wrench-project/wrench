@@ -37,7 +37,7 @@ namespace wrench {
      *
      * @param hostname: the name of the host on which to start the service
      * @param capacity: the storage capacity in bytes
-     * @param plist: the optional property list
+     * @param plist: a property list ({} means "use all defaults")
      */
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                double capacity,

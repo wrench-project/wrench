@@ -29,7 +29,7 @@ namespace wrench {
 
 
     /**
-     * @brief A Batch-scheduled compute service
+     * @brief A batch-scheduled compute service
      */
     class BatchService: public ComputeService {
 
@@ -59,7 +59,7 @@ namespace wrench {
 
         /* Public constructor */
         BatchService(std::string hostname,
-        std::vector<std::string> nodes_in_network,
+        std::vector<std::string> compute_nodes,
                      StorageService *default_storage_service,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
