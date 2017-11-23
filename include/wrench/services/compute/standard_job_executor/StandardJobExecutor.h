@@ -75,10 +75,10 @@ namespace wrench {
         std::set<std::unique_ptr<WorkunitMulticoreExecutor>> finished_workunit_executors;
 
         // Work units
-        std::set<std::shared_ptr<Workunit>> non_ready_workunits;
-        std::set<std::shared_ptr<Workunit>> ready_workunits;
-        std::set<std::shared_ptr<Workunit>> running_workunits;
-        std::set<std::shared_ptr<Workunit>> completed_workunits;
+        std::set<std::unique_ptr<Workunit>> non_ready_workunits;
+        std::set<std::unique_ptr<Workunit>> ready_workunits;
+        std::set<std::unique_ptr<Workunit>> running_workunits;
+        std::set<std::unique_ptr<Workunit>> completed_workunits;
 
         // Property list
         std::map<std::string, std::string> property_list;
@@ -99,10 +99,10 @@ namespace wrench {
         double getPropertyValueAsDouble(std::string property);
 
         void processWorkunitExecutorCompletion(WorkunitMulticoreExecutor *workunit_executor,
-                                               std::shared_ptr<Workunit> workunit);
+                                               Workunit *workunit);
 
         void processWorkunitExecutorFailure(WorkunitMulticoreExecutor *workunit_executor,
-                                            std::shared_ptr<Workunit> workunit,
+                                            Workunit *workunit,
                                             std::shared_ptr<FailureCause> cause);
 
         bool processNextMessage();
@@ -111,7 +111,7 @@ namespace wrench {
 
         void createWorkunits();
 
-        std::vector<std::shared_ptr<Workunit>> sortReadyWorkunits();
+        std::vector<Workunit*> sortReadyWorkunits();
 
     };
 

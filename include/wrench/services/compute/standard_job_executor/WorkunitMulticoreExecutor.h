@@ -44,7 +44,7 @@ namespace wrench {
                      std::string hostname,
                      unsigned long num_cores,
                      std::string callback_mailbox,
-                     std::shared_ptr<Workunit> workunit,
+                     Workunit *workunit,
                      StorageService *default_storage_service,
                      double thread_startup_overhead = 0.0);
 
@@ -54,12 +54,12 @@ namespace wrench {
         unsigned long getNumCores();
 
         /** @brief The Workunit this WorkunitExecutor is supposed to perform */
-        std::shared_ptr<Workunit> workunit;
+        Workunit *workunit;
 
     private:
         int main();
 
-        void performWork(std::shared_ptr<Workunit> work);
+        void performWork(Workunit *work);
 
         void runMulticoreComputation(double flops, double parallel_efficiency);
 

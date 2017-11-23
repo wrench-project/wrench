@@ -171,8 +171,18 @@ namespace wrench {
           break;
         }
 
+
+
         /** Detect Termination **/
-        if (non_ready_workunits.size() + ready_workunits.size() +  running_workunits.size() == 0) {
+        if (this->non_ready_workunits.size() + this->ready_workunits.size() +  this->running_workunits.size() == 0) {
+//          std::cerr << "CANARY 1: " << (*(this->completed_workunits. begin())).use_count() << "\n";
+//          std::shared_ptr<Workunit> canary = std::move(*(this->completed_workunits.begin()));
+//          std::cerr << "CANARY 2: " << canary.use_count() << "\n";
+////          this->completed_workunits.erase(*(this->completed_workunits. begin()));
+//          this->completed_workunits.erase(canary);
+//          std::cerr << "WTF: " << this->completed_workunits.size() << "\n";
+//          std::cerr << "CANARY 3: " << canary.use_count() << "\n";
+          this->completed_workunits.clear();
           break;
         }
 
@@ -188,12 +198,12 @@ namespace wrench {
     void StandardJobExecutor::dispatchReadyWorkunits() {
 
 //      std::cerr << "** IN DISPATCH READY WORK UNITS\n";
-      for (auto wu : this->ready_workunits) {
+//      for (auto wu : this->ready_workunits) {
 //        std::cerr << "WU: num_comp_tasks " << wu->tasks.size() << "\n";
-        for (auto t : wu->tasks) {
+//        for (auto t : wu->tasks) {
 //          std::cerr << "    - flops = " << t->getFlops() << ", min_cores = " << t->getMinNumCores() << ", max_cores = " << t->getMaxNumCores() << "\n";
-        }
-      }
+//        }
+//      }
 
       // If there is no ready work unit, there is nothing to dispatch
       if (this->ready_workunits.size() == 0) {
@@ -201,15 +211,15 @@ namespace wrench {
       }
 
       // Get an ordered (by the task selection algorithm) list of the ready workunits
-      std::vector<std::shared_ptr<Workunit>> sorted_ready_workunits = sortReadyWorkunits();
+      std::vector<Workunit *> sorted_ready_workunits = sortReadyWorkunits();
 
 //      std::cerr << "** SORTED\n";
-      for (auto wu : sorted_ready_workunits) {
+//      for (auto wu : sorted_ready_workunits) {
 //        std::cerr << "WU: num_comp_tasks " << wu->tasks.size() << "\n";
-        for (auto t : wu->tasks) {
+//        for (auto t : wu->tasks) {
 //          std::cerr << "    - flops = " << t->getFlops() << ", min_cores = " << t->getMinNumCores() << ", max_cores = " << t->getMaxNumCores() << "\n";
-        }
-      }
+//        }
+//      }
 
       // Go through the workunits in order of priority and dispatch each them to
       // hosts/cores, if possible
@@ -320,10 +330,18 @@ namespace wrench {
 
         // Update data structures
         this->running_workunit_executors.insert(std::move(workunit_executor));
-        this->ready_workunits.erase(wu);
-        this->running_workunits.insert(wu);
+
+        for (std::set<std::unique_ptr<Workunit>>::iterator it = this->ready_workunits.begin();
+                it != this->ready_workunits.end(); it++) {
+          if ((*it).get() == wu) {
+            PointerUtil::moveUniquePtrFromSetToSet(it, &(this->ready_workunits), &(this->running_workunits));
+            break;
+          }
+        }
 
       }
+
+      sorted_ready_workunits.clear();
 
 //      std::cerr << "RETURNING\n";
 
@@ -385,30 +403,33 @@ namespace wrench {
  */
     void StandardJobExecutor::processWorkunitExecutorCompletion(
             WorkunitMulticoreExecutor *workunit_executor,
-            std::shared_ptr<Workunit> workunit) {
-
+            Workunit *workunit) {
 
       // Update core availabilities
       this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
 
       // Remove the workunit executor from the workunit executor list
-      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
-      for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
+//      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
+      for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
         if ((*it).get() == workunit_executor) {
           PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunit_executors), &(this->finished_workunit_executors));
           break;
         }
       }
 
-      // Remove the work from the running work queue
-      if (this->running_workunits.find(workunit) == this->running_workunits.end()) {
+      // Find the workunit in the running workunig queue
+      bool found_it = false;
+      for (auto it = this->running_workunits.begin(); it != this->running_workunits.end(); it++) {
+        if ((*it).get() == workunit) {
+          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunits), &(this->completed_workunits));
+          found_it = true;
+          break;
+        }
+      }
+      if (!found_it) {
         throw std::runtime_error(
                 "StandardJobExecutor::processWorkunitExecutorCompletion(): couldn't find a recently completed workunit in the running workunit list");
       }
-      this->running_workunits.erase(workunit);
-
-      // Add the workunit to the completed workunit list
-      this->completed_workunits.insert(workunit);
 
       // Process task completions, if any
       for (auto task : workunit->tasks) {
@@ -442,12 +463,28 @@ namespace wrench {
           child->num_pending_parents--;
           if (child->num_pending_parents == 0) {
             // Make the child ready!
-            if (this->non_ready_workunits.find(child) == this->non_ready_workunits.end()) {
-              throw std::runtime_error(
-                      "MultihostMulticoreComputeService::processWorkCompletion(): can't find non-ready child in non-ready set!");
+
+            // Find the workunit in the running workunig queue
+            bool found_it = false;
+            for (auto it = this->non_ready_workunits.begin(); it != this->non_ready_workunits.end(); it++) {
+              if ((*it).get() == child) {
+                PointerUtil::moveUniquePtrFromSetToSet(it, &(this->non_ready_workunits), &(this->ready_workunits));
+                found_it = true;
+                break;
+              }
             }
-            this->non_ready_workunits.erase(child);
-            this->ready_workunits.insert(child);
+            if (!found_it) {
+              throw std::runtime_error(
+                      "MultihostMulticoreComputeService::processWorkCompletion(): couldn't find non-ready child in non-ready set!");
+            }
+
+
+//            if (this->non_ready_workunits.find(child) == this->non_ready_workunits.end()) {
+//              throw std::runtime_error(
+//                      "MultihostMulticoreComputeService::processWorkCompletion(): can't find non-ready child in non-ready set!");
+//            }
+//            this->non_ready_workunits.erase(child);
+//            this->ready_workunits.insert(child);
           }
         }
       }
@@ -465,15 +502,14 @@ namespace wrench {
 
     void StandardJobExecutor::processWorkunitExecutorFailure(
             WorkunitMulticoreExecutor *workunit_executor,
-            std::shared_ptr<Workunit> workunit,
+            Workunit *workunit,
             std::shared_ptr<FailureCause> cause) {
 
 
       WRENCH_INFO("A workunit executor has failed to complete a workunit on behalf of job '%s'", this->job->getName().c_str());
 
       // Remove the workunit executor from the workunit executor list
-      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
-      for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
+      for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
 //      for (auto wt : this->running_workunit_executors) {
         if ((*it).get() == workunit_executor) {
           this->running_workunit_executors.erase((it));
@@ -485,11 +521,19 @@ namespace wrench {
       this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
 
       // Remove the work from the running work queue
-      if (this->running_workunits.find(workunit) == this->running_workunits.end()) {
-        throw std::runtime_error(
-                "StandardJobExecutor::processWorkunitExecutorFailure(): couldn't find a recently failed workunit in the running workunit list");
+      bool found_it = false;
+      for (auto it = this->running_workunits.begin(); it != this->running_workunits.end(); it++) {
+        if ((*it).get() == workunit) {
+          this->running_workunits.erase(it);
+          found_it = true;
+          break;
+        }
       }
-      this->running_workunits.erase(workunit);
+      if (!found_it) {
+        throw std::runtime_error(
+                "StandardJobExecutor::processWorkunitExecutorCompletion(): couldn't find a recently failed workunit in the running workunit list");
+      }
+
 
       // Remove all other workunits for the job in the "not ready" state
       this->non_ready_workunits.clear();
@@ -498,17 +542,17 @@ namespace wrench {
       this->ready_workunits.clear();
 
       // Deal with running workunits!
-      for (auto w : this->running_workunits) {
-        if ((w->post_file_copies.size() != 0) || (w->pre_file_copies.size() != 0)) {
+      for (auto it = this->running_workunits.begin(); it != this->running_workunits.end(); it++) {
+        if (((*it)->post_file_copies.size() != 0) || ((*it)->pre_file_copies.size() != 0)) {
           throw std::runtime_error(
                   "StandardJobExecutor::processWorkunitExecutorFailure(): trying to cancel a running workunit that's doing some file copy operations - not supported (for now)");
         }
         // find the workunit executor  that's doing the work (lame iteration)
-        std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
-        for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
+        for (auto it_e = this->running_workunit_executors.begin();
+             it_e != this->running_workunit_executors.end(); it_e++) {
 //        for (auto wt :  this->running_workunit_executors) {
-          if ((*it)->workunit == w) {
-            (*it)->kill();
+          if ((*it_e)->workunit == (*it).get()) {
+            (*it_e)->kill();
             break;
           }
         }
@@ -540,29 +584,29 @@ namespace wrench {
  */
     void StandardJobExecutor::createWorkunits() {
 
-      std::shared_ptr<Workunit> pre_file_copies_work_unit = nullptr;
-      std::vector<std::shared_ptr<Workunit>> task_work_units;
-      std::shared_ptr<Workunit> post_file_copies_work_unit = nullptr;
-      std::shared_ptr<Workunit> cleanup_workunit = nullptr;
+      Workunit *pre_file_copies_work_unit = nullptr;
+      std::vector<Workunit *> task_work_units;
+      Workunit *post_file_copies_work_unit = nullptr;
+      Workunit *cleanup_workunit = nullptr;
 
       // Create the cleanup workunit, if any
       if (job->cleanup_file_deletions.size() > 0) {
-        cleanup_workunit = std::shared_ptr<Workunit>(new Workunit({}, {}, {}, {}, job->cleanup_file_deletions));
+        cleanup_workunit = new Workunit({}, {}, {}, {}, job->cleanup_file_deletions);
       }
 
       // Create the pre_file_copies work unit, if any
       if (job->pre_file_copies.size() > 0) {
-        pre_file_copies_work_unit = std::shared_ptr<Workunit>(new Workunit(job->pre_file_copies, {}, {}, {}, {}));
+        pre_file_copies_work_unit = new Workunit(job->pre_file_copies, {}, {}, {}, {});
       }
 
       // Create the post_file_copies work unit, if any
       if (job->post_file_copies.size() > 0) {
-        post_file_copies_work_unit = std::shared_ptr<Workunit>(new Workunit({}, {}, {}, job->post_file_copies, {}));
+        post_file_copies_work_unit = new Workunit({}, {}, {}, job->post_file_copies, {});
       }
 
       // Create the task work units, if any
       for (auto task : job->tasks) {
-        task_work_units.push_back(std::shared_ptr<Workunit>(new Workunit({}, {task}, job->file_locations, {}, {})));
+        task_work_units.push_back(new Workunit({}, {task}, job->file_locations, {}, {}));
       }
 
       // Add dependencies from pre copies to possible successors
@@ -595,7 +639,7 @@ namespace wrench {
       }
 
       // Create a list of all work units
-      std::vector<std::shared_ptr<Workunit>> all_work_units;
+      std::vector<Workunit*> all_work_units;
       if (pre_file_copies_work_unit) all_work_units.push_back(pre_file_copies_work_unit);
       for (auto twu : task_work_units) {
         all_work_units.push_back(twu);
@@ -603,28 +647,20 @@ namespace wrench {
       if (post_file_copies_work_unit) all_work_units.push_back(post_file_copies_work_unit);
       if (cleanup_workunit) all_work_units.push_back(cleanup_workunit);
 
+      task_work_units.clear();
+
       // Insert work units in the ready or non-ready queues
       for (auto wu : all_work_units) {
         if (wu->num_pending_parents == 0) {
-          this->ready_workunits.insert(wu);
+          this->ready_workunits.insert(std::unique_ptr<Workunit>(wu));
         } else {
-          this->non_ready_workunits.insert(wu);
+          this->non_ready_workunits.insert(std::unique_ptr<Workunit>(wu));
         }
       }
 
-      task_work_units.clear();
-
+      all_work_units.clear();
       return;
     }
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -673,14 +709,14 @@ namespace wrench {
      *
      * @return a sorted vector of ready tasks
      */
-    std::vector<std::shared_ptr<Workunit>> StandardJobExecutor::sortReadyWorkunits() {
+    std::vector<Workunit*> StandardJobExecutor::sortReadyWorkunits() {
 
 //      std::cerr << "IN sortReadyWorkunits()\n";
 
-      std::vector<std::shared_ptr<Workunit>> sorted_workunits;
+      std::vector<Workunit *> sorted_workunits;
 
-      for (auto wu : this->ready_workunits) {
-        sorted_workunits.push_back(wu);
+      for (auto it = this->ready_workunits.begin(); it != this->ready_workunits.end(); it++) {
+        sorted_workunits.push_back((*it).get());
       }
 
 //      std::cerr << "SORTED LENGTH = " << sorted_workunits.size() << "\n";
@@ -692,7 +728,7 @@ namespace wrench {
 
       // using function as comp
       std::sort(sorted_workunits.begin(), sorted_workunits.end(),
-                [selection_algorithm](const std::shared_ptr<Workunit> & wu1, const std::shared_ptr<Workunit> & wu2) -> bool
+                [selection_algorithm](const Workunit*  wu1, const Workunit*  wu2) -> bool
                 {
 //                    std::cerr << "IN LAMBDA\n";
                     // Non-computational workunits have higher priority
