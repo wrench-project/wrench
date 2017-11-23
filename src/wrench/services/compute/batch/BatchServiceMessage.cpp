@@ -31,7 +31,7 @@ namespace wrench {
             throw std::invalid_argument("BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(): Invalid arguments");
         }
         this->job = std::move(job);
-        this->answer_mailbox = std::move(answer_mailbox);
+        this->answer_mailbox = answer_mailbox;
     }
 
     /**

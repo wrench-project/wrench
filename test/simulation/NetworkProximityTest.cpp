@@ -119,7 +119,7 @@ private:
 
       while (proximity < 0 && count < max_count) {
         count++;
-        wrench::S4U_Simulation::sleep(1);
+        wrench::S4U_Simulation::sleep(10.0);
         proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
       }
 
@@ -251,7 +251,7 @@ private:
 
         while (first_pair_proximity < 0 && count < max_count) {
             count++;
-            wrench::S4U_Simulation::sleep(1.0);
+            wrench::S4U_Simulation::sleep(10.0);
             first_pair_proximity = this->simulation->getNetworkProximityService()->query(first_pair_to_compute_proximity);
         }
 
@@ -272,7 +272,7 @@ private:
 
         while (second_pair_proximity < 0 && count < max_count) {
             count++;
-            wrench::S4U_Simulation::sleep(1.0);
+            wrench::S4U_Simulation::sleep(10.0);
             second_pair_proximity = this->simulation->getNetworkProximityService()->query(second_pair_to_compute_proximity);
         }
 

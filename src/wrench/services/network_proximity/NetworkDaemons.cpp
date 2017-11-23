@@ -103,6 +103,7 @@ namespace wrench {
                     double start_time = S4U_Simulation::getClock();
 
                     try {
+                        WRENCH_INFO("Sending a NetworkProximityTransferMessage from %s to %s",this->mailbox_name.c_str(),this->next_mailbox_to_send.c_str());
                         S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                                 new NetworkProximityTransferMessage(msg_to_send,
                                                                                     this->getPropertyValueAsDouble(
@@ -110,7 +111,9 @@ namespace wrench {
 
 
                     } catch (std::shared_ptr<NetworkError> cause) {
-                        return true;
+                        time_for_next_measurement = S4U_Simulation::getClock()+measurement_period+
+                                                    (rand()%((this->noise)-(-this->noise) + 1) + (this->noise));
+                        continue;
                     }
 
                     double end_time = S4U_Simulation::getClock();
@@ -156,6 +159,9 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
 
         try {
+//            if(timeout<1){
+//                std::cout<<"Timeout very less "<<this->mailbox_name<<"\n";
+//            }
             message = S4U_Mailbox::getMessage(this->mailbox_name,timeout);
         } catch (std::shared_ptr<NetworkTimeout> cause) {
             return true;
