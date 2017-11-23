@@ -180,17 +180,19 @@ namespace wrench {
         if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
             // This is Synchronous
             try {
+                //Stop the network daemons
+                std::vector<std::unique_ptr<NetworkDaemons>>::iterator it;
+                for (it=this->network_daemons.begin();it!=this->network_daemons.end();it++){
+                    if((*it)->isUp()) {
+                        (*it)->stop();
+                    }
+                }
+                this->network_daemons.clear();
+                this->hosts_in_network.clear();
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                                 NetworkQueryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 
-                //Stop the network daemons
-                std::vector<std::unique_ptr<NetworkDaemons>>::iterator it;
-                for (it=this->network_daemons.begin();it!=this->network_daemons.end();it++){
-                    (*it)->stop();
-                }
-                this->network_daemons.clear();
-                this->hosts_in_network.clear();
             } catch (std::shared_ptr<NetworkError> cause) {
                 return false;
             }

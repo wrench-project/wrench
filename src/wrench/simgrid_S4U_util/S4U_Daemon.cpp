@@ -46,7 +46,7 @@ namespace wrench {
     }
 
     S4U_Daemon::~S4U_Daemon() {
-        WRENCH_INFO("In the Daemon Constructor");
+        WRENCH_INFO("In the Daemon Destructor");
     }
 
     int daemonGoodbye(void *x, void*y) {

@@ -64,7 +64,7 @@ namespace wrench {
        ~BatchService() override ;
 
         //cancels the job
-        void cancelJob(unsigned long jobid);
+//        void cancelJob(unsigned long jobid);
         //returns jobid,started time, running time
         std::vector<std::tuple<unsigned long,double,double>> getJobsInQueue();
 
