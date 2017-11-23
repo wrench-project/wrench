@@ -21,7 +21,7 @@ namespace wrench {
     class WorkflowTask;
 
     /**
-     * @brief A data file used i workflow
+     * @brief A data file used/produced by a WorkflowTask in a Workflow
      */
     class WorkflowFile {
 

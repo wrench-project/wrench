@@ -316,7 +316,7 @@ namespace wrench {
           break;
         }
         WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
-        this->compute_threads.push_back(compute_thread);
+        this->compute_threads.push_back(std::unique_ptr<ComputeThread>(compute_thread));
       }
 
       if (!success) {

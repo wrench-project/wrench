@@ -23,7 +23,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief A top-level class that defines a workflow management system
+     * @brief A top-level class that defines a workflow management system (WMS)
      */
     class WMS : public S4U_Daemon {
 

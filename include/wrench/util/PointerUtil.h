@@ -17,6 +17,9 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
     class PointerUtil {
 
@@ -36,10 +39,14 @@ namespace wrench {
         };
 
         template <class T1>
-        static void moveSingleSeparateUniquePtrFromSeToSet(std::unique_ptr<T1>* ptr,
+        static void moveSingleSeparateUniquePtrFromSetToSet(std::unique_ptr<T1>* ptr,
                                                            std::set<std::unique_ptr<T1>> *from,
                                                            std::set<std::unique_ptr<T1>> *to);
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 
 };

@@ -37,7 +37,7 @@ namespace wrench {
      *
      * @param hostname: the name of the host on which to start the service
      * @param capacity: the storage capacity in bytes
-     * @param plist: the optional property list
+     * @param plist: a property list ({} means "use all defaults")
      */
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                double capacity,
@@ -85,6 +85,7 @@ namespace wrench {
      * @return 0 on termination
      */
     int SimpleStorageService::main() {
+
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
 
@@ -140,6 +141,7 @@ namespace wrench {
       WRENCH_INFO("Simple Storage Service %s on host %s terminated!",
                   this->getName().c_str(),
                   S4U_Simulation::getHostName().c_str());
+
       return 0;
     }
 

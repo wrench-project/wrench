@@ -301,6 +301,9 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
             task);
 
   delete simulation;
+
+  free(argv[0]);
+  free(argv);
 }
 
 /**********************************************************************/
@@ -426,6 +429,9 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
             task);
 
   delete simulation;
+
+  free(argv[0]);
+  free(argv);
 }
 
 /**********************************************************************/
@@ -583,4 +589,7 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
             task);
 
   delete simulation;
+
+  free(argv[0]);
+  free(argv);
 }

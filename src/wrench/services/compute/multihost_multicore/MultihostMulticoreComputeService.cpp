@@ -8,6 +8,7 @@
  */
 
 #include <map>
+#include <wrench/util/PointerUtil.h>
 
 #include "services/ServiceMessage.h"
 #include "services/compute/ComputeServiceMessage.h"
@@ -224,7 +225,7 @@ namespace wrench {
      *        the compute resources available to this service. A number of cores equal to 0 means
      *        that all cores on the host are used.
      * @param default_storage_service: a storage service (or nullptr)
-     * @param plist: a property list
+     * @param plist: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(std::string hostname,
                                                                        bool supports_standard_jobs,
@@ -582,7 +583,7 @@ namespace wrench {
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}});
 
 
-      this->standard_job_executors.insert(executor);
+      this->standard_job_executors.insert(std::unique_ptr<StandardJobExecutor>(executor));
       this->running_jobs.insert(job);
 
       // Tell the caller that a job was dispatched!
@@ -908,11 +909,13 @@ namespace wrench {
     void MultihostMulticoreComputeService::terminateRunningStandardJob(StandardJob *job) {
 
       StandardJobExecutor *executor = nullptr;
-      for (auto e : this->standard_job_executors) {
-        if (e->getJob() == job) {
-          executor = e;
+      for (std::set<std::unique_ptr<StandardJobExecutor>>::iterator it = this->standard_job_executors.begin();
+              it != this->standard_job_executors.end(); it++) {
+        if ((*it)->getJob() == job) {
+          executor = (*it).get();
         }
       }
+
       if (executor == nullptr) {
         throw std::runtime_error(
                 "MultihostMulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
@@ -1033,11 +1036,22 @@ namespace wrench {
       }
 
       // Remove the executor from the executor list
-      if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
+      bool found_it = false;
+      for (std::set<std::unique_ptr<StandardJobExecutor>>::iterator it = this->standard_job_executors.begin();
+           it != this->standard_job_executors.end(); it++) {
+        if ((*it).get() == executor) {
+
+          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
+
+          found_it = true;
+          break;
+        }
+      }
+
+      if (!found_it) {
         throw std::runtime_error(
                 "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
-      this->standard_job_executors.erase(executor);
 
       // Remove the job from the running job list
       if (this->running_jobs.find(job) == this->running_jobs.end()) {
@@ -1078,11 +1092,21 @@ namespace wrench {
       }
 
       // Remove the executor from the executor list
-      if (this->standard_job_executors.find(executor) == this->standard_job_executors.end()) {
+      bool found_it = false;
+      for (std::set<std::unique_ptr<StandardJobExecutor>>::iterator it = this->standard_job_executors.begin();
+           it != this->standard_job_executors.end(); it++) {
+        if ((*it).get() == executor) {
+          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
+          found_it = true;
+          break;
+        }
+      }
+
+      // Remove the executor from the executor list
+      if (!found_it) {
         throw std::runtime_error(
                 "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
       }
-      this->standard_job_executors.erase(executor);
 
       // Remove the job from the running job list
       if (this->running_jobs.find(job) == this->running_jobs.end()) {

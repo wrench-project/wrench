@@ -7,14 +7,18 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_NETWORKQUERYSERVICEPROPERTY_H
-#define WRENCH_NETWORKQUERYSERVICEPROPERTY_H
+#ifndef WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H
+#define WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H
 
 #include <wrench/services/ServiceProperty.h>
 
 namespace wrench {
 
-    class NetworkQueryServiceProperty:public ServiceProperty {
+    /**
+     * @brief Properties for a NetworkProximityService
+     */
+
+    class NetworkProximityServiceProperty:public ServiceProperty {
     public:
         /** @brief The number of bytes in a request control message sent to the daemon to request a list of file locations **/
         DECLARE_PROPERTY_NAME(NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD);
@@ -37,4 +41,4 @@ namespace wrench {
 }
 
 
-#endif //WRENCH_NETWORKQUERYSERVICEPROPERTY_H
+#endif //WRENCH_NETWORKPROXIMITYSERVICEPROPERTY_H

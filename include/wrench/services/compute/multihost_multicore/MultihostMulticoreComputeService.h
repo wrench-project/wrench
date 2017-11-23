@@ -27,7 +27,7 @@ namespace wrench {
 
     class Alarm;
 
-    /**  @brief A ComputeService runs standard and pilot jobs on a set of
+    /**  @brief A ComputeService that runs on a set of
      *   multi-core hosts
      */
     class MultihostMulticoreComputeService : public ComputeService {
@@ -132,8 +132,10 @@ namespace wrench {
 
         PilotJob *containing_pilot_job; // In case this service is in fact a pilot job
 
-        // Vector of standard job executors
-        std::set<StandardJobExecutor *> standard_job_executors;
+        // Set of current standard job executors
+        std::set<std::unique_ptr<StandardJobExecutor>> standard_job_executors;
+        // Set of completed standard job executors
+        std::set<std::unique_ptr<StandardJobExecutor>> completed_job_executors;
 
         // Set of running jobs
         std::set<WorkflowJob *> running_jobs;

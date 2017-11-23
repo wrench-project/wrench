@@ -21,7 +21,7 @@
 namespace wrench {
 
     /**
-     * @brief A workflow computational task
+     * @brief A computational task in a Workflow
      */
     class WorkflowTask {
 
