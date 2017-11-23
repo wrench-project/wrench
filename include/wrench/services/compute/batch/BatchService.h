@@ -27,11 +27,13 @@
 
 namespace wrench {
 
-    class BatchService: public ComputeService {
 
     /**
-     * @brief A Batch Service
+     * @brief A batch-scheduled ComputeService
      */
+    class BatchService: public ComputeService {
+
+
 
 
     private:
@@ -40,12 +42,12 @@ namespace wrench {
                  {BatchServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
                  {BatchServiceProperty::THREAD_STARTUP_OVERHEAD,              "0"},
                  {BatchServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,    "1024"},
+                 {BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
                  {BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,    "1024"},
+                 {BatchServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,        "1024"},
                  {BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,        "1024"},
                  {BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,  "1024"},
                  {BatchServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,    "1024"},
-                 {BatchServiceProperty::SUBMIT_BATCH_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
-                 {BatchServiceProperty::SUBMIT_BATCH_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
                  {BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,           "1024"},
@@ -54,19 +56,29 @@ namespace wrench {
                 };
 
     public:
+
+        /* Public constructor */
         BatchService(std::string hostname,
-        std::vector<std::string> nodes_in_network,
+        std::vector<std::string> compute_nodes,
                      StorageService *default_storage_service,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
                 std::map<std::string, std::string> plist = {});
 
-       ~BatchService() override ;
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+
+       ~BatchService() override;
 
         //cancels the job
 //        void cancelJob(unsigned long jobid);
         //returns jobid,started time, running time
         std::vector<std::tuple<unsigned long,double,double>> getJobsInQueue();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
 
     private:

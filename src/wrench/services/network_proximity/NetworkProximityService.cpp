@@ -90,9 +90,9 @@ namespace wrench {
 
 
     /**
-     * @brief Lookup for the proximity value in database
+     * @brief Look up for the proximity value in database
      * @param hosts: the pair of hosts to look for the proximity value
-     * @return The proximity value between those pair of hosts
+     * @return The proximity value between the pair of hosts
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -106,7 +106,7 @@ namespace wrench {
         try {
             S4U_Mailbox::putMessage(this->mailbox_name, new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
                                                                                                  this->getPropertyValueAsDouble(
-                                                                                                         NetworkQueryServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
+                                                                                                         NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {
             throw WorkflowExecutionException(cause);
         }
@@ -127,7 +127,7 @@ namespace wrench {
     }
 
     /**
-     * Internal method to add an entry to the database
+     * @brief Internal method to add an entry to the database
      * @param pair: a pair of hosts
      * @param proximity_value: proximity value between the pair
      */
@@ -191,7 +191,7 @@ namespace wrench {
                 this->hosts_in_network.clear();
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                                NetworkQueryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                                NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 
             } catch (std::shared_ptr<NetworkError> cause) {
                 return false;
@@ -210,7 +210,7 @@ namespace wrench {
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                          new NetworkProximityLookupAnswerMessage(msg->hosts,proximityValue,
                                                                                  this->getPropertyValueAsDouble(
-                                                                                         NetworkQueryServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
+                                                                                         NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
             }
             catch (std::shared_ptr<NetworkError> cause) {
                 return true;
@@ -240,7 +240,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                      new NextContactDaemonAnswerMessage(network_daemons.at(random_number)->getHostname(),network_daemons.at(random_number)->mailbox_name,
                                                                         this->getPropertyValueAsDouble(
-                                                                                NetworkQueryServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
+                                                                                NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
 
         }  else {

@@ -86,7 +86,7 @@ namespace wrench {
         S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                  new NextContactDaemonRequestMessage(this->mailbox_name,
                                                                      this->getPropertyValueAsDouble(
-                                                                             NetworkQueryServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+                                                                             NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
 
 
         bool life = true;
@@ -107,7 +107,7 @@ namespace wrench {
                         S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                                 new NetworkProximityTransferMessage(msg_to_send,
                                                                                     this->getPropertyValueAsDouble(
-                                                                                            NetworkQueryServiceProperty::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD)));
+                                                                                            NetworkProximityServiceProperty::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD)));
 
 
                     } catch (std::shared_ptr<NetworkError> cause) {
@@ -127,7 +127,7 @@ namespace wrench {
                     S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                              new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
                                                                                       this->getPropertyValueAsDouble(
-                                                                                              NetworkQueryServiceProperty::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD)));
+                                                                                              NetworkProximityServiceProperty::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD)));
                     next_host_to_send = "";
                     next_mailbox_to_send = "";
 
@@ -140,7 +140,7 @@ namespace wrench {
                     S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                              new NextContactDaemonRequestMessage(this->mailbox_name,
                                                                                  this->getPropertyValueAsDouble(
-                                                                                         NetworkQueryServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+                                                                                         NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
                 }
 
             }
@@ -181,7 +181,7 @@ namespace wrench {
             try {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                                NetworkQueryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                                NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
             } catch (std::shared_ptr<NetworkError> cause) {
                 return false;
             }

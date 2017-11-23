@@ -13,6 +13,9 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL    */
+    /***********************/
 
 //    template <class T>
 //    void PointerUtil::moveUniquePtrFromSetToSet(
@@ -27,7 +30,7 @@ namespace wrench {
 //    }
 
     template <class T>
-    void PointerUtil::moveSingleSeparateUniquePtrFromSeToSet(std::unique_ptr<T>* ptr,
+    void PointerUtil::moveSingleSeparateUniquePtrFromSetToSet(std::unique_ptr<T>* ptr,
                                                        std::set<std::unique_ptr<T>> *from,
                                                        std::set<std::unique_ptr<T>> *to){
       auto tmp = const_cast<std::unique_ptr<T>&&>(*ptr);
@@ -35,9 +38,12 @@ namespace wrench {
       (*to).insert(std::move(tmp));
     };
 
-    template void PointerUtil::moveSingleSeparateUniquePtrFromSeToSet<StandardJobExecutor>(std::unique_ptr<StandardJobExecutor> *ptr,
+    template void PointerUtil::moveSingleSeparateUniquePtrFromSetToSet<StandardJobExecutor>(std::unique_ptr<StandardJobExecutor> *ptr,
                                                                       std::set<std::unique_ptr<StandardJobExecutor>> *from,
                                                                       std::set<std::unique_ptr<StandardJobExecutor>> *to);
 
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
