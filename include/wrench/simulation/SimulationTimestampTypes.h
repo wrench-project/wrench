@@ -34,6 +34,9 @@ namespace wrench {
           this->task = task;
         }
 
+        ~SimulationTimestampTaskCompletion() {
+        }
+
         /***********************/
         /** \endcond           */
         /***********************/
