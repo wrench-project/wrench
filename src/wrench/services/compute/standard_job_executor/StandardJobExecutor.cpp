@@ -612,6 +612,8 @@ namespace wrench {
         }
       }
 
+      task_work_units.clear();
+
       return;
     }
 
