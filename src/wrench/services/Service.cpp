@@ -40,7 +40,11 @@ namespace wrench {
    * @param value: the property value
    */
     void Service::setProperty(std::string property, std::string value) {
-      this->property_list.insert(std::make_pair(property, value));
+      if (this->property_list.find(property) != this->property_list.end()) {
+        this->property_list[property] = value;
+      } else {
+        this->property_list.insert(std::make_pair(property, value));
+      }
     }
 
     /**
