@@ -464,9 +464,16 @@ namespace wrench {
               continue;
             }
 
-            if ((picked_num_cores == 0) || (picked_num_cores < MIN(num_available_cores, t->getMaxNumCores()))) {
+            unsigned long desired_num_cores;
+            if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) == "maximum") {
+              desired_num_cores = t->getMaxNumCores();
+            } else {
+              desired_num_cores = t->getMinNumCores();
+            }
+
+            if ((picked_num_cores == 0) || (picked_num_cores < MIN(num_available_cores, desired_num_cores))) {
               picked_host = hostname;
-              picked_num_cores = MIN(num_available_cores, t->getMaxNumCores());
+              picked_num_cores = MIN(num_available_cores, desired_num_cores);
             }
           }
 
@@ -546,11 +553,19 @@ namespace wrench {
 
 //      WRENCH_INFO("*** THERE ARE POSSIBLE HOSTS FOR THIS JOB!!");
 
-      // Compute the max num cores usable by a job task
-      unsigned long maximum_num_cores = 0;
-      for (auto t : job->getTasks()) {
-        maximum_num_cores = MAX(maximum_num_cores, t->getMaxNumCores());
-      }
+//      // Compute the max num cores usable by a job task
+//      unsigned long maximum_num_cores = 0;
+//      for (auto t : job->getTasks()) {
+//        WRENCH_INFO("===> %s", this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM).c_str()
+//        );
+//        if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) == "minimum") {
+//          maximum_num_cores = MAX(maximum_num_cores, t->getMinNumCores());
+//        } else {
+//          maximum_num_cores = MAX(maximum_num_cores, t->getMaxNumCores());
+//        }
+//      }
+//
+//      WRENCH_INFO("MAXIMUM NUMBER OF CORES = %ld", maximum_num_cores);
 
       // Allocate resources for the job based on resource allocation strategies
       std::set<std::pair<std::string, unsigned long>> compute_resources;
