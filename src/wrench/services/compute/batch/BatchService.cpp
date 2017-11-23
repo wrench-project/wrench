@@ -29,7 +29,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 namespace wrench {
 
     BatchService::~BatchService() {
-        WRENCH_INFO("In the destructor right now\n");
+        WRENCH_INFO("In the Batch Service destructor\n");
+        this->default_property_values.clear();
     }
 
     /**
