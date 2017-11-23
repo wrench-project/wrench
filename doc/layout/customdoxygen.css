@@ -511,6 +511,7 @@ span.SRScope {
 .contents h1 {
     font-size: 22px;
     font-weight: 700 !important;
+    padding-top: 30px;
     padding-bottom: 5px;
     border-bottom: 1px solid #ddd;
 }
@@ -518,6 +519,7 @@ span.SRScope {
 .contents h2 {
     font-size: 18px;
     font-weight: 700 !important;
+    padding-top: 15px;
 }
 
 .contents h3 {

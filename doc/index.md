@@ -37,11 +37,11 @@ Through the use of SimGrid, WRENCH provides the ability to:
 
 # Architecture #                        {#overview-architecture}
 
-WRENCH is an _open-source library_ for deloping simulators. It is neither a graphical 
+WRENCH is an _open-source library_ for developing simulators. It is neither a graphical 
 interface nor a stand-alone simulator. WRENCH exposes several high-level simulation 
 abstractions to provide the **building blocks** for developing custom simulators. 
 
-WRENCH comprises four disctinct modules, each designed as a simulation component:
+WRENCH comprises four distinct modules, each designed as a simulation component:
 
 - **Simulation Engine:** the simulation code that provides the necessary models to simulate arbitrarily interconnected hardware resources (compute, network, and storage).
 - **Compute Services:** abstractions for the simulated infrastructure components that can execute workflow tasks (e.g., bare-metal servers, cloud platforms, batch-scheduled clusters, etc.).
