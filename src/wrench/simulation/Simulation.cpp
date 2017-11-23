@@ -60,8 +60,6 @@ namespace wrench {
      */
     Simulation::~Simulation() {
       this->s4u_simulation->shutdown();
-      WRENCH_INFO("IN SIMULATION DESTRUCTOR!!");
-
     }
 
     /**
