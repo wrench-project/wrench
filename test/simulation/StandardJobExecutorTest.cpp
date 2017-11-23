@@ -2098,8 +2098,6 @@ private:
       //Initialize with non-deterministic seeds
       rng.seed(std::random_device{}());
 
-
-
       for (int trial =0; trial < 500; trial++) {
         WRENCH_INFO("Trial %d", trial);
 
