@@ -2099,8 +2099,7 @@ private:
       rng.seed(std::random_device{}());
 
 
-
-      for (int trial =0; trial < 500; trial++) {
+      for (int trial =0; trial < 100; trial++) {
         WRENCH_INFO("Trial %d", trial);
 
         /**  Create a 4-task job and kill it **/
