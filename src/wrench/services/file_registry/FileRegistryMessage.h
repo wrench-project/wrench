@@ -13,6 +13,7 @@
 
 
 #include <services/ServiceMessage.h>
+#include <iostream>
 
 namespace wrench {
 

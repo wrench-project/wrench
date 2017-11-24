@@ -56,6 +56,9 @@ namespace wrench {
 
         void removeEntry(WorkflowFile *file, StorageService *storage_service);
 
+        ~FileRegistryService() {
+          this->default_property_values.clear();
+        }
 
     private:
 
