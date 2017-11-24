@@ -97,15 +97,15 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
-
       // Do a few lookups from the file registry service
       for (auto f : {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
-        if (file_registry_service->lookupEntry(f) !=
-            std::set<wrench::StorageService *>({this->test->storage_service_1000})) {
+        std::set<wrench::StorageService*> result = file_registry_service->lookupEntry(f);
+        if ((result.size() != 1)  || (*(result.begin()) != this->test->storage_service_1000)) {
           throw std::runtime_error(
                   "File registry service should know that file " + f->getId() + " is on storage service " +
                   this->test->storage_service_1000->getName());
         }
+
       }
 
       // Do a few queries to storage services
@@ -221,6 +221,7 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while submitting a file copy operations");
       }
+
 
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -377,6 +378,8 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -490,6 +493,8 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -650,6 +655,8 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -871,6 +878,8 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -1105,4 +1114,6 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }

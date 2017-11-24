@@ -43,7 +43,7 @@ tar xf @WRENCHRelease.tar.gz
 cd @WRENCHRelease
 cmake .
 make
-make install
+make install # try "sudo make install" if you don't have the permission to write
 ~~~~~~~~~~~~~
 
 If you want to stay on the bleeding edge, you should get the latest git version, and recompile it as you would do for an official archive:

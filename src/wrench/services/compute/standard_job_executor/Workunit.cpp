@@ -8,6 +8,7 @@
  */
 
 #include <wrench/workflow/job/StandardJob.h>
+#include <iostream>
 #include "wrench/services/compute/standard_job_executor/Workunit.h"
 
 namespace wrench {
@@ -46,7 +47,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Workunit::addDependency(std::shared_ptr<Workunit> parent, std::shared_ptr<Workunit> child) {
+    void Workunit::addDependency(Workunit *parent, Workunit *child) {
       if ((parent == nullptr) || (child == nullptr)) {
         throw std::invalid_argument("Workunit::addDependency(): Invalid arguments");
       }

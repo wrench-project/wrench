@@ -11,6 +11,7 @@
 #define WRENCH_SIMULATIONTIMESTAMP_H
 
 
+#include <iostream>
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
@@ -61,6 +62,11 @@ namespace wrench {
         /***********************/
         /** \endcond           */
         /***********************/
+
+
+        ~SimulationTimestamp() {
+          delete this->content;
+        }
 
     private:
         double date = -1.0;
