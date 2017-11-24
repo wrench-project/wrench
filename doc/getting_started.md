@@ -26,7 +26,7 @@ one of the following commands:
 
 ~~~~~~~~~~~~~{.sh}
 # running the cloud-based implementation
-wrench-simple-wms-cloud <PATH-TO-WRENCH-SRC-FOLDER>/examples/two_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
+wrench-simple-wms-cloud <PATH-TO-WRENCH-SRC-FOLDER>/examples/cloud_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
 
 # running the batch-based implementation
 wrench-simple-wms-batch <PATH-TO-WRENCH-SRC-FOLDER>/examples/two_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
@@ -38,14 +38,14 @@ The `simple-wms` example requires two arguments: (1) a [SimGrid virtual platform
 description file](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html); and
 (2) a WRENCH workflow file.
 
-_**SimGrid virtual platform description file:**_ 
+**SimGrid virtual platform description file:** 
 In [SimGrid](http://simgrid.gforge.inria.fr), any study must entail the description 
 of the platform on which you want to simulate your application. This file includes 
 definitions of computing hosts, clusters, storage, network links and routes, etc.
 A detailed description on how to build your platform description file can be found
 [here](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html).
 
-_**WRENCH workflow file:**_ 
+**WRENCH workflow file:**
 WRENCH provides native parsers for [DAX](http://workflowarchive.org) (DAG in XML) 
 and [JSON](http://workflowhub.org/traces/) formats. Please, refer to the hyperlinked
 texts for their respective documentations.
