@@ -60,7 +60,6 @@ namespace wrench {
      */
     Simulation::~Simulation() {
       this->s4u_simulation->shutdown();
-
     }
 
     /**

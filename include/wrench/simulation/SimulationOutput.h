@@ -14,6 +14,7 @@
 
 #include <typeinfo>
 #include <typeindex>
+#include <iostream>
 
 #include "wrench/simulation/SimulationTimestamp.h"
 #include "wrench/simulation/SimulationTrace.h"
@@ -67,6 +68,12 @@ namespace wrench {
         /** \endcond          */
         /***********************/
 
+        ~SimulationOutput() {
+          for (auto t : this->traces) {
+            delete t.second;
+          }
+          this->traces.clear();
+        }
 
     private:
         std::map<std::type_index, GenericSimulationTrace*> traces;

@@ -53,7 +53,7 @@ namespace wrench {
             std::string hostname,
             unsigned long num_cores,
             std::string callback_mailbox,
-            std::shared_ptr<Workunit> workunit,
+            Workunit *workunit,
             StorageService *default_storage_service,
             double thread_startup_overhead) :
             S4U_Daemon("workunit_multicore_executor_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber())) {
@@ -157,17 +157,21 @@ namespace wrench {
                     this->callback_mailbox.c_str());
       }
 
+
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
       } catch (std::shared_ptr<NetworkError> cause) {
         WRENCH_INFO("Work unit executor on can't report back due to network error.. aborting!");
+        this->workunit = nullptr; // To decrease the ref count
         return 0;
       } catch (std::shared_ptr<FatalFailure> cause) {
         WRENCH_INFO("Work unit executor got a fatal failure... aborting!");
+        this->workunit = nullptr; // To decrease the ref count
         return 0;
       }
 
       WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
+      this->workunit = nullptr; // To decrease the ref count
       return 0;
     }
 
@@ -178,7 +182,7 @@ namespace wrench {
      * @param work: the work to perform
      */
     void
-    WorkunitMulticoreExecutor::performWork(std::shared_ptr<Workunit> work) {
+    WorkunitMulticoreExecutor::performWork(Workunit *work) {
 
       /** Perform all pre file copies operations */
       for (auto file_copy : work->pre_file_copies) {

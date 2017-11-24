@@ -10,6 +10,47 @@ Getting Started                        {#getting-started}
 The first step is to have WRENCH library installed. If it is not done yet, please 
 follow the instructions to [install it](@ref install).
 
+# Running a First Example #         {#getting-started-example}
+
+WRENCH distribution provides an example WMS implementation (`simple-wms`) available 
+in the `examples` folder. A simple installation via `make && make install` already
+compiles all examples.
+
+WRENCH provides two implementations for the `simple-wms` example: a cloud-based 
+implementation `wrench-simple-wms-cloud`, and an implementation to run workflows 
+in a batch system (e.g., SLURM) `wrench-simple-wms-batch`.
+
+A successful WRENCH installation will put the examples binaries in the `/usr/local/bin` 
+folder (for MacOS and most Linux distributions). To run the examples, simply use 
+one of the following commands:
+
+~~~~~~~~~~~~~{.sh}
+# running the cloud-based implementation
+wrench-simple-wms-cloud <PATH-TO-WRENCH-SRC-FOLDER>/examples/cloud_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
+
+# running the batch-based implementation
+wrench-simple-wms-batch <PATH-TO-WRENCH-SRC-FOLDER>/examples/two_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
+~~~~~~~~~~~~~
+
+## Understanding the Simple-WMS Examples      {#getting-started-example-simplewms}
+
+The `simple-wms` example requires two arguments: (1) a [SimGrid virtual platform 
+description file](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html); and
+(2) a WRENCH workflow file.
+
+**SimGrid virtual platform description file:** 
+In [SimGrid](http://simgrid.gforge.inria.fr), any study must entail the description 
+of the platform on which you want to simulate your application. This file includes 
+definitions of computing hosts, clusters, storage, network links and routes, etc.
+A detailed description on how to build your platform description file can be found
+[here](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html).
+
+**WRENCH workflow file:**
+WRENCH provides native parsers for [DAX](http://workflowarchive.org) (DAG in XML) 
+and [JSON](http://workflowhub.org/traces/) formats. Please, refer to the hyperlinked
+texts for their respective documentations.
+
+
 # Preparing the Environment #         {#getting-started-prep}
 
 @WRENCHNotInternalDoc

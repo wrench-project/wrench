@@ -29,6 +29,7 @@ namespace wrench {
     public:
 
         SimulationMessage(std::string name, double payload);
+        virtual ~SimulationMessage(){};
 
         virtual std::string getName();
 

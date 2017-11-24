@@ -25,6 +25,9 @@ namespace wrench {
     /** @brief A dummy top-level class */
     class GenericSimulationTrace {
 
+    public:
+        virtual ~GenericSimulationTrace() {}
+
     };
     /***********************/
     /** \endcond           */
@@ -61,6 +64,12 @@ namespace wrench {
          */
         std::vector<SimulationTimestamp<T> *> getTrace() {
           return this->trace;
+        }
+
+        ~SimulationTrace<T>() {
+          for (auto s : this->trace) {
+            delete s;
+          }
         }
 
     private:
