@@ -69,7 +69,7 @@ namespace wrench {
         /** \cond INTERNAL    */
         /***********************/
 
-       ~BatchService() override;
+       ~BatchService();
 
         //cancels the job
 //        void cancelJob(unsigned long jobid);

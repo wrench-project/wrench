@@ -51,7 +51,7 @@ protected:
               "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
               "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-              "       <link id=\"2\" bandwidth=\"1000GBps\" latency=\"0us\"/>"
+              "       <link id=\"2\" bandwidth=\"1000GBps\" latency=\"1000us\"/>"
               "       <link id=\"3\" bandwidth=\"2000GBps\" latency=\"0us\"/>"
               "       <link id=\"4\" bandwidth=\"3000GBps\" latency=\"0us\"/>"
               "       <link id=\"5\" bandwidth=\"8000GBps\" latency=\"0us\"/>"
