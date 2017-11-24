@@ -25,6 +25,8 @@ namespace wrench {
      * @brief Top-level SimulationMessage class
      */
     class ServiceMessage : public SimulationMessage {
+    public:
+      virtual ~ServiceMessage(){};
     protected:
         ServiceMessage(std::string name, double payload);
 
@@ -35,6 +37,8 @@ namespace wrench {
      */
     class ServiceStopDaemonMessage : public ServiceMessage {
     public:
+        ~ServiceStopDaemonMessage(){};
+
         ServiceStopDaemonMessage(std::string ack_mailbox, double payload);
 
         /** @brief the mailbox to which the "I stopped" ack should be sent */

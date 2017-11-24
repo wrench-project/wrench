@@ -101,10 +101,14 @@ namespace wrench {
       }
 
       if (FileRegistryFileLookupAnswerMessage *msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
-        return msg->locations;
+        std::set<StorageService *> result = msg->locations;
+//        msg->locations.clear(); // TODO: Understand why this removes a memory leak
+        return result;
       } else {
         throw std::runtime_error("FileRegistryService::lookupEntry(): Unexpected [" + message->getName() + "] message");
       }
+
+
     }
 
 
