@@ -99,7 +99,8 @@ namespace wrench {
         WRENCH_INFO("Killing compute thread [%s]", this->compute_threads[i]->getName().c_str());
         this->compute_threads[i]->kill();
       }
-      this->compute_threads.clear();
+//      WRENCH_INFO("Clearing before everything got killed\n");
+//      this->compute_threads.clear();
 
     }
 
