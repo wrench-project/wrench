@@ -98,6 +98,7 @@ namespace wrench {
       std::vector<simgrid::s4u::Host *> host_list;
       this->engine->getHostList(&host_list);
       std::vector<std::string> hostname_list;
+      hostname_list.reserve(host_list.size());
       for (auto h : host_list) {
         hostname_list.push_back(h->getName());
       }

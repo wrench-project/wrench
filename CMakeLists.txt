@@ -186,7 +186,10 @@ set(TEST_FILES
         test/simulation/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
         test/simulation/BatchServiceTest.cpp
-        test/simulation/NoopScheduler.cpp test/simulation/NoopScheduler.h)
+        test/simulation/CloudServiceTest.cpp
+        test/simulation/NoopScheduler.cpp
+        test/simulation/NoopScheduler.h
+        )
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)

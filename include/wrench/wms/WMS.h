@@ -52,7 +52,7 @@ namespace wrench {
 
         WMS(Workflow *workflow,
             std::unique_ptr<Scheduler> scheduler,
-            std::string hostname,
+            std::string &hostname,
             std::string suffix);
 
         void runDynamicOptimizations();

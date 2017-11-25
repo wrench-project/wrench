@@ -8,13 +8,10 @@
  * (at your option) any later version.
  */
 
-
 #include <wrench-dev.h>
 
 #include "NoopScheduler.h"
 
 void NoopScheduler::scheduleTasks(wrench::JobManager *job_manager,
                                   std::map<std::string, std::vector<wrench::WorkflowTask *>> ready_tasks,
-                                  const std::set<wrench::ComputeService *> &compute_services) {
-  return;
-}
+                                  const std::set<wrench::ComputeService *> &compute_services) {}
