@@ -225,6 +225,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 /**********************************************************************/
@@ -355,6 +357,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 /**********************************************************************/
@@ -487,6 +491,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -624,6 +630,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -761,6 +769,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
 
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -897,6 +907,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
 
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -1044,6 +1056,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
 
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -1189,6 +1203,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   }
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -1335,4 +1351,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   }
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
