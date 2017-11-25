@@ -208,6 +208,8 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
