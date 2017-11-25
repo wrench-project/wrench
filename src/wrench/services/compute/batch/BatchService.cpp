@@ -509,6 +509,7 @@ namespace wrench {
 
       switch (next_job->getType()) {
         case WorkflowJob::STANDARD: {
+          auto job = (StandardJob*) next_job;
           WRENCH_INFO("Creating a StandardJobExecutor on %ld cores for a standard job on %ld nodes",
                       cores_per_node_asked_for, num_nodes_asked_for);
           // Create a standard job executor
@@ -516,30 +517,33 @@ namespace wrench {
                   this->simulation,
                   this->mailbox_name,
                   std::get<0>(*resources.begin()),
-                  (StandardJob *) next_job,
+                  job,
                   resources,
                   this->default_storage_service,
                   {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                            this->getPropertyValueAsString(
                                    BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}});
-          this->running_standard_job_executors.insert(std::unique_ptr<StandardJobExecutor>(executor));
+          std::unique_ptr<StandardJobExecutor> executor_uniq_ptr = std::unique_ptr<StandardJobExecutor>(executor);
+          this->running_standard_job_executors.insert(std::move(executor_uniq_ptr));
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
+
+          this->running_jobs.insert(std::move(batch_job_ptr));
 
 //          this->timeslots.push_back(batch_job->getEndingTimeStamp());
           //remember the allocated resources for the job
           batch_job->setAllocatedResources(resources);
 
           SimulationMessage* msg =
-                  new AlarmJobTimeOutMessage((StandardJob *) batch_job->getWorkflowJob(), 0);
+                  new AlarmJobTimeOutMessage(job, 0);
 
 
-            std::unique_ptr<Alarm> ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+            std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
                                                   "batch_standard"));
 
 //            this->sent_alrm_msgs.push_back(msg);
 //
-            this->running_jobs.insert(std::move(batch_job_ptr));
-          standard_job_alarms.push_back(std::move(ptr));
+
+          standard_job_alarms.push_back(std::move(alarm_ptr));
 
 
           return true;
@@ -594,11 +598,11 @@ namespace wrench {
           SimulationMessage* msg =
                   new AlarmJobTimeOutMessage(job, 0);
 
-            std::unique_ptr<Alarm> ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
+            std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
                                                                           "batch_pilot"));
 
 //            this->sent_alrm_msgs.push_back(msg);
-          this->pilot_job_alarms.push_back(std::move(ptr));
+          this->pilot_job_alarms.push_back(std::move(alarm_ptr));
 
 
           return true;

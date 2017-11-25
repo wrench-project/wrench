@@ -143,6 +143,7 @@ private:
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                         thread_startup_overhead)}}
         );
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
