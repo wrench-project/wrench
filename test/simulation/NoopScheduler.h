@@ -19,9 +19,8 @@ class NoopScheduler : public wrench::Scheduler {
 public:
     void scheduleTasks(wrench::JobManager *job_manager,
                        std::map<std::string, std::vector<wrench::WorkflowTask *>> ready_tasks,
-                       const std::set<wrench::ComputeService *> &compute_services);
+                       const std::set<wrench::ComputeService *> &compute_services) override;
 
 };
-
 
 #endif //WRENCH_NOOPSCHEDULER_H

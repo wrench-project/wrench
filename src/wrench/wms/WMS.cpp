@@ -28,7 +28,7 @@ namespace wrench {
      */
     WMS::WMS(Workflow *workflow,
              std::unique_ptr<Scheduler> scheduler,
-             std::string hostname,
+             std::string &hostname,
              std::string suffix) :
             S4U_Daemon("wms_" + suffix, "wms_" + suffix),
             workflow(workflow),

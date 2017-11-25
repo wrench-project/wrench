@@ -158,8 +158,8 @@ namespace wrench {
 
       // Check that at least one ComputeService is running
       bool one_compute_service_running = false;
-      for (auto it = this->compute_services.begin(); it != this->compute_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
+      for (const auto &compute_service : this->compute_services) {
+        if (compute_service->state == Service::UP) {
           one_compute_service_running = true;
           break;
         }
@@ -170,10 +170,10 @@ namespace wrench {
       }
 
       // Check that at least one StorageService is running (only needed if there are files in the workflow)
-      if (this->wms->workflow->getFiles().size() > 0) {
+      if (!this->wms->workflow->getFiles().empty()) {
         bool one_storage_service_running = false;
-        for (auto it = this->storage_services.begin(); it != this->storage_services.end(); it++) {
-          if ((*it)->state == Service::UP) {
+        for (const auto &storage_service : this->storage_services) {
+          if (storage_service->state == Service::UP) {
             one_storage_service_running = true;
           }
         }
@@ -184,7 +184,7 @@ namespace wrench {
       }
 
       // Check that a FileRegistryService is running if needed
-      if (this->wms->workflow->getInputFiles().size() > 0) {
+      if (!this->wms->workflow->getInputFiles().empty()) {
         if (not this->file_registry_service) {
           throw std::runtime_error(
                   "Simulation::launch(): A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()"
@@ -200,7 +200,7 @@ namespace wrench {
         }
       }
 
-
+      // run the simulation
       try {
         this->s4u_simulation->runSimulation();
       } catch (std::runtime_error &e) {

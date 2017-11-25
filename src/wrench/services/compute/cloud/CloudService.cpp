@@ -415,6 +415,7 @@ namespace wrench {
      */
     void CloudService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                                 std::map<std::string, std::string> &service_specific_args) {
+
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
       if (not this->supportsStandardJobs()) {
         try {
