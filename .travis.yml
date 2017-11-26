@@ -161,7 +161,7 @@ after_success:
     fi
   # sonarcloud
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      build-wrapper-linux-x86-64 --out-dir bw-output make all unit_tests;
+      build-wrapper-linux-x86-64 --out-dir bw-output make all;
       sonar-scanner -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN;
     fi
 
