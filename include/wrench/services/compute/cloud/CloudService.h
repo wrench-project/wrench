@@ -17,6 +17,7 @@
 #include "wrench/services/compute/ComputeService.h"
 #include "CloudServiceProperty.h"
 #include "wrench/simulation/Simulation.h"
+#include "wrench/workflow/job/PilotJob.h"
 
 namespace wrench {
 
@@ -40,7 +41,9 @@ namespace wrench {
                  {CloudServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
                  {CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
                  {CloudServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"}
+                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {CloudServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
+                 {CloudServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"}
                 };
 
     public:
@@ -48,7 +51,7 @@ namespace wrench {
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
                      StorageService *default_storage_service,
-                     std::map<std::string, std::string> plist);
+                     std::map<std::string, std::string> plist = {});
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -89,6 +92,8 @@ namespace wrench {
 
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                       std::map<std::string, std::string> &service_specific_args) override;
+
+        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) override;
 
         void terminate();
 

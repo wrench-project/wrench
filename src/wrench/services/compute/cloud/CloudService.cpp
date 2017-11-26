@@ -37,7 +37,7 @@ namespace wrench {
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
                                StorageService *default_storage_service,
-                               std::map<std::string, std::string> plist = {}) :
+                               std::map<std::string, std::string> plist) :
             ComputeService("cloud_service", "cloud_service", supports_standard_jobs, supports_pilot_jobs,
                            default_storage_service) {
 
@@ -277,6 +277,10 @@ namespace wrench {
         processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
 
+      } else if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
+        processSubmitPilotJob(msg->answer_mailbox, msg->job);
+        return true;
+
       } else if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         this->terminate();
         // This is Synchronous
@@ -313,7 +317,7 @@ namespace wrench {
                                        int num_cores,
                                        bool supports_standard_jobs,
                                        bool supports_pilot_jobs,
-                                       std::map<std::string, std::string> plist = {}) {
+                                       std::map<std::string, std::string> plist) {
 
       WRENCH_INFO("Asked to create a VM on %s with %d cores", pm_hostname.c_str(), num_cores);
 
@@ -457,6 +461,72 @@ namespace wrench {
                         job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
                         this->getPropertyValueAsDouble(
                                 ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
+
+    /**
+     * @brief Process a submit pilot job request
+     *
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
+    void CloudService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) {
+
+      WRENCH_INFO("Asked to run a pilot job with %ld hosts and %ld cores per host for %lf seconds",
+                  job->getNumHosts(), job->getNumCoresPerHost(), job->getDuration());
+
+      if (not this->supportsPilotJobs()) {
+        try {
+          S4U_Mailbox::dputMessage(
+                  answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
+                          job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
+                          this->getPropertyValueAsDouble(
+                                  CloudServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          return;
+        }
+        return;
+      }
+
+      // count the number of hosts that have enough cores
+      bool available_host = false;
+
+      for (auto &vm : vm_list) {
+        if (std::get<2>(vm.second) >= job->getNumCoresPerHost()) {
+          ComputeService *cs = std::get<1>(vm.second).get();
+          std::map<std::string, std::string> service_specific_arguments;
+          cs->submitPilotJob(job, service_specific_arguments);
+          available_host = true;
+          break;
+        }
+      }
+
+      // Do we have enough hosts?
+      // currently, the cloud service does not support
+      if (job->getNumHosts() > 1 || not available_host) {
+        try {
+          S4U_Mailbox::dputMessage(
+                  answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
+                          job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
+                          this->getPropertyValueAsDouble(
+                                  CloudServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          return;
+        }
+        return;
+      }
+
+      // success
+      try {
+        S4U_Mailbox::dputMessage(
+                answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
+                        job, this, true, nullptr,
+                        this->getPropertyValueAsDouble(
+                                CloudServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }

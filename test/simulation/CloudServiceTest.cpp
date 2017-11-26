@@ -32,6 +32,8 @@ public:
 
     void do_StandardJobTaskTest_test();
 
+    void do_PilotJobTaskTest_test();
+
     void do_NumCoresTest_test();
 
 protected:
@@ -95,13 +97,13 @@ protected:
 /**  STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST        **/
 /**********************************************************************/
 
-class CloudOneStandardJobTestWMS : public wrench::WMS {
+class CloudStandardJobTestWMS : public wrench::WMS {
 
 public:
-    CloudOneStandardJobTestWMS(CloudServiceTest *test,
-                               wrench::Workflow *workflow,
-                               std::unique_ptr<wrench::Scheduler> scheduler,
-                               std::string &hostname) :
+    CloudStandardJobTestWMS(CloudServiceTest *test,
+                            wrench::Workflow *workflow,
+                            std::unique_ptr<wrench::Scheduler> scheduler,
+                            std::string &hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -145,7 +147,7 @@ private:
     }
 };
 
-TEST_F(CloudServiceTest, CloudOneStandardJobTestWMS) {
+TEST_F(CloudServiceTest, CloudStandardJobTestWMS) {
   DO_TEST_WITH_FORK(do_StandardJobTaskTest_test);
 }
 
@@ -167,7 +169,7 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(std::unique_ptr<wrench::WMS>(
-          new CloudOneStandardJobTestWMS(this, workflow, std::unique_ptr<wrench::Scheduler>(
+          new CloudStandardJobTestWMS(this, workflow, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 
   // Create a Storage Service
@@ -176,7 +178,123 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
 
   // Create a Cloud Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::CloudService>(new wrench::CloudService(hostname, true, true, storage_service, {}))));
+          std::unique_ptr<wrench::CloudService>(new wrench::CloudService(hostname, true, false, storage_service, {}))));
+
+  // Create a file registry
+  EXPECT_NO_THROW(simulation->setFileRegistryService(
+          std::unique_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService(hostname))));
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+
+  // Running a "run a single task" simulation
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+  free(argv[0]);
+  free(argv);
+}
+
+/**********************************************************************/
+/**  PILOT JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST           **/
+/**********************************************************************/
+
+class CloudPilotJobTestWMS : public wrench::WMS {
+
+public:
+    CloudPilotJobTestWMS(CloudServiceTest *test,
+                            wrench::Workflow *workflow,
+                            std::unique_ptr<wrench::Scheduler> scheduler,
+                            std::string &hostname) :
+            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    CloudServiceTest *test;
+
+    int main() {
+      // Create a data movement manager
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
+              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+
+      // Create a job manager
+      std::unique_ptr<wrench::JobManager> job_manager =
+              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+
+      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+
+      // Create a pilot job
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 60.0);
+
+      // Submit the pilot job for execution
+      try {
+        ((wrench::CloudService *) this->test->compute_service)->createVM(
+                this->simulation->getHostnameList()[1],
+                "vm1_" + this->simulation->getHostnameList()[1],
+                1, {}
+        );
+        ((wrench::CloudService *) this->test->compute_service)->createVM(
+                this->simulation->getHostnameList()[1],
+                "vm2_" + this->simulation->getHostnameList()[1],
+                1, {}
+        );
+        ((wrench::CloudService *) this->test->compute_service)->createVM(
+                this->simulation->getHostnameList()[1],
+                "vm3_" + this->simulation->getHostnameList()[1],
+                1, {}
+        );
+        ((wrench::CloudService *) this->test->compute_service)->createVM(
+                this->simulation->getHostnameList()[1],
+                "vm4_" + this->simulation->getHostnameList()[1],
+                1, {}
+        );
+        job_manager->submitJob(pilot_job, this->test->compute_service);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      // Terminate
+      this->simulation->shutdownAllComputeServices();
+      this->simulation->shutdownAllStorageServices();
+      this->simulation->getFileRegistryService()->stop();
+      return 0;
+    }
+};
+
+TEST_F(CloudServiceTest, CloudPilotJobTestWMS) {
+  DO_TEST_WITH_FORK(do_PilotJobTaskTest_test);
+}
+
+void CloudServiceTest::do_PilotJobTaskTest_test() {
+
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("cloud_service_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(std::unique_ptr<wrench::WMS>(
+          new CloudPilotJobTestWMS(this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), hostname))));
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
+
+  // Create a Cloud Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::CloudService>(new wrench::CloudService(hostname, false, true, storage_service, {}))));
 
   // Create a file registry
   EXPECT_NO_THROW(simulation->setFileRegistryService(
