@@ -93,6 +93,8 @@ namespace wrench {
         virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                               std::map<std::string, std::string> &service_specific_args);
 
+        virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
+
         /** @brief Whether the compute service supports pilot jobs */
         bool supports_pilot_jobs;
         /** @brief Whether the compute service supports standard jobs */

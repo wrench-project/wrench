@@ -301,6 +301,18 @@ namespace wrench {
     }
 
     /**
+     * @brief Process a submit pilot job request
+     *
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
+    void ComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) {
+      throw std::runtime_error("ComputeService::processSubmitPilotJob(): Not implemented here");
+    }
+
+    /**
      * @brief Process a get number of cores request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent

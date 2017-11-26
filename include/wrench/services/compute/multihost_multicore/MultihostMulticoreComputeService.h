@@ -72,12 +72,12 @@ namespace wrench {
     public:
 
         // Public Constructor
-        MultihostMulticoreComputeService(std::string hostname,
-                                bool supports_standard_jobs,
-                                bool supports_pilot_jobs,
-                                std::set<std::pair<std::string, unsigned long>> compute_resources,
-                                StorageService *default_storage_service,
-                                std::map<std::string, std::string> plist = {});
+        MultihostMulticoreComputeService(const std::string &hostname,
+                                         bool supports_standard_jobs,
+                                         bool supports_pilot_jobs,
+                                         std::set<std::pair<std::string, unsigned long>> compute_resources,
+                                         StorageService *default_storage_service,
+                                         std::map<std::string, std::string> plist = {});
 
 
         /***********************/
@@ -110,14 +110,14 @@ namespace wrench {
         friend class Simulation;
 
         // Low-level Constructor
-        MultihostMulticoreComputeService(std::string hostname,
-                                bool supports_standard_jobs,
-                                bool supports_pilot_jobs,
-                                std::set<std::pair<std::string, unsigned long>> compute_resources,
-                                std::map<std::string, std::string> plist,
-                                double ttl,
-                                PilotJob *pj, std::string suffix,
-                                StorageService *default_storage_service);
+        MultihostMulticoreComputeService(const std::string &hostname,
+                                         bool supports_standard_jobs,
+                                         bool supports_pilot_jobs,
+                                         std::set<std::pair<std::string, unsigned long>> compute_resources,
+                                         std::map<std::string, std::string> plist,
+                                         double ttl,
+                                         PilotJob *pj, std::string suffix,
+                                         StorageService *default_storage_service);
 
         std::string hostname;
         std::set<std::pair<std::string, unsigned long>> compute_resources;
@@ -175,6 +175,7 @@ namespace wrench {
         bool dispatchPilotJob(PilotJob *job);
 
         std::set<std::pair<std::string, unsigned long>> computeResourceAllocation(StandardJob *job);
+
         std::set<std::pair<std::string, unsigned long>> computeResourceAllocationAggressive(StandardJob *job);
 
 
@@ -194,6 +195,8 @@ namespace wrench {
 
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                       std::map<std::string, std::string> &service_specific_arguments) override;
+
+        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) override;
     };
 };
 
