@@ -321,7 +321,7 @@ namespace wrench {
 
         if (simgrid::s4u::Host::by_name_or_null(vm_hostname) == nullptr) {
           if (num_cores <= 0) {
-            num_cores = S4U_Simulation::getNumCores(hostname);
+            num_cores = S4U_Simulation::getNumCores(pm_hostname);
           }
 
           simgrid::s4u::VirtualMachine *vm = new simgrid::s4u::VirtualMachine(vm_hostname.c_str(),
