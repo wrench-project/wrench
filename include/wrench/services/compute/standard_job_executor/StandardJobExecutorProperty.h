@@ -19,6 +19,9 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    /**
+     * @brief Properties for a StandardJobExecutor
+     */
     class StandardJobExecutorProperty {
 
     public:

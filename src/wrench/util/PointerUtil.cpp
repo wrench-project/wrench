@@ -17,18 +17,14 @@ namespace wrench {
     /** \cond INTERNAL    */
     /***********************/
 
-//    template <class T>
-//    void PointerUtil::moveUniquePtrFromSetToSet(
-//                          typename std::set<std::unique_ptr<T>>::iterator it,
-//                          std::set<std::unique_ptr<T>> *from,
-//                          std::set<std::unique_ptr<T>> *to) {
-//
-//      auto tmp = const_cast<std::unique_ptr<T>&&>(*it);
-//      (*from).erase(it);
-//      (*to).insert(std::move(tmp));
-//
-//    }
 
+    /**
+     * @brief An internal helper method to move a unique_ptr from a set to another
+     * @tparam T: template class
+     * @param ptr: unique pointer to an object of class T that's in a set
+     * @param from: pointer to the set in which the object is
+     * @param to: pointer to the set to which the object should be moved
+     */
     template <class T>
     void PointerUtil::moveSingleSeparateUniquePtrFromSetToSet(std::unique_ptr<T>* ptr,
                                                        std::set<std::unique_ptr<T>> *from,
@@ -38,9 +34,6 @@ namespace wrench {
       (*to).insert(std::move(tmp));
     };
 
-    template void PointerUtil::moveSingleSeparateUniquePtrFromSetToSet<StandardJobExecutor>(std::unique_ptr<StandardJobExecutor> *ptr,
-                                                                      std::set<std::unique_ptr<StandardJobExecutor>> *from,
-                                                                      std::set<std::unique_ptr<StandardJobExecutor>> *to);
 
     /***********************/
     /** \endcond           */

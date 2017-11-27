@@ -10,9 +10,14 @@
 #include "BatchService.h"
 
 namespace wrench {
+
     /***********************/
     /** \cond INTERNAL     */
     /***********************/
+
+    /**
+     * @brief An implementation of a batch scheduling algorithm to be used in a BatchService
+     */
     class BatchScheduler {
     public:
         BatchScheduler();
