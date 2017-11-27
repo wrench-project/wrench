@@ -21,6 +21,14 @@ namespace wrench {
         WRENCH_INFO("Alarm::~Alarm()::In the destructor of Alarm");
     }
 
+    /**
+     * @brief Constructor
+     * @param date: the date at this the message should be sent
+     * @param hostname: the name of the host on which the Alarm daemon should run
+     * @param reply_mailbox_name: the mailbox to which the message should be sent
+     * @param msg: the message to send
+     * @param suffix: a (possibly empty) suffix to append to the daemon name
+     */
     Alarm::Alarm(double date, std::string hostname, std::string reply_mailbox_name,
                  SimulationMessage* msg, std::string suffix):Service("alarm_service_"+suffix,"alarm_service_"+suffix) {
 
@@ -40,6 +48,11 @@ namespace wrench {
         }
     }
 
+    /**
+     * @brief Main method of the daemon
+     *
+     * @return 0 on termination
+     */
     int Alarm::main() {
         TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
         WRENCH_INFO("Alarm Service starting on host %s!", S4U_Simulation::getHostName().c_str());
@@ -61,6 +74,10 @@ namespace wrench {
         return 0;
     }
 
+    /**
+     * @brief Brutally kill the daemon
+     *
+     */
     void Alarm::kill() {
         //kill itself
         this->kill_actor();

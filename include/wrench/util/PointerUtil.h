@@ -21,10 +21,20 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    /**
+     * @brief A helper class that implements useful smart pointer operations
+     */
     class PointerUtil {
 
     public:
 
+        /**
+         * @brief A helper method to move a unique_ptr from a set to another
+         * @tparam T: template class
+         * @param ptr: unique pointer to an object of class T that's in a set
+         * @param from: pointer to the set in which the object is
+         * @param to: pointer to the set to which the object should be moved
+         */
         template<class T>
         static void moveUniquePtrFromSetToSet(
                 typename std::set<std::unique_ptr<T>>::iterator it,

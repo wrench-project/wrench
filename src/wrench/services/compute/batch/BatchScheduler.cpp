@@ -5,9 +5,18 @@
 #include "wrench/services/compute/batch/BatchScheduler.h"
 
 namespace wrench{
+
+    /**
+     * @brief Constructor
+     */
     BatchScheduler::BatchScheduler() {
 
     }
+
+    /**
+     * @brief Schedule method
+     * @return
+     */
     BatchJob* BatchScheduler::schedule_job() {
         //We currently only support FCFS
 //        if(BatchService::);

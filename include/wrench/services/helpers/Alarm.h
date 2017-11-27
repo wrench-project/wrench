@@ -24,6 +24,10 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    /**
+     * @brief A daemon that sends a message to a mailbox after some specified amount of time and then terminates
+     */
+
     class Alarm: public Service {
 
         friend class S4U_Daemon;
