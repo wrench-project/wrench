@@ -12,15 +12,15 @@ follow the instructions to [install it](@ref install).
 
 # Running a First Example #         {#getting-started-example}
 
-WRENCH distribution provides an example WMS implementation (`simple-wms`) available 
-in the `examples` folder. A simple installation via `make && make install` already
+The WRENCH distribution provides an example WMS implementation (`simple-wms`) available 
+in the `examples` folder. Note that a simple installation via `make && make install`
 compiles all examples.
 
 WRENCH provides two implementations for the `simple-wms` example: a cloud-based 
 implementation `wrench-simple-wms-cloud`, and an implementation to run workflows 
 in a batch system (e.g., SLURM) `wrench-simple-wms-batch`.
 
-A successful WRENCH installation will put the examples binaries in the `/usr/local/bin` 
+By default, a successful WRENCH installation puts the examples binaries in the `/usr/local/bin` 
 folder (for MacOS and most Linux distributions). To run the examples, simply use 
 one of the following commands:
 
@@ -39,16 +39,16 @@ description file](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html)
 (2) a WRENCH workflow file.
 
 **SimGrid virtual platform description file:** 
-In [SimGrid](http://simgrid.gforge.inria.fr), any study must entail the description 
-of the platform on which you want to simulate your application. This file includes 
-definitions of computing hosts, clusters, storage, network links and routes, etc.
-A detailed description on how to build your platform description file can be found
+Any [SimGrid](http://simgrid.gforge.inria.fr) simulation must be provided with the description 
+of the platform on which an application exeuction is to be simulates. This is done via
+a platform desctription file that includes 
+definitions of compute hosts, clusters of hosts, storage resources, network links, routes between hosts, etc.
+A detailed description on how to create a platform description file can be found
 [here](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html).
 
 **WRENCH workflow file:**
 WRENCH provides native parsers for [DAX](http://workflowarchive.org) (DAG in XML) 
-and [JSON](http://workflowhub.org/traces/) formats. Please, refer to the hyperlinked
-texts for their respective documentations.
+and [JSON](http://workflowhub.org/traces/) worfklow description file formats. Refer to their respective Web sites for detailed documentation.
 
 
 # Preparing the Environment #         {#getting-started-prep}
