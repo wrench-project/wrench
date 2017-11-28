@@ -523,13 +523,13 @@ namespace wrench {
                   {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                            this->getPropertyValueAsString(
                                    BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}});
+
           std::unique_ptr<StandardJobExecutor> executor_uniq_ptr = std::unique_ptr<StandardJobExecutor>(executor);
           this->running_standard_job_executors.insert(std::move(executor_uniq_ptr));
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
-
+            
           this->running_jobs.insert(std::move(batch_job_ptr));
 
-//          this->timeslots.push_back(batch_job->getEndingTimeStamp());
           //remember the allocated resources for the job
           batch_job->setAllocatedResources(resources);
 
@@ -540,8 +540,6 @@ namespace wrench {
             std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
                                                   "batch_standard"));
 
-//            this->sent_alrm_msgs.push_back(msg);
-//
 
           standard_job_alarms.push_back(std::move(alarm_ptr));
 
@@ -576,7 +574,6 @@ namespace wrench {
 
           // Put the job in the running queue
           this->running_jobs.insert(std::move(batch_job_ptr));
-//          this->timeslots.push_back(batch_job->getEndingTimeStamp());
 
           //remember the allocated resources for the job
           batch_job->setAllocatedResources(resources);
@@ -601,7 +598,6 @@ namespace wrench {
             std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
                                                                           "batch_pilot"));
 
-//            this->sent_alrm_msgs.push_back(msg);
           this->pilot_job_alarms.push_back(std::move(alarm_ptr));
 
 

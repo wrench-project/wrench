@@ -2172,7 +2172,6 @@ private:
                   nullptr,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
           );
-              
 
           // Sleep some random number of seconds
           double sleep_time = dist(rng);
