@@ -22,10 +22,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 namespace wrench {
 
     /**
-     * @brief Exception handler to catch SIGABRT signals from SimGrid (which should
-     * probably throw exceptions at some point)
-     *
-     * @param signal: the signal number
+     * \cond
      */
     void signal_handler(int signal) {
       if (signal == SIGABRT) {
@@ -35,6 +32,9 @@ namespace wrench {
         std::cerr << "Unexpected signal " << signal << " received\n";
       }
     }
+    /**
+     * \endcond
+     */
 
     /**
      * @brief  Constructor
