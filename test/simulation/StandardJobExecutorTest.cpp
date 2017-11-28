@@ -333,6 +333,7 @@ private:
         // Create a StandardJobExecutor that will run stuff on one host and two core
         double thread_startup_overhead = 10.0;
         bool success = true;
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr;
         try {
           wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
                   test->simulation,
@@ -344,6 +345,7 @@ private:
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
           );
+            executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
         } catch (std::runtime_error &e) {
           // Expected exception
           success = false;
@@ -497,6 +499,7 @@ private:
         // Create a StandardJobExecutor that will run stuff on one host and two core
         double thread_startup_overhead = 10.0;
         bool success = true;
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr;
         try {
           wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
                   test->simulation,
@@ -508,9 +511,12 @@ private:
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
           );
+            executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
         } catch (std::runtime_error &e) {
           throw std::runtime_error("Should have been able to create standard job executor!");
         }
+
+
 
 
         // Wait for a message on my mailbox
@@ -683,6 +689,7 @@ private:
         // Create a StandardJobExecutor that will run stuff on one host and two core
         double thread_startup_overhead = 10.0;
         bool success = true;
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr;
         try {
           wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
                   test->simulation,
@@ -694,6 +701,7 @@ private:
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
           );
+            executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
         } catch (std::runtime_error &e) {
           throw std::runtime_error("Should have been able to create standard job executor!");
         }
@@ -870,6 +878,8 @@ private:
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
 
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
@@ -935,6 +945,7 @@ private:
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1004,6 +1015,7 @@ private:
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(thread_startup_overhead)}}
         );
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1183,6 +1195,9 @@ private:
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
 
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+
+
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1271,6 +1286,8 @@ private:
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
 
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
@@ -1355,6 +1372,7 @@ private:
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1550,6 +1568,7 @@ private:
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1634,6 +1653,7 @@ private:
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
+          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -2006,6 +2026,7 @@ private:
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
         );
 
+
         // Sleep 48.20 second
         wrench::S4U_Simulation::sleep(48.20);
 
@@ -2194,6 +2215,7 @@ private:
                   nullptr,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
           );
+              
 
           // Sleep some random number of seconds
           double sleep_time = dist(rng);
