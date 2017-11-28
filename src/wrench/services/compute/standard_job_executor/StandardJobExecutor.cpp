@@ -141,6 +141,7 @@ namespace wrench {
 
       // Kill the StandardJobExecutor
       this->kill_actor();
+
     }
 
     /**
