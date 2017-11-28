@@ -40,8 +40,9 @@ namespace wrench {
      * @param process_name: the name of the simulated process/actor
      */
     S4U_Daemon::S4U_Daemon(std::string process_name)
-            : process_name(process_name),
-              mailbox_name("") {
+            {
+      this->process_name = process_name; // TODO: Why does this leak?
+      this->mailbox_name="";
       this->terminated = false;
     }
 

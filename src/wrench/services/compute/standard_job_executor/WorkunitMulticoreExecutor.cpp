@@ -44,7 +44,7 @@ namespace wrench {
      * @param num_cores: the number of cores available to the executor
      * @param callback_mailbox: the callback mailbox to which the worker
      *        thread can send "work done" messages
-     * @param workunit: the workinit to perform
+     * @param workunit: the workunit to perform
      * @param default_storage_service: the default storage service from which to read/write data (if any)
      * @param thread_startup_overhead: the thread_startup overhead, in seconds
      */

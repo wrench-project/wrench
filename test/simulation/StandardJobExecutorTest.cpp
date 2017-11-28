@@ -898,7 +898,13 @@ private:
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
+
         workflow->removeTask(task);
+
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+        // TODO: (this is a general design issue)
+        delete executor;
+
       }
 
       /** Case 2: Create a multicore task with 50% parallel efficiency that lasts one hour **/
@@ -963,6 +969,10 @@ private:
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+        // TODO: (this is a general design issue)
+        delete executor;
+
       }
 
       /** Case 3: Create a multicore task with 50% parallel efficiency and include thread startup overhead **/
@@ -1025,6 +1035,10 @@ private:
         workflow->removeTask(task);
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+        // TODO: (this is a general design issue)
+        delete executor;
 
       }
 
@@ -1214,6 +1228,10 @@ private:
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+        // TODO: (this is a general design issue)
+        delete executor;
+
       }
 
 
@@ -1293,6 +1311,10 @@ private:
         workflow->removeTask(task1);
         workflow->removeTask(task2);
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+        // TODO: (this is a general design issue)
+        delete executor;
 
       }
 
@@ -1377,6 +1399,10 @@ private:
         workflow->removeTask(task2);
         workflow->removeTask(task3);
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+        // TODO: (this is a general design issue)
+        delete executor;
 
       }
 
@@ -1565,6 +1591,10 @@ private:
         workflow->removeTask(task1);
         workflow->removeTask(task2);
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+                                                // TODO: (this is a general design issue)
+        delete executor;
       }
 
       /** Case 2: Create 4 tasks that will run in best fit manner **/
@@ -1617,9 +1647,9 @@ private:
         wrench::StandardJobExecutorDoneMessage *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
         if (!msg) {
           wrench::StandardJobExecutorFailedMessage *msg = dynamic_cast<wrench::StandardJobExecutorFailedMessage *>(message.get());
-          std::cerr << "----> " << msg->cause->toString() << "\n";
+//          std::cerr << "----> " << msg->cause->toString() << "\n";
 
-          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+          throw std::runtime_error("Unexpected '" + msg->cause->toString() + "' error");
 
         }
 
@@ -1646,6 +1676,10 @@ private:
 //        if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops()/4, task2->getEndDate())) {
 //          throw std::runtime_error("Case 2: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
 //        }
+
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+                                                // TODO: (this is a general design issue)
+        delete executor;
 
         workflow->removeTask(task1);
         workflow->removeTask(task2);
@@ -1817,6 +1851,10 @@ private:
         workflow->removeTask(task2);
         workflow->removeTask(task3);
         workflow->removeTask(task4);
+
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+        // TODO: (this is a general design issue)
+        delete executor;
       }
 
 
@@ -1981,6 +2019,11 @@ private:
         workflow->removeTask(task2);
         workflow->removeTask(task3);
         workflow->removeTask(task4);
+
+        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+        // TODO: (this is a general design issue)
+        delete executor;
+        
       }
 
 
