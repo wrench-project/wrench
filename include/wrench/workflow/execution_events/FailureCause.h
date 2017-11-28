@@ -26,9 +26,11 @@ namespace wrench {
     /** \cond DEVELOPER    */
     /***********************/
 
+
     /**
      * @brief A top-level class to describe all simulation-valid failures that can occur during
      *        workflow execution
+     *
      */
     class FailureCause {
 

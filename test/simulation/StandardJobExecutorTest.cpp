@@ -911,9 +911,9 @@ private:
 
         workflow->removeTask(task);
 
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-        // TODO: (this is a general design issue)
-        delete executor;
+//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+//        // TODO: (this is a general design issue)
+//        delete executor;
 
       }
 
@@ -980,9 +980,9 @@ private:
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-        // TODO: (this is a general design issue)
-        delete executor;
+//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+//        // TODO: (this is a general design issue)
+//        delete executor;
 
       }
 
@@ -1047,10 +1047,10 @@ private:
         workflow->removeTask(task);
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
-
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-        // TODO: (this is a general design issue)
-        delete executor;
+//
+//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+//        // TODO: (this is a general design issue)
+//        delete executor;
 
       }
 
@@ -1243,9 +1243,9 @@ private:
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-        // TODO: (this is a general design issue)
-        delete executor;
+//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+//        // TODO: (this is a general design issue)
+//        delete executor;
 
       }
 
@@ -1329,9 +1329,9 @@ private:
         workflow->removeTask(task2);
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-        // TODO: (this is a general design issue)
-        delete executor;
+//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+//        // TODO: (this is a general design issue)
+//        delete executor;
 
       }
 
@@ -1418,9 +1418,9 @@ private:
         workflow->removeTask(task3);
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-        // TODO: (this is a general design issue)
-        delete executor;
+//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+//        // TODO: (this is a general design issue)
+//        delete executor;
 
       }
 
@@ -1611,9 +1611,9 @@ private:
         workflow->removeTask(task2);
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-                                                // TODO: (this is a general design issue)
-        delete executor;
+//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+//                                                // TODO: (this is a general design issue)
+//        delete executor;
       }
 
       /** Case 2: Create 4 tasks that will run in best fit manner **/
@@ -1697,9 +1697,9 @@ private:
 //          throw std::runtime_error("Case 2: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
 //        }
 
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-                                                // TODO: (this is a general design issue)
-        delete executor;
+//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
+//                                                // TODO: (this is a general design issue)
+//        delete executor;
 
         workflow->removeTask(task1);
         workflow->removeTask(task2);

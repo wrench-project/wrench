@@ -50,10 +50,18 @@ namespace wrench {
 //        WRENCH_INFO("In the Daemon Destructor");
     }
 
-    int daemonGoodbye(void *x, void*y) {
+
+    /**
+     * \cond
+     */
+    static int daemon_goodbye(void *x, void *y) {
       WRENCH_INFO("Terminating");
       return 0;
     }
+
+    /**
+     * \endcond
+     */
 
     /**
      * @brief Start the daemon
@@ -80,7 +88,7 @@ namespace wrench {
       if (daemonized)
         this->s4u_actor->daemonize();
 
-      this->s4u_actor->onExit(daemonGoodbye, (void *)(this->process_name.c_str()));
+      this->s4u_actor->onExit(daemon_goodbye, (void *) (this->process_name.c_str()));
 
 
       // Set the mailbox receiver
