@@ -40,8 +40,9 @@ namespace wrench {
      * @param process_name: the name of the simulated process/actor
      */
     S4U_Daemon::S4U_Daemon(std::string process_name)
-            : process_name(process_name),
-              mailbox_name("") {
+            {
+      this->process_name = process_name; // TODO: Why does this leak?
+      this->mailbox_name="";
       this->terminated = false;
     }
 
@@ -49,10 +50,18 @@ namespace wrench {
 //        WRENCH_INFO("In the Daemon Destructor");
     }
 
-    int daemonGoodbye(void *x, void*y) {
+
+    /**
+     * \cond
+     */
+    static int daemon_goodbye(void *x, void *y) {
       WRENCH_INFO("Terminating");
       return 0;
     }
+
+    /**
+     * \endcond
+     */
 
     /**
      * @brief Start the daemon
@@ -79,7 +88,7 @@ namespace wrench {
       if (daemonized)
         this->s4u_actor->daemonize();
 
-      this->s4u_actor->onExit(daemonGoodbye, (void *)(this->process_name.c_str()));
+      this->s4u_actor->onExit(daemon_goodbye, (void *) (this->process_name.c_str()));
 
 
       // Set the mailbox receiver
