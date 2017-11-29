@@ -63,10 +63,11 @@ The `SimpleWMS` example implementations (either cloud or batch) are structured a
   the workflow object (wrench::Workflow) and a scheduler (wrench::Scheduler). For the 
   cloud example, a cloud scheduler is required to decide when to spawn VMs on hosts. The
   batch service does not require a specific scheduler, since resources are fixed. In 
-  such case, a regular scheduler can be used.
-- A file registry (wrench::FileRegistryService), or a file replica catalog keeps track
-  of files stored in different storage services.
-- Workflow input files are staged into the storage service, and the simulation is launched. 
+  such cases, a regular scheduler can be used.
+- A file registry (wrench::FileRegistryService), a.k.a. a file replica catalog, which keeps track of files stored in different storage services, is deployed on a host. 
+- Workflow input files are staged on the storage service
+- The simulation is launched. 
+- Timestamps can be retrieved to inspect the simulation result.
 
 
 # Preparing the Environment #         {#getting-started-prep}
