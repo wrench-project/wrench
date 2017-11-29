@@ -68,7 +68,6 @@ USE CASE:
 
 RELEASE:
     - ALL THE ABOVE
-    - 09/22:  SG Release
     - 10/5:   WRENCH 1.0alpha
 
 ---------------------------------------------------------------------
