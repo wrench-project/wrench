@@ -31,14 +31,13 @@ namespace wrench {
      */
     Alarm::Alarm(double date, std::string hostname, std::string reply_mailbox_name,
                  SimulationMessage* msg, std::string suffix):Service("alarm_service_"+suffix,"alarm_service_"+suffix) {
-
-        //it would be helpful to debug which service this alarm is for if we pass <compute_service_name> in the suffix=
+        
         this->date = date;
         if(this->date<=S4U_Simulation::getClock()){
             WRENCH_INFO("Alarm is being started but the date to notify is less than current timestamp. will be notified immediately");
         }
         this->reply_mailbox_name = reply_mailbox_name;
-        this->msg = msg;
+        this->msg = std::unique_ptr<SimulationMessage>(msg);
         // Start the daemon on the same host
         try {
             WRENCH_INFO("Alarm Service starting...");
@@ -63,7 +62,7 @@ namespace wrench {
             S4U_Simulation::sleep(time_to_sleep);
                 try {
                     S4U_Mailbox::putMessage(this->reply_mailbox_name,
-                                            msg);
+                                            msg.release());
                 } catch (std::shared_ptr<NetworkError> cause) {
                     WRENCH_WARN("AlarmService was not able to send the trigger to its upper service");
                 }
