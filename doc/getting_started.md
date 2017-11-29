@@ -12,11 +12,11 @@ follow the instructions to [install it](@ref install).
 
 # Running a First Example #         {#getting-started-example}
 
-The WRENCH distribution provides an example WMS implementation (`simple-wms`) available 
+The WRENCH distribution provides an example WMS implementation (`SimpleWMS`) available 
 in the `examples` folder. Note that a simple installation via `make && make install`
 compiles all examples.
 
-WRENCH provides two implementations for the `simple-wms` example: a cloud-based 
+WRENCH provides two implementations for the `SimpleWMS` example: a cloud-based 
 implementation `wrench-simple-wms-cloud`, and an implementation to run workflows 
 in a batch system (e.g., SLURM) `wrench-simple-wms-batch`.
 
@@ -34,7 +34,7 @@ wrench-simple-wms-batch <PATH-TO-WRENCH-SRC-FOLDER>/examples/two_hosts.xml <PATH
 
 ## Understanding the Simple-WMS Examples      {#getting-started-example-simplewms}
 
-The `simple-wms` example requires two arguments: (1) a [SimGrid virtual platform 
+The `SimpleWMS` example requires two arguments: (1) a [SimGrid virtual platform 
 description file](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html); and
 (2) a WRENCH workflow file.
 
@@ -48,7 +48,25 @@ A detailed description on how to create a platform description file can be found
 
 **WRENCH workflow file:**
 WRENCH provides native parsers for [DAX](http://workflowarchive.org) (DAG in XML) 
-and [JSON](http://workflowhub.org/traces/) worfklow description file formats. Refer to their respective Web sites for detailed documentation.
+and [JSON](http://workflowhub.org/traces/) worfklow description file formats. Refer to 
+their respective Web sites for detailed documentation.
+
+The `SimpleWMS` example implementations (either cloud or batch) are structured as follows:
+
+- The first step is to read and parse the workflow and the SimGrid platform files, and
+  create a simulation object (wrench::Simulation).
+- A storage service (wrench::SimpleStorageService) is created and deployed on a host.
+- A cloud (wrench::CloudService) or a batch (wrench::BatchService) service is created and 
+  deployed on a host. Both services are seen by the simulation engine as a compute service 
+  (wrench::ComputeService) – jobs can then be scheduled to these resources. 
+- A WMS (wrench::WMS) is instantiated (in this case the `SimpleWMS`) with a reference to 
+  the workflow object (wrench::Workflow) and a scheduler (wrench::Scheduler). For the 
+  cloud example, a cloud scheduler is required to decide when to spawn VMs on hosts. The
+  batch service does not require a specific scheduler, since resources are fixed. In 
+  such case, a regular scheduler can be used.
+- A file registry (wrench::FileRegistryService), or a file replica catalog keeps track
+  of files stored in different storage services.
+- Workflow input files are staged into the storage service, and the simulation is launched. 
 
 
 # Preparing the Environment #         {#getting-started-prep}
