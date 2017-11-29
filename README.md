@@ -49,7 +49,7 @@ make install  # try "sudo make install" if you don't have the permission to writ
 ## Get in Touch
 
 The main channel to reach the WRENCH team is via the support email: 
-[support@wrench-project.org](mailto:support@wrench-project.org?subject=WRENCH Support Contact: Your Topic).
+[support@wrench-project.org](mailto:support@wrench-project.org).
 
 **Bug Report / Feature Request:** our preferred channel to report a bug or request a feature is via  
 WRENCH's [Github Issues Track](https://github.com/wrench-project/wrench/issues).
