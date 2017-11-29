@@ -56,6 +56,16 @@ namespace wrench {
           this->daemon->setTerminated();
         }
 
+//        static bool destruct(S4U_Daemon *daemon) {
+//          if (daemon->getTerminated()) {
+//            delete daemon;
+//            return true;
+//          } else {
+//            // print "Can't destroy object yet"
+//            return false;
+//          }
+//        }
+
     private:
         S4U_Daemon *daemon;
 

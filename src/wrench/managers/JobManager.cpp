@@ -322,7 +322,7 @@ namespace wrench {
 
     /**
      * @brief Terminate a job (standard or pilot) that hasn't completed/expired/failed yet
-     * @param job: the job
+     * @param job: the job to be terminated
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -370,7 +370,7 @@ namespace wrench {
     /**
      * @brief Forget a job (to free memory, only once a job is completed)
      *
-     * @param job: a workflow job
+     * @param job: a job to forget
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
@@ -413,7 +413,7 @@ namespace wrench {
 
     /**
      * @brief Main method of the daemon that implements the JobManager
-     * @return 0 in success
+     * @return 0 on success
      */
     int JobManager::main() {
 

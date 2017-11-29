@@ -133,7 +133,7 @@ private:
 
         // Create a StandardJobExecutor that will run stuff on one host and one core
         double thread_startup_overhead = 10.0;
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
@@ -142,8 +142,7 @@ private:
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                         thread_startup_overhead)}}
-        );
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+        ));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -333,9 +332,9 @@ private:
         // Create a StandardJobExecutor that will run stuff on one host and two core
         double thread_startup_overhead = 10.0;
         bool success = true;
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr;
+        std::unique_ptr<wrench::StandardJobExecutor> executor;
         try {
-          wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+          executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                   test->simulation,
                   my_mailbox,
                   test->simulation->getHostnameList()[0],
@@ -344,8 +343,7 @@ private:
                   nullptr,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
-          );
-            executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+          ));
         } catch (std::runtime_error &e) {
           // Expected exception
           success = false;
@@ -499,9 +497,9 @@ private:
         // Create a StandardJobExecutor that will run stuff on one host and two core
         double thread_startup_overhead = 10.0;
         bool success = true;
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr;
+        std::unique_ptr<wrench::StandardJobExecutor> executor;
         try {
-          wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+          executor =         std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                   test->simulation,
                   my_mailbox,
                   test->simulation->getHostnameList()[0],
@@ -510,8 +508,7 @@ private:
                   nullptr,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
-          );
-            executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+          ));
         } catch (std::runtime_error &e) {
           throw std::runtime_error("Should have been able to create standard job executor!");
         }
@@ -689,9 +686,10 @@ private:
         // Create a StandardJobExecutor that will run stuff on one host and two core
         double thread_startup_overhead = 10.0;
         bool success = true;
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr;
+        std::unique_ptr<wrench::StandardJobExecutor> executor;
+
         try {
-          wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+          executor =         std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                   test->simulation,
                   my_mailbox,
                   test->simulation->getHostnameList()[1],
@@ -700,8 +698,7 @@ private:
                   nullptr,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
-          );
-            executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+          ));
         } catch (std::runtime_error &e) {
           throw std::runtime_error("Should have been able to create standard job executor!");
         }
@@ -868,7 +865,8 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and 6 core
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[1],
@@ -876,9 +874,8 @@ private:
                 {std::make_pair(test->simulation->getHostnameList()[1], 6)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
+        ));
 
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -908,12 +905,7 @@ private:
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-
         workflow->removeTask(task);
-
-//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-//        // TODO: (this is a general design issue)
-//        delete executor;
 
       }
 
@@ -936,7 +928,8 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and 6 core
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[1],
@@ -944,8 +937,7 @@ private:
                 {std::make_pair(test->simulation->getHostnameList()[1], 10)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+        ));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -980,10 +972,6 @@ private:
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-//        // TODO: (this is a general design issue)
-//        delete executor;
-
       }
 
       /** Case 3: Create a multicore task with 50% parallel efficiency and include thread startup overhead **/
@@ -1006,7 +994,7 @@ private:
 
         // Create a StandardJobExecutor that will run stuff on one host and 6 core
         double thread_startup_overhead = 14;
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[1],
@@ -1014,8 +1002,7 @@ private:
                 {std::make_pair(test->simulation->getHostnameList()[1], 10)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(thread_startup_overhead)}}
-        );
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+        ));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1047,10 +1034,6 @@ private:
         workflow->removeTask(task);
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
-//
-//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-//        // TODO: (this is a general design issue)
-//        delete executor;
 
       }
 
@@ -1185,7 +1168,8 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
@@ -1193,9 +1177,8 @@ private:
                 {std::make_pair(test->simulation->getHostnameList()[0], 10)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
+        ));
 
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
 
 
 
@@ -1243,9 +1226,6 @@ private:
 
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-//        // TODO: (this is a general design issue)
-//        delete executor;
 
       }
 
@@ -1276,7 +1256,7 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
@@ -1284,9 +1264,8 @@ private:
                 {std::make_pair(test->simulation->getHostnameList()[0], 10)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
+        ));
 
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1329,10 +1308,6 @@ private:
         workflow->removeTask(task2);
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-//        // TODO: (this is a general design issue)
-//        delete executor;
-
       }
 
 
@@ -1363,7 +1338,8 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
@@ -1371,8 +1347,7 @@ private:
                 {std::make_pair(test->simulation->getHostnameList()[0], 10)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+        ));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1417,10 +1392,6 @@ private:
         workflow->removeTask(task2);
         workflow->removeTask(task3);
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
-
-//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-//        // TODO: (this is a general design issue)
-//        delete executor;
 
       }
 
@@ -1558,7 +1529,7 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
@@ -1567,8 +1538,7 @@ private:
                  std::make_pair(test->simulation->getHostnameList()[1], 10)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+        ));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1611,9 +1581,6 @@ private:
         workflow->removeTask(task2);
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
 
-//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-//                                                // TODO: (this is a general design issue)
-//        delete executor;
       }
 
       /** Case 2: Create 4 tasks that will run in best fit manner **/
@@ -1643,7 +1610,7 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 test->simulation->getHostnameList()[0],
@@ -1652,8 +1619,7 @@ private:
                  std::make_pair(test->simulation->getHostnameList()[1], 10)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
-          std::unique_ptr<wrench::StandardJobExecutor>executor_uniq_ptr = std::unique_ptr<wrench::StandardJobExecutor>(std::move(executor));
+        ));
 
         // Wait for a message on my mailbox
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1696,10 +1662,6 @@ private:
 //        if (!StandardJobExecutorTest::isJustABitGreater(before + task2->getFlops()/4, task2->getEndDate())) {
 //          throw std::runtime_error("Case 2: Unexpected task2 end date: " + std::to_string(task2->getEndDate()));
 //        }
-
-//        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-//                                                // TODO: (this is a general design issue)
-//        delete executor;
 
         workflow->removeTask(task1);
         workflow->removeTask(task2);
@@ -1848,7 +1810,7 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 "Host3",
@@ -1857,7 +1819,7 @@ private:
                  std::make_pair("Host4", 10)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
+        ));
 
         // Sleep 1 second
         wrench::S4U_Simulation::sleep(80);
@@ -1872,9 +1834,6 @@ private:
         workflow->removeTask(task3);
         workflow->removeTask(task4);
 
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-        // TODO: (this is a general design issue)
-        delete executor;
       }
 
 
@@ -2015,7 +1974,7 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-        wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                 test->simulation,
                 my_mailbox,
                 "Host3",
@@ -2024,7 +1983,7 @@ private:
                  std::make_pair("Host4", 10)},
                 nullptr,
                 {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-        );
+        ));
 
 
         // Sleep 48.20 second
@@ -2041,10 +2000,7 @@ private:
         workflow->removeTask(task3);
         workflow->removeTask(task4);
 
-        wrench::S4U_Simulation::sleep(0.00001); // TODO: This is needed to avoid a segfault from the delete
-        // TODO: (this is a general design issue)
-        delete executor;
-        
+
       }
 
 
@@ -2163,7 +2119,7 @@ private:
       //Initialize with non-deterministic seeds
       rng.seed(std::random_device{}());
 
-      for (int trial =0; trial < 500; trial++) {
+      for (int trial =0; trial < 50; trial++) {
         WRENCH_INFO("Trial %d", trial);
 
         /**  Create a 4-task job and kill it **/
@@ -2205,7 +2161,7 @@ private:
           WRENCH_INFO("BEFORE = %lf", before);
 
           // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-          wrench::StandardJobExecutor *executor = new wrench::StandardJobExecutor(
+          std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
                   test->simulation,
                   my_mailbox,
                   "Host3",
@@ -2214,7 +2170,7 @@ private:
                    std::make_pair("Host4", 10)},
                   nullptr,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-          );
+          ));
               
 
           // Sleep some random number of seconds
