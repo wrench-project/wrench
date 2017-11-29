@@ -52,8 +52,6 @@ WRENCH comprises four distinct modules, each designed as a simulation component:
 ![Overview of the WRENCH architecture.](images/wrench-architecture.png)
 
 
-<br />
-
 # Classes of Users #                       {#overview-users}
 
 WRENCH is intended for three different classes of users:
@@ -85,3 +83,11 @@ provides, in addition to all levels above, a detailed documentation for all WREN
 including binders to SimGrid.
 @WRENCHNotInternalDoc ([See Internal Documentation](../internal/index.html)) @endWRENCHDoc
 
+
+# Get in Touch #                        {#overview-contact}
+
+The main channel to reach the WRENCH team is via the support email: 
+[support@wrench-project.org](mailto:support@wrench-project.org?subject=WRENCH Support Contact: Your Topic).
+
+**Bug Report / Feature Request:** our preferred channel to report a bug or request a feature is via  
+WRENCH's [Github Issues Track](https://github.com/wrench-project/wrench/issues).

@@ -96,7 +96,7 @@ your own algorithms and services.
  
 @endWRENCHDoc
 
-## Building Your CMakeLists.txt File ##                {#getting-started-prep-cmakelists}
+## Creating Your CMakeLists.txt File ##                {#getting-started-prep-cmakelists}
 
 Below is an example of a `CMakeLists.txt` file that can be used as a starting 
 template for developing a WRENCH application compiled using cmake:
@@ -158,6 +158,10 @@ target_link_libraries(unit_tests
 Internal developers are expected to **contribute** code to WRENCH's core components.
 Please, refer to the [API Reference](./annotated.html) to find the detailed 
 documentation for WRENCH functions.
+
+> **Note:** It is strongly recommended that WRENCH internal developers (contributors) 
+> _fork_ WRENCH's code from the [GitHub repository](http://github.com/wrench-project/wrench),
+> and create pull requests with their proposed modifications.
 
 In addition to the common [installation steps](./install.html), WRENCH's internal
 developers are strongly encouraged to install the following dependencies/tools:
