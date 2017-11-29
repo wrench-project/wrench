@@ -68,7 +68,7 @@ namespace wrench {
 
     /**
      * @brief Ask the data manager to initiate an asynchronous file copy
-     * @param file: the file
+     * @param file: the file to copy
      * @param src: the source data storage
      * @param dst: the destination data storage
      *
@@ -91,7 +91,7 @@ namespace wrench {
 
     /**
      * @brief Ask the data manager to perform a synchronous file copy
-     * @param file: the file
+     * @param file: the file to copy
      * @param src: the source data storage
      * @param dst: the destination data storage
      *
@@ -116,7 +116,7 @@ namespace wrench {
 
     /**
      * @brief Main method of the daemon that implements the DataMovementManager
-     * @return 0 in success
+     * @return 0 on success
      */
     int DataMovementManager::main() {
 
