@@ -205,10 +205,11 @@ namespace wrench {
                                                                                  WorkflowFile *file,
                                                                                  double payload)
             : StorageServiceMessage("FILE_WRITE_REQUEST",
-                                    payload + file->getSize()) {
+                                    payload) {
       if ((answer_mailbox == "") || (file == nullptr)) {
         throw std::invalid_argument("StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
       }
+      this->payload += file->getSize();
       this->answer_mailbox = answer_mailbox;
       this->file = file;
     }
