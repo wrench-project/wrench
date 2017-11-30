@@ -31,7 +31,6 @@ namespace wrench {
         throw std::runtime_error("A cloud service should be provided.");
       }
       this->cloud_service = cloud_service;
-      this->execution_hosts = cloud_service->getExecutionHosts();
     }
 
     /**
@@ -46,6 +45,11 @@ namespace wrench {
     void CloudScheduler::scheduleTasks(JobManager *job_manager,
                                        std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                                        const std::set<ComputeService *> &compute_services) {
+
+      // obtain list of execution hosts
+      if (this->execution_hosts.empty()) {
+        this->execution_hosts = this->cloud_service->getExecutionHosts();
+      }
 
       if (compute_services.find(cloud_service) == compute_services.end()) {
         throw std::runtime_error("The default cloud service is not listed as a compute service.");
