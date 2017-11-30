@@ -298,10 +298,11 @@ namespace wrench {
     * @param file: the workflow data file
     */
     StorageServiceFileContentMessage::StorageServiceFileContentMessage(WorkflowFile *file) : StorageServiceMessage(
-            "FILE_CONTENT", file->getSize()) {
+            "FILE_CONTENT", 0) {
       if (file == nullptr) {
         throw std::invalid_argument("StorageServiceFileContentMessage::StorageServiceFileContentMessage(): Invalid arguments");
       }
+      this->payload += file->getSize();
       this->file = file;
     }
 

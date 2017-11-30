@@ -61,6 +61,13 @@ namespace wrench {
     }
 
     /**
+     * @brief Destructor
+     */
+    CloudService::~CloudService() {
+      this->default_property_values.clear();
+    }
+
+    /**
      * @brief Get a list of execution hosts to run VMs
      *
      * @return The list of execution hosts

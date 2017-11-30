@@ -73,7 +73,7 @@ namespace wrench {
         //cancels the job
 //        void cancelJob(unsigned long jobid);
         //returns jobid,started time, running time
-        std::vector<std::tuple<unsigned long,double,double>> getJobsInQueue();
+//        std::vector<std::tuple<unsigned long,double,double>> getJobsInQueue();
 
         /***********************/
         /** \endcond           */
