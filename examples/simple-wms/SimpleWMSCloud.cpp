@@ -75,6 +75,12 @@ int main(int argc, char **argv) {
   wrench::StorageService *storage_service = simulation.add(std::unique_ptr<wrench::SimpleStorageService>(
           new wrench::SimpleStorageService(storage_host, 10000000000000.0)));
 
+  /* Construct a list of hosts (in the example only one host) on which the
+   * cloud service will be able to run tasks
+   */
+  std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
+  std::vector<std::string> execution_hosts = {executor_host};
+
   /* Instantiate a cloud service, to be started on some host in the simulation platform.
    * A cloud service is an abstraction of a compute service that corresponds to a
    * Cloud platform that provides access to virtualized compute resources.
@@ -87,8 +93,8 @@ int main(int argc, char **argv) {
    * configurable properties for each kind of service.
    */
   std::string wms_host = hostname_list[0];
-  wrench::ComputeService *cloud_service = new wrench::CloudService(
-          wms_host, true, true, storage_service,
+  wrench::CloudService *cloud_service = new wrench::CloudService(
+          wms_host, true, true, execution_hosts, storage_service,
           {{wrench::CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"}});
 
   /* Add the cloud service to the simulation, catching a possible exception */
@@ -99,12 +105,6 @@ int main(int argc, char **argv) {
     std::cerr << "Error: " << e.what() << std::endl;
     std::exit(1);
   }
-
-  /* Construct a list of hosts (in the example only one host) on which the
-   * cloud service will be able to run tasks
-   */
-  std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
-  std::vector<std::string> execution_hosts = {executor_host};
 
   /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
    * for executing the workflow, and uses a scheduler (CloudScheduler). That scheduler
@@ -118,9 +118,7 @@ int main(int argc, char **argv) {
           std::unique_ptr<wrench::WMS>(
                   new wrench::SimpleWMS(&workflow,
                                         std::unique_ptr<wrench::Scheduler>(
-                                                new wrench::CloudScheduler(cloud_service,
-                                                                           execution_hosts,
-                                                                           &simulation)),
+                                                new wrench::CloudScheduler(cloud_service, &simulation)),
                                         wms_host)));
 
   /* Instantiate a file registry service to be started on some host. This service is
