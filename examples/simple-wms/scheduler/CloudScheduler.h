@@ -23,15 +23,13 @@ namespace wrench {
     class CloudScheduler : public Scheduler {
 
     public:
-        CloudScheduler(ComputeService *cloud_service, std::vector<std::string> &execution_hosts,
-                       Simulation *simulation);
+        CloudScheduler(CloudService *cloud_service, Simulation *simulation);
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        void scheduleTasks(JobManager *job_manager,
-                           std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
+        void scheduleTasks(JobManager *job_manager, std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                            const std::set<ComputeService *> &compute_services) override;
 
         /***********************/
@@ -41,7 +39,7 @@ namespace wrench {
     private:
         std::string choosePMHostname();
 
-        ComputeService *cloud_service;
+        CloudService *cloud_service;
         std::vector<std::string> execution_hosts;
         std::map<std::string, std::vector<std::string>> vm_list;
         Simulation *simulation;

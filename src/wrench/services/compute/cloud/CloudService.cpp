@@ -28,6 +28,7 @@ namespace wrench {
      * @param hostname: the hostname on which to start the service
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
+     * @param execution_hosts: the hosts available for running virtual machines
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      *
@@ -36,11 +37,16 @@ namespace wrench {
     CloudService::CloudService(const std::string &hostname,
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
+                               std::vector<std::string> execution_hosts,
                                StorageService *default_storage_service,
                                std::map<std::string, std::string> plist) :
             ComputeService("cloud_service", "cloud_service", supports_standard_jobs, supports_pilot_jobs,
                            default_storage_service) {
 
+      if (execution_hosts.empty()) {
+        throw std::runtime_error("At least one execution host should be provided");
+      }
+      this->execution_hosts = execution_hosts;
       this->hostname = hostname;
 
       // Set default and specified properties
@@ -51,6 +57,47 @@ namespace wrench {
         this->start(hostname);
       } catch (std::invalid_argument &e) {
         throw e;
+      }
+    }
+
+    /**
+     * @brief Get a list of execution hosts to run VMs
+     *
+     * @return The list of execution hosts
+     *
+     * @throw WorkflowExecutionException
+     */
+    std::vector<std::string> CloudService::getExecutionHosts() {
+      if (this->state == Service::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      // send a "get execution hosts" message to the daemon's mailbox
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_execution_hosts");
+
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new CloudServiceGetExecutionHostsRequestMessage(
+                                        answer_mailbox,
+                                        this->getPropertyValueAsDouble(
+                                                CloudServiceProperty::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      // Wait for a reply
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto *msg = dynamic_cast<CloudServiceGetExecutionHostsAnswerMessage *>(message.get())) {
+        return msg->execution_hosts;
+      } else {
+        throw std::runtime_error("CloudService::createVM(): Unexpected [" + msg->getName() + "] message");
       }
     }
 
@@ -268,6 +315,9 @@ namespace wrench {
         processGetNumIdleCores(msg->answer_mailbox);
         return true;
 
+      } else if (auto *msg = dynamic_cast<CloudServiceGetExecutionHostsRequestMessage *>(message.get())) {
+        processGetExecutionHosts(msg->answer_mailbox);
+
       } else if (auto *msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
         processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->num_cores,
                         msg->supports_standard_jobs, msg->supports_pilot_jobs, msg->plist);
@@ -299,6 +349,25 @@ namespace wrench {
     }
 
     /**
+     * @brief Get a list of execution hosts to run VMs
+     *
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     */
+    void CloudService::processGetExecutionHosts(const std::string &answer_mailbox) {
+
+      try {
+        S4U_Mailbox::dputMessage(
+                answer_mailbox,
+                new CloudServiceGetExecutionHostsAnswerMessage(
+                        this->execution_hosts,
+                        this->getPropertyValueAsDouble(
+                                CloudServiceProperty::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
+
+    /**
      * @brief Create a multicore executor VM in a physical machine
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
@@ -308,8 +377,6 @@ namespace wrench {
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param plist: a property list ({} means "use all defaults")
-     *
-     * @return A multicore executor VM in a physical machine
      */
     void CloudService::processCreateVM(const std::string &answer_mailbox,
                                        const std::string &pm_hostname,

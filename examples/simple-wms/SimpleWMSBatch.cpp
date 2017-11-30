@@ -90,10 +90,10 @@ int main(int argc, char **argv) {
 
   std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
 
-  wrench::ComputeService *cloud_service = new wrench::CloudService(
-          wms_host, true, true, storage_service,
-          {{wrench::CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
   std::vector<std::string> execution_hosts = {executor_host};
+  wrench::CloudService *cloud_service = new wrench::CloudService(
+          wms_host, true, true, execution_hosts, storage_service,
+          {{wrench::CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "666"}});
 
   try {
 
@@ -136,8 +136,7 @@ int main(int argc, char **argv) {
                   new wrench::SimpleWMS(&workflow,
                                         std::unique_ptr<wrench::Scheduler>(
 //                                                new wrench::RandomScheduler()),
-                                                new wrench::CloudScheduler(cloud_service, execution_hosts,
-                                                                           &simulation)),
+                                                new wrench::CloudScheduler(cloud_service, &simulation)),
                                         wms_host)));
 
 //  wms->setPilotJobScheduler(std::unique_ptr<wrench::PilotJobScheduler>(new wrench::CriticalPathScheduler()));

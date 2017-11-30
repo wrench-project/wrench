@@ -177,8 +177,10 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
           std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Cloud Service
+  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::CloudService>(new wrench::CloudService(hostname, true, false, storage_service, {}))));
+          std::unique_ptr<wrench::CloudService>(
+                  new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {}))));
 
   // Create a file registry
   EXPECT_NO_THROW(simulation->setFileRegistryService(
@@ -203,9 +205,9 @@ class CloudPilotJobTestWMS : public wrench::WMS {
 
 public:
     CloudPilotJobTestWMS(CloudServiceTest *test,
-                            wrench::Workflow *workflow,
-                            std::unique_ptr<wrench::Scheduler> scheduler,
-                            std::string &hostname) :
+                         wrench::Workflow *workflow,
+                         std::unique_ptr<wrench::Scheduler> scheduler,
+                         std::string &hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -293,8 +295,10 @@ void CloudServiceTest::do_PilotJobTaskTest_test() {
           std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Cloud Service
+  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::CloudService>(new wrench::CloudService(hostname, false, true, storage_service, {}))));
+          std::unique_ptr<wrench::CloudService>(
+                  new wrench::CloudService(hostname, false, true, execution_hosts, storage_service, {}))));
 
   // Create a file registry
   EXPECT_NO_THROW(simulation->setFileRegistryService(
@@ -403,8 +407,10 @@ void CloudServiceTest::do_NumCoresTest_test() {
           std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Cloud Service
+  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::CloudService>(new wrench::CloudService(hostname, true, true, storage_service, {}))));
+          std::unique_ptr<wrench::CloudService>(
+                  new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {}))));
 
   // Create a file registry
   EXPECT_NO_THROW(simulation->setFileRegistryService(
