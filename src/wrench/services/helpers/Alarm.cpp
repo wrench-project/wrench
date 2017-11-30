@@ -18,7 +18,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
 namespace wrench {
 
     Alarm::~Alarm() {
-        WRENCH_INFO("Alarm::~Alarm()::In the destructor of Alarm");
     }
 
     /**
@@ -60,6 +59,7 @@ namespace wrench {
 
         if(time_to_sleep>0) {
             S4U_Simulation::sleep(time_to_sleep);
+            WRENCH_INFO("Alarm Service Sending a message to %s", this->reply_mailbox_name.c_str());
                 try {
                     S4U_Mailbox::putMessage(this->reply_mailbox_name,
                                             msg.release());
