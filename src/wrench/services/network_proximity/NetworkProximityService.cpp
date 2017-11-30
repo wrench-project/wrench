@@ -29,7 +29,7 @@ namespace wrench {
      */
 
     NetworkProximityService::~NetworkProximityService() {
-        WRENCH_INFO("In the NetworkProximity Destructor");
+        this->default_property_values.clear();
     }
 
     /**
