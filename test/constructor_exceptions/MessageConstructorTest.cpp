@@ -271,6 +271,8 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   EXPECT_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, storage_service, true, failure_cause, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, storage_service, false, nullptr, 666), std::invalid_argument);
 
+  EXPET_NO_THROW(new wrench::StorageServiceFileContentMessage(file, 666));
+  EXPET_THROW(new wrench::StorageServiceFileContentMessage(nullptr, 666), std::invalid_argument);
 }
 
 
