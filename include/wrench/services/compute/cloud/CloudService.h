@@ -75,6 +75,17 @@ namespace wrench {
         /** \endcond          **/
         /***********************/
 
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+
+        ~CloudService();
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
+
     private:
         friend class Simulation;
 
