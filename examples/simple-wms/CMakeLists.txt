@@ -15,6 +15,8 @@ set(SOURCE_FILES
         scheduler/MinMinScheduler.cpp
         scheduler/MaxMinScheduler.h
         scheduler/MaxMinScheduler.cpp
+        scheduler/BatchScheduler.cpp
+        scheduler/BatchScheduler.h
         scheduler/pilot_job/CriticalPathScheduler.h
         scheduler/pilot_job/CriticalPathScheduler.cpp
         )

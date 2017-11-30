@@ -68,6 +68,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     std::vector<std::string> CloudService::getExecutionHosts() {
+
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
@@ -317,6 +318,7 @@ namespace wrench {
 
       } else if (auto *msg = dynamic_cast<CloudServiceGetExecutionHostsRequestMessage *>(message.get())) {
         processGetExecutionHosts(msg->answer_mailbox);
+        return true;
 
       } else if (auto *msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
         processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->num_cores,

@@ -21,7 +21,6 @@
 #include "wrench/workflow/job/WorkflowJob.h"
 #include <tuple>
 #include "BatchJob.h"
-#include "BatchScheduler.h"
 #include <set>
 #include <wrench/services/helpers/Alarm.h>
 
