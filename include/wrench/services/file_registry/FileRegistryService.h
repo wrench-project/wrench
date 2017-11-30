@@ -21,7 +21,7 @@ namespace wrench {
     class WorkflowFile;
 
     class StorageService;
-
+    
     /**
      * @brief A file registry service (a.k.a. replica catalog)
      */
@@ -46,15 +46,25 @@ namespace wrench {
 
     public:
 
+
         // Public Constructor
         FileRegistryService(std::string hostname,
                             std::map<std::string, std::string> = {});
+
+        /****************************/
+        /** \cond DEVELOPER         */
+        /****************************/
 
         std::set<StorageService *> lookupEntry(WorkflowFile *file);
 
         void addEntry(WorkflowFile *file, StorageService *storage_service);
 
         void removeEntry(WorkflowFile *file, StorageService *storage_service);
+
+        /****************************/
+        /** \endcond                */
+        /****************************/
+
 
         /****************************/
         /** \cond INTERNAL          */
@@ -84,6 +94,7 @@ namespace wrench {
 
         std::map<WorkflowFile *, std::set<StorageService *>> entries;
     };
+
 
 
 };

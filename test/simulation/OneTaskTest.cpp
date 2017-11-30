@@ -247,6 +247,17 @@ private:
         throw std::runtime_error("Shouldn't be able to add nullptr entry in the File Registry Service");
       }
 
+      /* Do a bogus remove entry of the file registry service */
+      success = true;
+      try {
+        this->simulation->getFileRegistryService()->removeEntry(nullptr, nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to remove nullptr entry in the File Registry Service");
+      }
+
 
 
       // Terminate
