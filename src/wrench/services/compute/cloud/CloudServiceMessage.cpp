@@ -26,6 +26,36 @@ namespace wrench {
      * @brief Constructor
      *
      * @param answer_mailbox: the mailbox to which to send the answer
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    CloudServiceGetExecutionHostsRequestMessage::CloudServiceGetExecutionHostsRequestMessage(
+            const std::string &answer_mailbox, double payload) : CloudServiceMessage("GET_EXECUTION_HOSTS_REQUEST",
+                                                                                     payload) {
+
+      if (answer_mailbox.empty()) {
+        throw std::invalid_argument(
+                "CloudServiceGetExecutionHostsRequestMessage::CloudServiceGetExecutionHostsRequestMessage(): "
+                        "Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param execution_hosts: the hosts available for running virtual machines
+     * @param payload: the message size in bytes
+     */
+    CloudServiceGetExecutionHostsAnswerMessage::CloudServiceGetExecutionHostsAnswerMessage(
+            std::vector<std::string> &execution_hosts, double payload) : CloudServiceMessage(
+            "GET_EXECUTION_HOSTS_ANSWER", payload), execution_hosts(execution_hosts) {}
+
+    /**
+     * @brief Constructor
+     *
+     * @param answer_mailbox: the mailbox to which to send the answer
      * @param pm_hostname: the name of the physical machine host
      * @param vm_hostname: the name of the new VM host
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
@@ -47,7 +77,7 @@ namespace wrench {
             CloudServiceMessage("CREATE_VM_REQUEST", payload), num_cores(num_cores),
             supports_standard_jobs(supports_standard_jobs), supports_pilot_jobs(supports_pilot_jobs), plist(plist) {
 
-      if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty()) {
+      if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty() || (num_cores < 0)) {
         throw std::invalid_argument(
                 "CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(): Invalid arguments");
       }

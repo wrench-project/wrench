@@ -34,7 +34,7 @@ namespace wrench {
                                                                                                ComputeService *cs,
                                                                                                double payload)
             : MulticoreComputeServiceMessage("NOT_ENOUGH_CORES", payload), compute_service(cs) {
-      if (job == nullptr) {
+      if ((job == nullptr) || (cs == nullptr)) {
         throw std::invalid_argument("MulticoreComputeServiceNotEnoughCoresMessage::MulticoreComputeServiceNotEnoughCoresMessage(): Invalid arguments");
       }
       this->job = job;

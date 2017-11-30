@@ -129,11 +129,9 @@ private:
 
       // Submit the 2-task job for execution
       try {
-        ((wrench::CloudService *) this->test->compute_service)->createVM(
-                this->simulation->getHostnameList()[1],
-                "vm_" + this->simulation->getHostnameList()[1],
-                2, {}
-        );
+        auto cs = (wrench::CloudService *) this->test->compute_service;
+        std::string execution_host = cs->getExecutionHosts()[0];
+        cs->createVM(execution_host, "vm_" + execution_host, 2);
         job_manager->submitJob(two_task_job, this->test->compute_service);
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
@@ -177,8 +175,10 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
           std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Cloud Service
+  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::CloudService>(new wrench::CloudService(hostname, true, false, storage_service, {}))));
+          std::unique_ptr<wrench::CloudService>(
+                  new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {}))));
 
   // Create a file registry
   EXPECT_NO_THROW(simulation->setFileRegistryService(
@@ -203,9 +203,9 @@ class CloudPilotJobTestWMS : public wrench::WMS {
 
 public:
     CloudPilotJobTestWMS(CloudServiceTest *test,
-                            wrench::Workflow *workflow,
-                            std::unique_ptr<wrench::Scheduler> scheduler,
-                            std::string &hostname) :
+                         wrench::Workflow *workflow,
+                         std::unique_ptr<wrench::Scheduler> scheduler,
+                         std::string &hostname) :
             wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
       this->test = test;
     }
@@ -230,27 +230,16 @@ private:
 
       // Submit the pilot job for execution
       try {
-        ((wrench::CloudService *) this->test->compute_service)->createVM(
-                this->simulation->getHostnameList()[1],
-                "vm1_" + this->simulation->getHostnameList()[1],
-                1, {}
-        );
-        ((wrench::CloudService *) this->test->compute_service)->createVM(
-                this->simulation->getHostnameList()[1],
-                "vm2_" + this->simulation->getHostnameList()[1],
-                1, {}
-        );
-        ((wrench::CloudService *) this->test->compute_service)->createVM(
-                this->simulation->getHostnameList()[1],
-                "vm3_" + this->simulation->getHostnameList()[1],
-                1, {}
-        );
-        ((wrench::CloudService *) this->test->compute_service)->createVM(
-                this->simulation->getHostnameList()[1],
-                "vm4_" + this->simulation->getHostnameList()[1],
-                1, {}
-        );
+        auto cs = (wrench::CloudService *) this->test->compute_service;
+        std::string execution_host = cs->getExecutionHosts()[0];
+
+        cs->createVM(execution_host, "vm1_" + execution_host, 1);
+        cs->createVM(execution_host, "vm2_" + execution_host, 1);
+        cs->createVM(execution_host, "vm3_" + execution_host, 1);
+        cs->createVM(execution_host, "vm4_" + execution_host, 1);
+
         job_manager->submitJob(pilot_job, this->test->compute_service);
+
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
       }
@@ -293,8 +282,10 @@ void CloudServiceTest::do_PilotJobTaskTest_test() {
           std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Cloud Service
+  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::CloudService>(new wrench::CloudService(hostname, false, true, storage_service, {}))));
+          std::unique_ptr<wrench::CloudService>(
+                  new wrench::CloudService(hostname, false, true, execution_hosts, storage_service, {}))));
 
   // Create a file registry
   EXPECT_NO_THROW(simulation->setFileRegistryService(
@@ -340,22 +331,21 @@ private:
         }
 
         // create a VM with the PM number of cores
-        ((wrench::CloudService *) this->test->compute_service)->createVM(
-                this->simulation->getHostnameList()[1], "vm_1" + this->simulation->getHostnameList()[1], 0, {});
+        auto cs = (wrench::CloudService *) this->test->compute_service;
+        std::string execution_host = cs->getExecutionHosts()[0];
 
-        num_cores = this->test->compute_service->getNumCores();
-        num_idle_cores = this->test->compute_service->getNumIdleCores();
+        cs->createVM(execution_host, "vm_1" + execution_host, 0);
+        num_cores = cs->getNumCores();
+        num_idle_cores = cs->getNumIdleCores();
 
         if (num_cores != 4 || num_idle_cores != 4) {
           throw std::runtime_error("getNumCores() and getNumIdleCores() should be 4.");
         }
 
         // create a VM with two cores
-        ((wrench::CloudService *) this->test->compute_service)->createVM(
-                this->simulation->getHostnameList()[1], "vm_2" + this->simulation->getHostnameList()[1], 2, {});
-
-        num_cores = this->test->compute_service->getNumCores();
-        num_idle_cores = this->test->compute_service->getNumIdleCores();
+        cs->createVM(execution_host, "vm_2" + execution_host, 2);
+        num_cores = cs->getNumCores();
+        num_idle_cores = cs->getNumIdleCores();
 
         if (num_cores != 6 || num_idle_cores != 6) {
           throw std::runtime_error("getNumCores() and getNumIdleCores() should be 6.");
@@ -403,8 +393,10 @@ void CloudServiceTest::do_NumCoresTest_test() {
           std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Cloud Service
+  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::CloudService>(new wrench::CloudService(hostname, true, true, storage_service, {}))));
+          std::unique_ptr<wrench::CloudService>(
+                  new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {}))));
 
   // Create a file registry
   EXPECT_NO_THROW(simulation->setFileRegistryService(

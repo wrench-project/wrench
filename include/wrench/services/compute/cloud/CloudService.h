@@ -38,6 +38,8 @@ namespace wrench {
                  {CloudServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,       "1024"},
                  {CloudServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD,           "1024"},
                  {CloudServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD,            "1024"},
+                 {CloudServiceProperty::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                 {CloudServiceProperty::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,  "1024"},
                  {CloudServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
                  {CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
                  {CloudServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
@@ -50,6 +52,7 @@ namespace wrench {
         CloudService(const std::string &hostname,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
+                     std::vector<std::string> execution_hosts,
                      StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {});
 
@@ -62,7 +65,8 @@ namespace wrench {
                       unsigned long num_cores,
                       std::map<std::string, std::string> plist = {});
 
-        // Running jobs
+        std::vector<std::string> getExecutionHosts();
+
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
@@ -82,6 +86,8 @@ namespace wrench {
 
         void processGetNumIdleCores(const std::string &answer_mailbox) override;
 
+        void processGetExecutionHosts(const std::string &answer_mailbox);
+
         void processCreateVM(const std::string &answer_mailbox,
                              const std::string &pm_hostname,
                              const std::string &vm_hostname,
@@ -96,6 +102,8 @@ namespace wrench {
         void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) override;
 
         void terminate();
+
+        std::vector<std::string> execution_hosts;
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
         std::map<std::string, std::tuple<simgrid::s4u::VirtualMachine *, std::unique_ptr<ComputeService>, int>> vm_list;
