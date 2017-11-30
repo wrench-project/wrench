@@ -58,9 +58,7 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        ~SimpleStorageService() {
-            this->default_property_values.clear();
-        }
+        ~SimpleStorageService();
 
         /***********************/
         /** \endcond          **/

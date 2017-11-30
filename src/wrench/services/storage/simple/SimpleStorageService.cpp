@@ -33,6 +33,13 @@ namespace wrench {
     }
 
     /**
+     * @brief Destructor
+     */
+    SimpleStorageService::~SimpleStorageService() {
+      this->default_property_values.clear();
+    }
+
+    /**
      * @brief Public constructor
      *
      * @param hostname: the name of the host on which to start the service
