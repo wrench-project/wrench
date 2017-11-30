@@ -22,6 +22,8 @@
 #include "wrench/services/file_registry/FileRegistryServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudService.h"
 #include "wrench/services/compute/cloud/CloudServiceProperty.h"
+#include "wrench/services/compute/batch/BatchService.h"
+#include "wrench/services/compute/batch/BatchServiceProperty.h"
 
 // WMS Implementations
 #include "wrench/wms/WMS.h"

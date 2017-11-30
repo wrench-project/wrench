@@ -29,7 +29,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 namespace wrench {
 
     BatchService::~BatchService() {
-        WRENCH_INFO("In the Batch Service destructor\n");
         this->default_property_values.clear();
     }
 
@@ -356,9 +355,11 @@ namespace wrench {
           for (it = this->running_jobs.begin(); it != this->running_jobs.end();) {
             if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
               if ((*it)->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-                this->processStandardJobTimeout(
-                        (StandardJob *) (*it)->getWorkflowJob());
-                this->updateResources((*it)->getResourcesAllocated());
+                  if(this->foundRunningJobOnTheList((*it)->getWorkflowJob())) {
+                      this->processStandardJobTimeout(
+                              (StandardJob *) (*it)->getWorkflowJob());
+                      this->updateResources((*it)->getResourcesAllocated());
+                  }
                 it = this->running_jobs.erase(it);
               } else if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
               } else {
@@ -731,9 +732,10 @@ namespace wrench {
 
       } else if (AlarmJobTimeOutMessage *msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
         if (msg->job->getType() == WorkflowJob::STANDARD) {
-          this->processStandardJobTimeout((StandardJob *) (msg->job));
-          this->updateResources((StandardJob *) msg->job);
-          this->sendStandardJobCallBackMessage((StandardJob *) msg->job);
+            //if the job is not in the running job list, probably it has already been finished/dead/terminated/killed or something else
+                this->processStandardJobTimeout((StandardJob *) (msg->job));
+                this->foundRunningJobOnTheList((StandardJob *) msg->job);
+                this->sendStandardJobCallBackMessage((StandardJob *) msg->job);
           return true;
         } else if (msg->job->getType() == WorkflowJob::PILOT) {
           auto job = (PilotJob *) msg->job;
@@ -816,7 +818,7 @@ namespace wrench {
 
         if (!job_on_the_list) {
             throw std::runtime_error(
-                    "BatchService::updateResources(): Received a standard job completion, but the job is not in the running job list");
+                    "BatchService::updateResources(): Received a standard job , but the job is not in the running job list");
         }
     }
 
@@ -835,6 +837,8 @@ namespace wrench {
     }
 
     void BatchService::processStandardJobTimeout(StandardJob *job) {
+
+        WRENCH_INFO("A standard job executor has timed out %s", job->getName().c_str());
         std::set<std::unique_ptr<StandardJobExecutor>>::iterator it;
 
         bool terminated = false;
@@ -846,6 +850,13 @@ namespace wrench {
                 break;
             }
         }
+        for (it = this->finished_standard_job_executors.begin(); it != this->finished_standard_job_executors.end(); it++) {
+            if (((*it).get())->getJob() == job) {
+                terminated = true;
+                break;
+            }
+        }
+
         if (not terminated) {
             throw std::runtime_error(
                     "BatchService::processStandardJobTimeout(): Cannot find standard job executor corresponding to job being timedout");
@@ -881,6 +892,7 @@ namespace wrench {
              it != this->running_standard_job_executors.end(); it++) {
             if (((*it).get())->getJob() == job) {
                 executor = (it->get());
+                break;
             }
         }
         if (executor == nullptr) {
@@ -1041,7 +1053,7 @@ namespace wrench {
       bool job_on_the_list = this->foundRunningJobOnTheList((WorkflowJob*)job);
       if (!job_on_the_list) {
         throw std::runtime_error(
-                "BatchService::processPilotJobCompletion():  Pilot job completion message recevied but no such pilot jobs found in queue"
+                "BatchService::processPilotJobCompletion():  Pilot job completion message received but no such pilot jobs found in queue"
         );
       }
 
