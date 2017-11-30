@@ -80,7 +80,6 @@ set(HEADER_FILES
         include/wrench-dev.h
         include/wrench/services/compute/batch/BatchJob.h
         include/wrench/services/compute/batch/BatchServiceMessage.h
-        include/wrench/services/compute/batch/BatchScheduler.h
         include/wrench/services/compute/batch/BatchService.h
         include/wrench/services/compute/batch/BatchServiceProperty.h
         include/wrench/util/WorkflowUtil.h
@@ -159,7 +158,6 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity/NetworkDaemons.cpp
         src/wrench/services/compute/batch/BatchJob.cpp
         src/wrench/services/compute/batch/BatchServiceMessage.cpp
-        src/wrench/services/compute/batch/BatchScheduler.cpp
         src/wrench/services/compute/batch/BatchService.cpp
         src/wrench/services/compute/batch/BatchServiceProperty.cpp
         src/wrench/util/WorkflowUtil.cpp
