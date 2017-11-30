@@ -69,17 +69,19 @@ int main(int argc, char **argv) {
           new wrench::SimpleStorageService(storage_host, 10000000000000.0)));
 
   std::string wms_host = hostname_list[0];
-    /* Instantiate a batch service, to be started on some host in the simulation platform.
-  * A batch service is an abstraction of a compute service that corresponds to
-  * Batch Systems that provides us access to run simulations of  batch jobs .
-  * In this example, this particular batch service supports both standard jobs and pilot jobs.
-  * Unless otherwise specified, tasks running on the service will read/write workflow files
-  * from the storage service instantiated above. Finally, the last argument to the constructor
-  * shows how to configure particular simulated behaviors of the compute service via a property
-  * list. In this example, one specified that the message that will be send to the service to
-  * terminate it will by 2048 bytes. See the documentation to find out all available
-  * configurable properties for each kind of service.
-  */
+
+  /* Instantiate a batch service, to be started on some host in the simulation platform.
+   * A batch service is an abstraction of a compute service that corresponds to
+   * batch-scheduled platforms in which jobs are submitted to a queue and dispatched
+   * to compute nodes according to various scheduling algorithms.
+   * In this example, this particular batch service supports both standard jobs and pilot jobs.
+   * Unless otherwise specified, tasks running on the service will read/write workflow files
+   * from the storage service instantiated above. Finally, the last argument to the constructor
+   * shows how to configure particular simulated behaviors of the compute service via a property
+   * list. In this example, one specifies that the message that will be send to the service to
+   * terminate it will be 2048 bytes. See the documentation to find out all available
+   * configurable properties for each kind of service.
+   */
 
   wrench::ComputeService *batch_service = new wrench::BatchService(wms_host,hostname_list,
   storage_service,true,true,{{wrench::BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "2048"}});
