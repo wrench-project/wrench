@@ -29,8 +29,11 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard J
 namespace wrench {
 
 
+    /**
+     * @brief Destructor
+     */
     StandardJobExecutor::~StandardJobExecutor() {
-//      WRENCH_INFO("IN STANDARD_JOB_EXECUTOR_DESTRUCTOR");
+      this->default_property_values.clear();
     }
 
     /**

@@ -74,6 +74,14 @@ namespace wrench {
       }
     }
 
+
+    /**
+     * @brief Destructor
+     */
+    MultihostMulticoreComputeService::~MultihostMulticoreComputeService() {
+      this->default_property_values.clear();
+    }
+
     /**
      * @brief Asynchronously submit a pilot job to the compute service
      *
