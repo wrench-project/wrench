@@ -77,7 +77,7 @@ namespace wrench {
             CloudServiceMessage("CREATE_VM_REQUEST", payload), num_cores(num_cores),
             supports_standard_jobs(supports_standard_jobs), supports_pilot_jobs(supports_pilot_jobs), plist(plist) {
 
-      if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty()) {
+      if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty() || (num_cores < 0)) {
         throw std::invalid_argument(
                 "CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(): Invalid arguments");
       }

@@ -15,6 +15,7 @@
 #include "../../src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.h"
 #include "../../src/wrench/services/compute/ComputeServiceMessage.h"
 #include "../../src/wrench/services/storage/StorageServiceMessage.h"
+#include "../../src/wrench/services/compute/cloud/CloudServiceMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
 class MessageConstructorTest : public ::testing::Test {
@@ -182,6 +183,27 @@ TEST_F(MessageConstructorTest, MulticoreComputeServiceMessages) {
   EXPECT_THROW(new wrench::MulticoreComputeServiceFlopRateAnswerMessage(-0.1, 666), std::invalid_argument);
 
 }
+
+
+TEST_F(MessageConstructorTest, CloudServiceMessages) {
+
+  EXPECT_NO_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("mailbox", 600));
+  EXPECT_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("", 666), std::invalid_argument);
+
+  std::vector<std::string> arg;
+  arg.push_back("aaa");
+  EXPECT_NO_THROW(new wrench::CloudServiceGetExecutionHostsAnswerMessage(arg, 600));
+
+  std::map<std::string, std::string> plist;
+  EXPECT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "host", 42, true, true, plist, 666));
+  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("", "host", "host", 42, true, true, plist, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "", "host", 42, true, true, plist, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "", 42, true, true, plist, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "host", -1, true, true, plist, 666), std::invalid_argument);
+
+}
+
+
 
 TEST_F(MessageConstructorTest, StorageServiceMessages) {
   EXPECT_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage("mailbox", 666));
