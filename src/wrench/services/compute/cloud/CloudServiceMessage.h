@@ -11,6 +11,8 @@
 #ifndef WRENCH_CLOUDSERVICEMESSAGE_H
 #define WRENCH_CLOUDSERVICEMESSAGE_H
 
+#include <vector>
+
 #include "services/compute/ComputeServiceMessage.h"
 
 namespace wrench {
@@ -27,6 +29,26 @@ namespace wrench {
     class CloudServiceMessage : public ComputeServiceMessage {
     protected:
         CloudServiceMessage(const std::string &name, double payload);
+    };
+
+    /**
+     * @brief CloudServiceGetExecutionHostsRequestMessage class
+     */
+    class CloudServiceGetExecutionHostsRequestMessage : public CloudServiceMessage {
+    public:
+        CloudServiceGetExecutionHostsRequestMessage(const std::string &answer_mailbox, double payload);
+
+        std::string answer_mailbox;
+    };
+
+    /**
+     * @brief CloudServiceGetExecutionHostsAnswerMessage class
+     */
+    class CloudServiceGetExecutionHostsAnswerMessage : public CloudServiceMessage {
+    public:
+        CloudServiceGetExecutionHostsAnswerMessage(std::vector<std::string> &execution_hosts, double payload);
+
+        std::vector<std::string> execution_hosts;
     };
 
     /**
@@ -61,7 +83,7 @@ namespace wrench {
 
         bool success;
     };
-    
+
     /***********************/
     /** \endcond           */
     /***********************/
