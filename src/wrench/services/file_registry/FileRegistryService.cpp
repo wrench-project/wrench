@@ -67,6 +67,10 @@ namespace wrench {
     }
 
 
+    FileRegistryService::~FileRegistryService() {
+      this->default_property_values.clear();
+    }
+
     /**
      * @brief Lookup an entry for a file
      * @param file: the file to lookup

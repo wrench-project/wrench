@@ -105,6 +105,16 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
+        ~MultihostMulticoreComputeService();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
     private:
 
         friend class Simulation;
