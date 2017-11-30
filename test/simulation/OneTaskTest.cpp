@@ -224,6 +224,31 @@ private:
         throw std::runtime_error("Output file not written to storage service");
       }
 
+
+      /* Do a bogus lookup of the file registry service */
+      bool success = true;
+      try {
+        this->simulation->getFileRegistryService()->lookupEntry(nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to lookup a nullptr entry in the File Registry Service");
+      }
+
+      /* Do a bogus add entry of the file registry service */
+      success = true;
+      try {
+        this->simulation->getFileRegistryService()->addEntry(nullptr, nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to add nullptr entry in the File Registry Service");
+      }
+
+
+
       // Terminate
       this->simulation->shutdownAllComputeServices();
       this->simulation->shutdownAllStorageServices();
