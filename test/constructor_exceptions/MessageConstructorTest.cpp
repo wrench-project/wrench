@@ -16,6 +16,7 @@
 #include "../../src/wrench/services/compute/ComputeServiceMessage.h"
 #include "../../src/wrench/services/storage/StorageServiceMessage.h"
 #include "../../src/wrench/services/compute/cloud/CloudServiceMessage.h"
+#include "../../src/wrench/services/network_proximity/NetworkProximityMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
 class MessageConstructorTest : public ::testing::Test {
@@ -273,6 +274,21 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
 }
 
 
+TEST_F(MessageConstructorTest, NetworkProximityMessages) {
 
+  EXPECT_NO_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("a","b"), 666));
+  EXPECT_THROW(new wrench::NetworkProximityLookupRequestMessage("", std::make_pair("a","b"), 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("","b"), 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("a",""), 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a","b"), 1.0, 666));
+  EXPECT_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("","b"), 1.0, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a",""), 1.0, 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("a","b"), 1.0, 666));
+  EXPECT_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("","b"), 1.0, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("a",""), 1.0, 666), std::invalid_argument);
+
+}
 
 
