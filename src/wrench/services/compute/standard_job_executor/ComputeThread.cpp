@@ -40,7 +40,7 @@ namespace wrench {
 
     int ComputeThread::main() {
       try {
-        WRENCH_INFO("New compute threads beginnin %.2f-flop computation", this->flops);
+        WRENCH_INFO("New compute threads beginning %.2f-flop computation", this->flops);
         S4U_Simulation::compute(this->flops);
       } catch (std::exception &e) {
         WRENCH_INFO("Probably got killed while I was computing");

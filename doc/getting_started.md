@@ -29,7 +29,7 @@ one of the following commands:
 wrench-simple-wms-cloud <PATH-TO-WRENCH-SRC-FOLDER>/examples/cloud_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
 
 # running the batch-based implementation
-wrench-simple-wms-batch <PATH-TO-WRENCH-SRC-FOLDER>/examples/two_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
+wrench-simple-wms-batch <PATH-TO-WRENCH-SRC-FOLDER>/examples/batch_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
 ~~~~~~~~~~~~~
 
 ## Understanding the Simple-WMS Examples      {#getting-started-example-simplewms}

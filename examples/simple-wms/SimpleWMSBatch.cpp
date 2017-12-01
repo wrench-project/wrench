@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
   char *workflow_file = argv[2];
 
 
-/* Reading and parsing the workflow description file to create a wrench::Workflow object */
+  /* Reading and parsing the workflow description file to create a wrench::Workflow object */
   std::cerr << "Loading workflow..." << std::endl;
   wrench::Workflow workflow;
   wrench::WorkflowUtil::loadFromDAX(workflow_file, &workflow);
@@ -82,9 +82,9 @@ int main(int argc, char **argv) {
    * terminate it will be 2048 bytes. See the documentation to find out all available
    * configurable properties for each kind of service.
    */
-
-  wrench::ComputeService *batch_service = new wrench::BatchService(wms_host,hostname_list,
-  storage_service,true,true,{{wrench::BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "2048"}});
+  wrench::ComputeService *batch_service = new wrench::BatchService(
+          wms_host, hostname_list, storage_service, true, true,
+          {{wrench::BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "2048"}});
 
   /* Add the batch service to the simulation, catching a possible exception */
   try {
@@ -94,12 +94,6 @@ int main(int argc, char **argv) {
     std::cerr << "Error: " << e.what() << std::endl;
     std::exit(1);
   }
-
-  /* Construct a list of hosts (in the example only one host) on which the
-   * batch service will be able to run tasks
-   */
-  std::string executor_host = hostname_list[(hostname_list.size() > 1) ? 1 : 0];
-  std::vector<std::string> execution_hosts = {executor_host};
 
   /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
    * for executing the workflow, and uses a scheduler (BatchScheduler). That scheduler
@@ -113,10 +107,7 @@ int main(int argc, char **argv) {
           std::unique_ptr<wrench::WMS>(
                   new wrench::SimpleWMS(&workflow,
                                         std::unique_ptr<wrench::Scheduler>(
-                                                new wrench::BatchScheduler(batch_service,
-                                                                           execution_hosts,
-                                                                           &simulation)),
-                                        wms_host)));
+                                                new wrench::BatchScheduler(batch_service, &simulation)), wms_host)));
 
   /* Instantiate a file registry service to be started on some host. This service is
    * essentially a replica catalog that stores <file , storage service> pairs so that
