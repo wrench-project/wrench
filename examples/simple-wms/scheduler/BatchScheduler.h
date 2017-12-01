@@ -24,8 +24,7 @@ namespace wrench {
     class BatchScheduler : public Scheduler {
 
     public:
-        BatchScheduler(ComputeService *cloud_service, std::vector<std::string> &execution_hosts,
-                       Simulation *simulation);
+        BatchScheduler(ComputeService *cloud_service, Simulation *simulation);
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -42,7 +41,6 @@ namespace wrench {
     private:
 
         ComputeService *batch_service;
-        std::vector<std::string> execution_hosts;
         Simulation *simulation;
     };
 }
