@@ -214,9 +214,9 @@ install:
   #install BATSCHED
   - wget https://gitlab.inria.fr/batsim/batsched/repository/master/archive.tar.gz
   - tar -xf archive.tar.gz
-  - cd batsched-master* && mkdir build && cd build && cmake ..
-  - sed -i 's/REDOX_LIBRARY:FILEPATH=REDOX_LIBRARY-NOTFOUND/REDOX_LIBRARY:FILEPATH=\/usr\/local\/lib64\/libredox.so/g' CMakeCache.txt
-  - cmake .. && make && sudo make install && cd ..
+  - cd batsched-master* && mkdir build && cd build
+  - cmake .. -DREDOX_LIBRARY:FILEPATH=/usr/local/lib64/libredox.so
+  - make && sudo make install && cd ..
 
 
 
