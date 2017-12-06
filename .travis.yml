@@ -147,6 +147,79 @@ install:
   - tar xf release-1.8.0.tar.gz
   - cd googletest-release-1.8.0/googletest && cmake . && make && sudo make install && cd ../..
 
+  #install necessary dependencies for Batsched
+  #install ASCIIDOC
+  - wget https://newcontinuum.dl.sourceforge.net/project/asciidoc/asciidoc/8.6.9/asciidoc-8.6.9.tar.gz
+  - tar -xzf asciidoc-8.6.9.tar.gz
+  - cd asciidoc-8.6.9 && ./configure && sudo make install && cd ..
+
+  #install AUTOCONF
+  - wget http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
+  - tar xf autoconf*
+  - cd autoconf-2.69 && sh configure --prefix /usr/local && make install && cd ..
+
+  #install AUTOMAKE
+  - wget http://ftp.gnu.org/gnu/automake/automake-1.15.tar.gz
+  - tar xf automake*
+  - cd automake-1.15 && sh configure --prefix /usr/local && make install && cd ..
+
+  #install LIBTOOL
+  - wget http://mirror.jre655.com/GNU/libtool/libtool-2.4.6.tar.gz
+  - tar xf libtool*
+  - cd libtool-2.4.6 && sh configure --prefix /usr/local && make install && cd ..
+
+  #install LIBSODIUM
+  - git clone git://github.com/jedisct1/libsodium.git
+  - cd libsodium && ./autogen.sh && ./configure && make check && sudo make install
+  - sudo ldconfig
+  - cd ..
+
+  #install ZMQ
+  - wget http://download.zeromq.org/zeromq-4.0.5.tar.gz
+  - tar xvzf zeromq-4.0.5.tar.gz
+  - cd zeromq-4.0.5 && ./configure && sudo make install && sudo ldconfig && cd ..
+
+  #install CPPZMQ
+  - git clone https://github.com/zeromq/cppzmq.git
+  - cd cppzmq/ && mkdir build && cd build/ && cmake .. && sudo make -j4 install && cd ../../
+
+  #install GMPLIB
+  - wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz
+  - tar -xf gmp-6.1.2.tar.xz
+  - cd gmp-6.1.2/ && ./configure && make && sudo make install && cd ..
+
+  #install RAPIDJSON
+  - git clone https://github.com/Tencent/rapidjson.git
+  - cd rapidjson
+  - mkdir build
+  - cd build && cmake .. && make && sudo make install && cd ../../
+
+  #install HIREDIS
+  - git clone https://github.com/redis/hiredis.git
+  - cd hiredis && make && sudo make install && cd ..
+
+  #install LIBEV
+  - wget https://launchpad.net/ubuntu/+archive/primary/+files/libev_4.22.orig.tar.gz
+  - tar -xf libev_4.22.orig.tar.gz
+  - cd libev-4.22/ && ./configure && make && sudo make install && cd ..
+
+  #install REDOX
+  - git clone https://github.com/hmartiro/redox.git
+  - cd redox && mkdir build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ && make && sudo make install && cd ../../
+
+  #install BOOST
+  #- wget https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.gz
+  #- tar -xf boost_1_65_1.tar.gz && cd boost_1_65_1/ && ./bootstrap.sh && ./b2 install --prefix=/usr/local
+
+  #install BATSCHED
+  - wget https://gitlab.inria.fr/batsim/batsched/repository/master/archive.tar.gz
+  - tar -xf archive.tar.gz
+  - cd batsched-master* && mkdir build && cd build && cmake ..
+  - sed -i 's/REDOX_LIBRARY:FILEPATH=REDOX_LIBRARY-NOTFOUND/REDOX_LIBRARY:FILEPATH=\/usr\/local\/lib64\/libredox.so/g' CMakeCache.txt
+  - cmake .. && make && sudo make install && cd ..
+
+
+
 script:
   - cmake -DCMAKE_VERBOSE_MAKEFILE=ON .
   - make all unit_tests doc-gh
