@@ -207,7 +207,7 @@ install:
   - git clone https://github.com/hmartiro/redox.git
   - cd redox && mkdir build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ && make && sudo make install && cd ../../
 
-  install BOOST
+  # install BOOST
   - wget https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.gz
   - tar -xf boost_1_65_1.tar.gz && cd boost_1_65_1/ && ./bootstrap.sh && ./b2 install --prefix=/usr/local && cd ..
 
