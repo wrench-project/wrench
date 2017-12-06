@@ -21,13 +21,14 @@ namespace wrench {
     public:
         //job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
         BatchJob(WorkflowJob* job, unsigned long jobid, unsigned long time_in_minutes, unsigned long number_nodes,
-                 unsigned long cores_per_node,double ending_time_stamp);
+                 unsigned long cores_per_node,double ending_time_stamp, double appeared_time_stamp);
 
 
         unsigned long getJobID();
         unsigned long getAllocatedTime();
         unsigned long getAllocatedCoresPerNode();
         double getEndingTimeStamp();
+        double getAppearedTimeStamp();
         unsigned long getNumNodes();
         WorkflowJob* getWorkflowJob();
         void setEndingTimeStamp(double);
@@ -41,6 +42,7 @@ namespace wrench {
         unsigned long num_nodes;
         unsigned long cores_per_node;
         double ending_time_stamp;
+        double appeared_time_stamp;
         std::set<std::pair<std::string,unsigned long>> resources_allocated;
     };
 

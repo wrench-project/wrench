@@ -21,21 +21,22 @@
 #include "wrench/workflow/job/WorkflowJob.h"
 #include <tuple>
 #include "BatchJob.h"
+#include "BatchNetworkListener.h"
 #include <set>
 #include <wrench/services/helpers/Alarm.h>
+#include <wrench/services/compute/batch/BatchRequestReplyProcess.h>
 
 namespace wrench {
 
-
-    /**
-     * @brief A batch-scheduled ComputeService
-     */
     class BatchService: public ComputeService {
 
-
+        /**
+         * @brief A Batch Service
+         */
 
 
     private:
+
         std::map<std::string, std::string> default_property_values =
                 {{BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,          "1024"},
                  {BatchServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
@@ -51,47 +52,38 @@ namespace wrench {
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,           "FIRSTFIT"},
-                 {BatchServiceProperty::JOB_SELECTION_ALGORITHM,           "FCFS"}
+                 {BatchServiceProperty::JOB_SELECTION_ALGORITHM,           "FCFS"},
+                 {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,    "1024"},
+                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,           "easy_bf"}
                 };
 
     public:
-
-        /* Public constructor */
         BatchService(std::string hostname,
-        std::vector<std::string> compute_nodes,
+                     std::vector<std::string> nodes_in_network,
                      StorageService *default_storage_service,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
-                std::map<std::string, std::string> plist = {});
-
-        /***********************/
-        /** \cond INTERNAL    */
-        /***********************/
-
-       ~BatchService();
+                     std::map<std::string, std::string> plist = {});
 
         //cancels the job
-//        void cancelJob(unsigned long jobid);
+        void cancelJob(unsigned long jobid);
         //returns jobid,started time, running time
-//        std::vector<std::tuple<unsigned long,double,double>> getJobsInQueue();
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
+        std::vector<std::tuple<unsigned long,double,double>> getJobsInQueue();
 
 
     private:
         BatchService(std::string hostname,
-        std::vector<std::string> nodes_in_network,
-        StorageService *default_storage_service,
+                     std::vector<std::string> nodes_in_network,
+                     StorageService *default_storage_service,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
                      unsigned long reduced_cores,
-        std::map<std::string, std::string> plist,
-        std::string suffix);
+                     std::map<std::string, std::string> plist,
+                     std::string suffix);
+
 
         //Configuration to create randomness in measurement period initially
-//        unsigned long random_interval = 10;
+        unsigned long random_interval = 10;
 
         //create alarms for standardjobs
         std::vector<std::unique_ptr<Alarm>> standard_job_alarms;
@@ -99,13 +91,15 @@ namespace wrench {
         //alarms for pilot jobs (only one pilot job alarm)
         std::vector<std::unique_ptr<Alarm>> pilot_job_alarms;
 
-//        std::vector<std::shared_ptr<SimulationMessage>> sent_alrm_msgs;
+        //vector of network listeners
+        std::vector<std::unique_ptr<BatchNetworkListener>> network_listeners;
 
         /* Resources information in Batchservice */
         unsigned long total_num_of_nodes;
         std::map<std::string,unsigned long> nodes_to_cores_map;
-//        std::vector<double> timeslots;
+        std::vector<double> timeslots;
         std::map<std::string,unsigned long> available_nodes_to_cores;
+        std::map<unsigned long,std::string> host_id_to_names;
         /*End Resources information in Batchservice */
 
         // Vector of standard job executors
@@ -118,10 +112,28 @@ namespace wrench {
         std::deque<std::unique_ptr<BatchJob>> pending_jobs;
         //A set of running batch jobs
         std::set<std::unique_ptr<BatchJob>> running_jobs;
+        // A set of waiting jobs that have been submitted to batsched, but not scheduled
+        std::set<std::unique_ptr<BatchJob>> waiting_jobs;
+
+        //Batch Service request reply process
+        std::unique_ptr<BatchNetworkListener> request_reply_process;
+
+        //Batch scheduling supported algorithms
+        std::set<std::string> scheduling_algorithms={"easy_bf",""}; //TODO:: fill in all the supported algorithms of batscheduler
+        pid_t pid;
+
+        //Is sched ready?
+        bool is_bat_sched_ready;
+
+        //timestamp received from batscheduler
+        double batsched_timestamp;
+
+        //fork the batsched_process
+        void run_batsched();
 
         unsigned long generateUniqueJobId();
 
-        bool foundRunningJobOnTheList(WorkflowJob* job);
+        std::string foundRunningJobOnTheList(WorkflowJob* job);
 
         //submits the standard job
         //overriden function of parent Compute Service
@@ -151,7 +163,7 @@ namespace wrench {
         std::unique_ptr<BatchJob> scheduleJob(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
-        void terminate(bool);
+        void terminate();
 
         //Fail the standard jobs inside the pilot jobs
         void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
@@ -168,6 +180,9 @@ namespace wrench {
         //Process standardjob timeout
         void processPilotJobTimeout(PilotJob* job);
 
+        //notify upper level job submitters (about pilot job termination)
+        void notifyJobSubmitters(PilotJob* job);
+
         //update the resources
         void updateResources(std::set<std::pair<std::string,unsigned long>> resources);
         void updateResources(StandardJob* job);
@@ -177,6 +192,15 @@ namespace wrench {
 
         //send call back to the standard job submitters
         void sendStandardJobCallBackMessage(StandardJob*job);
+
+        //send all the jobs in the queue to the batscheduler
+        bool scheduleAllQueuedJobs();
+
+        //process execute events from batsched
+        void processExecuteJobFromBatSched(std::string bat_sched_reply);
+
+        //notify batsched about job completion/failure/killed events
+        void notifyJobEventsToBatSched(std::string job_id,std::string status, std::string job_state, std::string kill_reason);
 
     };
 }
