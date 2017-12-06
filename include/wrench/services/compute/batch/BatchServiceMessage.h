@@ -45,6 +45,73 @@ namespace wrench{
     };
 
 
+    /**
+     * @brief BatchSimulationBeginsToSchedulerMessage class
+     */
+    class BatchSimulationBeginsToSchedulerMessage : public BatchServiceMessage {
+    public:
+        BatchSimulationBeginsToSchedulerMessage(std::string answer_mailbox, std::string job_args_to_scheduler, double payload);
+
+        /** @brief The mailbox to answer to */
+        std::string answer_mailbox;
+        /** @brief JSON data arguments to the scheduler */
+        std::string job_args_to_scheduler;
+    };
+
+    /**
+     * @brief BatchSchedReadyMessage class
+     */
+    class BatchSchedReadyMessage : public BatchServiceMessage {
+    public:
+        BatchSchedReadyMessage(std::string answer_mailbox, double payload);
+
+        /** @brief The mailbox to answer to */
+        std::string answer_mailbox;
+    };
+
+
+    /**
+     * @brief BatchExecuteJobFromBatschedMessage class
+     */
+    class BatchExecuteJobFromBatSchedMessage : public BatchServiceMessage {
+    public:
+        BatchExecuteJobFromBatSchedMessage(std::string answer_mailbox, std::string batsched_decision_reply, double payload);
+
+        /** @brief The mailbox to answer to */
+        std::string answer_mailbox;
+
+        /** @brief The decisions reply by batsched to the batchservice */
+        std::string batsched_decision_reply;
+    };
+
+
+    /**
+     * @brief BatchJobSubmissionToSchedulerMessage class
+     */
+    class BatchJobSubmissionToSchedulerMessage : public BatchServiceMessage {
+    public:
+        BatchJobSubmissionToSchedulerMessage(std::string answer_mailbox, WorkflowJob* job, std::string job_args_to_scheduler, double payload);
+
+        /** @brief The mailbox to answer to */
+        std::string answer_mailbox;
+        /** @brief The batch job */
+        WorkflowJob *job;
+        /** @brief JSON data arguments to the scheduler */
+        std::string job_args_to_scheduler;
+    };
+
+    /**
+     * @brief BatchJobReplyFromSchedulerMessage class
+     */
+    class BatchJobReplyFromSchedulerMessage : public BatchServiceMessage {
+    public:
+        BatchJobReplyFromSchedulerMessage(std::string reply, double payload);
+
+        /** @brief The message replied by the scheduler */
+        std::string reply;
+    };
+
+
 
 }
 

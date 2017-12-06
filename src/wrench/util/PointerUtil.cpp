@@ -32,7 +32,12 @@ namespace wrench {
       auto tmp = const_cast<std::unique_ptr<T>&&>(*ptr);
       (*from).erase(*ptr);
       (*to).insert(std::move(tmp));
+
     };
+
+    template void PointerUtil::moveSingleSeparateUniquePtrFromSetToSet<StandardJobExecutor>(std::unique_ptr<StandardJobExecutor> *ptr,
+                                                                                           std::set<std::unique_ptr<StandardJobExecutor>> *from,
+                                                                                           std::set<std::unique_ptr<StandardJobExecutor>> *to);
 
 
     /***********************/

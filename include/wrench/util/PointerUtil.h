@@ -14,6 +14,7 @@
 
 #include <memory>
 #include <set>
+#include <deque>
 
 namespace wrench {
 
@@ -45,6 +46,19 @@ namespace wrench {
           auto tmp = const_cast<std::unique_ptr<T>&&>(*it);
           (*from).erase(it);
           (*to).insert(std::move(tmp));
+
+        };
+
+        template<class T>
+        static void moveUniquePtrFromDequeToSet(
+                typename std::deque<std::unique_ptr<T>>::iterator it,
+                std::deque<std::unique_ptr<T>> *from,
+                std::set<std::unique_ptr<T>> *to)
+        {
+
+            auto tmp = const_cast<std::unique_ptr<T>&&>(*it);
+            (*from).erase(it);
+            (*to).insert(std::move(tmp));
 
         };
 

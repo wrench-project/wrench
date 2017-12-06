@@ -82,6 +82,8 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchServiceMessage.h
         include/wrench/services/compute/batch/BatchService.h
         include/wrench/services/compute/batch/BatchServiceProperty.h
+        include/wrench/services/compute/batch/BatchRequestReplyProcess.h
+        include/wrench/services/compute/batch/BatchNetworkListener.h
         include/wrench/util/WorkflowUtil.h
         include/wrench/services/helpers/Alarm.h
         include/wrench/util/PointerUtil.h
@@ -160,6 +162,8 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchServiceMessage.cpp
         src/wrench/services/compute/batch/BatchService.cpp
         src/wrench/services/compute/batch/BatchServiceProperty.cpp
+        src/wrench/services/compute/batch/BatchRequestReplyProcess.cpp
+        src/wrench/services/compute/batch/BatchNetworkListener.cpp
         src/wrench/util/WorkflowUtil.cpp
         src/wrench/services/helpers/Alarm.cpp
         src/wrench/util/PointerUtil.cpp
@@ -205,7 +209,7 @@ install(DIRECTORY include/ DESTINATION include)
 
 # generate unit tests
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
-target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm)
+target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm -lzmq)
 set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
 set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
 add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
