@@ -216,7 +216,7 @@ install:
   - tar -xf archive.tar.gz
   - cd batsched-master* && mkdir build && cd build
   - cmake .. -DREDOX_LIBRARY:FILEPATH=/usr/local/lib64/libredox.so
-  - make && sudo make install && cd ..
+  - make && sudo make install && cd ../../
 
 
 
