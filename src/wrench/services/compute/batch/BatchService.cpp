@@ -191,14 +191,14 @@ namespace wrench {
 
         //Create a Batch Job
         unsigned long jobid = this->generateUniqueJobId();
-        std::unique_ptr<BatchJob> batch_job = std::unique_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for,
-                                                                                     nodes_asked_for, cores_asked_for, -1, S4U_Simulation::getClock()));
+        BatchJob* batch_job = new BatchJob(job, jobid, time_asked_for,
+                                                                                     nodes_asked_for, cores_asked_for, -1, S4U_Simulation::getClock());
 
         //  send a "run a batch job" message to the daemon's mailbox
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new BatchServiceJobRequestMessage(answer_mailbox, std::move(batch_job),
+                                    new BatchServiceJobRequestMessage(answer_mailbox, batch_job,
                                                                       this->getPropertyValueAsDouble(
                                                                               BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {
@@ -306,14 +306,14 @@ namespace wrench {
 
         //Create a Batch Job
         unsigned long jobid = this->generateUniqueJobId();
-        std::unique_ptr<BatchJob> batch_job = std::unique_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for,
-                                                                                     nodes_asked_for, cores_asked_for, -1, S4U_Simulation::getClock()));
+        BatchJob* batch_job = new BatchJob(job, jobid, time_asked_for,
+                                                                                     nodes_asked_for, cores_asked_for, -1, S4U_Simulation::getClock());
 
         //  send a "run a batch job" message to the daemon's mailbox
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_pilot_job_mailbox");
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new BatchServiceJobRequestMessage(answer_mailbox, std::move(batch_job),
+                                    new BatchServiceJobRequestMessage(answer_mailbox, batch_job,
                                                                       this->getPropertyValueAsDouble(
                                                                               BatchServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {
@@ -670,7 +670,7 @@ namespace wrench {
         batch_submission_data["events"] = nlohmann::json::array();
         int i = 0;
         std::deque<std::unique_ptr<BatchJob>>::iterator it;
-        for (it=this->pending_jobs.begin();it!=this->pending_jobs.end();it++) {
+        for (it=this->pending_jobs.begin();i<this->pending_jobs.size();it++) {
 
             BatchJob *batch_job = it->get();
 
@@ -978,7 +978,7 @@ namespace wrench {
                     return true;
                 }
             }
-            this->pending_jobs.push_back(std::move(msg->job));
+            this->pending_jobs.push_back(std::unique_ptr<BatchJob>(msg->job));
             return true;
 
         } else if (StandardJobExecutorDoneMessage *msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
