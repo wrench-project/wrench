@@ -30,10 +30,17 @@
 #include <signal.h>
 #include <json.hpp>
 #include <boost/algorithm/string.hpp>
+#include <wrench/util/MessageManager.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
 namespace wrench {
+
+    BatchService::~BatchService() {
+        std::cout<<"Inside the batchservice destructor\n";
+        MessageManager::cleanUpMessages(this->mailbox_name);
+    }
+
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service

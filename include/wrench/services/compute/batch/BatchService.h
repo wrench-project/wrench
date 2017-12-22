@@ -70,6 +70,8 @@ namespace wrench {
         //returns jobid,started time, running time
         std::vector<std::tuple<unsigned long,double,double>> getJobsInQueue();
 
+        ~BatchService();
+
 
     private:
         BatchService(std::string hostname,
