@@ -122,7 +122,7 @@ namespace wrench {
         std::unique_ptr<BatchNetworkListener> request_reply_process;
 
         //Batch scheduling supported algorithms
-        std::set<std::string> scheduling_algorithms={"easy_bf","conservative_bf", "easy_bf", "easy_bf_plot_liquid_load_horizon",
+        std::set<std::string> scheduling_algorithms={"easy_bf","conservative_bf", "easy_bf_plot_liquid_load_horizon",
                                                      "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
                                                      "energy_bf_monitoring",
                                                      "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
