@@ -1310,7 +1310,15 @@ namespace wrench {
                 );
             }
 
-            const char *args[] = {"batsched", "-v", algorithm.c_str(), NULL};
+            std::string queue_ordering = this->getPropertyValueAsString(BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM);
+            bool is_queue_ordering_available = this->queue_ordering_options.find(queue_ordering) != this->queue_ordering_options.end();
+            if (not is_queue_ordering_available) {
+                throw std::runtime_error(
+                        "The queue ordering option " + queue_ordering + " is not supported by the batch service"
+                );
+            }
+
+            const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), NULL};
             // Now execute it
             execvp(args[0], (char **) args);
         } else if (this->pid > 0) {
