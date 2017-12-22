@@ -54,7 +54,8 @@ namespace wrench {
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,           "FIRSTFIT"},
                  {BatchServiceProperty::JOB_SELECTION_ALGORITHM,           "FCFS"},
                  {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,    "1024"},
-                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,           "easy_bf"}
+                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,           "easy_bf"},
+                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,           "fcfs"}
                 };
 
     public:
@@ -121,7 +122,21 @@ namespace wrench {
         std::unique_ptr<BatchNetworkListener> request_reply_process;
 
         //Batch scheduling supported algorithms
-        std::set<std::string> scheduling_algorithms={"easy_bf",""}; //TODO:: fill in all the supported algorithms of batscheduler
+        std::set<std::string> scheduling_algorithms={"easy_bf","conservative_bf", "easy_bf", "easy_bf_plot_liquid_load_horizon",
+                                                     "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
+                                                     "energy_bf_monitoring",
+                                                     "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
+                                                     "filler", "killer", "killer2", "rejecter", "sleeper",
+                                                     "submitter"
+        };
+
+        //Batch queue ordering options
+        std::set<std::string> queue_ordering_options={"fcfs", "lcfs", "desc_bounded_slowdown", "desc_slowdown",
+                                                      "asc_size", "desc_size", "asc_walltime", "desc_walltime"
+
+        };
+
+
         pid_t pid;
 
         //Is sched ready?
