@@ -2238,7 +2238,8 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
     EXPECT_NO_THROW(compute_service = simulation->add(
             std::unique_ptr<wrench::BatchService>(
                     new wrench::BatchService(hostname,simulation->getHostnameList(), storage_service1,true,true,{
-                                                     {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "filler"}
+                                                     {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "filler"},
+                                                     {wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,           "lcfs"}
                                              }))));
 
     std::unique_ptr<wrench::FileRegistryService> file_registry_service(
