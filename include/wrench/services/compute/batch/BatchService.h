@@ -51,11 +51,13 @@ namespace wrench {
                  {BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                 {BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,           "FIRSTFIT"},
                  {BatchServiceProperty::JOB_SELECTION_ALGORITHM,           "FCFS"},
                  {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,    "1024"},
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,           "easy_bf"},
-                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,           "fcfs"}
+                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,           "fcfs"},
+                 {BatchServiceProperty::BATCH_FAKE_SUBMISSION,           "false"}
                 };
 
     public:
@@ -152,6 +154,10 @@ namespace wrench {
 
         std::string foundRunningJobOnTheList(WorkflowJob* job);
 
+        std::string convertAvailableResourcesToJsonString(std::map<std::string,unsigned long>);
+
+        std::string convertResourcesToJsonString(std::set<std::pair<std::string,unsigned long>>);
+
         //submits the standard job
         //overriden function of parent Compute Service
         void submitStandardJob(StandardJob *job,std::map<std::string, std::string> &batch_job_args) override;
@@ -218,6 +224,7 @@ namespace wrench {
 
         //notify batsched about job completion/failure/killed events
         void notifyJobEventsToBatSched(std::string job_id,std::string status, std::string job_state, std::string kill_reason);
+
 
     };
 }
