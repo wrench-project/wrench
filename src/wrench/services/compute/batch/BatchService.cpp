@@ -392,17 +392,21 @@ namespace wrench {
             if (this->running_jobs.size() > 0) {
                 std::set<std::unique_ptr<BatchJob>>::iterator it;
                 for (it = this->running_jobs.begin(); it != this->running_jobs.end();) {
-                    if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
-                        if ((*it)->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-                            this->processStandardJobTimeout(
-                                    (StandardJob *) (*it)->getWorkflowJob());
-                            this->updateResources((*it)->getResourcesAllocated());
-                            it = this->running_jobs.erase(it);
-                        } else if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-                        } else {
-                            throw std::runtime_error(
-                                    "BatchService::main(): Received a JOB type other than Standard and Pilot jobs"
-                            );
+                    if(this->getPropertyValueAsString(BatchServiceProperty::BATCH_FAKE_SUBMISSION)=="false") {
+                        if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
+                            if ((*it)->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
+                                this->processStandardJobTimeout(
+                                        (StandardJob *) (*it)->getWorkflowJob());
+                                this->updateResources((*it)->getResourcesAllocated());
+                                it = this->running_jobs.erase(it);
+                            } else if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+                            } else {
+                                throw std::runtime_error(
+                                        "BatchService::main(): Received a JOB type other than Standard and Pilot jobs"
+                                );
+                            }
+                        }else{
+                            ++it;
                         }
                     } else {
                         ++it;
@@ -570,7 +574,7 @@ namespace wrench {
         }
         if (executor == nullptr) {
             throw std::runtime_error(
-                    "MultihostMulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
+                    "BatchService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
         }
 
         // Terminate the executor
@@ -807,7 +811,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "MultihostMulticoreComputeService::terminatePilotJob(): Received an unexpected [" +
+                    "BatchService::terminatePilotJob(): Received an unexpected [" +
                     message->getName() +
                     "] message!");
         }
@@ -820,8 +824,10 @@ namespace wrench {
     void BatchService::terminate() {
         this->setStateToDown();
 
-        WRENCH_INFO("Failing current standard jobs");
-        this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+        if(this->getPropertyValueAsString(BatchServiceProperty::BATCH_FAKE_SUBMISSION)=="false") {
+            WRENCH_INFO("Failing current standard jobs");
+            this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+        }
 
         //remove standard job alarms
         std::vector<std::unique_ptr<Alarm>>::iterator it;
@@ -989,6 +995,7 @@ namespace wrench {
             return true;
 
         } else if (StandardJobExecutorDoneMessage *msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
+            std::cout<<"Calling from here\n";
             processStandardJobCompletion(msg->executor, msg->job);
             return true;
 
@@ -1390,6 +1397,24 @@ namespace wrench {
             resources.insert(std::make_pair(this->host_id_to_names[node], cores_per_node_asked_for));
         }
 
+        if(this->getPropertyValueAsString(
+                BatchServiceProperty::BATCH_FAKE_SUBMISSION)=="true"){
+            WRENCH_INFO("Sending Batch Fake Submission Reply by job %s", workflow_job->getName().c_str());
+            std::string json_string_available_resources = this->convertAvailableResourcesToJsonString(this->available_nodes_to_cores);
+            std::string json_string_resources = this->convertResourcesToJsonString(resources);
+            try {
+                S4U_Mailbox::putMessage(workflow_job->popCallbackMailbox(),
+                                        new ComputeServiceInformationMessage(workflow_job,"\nAvailable Resources:{\n"+json_string_available_resources+"\n}\n"+"\nResources Allocateed:{\n"+json_string_resources+"\n}\n",this->getPropertyValueAsDouble(
+                                                BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD
+                                        )));
+            } catch (std::shared_ptr<NetworkError> cause) {
+                throw std::runtime_error(
+                        "BatchService::processExecuteJobFromBatSched():: Network Error while sending the fake job submission reply"
+                );
+            }
+            return;
+        }
+
 
 
         switch (workflow_job->getType()) {
@@ -1514,6 +1539,31 @@ namespace wrench {
                                          data));
 
         network_listeners.push_back(std::move(network_listener));
+    }
+
+
+    std::string BatchService::convertAvailableResourcesToJsonString(std::map<std::string,unsigned long> avail_resources) {
+        std::string output = "";
+        std::string convrt = "";
+        std::string result = "";
+        for (auto it = avail_resources.cbegin(); it != avail_resources.cend(); it++) {
+            convrt = std::to_string(it->second);
+            output += (it->first) + ":" + (convrt) + ", ";
+        }
+        result = output.substr(0, output.size() - 2 );
+        return result;
+    }
+
+    std::string BatchService::convertResourcesToJsonString(std::set<std::pair<std::string, unsigned long>> resources) {
+        std::string output = "";
+        std::string convrt = "";
+        std::string result = "";
+        for (auto it = resources.cbegin(); it != resources.cend(); it++) {
+            convrt = std::to_string(it->second);
+            output += (it->first) + ":" + (convrt) + ", ";
+        }
+        result = output.substr(0, output.size() - 2 );
+        return result;
     }
 
 
