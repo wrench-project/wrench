@@ -137,4 +137,16 @@ namespace wrench {
         this->job = job;
     }
 
+    /**
+     * @brief Constructor
+     * @param job: a workflow job
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_arguments
+     */
+    AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id,double payload)
+            : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload) {
+        this->job_id = job_id;
+    }
+
 }

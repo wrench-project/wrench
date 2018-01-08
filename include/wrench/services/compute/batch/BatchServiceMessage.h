@@ -44,6 +44,15 @@ namespace wrench{
         WorkflowJob* job;
     };
 
+    /**
+     * @brief AlarmNotifyBatschedMessage class
+     */
+    class AlarmNotifyBatschedMessage : public ServiceMessage {
+    public:
+        AlarmNotifyBatschedMessage(std::string job_id,double payload);
+        std::string job_id;
+    };
+
 
     /**
      * @brief BatchSimulationBeginsToSchedulerMessage class
