@@ -1033,6 +1033,10 @@ namespace wrench {
                         "BatchService::processNextMessage(): Alarm about unknown job type"
                 );
             }
+        } else if (AlarmNotifyBatschedMessage *msg = dynamic_cast<AlarmNotifyBatschedMessage *>(message.get())){
+            //first forward this notification to the batsched
+            this->notifyJobEventsToBatSched(msg->job_id,"SUCCESS","COMPLETED_SUCCESSFULLY","");
+            return true;
         } else {
             throw std::runtime_error(
                     "BatchService::processNextMessage(): Unknown message type: " +
@@ -1393,18 +1397,35 @@ namespace wrench {
         std::map<std::string, unsigned long>::iterator it;
 
         for(auto node:node_resources){
-            this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
+            if(this->getPropertyValueAsString(
+                    BatchServiceProperty::BATCH_FAKE_SUBMISSION)=="false") {
+                this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
+            }
             resources.insert(std::make_pair(this->host_id_to_names[node], cores_per_node_asked_for));
         }
 
         if(this->getPropertyValueAsString(
                 BatchServiceProperty::BATCH_FAKE_SUBMISSION)=="true"){
+
+            if(time_in_minutes>0) {
+                batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
+                SimulationMessage *msg =
+                        new AlarmNotifyBatschedMessage(std::to_string(batch_job->getJobID()), 0);
+                std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(
+                        new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+                                  "batch_alarm_notify_batsched"));
+                standard_job_alarms.push_back(
+                        std::move(alarm_ptr));
+            }else{
+                this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()),"SUCCESS","COMPLETED_SUCCESSFULLY","");
+            }
+
             WRENCH_INFO("Sending Batch Fake Submission Reply by job %s", workflow_job->getName().c_str());
             std::string json_string_available_resources = this->convertAvailableResourcesToJsonString(this->available_nodes_to_cores);
             std::string json_string_resources = this->convertResourcesToJsonString(resources);
             try {
                 S4U_Mailbox::putMessage(workflow_job->popCallbackMailbox(),
-                                        new ComputeServiceInformationMessage(workflow_job,"\nAvailable Resources:{\n"+json_string_available_resources+"\n}\n"+"\nResources Allocateed:{\n"+json_string_resources+"\n}\n",this->getPropertyValueAsDouble(
+                                        new ComputeServiceInformationMessage(workflow_job,"\nResources Allocated:{\n"+json_string_resources+"\n}\n",this->getPropertyValueAsDouble(
                                                 BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD
                                         )));
             } catch (std::shared_ptr<NetworkError> cause) {

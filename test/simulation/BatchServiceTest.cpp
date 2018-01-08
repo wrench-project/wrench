@@ -14,6 +14,7 @@
 #include <gtest/gtest.h>
 #include <wrench/services/compute/batch/BatchService.h>
 #include <wrench/services/compute/batch/BatchServiceMessage.h>
+#include <wrench/util/TraceFileLoader.h>
 #include "NoopScheduler.h"
 #include "wrench/workflow/job/PilotJob.h"
 
@@ -46,6 +47,7 @@ public:
     void do_InsufficientCoresInsidePilotJobTaskTest_test();
     void do_DifferentBatchAlgorithmsSubmissionTest_test();
     void do_BatchFakeJobSubmissionTest_test();
+    void do_BatchTraceFileJobSubmissionTest_test();
 
 
 protected:
@@ -130,7 +132,7 @@ private:
                                                                                   this->test->storage_service2)});
 
             std::map<std::string, std::string> batch_job_args;
-            batch_job_args["-N"] = "1";
+            batch_job_args["-N"] = "2";
             batch_job_args["-t"] = "5"; //time in minutes
             batch_job_args["-c"] = "4"; //number of cores per node
             try {
@@ -2426,6 +2428,172 @@ void BatchServiceTest::do_BatchFakeJobSubmissionTest_test() {
     free(argv);
 }
 
+
+/**********************************************************************/
+/**  BATCH TRACE FILE JOB SUBMISSION TASK SIMULATION TEST **/
+/**********************************************************************/
+
+class BatchTraceFileJobSubmissionTestWMS : public wrench::WMS {
+
+public:
+    BatchTraceFileJobSubmissionTestWMS(BatchServiceTest *test,
+                                  wrench::Workflow *workflow,
+                                  std::unique_ptr<wrench::Scheduler> scheduler,
+                                  std::string hostname) :
+            wrench::WMS(std::move(workflow), std::move(scheduler), hostname, "test") {
+        this->test = test;
+    }
+
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+        // Create a job manager
+        std::unique_ptr<wrench::JobManager> job_manager =
+                std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+        {
+            //Let's load the trace file
+            std::vector<std::pair<double,std::tuple<std::string, double, int, int, double, int>>>
+                    trace_file_tasks = wrench::TraceFileLoader::loadFromTraceFile("test/trace_files/NASA-iPSC-1993-3.swf",0);
+            for(auto tasks_info:trace_file_tasks){
+                double sub_time = tasks_info.first;
+                double curtime = wrench::S4U_Simulation::getClock();
+                double sleeptime = sub_time-curtime;
+                if(sleeptime>0)
+                    wrench::S4U_Simulation::sleep(sleeptime);
+                std::tuple<std::string, double, int, int, double, int> task_args = std::get<1>(tasks_info);
+                std::string id = std::get<0>(task_args);
+                double flops = std::get<1>(task_args);
+                int min_num_cores = std::get<2>(task_args);
+                int max_num_cores = std::get<3>(task_args);
+                double parallel_efficiency = std::get<4>(task_args);
+                int num_nodes = std::get<5>(task_args);
+                if(min_num_cores == -1 || max_num_cores == -1){
+                    min_num_cores = 10;
+                    max_num_cores = 10;
+                }
+                if(num_nodes>4){
+                    continue;
+                }
+                wrench::WorkflowTask *task = this->workflow->addTask(id,flops, min_num_cores,max_num_cores,parallel_efficiency);
+
+                wrench::StandardJob *job = job_manager->createStandardJob(
+                        {task},
+                        {},
+                        {},
+                        {},
+                        {});
+
+
+                std::map<std::string, std::string> batch_job_args;
+                batch_job_args["-N"] = std::to_string(num_nodes);
+                batch_job_args["-t"] = std::to_string(flops);
+                batch_job_args["-c"] = std::to_string(min_num_cores); //use all cores
+                try {
+                    job_manager->submitJob(job, this->test->compute_service, batch_job_args);
+                }catch (wrench::WorkflowExecutionException &e){
+                    throw std::runtime_error(
+                            "Got some exception"
+                    );
+                }
+
+                // Wait for a fake job submission reply
+                std::unique_ptr<wrench::SimulationMessage> message = nullptr;
+                try {
+                    std::cout<<"Listening to mailbox "<<this->workflow->getCallbackMailbox()<<"\n";
+                    message = wrench::S4U_Mailbox::getMessage(this->workflow->getCallbackMailbox());
+                } catch (std::shared_ptr<wrench::NetworkError> cause) {
+                    throw wrench::WorkflowExecutionException(cause);
+                }
+
+                if (wrench::ComputeServiceInformationMessage *m = dynamic_cast<wrench::ComputeServiceInformationMessage *>(message.get())) {
+                    std::cout<<"Resources information obtained "<<m->information<<"\n";
+                } else {
+                    throw std::runtime_error(
+                            "BatchServiceTest::BatchFakeJobSubmissionTestWMS(): Reply from Fake Job submission was not obtained");
+                }
+
+                this->workflow->removeTask(task);
+            }
+        }
+
+        // Terminate everything
+        this->simulation->shutdownAllComputeServices();
+        this->simulation->shutdownAllStorageServices();
+        this->simulation->getFileRegistryService()->stop();
+        return 0;
+    }
+};
+
+TEST_F(BatchServiceTest, BatchTraceFileJobSubmissionTest) {
+    DO_TEST_WITH_FORK(do_BatchTraceFileJobSubmissionTest_test);
+}
+
+
+void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
+
+    // Create and initialize a simulation
+    wrench::Simulation *simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("batch_service_test");
+
+    EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+    // Setting up the platform
+    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    // Get a hostname
+    std::string hostname = simulation->getHostnameList()[0];
+
+    // Create a WMS
+    EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+            std::unique_ptr<wrench::WMS>(new BatchTraceFileJobSubmissionTestWMS(this, std::move(workflow.get()),
+                                                                           std::unique_ptr<wrench::Scheduler>(
+                            new NoopScheduler()), hostname))));
+
+    // Create a Storage Service
+    EXPECT_NO_THROW(storage_service1 = simulation->add(
+            std::unique_ptr<wrench::SimpleStorageService>(
+                    new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+    // Create a Storage Service
+    EXPECT_NO_THROW(storage_service2 = simulation->add(
+            std::unique_ptr<wrench::SimpleStorageService>(
+                    new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+    // Create a Batch Service
+    EXPECT_NO_THROW(compute_service = simulation->add(
+            std::unique_ptr<wrench::BatchService>(
+                    new wrench::BatchService(hostname,simulation->getHostnameList(), storage_service1,true,true,{
+                            {wrench::BatchServiceProperty::BATCH_FAKE_SUBMISSION, "true"}
+                    }))));
+
+    std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+            new wrench::FileRegistryService(hostname));
+
+    simulation->setFileRegistryService(std::move(file_registry_service));
+
+    // Create two workflow files
+    wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+    wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+
+    // Staging the input_file on the storage service
+    EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+
+
+    // Running a "run a single task" simulation
+    // Note that in these tests the WMS creates workflow tasks, which a user would
+    // of course not be likely to do
+    EXPECT_NO_THROW(simulation->launch());
+
+    delete simulation;
+
+    free(argv[0]);
+    free(argv);
+}
 
 
 
