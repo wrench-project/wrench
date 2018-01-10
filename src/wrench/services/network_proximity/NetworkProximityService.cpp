@@ -36,6 +36,9 @@ namespace wrench {
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
      * @param hosts_in_network: the hosts running in the network
+     * @param message_size: the message size (in bytes) exchanged by monitoring daemon
+     * @param measurement_period: the time (in seconds) between measurements at a daemon
+     * @param noise: a random noise added to the daemon (TODO: more explanation)
      * @param plist: a property list ({} means "use all defaults")
      */
     NetworkProximityService::NetworkProximityService(std::string hostname,
@@ -50,6 +53,9 @@ namespace wrench {
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
      * @param hosts_in_network: the hosts running in the network
+     * @param message_size: TODO
+     * @param measurement_period: TODO
+     * @param noise: TODO
      * @param plist: a property list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
      */
@@ -140,8 +146,11 @@ namespace wrench {
         }
     }
 
-
-
+    /**
+     * @brief Main routine of the daemon
+     *
+     * @return 0 on success, non 0 otherwise
+     */
     int NetworkProximityService::main() {
 
         TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
