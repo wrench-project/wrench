@@ -30,10 +30,17 @@
 #include <signal.h>
 #include <json.hpp>
 #include <boost/algorithm/string.hpp>
+#include <wrench/util/MessageManager.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
 namespace wrench {
+
+    BatchService::~BatchService() {
+        std::cout<<"Inside the batchservice destructor\n";
+        MessageManager::cleanUpMessages(this->mailbox_name);
+    }
+
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
@@ -191,14 +198,14 @@ namespace wrench {
 
         //Create a Batch Job
         unsigned long jobid = this->generateUniqueJobId();
-        std::unique_ptr<BatchJob> batch_job = std::unique_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for,
-                                                                                     nodes_asked_for, cores_asked_for, -1, S4U_Simulation::getClock()));
+        BatchJob* batch_job = new BatchJob(job, jobid, time_asked_for,
+                                                                                     nodes_asked_for, cores_asked_for, -1, S4U_Simulation::getClock());
 
         //  send a "run a batch job" message to the daemon's mailbox
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new BatchServiceJobRequestMessage(answer_mailbox, std::move(batch_job),
+                                    new BatchServiceJobRequestMessage(answer_mailbox, batch_job,
                                                                       this->getPropertyValueAsDouble(
                                                                               BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {
@@ -306,14 +313,14 @@ namespace wrench {
 
         //Create a Batch Job
         unsigned long jobid = this->generateUniqueJobId();
-        std::unique_ptr<BatchJob> batch_job = std::unique_ptr<BatchJob>(new BatchJob(job, jobid, time_asked_for,
-                                                                                     nodes_asked_for, cores_asked_for, -1, S4U_Simulation::getClock()));
+        BatchJob* batch_job = new BatchJob(job, jobid, time_asked_for,
+                                                                                     nodes_asked_for, cores_asked_for, -1, S4U_Simulation::getClock());
 
         //  send a "run a batch job" message to the daemon's mailbox
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_pilot_job_mailbox");
         try {
             S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new BatchServiceJobRequestMessage(answer_mailbox, std::move(batch_job),
+                                    new BatchServiceJobRequestMessage(answer_mailbox, batch_job,
                                                                       this->getPropertyValueAsDouble(
                                                                               BatchServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> cause) {
@@ -385,17 +392,21 @@ namespace wrench {
             if (this->running_jobs.size() > 0) {
                 std::set<std::unique_ptr<BatchJob>>::iterator it;
                 for (it = this->running_jobs.begin(); it != this->running_jobs.end();) {
-                    if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
-                        if ((*it)->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-                            this->processStandardJobTimeout(
-                                    (StandardJob *) (*it)->getWorkflowJob());
-                            this->updateResources((*it)->getResourcesAllocated());
-                            it = this->running_jobs.erase(it);
-                        } else if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-                        } else {
-                            throw std::runtime_error(
-                                    "BatchService::main(): Received a JOB type other than Standard and Pilot jobs"
-                            );
+                    if(this->getPropertyValueAsString(BatchServiceProperty::BATCH_FAKE_SUBMISSION)=="false") {
+                        if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
+                            if ((*it)->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
+                                this->processStandardJobTimeout(
+                                        (StandardJob *) (*it)->getWorkflowJob());
+                                this->updateResources((*it)->getResourcesAllocated());
+                                it = this->running_jobs.erase(it);
+                            } else if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+                            } else {
+                                throw std::runtime_error(
+                                        "BatchService::main(): Received a JOB type other than Standard and Pilot jobs"
+                                );
+                            }
+                        }else{
+                            ++it;
                         }
                     } else {
                         ++it;
@@ -563,7 +574,7 @@ namespace wrench {
         }
         if (executor == nullptr) {
             throw std::runtime_error(
-                    "MultihostMulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
+                    "BatchService::terminateRunningStandardJob(): Cannot find standard job executor corresponding to job being terminated");
         }
 
         // Terminate the executor
@@ -670,7 +681,7 @@ namespace wrench {
         batch_submission_data["events"] = nlohmann::json::array();
         int i = 0;
         std::deque<std::unique_ptr<BatchJob>>::iterator it;
-        for (it=this->pending_jobs.begin();it!=this->pending_jobs.end();it++) {
+        for (it=this->pending_jobs.begin();i<this->pending_jobs.size();it++) {
 
             BatchJob *batch_job = it->get();
 
@@ -800,7 +811,7 @@ namespace wrench {
 
         } else {
             throw std::runtime_error(
-                    "MultihostMulticoreComputeService::terminatePilotJob(): Received an unexpected [" +
+                    "BatchService::terminatePilotJob(): Received an unexpected [" +
                     message->getName() +
                     "] message!");
         }
@@ -813,8 +824,10 @@ namespace wrench {
     void BatchService::terminate() {
         this->setStateToDown();
 
-        WRENCH_INFO("Failing current standard jobs");
-        this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+        if(this->getPropertyValueAsString(BatchServiceProperty::BATCH_FAKE_SUBMISSION)=="false") {
+            WRENCH_INFO("Failing current standard jobs");
+            this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+        }
 
         //remove standard job alarms
         std::vector<std::unique_ptr<Alarm>>::iterator it;
@@ -978,10 +991,11 @@ namespace wrench {
                     return true;
                 }
             }
-            this->pending_jobs.push_back(std::move(msg->job));
+            this->pending_jobs.push_back(std::unique_ptr<BatchJob>(msg->job));
             return true;
 
         } else if (StandardJobExecutorDoneMessage *msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
+            std::cout<<"Calling from here\n";
             processStandardJobCompletion(msg->executor, msg->job);
             return true;
 
@@ -1019,6 +1033,10 @@ namespace wrench {
                         "BatchService::processNextMessage(): Alarm about unknown job type"
                 );
             }
+        } else if (AlarmNotifyBatschedMessage *msg = dynamic_cast<AlarmNotifyBatschedMessage *>(message.get())){
+            //first forward this notification to the batsched
+            this->notifyJobEventsToBatSched(msg->job_id,"SUCCESS","COMPLETED_SUCCESSFULLY","");
+            return true;
         } else {
             throw std::runtime_error(
                     "BatchService::processNextMessage(): Unknown message type: " +
@@ -1303,7 +1321,15 @@ namespace wrench {
                 );
             }
 
-            const char *args[] = {"batsched", "-v", algorithm.c_str(), NULL};
+            std::string queue_ordering = this->getPropertyValueAsString(BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM);
+            bool is_queue_ordering_available = this->queue_ordering_options.find(queue_ordering) != this->queue_ordering_options.end();
+            if (not is_queue_ordering_available) {
+                throw std::runtime_error(
+                        "The queue ordering option " + queue_ordering + " is not supported by the batch service"
+                );
+            }
+
+            const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), NULL};
             // Now execute it
             execvp(args[0], (char **) args);
         } else if (this->pid > 0) {
@@ -1371,8 +1397,43 @@ namespace wrench {
         std::map<std::string, unsigned long>::iterator it;
 
         for(auto node:node_resources){
-            this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
+            if(this->getPropertyValueAsString(
+                    BatchServiceProperty::BATCH_FAKE_SUBMISSION)=="false") {
+                this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
+            }
             resources.insert(std::make_pair(this->host_id_to_names[node], cores_per_node_asked_for));
+        }
+
+        if(this->getPropertyValueAsString(
+                BatchServiceProperty::BATCH_FAKE_SUBMISSION)=="true"){
+
+            if(time_in_minutes>0) {
+                batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
+                SimulationMessage *msg =
+                        new AlarmNotifyBatschedMessage(std::to_string(batch_job->getJobID()), 0);
+                std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(
+                        new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+                                  "batch_alarm_notify_batsched"));
+                standard_job_alarms.push_back(
+                        std::move(alarm_ptr));
+            }else{
+                this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()),"SUCCESS","COMPLETED_SUCCESSFULLY","");
+            }
+
+            WRENCH_INFO("Sending Batch Fake Submission Reply by job %s", workflow_job->getName().c_str());
+            std::string json_string_available_resources = this->convertAvailableResourcesToJsonString(this->available_nodes_to_cores);
+            std::string json_string_resources = this->convertResourcesToJsonString(resources);
+            try {
+                S4U_Mailbox::putMessage(workflow_job->popCallbackMailbox(),
+                                        new ComputeServiceInformationMessage(workflow_job,"\nResources Allocated:{\n"+json_string_resources+"\n}\n",this->getPropertyValueAsDouble(
+                                                BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD
+                                        )));
+            } catch (std::shared_ptr<NetworkError> cause) {
+                throw std::runtime_error(
+                        "BatchService::processExecuteJobFromBatSched():: Network Error while sending the fake job submission reply"
+                );
+            }
+            return;
         }
 
 
@@ -1499,6 +1560,31 @@ namespace wrench {
                                          data));
 
         network_listeners.push_back(std::move(network_listener));
+    }
+
+
+    std::string BatchService::convertAvailableResourcesToJsonString(std::map<std::string,unsigned long> avail_resources) {
+        std::string output = "";
+        std::string convrt = "";
+        std::string result = "";
+        for (auto it = avail_resources.cbegin(); it != avail_resources.cend(); it++) {
+            convrt = std::to_string(it->second);
+            output += (it->first) + ":" + (convrt) + ", ";
+        }
+        result = output.substr(0, output.size() - 2 );
+        return result;
+    }
+
+    std::string BatchService::convertResourcesToJsonString(std::set<std::pair<std::string, unsigned long>> resources) {
+        std::string output = "";
+        std::string convrt = "";
+        std::string result = "";
+        for (auto it = resources.cbegin(); it != resources.cend(); it++) {
+            convrt = std::to_string(it->second);
+            output += (it->first) + ":" + (convrt) + ", ";
+        }
+        result = output.substr(0, output.size() - 2 );
+        return result;
     }
 
 

@@ -551,6 +551,20 @@ namespace wrench {
             keep_going = true;
           }
 
+        } else if (ComputeServiceInformationMessage *msg = dynamic_cast<ComputeServiceInformationMessage *>(message.get())) {
+
+          // update job state
+          WorkflowJob *job = msg->job;
+
+          // Forward the notification to the source
+          WRENCH_INFO("Forwarding information to %s", job->getOriginCallbackMailbox().c_str());
+          try {
+            S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+                                     new ComputeServiceInformationMessage(job, msg->information, msg->payload));
+          } catch (std::shared_ptr<NetworkError> cause) {
+            keep_going = true;
+          }
+
         } else {
           throw std::runtime_error("JobManager::main(): Unexpected [" + message->getName() + "] message");
         }

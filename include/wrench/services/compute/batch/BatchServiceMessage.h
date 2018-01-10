@@ -27,12 +27,12 @@ namespace wrench{
      */
     class BatchServiceJobRequestMessage : public BatchServiceMessage {
     public:
-        BatchServiceJobRequestMessage(std::string answer_mailbox, std::unique_ptr<BatchJob> job , double payload);
+        BatchServiceJobRequestMessage(std::string answer_mailbox, BatchJob* job , double payload);
 
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
         /** @brief The batch job */
-        std::unique_ptr<BatchJob> job;
+        BatchJob* job;
     };
 
     /**
@@ -42,6 +42,15 @@ namespace wrench{
     public:
         AlarmJobTimeOutMessage(WorkflowJob* job,double payload);
         WorkflowJob* job;
+    };
+
+    /**
+     * @brief AlarmNotifyBatschedMessage class
+     */
+    class AlarmNotifyBatschedMessage : public ServiceMessage {
+    public:
+        AlarmNotifyBatschedMessage(std::string job_id,double payload);
+        std::string job_id;
     };
 
 
@@ -82,6 +91,17 @@ namespace wrench{
 
         /** @brief The decisions reply by batsched to the batchservice */
         std::string batsched_decision_reply;
+    };
+
+    /**
+     * @brief BatchFakeReplyMessage class
+     */
+    class BatchFakeJobSubmissionReplyMessage : public BatchServiceMessage {
+    public:
+        BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload);
+
+        /** @brief The resources info in json data string */
+        std::string json_data_string;
     };
 
 
