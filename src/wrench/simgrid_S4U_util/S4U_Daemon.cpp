@@ -85,6 +85,7 @@ namespace wrench {
         std::abort();
       }
 
+      // TODO: This wasn't working right last time Henri checked... but it's likely no big deal
       if (daemonized)
         this->s4u_actor->daemonize();
 
