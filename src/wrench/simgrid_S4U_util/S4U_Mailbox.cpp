@@ -12,6 +12,7 @@
 #include <xbt/ex.hpp>
 #include <simgrid/s4u/Mailbox.hpp>
 #include <simgrid/s4u.hpp>
+#include <wrench/util/MessageManager.h>
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
@@ -58,6 +59,8 @@ namespace wrench {
         throw std::shared_ptr<FatalFailure>(new FatalFailure());
       }
 
+      //Remove this message from the message manager list
+      MessageManager::removeReceivedMessages(mailbox_name,msg);
       WRENCH_DEBUG("Received a '%s' message from mailbox %s", msg->getName().c_str(), mailbox_name.c_str());
       return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -99,6 +102,9 @@ namespace wrench {
 
       SimulationMessage *msg = static_cast<SimulationMessage *>(data);
 
+      //Remove this message from the message manager list
+      MessageManager::removeReceivedMessages(mailbox_name,msg);
+
       WRENCH_INFO("Received a '%s' message from mailbox '%s'", msg->getName().c_str(), mailbox_name.c_str());
 
       return std::unique_ptr<SimulationMessage>(msg);
@@ -119,6 +125,8 @@ namespace wrench {
                    mailbox_name.c_str());
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       try {
+        //also let the MessageManager manage this message
+        MessageManager::manageMessage(mailbox_name,msg);
         mailbox->put(msg, (uint64_t) msg->payload);
       } catch (xbt_ex &e) {
         if ((e.category == network_error) || (e.category == timeout_error)) {

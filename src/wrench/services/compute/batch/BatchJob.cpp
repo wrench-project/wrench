@@ -2,6 +2,7 @@
 // Created by suraj on 9/16/17.
 //
 
+#include <iostream>
 #include "wrench/services/compute/batch/BatchJob.h"
 
 namespace wrench {
@@ -13,7 +14,8 @@ namespace wrench {
             );
         }
         this->job = job;
-        if(jobid<=0 || time_in_minutes<=0 || num_nodes<=0 || cores_per_node<=0 ){
+        if(jobid<=0 || time_in_minutes<0 || num_nodes<=0 || cores_per_node<=0 ){
+            std::cout<<"Info: "<<jobid<<" "<<time_in_minutes<<" "<<num_nodes<<" "<<cores_per_node<<"\n";
             throw std::invalid_argument(
                     "BatchJob::BatchJob(): either jobid, time_in_minutes, num_nodes, cores_per_node is less than or equal to zero"
             );

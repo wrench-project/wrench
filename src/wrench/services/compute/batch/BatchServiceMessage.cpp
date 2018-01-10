@@ -81,6 +81,20 @@ namespace wrench {
         this->job = job;
     }
 
+
+    /**
+     * @brief Constructor
+     * @param answer_mailbox: the mailbox to reply to
+     * @param json_data_string: the current and the expected resources required
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    BatchFakeJobSubmissionReplyMessage::BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload)
+            : BatchServiceMessage("BATCH_FAKE_JOB_SUBMISSION_REPLY", payload) {
+        this->json_data_string = json_data_string;
+    }
+
     /**
      * @brief Constructor
      * @param reply: the replied answer by scheduler
@@ -102,12 +116,12 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(std::string answer_mailbox,
-                                                                 std::unique_ptr<BatchJob> job,double payload)
+                                                                 BatchJob* job,double payload)
             : BatchServiceMessage("SUBMIT_BATCH_JOB_REQUEST", payload) {
         if (job == nullptr) {
             throw std::invalid_argument("BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(): Invalid arguments");
         }
-        this->job = std::move(job);
+        this->job = job;
         this->answer_mailbox = answer_mailbox;
     }
 
@@ -121,6 +135,18 @@ namespace wrench {
     AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(WorkflowJob* job,double payload)
             : ServiceMessage("ALARM_JOB_TIMED_OUT", payload) {
         this->job = job;
+    }
+
+    /**
+     * @brief Constructor
+     * @param job: a workflow job
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_arguments
+     */
+    AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id,double payload)
+            : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload) {
+        this->job_id = job_id;
     }
 
 }

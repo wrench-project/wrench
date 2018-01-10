@@ -87,6 +87,8 @@ set(HEADER_FILES
         include/wrench/util/WorkflowUtil.h
         include/wrench/services/helpers/Alarm.h
         include/wrench/util/PointerUtil.h
+        include/wrench/util/MessageManager.h
+        include/wrench/util/TraceFileLoader.h
         )
 
 # source files
@@ -167,6 +169,8 @@ set(SOURCE_FILES
         src/wrench/util/WorkflowUtil.cpp
         src/wrench/services/helpers/Alarm.cpp
         src/wrench/util/PointerUtil.cpp
+        src/wrench/util/MessageManager.cpp
+        src/wrench/util/TraceFileLoader.cpp
         )
 
 # test files
@@ -191,8 +195,7 @@ set(TEST_FILES
         test/simulation/BatchServiceTest.cpp
         test/simulation/CloudServiceTest.cpp
         test/simulation/NoopScheduler.cpp
-        test/simulation/NoopScheduler.h
-        )
+        test/simulation/NoopScheduler.h)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)

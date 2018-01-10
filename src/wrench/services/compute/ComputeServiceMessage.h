@@ -276,6 +276,20 @@ namespace wrench {
         unsigned long num_idle_cores;
     };
 
+    /**
+     * @brief ComputeServiceInformationMessage class
+     */
+    class ComputeServiceInformationMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload);
+
+        /** @brief The job that is replying the information*/
+        WorkflowJob* job;
+
+        /** @brief The information to reply back */
+        std::string information;
+    };
+
 
     /***********************/
     /** \endcond           */
