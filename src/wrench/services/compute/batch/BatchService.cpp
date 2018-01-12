@@ -26,6 +26,7 @@
 #include "wrench/services/compute/batch/BatchServiceMessage.h"
 #include "wrench/services/compute/batch/BatchRequestReplyProcess.h"
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <signal.h>
 #include <json.hpp>
 #include <boost/algorithm/string.hpp>
