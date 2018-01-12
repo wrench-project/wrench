@@ -40,24 +40,23 @@ namespace wrench {
                                std::vector<std::string> execution_hosts,
                                StorageService *default_storage_service,
                                std::map<std::string, std::string> plist) :
-            ComputeService("cloud_service", "cloud_service", supports_standard_jobs, supports_pilot_jobs,
+            ComputeService(hostname, "cloud_service", "cloud_service", supports_standard_jobs, supports_pilot_jobs,
                            default_storage_service) {
 
       if (execution_hosts.empty()) {
         throw std::runtime_error("At least one execution host should be provided");
       }
       this->execution_hosts = execution_hosts;
-      this->hostname = hostname;
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
 
       // Start the daemon on the same host
-      try {
-        this->start(hostname);
-      } catch (std::invalid_argument &e) {
-        throw e;
-      }
+//      try {
+//        this->start_daemon(hostname);
+//      } catch (std::invalid_argument &e) {
+//        throw e;
+//      }
     }
 
     /**
@@ -386,6 +385,8 @@ namespace wrench {
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param plist: a property list ({} means "use all defaults")
+     *
+     * @throw std::runtime_error
      */
     void CloudService::processCreateVM(const std::string &answer_mailbox,
                                        const std::string &pm_hostname,
@@ -408,12 +409,21 @@ namespace wrench {
                                                                               simgrid::s4u::Host::by_name(
                                                                                       pm_hostname), num_cores);
 
-          // create a multicore executor for the VM
+          // create a multihost multicore computer service for the VM
           std::unique_ptr<ComputeService> cs(
                   new MultihostMulticoreComputeService(vm_hostname, supports_standard_jobs, supports_pilot_jobs,
                                                        {std::make_pair(vm_hostname, num_cores)},
                                                        default_storage_service, plist));
+
           cs->setSimulation(this->simulation);
+
+          // start the service
+          try {
+            cs->start();
+          } catch (std::runtime_error &e) {
+            throw;
+          }
+
 
           this->vm_list[vm_hostname] = std::make_tuple(vm, std::move(cs), num_cores);
 

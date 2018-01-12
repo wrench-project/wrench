@@ -30,8 +30,6 @@ namespace wrench {
         int message_size,double measurement_period,
         int noise);
 
-        std::string getHostname();
-
     private:
         std::map<std::string, std::string> default_property_values =
                 {{NetworkProximityServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,          "1024"},
@@ -55,7 +53,6 @@ namespace wrench {
                        int noise, std::string suffix);
 
 
-        std::string hostname;
         int message_size;
         double measurement_period;
         int noise;

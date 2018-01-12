@@ -38,10 +38,8 @@ namespace wrench {
 
 				virtual ~S4U_Daemon();
 
-				void start(std::string hostname, bool daemonized=false);
-				/** @brief The daemon's main routine
-				 * @return 0 on success, !=0 otherwise
-				 */
+				void start_daemon(std::string hostname, bool daemonized = false);
+
 				virtual int main() = 0;
         void setTerminated();
 				std::string getName();

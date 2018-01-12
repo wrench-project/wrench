@@ -174,7 +174,7 @@ private:
         // Doe the task-stored time information look good
         if (!StandardJobExecutorTest::isJustABitGreater(before, task->getStartDate())) {
           throw std::runtime_error(
-                  "Case 1: Unexpected task start date: " + std::to_string(task->getStartDate()));
+                  "Case 1: Unexpected task start_daemon date: " + std::to_string(task->getStartDate()));
         }
 
         // Note that we have to subtract the last thread startup overhead (for file deletions)

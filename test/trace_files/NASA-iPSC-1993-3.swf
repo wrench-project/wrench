@@ -18,7 +18,7 @@
 ; MaxNodes: 128
 ; MaxProcs: 128
 ; Note: There is no information on wait times - the given submit
-;       times are actually start times
+;       times are actually start_daemon times
 ; Note: group 1 is normal users
 ;       group 2 is system personnel
 ; Note: there is no data about batch queues

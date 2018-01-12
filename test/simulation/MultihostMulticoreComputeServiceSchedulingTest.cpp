@@ -531,7 +531,7 @@ private:
           }
 
           if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(0, wrench::S4U_Simulation::getClock())) {
-            throw std::runtime_error("Pilot job should start at time 0");
+            throw std::runtime_error("Pilot job should start_daemon at time 0");
           }
         }
 

@@ -113,6 +113,7 @@ TEST_F(OneTaskTest, Noop) {
 
 void OneTaskTest::do_Noop_test() {
 
+
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
   int argc = 1;

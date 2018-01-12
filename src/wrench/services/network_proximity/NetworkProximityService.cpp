@@ -65,7 +65,7 @@ namespace wrench {
             int message_size, double measurement_period, int noise,
             std::map<std::string, std::string> plist,
             std::string suffix) :
-            Service("network_proximity" + suffix, "network_proximity" + suffix) {
+            Service(hostname, "network_proximity" + suffix, "network_proximity" + suffix) {
 
         this->hosts_in_network = std::move(hosts_in_network);
 
@@ -79,19 +79,36 @@ namespace wrench {
             this->setProperty(p.first, p.second);
         }
 
-        //Start the network daemons
+        // Create the network daemons
         std::vector<std::string>::iterator it;
         for (it=this->hosts_in_network.begin();it!=this->hosts_in_network.end();it++){
             this->network_daemons.push_back(std::unique_ptr<NetworkDaemons>(new NetworkDaemons(*it,this->mailbox_name, message_size,measurement_period,noise)));
         }
 
-        // Start the daemon on the same host
-        try {
-            this->start(std::move(hostname));
-        } catch (std::invalid_argument e) {
-            throw e;
-        }
+//        // Start the daemon on the same host
+//        try {
+//          this->start_daemon(std::move(hostname));
+//        } catch (std::invalid_argument e) {
+//            throw e;
+//        }
 
+    }
+
+    /**
+     * @brief Starts the network proximity service sets of daemons
+     *
+     * @throw std::runtime_error
+     */
+    void NetworkProximityService::start() {
+      try {
+        // Start the network daemons
+        for (auto it = this->network_daemons.begin(); it != this->network_daemons.end(); it++) {
+          (*it)->start();
+        }
+        this->start_daemon(this->hostname, false);
+      } catch (std::runtime_error &e) {
+        throw;
+      }
     }
 
 

@@ -78,7 +78,8 @@ namespace wrench {
 
         virtual void terminatePilotJob(PilotJob *job);
 
-        ComputeService(std::string service_name,
+        ComputeService(std::string hostname,
+                       std::string service_name,
                        std::string mailbox_name_prefix,
                        bool supports_standard_jobs,
                        bool supports_pilot_jobs,

@@ -106,6 +106,15 @@ namespace wrench {
     }
 
     /**
+     * @brief Determines whether a host exists for a given hostname
+     * @param hostname: the hostname
+     * @return true or false
+     */
+    bool S4U_Simulation::hostExists(std::string hostname) {
+      return (simgrid::s4u::Host::by_name(hostname) != nullptr);
+    }
+
+    /**
      * @brief Retrieve the number of cores of a host
      *
      * @param hostname: the name of the host

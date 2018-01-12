@@ -47,10 +47,14 @@ namespace wrench{
                                 int message_size, double measurement_period, int noise,
                                 std::map<std::string, std::string> = {});
 
+        void start();
+
         double query(std::pair<std::string, std::string> hosts);
 
 
-    private:
+
+
+          private:
 
         friend class Simulation;
 

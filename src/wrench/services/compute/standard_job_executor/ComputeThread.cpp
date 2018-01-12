@@ -35,7 +35,7 @@ namespace wrench {
 
       // Start my daemon on the host
       this->hostname = S4U_Simulation::getHostName();
-      this->start(this->hostname, false);
+      this->start_daemon(this->hostname, false);
     }
 
     int ComputeThread::main() {

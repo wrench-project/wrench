@@ -13,6 +13,8 @@
 
 namespace wrench{
 
+    // TODO: At some point, we may want to make this with only unique pointers...
+
     std::map<std::string,std::vector<SimulationMessage*>> MessageManager::mailbox_messages = {};
 
     void MessageManager::manageMessage(std::string mailbox, SimulationMessage *msg) {
