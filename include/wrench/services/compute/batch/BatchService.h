@@ -183,7 +183,7 @@ namespace wrench {
         std::set<std::pair<std::string,unsigned long>> scheduleOnHosts(std::string host_selection_algorithm,
                                                                        unsigned long, unsigned long);
 
-        std::unique_ptr<BatchJob> scheduleJob(std::string);
+        BatchJob* scheduleJob(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void terminate();
@@ -221,6 +221,10 @@ namespace wrench {
 
         //process execute events from batsched
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
+
+        //process execution of job
+        void processExecution(std::set<std::pair<std::string,unsigned long>>,WorkflowJob*,
+                              BatchJob*, unsigned long, unsigned long, unsigned long);
 
         //notify batsched about job completion/failure/killed events
         void notifyJobEventsToBatSched(std::string job_id,std::string status, std::string job_state, std::string kill_reason);
