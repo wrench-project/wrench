@@ -127,7 +127,7 @@ namespace wrench {
       try {
         //also let the MessageManager manage this message
         MessageManager::manageMessage(mailbox_name,msg);
-        mailbox->put(msg, (size_t) msg->payload);
+        mailbox->put(msg, (uint64_t) msg->payload);
       } catch (xbt_ex &e) {
         if ((e.category == network_error) || (e.category == timeout_error)) {
           throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, mailbox_name));
@@ -198,7 +198,7 @@ namespace wrench {
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       try {
-        comm_ptr = mailbox->put_async(msg, (size_t) msg->payload);
+        comm_ptr = mailbox->put_async(msg, (uint64_t) msg->payload);
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, mailbox_name));
