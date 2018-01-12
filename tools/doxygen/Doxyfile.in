@@ -1910,7 +1910,7 @@ GENERATE_MAN           = NO
 MAN_OUTPUT             = man
 
 # The MAN_EXTENSION tag determines the extension that is added to the generated
-# man pages. In case the manual section does not start with a number, the number
+# man pages. In case the manual section does not start_daemon with a number, the number
 # 3 is prepended. The dot (.) at the beginning of the MAN_EXTENSION tag is
 # optional.
 # The default value is: .3.

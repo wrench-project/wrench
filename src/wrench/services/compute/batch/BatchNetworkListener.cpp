@@ -41,10 +41,9 @@ namespace wrench{
     BatchNetworkListener::BatchNetworkListener(
             std::string hostname, std::string batch_service_mailbox, std::string self_port, std::string sched_port,
             NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send, std::map<std::string, std::string> plist, std::string suffix="") :
-            Service("batch_network_listener" + suffix, "batch_network_listener" + suffix) {
+            Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
 
       // Start the daemon on the same host
-      this->hostname = hostname;
       this->self_port = self_port;
       this->sched_port = sched_port;
       this->MY_LISTENER_TYPE = MY_TYPE;
@@ -53,7 +52,7 @@ namespace wrench{
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
       try {
-        this->start(hostname);
+        this->start_daemon(hostname);
       } catch (std::invalid_argument e) {
         throw e;
       }

@@ -55,6 +55,8 @@ namespace wrench {
             std::string &hostname,
             std::string suffix);
 
+        void start();
+
         void runDynamicOptimizations();
 
         void runStaticOptimizations();

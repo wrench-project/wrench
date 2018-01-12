@@ -74,7 +74,8 @@ namespace wrench {
                                 std::map<WorkflowFile *, StorageService *> file_locations,
                                 StorageService *default_storage_service);
 
-        StorageService(std::string service_name,
+        StorageService(std::string hostname,
+                       std::string service_name,
                        std::string data_mailbox_name_prefix,
                        double capacity);
 

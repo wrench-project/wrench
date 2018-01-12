@@ -274,7 +274,8 @@ namespace wrench {
             PilotJob *pj,
             std::string suffix,
             StorageService *default_storage_service) :
-            ComputeService("multihost_multicore" + suffix,
+            ComputeService(hostname,
+                           "multihost_multicore" + suffix,
                            "multihost_multicore" + suffix,
                            supports_standard_jobs,
                            supports_pilot_jobs,
@@ -282,8 +283,6 @@ namespace wrench {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
-
-      this->hostname = hostname;
 
       // Check that there is at least one core per host and that hosts have enough cores
       for (auto host : compute_resources) {
@@ -315,12 +314,12 @@ namespace wrench {
       this->has_ttl = (ttl >= 0);
       this->containing_pilot_job = pj;
 
-      // Start the daemon on the same host
-      try {
-        this->start(hostname);
-      } catch (std::invalid_argument &e) {
-        throw;
-      }
+//      // Start the daemon on the same host
+//      try {
+//        this->start_daemon(hostname);
+//      } catch (std::invalid_argument &e) {
+//        throw;
+//      }
     }
 
     /**
@@ -609,6 +608,8 @@ namespace wrench {
      * @brief Try to dispatch a pilot job
      * @param job: the job
      * @return true is the job was dispatched, false otherwise
+     *
+     * @throw std::runtime_error
      */
     bool MultihostMulticoreComputeService::dispatchPilotJob(PilotJob *job) {
 
@@ -653,6 +654,13 @@ namespace wrench {
 
       cs->setSimulation(this->simulation);
       job->setComputeService(cs);
+
+      // Start the compute service
+      try {
+        cs->start();
+      } catch (std::runtime_error &e) {
+        throw;
+      }
 
       // Put the job in the running queue
       this->running_jobs.insert((WorkflowJob *) job);

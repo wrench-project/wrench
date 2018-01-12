@@ -38,6 +38,8 @@ namespace wrench {
             DOWN,
         };
 
+        virtual void start();
+
         virtual void stop();
 
         std::string getHostname();
@@ -72,7 +74,7 @@ namespace wrench {
 
         friend class Simulation;
 
-        Service(std::string process_name_prefix, std::string mailbox_name_prefix);
+        Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix);
 
         // Property stuff
         void setProperty(std::string, std::string);

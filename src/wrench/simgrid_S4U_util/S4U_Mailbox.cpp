@@ -161,7 +161,7 @@ namespace wrench {
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
 
       try {
-        mailbox->put_init(msg, msg->payload)->detach();
+        mailbox->put_init(msg, (uint64_t) msg->payload)->detach();
       } catch (xbt_ex &e) {
         if ((e.category == network_error) || (e.category == timeout_error)) {
           WRENCH_INFO("Network error while doing a dputMessage()");

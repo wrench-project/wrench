@@ -180,6 +180,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
           std::unique_ptr<wrench::SimpleStorageService>(
                   new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
+  // Create a file registry service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
           new wrench::FileRegistryService(hostname));
 
@@ -198,6 +199,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     std::string network_daemon4 = simulation->getHostnameList()[3];
   std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
+  // Create a network proximity service
   std::unique_ptr<wrench::NetworkProximityService> network_proximity_service(
           new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, 1, 2, 1)
   );

@@ -67,12 +67,14 @@ namespace wrench {
      * @brief Start the daemon
      *
      * @param hostname: the name of the host on which to start the daemon
+     * @param daemonized: whether the S4U actor should be daemonized (untstart_ested)
      */
-    void S4U_Daemon::start(std::string hostname, bool daemonized) {
+    void S4U_Daemon::start_daemon(std::string hostname, bool daemonized) {
 
       // Check that the host exists, and if not throw an exceptions
       if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
-        throw std::invalid_argument("S4U_DaemonWithMailbox::start(): Unknown host name '" + hostname + "'");
+        WRENCH_INFO("THROWING IN S$UDAEMON: '%s'", hostname.c_str());
+        throw std::invalid_argument("S4U_DaemonWithMailbox::start_daemon(): Unknown host name '" + hostname + "'");
       }
 
       // Create the s4u_actor
@@ -82,6 +84,7 @@ namespace wrench {
                                                            S4U_DaemonActor(this));
       } catch (std::exception &e) {
         // Some internal SimGrid exceptions...
+        WRENCH_INFO("CRAP");
         std::abort();
       }
 

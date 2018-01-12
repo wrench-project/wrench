@@ -147,18 +147,20 @@ namespace wrench {
     /**
      * @brief Constructor
      *
+     * @param hostname: the name of the host on which the service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
      * @param supports_standard_jobs: true if the job executor should support standard jobs
      * @param supports_pilot_jobs: true if the job executor should support pilot jobs
      * @param default_storage_service: a storage service
      */
-    ComputeService::ComputeService(std::string service_name,
+    ComputeService::ComputeService(std::string hostname,
+                                   std::string service_name,
                                    std::string mailbox_name_prefix,
                                    bool supports_standard_jobs,
                                    bool supports_pilot_jobs,
                                    StorageService *default_storage_service) :
-            Service(service_name, mailbox_name_prefix),
+            Service(hostname, service_name, mailbox_name_prefix),
             supports_pilot_jobs(supports_pilot_jobs),
             supports_standard_jobs(supports_standard_jobs),
             default_storage_service(default_storage_service) {

@@ -23,12 +23,13 @@ namespace wrench {
     /**
      * @brief Constructor
      *
+     * @param hostname: the name of the host on which the service runs
      * @param service_name: the name of the storage service
      * @param mailbox_name_prefix:
      * @param capacity:
      */
-    StorageService::StorageService(std::string service_name, std::string mailbox_name_prefix, double capacity) :
-            Service(service_name, mailbox_name_prefix) {
+    StorageService::StorageService(std::string hostname, std::string service_name, std::string mailbox_name_prefix, double capacity) :
+            Service(hostname, service_name, mailbox_name_prefix) {
 
       if (capacity < 0) {
         throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): Invalid argument");

@@ -129,7 +129,6 @@ namespace wrench {
                                          PilotJob *pj, std::string suffix,
                                          StorageService *default_storage_service);
 
-        std::string hostname;
         std::set<std::pair<std::string, unsigned long>> compute_resources;
         // Core availabilities (for each hosts, how many cores are currently available on it)
         std::map<std::string, unsigned long> core_availabilities;

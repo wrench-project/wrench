@@ -29,7 +29,7 @@ namespace wrench {
      * @param suffix: a (possibly empty) suffix to append to the daemon name
      */
     Alarm::Alarm(double date, std::string hostname, std::string reply_mailbox_name,
-                 SimulationMessage* msg, std::string suffix):Service("alarm_service_"+suffix,"alarm_service_"+suffix) {
+                 SimulationMessage* msg, std::string suffix):Service(hostname, "alarm_service_"+suffix,"alarm_service_"+suffix) {
         
         this->date = date;
         if(this->date<=S4U_Simulation::getClock()){
@@ -37,10 +37,11 @@ namespace wrench {
         }
         this->reply_mailbox_name = reply_mailbox_name;
         this->msg = std::unique_ptr<SimulationMessage>(msg);
+
         // Start the daemon on the same host
         try {
             WRENCH_INFO("Alarm Service starting...");
-            this->start(hostname,true);
+          this->start_daemon(hostname, true);
         } catch (std::invalid_argument e) {
             throw e;
         }

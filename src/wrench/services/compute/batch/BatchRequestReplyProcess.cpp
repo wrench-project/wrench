@@ -40,17 +40,16 @@ namespace wrench{
 
     BatchRequestReplyProcess::BatchRequestReplyProcess(
             std::string hostname,std::string self_port, std::string sched_port, std::string suffix="") :
-            Service("batch_request_reply" + suffix, "batch_request_reply" + suffix) {
+            Service(hostname, "batch_request_reply" + suffix, "batch_request_reply" + suffix) {
 
       // Start the daemon on the same host
-      this->hostname = std::move(hostname);
       std::cout<<"Not thrown until here\n";
       //create a network listener here, because there will be only one network listener but many network senders
       std::unique_ptr<BatchNetworkListener> network_listener = std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name, self_port,
                                                                                                                               sched_port,BatchNetworkListener::NETWORK_LISTENER_TYPE::LISTENER,
                                                                                                                               ""));
       try {
-        this->start(this->hostname);
+        this->start_daemon(this->hostname);
       } catch (std::invalid_argument e) {
         throw e;
       }

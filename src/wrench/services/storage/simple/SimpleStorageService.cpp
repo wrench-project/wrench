@@ -66,7 +66,7 @@ namespace wrench {
             double capacity,
             std::map<std::string, std::string> plist,
             std::string suffix) :
-            StorageService("simple" + suffix, "simple" + suffix, capacity) {
+            StorageService(hostname, "simple" + suffix, "simple" + suffix, capacity) {
 
       // Set default properties
       for (auto p : this->default_property_values) {
@@ -78,12 +78,12 @@ namespace wrench {
         this->setProperty(p.first, p.second);
       }
 
-      // Start the daemon on the same host
-      try {
-        this->start(hostname);
-      } catch (std::invalid_argument &e) {
-        throw;
-      }
+//      // Start the daemon on the same host
+//      try {
+//        this->start_daemon(hostname);
+//      } catch (std::invalid_argument &e) {
+//        throw;
+//      }
     }
 
     /**

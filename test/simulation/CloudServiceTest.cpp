@@ -121,6 +121,7 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
 
+      // Create a file registry service
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
       // Create a 2-task job
