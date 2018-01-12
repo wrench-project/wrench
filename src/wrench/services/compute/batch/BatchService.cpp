@@ -112,12 +112,6 @@ namespace wrench {
 #else
       is_bat_sched_ready = true;
 #endif
-//      // Start the daemon on the same host
-//      try {
-//        this->start(hostname);
-//      } catch (std::invalid_argument e) {
-//        throw e;
-//      }
     }
 
 
@@ -364,8 +358,9 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
 
-#ifdef ENABLE_BATSCHED
       WRENCH_INFO("Batch Service starting on host %s!", S4U_Simulation::getHostName().c_str());
+
+#ifdef ENABLE_BATSCHED
         nlohmann::json compute_resources_map;
         compute_resources_map["now"] = S4U_Simulation::getClock();
         compute_resources_map["events"][0]["timestamp"] = S4U_Simulation::getClock();
@@ -1369,8 +1364,9 @@ namespace wrench {
  */
     void BatchService::run_batsched() {
       this->pid = fork();
-      if (this->pid == 0) {
-        // run the batsched here
+
+      if (this->pid == 0) { // Child process that will exec batsched
+
         std::string algorithm = this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM);
         bool is_supported = this->scheduling_algorithms.find(algorithm) != this->scheduling_algorithms.end();
         if (not is_supported) {
@@ -1497,6 +1493,12 @@ namespace wrench {
           // Create and launch a compute service for the pilot job
           job->setComputeService(cs);
 
+
+          try {
+            cs->start();
+          } catch (std::runtime_error &e) {
+            throw;
+          }
 
           // Put the job in the running queue
 //          this->running_jobs.insert(std::move(batch_job_ptr));
