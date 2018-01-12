@@ -234,7 +234,6 @@ void BatchServiceTest::do_StandardJobTaskTest_test() {
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  std::cerr << "TEST CALLS LAUNCH\n" << getpid() << "\n";
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
@@ -2209,11 +2208,7 @@ private:
     }
 };
 
-<<<<<<< HEAD
-TEST_F(BatchServiceTest, DifferentBatchAlgorithmsSubmissionTest) {
-  DO_TEST_WITH_FORK(do_DifferentBatchAlgorithmsSubmissionTest_test);
-}
-=======
+
 #ifdef ENABLE_BATSCHED
     TEST_F(BatchServiceTest, DifferentBatchAlgorithmsSubmissionTest) {
         DO_TEST_WITH_FORK(do_DifferentBatchAlgorithmsSubmissionTest_test);
@@ -2223,7 +2218,6 @@ TEST_F(BatchServiceTest, DifferentBatchAlgorithmsSubmissionTest) {
         DO_TEST_WITH_FORK(do_DifferentBatchAlgorithmsSubmissionTest_test);
     }
 #endif
->>>>>>> a462579fbf6cc825fbc5dfdaff2b35a81e917ee5
 
 
 void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
@@ -2377,11 +2371,7 @@ private:
     }
 };
 
-<<<<<<< HEAD
-TEST_F(BatchServiceTest, BatchFakeJobSubmissionTest) {
-  DO_TEST_WITH_FORK(do_BatchFakeJobSubmissionTest_test);
-}
-=======
+
 #ifdef ENABLE_BATSCHED
     TEST_F(BatchServiceTest, BatchFakeJobSubmissionTest) {
         DO_TEST_WITH_FORK(do_BatchFakeJobSubmissionTest_test);
@@ -2391,7 +2381,6 @@ TEST_F(BatchServiceTest, BatchFakeJobSubmissionTest) {
         DO_TEST_WITH_FORK(do_BatchFakeJobSubmissionTest_test);
     }
 #endif
->>>>>>> a462579fbf6cc825fbc5dfdaff2b35a81e917ee5
 
 
 void BatchServiceTest::do_BatchFakeJobSubmissionTest_test() {
@@ -2556,11 +2545,6 @@ private:
     }
 };
 
-<<<<<<< HEAD
-TEST_F(BatchServiceTest, BatchTraceFileJobSubmissionTest) {
-  DO_TEST_WITH_FORK(do_BatchTraceFileJobSubmissionTest_test);
-}
-=======
 #ifdef ENABLE_BATSCHED
     TEST_F(BatchServiceTest, BatchTraceFileJobSubmissionTest) {
         DO_TEST_WITH_FORK(do_BatchTraceFileJobSubmissionTest_test);
@@ -2570,7 +2554,6 @@ TEST_F(BatchServiceTest, BatchTraceFileJobSubmissionTest) {
         DO_TEST_WITH_FORK(do_BatchTraceFileJobSubmissionTest_test);
     }
 #endif
->>>>>>> a462579fbf6cc825fbc5dfdaff2b35a81e917ee5
 
 
 void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
