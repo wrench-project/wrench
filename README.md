@@ -51,7 +51,7 @@ make install  # try "sudo make install" if you don't have the permission to writ
 
 For enabling the use of Batsched:
 ```bash
-cmake -DENABLE_VATSCHED=on .
+cmake -DENABLE_BATSCHED=on .
 make
 make install  # try "sudo make install" if you don't have the permission to write
 ```
