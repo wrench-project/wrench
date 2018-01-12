@@ -4,6 +4,9 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 project(wrench CXX)
 
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
+if (ENABLE_BATSCHED)
+    add_definitions(-DENABLE_BATSCHED)
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -212,7 +215,13 @@ install(DIRECTORY include/ DESTINATION include)
 
 # generate unit tests
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
-target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm -lzmq)
+if (ENABLE_BATSCHED)
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm -lzmq)
+else()
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm)
+endif()
+
+
 set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
 set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
 add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
