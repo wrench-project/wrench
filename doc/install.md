@@ -29,6 +29,9 @@ And, one of the following:
 - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
 
+- [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for batch-scheduled resource simulation
+
+
 
 # Source Install #                  {#install-source}
 
@@ -46,11 +49,20 @@ make
 make install # try "sudo make install" if you don't have the permission to write
 ~~~~~~~~~~~~~
 
+To enable the use of Batsched (provided you have installed that package, see above):
+~~~~~~~~~~~~~{.sh}
+cmake -DENABLE_BATSCHED .
+~~~~~~~~~~~~~
+
+
+
 If you want to stay on the bleeding edge, you should get the latest git version, and recompile it as you would do for an official archive:
 
 ~~~~~~~~~~~~~{.sh}
 git clone https://github.com/wrench-project/wrench
 ~~~~~~~~~~~~~
+
+
 
 
 ## Existing Compilation Targets ##  {#install-source-targets}
