@@ -73,7 +73,7 @@ set(HEADER_FILES
         include/wrench/services/file_registry/FileRegistryServiceProperty.h
         include/wrench/services/network_proximity/NetworkProximityService.h
         include/wrench/services/network_proximity/NetworkProximityServiceProperty.h
-        include/wrench/services/network_proximity/NetworkDaemons.h
+        include/wrench/services/network_proximity/NetworkDaemon.h
         include/wrench/simulation/Simulation.h
         include/wrench/simulation/SimulationTimestampTypes.h
         include/wrench/simulation/SimulationOutput.h
@@ -162,7 +162,7 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity/NetworkProximityServiceProperty.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.h
-        src/wrench/services/network_proximity/NetworkDaemons.cpp
+        src/wrench/services/network_proximity/NetworkDaemon.cpp
         src/wrench/services/compute/batch/BatchJob.cpp
         src/wrench/services/compute/batch/BatchServiceMessage.cpp
         src/wrench/services/compute/batch/BatchService.cpp

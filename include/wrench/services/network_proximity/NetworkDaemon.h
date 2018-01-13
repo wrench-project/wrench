@@ -22,10 +22,10 @@ namespace wrench {
     /**
      * @brief A network daemon running (proximity is computed between two such running daemons)
      */
-    class NetworkDaemons: public Service {
+    class NetworkDaemon: public Service {
     public:
 
-        NetworkDaemons(std::string hostname,
+        NetworkDaemon(std::string hostname,
                        std::string network_proximity_service_mailbox,
         int message_size,double measurement_period,
         int noise);
@@ -47,7 +47,7 @@ namespace wrench {
 
         friend class Simulation;
 
-        NetworkDaemons(std::string hostname,
+        NetworkDaemon(std::string hostname,
                        std::string network_proximity_service_mailbox,
                        int message_size,double measurement_period,
                        int noise, std::string suffix);

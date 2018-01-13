@@ -14,7 +14,7 @@
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
 #include "NetworkProximityMessage.h"
-#include "wrench/services/network_proximity/NetworkDaemons.h"
+#include "wrench/services/network_proximity/NetworkDaemon.h"
 
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <random>
@@ -82,7 +82,7 @@ namespace wrench {
         // Create the network daemons
         std::vector<std::string>::iterator it;
         for (it=this->hosts_in_network.begin();it!=this->hosts_in_network.end();it++){
-            this->network_daemons.push_back(std::unique_ptr<NetworkDaemons>(new NetworkDaemons(*it,this->mailbox_name, message_size,measurement_period,noise)));
+            this->network_daemons.push_back(std::unique_ptr<NetworkDaemon>(new NetworkDaemon(*it,this->mailbox_name, message_size,measurement_period,noise)));
         }
 
 //        // Start the daemon on the same host
@@ -207,7 +207,7 @@ namespace wrench {
             // This is Synchronous
             try {
                 //Stop the network daemons
-                std::vector<std::unique_ptr<NetworkDaemons>>::iterator it;
+                std::vector<std::unique_ptr<NetworkDaemon>>::iterator it;
                 for (it=this->network_daemons.begin();it!=this->network_daemons.end();it++){
                     if((*it)->isUp()) {
                         (*it)->stop();
