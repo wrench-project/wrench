@@ -12,7 +12,7 @@
 
 #include "wrench/services/Service.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
-#include "wrench/services/network_proximity/NetworkDaemons.h"
+#include "wrench/services/network_proximity/NetworkDaemon.h"
 
 namespace wrench{
 
@@ -64,7 +64,7 @@ namespace wrench{
                                 int noise,std::map<std::string, std::string>,
                                 std::string suffix = "");
 
-        std::vector<std::unique_ptr<NetworkDaemons>> network_daemons;
+        std::vector<std::unique_ptr<NetworkDaemon>> network_daemons;
         std::vector<std::string> hosts_in_network;
 
         int main();

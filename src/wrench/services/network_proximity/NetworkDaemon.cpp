@@ -9,7 +9,7 @@
 
 
 #include <wrench/logging/TerminalOutput.h>
-#include "wrench/services/network_proximity/NetworkDaemons.h"
+#include "wrench/services/network_proximity/NetworkDaemon.h"
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <simulation/SimulationMessage.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
@@ -28,11 +28,11 @@ namespace wrench {
      * @param measurement_period the time-difference between two message transfer to compute proximity
      * @param noise the noise to add to compute the time-difference
      */
-    NetworkDaemons::NetworkDaemons(std::string hostname,
+    NetworkDaemon::NetworkDaemon(std::string hostname,
                                    std::string network_proximity_service_mailbox,
                                    int message_size=1,double measurement_period=1000,
                                    int noise=100):
-            NetworkDaemons(hostname,network_proximity_service_mailbox,
+            NetworkDaemon(hostname,network_proximity_service_mailbox,
             message_size,measurement_period, noise,"") {
     }
 
@@ -47,7 +47,7 @@ namespace wrench {
      * @param suffix: suffix to append to the service name and mailbox
      */
 
-    NetworkDaemons::NetworkDaemons(
+    NetworkDaemon::NetworkDaemon(
             std::string hostname,
             std::string network_proximity_service_mailbox,
             int message_size=1,double measurement_period=1000,
@@ -69,7 +69,7 @@ namespace wrench {
 
     }
 
-    int NetworkDaemons::main() {
+    int NetworkDaemon::main() {
 
         TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
 
@@ -148,7 +148,7 @@ namespace wrench {
 
 
 
-    bool NetworkDaemons::processNextMessage(double timeout) {
+    bool NetworkDaemon::processNextMessage(double timeout) {
 
         // Wait for a message
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -200,7 +200,7 @@ namespace wrench {
         }
     }
 
-//    std::string NetworkDaemons::getHostname() {
+//    std::string NetworkDaemon::getHostname() {
 //        return this->hostname;
 //    }
 
