@@ -54,11 +54,12 @@ namespace wrench{
       this->batch_service_mailbox = batch_service_mailbox;
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
-      try {
-        this->start_daemon(hostname);
-      } catch (std::invalid_argument e) {
-        throw e;
-      }
+
+//      try {
+//        this->start_daemon(hostname);
+//      } catch (std::invalid_argument e) {
+//        throw e;
+//      }
     }
 
     int BatchNetworkListener::main() {

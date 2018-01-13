@@ -9,7 +9,7 @@
 
 
 #include <wrench/logging/TerminalOutput.h>
-#include "wrench/services/network_proximity/NetworkDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximityDaemon.h"
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <simulation/SimulationMessage.h>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
@@ -28,11 +28,11 @@ namespace wrench {
      * @param measurement_period the time-difference between two message transfer to compute proximity
      * @param noise the noise to add to compute the time-difference
      */
-    NetworkDaemon::NetworkDaemon(std::string hostname,
+    NetworkProximityDaemon::NetworkProximityDaemon(std::string hostname,
                                    std::string network_proximity_service_mailbox,
                                    int message_size=1,double measurement_period=1000,
                                    int noise=100):
-            NetworkDaemon(hostname,network_proximity_service_mailbox,
+            NetworkProximityDaemon(hostname,network_proximity_service_mailbox,
             message_size,measurement_period, noise,"") {
     }
 
@@ -47,7 +47,7 @@ namespace wrench {
      * @param suffix: suffix to append to the service name and mailbox
      */
 
-    NetworkDaemon::NetworkDaemon(
+    NetworkProximityDaemon::NetworkProximityDaemon(
             std::string hostname,
             std::string network_proximity_service_mailbox,
             int message_size=1,double measurement_period=1000,
@@ -69,7 +69,7 @@ namespace wrench {
 
     }
 
-    int NetworkDaemon::main() {
+    int NetworkProximityDaemon::main() {
 
         TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
 
@@ -148,7 +148,7 @@ namespace wrench {
 
 
 
-    bool NetworkDaemon::processNextMessage(double timeout) {
+    bool NetworkProximityDaemon::processNextMessage(double timeout) {
 
         // Wait for a message
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -200,7 +200,7 @@ namespace wrench {
         }
     }
 
-//    std::string NetworkDaemon::getHostname() {
+//    std::string NetworkProximityDaemon::getHostname() {
 //        return this->hostname;
 //    }
 
