@@ -361,7 +361,7 @@ namespace wrench {
       WRENCH_INFO("Batch Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
 #ifdef ENABLE_BATSCHED
-        nlohmann::json compute_resources_map;
+      nlohmann::json compute_resources_map;
         compute_resources_map["now"] = S4U_Simulation::getClock();
         compute_resources_map["events"][0]["timestamp"] = S4U_Simulation::getClock();
         compute_resources_map["events"][0]["type"] = "SIMULATION_BEGINS";
@@ -384,7 +384,7 @@ namespace wrench {
                                          "14000", "28000",
                                          BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                          data));
-
+        network_listener->start();
         network_listeners.push_back(std::move(network_listener));
 #endif
 
@@ -713,6 +713,7 @@ namespace wrench {
                                          "14000", "28000",
                                          BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                          data));
+        network_listener->start();
         network_listeners.push_back(std::move(network_listener));
         this->is_bat_sched_ready = false;
 #else
@@ -890,7 +891,9 @@ namespace wrench {
                                          BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                          data));
 
+        network_listener->start();
         network_listeners.push_back(std::move(network_listener));
+
 #endif
 
 
@@ -1757,7 +1760,9 @@ namespace wrench {
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
 
+      network_listener->start();
       network_listeners.push_back(std::move(network_listener));
+
     }
 
 

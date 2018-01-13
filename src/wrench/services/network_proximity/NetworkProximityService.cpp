@@ -14,7 +14,7 @@
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
 #include "NetworkProximityMessage.h"
-#include "wrench/services/network_proximity/NetworkDaemon.h"
+#include "wrench/services/network_proximity/NetworkProximityDaemon.h"
 
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <random>
@@ -82,20 +82,13 @@ namespace wrench {
         // Create the network daemons
         std::vector<std::string>::iterator it;
         for (it=this->hosts_in_network.begin();it!=this->hosts_in_network.end();it++){
-            this->network_daemons.push_back(std::unique_ptr<NetworkDaemon>(new NetworkDaemon(*it,this->mailbox_name, message_size,measurement_period,noise)));
+            this->network_daemons.push_back(std::unique_ptr<NetworkProximityDaemon>(new NetworkProximityDaemon(*it,this->mailbox_name, message_size,measurement_period,noise)));
         }
-
-//        // Start the daemon on the same host
-//        try {
-//          this->start_daemon(std::move(hostname));
-//        } catch (std::invalid_argument e) {
-//            throw e;
-//        }
-
     }
 
     /**
-     * @brief Starts the network proximity service sets of daemons
+     * @brief Starts the network proximity service sets of daemons and the
+     *        proximity service itself
      *
      * @throw std::runtime_error
      */
@@ -207,7 +200,7 @@ namespace wrench {
             // This is Synchronous
             try {
                 //Stop the network daemons
-                std::vector<std::unique_ptr<NetworkDaemon>>::iterator it;
+                std::vector<std::unique_ptr<NetworkProximityDaemon>>::iterator it;
                 for (it=this->network_daemons.begin();it!=this->network_daemons.end();it++){
                     if((*it)->isUp()) {
                         (*it)->stop();
