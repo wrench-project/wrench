@@ -18,6 +18,7 @@
 // Compute Services
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/ComputeServiceProperty.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
 
 // Storage Services
 #include "wrench/services/storage/StorageService.h"

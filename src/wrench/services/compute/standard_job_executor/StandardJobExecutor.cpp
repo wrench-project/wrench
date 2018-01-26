@@ -18,7 +18,7 @@
 #include "simulation/SimulationMessage.h"
 #include "wrench/services/storage/StorageService.h"
 #include "services/ServiceMessage.h"
-#include "services/compute/ComputeServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "StandardJobExecutorMessage.h"

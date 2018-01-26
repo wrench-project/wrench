@@ -14,7 +14,7 @@
 
 #include <vector>
 
-#include "services/compute/ComputeServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
 
 namespace wrench {
 
