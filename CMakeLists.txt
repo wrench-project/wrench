@@ -105,7 +105,7 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.h
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
-        src/wrench/simgrid_S4U_util/S4U_Mailbox.h
+        include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/WorkflowTask.cpp

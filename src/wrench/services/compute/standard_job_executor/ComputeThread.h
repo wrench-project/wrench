@@ -11,7 +11,7 @@
 #ifndef WRENCH_COMPUTETHREAD_H
 #define WRENCH_COMPUTETHREAD_H
 
-#include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "StandardJobExecutorMessage.h"
 

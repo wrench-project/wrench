@@ -11,7 +11,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/services/compute/batch/BatchService.h"
-#include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
 #include <wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h>
 #include <wrench/util/PointerUtil.h>

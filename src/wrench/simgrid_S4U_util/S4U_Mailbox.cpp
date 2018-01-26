@@ -18,7 +18,7 @@
 #include "wrench/workflow/execution_events/FailureCause.h"
 
 #include "wrench/logging/TerminalOutput.h"
-#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "simulation/SimulationMessage.h"
 
