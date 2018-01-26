@@ -36,6 +36,8 @@ And, one of the following:
 - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
 
+- [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for batch-scheduled resource simulation
+
 
 ## Building From Source
 
@@ -46,6 +48,14 @@ cmake .
 make
 make install  # try "sudo make install" if you don't have the permission to write
 ```
+
+For enabling the use of Batsched:
+```bash
+cmake -DENABLE_BATSCHED=on .
+make
+make install  # try "sudo make install" if you don't have the permission to write
+```
+
 
 ## Get in Touch
 

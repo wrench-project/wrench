@@ -42,6 +42,8 @@ namespace wrench {
 
         std::vector<std::string> getHostnameList();
 
+        bool hostExists(std::string hostname);
+
         void launch();
 
         ComputeService *add(std::unique_ptr<ComputeService> executor);
@@ -108,6 +110,9 @@ namespace wrench {
         std::set<std::unique_ptr<ComputeService>> compute_services;
 
         std::set<std::unique_ptr<StorageService>> storage_services;
+
+        void check_simulation_setup();
+        void start_all_processes();
 
     };
 

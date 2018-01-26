@@ -21,7 +21,7 @@ namespace wrench {
     class WorkflowFile;
 
     class StorageService;
-    
+
     /**
      * @brief A file registry service (a.k.a. replica catalog)
      */

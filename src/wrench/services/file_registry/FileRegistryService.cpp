@@ -46,7 +46,7 @@ namespace wrench {
             std::string hostname,
             std::map<std::string, std::string> plist,
             std::string suffix) :
-            Service("file_registry" + suffix, "file_registry" + suffix) {
+            Service(hostname, "file_registry" + suffix, "file_registry" + suffix) {
 
       // Set default properties
       for (auto p : this->default_property_values) {
@@ -58,12 +58,12 @@ namespace wrench {
         this->setProperty(p.first, p.second);
       }
 
-      // Start the daemon on the same host
-      try {
-        this->start(hostname);
-      } catch (std::invalid_argument e) {
-        throw e;
-      }
+//      // Start the daemon on the same host
+//      try {
+//        this->start_daemon(hostname);
+//      } catch (std::invalid_argument e) {
+//        throw e;
+//      }
     }
 
 

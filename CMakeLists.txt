@@ -4,6 +4,9 @@ message(STATUS "Cmake version ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}.${CM
 project(wrench CXX)
 
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
+if (ENABLE_BATSCHED)
+    add_definitions(-DENABLE_BATSCHED)
+endif()
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -71,7 +74,7 @@ set(HEADER_FILES
         include/wrench/services/file_registry/FileRegistryServiceProperty.h
         include/wrench/services/network_proximity/NetworkProximityService.h
         include/wrench/services/network_proximity/NetworkProximityServiceProperty.h
-        include/wrench/services/network_proximity/NetworkDaemons.h
+        include/wrench/services/network_proximity/NetworkProximityDaemon.h
         include/wrench/simulation/Simulation.h
         include/wrench/simulation/SimulationTimestampTypes.h
         include/wrench/simulation/SimulationOutput.h
@@ -88,6 +91,8 @@ set(HEADER_FILES
         include/wrench/util/WorkflowUtil.h
         include/wrench/services/helpers/Alarm.h
         include/wrench/util/PointerUtil.h
+        include/wrench/util/MessageManager.h
+        include/wrench/util/TraceFileLoader.h
         )
 
 # source files
@@ -157,7 +162,7 @@ set(SOURCE_FILES
         src/wrench/services/network_proximity/NetworkProximityServiceProperty.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.h
-        src/wrench/services/network_proximity/NetworkDaemons.cpp
+        src/wrench/services/network_proximity/NetworkProximityDaemon.cpp
         src/wrench/services/compute/batch/BatchJob.cpp
         src/wrench/services/compute/batch/BatchServiceMessage.cpp
         src/wrench/services/compute/batch/BatchService.cpp
@@ -167,6 +172,8 @@ set(SOURCE_FILES
         src/wrench/util/WorkflowUtil.cpp
         src/wrench/services/helpers/Alarm.cpp
         src/wrench/util/PointerUtil.cpp
+        src/wrench/util/MessageManager.cpp
+        src/wrench/util/TraceFileLoader.cpp
         )
 
 # test files
@@ -188,8 +195,7 @@ set(TEST_FILES
         test/simulation/BatchServiceTest.cpp
         test/simulation/CloudServiceTest.cpp
         test/simulation/NoopScheduler.cpp
-        test/simulation/NoopScheduler.h
-        )
+        test/simulation/NoopScheduler.h)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
@@ -206,7 +212,13 @@ install(DIRECTORY include/ DESTINATION include)
 
 # generate unit tests
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
-target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm -lzmq)
+if (ENABLE_BATSCHED)
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm -lzmq)
+else()
+    target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm)
+endif()
+
+
 set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
 set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
 add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)

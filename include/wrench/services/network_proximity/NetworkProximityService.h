@@ -12,7 +12,7 @@
 
 #include "wrench/services/Service.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
-#include "wrench/services/network_proximity/NetworkDaemons.h"
+#include "wrench/services/network_proximity/NetworkProximityDaemon.h"
 
 namespace wrench{
 
@@ -47,10 +47,14 @@ namespace wrench{
                                 int message_size, double measurement_period, int noise,
                                 std::map<std::string, std::string> = {});
 
+        void start();
+
         double query(std::pair<std::string, std::string> hosts);
 
 
-    private:
+
+
+          private:
 
         friend class Simulation;
 
@@ -60,7 +64,7 @@ namespace wrench{
                                 int noise,std::map<std::string, std::string>,
                                 std::string suffix = "");
 
-        std::vector<std::unique_ptr<NetworkDaemons>> network_daemons;
+        std::vector<std::unique_ptr<NetworkProximityDaemon>> network_daemons;
         std::vector<std::string> hosts_in_network;
 
         int main();
