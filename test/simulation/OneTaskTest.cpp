@@ -26,6 +26,8 @@ public:
     wrench::StorageService *storage_service2 = nullptr;
     wrench::ComputeService *compute_service = nullptr;
 
+    void do_BadSetup_test();
+
     void do_Noop_test();
 
     void do_ExecutionWithLocationMap_test();
@@ -68,6 +70,73 @@ protected:
     wrench::Workflow *workflow;
 
 };
+
+
+/**********************************************************************/
+/**  BAD SETUP SIMULATION TEST                                       **/
+/**********************************************************************/
+
+class BadSetupTestWMS : public wrench::WMS {
+
+public:
+    BadSetupTestWMS(OneTaskTest *test,
+                    wrench::Workflow *workflow,
+                    std::unique_ptr<wrench::Scheduler> scheduler,
+                    std::string hostname) :
+            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    OneTaskTest *test;
+
+    int main() {
+
+      return 0;
+    }
+};
+
+TEST_F(OneTaskTest, BadSetup) {
+  DO_TEST_WITH_FORK(do_BadSetup_test);
+}
+
+void OneTaskTest::do_BadSetup_test() {
+
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a WMS
+  ASSERT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+          std::unique_ptr<wrench::WMS>(new BadSetupTestWMS(this, workflow,
+                                                           std::unique_ptr<wrench::Scheduler>(
+                                                                   new NoopScheduler()),
+                          hostname))));
+
+  // Running a "run a single task" simulation
+  EXPECT_THROW(simulation->launch(), std::runtime_error);
+
+  // At this point, we should have a clean exit without complaints
+  // from the SimGrid maestro
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
 
 /**********************************************************************/
 /**  NOOP SIMULATION TEST                                            **/
@@ -113,6 +182,7 @@ TEST_F(OneTaskTest, Noop) {
 
 void OneTaskTest::do_Noop_test() {
 
+
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
   int argc = 1;
@@ -144,9 +214,9 @@ void OneTaskTest::do_Noop_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname, 0)},
-                                                      nullptr,
-                                                      {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               nullptr,
+                                                               {}))));
 
   // Create a Storage Service
   ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -299,9 +369,9 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      nullptr,
-                                                      {}))));
+                                                               {std::make_pair(hostname,0)},
+                                                               nullptr,
+                                                               {}))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -433,9 +503,9 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service1,
-                                                      {}))));
+                                                               {std::make_pair(hostname,0)},
+                                                               storage_service1,
+                                                               {}))));
 
   // Create a File Registry Service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -594,9 +664,9 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service2,
-                                                      {}))));
+                                                               {std::make_pair(hostname,0)},
+                                                               storage_service2,
+                                                               {}))));
 
   // Create a File Registry Service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(

@@ -394,4 +394,14 @@ namespace wrench {
      */
     ComputeServiceNumIdleCoresAnswerMessage::ComputeServiceNumIdleCoresAnswerMessage(unsigned long num, double payload)
             : ComputeServiceMessage("NUM_IDLE_CORES_ANSWER", payload), num_idle_cores(num) {}
+
+    /**
+     * @brief Constructor
+     * @param num: information to reply back
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    ComputeServiceInformationMessage::ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload)
+            : ComputeServiceMessage("INFORMATION_REPLY", payload), information(information), job(job) {}
 };

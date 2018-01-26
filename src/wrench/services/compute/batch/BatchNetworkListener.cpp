@@ -4,14 +4,17 @@
 
 #include <wrench/services/compute/batch/BatchRequestReplyProcess.h>
 #include <wrench-dev.h>
-#include <sys/socket.h>
-#include <zmq.h>
-#include <zmq.hpp>
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <wrench/services/compute/batch/BatchServiceMessage.h>
 #include <wrench/services/compute/batch/BatchServiceProperty.h>
 #include <json.hpp>
 #include "wrench/services/compute/batch/BatchNetworkListener.h"
+
+#ifdef ENABLE_BATSCHED
+#include <zmq.hpp>
+#include <zmq.h>
+#include <sys/socket.h>
+#endif
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_network_listener_service, "Log category for Batch Network Listener Service");
 
@@ -41,10 +44,9 @@ namespace wrench{
     BatchNetworkListener::BatchNetworkListener(
             std::string hostname, std::string batch_service_mailbox, std::string self_port, std::string sched_port,
             NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send, std::map<std::string, std::string> plist, std::string suffix="") :
-            Service("batch_network_listener" + suffix, "batch_network_listener" + suffix) {
+            Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
 
       // Start the daemon on the same host
-      this->hostname = hostname;
       this->self_port = self_port;
       this->sched_port = sched_port;
       this->MY_LISTENER_TYPE = MY_TYPE;
@@ -52,15 +54,18 @@ namespace wrench{
       this->batch_service_mailbox = batch_service_mailbox;
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
-      try {
-        this->start(hostname);
-      } catch (std::invalid_argument e) {
-        throw e;
-      }
+
+//      try {
+//        this->start_daemon(hostname);
+//      } catch (std::invalid_argument e) {
+//        throw e;
+//      }
     }
 
     int BatchNetworkListener::main() {
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
+
+#ifdef ENABLE_BATSCHED
 
       WRENCH_INFO("Batch Network Listener Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
@@ -100,12 +105,14 @@ namespace wrench{
         );
       }
 
+#endif
+
       WRENCH_INFO("Batch Network Listener Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
     void BatchNetworkListener::read() {
-
+#ifdef ENABLE_BATSCHED
       zmq::context_t context (1);
       zmq::socket_t socket (context, ZMQ_REP);
 
@@ -115,9 +122,11 @@ namespace wrench{
       zmq::message_t reply;
       socket.recv(&reply);
       this->reply_received = std::string(static_cast<char*>(reply.data()), reply.size());
+#endif
     }
 
     void BatchNetworkListener::send_receive() {
+#ifdef ENABLE_BATSCHED
       zmq::context_t context (1);
       zmq::socket_t socket (context, ZMQ_REQ);
       socket.connect ("tcp://localhost:"+this->sched_port);
@@ -176,10 +185,11 @@ namespace wrench{
       } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
+#endif
     }
 
     void BatchNetworkListener::send() {
-
+#ifdef ENABLE_BATSCHED
       zmq::context_t context (1);
       zmq::socket_t socket (context, ZMQ_REQ);
 
@@ -188,7 +198,7 @@ namespace wrench{
       zmq::message_t request(strlen(data.c_str()));
       memcpy(request.data(), data.c_str(), strlen(data.c_str()));
       socket.send(request);
-
+#endif
     }
 
 

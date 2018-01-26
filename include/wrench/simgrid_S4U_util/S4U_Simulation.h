@@ -30,6 +30,7 @@ namespace wrench {
 				void runSimulation();
 				static double getClock();
 				static std::string getHostName();
+				bool hostExists(std::string hostname);
 				static unsigned int getNumCores(std::string hostname);
 				static double getFlopRate(std::string hostname);
 				static void compute(double);

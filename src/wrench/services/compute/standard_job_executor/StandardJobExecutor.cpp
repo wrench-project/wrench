@@ -89,7 +89,6 @@ namespace wrench {
         throw std::runtime_error("StandardJobExecutor::StandardJobExecutor(): insufficient resources to run jobs");
       }
 
-
       // Set instance variables
       this->simulation = simulation;
       this->callback_mailbox = callback_mailbox;
@@ -119,7 +118,7 @@ namespace wrench {
 
       // Start the daemon
       try {
-        this->start(hostname);
+        this->start_daemon(hostname);
       } catch (std::invalid_argument &e) {
         throw &e;
       }

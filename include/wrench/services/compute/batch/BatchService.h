@@ -51,10 +51,13 @@ namespace wrench {
                  {BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                 {BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,           "FIRSTFIT"},
                  {BatchServiceProperty::JOB_SELECTION_ALGORITHM,           "FCFS"},
                  {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,    "1024"},
-                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,           "easy_bf"}
+                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,           "easy_bf"},
+                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,           "fcfs"},
+                 {BatchServiceProperty::BATCH_FAKE_SUBMISSION,           "false"}
                 };
 
     public:
@@ -69,6 +72,8 @@ namespace wrench {
         void cancelJob(unsigned long jobid);
         //returns jobid,started time, running time
         std::vector<std::tuple<unsigned long,double,double>> getJobsInQueue();
+
+        ~BatchService();
 
 
     private:
@@ -119,7 +124,21 @@ namespace wrench {
         std::unique_ptr<BatchNetworkListener> request_reply_process;
 
         //Batch scheduling supported algorithms
-        std::set<std::string> scheduling_algorithms={"easy_bf",""}; //TODO:: fill in all the supported algorithms of batscheduler
+        std::set<std::string> scheduling_algorithms={"easy_bf","conservative_bf", "easy_bf_plot_liquid_load_horizon",
+                                                     "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
+                                                     "energy_bf_monitoring",
+                                                     "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
+                                                     "filler", "killer", "killer2", "rejecter", "sleeper",
+                                                     "submitter"
+        };
+
+        //Batch queue ordering options
+        std::set<std::string> queue_ordering_options={"fcfs", "lcfs", "desc_bounded_slowdown", "desc_slowdown",
+                                                      "asc_size", "desc_size", "asc_walltime", "desc_walltime"
+
+        };
+
+
         pid_t pid;
 
         //Is sched ready?
@@ -134,6 +153,10 @@ namespace wrench {
         unsigned long generateUniqueJobId();
 
         std::string foundRunningJobOnTheList(WorkflowJob* job);
+
+        std::string convertAvailableResourcesToJsonString(std::map<std::string,unsigned long>);
+
+        std::string convertResourcesToJsonString(std::set<std::pair<std::string,unsigned long>>);
 
         //submits the standard job
         //overriden function of parent Compute Service
@@ -160,7 +183,7 @@ namespace wrench {
         std::set<std::pair<std::string,unsigned long>> scheduleOnHosts(std::string host_selection_algorithm,
                                                                        unsigned long, unsigned long);
 
-        std::unique_ptr<BatchJob> scheduleJob(std::string);
+        BatchJob* scheduleJob(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void terminate();
@@ -199,8 +222,13 @@ namespace wrench {
         //process execute events from batsched
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
+        //process execution of job
+        void processExecution(std::set<std::pair<std::string,unsigned long>>,WorkflowJob*,
+                              BatchJob*, unsigned long, unsigned long, unsigned long);
+
         //notify batsched about job completion/failure/killed events
         void notifyJobEventsToBatSched(std::string job_id,std::string status, std::string job_state, std::string kill_reason);
+
 
     };
 }

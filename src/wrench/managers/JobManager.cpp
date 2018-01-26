@@ -38,7 +38,7 @@ namespace wrench {
 
       // Start the daemon
       std::string localhost = S4U_Simulation::getHostName();
-      this->start(localhost);
+      this->start_daemon(localhost);
     }
 
     /**
@@ -547,6 +547,20 @@ namespace wrench {
           try {
             S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                      new ComputeServicePilotJobExpiredMessage(job, msg->compute_service, 0.0));
+          } catch (std::shared_ptr<NetworkError> cause) {
+            keep_going = true;
+          }
+
+        } else if (ComputeServiceInformationMessage *msg = dynamic_cast<ComputeServiceInformationMessage *>(message.get())) {
+
+          // update job state
+          WorkflowJob *job = msg->job;
+
+          // Forward the notification to the source
+          WRENCH_INFO("Forwarding information to %s", job->getOriginCallbackMailbox().c_str());
+          try {
+            S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+                                     new ComputeServiceInformationMessage(job, msg->information, msg->payload));
           } catch (std::shared_ptr<NetworkError> cause) {
             keep_going = true;
           }

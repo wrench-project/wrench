@@ -190,13 +190,28 @@ namespace wrench {
     void WMS::setSimulation(Simulation *simulation) {
       this->simulation = simulation;
 
+//      // Start the daemon
+//      try {
+//        this->start_daemon(this->hostname);
+//      } catch (std::invalid_argument &e) {
+//        throw;
+//      }
+    }
+
+    /**
+     * @brief Start the WMS daemon
+     *
+     * @throw std::runtime_error
+     */
+    void WMS::start() {
       // Start the daemon
       try {
-        this->start(this->hostname);
+        this->start_daemon(this->hostname);
       } catch (std::invalid_argument &e) {
-        throw;
+        throw std::runtime_error("WMS:start(): " + std::string(e.what()));
       }
     }
+
 
     /**
      * @brief Get the name of the host on which the WMS is running

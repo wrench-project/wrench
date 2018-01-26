@@ -74,7 +74,7 @@ namespace wrench {
       this->default_storage_service = default_storage_service;
 
       // Start my daemon on the host
-      this->start(this->hostname);
+      this->start_daemon(this->hostname);
 
     }
 

@@ -25,13 +25,14 @@ namespace wrench {
     /**
      * @brief Constructor that mostly calls the S4U_DaemonWithMailbox() constructor
      *
+     * @param hostname: the name of the host on which the service runs
      * @param process_name_prefix: the prefix for the process name
      * @param mailbox_name_prefix: the prefix for the mailbox name
      */
-    Service::Service(std::string process_name_prefix, std::string mailbox_name_prefix) :
+    Service::Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix) :
             S4U_Daemon(process_name_prefix, mailbox_name_prefix) {
+      this->hostname = hostname;
       this->name = process_name_prefix;
-      this->state = Service::UP;
     }
 
  /**
@@ -78,6 +79,20 @@ namespace wrench {
       return value;
     }
 
+    /**
+     * @brief Start the service 
+     * 
+     * @throw std::runtime_error
+     */
+    void Service::start() {
+      try {
+        this->start_daemon(this->hostname);
+        this->state = Service::UP;
+      } catch (std::invalid_argument &e) {
+        XBT_INFO("THROWING!! %s", e.what());
+        throw std::runtime_error("Service::start(): " + std::string(e.what()));
+      }
+    }
 
     /**
     * @brief Synchronously stop the service (does nothing if the service is already stopped)

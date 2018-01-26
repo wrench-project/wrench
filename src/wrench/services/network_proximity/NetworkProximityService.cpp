@@ -14,7 +14,7 @@
 #include <simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
 #include "NetworkProximityMessage.h"
-#include "wrench/services/network_proximity/NetworkDaemons.h"
+#include "wrench/services/network_proximity/NetworkProximityDaemon.h"
 
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <random>
@@ -36,6 +36,9 @@ namespace wrench {
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
      * @param hosts_in_network: the hosts running in the network
+     * @param message_size: the message size (in bytes) exchanged by monitoring daemon
+     * @param measurement_period: the time (in seconds) between measurements at a daemon
+     * @param noise: a random noise added to the daemon (TODO: more explanation)
      * @param plist: a property list ({} means "use all defaults")
      */
     NetworkProximityService::NetworkProximityService(std::string hostname,
@@ -50,6 +53,9 @@ namespace wrench {
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
      * @param hosts_in_network: the hosts running in the network
+     * @param message_size: TODO
+     * @param measurement_period: TODO
+     * @param noise: TODO
      * @param plist: a property list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
      */
@@ -59,7 +65,7 @@ namespace wrench {
             int message_size, double measurement_period, int noise,
             std::map<std::string, std::string> plist,
             std::string suffix) :
-            Service("network_proximity" + suffix, "network_proximity" + suffix) {
+            Service(hostname, "network_proximity" + suffix, "network_proximity" + suffix) {
 
         this->hosts_in_network = std::move(hosts_in_network);
 
@@ -73,19 +79,29 @@ namespace wrench {
             this->setProperty(p.first, p.second);
         }
 
-        //Start the network daemons
+        // Create the network daemons
         std::vector<std::string>::iterator it;
         for (it=this->hosts_in_network.begin();it!=this->hosts_in_network.end();it++){
-            this->network_daemons.push_back(std::unique_ptr<NetworkDaemons>(new NetworkDaemons(*it,this->mailbox_name, message_size,measurement_period,noise)));
+            this->network_daemons.push_back(std::unique_ptr<NetworkProximityDaemon>(new NetworkProximityDaemon(*it,this->mailbox_name, message_size,measurement_period,noise)));
         }
+    }
 
-        // Start the daemon on the same host
-        try {
-            this->start(std::move(hostname));
-        } catch (std::invalid_argument e) {
-            throw e;
+    /**
+     * @brief Starts the network proximity service sets of daemons and the
+     *        proximity service itself
+     *
+     * @throw std::runtime_error
+     */
+    void NetworkProximityService::start() {
+      try {
+        // Start the network daemons
+        for (auto it = this->network_daemons.begin(); it != this->network_daemons.end(); it++) {
+          (*it)->start();
         }
-
+        this->start_daemon(this->hostname, false);
+      } catch (std::runtime_error &e) {
+        throw;
+      }
     }
 
 
@@ -140,8 +156,11 @@ namespace wrench {
         }
     }
 
-
-
+    /**
+     * @brief Main routine of the daemon
+     *
+     * @return 0 on success, non 0 otherwise
+     */
     int NetworkProximityService::main() {
 
         TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
@@ -181,7 +200,7 @@ namespace wrench {
             // This is Synchronous
             try {
                 //Stop the network daemons
-                std::vector<std::unique_ptr<NetworkDaemons>>::iterator it;
+                std::vector<std::unique_ptr<NetworkProximityDaemon>>::iterator it;
                 for (it=this->network_daemons.begin();it!=this->network_daemons.end();it++){
                     if((*it)->isUp()) {
                         (*it)->stop();

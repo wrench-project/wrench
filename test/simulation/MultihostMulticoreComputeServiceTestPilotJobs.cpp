@@ -239,7 +239,7 @@ private:
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
 
-      // Wait for the pilot job start
+      // Wait for the pilot job start_daemon
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
         event = workflow->waitForNextExecutionEvent();
@@ -411,7 +411,7 @@ private:
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
 
-      // Wait for the pilot job start
+      // Wait for the pilot job start_daemon
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
         event = workflow->waitForNextExecutionEvent();
@@ -683,7 +683,7 @@ private:
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
 
-      // Wait for the pilot job start
+      // Wait for the pilot job start_daemon
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
         event = workflow->waitForNextExecutionEvent();
@@ -846,7 +846,7 @@ private:
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
 
-      // Wait for the pilot job start
+      // Wait for the pilot job start_daemon
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
         event = workflow->waitForNextExecutionEvent();
