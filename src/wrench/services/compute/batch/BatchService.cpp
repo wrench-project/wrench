@@ -19,7 +19,7 @@
 #include <zmq.hpp>
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
-#include "services/compute/ComputeServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/services/storage/StorageService.h"
