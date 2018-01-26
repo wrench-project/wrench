@@ -44,4 +44,7 @@
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/PilotJob.h"
 
+// Simgrid Util
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+
 #endif //WRENCH_WRENCH_DEV_H
