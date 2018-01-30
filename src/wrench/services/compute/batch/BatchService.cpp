@@ -11,14 +11,14 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/services/compute/batch/BatchService.h"
-#include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <services/ServiceMessage.h>
 #include <wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h>
 #include <wrench/util/PointerUtil.h>
 #include <wrench/services/compute/batch/BatchNetworkListener.h>
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
-#include "services/compute/ComputeServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/services/storage/StorageService.h"

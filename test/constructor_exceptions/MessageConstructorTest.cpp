@@ -13,7 +13,7 @@
 #include "wrench/workflow/Workflow.h"
 #include "../../src/wrench/services/file_registry/FileRegistryMessage.h"
 #include "../../src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.h"
-#include "../../src/wrench/services/compute/ComputeServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
 #include "../../src/wrench/services/storage/StorageServiceMessage.h"
 #include "../../src/wrench/services/compute/cloud/CloudServiceMessage.h"
 #include "../../src/wrench/services/network_proximity/NetworkProximityMessage.h"

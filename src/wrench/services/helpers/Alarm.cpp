@@ -11,7 +11,7 @@
 #include <wrench-dev.h>
 #include <services/ServiceMessage.h>
 #include "wrench/services/helpers/Alarm.h"
-#include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
 

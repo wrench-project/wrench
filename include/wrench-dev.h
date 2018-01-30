@@ -18,6 +18,7 @@
 // Compute Services
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/ComputeServiceProperty.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
 
 // Storage Services
 #include "wrench/services/storage/StorageService.h"
@@ -42,5 +43,8 @@
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/PilotJob.h"
+
+// Simgrid Util
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 #endif //WRENCH_WRENCH_DEV_H

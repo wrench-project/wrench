@@ -8,7 +8,7 @@
  */
 
 #include <wrench-dev.h>
-#include <simgrid_S4U_util/S4U_Mailbox.h>
+#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 #include <simulation/SimulationMessage.h>
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <gtest/gtest.h>

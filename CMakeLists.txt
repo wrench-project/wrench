@@ -57,6 +57,7 @@ set(HEADER_FILES
         include/wrench/services/ServiceProperty.h
         include/wrench/services/compute/ComputeService.h
         include/wrench/services/compute/ComputeServiceProperty.h
+        include/wrench/services/compute/ComputeServiceMessage.h
         include/wrench/services/compute/standard_job_executor/Workunit.h
         include/wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutor.h
@@ -104,7 +105,7 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.h
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
-        src/wrench/simgrid_S4U_util/S4U_Mailbox.h
+        include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/WorkflowTask.cpp
@@ -136,7 +137,6 @@ set(SOURCE_FILES
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/ServiceMessage.h
         src/wrench/services/compute/ComputeServiceMessage.cpp
-        src/wrench/services/compute/ComputeServiceMessage.h
         src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.cpp
         src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.h
         src/wrench/services/storage/StorageServiceMessage.cpp
@@ -183,9 +183,6 @@ set(TEST_FILES
         test/workflow/WorkflowTest.cpp
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
-        #        test/wms/optimizations/dynamic/FailureDynamicClusteringTest.cpp
-        #        test/wms/optimizations/static/SimplePipelineClusteringTest.cpp
-        #        test/wms/scheduler/pilot_job/CriticalPathSchedulerTest.cpp
         test/simulation/OneTaskTest.cpp
         test/simulation/SimpleStorageServiceFunctionalTest.cpp
         test/simulation/SimpleStorageServicePerformanceTest.cpp
