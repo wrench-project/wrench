@@ -206,6 +206,8 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workflow::loadFromDAX(const std::string &filename) {
+
+
       pugi::xml_document dax_tree;
 
       if (not dax_tree.load_file(filename.c_str())) {
@@ -227,7 +229,7 @@ namespace wrench {
           num_procs = std::stoi(job.attribute("num_procs").value());
         }
         // Create the task
-        task = this->addTask(id + "_" + name, flops, num_procs);
+        task = this->addTask(id, flops, num_procs);
 
 
         // Go through the children "uses" nodes
