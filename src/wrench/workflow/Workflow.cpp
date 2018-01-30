@@ -255,6 +255,22 @@ namespace wrench {
           // TODO: Are there other types of "link" values?
         }
       }
+
+      // Iterate through the "child" nodes to handle control dependencies
+      for (pugi::xml_node child = dag.child("child"); child; child = child.next_sibling("child")) {
+
+        WorkflowTask *child_task = this->getWorkflowTaskByID(child.attribute("ref").value());
+
+        // Go through the children "parent" nodes
+        for (pugi::xml_node parent = child.child("parent"); parent; parent = parent.next_sibling("parent")) {
+          std::string parent_id = parent.attribute("ref").value();
+
+          WorkflowTask *parent_task = this->getWorkflowTaskByID(parent_id);
+          this->addControlDependency(parent_task, child_task);
+
+        }
+      }
+      
     }
 
     /**
