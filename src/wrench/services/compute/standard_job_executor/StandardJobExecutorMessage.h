@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h"
-#include "services/compute/ComputeServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
 
 namespace wrench {
 

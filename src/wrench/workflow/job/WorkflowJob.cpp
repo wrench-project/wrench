@@ -10,7 +10,7 @@
 
 #include <string>
 #include <wrench-dev.h>
-#include "simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/workflow/job/WorkflowJob.h"
 #include "wrench/workflow/Workflow.h"
 
