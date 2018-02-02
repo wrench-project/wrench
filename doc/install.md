@@ -88,3 +88,14 @@ If you want to see actual compiler and linker invocations, add VERBOSE=1 to your
 make VERBOSE=1
 ~~~~~~~~~~~~~
 
+
+
+## Troubleshooting
+
+~~~~~~~~~~~~~{.sh}
+Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
+~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~{.sh}
+brew install pkg-config
+~~~~~~~~~~~~~
