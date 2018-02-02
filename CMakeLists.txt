@@ -36,6 +36,7 @@ set(HEADER_FILES
         include/wrench/exceptions/WorkflowExecutionException.h
         include/wrench/simgrid_S4U_util/S4U_Simulation.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
+        include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
         include/wrench/logging/TerminalOutput.h
         include/wrench/wms/WMS.h
@@ -66,6 +67,7 @@ set(HEADER_FILES
         include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h
         include/wrench/services/compute/cloud/CloudService.h
         include/wrench/services/compute/cloud/CloudServiceProperty.h
+        include/wrench/services/storage/simple/IncomingFile.h
         include/wrench/services/storage/StorageService.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageService.h
@@ -105,7 +107,7 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.h
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
-        include/wrench/simgrid_S4U_util/S4U_Mailbox.h
+        src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/WorkflowTask.cpp
@@ -116,6 +118,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.cpp
         src/wrench/workflow/job/PilotJob.cpp
         src/wrench/managers/JobManager.cpp
+        src/wrench/managers/DataMovementManager.cpp
         src/wrench/simulation/Simulation.cpp
         src/wrench/workflow/job/WorkflowJob.cpp
         src/wrench/workflow/job/StandardJob.cpp
@@ -125,7 +128,6 @@ set(SOURCE_FILES
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/storage/StorageService.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
-        src/wrench/managers/DataMovementManager.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
         src/wrench/services/compute/ComputeServiceProperty.cpp
@@ -147,9 +149,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/cloud/CloudServiceProperty.cpp
         src/wrench/services/compute/cloud/CloudServiceMessage.h
         src/wrench/services/compute/cloud/CloudServiceMessage.cpp
-        src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
         src/wrench/services/storage/simple/IncomingFile.cpp
-        include/wrench/services/storage/simple/IncomingFile.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp
@@ -169,8 +169,8 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchServiceProperty.cpp
         src/wrench/services/compute/batch/BatchRequestReplyProcess.cpp
         src/wrench/services/compute/batch/BatchNetworkListener.cpp
-        src/wrench/util/WorkflowUtil.cpp
         src/wrench/services/helpers/Alarm.cpp
+        src/wrench/util/WorkflowUtil.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/util/TraceFileLoader.cpp
@@ -195,7 +195,8 @@ set(TEST_FILES
         test/simulation/BatchServiceTest.cpp
         test/simulation/CloudServiceTest.cpp
         test/simulation/NoopScheduler.cpp
-        test/simulation/NoopScheduler.h)
+        test/simulation/NoopScheduler.h
+        )
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
@@ -224,6 +225,7 @@ set_target_properties(unit_tests PROPERTIES LINK_FLAGS "--coverage")
 add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 
 
+# additional packages
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
 
 
