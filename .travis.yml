@@ -16,19 +16,19 @@ services:
 
 before_install:
   - docker pull wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION}
-  - sudo docker run -d -t -v $PWD:/home/wrench --name=wrench wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION} bash
-  - docker ps -a
+  - docker run -d -t --name=wrench wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION} bash
+  - docker cp . wrench:/home/wrench
   - docker exec -it wrench ls -lh
 
 script:
-  - sudo docker exec -it wrench cmake -DCMAKE_VERBOSE_MAKEFILE=ON .
-  - sudo docker exec -it wrench make all unit_tests doc-gh
-  - sudo docker exec -it wrench ./unit_tests
+  - docker exec -it wrench cmake -DCMAKE_VERBOSE_MAKEFILE=ON .
+  - docker exec -it wrench make all unit_tests doc-gh
+  - docker exec -it wrench ./unit_tests
 
 after_success:
-  - sudo docker stop wrench
-  - sudo docker rm wrench
-  - sudo docker rmi wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION}
+  - docker stop wrench
+  - docker rm wrench
+  - docker rmi wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION}
   # coverage analysis
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       lcov --directory . --capture --output-file coverage.info;
