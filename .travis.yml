@@ -18,12 +18,14 @@ before_install:
   - docker pull wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION}
   - docker run -d -t --name=wrench wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION} bash
   - docker cp . wrench:/home/wrench
-  - docker exec -it wrench ls -lh
+  - docker exec -it wrench mkdir build
+  - docker exec -it wrench ls -lh src
 
 script:
-  - docker exec -it wrench cmake -DCMAKE_VERBOSE_MAKEFILE=ON .
-  - docker exec -it wrench make all unit_tests doc-gh
-  - docker exec -it wrench ./unit_tests
+  - docker exec -it wrench -w /home/wrench/build cmake -DCMAKE_VERBOSE_MAKEFILE=ON .
+  - docker exec -it wrench ls -lh build
+  - docker exec -it wrench -w /home/wrench/build make all unit_tests doc-gh
+  - docker exec -it wrench -w /home/wrench/build ./unit_tests
 
 after_success:
   - docker stop wrench
