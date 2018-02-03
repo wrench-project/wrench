@@ -24,8 +24,8 @@ before_install:
 script:
   - docker exec -it wrench -w /home/wrench/build cmake -DCMAKE_VERBOSE_MAKEFILE=ON .
   - docker exec -it wrench ls -lh build
-  - docker exec -it wrench -w /home/wrench/build make all unit_tests doc-gh
-  - docker exec -it wrench -w /home/wrench/build ./unit_tests
+  - docker exec -w /home/wrench/build -it wrench make all unit_tests doc-gh
+  - docker exec -w /home/wrench/build -it wrench ./unit_tests
 
 after_success:
   - docker stop wrench
