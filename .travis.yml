@@ -16,11 +16,11 @@ services:
 
 before_install:
   - docker pull wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION}
-
-script:
-  - docker run -d -v $PWD:/home/wrench --name=wrench wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION} bash
+  - docker run -d -t -v $PWD:/home/wrench --name=wrench wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION} bash
   - docker ps -a
   - docker exec -it wrench ls -lh
+
+script:
   - docker exec -it wrench cmake -DCMAKE_VERBOSE_MAKEFILE=ON .
   - docker exec -it wrench make all unit_tests doc-gh
   - docker exec -it wrench ./unit_tests
