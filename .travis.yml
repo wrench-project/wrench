@@ -39,12 +39,10 @@ after_success:
       docker exec -w /home/wrench/build -it wrench lcov --directory . --capture --output-file coverage.info;
       docker exec -w /home/wrench/build -it wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
       docker exec -w /home/wrench/build -it wrench coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
-
       # sonarcloud
       docker cp wrench:/home/wrench/build .;
       build-wrapper-linux-x86-64 --out-dir bw-output make all;
       sonar-scanner -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN;
-
       # remove container
       docker stop wrench;
       docker rm wrench;
