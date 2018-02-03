@@ -18,20 +18,16 @@ services:
   - docker
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      docker pull wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION};
-      docker run -d -t --name=wrench wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION} bash;
-      docker cp . wrench:/home/wrench;
-      docker exec -it wrench mkdir build;
-    fi
+  - docker pull wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION};
+  - docker run -d -t --name=wrench wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION} bash;
+  - docker cp . wrench:/home/wrench;
+  - docker exec -it wrench mkdir build;
 
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      docker exec -w /home/wrench/build -it wrench cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-      docker exec -it wrench ls -lh build;
-      docker exec -w /home/wrench/build -it wrench make all unit_tests doc-gh;
-      docker exec -w /home/wrench/build -it wrench ./unit_tests;
-    fi
+  - docker exec -w /home/wrench/build -it wrench cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..;
+  - docker exec -it wrench ls -lh build;
+  - docker exec -w /home/wrench/build -it wrench make all unit_tests doc-gh;
+  - docker exec -w /home/wrench/build -it wrench ./unit_tests;
 
 after_success:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
@@ -41,13 +37,14 @@ after_success:
       docker exec -w /home/wrench/build -it wrench coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
       # sonarcloud
       docker cp wrench:/home/wrench/build .;
+      docker cp wrench:/home/wrench/docs .;
       build-wrapper-linux-x86-64 --out-dir bw-output make all;
       sonar-scanner -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN;
-      # remove container
-      docker stop wrench;
-      docker rm wrench;
-      docker rmi wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION};
     fi
+  # remove container
+  - docker stop wrench;
+  - docker rm wrench;
+  - docker rmi wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION};
 
 #deploy:
 #  provider: pages
