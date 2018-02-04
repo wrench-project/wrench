@@ -16,8 +16,10 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include <json.hpp>
+#ifdef ENABLE_BATSCHED
 #include <zmq.hpp>
 #include <zmq.h>
+#endif
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_network_listener_service, "Log category for Batch Network Listener Service");
 
