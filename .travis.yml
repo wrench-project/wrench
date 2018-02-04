@@ -13,6 +13,7 @@ addons:
 
 env:
   - DIST=ubuntu-trusty GCC_VERSION=5
+  - DIST=ubuntu-trusty GCC_VERSION=6
 
 services:
   - docker
@@ -63,5 +64,4 @@ notifications:
     recipients:
       - wrench@mailman.isi.edu
     on_success: change
-    on_failure: change
-#    on_failure: always
+    on_failure: always
