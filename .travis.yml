@@ -23,6 +23,7 @@ before_install:
       docker pull wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION};
       docker run -d -t --name=wrench wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION} bash;
       docker cp . wrench:/home/wrench;
+      docker cp .git wrench:/home/wrench/.git;
       docker exec -it wrench mkdir build;
     fi
 
@@ -45,11 +46,11 @@ after_success:
       docker cp wrench:/home/wrench/docs .;
       build-wrapper-linux-x86-64 --out-dir bw-output make all;
       sonar-scanner -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN;
+
+      docker stop wrench;
+      docker rm wrench;
+      docker rmi wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION};
     fi
-  # remove container
-  - docker stop wrench;
-  - docker rm wrench;
-  - docker rmi wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION};
 
 #deploy:
 #  provider: pages
