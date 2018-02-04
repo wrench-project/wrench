@@ -19,38 +19,34 @@ services:
   - docker
 
 before_install:
+  # install container
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       docker pull wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION};
       docker run -d -t --name=wrench wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION} bash;
-      docker cp . wrench:/home/wrench;
-      docker exec -it wrench mkdir build;
+      docker exec -it wrench git clone https://github.com/wrench-project/wrench;
+      docker exec -it wrench mkdir wrench/build;
     fi
 
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      docker exec -w /home/wrench/build -it wrench cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..;
-      docker exec -w /home/wrench/build -it wrench make all unit_tests doc-gh;
-      docker exec -w /home/wrench/build -it wrench ./unit_tests;
+      docker exec -w /home/wrench/wrench/build -it wrench cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..;
+      docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests doc-gh;
+      docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
     fi
 
 after_success:
-  # configure coveralls
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      sudo apt-get install lcov;
-      sudo gem install coveralls-lcov;
-    fi
   # coverage analysis and sonarcloud
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      docker cp wrench:/home/wrench/build .;
-      docker cp wrench:/home/wrench/docs .;
+      docker exec -w /home/wrench/wrench/build -it wrench lcov --directory . --capture --output-file coverage.info;
+      docker exec -w /home/wrench/wrench/build -it wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
+      docker exec -w /home/wrench/wrench/build -it wrench coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
+
+      docker cp wrench:/home/wrench/wrench/build .;
+      docker cp wrench:/home/wrench/wrench/docs .;
+
       docker stop wrench;
       docker rm wrench;
       docker rmi wrenchproject/wrench-build:${DIST}-gcc${GCC_VERSION};
-
-      cd build;
-      lcov --directory . --capture --output-file coverage.info;
-      lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
-      coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
 
       build-wrapper-linux-x86-64 --out-dir bw-output make all;
       sonar-scanner -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN;
