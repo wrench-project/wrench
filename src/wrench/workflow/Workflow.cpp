@@ -294,7 +294,7 @@ namespace wrench {
         file.open(filename);
         file >> j;
       } catch (const std::ifstream::failure &e) {
-        throw std::invalid_argument("WorkflowUtil::loadFromJson(): Invalid Json file");
+        throw std::invalid_argument("Workflow::loadFromJson(): Invalid Json file");
       }
 
       nlohmann::json workflowJobs;
