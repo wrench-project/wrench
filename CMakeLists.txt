@@ -90,7 +90,6 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchServiceProperty.h
         include/wrench/services/compute/batch/BatchRequestReplyProcess.h
         include/wrench/services/compute/batch/BatchNetworkListener.h
-        include/wrench/util/WorkflowUtil.h
         include/wrench/services/helpers/Alarm.h
         include/wrench/util/PointerUtil.h
         include/wrench/util/MessageManager.h
@@ -170,7 +169,6 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchRequestReplyProcess.cpp
         src/wrench/services/compute/batch/BatchNetworkListener.cpp
         src/wrench/services/helpers/Alarm.cpp
-        src/wrench/util/WorkflowUtil.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/util/TraceFileLoader.cpp

@@ -48,6 +48,8 @@ namespace wrench {
 
         void loadFromDAX(const std::string &filename);
 
+        void loadFromJSON(const std::string &filename);
+
         unsigned long getNumberOfTasks();
 
         void exportToEPS(std::string);
