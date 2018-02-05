@@ -11,6 +11,7 @@
 #include <lemon/graph_to_eps.h>
 #include <lemon/bfs.h>
 #include <pugixml.hpp>
+#include <json.hpp>
 
 #include "wrench/logging/TerminalOutput.h"
 #include "simulation/SimulationMessage.h"
@@ -40,7 +41,8 @@ namespace wrench {
                                     int max_num_cores,
                                     double parallel_efficiency) {
 
-      if ((flops < 0.0) || (min_num_cores < 1) || (max_num_cores < 0) || ((max_num_cores > 0) && (min_num_cores > max_num_cores))) {
+      if ((flops < 0.0) || (min_num_cores < 1) || (max_num_cores < 0) ||
+          ((max_num_cores > 0) && (min_num_cores > max_num_cores))) {
         throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
       }
 
@@ -207,7 +209,6 @@ namespace wrench {
      */
     void Workflow::loadFromDAX(const std::string &filename) {
 
-
       pugi::xml_document dax_tree;
 
       if (not dax_tree.load_file(filename.c_str())) {
@@ -231,7 +232,6 @@ namespace wrench {
         // Create the task
         task = this->addTask(id, flops, num_procs);
 
-
         // Go through the children "uses" nodes
         for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
           // getMessage the "uses" attributes
@@ -245,7 +245,7 @@ namespace wrench {
 
           try {
             file = this->getWorkflowFileByID(id);
-          } catch (std::invalid_argument) {
+          } catch (std::invalid_argument &e) {
             file = this->addFile(id, size);
           }
           if (link == "input") {
@@ -269,10 +269,74 @@ namespace wrench {
 
           WorkflowTask *parent_task = this->getWorkflowTaskByID(parent_id);
           this->addControlDependency(parent_task, child_task);
-
         }
       }
-      
+    }
+
+    /**
+     * @brief Create a workflow based on a JSON file
+     *
+     * @param filename: the path to the JSON file
+     *
+     * @throw std::invalid_argument
+     */
+    void Workflow::loadFromJSON(const std::string &filename) {
+      ///make workflow task
+      wrench::WorkflowTask *task;
+
+      /// read a JSON file
+      std::ifstream file;
+      nlohmann::json j;
+
+      //handle the exceptions of opening the json file
+      file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+      try {
+        file.open(filename);
+        file >> j;
+      } catch (const std::ifstream::failure &e) {
+        throw std::invalid_argument("WorkflowUtil::loadFromJson(): Invalid Json file");
+      }
+
+      nlohmann::json workflowJobs;
+      try {
+        workflowJobs = j.at("workflow");
+      } catch (std::out_of_range &e) {
+        std::cerr << "out of range" << '\n';
+      }
+
+      for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
+        if (it.key() == "jobs") {
+          std::vector<nlohmann::json> jobs = it.value();
+
+          for (auto &job : jobs) {
+            std::string name = job.at("name");
+            double flops = job.at("runtime");
+            int num_procs = 1;
+            task = this->addTask(name, flops, num_procs);
+            std::vector<nlohmann::json> files = job.at("files");
+
+            for (auto &f : files) {
+              double size = f.at("size");
+              std::string link = f.at("link");
+              std::string id = f.at("name");
+              wrench::WorkflowFile *file = nullptr;
+              try {
+                file = this->getWorkflowFileByID(id);
+              } catch (const std::invalid_argument &ia) {
+                // making a new file
+                file = this->addFile(id, size);
+              }
+              if (link == "input") {
+                task->addInputFile(file);
+              }
+              if (link == "output") {
+                task->addOutputFile(file);
+              }
+            }
+          }
+        }
+      }
+      file.close();
     }
 
     /**
