@@ -219,6 +219,9 @@ namespace wrench {
 
         } else if (NetworkProximityLookupRequestMessage *msg = dynamic_cast<NetworkProximityLookupRequestMessage *>(message.get())) {
             double proximityValue=-1.0;
+
+            // TODO: if All2All go into if, else proximity value will be computing the euclidian distance between two nodes
+
             if (this->entries.find(msg->hosts) != this->entries.end()) {
                 proximityValue = this->entries[msg->hosts];
                 //this->addEntryToDatabase(msg->hosts,proximityValue);
@@ -240,6 +243,8 @@ namespace wrench {
             try {
                 WRENCH_INFO("NetworkProximityService::processNextMessage()::Adding proximity value between %s and %s into the database",msg->hosts.first.c_str(),msg->hosts.second.c_str());
                 this->addEntryToDatabase(msg->hosts,msg->proximityValue);
+
+                // TODO: if this is Vivaldi, update coordinates of hosts.first and hosts.second
             }
             catch (std::shared_ptr<NetworkError> cause) {
                 return true;
@@ -248,6 +253,7 @@ namespace wrench {
 
         }else if (NextContactDaemonRequestMessage *msg = dynamic_cast<NextContactDaemonRequestMessage *>(message.get())) {
 
+            // TODO: if this is All2All, keep Suraj's implementation, if not then use vivaldi scheme
 
             std::random_device rdev;
             std::mt19937 rgen(rdev());
