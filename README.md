@@ -31,7 +31,7 @@ And, one of the following:
 - [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.17 or higher
 - [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
-- [JSON for Modern C++](https://github.com/nlohmann/json) - version 2.1.1 or higher 
+- [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.1.0 or higher 
 - [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
 
