@@ -37,6 +37,8 @@ namespace wrench {
 
         /** @brief The overhead, in seconds, of looking up entries for a file **/
         DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
+
+        // TODO: add SERVICE_TYPE property
     };
 }
 

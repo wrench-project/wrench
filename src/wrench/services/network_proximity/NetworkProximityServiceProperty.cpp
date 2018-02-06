@@ -23,4 +23,6 @@ namespace wrench {
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD);
 
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, LOOKUP_OVERHEAD);
+
+    // TODO: add set property name SERVICE_TYPE
 };
