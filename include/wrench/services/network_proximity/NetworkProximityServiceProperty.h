@@ -39,6 +39,11 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
 
         // TODO: add SERVICE_TYPE property
+        /** @brief The type of network proximity service to be used **/
+        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_SERVICE_TYPE);
+
+        /** @brief The percentage of other network daemons that each network daemon will communicate with **/
+        DECLARE_PROPERTY_NAME(NETWORK_DAEMON_COMMUNICATION_PERCENTAGE);
     };
 }
 

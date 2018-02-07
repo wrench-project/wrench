@@ -23,11 +23,13 @@ namespace wrench{
 
     private:
         std::map<std::string, std::string> default_property_values =
-                {{NetworkProximityServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,          "1024"},
-                 {NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD,    "1024"},
+                {{NetworkProximityServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,              "1024"},
+                 {NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,           "1024"},
+                 {NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD,        "1024"},
                  {NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                      "0.0"},
+                 {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                           "0.0"},
+                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE,       "ALLTOALL"}, // how are we error checking bad properties?
+                 {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_PERCENTAGE,   "1.0"}, // how are we error checking bad properties?
                 };
 
     public:
@@ -51,18 +53,13 @@ namespace wrench{
 
         double query(std::pair<std::string, std::string> hosts);
 
+        // TODO: add function to return coordinate of desired network daemon
 
 
 
           private:
 
         friend class Simulation;
-
-        NetworkProximityService(std::string db_hostname,
-                                std::vector<std::string> hosts_in_network,
-                                int message_size, double measurement_period,
-                                int noise,std::map<std::string, std::string>,
-                                std::string suffix = "");
 
         std::vector<std::unique_ptr<NetworkProximityDaemon>> network_daemons;
         std::vector<std::string> hosts_in_network;
@@ -75,6 +72,9 @@ namespace wrench{
 
         std::map<std::pair<std::string,std::string>,double> entries;
 
+        std::map<std::string, std::pair<double, double>> coordinate_lookup_table;
+
+        std::map<std::string, std::vector<std::string>> communication_lookup_table;
     };
 }
 
