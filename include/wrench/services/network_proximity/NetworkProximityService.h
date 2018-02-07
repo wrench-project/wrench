@@ -54,9 +54,7 @@ namespace wrench{
         double query(std::pair<std::string, std::string> hosts);
 
         // TODO: add function to return coordinate of desired network daemon
-
-
-
+        
           private:
 
         friend class Simulation;
