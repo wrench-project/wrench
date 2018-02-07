@@ -100,4 +100,28 @@ namespace wrench {
             NetworkProximityMessage("NETWORK_PROXIMITY_TRANSFER", payload) {
         this->message_to_transfer = message_to_transfer;
     }
+
+    /**
+     * @brief CoordinateLookupRequestMessage class
+     * @param requested_host: the host whose coordinates are being requested
+     * @param payload: the message size in bytes
+     */
+    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string requested_host, double payload) :
+            NetworkProximityMessage("COORDINATE_LOOKUP_REQUEST", payload) {
+        this->requested_host = requested_host;
+    }
+
+    /**
+     * @brief CoordinateLookupAnswerMessage class
+     * @param requested_host: the host whose coordinates are being requested
+     * @param xy_coordinate: the (x,y) coordinate corresponding to the requested_host
+     * @param payload: the message size in bytes
+     */
+    CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(std::string requested_host,
+                                                                 std::pair<double, double> xy_coordinate,
+                                                                 double payload) :
+            NetworkProximityMessage("COORDINATE_LOOKUP_ANSWER", payload) {
+        this->requested_host = requested_host;
+        this->xy_coordinate = xy_coordinate;
+    }
 }

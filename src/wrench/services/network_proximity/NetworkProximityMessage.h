@@ -119,6 +119,29 @@ namespace wrench {
         /** @brief The next mailbox for the network daemon to contact */
         std::string next_mailbox_to_send;
     };
+
+    /**
+     * @brief CoordinateLookupRequestMessage class
+     */
+    class CoordinateLookupRequestMessage: public NetworkProximityMessage {
+    public:
+        CoordinateLookupRequestMessage(std::string requested_host, double payload);
+
+        /** @brief The host who's coordinates is being requested */
+        std::string requested_host;
+    };
+
+    /**
+     * @brief CoordinateLookupAnswerMessage class
+     */
+    class CoordinateLookupAnswerMessage: public NetworkProximityMessage {
+    public:
+        CoordinateLookupAnswerMessage(std::string requested_host, std::pair<double, double> xy_coordinate, double payload);
+        /** @brief The host whose current coordinates were requested for */
+        std::string requested_host;
+        /** @brief The current (x,y) coordinate corresponding to the requested_host */
+        std::pair<double, double> xy_coordinate;
+    };
 }
 
 
