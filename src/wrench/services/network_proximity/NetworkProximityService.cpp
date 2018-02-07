@@ -26,7 +26,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service, "Log category for Networ
 
 namespace wrench {
 
-
+    // TODO: discuss why clear property values?
     /**
      * @brief Destructor
      */
@@ -35,6 +35,7 @@ namespace wrench {
         this->default_property_values.clear();
     }
 
+    // TODO: discuss removal of other constructor
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
@@ -62,7 +63,11 @@ namespace wrench {
             this->setProperty(p.first, p.second);
         }
 
-        // ALL VIVALDI STUFF, PROBABLY SHOULD PUT THIS IN A FUNCTION so the ifelse block is smaller
+        // TODO: discuss
+        // NEED TO STORE SHARED POINTERS TO THESE NETWORK DAEMONS INSTEAD...
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //        VIVALDI STARTUP STUFF, PROBABLY SHOULD PUT THIS IN A FUNCTION so the ifelse block is smaller        //
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
 
         if (boost::iequals(network_service_type, "vivaldi")) {
@@ -147,7 +152,9 @@ namespace wrench {
                 }
             }
         }
-        // END VIVALDI RELATED STUFF
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //                                       END VIVALDI STARTUP RELATED STUFF                                    //
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
         // Create the network daemons
@@ -175,6 +182,41 @@ namespace wrench {
       }
     }
 
+    /**
+     * @brief Look up the current (x,y) coordinates of a given host
+     * @param requested_host: the host whose coordinates are being requested
+     * @return The pair (x,y) coordinate values
+     *
+     * @throw WorkFlowExecutionException
+     * @throw std::runtime_error
+     */
+    std::pair<double, double> NetworkProximityService::getCoordinate(std::string requested_host) {
+        WRENCH_INFO("IN query()");
+
+        std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_get_coordinate_entry");
+
+        try {
+            S4U_Mailbox::putMessage(this->mailbox_name, new CoordinateLookupRequestMessage(answer_mailbox, std::move(requested_host),
+                                                                                                 this->getPropertyValueAsDouble(
+                                                                                                         NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> cause) {
+            throw WorkflowExecutionException(cause);
+        }
+
+        std::unique_ptr<SimulationMessage> message = nullptr;
+
+        try {
+            message = S4U_Mailbox::getMessage(answer_mailbox);
+        } catch (std::shared_ptr<NetworkError> cause) {
+            throw WorkflowExecutionException(cause);
+        }
+
+        if (CoordinateLookupAnswerMessage *msg = dynamic_cast<CoordinateLookupAnswerMessage *>(message.get())) {
+            return msg->xy_coordinate;
+        } else {
+            throw std::runtime_error("NetworkProximityService::getCoordinate(): Unexpected [" + message->getName() + "] message");
+        }
+    }
 
     /**
      * @brief Look up for the proximity value in database
@@ -291,13 +333,37 @@ namespace wrench {
         } else if (NetworkProximityLookupRequestMessage *msg = dynamic_cast<NetworkProximityLookupRequestMessage *>(message.get())) {
             double proximityValue=-1.0;
 
-            // TODO: if All2All go into if, else proximity value will be computing the euclidian distance between two nodes
+            // TODO: discuss using typedefs
+            std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
 
-            if (this->entries.find(msg->hosts) != this->entries.end()) {
-                proximityValue = this->entries[msg->hosts];
-                //this->addEntryToDatabase(msg->hosts,proximityValue);
+            // should i use a typedefd struct for coordinates? if so, where would i put the definition?
+            if (boost::iequals(network_service_type, "vivaldi")) {
+                auto host1 = this->coordinate_lookup_table.find(msg->hosts.first);
+                auto host2 = this->coordinate_lookup_table.find(msg->hosts.second);
 
+                if (host1 != this->coordinate_lookup_table.end() && host2 != this->coordinate_lookup_table.end()) {
+                    double h1_x, h1_y, h2_x, h2_y;
+
+                    h1_x = host1->second.first;
+                    h1_y = host1->second.second;
+
+                    h2_x = host2->second.first;
+                    h2_y = host2->second.second;
+
+                    double x, y;
+                    x = h1_x - h2_x;
+                    y = h1_y - h2_y;
+
+                    proximityValue = std::sqrt(std::pow(x, 2) + std::pow(y, 2));
+                }
             }
+            else {
+                if (this->entries.find(msg->hosts) != this->entries.end()) {
+                    proximityValue = this->entries[msg->hosts];
+                    //this->addEntryToDatabase(msg->hosts,proximityValue);
+                }
+            }
+
             try {
                 //NetworkProximityComputeAnswerMessage *proximity_msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get());
                 S4U_Mailbox::dputMessage(msg->answer_mailbox,
@@ -316,6 +382,7 @@ namespace wrench {
                 this->addEntryToDatabase(msg->hosts,msg->proximityValue);
 
                 // TODO: if this is Vivaldi, update coordinates of hosts.first and hosts.second
+
             }
             catch (std::shared_ptr<NetworkError> cause) {
                 return true;
@@ -323,13 +390,24 @@ namespace wrench {
             return true;
 
         }else if (NextContactDaemonRequestMessage *msg = dynamic_cast<NextContactDaemonRequestMessage *>(message.get())) {
-
+            int random_number;
+            std::string next_host_to_send;
+            std::string next_mail_box_to_send;
             // TODO: if this is All2All, keep Suraj's implementation, if not then use vivaldi scheme
+            std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
 
-            std::random_device rdev;
-            std::mt19937 rgen(rdev());
-            std::uniform_int_distribution<int> idist(0,this->hosts_in_network.size()-1);
-            int random_number = idist(rgen);
+            if (boost::iequals(network_service_type, "a")) {
+                std::hash<std::string> hash_func;
+                std::default_random_engine e;
+               // std::uniform_int_distribution<unsigned> u(0, this->communication_lookup_table.find(msg->hostname)->second.size() - 1);
+                // random_number = u(e);
+            }
+            else {
+                std::random_device rdev;
+                std::mt19937 rgen(rdev());
+                std::uniform_int_distribution<int> idist(0,this->hosts_in_network.size()-1);
+                random_number = idist(rgen);
+            }
 
 //            unsigned long randNum = (std::rand()%(this->hosts_in_network.size()));
 
@@ -338,8 +416,25 @@ namespace wrench {
                                                                         this->getPropertyValueAsDouble(
                                                                                 NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
+        }
 
-        }  else {
+        // TODO: discuss
+        else if (CoordinateLookupRequestMessage *msg = dynamic_cast<CoordinateLookupRequestMessage *> (message.get())) {
+            std::string requested_host = msg->requested_host;
+            auto const coordinate_itr = this->coordinate_lookup_table.find(requested_host);
+            if (coordinate_itr != this->coordinate_lookup_table.cend()) {
+                try {
+                    S4U_Mailbox::dputMessage(msg->answer_mailbox,
+                    new CoordinateLookupAnswerMessage(requested_host, coordinate_itr->second,
+                    this->getPropertyValueAsDouble(NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
+                }
+                catch (std::shared_ptr<NetworkError> cause) {
+                    return true;
+                }
+            }
+        }
+
+        else {
             throw std::runtime_error(
                     "NetworkProximityService::processNextMessage(): Unknown message type: " + std::to_string(message->payload));
         }

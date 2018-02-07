@@ -100,7 +100,7 @@ namespace wrench {
      */
     class NextContactDaemonRequestMessage : public NetworkProximityMessage {
     public:
-        NextContactDaemonRequestMessage(std::string answer_mailbox,double payload);
+        NextContactDaemonRequestMessage(std::string answer_mailbox, double payload);
 
         /** @brief The mailbox to return the answer to */
         std::string answer_mailbox;
@@ -125,7 +125,10 @@ namespace wrench {
      */
     class CoordinateLookupRequestMessage: public NetworkProximityMessage {
     public:
-        CoordinateLookupRequestMessage(std::string requested_host, double payload);
+        CoordinateLookupRequestMessage(std::string answer_mailbox, std::string requested_host, double payload);
+
+        /** @brief The mailbox to return the answer to */
+        std::string answer_mailbox;
 
         /** @brief The host who's coordinates is being requested */
         std::string requested_host;
@@ -137,8 +140,10 @@ namespace wrench {
     class CoordinateLookupAnswerMessage: public NetworkProximityMessage {
     public:
         CoordinateLookupAnswerMessage(std::string requested_host, std::pair<double, double> xy_coordinate, double payload);
+
         /** @brief The host whose current coordinates were requested for */
         std::string requested_host;
+
         /** @brief The current (x,y) coordinate corresponding to the requested_host */
         std::pair<double, double> xy_coordinate;
     };

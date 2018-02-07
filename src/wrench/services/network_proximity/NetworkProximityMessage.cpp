@@ -103,11 +103,13 @@ namespace wrench {
 
     /**
      * @brief CoordinateLookupRequestMessage class
+     * @param the mailbox to return the answer to
      * @param requested_host: the host whose coordinates are being requested
      * @param payload: the message size in bytes
      */
-    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string requested_host, double payload) :
+    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string answer_mailbox, std::string requested_host, double payload) :
             NetworkProximityMessage("COORDINATE_LOOKUP_REQUEST", payload) {
+        this->answer_mailbox = answer_mailbox;
         this->requested_host = requested_host;
     }
 
