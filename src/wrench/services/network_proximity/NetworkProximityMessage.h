@@ -89,10 +89,8 @@ namespace wrench {
      */
     class NetworkProximityTransferMessage : public NetworkProximityMessage {
     public:
-        NetworkProximityTransferMessage(std::string message_to_transfer,double payload);
+        NetworkProximityTransferMessage(double payload);
 
-        /** @brief The actual message transferred between network daemons */
-        std::string message_to_transfer;
     };
 
     /**

@@ -134,9 +134,9 @@ int main(int argc, char **argv) {
   // TRYING NETWORK PROXIMITY SERVICE WITH VIVALDI....
   std::vector<std::string> hostname_list_copy(hostname_list);
   std::string hostname_copy(hostname_list[0]);
-  wrench::NetworkProximityService *NPS = new wrench::NetworkProximityService(hostname_copy, hostname_list_copy, 1024, 10.0, 1, {
+  wrench::NetworkProximityService *NPS = new wrench::NetworkProximityService(hostname_copy, hostname_list_copy, {
           {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "vivaldi"},
-          {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_PERCENTAGE, "1.0"}});
+          {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"}});
 
   simulation.setNetworkProximityService(std::unique_ptr<wrench::NetworkProximityService>(NPS));
   /* It is necessary to store, or "stage", input files for the first task(s) of the workflow on some storage

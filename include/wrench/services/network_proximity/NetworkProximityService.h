@@ -10,6 +10,7 @@
 #ifndef WRENCH_NETWORKPROXIMITYSERVICE_H
 #define WRENCH_NETWORKPROXIMITYSERVICE_H
 
+#include <complex>
 #include "wrench/services/Service.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 #include "wrench/services/network_proximity/NetworkProximityDaemon.h"
@@ -23,13 +24,16 @@ namespace wrench{
 
     private:
         std::map<std::string, std::string> default_property_values =
-                {{NetworkProximityServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,              "1024"},
-                 {NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,           "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD,        "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                           "0.0"},
-                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE,       "ALLTOALL"}, // how are we error checking bad properties?
-                 {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_PERCENTAGE,   "1.0"}, // how are we error checking bad properties?
+                {{NetworkProximityServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                "1024"},
+                 {NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,             "1024"},
+                 {NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD,          "1024"},
+                 {NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,      "1024"},
+                 {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                            "0.0"},
+                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE,             "ALLTOALL"}, // how are we error checking bad properties?
+                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE,             "1024"}, // how are we error checking bad properties?
+                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,       "60"}, // how are we error checking bad properties?
+                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "20"}, // how are we error checking bad properties?
+                 {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE,    "1.0"}, // how are we error checking bad properties?
                 };
 
     public:
@@ -46,7 +50,6 @@ namespace wrench{
 
         NetworkProximityService(std::string db_hostname,
                                 std::vector<std::string> hosts_in_network,
-                                int message_size, double measurement_period, int noise,
                                 std::map<std::string, std::string> = {});
 
         void start();
@@ -56,7 +59,7 @@ namespace wrench{
         // TODO: add function to return coordinate of desired network daemon
         std::pair<double, double> getCoordinate(std::string);
 
-          private:
+    private:
 
         friend class Simulation;
 
@@ -71,7 +74,7 @@ namespace wrench{
 
         std::map<std::pair<std::string,std::string>,double> entries;
 
-        std::map<std::string, std::pair<double, double>> coordinate_lookup_table;
+        std::map<std::string, std::complex<double>> coordinate_lookup_table;
 
         std::map<std::string, std::vector<std::string>> communication_lookup_table;
     };
