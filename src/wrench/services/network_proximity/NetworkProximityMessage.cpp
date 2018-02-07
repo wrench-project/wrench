@@ -96,9 +96,8 @@ namespace wrench {
      * @param message_to_transfer: the message to transfer to measure proximity
      * @param payload: the message size in bytes
      */
-    NetworkProximityTransferMessage::NetworkProximityTransferMessage(std::string message_to_transfer,double payload) :
+    NetworkProximityTransferMessage::NetworkProximityTransferMessage(double payload) :
             NetworkProximityMessage("NETWORK_PROXIMITY_TRANSFER", payload) {
-        this->message_to_transfer = message_to_transfer;
     }
 
     /**
