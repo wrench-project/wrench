@@ -24,6 +24,8 @@
 #include "wrench/services/compute/cloud/CloudServiceProperty.h"
 #include "wrench/services/compute/batch/BatchService.h"
 #include "wrench/services/compute/batch/BatchServiceProperty.h"
+#include "wrench/services/network_proximity/NetworkProximityService.h"
+#include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 
 // WMS Implementations
 #include "wrench/wms/WMS.h"
