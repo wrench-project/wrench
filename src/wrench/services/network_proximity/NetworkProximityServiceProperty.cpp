@@ -25,4 +25,7 @@ namespace wrench {
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, LOOKUP_OVERHEAD);
 
     // TODO: add set property name SERVICE_TYPE
+    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_SERVICE_TYPE);
+
+    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_DAEMON_COMMUNICATION_PERCENTAGE);
 };
