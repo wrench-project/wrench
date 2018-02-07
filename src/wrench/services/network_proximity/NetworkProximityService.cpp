@@ -19,6 +19,9 @@
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <random>
 
+#include <boost/algorithm/string.hpp>
+#include <functional>
+
 XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service, "Log category for Network Proximity Service");
 
 namespace wrench {
@@ -45,27 +48,7 @@ namespace wrench {
                                                      std::vector<std::string> hosts_in_network,
                                                      int message_size, double measurement_period, int noise,
                                                      std::map<std::string, std::string> plist):
-    NetworkProximityService(std::move(hostname), std::move(hosts_in_network), message_size, measurement_period, noise, std::move(plist),"") {
-
-    }
-
-    /**
-     * @brief Constructor
-     * @param hostname: the hostname on which to start the service
-     * @param hosts_in_network: the hosts running in the network
-     * @param message_size: TODO
-     * @param measurement_period: TODO
-     * @param noise: TODO
-     * @param plist: a property list ({} means "use all defaults")
-     * @param suffix: suffix to append to the service name and mailbox
-     */
-    NetworkProximityService::NetworkProximityService(
-            std::string hostname,
-            std::vector<std::string> hosts_in_network,
-            int message_size, double measurement_period, int noise,
-            std::map<std::string, std::string> plist,
-            std::string suffix) :
-            Service(hostname, "network_proximity" + suffix, "network_proximity" + suffix) {
+                                                     Service(hostname, "network_proximity" , "network_proximity") {
 
         this->hosts_in_network = std::move(hosts_in_network);
 
@@ -78,6 +61,94 @@ namespace wrench {
         for (auto p : plist) {
             this->setProperty(p.first, p.second);
         }
+
+        // ALL VIVALDI STUFF, PROBABLY SHOULD PUT THIS IN A FUNCTION so the ifelse block is smaller
+        std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
+
+        if (boost::iequals(network_service_type, "vivaldi")) {
+
+            // set up the coordinate_lookup_table
+            for (auto const &host: this->hosts_in_network) {
+                this->coordinate_lookup_table.insert(std::make_pair(host, std::make_pair(0.0, 0.0)));
+            }
+
+            if (this->hosts_in_network.size() > 1) {
+                double communication_percentage = this->getPropertyValueAsDouble("NETWORK_DAEMON_COMMUNICATION_PERCENTAGE");
+
+                /* Each network daemon can communicate with a maximum of (n-1) other daemons.
+                 * The size of a network daemon's communication pool will a percentage of (n-1) other daemons.
+                 */
+                int communication_pool_size = std::ceil(communication_percentage * this->hosts_in_network.size() - 1);
+
+                /* Set up the communication look up table.
+                 * Maybe I need to switch this to an unordered_map for faster lookup times. What happens if
+                 * load factor gets bad? That won't really be a problem if I use map, but lookup times are
+                 * logn..
+                 *
+                 */
+                std::vector<std::string> empty_vector;
+                for (auto const &host: this->hosts_in_network) {
+                    this->communication_lookup_table.insert(std::make_pair(host, empty_vector));
+                }
+
+                // used for some randomness
+                std::hash<std::string> hash_func;
+                std::default_random_engine e;
+                std::uniform_int_distribution<unsigned> u(0, this->hosts_in_network.size() - 1);
+
+                std::list<std::pair<std::string, int>> possible_peers;
+                std::list<std::pair<std::string, int>>::const_iterator stop_itr;
+
+                /* For each host that a network daemon will run on, create a linked list of all the OTHER network
+                 * daemons and give each node a random number.
+                 * Sort that linked list by the random number.
+                 * Each network daemon's communication pool will be the first 'communication_pool_size' nodes
+                 * from the linked list.
+                 *
+                 * This whole nested for loop looks like n^2logn, that seems bad. Maybe if I pick
+                 * communication_pool_size random numbers, it could be faster, but would have to account for
+                 * duplicate random numbers being chosen.
+                 */
+                for (auto current_host = this->hosts_in_network.cbegin();
+                     current_host != this->hosts_in_network.cend(); ++current_host) {
+                    possible_peers.clear();
+                    e.seed(hash_func(*current_host));
+                    for (auto it = this->hosts_in_network.cbegin(); it != this->hosts_in_network.cend(); ++it) {
+                        if (current_host != it) {
+                            possible_peers.push_front(std::make_pair(*it, u(e)));
+                        }
+                    }
+
+                    // Sort based on random value assigned to each node. Is this random enough?
+                    possible_peers.sort([](const std::pair<std::string, int> &f, const std::pair<std::string, int> &s) {
+                        return f.second <= s.second;
+                    });
+
+                    // Pick communication_pool_size network daemons
+                    stop_itr = possible_peers.cbegin();
+                    std::advance(stop_itr, communication_pool_size);
+
+                    auto search = this->communication_lookup_table.find(*current_host);
+                    if (search != this->communication_lookup_table.end()) {
+                        for (auto vec_itr = possible_peers.cbegin(); vec_itr != stop_itr; ++vec_itr) {
+                            (search->second).push_back(vec_itr->first);
+                        }
+                    }
+                }
+
+                // DEBUGING: printing comm lookup table
+                WRENCH_INFO("--------NETWORK DAEMON COMMUNICATION POOLS---------");
+                for (auto const & pool: this->communication_lookup_table) {
+                    WRENCH_INFO("%s network daemon talks to:", pool.first.c_str());
+                    for (auto const & peer: pool.second) {
+                        WRENCH_INFO("peer: %s", peer.c_str());
+                    }
+                    WRENCH_INFO("---------------------------------------------------");
+                }
+            }
+        }
+        // END VIVALDI RELATED STUFF
+
 
         // Create the network daemons
         std::vector<std::string>::iterator it;
