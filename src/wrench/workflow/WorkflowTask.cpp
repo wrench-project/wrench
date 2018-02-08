@@ -24,11 +24,16 @@ namespace wrench {
      * @param id: the task id
      * @param flops: the task's number of flops
      * @param min_cores: the minimum number of cores required for running the task
-     * @param max_cores: the maximum number of cores that the task can use (0 means infinity)
+     * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param parallel_efficiency: the multi-core parallel efficiency
+     * @param memory_requirement: memory requirement in bytes
      */
-    WorkflowTask::WorkflowTask(const std::string id, const double flops, const int min_num_cores, const int max_num_cores, const double parallel_efficiency) :
-            id(id), flops(flops), min_num_cores(min_num_cores), max_num_cores(max_num_cores), parallel_efficiency(parallel_efficiency), state(WorkflowTask::READY), job(nullptr) {
+    WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
+                               const unsigned long max_num_cores, const double parallel_efficiency,
+                               const double memory_requirement) :
+            id(id), flops(flops), min_num_cores(min_num_cores), max_num_cores(max_num_cores),
+            parallel_efficiency(parallel_efficiency), memory_requirement(memory_requirement),
+            state(WorkflowTask::READY), job(nullptr) {
     }
 
     /**
@@ -106,11 +111,21 @@ namespace wrench {
     /**
      * @brief Get the parallel efficiency of the task
      *
-     * @return the parallel efficiency
+     * @return the parallel efficiency (number between 0.0 and 1.0)
      */
     double WorkflowTask::getParallelEfficiency() const {
       return this->parallel_efficiency;
     }
+
+    /**
+     * @brief Get the memory requirement of the task
+     *
+     * @return the memory requirement (in bytes)
+     */
+    double WorkflowTask::getMemoryRequirement() const {
+      return this->memory_requirement;
+    }
+
 
     /**
      * @brief Get the number of children of a task
