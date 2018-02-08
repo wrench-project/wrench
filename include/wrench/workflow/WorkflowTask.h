@@ -36,6 +36,8 @@ namespace wrench {
 
         double getParallelEfficiency() const;
 
+        double getMemoryRequirement() const;
+
         int getNumberOfChildren() const;
 
         int getNumberOfParents() const;
@@ -120,9 +122,10 @@ namespace wrench {
         std::string id;                    // Task ID
         std::string cluster_id;            // ID for clustered task
         double flops;                      // Number of flops
-        unsigned long min_num_cores = 1; // = 1 (always?)
-        unsigned long max_num_cores = 1; // = infty?
-        double parallel_efficiency = 1.0;
+        unsigned long min_num_cores;
+        unsigned long max_num_cores;
+        double parallel_efficiency;
+        double memory_requirement;
 
         double start_date = -1.0;          // Date at which task began execution (getter?)
         double end_date = -1.0;            // Date at which task finished execution (getter?)
@@ -136,7 +139,12 @@ namespace wrench {
         std::map<std::string, WorkflowFile *> input_files;    // List of input files
 
         // Private constructor (called by Workflow)
-        WorkflowTask(const std::string id, const double t, const int min_num_cores, const int max_num_cores, const double parallel_efficiency);
+        WorkflowTask(const std::string id,
+                     const double t,
+                     const unsigned long min_num_cores,
+                     const unsigned long max_num_cores,
+                     const double parallel_efficiency,
+                     const double memory_requirement);
 
         // Containing job
         WorkflowJob *job;
