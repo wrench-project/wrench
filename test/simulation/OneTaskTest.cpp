@@ -30,6 +30,8 @@ public:
 
     void do_Noop_test();
 
+    void do_HostMemory_test();
+
     void do_ExecutionWithLocationMap_test();
 
     void do_ExecutionWithDefaultStorageService_test();
@@ -58,6 +60,9 @@ protected:
               "<platform version=\"4.1\"> "
               "   <AS id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"SingleHost\" speed=\"1f\"/> "
+              "       <host id=\"OtherHost\" speed=\"1f\"> "
+              "         <prop id=\"ram\" value=\"1024\"/> "
+              "       </host>"
               "   </AS> "
               "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
@@ -241,7 +246,7 @@ void OneTaskTest::do_Noop_test() {
   EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
 
 
-  // Running a "run a single task" simulation
+  // Running a "do nothing" simulation
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
@@ -249,6 +254,125 @@ void OneTaskTest::do_Noop_test() {
   free(argv[0]);
   free(argv);
 }
+
+/**********************************************************************/
+/**  HOST MEMORY SIMULATION TEST                                     **/
+/**********************************************************************/
+
+class HostMemoryTestWMS : public wrench::WMS {
+
+public:
+    HostMemoryTestWMS(OneTaskTest *test,
+                wrench::Workflow *workflow,
+                std::unique_ptr<wrench::Scheduler> scheduler,
+                std::string hostname1,
+                std::string hostname2) :
+            wrench::WMS(workflow, std::move(scheduler), hostname1, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    OneTaskTest *test;
+
+    int main() {
+
+
+      double ram_capacity;
+
+      ram_capacity = wrench::Simulation::getHostMemoryCapacity("SingleHost");
+      if (ram_capacity != DBL_MAX) {
+        throw std::runtime_error("RAM Capacity of SingleHost should be +infty");
+      }
+
+      ram_capacity = wrench::Simulation::getMemoryCapacity();
+      if (ram_capacity != DBL_MAX) {
+        throw std::runtime_error("RAM Capacity of SingleHost should be +infty");
+      }
+
+
+      ram_capacity = wrench::Simulation::getHostMemoryCapacity("OtherHost");
+      if (ram_capacity == DBL_MAX) {
+        throw std::runtime_error("RAM Capacity of OtherHost should not be +infty");
+      }
+      if (fabs(ram_capacity - 1024) > 0.01) {
+        throw std::runtime_error("RAM Capacity of OtherHost should  be 1024");
+      }
+
+
+      // Terminate
+      this->simulation->shutdownAllComputeServices();
+      this->simulation->shutdownAllStorageServices();
+      this->simulation->getFileRegistryService()->stop();
+      return 0;
+    }
+};
+
+TEST_F(OneTaskTest, HostMemory) {
+  DO_TEST_WITH_FORK(do_HostMemory_test);
+}
+
+void OneTaskTest::do_HostMemory_test() {
+
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  simulation->instantiatePlatform(platform_file_path);
+
+  // Get a hostname
+  std::string hostname1 = "SingleHost";
+  std::string hostname2 = "OtherHost";
+
+  // Create a WMS
+  wrench::WMS *wms = simulation->setWMS(
+          std::unique_ptr<wrench::WMS>(new HostMemoryTestWMS(this, workflow,
+                                                       std::unique_ptr<wrench::Scheduler>(
+                                                               new NoopScheduler()),
+                          hostname1, hostname2
+          )));
+
+  // Create a Compute Service
+  compute_service = simulation->add(
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname1, true, true,
+                                                               {std::make_pair(hostname1, 0)},
+                                                               nullptr,
+                                                               {})));
+
+  // Create a Storage Service
+  storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname1, 10000000000000.0)));
+
+
+  // Start a file registry service
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname1));
+
+
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+  // Staging the input_file on the storage service
+  simulation->stageFiles({input_file}, storage_service1);
+
+
+  // Running a "do nothing" simulation
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
 
 /**********************************************************************/
 /** EXECUTION WITH LOCATION_MAP SIMULATION TEST                      **/
