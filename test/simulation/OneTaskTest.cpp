@@ -7,9 +7,11 @@
  * (at your option) any later version.
  */
 
+#include <math.h>
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
+
 
 #include "NoopScheduler.h"
 
