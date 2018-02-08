@@ -179,15 +179,28 @@ namespace wrench {
       return simgrid::s4u::this_actor::sleep_for(duration);
     }
 
+    /**
+     * @brief Get the memory capacity of a host given a hostname
+     * @param hostname: the hostname
+     * @return the memory capacity in bytes
+     */
     double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
       return getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
     }
 
+    /**
+     * @brief Get the memory capacity of the current host
+     * @return the memory capacity in bytes
+     */
     double S4U_Simulation::getMemoryCapacity() {
       return S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host::current());
     }
 
-
+    /**
+     * @brief Get the memory capacity of a S4U host
+     * @param host: the host
+     * @return the memory capacity in bytes
+     */
     double S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
       std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory", "Memory", "MEMORY"};
       double capacity_value = DBL_MAX;
