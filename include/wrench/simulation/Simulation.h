@@ -84,6 +84,10 @@ namespace wrench {
 
         double getCurrentSimulatedDate();
 
+        static double getHostMemoryCapacity(std::string hostname);
+
+        static double getMemoryCapacity();
+
         /***********************/
         /** \endcond            */
         /***********************/

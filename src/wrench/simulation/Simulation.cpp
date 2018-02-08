@@ -546,4 +546,12 @@ namespace wrench {
       return S4U_Simulation::getClock();
     }
 
+    double Simulation::getHostMemoryCapacity(std::string hostname) {
+      return S4U_Simulation::getHostMemoryCapacity(hostname);
+    }
+
+    double Simulation::getMemoryCapacity() {
+      return S4U_Simulation::getMemoryCapacity();
+    }
+
 };

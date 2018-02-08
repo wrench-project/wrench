@@ -39,8 +39,13 @@ namespace wrench {
         bool isPlatformSetup();
         std::vector<std::string> getAllHostnames();
         void shutdown();
+				static double getHostMemoryCapacity(std::string hostname);
+				static double getMemoryCapacity();
+
+
 
 		private:
+				static double getHostMemoryCapacity(simgrid::s4u::Host *host);
 				simgrid::s4u::Engine *engine;
 				bool initialized = false;
 				bool platform_setup = false;

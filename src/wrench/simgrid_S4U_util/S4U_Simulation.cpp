@@ -10,6 +10,8 @@
 
 #include <iostream>
 #include <xbt/ex.hpp>
+#include <set>
+#include <cfloat>
 
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -175,6 +177,35 @@ namespace wrench {
      */
     void S4U_Simulation::sleep(double duration) {
       return simgrid::s4u::this_actor::sleep_for(duration);
+    }
+
+    double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
+      return getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
+    }
+
+    double S4U_Simulation::getMemoryCapacity() {
+      return S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host::current());
+    }
+
+
+    double S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
+      std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory", "Memory", "MEMORY"};
+      double capacity_value = DBL_MAX;
+
+      for (auto tag : tags) {
+        const char *capacity_string = host->getProperty(tag.c_str());
+        if (capacity_string) {
+          if (capacity_value != DBL_MAX) {
+            throw std::invalid_argument("S4U_Simulation::getHostMemoryCapacity(): Host '" + host->getName() + "' has multiple memory capacity specifications");
+          }
+          if (sscanf(capacity_string, "%lf", &capacity_value) != 1) {
+            throw std::invalid_argument(
+                    "S4U_Simulation::getHostMemoryCapacity(): Host '" + host->getName() + "'has invalid memory capacity specification '" + tag +":" +
+                    std::string(capacity_string) + "'");
+          }
+        }
+      }
+      return capacity_value;
     }
 
 };
