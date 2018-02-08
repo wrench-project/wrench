@@ -546,10 +546,19 @@ namespace wrench {
       return S4U_Simulation::getClock();
     }
 
+    /**
+     * @brief Get the memory capacity of a host given a hostname
+     * @param hostname: the hostname
+     * @return the memory capacity in bytes
+     */
     double Simulation::getHostMemoryCapacity(std::string hostname) {
       return S4U_Simulation::getHostMemoryCapacity(hostname);
     }
 
+    /**
+     * @brief Get the memory capacity of the current host
+     * @return the memory capacity in bytes
+     */
     double Simulation::getMemoryCapacity() {
       return S4U_Simulation::getMemoryCapacity();
     }
