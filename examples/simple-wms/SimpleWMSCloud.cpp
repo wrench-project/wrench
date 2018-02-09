@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -114,12 +114,11 @@ int main(int argc, char **argv) {
    * The WMS implementation is in SimpleWMS.[cpp|h].
    */
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
-  wrench::WMS *wms = simulation.setWMS(
+  wrench::WMS *wms = simulation.add(
           std::unique_ptr<wrench::WMS>(
                   new wrench::SimpleWMS(&workflow,
                                         std::unique_ptr<wrench::Scheduler>(
-                                                new wrench::CloudScheduler(cloud_service, &simulation)),
-                                        wms_host)));
+                                                new wrench::CloudScheduler(cloud_service, &simulation)), wms_host)));
 
   /* Instantiate a file registry service to be started on some host. This service is
    * essentially a replica catalog that stores <file , storage service> pairs so that

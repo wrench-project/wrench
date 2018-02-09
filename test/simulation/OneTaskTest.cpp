@@ -127,7 +127,7 @@ void OneTaskTest::do_BadSetup_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  ASSERT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  ASSERT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new BadSetupTestWMS(this, workflow,
                                                            std::unique_ptr<wrench::Scheduler>(
                                                                    new NoopScheduler()),
@@ -210,7 +210,7 @@ void OneTaskTest::do_Noop_test() {
 
   // Create a WMS
   ASSERT_THROW(simulation->launch(), std::runtime_error);
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new NoopTestWMS(this, workflow,
                                                        std::unique_ptr<wrench::Scheduler>(
                                                                new NoopScheduler()),
@@ -334,7 +334,7 @@ void OneTaskTest::do_HostMemory_test() {
   std::string hostname2 = "OtherHost";
 
   // Create a WMS
-  wrench::WMS *wms = simulation->setWMS(
+  wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new HostMemoryTestWMS(this, workflow,
                                                        std::unique_ptr<wrench::Scheduler>(
                                                                new NoopScheduler()),
@@ -485,7 +485,7 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ExecutionWithLocationMapTestWMS(this, workflow,
                                                                            std::unique_ptr<wrench::Scheduler>(
                                                                                    new NoopScheduler()),
@@ -614,7 +614,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ExecutionWithDefaultStorageServiceTestWMS(this, workflow,
                                                                                      std::unique_ptr<wrench::Scheduler>(
                                                                                              new NoopScheduler()),
@@ -769,7 +769,7 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ExecutionWithPrePostCopiesAndCleanupTestWMS(this, workflow,
                                                                                        std::unique_ptr<wrench::Scheduler>(
                                                                                                new NoopScheduler()),

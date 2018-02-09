@@ -167,7 +167,7 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(std::unique_ptr<wrench::WMS>(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(std::unique_ptr<wrench::WMS>(
           new CloudStandardJobTestWMS(this, workflow, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 
@@ -274,7 +274,7 @@ void CloudServiceTest::do_PilotJobTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(std::unique_ptr<wrench::WMS>(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(std::unique_ptr<wrench::WMS>(
           new CloudPilotJobTestWMS(this, workflow, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 
@@ -385,7 +385,7 @@ void CloudServiceTest::do_NumCoresTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(std::unique_ptr<wrench::WMS>(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(std::unique_ptr<wrench::WMS>(
           new CloudNumCoresTestWMS(this, workflow, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
 

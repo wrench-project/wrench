@@ -194,7 +194,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceUnsupportedJobTypeTestWMS(this, workflow,
                                                                                             std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -327,7 +327,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(this, workflow,
                                                                                             std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -460,7 +460,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(this, workflow,
                                                                                                std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -599,7 +599,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   std::string hostname = "QuadCoreHost";
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(this, workflow,
                                                                                                std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -720,7 +720,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceJobTerminationTestWMS(this, workflow,
                                                                                         std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -858,7 +858,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(this, workflow,
                                                                                                     std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1007,7 +1007,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceCompletedJobTerminationTestWMS(this, workflow,
                                                                                                  std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1154,7 +1154,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(
                   new MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(this, workflow,
                                                                                             std::unique_ptr<wrench::Scheduler>(
@@ -1302,7 +1302,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(
                   new MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(this, workflow,
                                                                                                std::unique_ptr<wrench::Scheduler>(

@@ -26,7 +26,7 @@ namespace wrench {
 
 		public:
 				void initialize(int *argc, char **argv);
-				void setupPlatform(std::string);
+				void setupPlatform(std::string&);
 				void runSimulation();
 				static double getClock();
 				static std::string getHostName();

@@ -226,7 +226,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskTestWMS(this, workflow.get(),
                                                                     std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -389,7 +389,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskNotEnoughCoresTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskNotEnoughCoresTestWMS(this, workflow.get(),
                                                                                   std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -579,7 +579,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskBogusPreFileCopyTestWMS(this, workflow.get(),
                                                                                     std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -764,7 +764,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskMissingFileTestWMS(this, workflow.get(),
                                                                                std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1066,7 +1066,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneMultiCoreTaskTestWMS(this, workflow.get(),
                                                                    std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1424,7 +1424,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new TwoMultiCoreTasksTestWMS(this, workflow.get(),
                                                                     std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1699,7 +1699,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MultiHostTestWMS(this, workflow.get(),
                                                             std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1863,7 +1863,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new JobTerminationTestDuringAComputationWMS(this, workflow.get(),
                                                                                    std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), "Host3"))));
@@ -2030,7 +2030,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new JobTerminationTestDuringATransferWMS(this, workflow.get(),
                                                                                 std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), "Host3"))));
@@ -2216,7 +2216,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new JobTerminationTestAtRandomTimesWMS(this, workflow.get(),
                                                                               std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), "Host3"))));

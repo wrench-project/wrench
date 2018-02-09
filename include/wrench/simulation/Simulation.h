@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -50,6 +50,8 @@ namespace wrench {
 
         StorageService *add(std::unique_ptr<StorageService> executor);
 
+        WMS *add(std::unique_ptr<WMS>);
+
         void setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service);
 
         void setNetworkProximityService(std::unique_ptr<NetworkProximityService> network_proximity_service);
@@ -57,8 +59,6 @@ namespace wrench {
         void stageFile(WorkflowFile *file, StorageService *storage_service);
 
         void stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service);
-
-        WMS *setWMS(std::unique_ptr<WMS>);
 
         /** @brief The simulation post-mortem output */
         SimulationOutput output;
@@ -105,7 +105,7 @@ namespace wrench {
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 
-        std::unique_ptr<WMS> wms = nullptr;
+        std::set<std::unique_ptr<WMS>> wmses;
 
         std::unique_ptr<FileRegistryService> file_registry_service = nullptr;
 
@@ -116,6 +116,7 @@ namespace wrench {
         std::set<std::unique_ptr<StorageService>> storage_services;
 
         void check_simulation_setup();
+
         void start_all_processes();
 
     };

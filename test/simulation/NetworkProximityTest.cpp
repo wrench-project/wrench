@@ -161,7 +161,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ProxTestWMS(this, workflow,
                                                        std::unique_ptr<wrench::Scheduler>(
                                                                new NoopScheduler()),
@@ -322,7 +322,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
     std::string hostname = simulation->getHostnameList()[0];
 
     // Create a WMS
-    EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+    EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
             std::unique_ptr<wrench::WMS>(new CompareProxTestWMS(this, workflow,
                                                          std::unique_ptr<wrench::Scheduler>(
                                                                  new NoopScheduler()),

@@ -194,7 +194,7 @@ void BatchServiceTest::do_StandardJobTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneStandardJobSubmissionTestWMS(this, std::move(workflow.get()),
                                                                            std::unique_ptr<wrench::Scheduler>(
                           {
@@ -348,7 +348,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OnePilotJobSubmissionTestWMS(this, workflow.get(),
                                                                         std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -550,7 +550,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new StandardPlusPilotJobSubmissionTestWMS(this, workflow.get(),
                                                                                  std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -690,7 +690,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new InsufficientCoresJobSubmissionTestWMS(this, workflow.get(),
                                                                                  std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -828,7 +828,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new NoArgumentsJobSubmissionTestWMS(this, workflow.get(),
                                                                            std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -981,7 +981,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new StandardJobTimeoutSubmissionTestWMS(this, workflow.get(),
                                                                                std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1133,7 +1133,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new PilotJobTimeoutSubmissionTestWMS(this, workflow.get(),
                                                                             std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1350,7 +1350,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new BestFitStandardJobSubmissionTestWMS(this, workflow.get(),
                                                                                std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1548,7 +1548,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new StandardJobInsidePilotJobTimeoutSubmissionTestWMS(this, workflow.get(),
                                                                                              std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1741,7 +1741,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new StandardJobInsidePilotJobSucessSubmissionTestWMS(this, workflow.get(),
                                                                                             std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -1917,7 +1917,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new InsufficientCoresInsidePilotJobSubmissionTestWMS(this, workflow.get(),
                                                                                             std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -2076,7 +2076,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MultipleStandardJobSubmissionTestWMS(this, workflow.get(),
                                                                                 std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -2237,7 +2237,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new DifferentBatchAlgorithmsSubmissionTestWMS(this, std::move(workflow.get()),
                                                                                      std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -2400,7 +2400,7 @@ void BatchServiceTest::do_BatchFakeJobSubmissionTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new BatchFakeJobSubmissionTestWMS(this, std::move(workflow.get()),
                                                                          std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
@@ -2573,7 +2573,7 @@ void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new BatchTraceFileJobSubmissionTestWMS(this, std::move(workflow.get()),
                                                                               std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), hostname))));
