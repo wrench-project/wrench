@@ -404,7 +404,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceInformationMessage::ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload)
-            : ComputeServiceMessage("INFORMATION_REPLY", payload), information(information), job(job) {}
+            : ComputeServiceMessage("INFORMATION_REPLY", payload), job(job), information(information) {}
 
 
     /**

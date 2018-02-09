@@ -52,7 +52,7 @@ namespace wrench {
       // TODO: Henri added the factor 2 below because running with the "one task" example,
       // TODO: the pilot job was just a bit too short and the WMS was in an infinite loop
       // TODO: (which is an annoying but simulation-valid behavior)
-      double pilot_job_duration = 2.0 * flops / target_service->getCoreFlopRate();
+      double pilot_job_duration = 2.0 * flops / target_service->getCoreFlopRate()[0];
       WRENCH_INFO("Submitting a pilot job (1 host, 1 core, %lf seconds)", pilot_job_duration);
 
       WorkflowJob *job = (WorkflowJob *) job_manager->createPilotJob(workflow, 1, 1, pilot_job_duration);

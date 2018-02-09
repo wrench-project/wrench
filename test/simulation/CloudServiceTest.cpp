@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
+#include <numeric>
 
 #include "NoopScheduler.h"
 #include "TestWithFork.h"
@@ -325,9 +326,13 @@ private:
     int main() {
       try {
         // no VMs
-        unsigned long num_cores = this->test->compute_service->getNumCores();
-        unsigned long num_idle_cores = this->test->compute_service->getNumIdleCores();
-        if (num_cores != 0 || num_idle_cores != 0) {
+        std::vector<unsigned long> num_cores = this->test->compute_service->getNumCores();
+
+        unsigned long sum_num_cores = (unsigned long)std::accumulate(num_cores.begin(), num_cores.end(), 0);
+        std::vector<unsigned long> num_idle_cores = this->test->compute_service->getNumIdleCores();
+        unsigned long sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_cores.end(), 0);
+
+        if (sum_num_cores != 0 || sum_num_idle_cores != 0) {
           throw std::runtime_error("getNumCores() and getNumIdleCores() should be 0.");
         }
 
@@ -337,18 +342,24 @@ private:
 
         cs->createVM(execution_host, "vm_1" + execution_host, 0);
         num_cores = cs->getNumCores();
-        num_idle_cores = cs->getNumIdleCores();
+        sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
 
-        if (num_cores != 4 || num_idle_cores != 4) {
+        num_idle_cores = cs->getNumIdleCores();
+        sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+
+        if (sum_num_cores != 4 || sum_num_idle_cores != 4) {
           throw std::runtime_error("getNumCores() and getNumIdleCores() should be 4.");
         }
 
         // create a VM with two cores
         cs->createVM(execution_host, "vm_2" + execution_host, 2);
         num_cores = cs->getNumCores();
-        num_idle_cores = cs->getNumIdleCores();
+        sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
 
-        if (num_cores != 6 || num_idle_cores != 6) {
+        num_idle_cores = cs->getNumIdleCores();
+        sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+
+        if (sum_num_cores != 6 || sum_num_idle_cores != 6) {
           throw std::runtime_error("getNumCores() and getNumIdleCores() should be 6.");
         }
 
