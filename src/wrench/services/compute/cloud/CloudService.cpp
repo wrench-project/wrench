@@ -631,46 +631,37 @@ namespace wrench {
       // Build a dictionary
       std::map<std::string, std::vector<double>> dict;
 
-
-      // TODO: HENRI WROTE THIS BELOW, MATCHING THE ORIGINAL IMPLEMENTATION BUT RAFAEL
-      // TODO: BUT RAFAEL NEEDS TO MAKE SURE IT MAKES SENSE
-      // TODO: IN PARTICULAR THE DISTINCTION BETWEEN HOSTS AND VMs
-
-      // Num cores per host
+      // Num cores per vm
       std::vector<double> num_cores;
-      // TODO: HENRI SAYS "Shouldn't this below be about hosts instead of VMs?"
-//      for (auto &host : this->execution_hosts) {
-//        num_cores.push_back(Simulation::getNumCores(host));
-//      }
       for (auto &vm : this->vm_list) {
         num_cores.push_back(std::get<2>(vm.second));
       }
 
       dict.insert(std::make_pair("num_cores",num_cores));
 
-      // Num idle cores per hosts
+      // Num idle cores per vm
       std::vector<double> num_idle_cores;
-      // TODO: HENRI SAYS "Shouldn't this below be about hosts instead of VMs?"
-//      for (auto &host : this->execution_hosts) {
-//        num_idle_cores.push_back(666);
-//      }
       for (auto &vm : this->vm_list) {
         num_idle_cores.push_back(std::get<1>(vm.second)->getNumIdleCores());
       }
 
       dict.insert(std::make_pair("num_idle_cores",num_idle_cores));
 
-      // Flop rate per host
+      // Flop rate per vm
       std::vector<double> flop_rates;
-      for (auto &host : this->execution_hosts) {
-        flop_rates.push_back(Simulation::getFlopRate(host));
+      for (auto &vm : this->vm_list) {
+        // TODO: This is calling a S4U thing directly, without going though our
+        // TODO: S4U_Simulation class (perhaps change later, but then the CloudService
+        // TODO: implementation will have to change since it uses the simgrid::s4u stuff
+        // TODO: directly
+        flop_rates.push_back((std::get<0>(vm.second))->getPstateSpeed(0));
       }
       dict.insert(std::make_pair("flop_rates", flop_rates));
 
       // RAM capacity per host
       std::vector<double> ram_capacities;
-      for (auto &host : this->execution_hosts) {
-        ram_capacities.push_back(Simulation::getHostMemoryCapacity(host));
+      for (auto &vm : this->vm_list) {
+        ram_capacities.push_back(DBL_MAX);  // TODO: What about VM memory capacities???
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
@@ -678,7 +669,6 @@ namespace wrench {
       ttl.push_back(DBL_MAX);
       dict.insert(std::make_pair("ttl", ttl));
 
-      WRENCH_INFO("SENDING REPLY");
       // Send the reply
       ComputeServiceResourceDescriptionAnswerMessage *answer_message = new ComputeServiceResourceDescriptionAnswerMessage(
               dict,
@@ -687,7 +677,6 @@ namespace wrench {
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        WRENCH_INFO("CRAP!");
         return;
       }
     }
