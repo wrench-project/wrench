@@ -12,6 +12,7 @@
 #define WRENCH_COMPUTESERVICEMESSAGE_H
 
 #include <memory>
+#include <vector>
 #include "wrench/workflow/execution_events/FailureCause.h"
 #include "services/ServiceMessage.h"
 
@@ -255,8 +256,8 @@ namespace wrench {
     };
 
     /**
-  * @brief ComputeServiceNumIdleCoresRequestMessage class
-  */
+     * @brief ComputeServiceNumIdleCoresRequestMessage class
+    */
     class ComputeServiceNumIdleCoresRequestMessage : public ComputeServiceMessage {
     public:
         ComputeServiceNumIdleCoresRequestMessage(std::string answer_mailbox, double payload);
@@ -288,6 +289,28 @@ namespace wrench {
 
         /** @brief The information to reply back */
         std::string information;
+    };
+
+
+    /**
+     * @brief ComputeServiceResourceDescriptionRequestMessage class
+    */
+    class ComputeServiceResourceDescriptionRequestMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceResourceDescriptionRequestMessage(std::string answer_mailbox, double payload);
+
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+    };
+
+    /**
+     * @brief ComputeServiceNumIdleCoresAnswerMessage class
+     */
+    class ComputeServiceResourceDescriptionAnswerMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceResourceDescriptionAnswerMessage(std::map<std::string, std::vector<double>> info, double payload);
+
+        std::map<std::string, std::vector<double>> info;
     };
 
 

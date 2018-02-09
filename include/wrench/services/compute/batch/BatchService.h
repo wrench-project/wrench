@@ -36,6 +36,8 @@ namespace wrench {
 
         std::map<std::string, std::string> default_property_values =
                 {{BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
+                 {BatchServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,"1024"},
+                 {BatchServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, "1024"},
                  {BatchServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,              "1024"},
                  {BatchServiceProperty::THREAD_STARTUP_OVERHEAD,                     "0"},
                  {BatchServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           "1024"},
@@ -169,6 +171,8 @@ namespace wrench {
         bool processNextMessage();
 
         bool dispatchNextPendingJob();
+
+        void processGetResourceDescription(const std::string &answer_mailbox) override;
 
         void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
 

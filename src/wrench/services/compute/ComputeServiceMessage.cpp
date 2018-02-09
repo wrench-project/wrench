@@ -395,6 +395,7 @@ namespace wrench {
     ComputeServiceNumIdleCoresAnswerMessage::ComputeServiceNumIdleCoresAnswerMessage(unsigned long num, double payload)
             : ComputeServiceMessage("NUM_IDLE_CORES_ANSWER", payload), num_idle_cores(num) {}
 
+    
     /**
      * @brief Constructor
      * @param num: information to reply back
@@ -404,4 +405,35 @@ namespace wrench {
      */
     ComputeServiceInformationMessage::ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload)
             : ComputeServiceMessage("INFORMATION_REPLY", payload), information(information), job(job) {}
+
+
+    /**
+     * @brief Constructor
+     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    ComputeServiceResourceDescriptionRequestMessage::ComputeServiceResourceDescriptionRequestMessage(std::string answer_mailbox,
+                                                                                       double payload)
+            : ComputeServiceMessage("RESOURCE_DESCRIPTION_REQUEST", payload) {
+      if (answer_mailbox.empty()) {
+        throw std::invalid_argument(
+                "ComputeServiceResourceDescriptionRequestMessage::ComputeServiceResourceDescriptionRequestMessage(): Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+    }
+
+    /**
+     * @brief Constructor
+     * @param info: resource description
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    ComputeServiceResourceDescriptionAnswerMessage::ComputeServiceResourceDescriptionAnswerMessage(std::map<std::string, std::vector<double>> info, double payload)
+            : ComputeServiceMessage("RESOURCE_DESCRIPTION_ANSWER", payload), info(info) {}
+    
+    
+    
 };

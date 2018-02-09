@@ -31,6 +31,7 @@
 #include <json.hpp>
 #include <boost/algorithm/string.hpp>
 #include <wrench/util/MessageManager.h>
+#include <cfloat>
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
@@ -948,6 +949,10 @@ namespace wrench {
         }
         return false;
 
+      } else if (auto *msg = dynamic_cast<ComputeServiceResourceDescriptionRequestMessage *>(message.get())) {
+        processGetResourceDescription(msg->answer_mailbox);
+        return true;
+
       } else if (auto *msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
         is_bat_sched_ready = true;
         return true;
@@ -1801,5 +1806,60 @@ namespace wrench {
       return result;
     }
 
+    /**
+  * @brief Process a "get resource description message"
+  * @param answer_mailbox: the mailbox to which the description message should be sent
+  */
+    void BatchService::processGetResourceDescription(const std::string &answer_mailbox) {
+      // Build a dictionary
+      std::map<std::string, std::vector<double>> dict;
 
+      // Num cores per hosts
+      std::vector<double> num_cores;
+      for (auto h : this->nodes_to_cores_map) {
+        num_cores.push_back((double)(h.second));
+      }
+
+      std::map<std::string, unsigned long> available_nodes_to_cores;
+      num_cores.push_back(666);
+      num_cores.push_back(777);
+      dict.insert(std::make_pair("num_cores",num_cores));
+
+      // Num idle cores per hosts
+      std::vector<double> num_idle_cores;
+      for (auto h : this->available_nodes_to_cores) {
+        num_idle_cores.push_back((double)(h.second));
+      }
+      dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
+
+      // Flop rate per host
+      std::vector<double> flop_rates;
+      for (auto h : this->nodes_to_cores_map) {
+        flop_rates.push_back(S4U_Simulation::getFlopRate(h.first));
+      }
+      dict.insert(std::make_pair("flop_rates", flop_rates));
+
+      // RAM capacity per host
+      std::vector<double> ram_capacities;
+      for (auto h : this->nodes_to_cores_map) {
+        ram_capacities.push_back(S4U_Simulation::getMemoryCapacity(h.first));
+      }
+      dict.insert(std::make_pair("ram_capacities", ram_capacities));
+
+      std::vector<double> ttl;
+      ttl.push_back(DBL_MAX);
+      dict.insert(std::make_pair("ttl", ttl));
+
+
+      // Send the reply
+      ComputeServiceResourceDescriptionAnswerMessage *answer_message = new ComputeServiceResourceDescriptionAnswerMessage(
+              dict,
+              this->getPropertyValueAsDouble(
+                      ComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
+      try {
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
 }
