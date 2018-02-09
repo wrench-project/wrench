@@ -86,6 +86,10 @@ namespace wrench {
 
         static double getHostMemoryCapacity(std::string hostname);
 
+        static unsigned long getNumCores(std::string hostname);
+
+        static double getFlopRate(std::string hostname);
+
         static double getMemoryCapacity();
 
         /***********************/
