@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,15 +23,17 @@ namespace wrench {
      * @param scheduler: a scheduler implementation
      * @param hostname: the name of the host on which to run the WMS
      * @param suffix: a string to append to the process name
+     * @param start_time: the simulated time when the WMS should start running
      *
      * @throw std::invalid_argument
      */
     WMS::WMS(Workflow *workflow,
              std::unique_ptr<Scheduler> scheduler,
              std::string &hostname,
-             std::string suffix) :
+             std::string suffix,
+             double start_time) :
             S4U_Daemon("wms_" + suffix, "wms_" + suffix),
-            workflow(workflow),
+            workflow(workflow), start_time(start_time),
             scheduler(std::move(scheduler)) {
 
       this->hostname = hostname;
@@ -71,7 +73,7 @@ namespace wrench {
      */
     void WMS::runDynamicOptimizations() {
       for (auto &opt : this->dynamic_optimizations) {
-        opt.get()->process(this->workflow);
+        opt->process(this->workflow);
       }
     }
 
@@ -80,7 +82,7 @@ namespace wrench {
      */
     void WMS::runStaticOptimizations() {
       for (auto &opt : this->static_optimizations) {
-        opt.get()->process(this->workflow);
+        opt->process(this->workflow);
       }
     }
 
@@ -189,13 +191,6 @@ namespace wrench {
      */
     void WMS::setSimulation(Simulation *simulation) {
       this->simulation = simulation;
-
-//      // Start the daemon
-//      try {
-//        this->start_daemon(this->hostname);
-//      } catch (std::invalid_argument &e) {
-//        throw;
-//      }
     }
 
     /**
@@ -211,7 +206,6 @@ namespace wrench {
         throw std::runtime_error("WMS:start(): " + std::string(e.what()));
       }
     }
-
 
     /**
      * @brief Get the name of the host on which the WMS is running

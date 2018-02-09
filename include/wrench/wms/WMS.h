@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,9 +11,9 @@
 #define WRENCH_WMS_H
 
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/wms/DynamicOptimization.h"
+#include "wrench/wms/StaticOptimization.h"
 #include "wrench/wms/scheduler/Scheduler.h"
-#include "DynamicOptimization.h"
-#include "StaticOptimization.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 #include "wrench/workflow/Workflow.h"
 #include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
@@ -53,7 +53,8 @@ namespace wrench {
         WMS(Workflow *workflow,
             std::unique_ptr<Scheduler> scheduler,
             std::string &hostname,
-            std::string suffix);
+            std::string suffix,
+            double start_time = 0);
 
         void start();
 
@@ -90,6 +91,8 @@ namespace wrench {
         Simulation *simulation;
         /** @brief The workflow to execute */
         Workflow *workflow;
+        /** @brief the WMS simulated start time */
+        double start_time;
 
         /** @brief The selected scheduler */
         std::unique_ptr<Scheduler> scheduler;

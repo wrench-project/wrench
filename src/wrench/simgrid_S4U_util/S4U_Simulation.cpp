@@ -73,7 +73,7 @@ namespace wrench {
      *
      * @param filename: the path to an XML platform file
      */
-    void S4U_Simulation::setupPlatform(std::string filename) {
+    void S4U_Simulation::setupPlatform(std::string &filename) {
       try {
         this->engine->loadPlatform(filename.c_str());
       } catch (xbt_ex &e) {

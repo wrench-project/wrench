@@ -385,7 +385,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneJobTestWMS(this, workflow,
                                                          std::unique_ptr<wrench::Scheduler>(
                                                                  new NoopScheduler()),
@@ -642,7 +642,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MultiJobTestWMS(this, workflow,
                                                            std::unique_ptr<wrench::Scheduler>(
                                                                    new NoopScheduler()),

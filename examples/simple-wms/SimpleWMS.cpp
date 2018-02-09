@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ namespace wrench {
         // Get the available compute services
         std::set<ComputeService *> compute_services = this->simulation->getRunningComputeServices();
 
-        if (compute_services.size() == 0) {
+        if (compute_services.empty()) {
           WRENCH_INFO("Aborting - No compute services available!");
           break;
         }
@@ -137,7 +137,7 @@ namespace wrench {
      * @param event: a workflow execution event
      */
     void SimpleWMS::processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent> event) {
-      StandardJob *job = (StandardJob *) (event->job);
+      auto job = (StandardJob *) (event->job);
       WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
       WRENCH_INFO("CauseType: %s", event->failure_cause->toString().c_str());
       this->job_manager->forgetJob(job);

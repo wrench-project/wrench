@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
    * The WMS implementation is in SimpleWMS.[cpp|h].
    */
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
-  wrench::WMS *wms = simulation.setWMS(
+  wrench::WMS *wms = simulation.add(
           std::unique_ptr<wrench::WMS>(
                   new wrench::SimpleWMS(&workflow,
                                         std::unique_ptr<wrench::Scheduler>(
