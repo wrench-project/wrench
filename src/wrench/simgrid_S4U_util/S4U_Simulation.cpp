@@ -152,6 +152,8 @@ namespace wrench {
       return flop_rate;
     }
 
+
+
     /**
      * @brief Retrieves the current simulation date
      *
