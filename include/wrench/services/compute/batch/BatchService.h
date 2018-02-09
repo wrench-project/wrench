@@ -172,7 +172,7 @@ namespace wrench {
 
         bool dispatchNextPendingJob();
 
-        void processGetResourceDescription(const std::string &answer_mailbox) override;
+        void processGetResourceInformation(const std::string &answer_mailbox) override;
 
         void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
 

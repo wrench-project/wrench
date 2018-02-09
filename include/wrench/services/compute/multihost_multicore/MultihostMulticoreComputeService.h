@@ -202,7 +202,7 @@ namespace wrench {
 
 //        void processGetNumCores(const std::string &answer_mailbox) override;
 
-        void processGetResourceDescription(const std::string &answer_mailbox) override;
+        void processGetResourceInformation(const std::string &answer_mailbox) override;
 
 //        void processGetNumIdleCores(const std::string &answer_mailbox) override;
 

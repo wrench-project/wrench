@@ -315,8 +315,8 @@ namespace wrench {
         }
         return false;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceResourceDescriptionRequestMessage *>(message.get())) {
-        processGetResourceDescription(msg->answer_mailbox);
+      } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+        processGetResourceInformation(msg->answer_mailbox);
         return true;
 
 //      } else if (auto *msg = dynamic_cast<ComputeServiceNumCoresRequestMessage *>(message.get())) {
@@ -624,10 +624,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a "get resource description message"
+     * @brief Process a "get resource information message"
      * @param answer_mailbox: the mailbox to which the description message should be sent
      */
-    void CloudService::processGetResourceDescription(const std::string &answer_mailbox) {
+    void CloudService::processGetResourceInformation(const std::string &answer_mailbox) {
       // Build a dictionary
       std::map<std::string, std::vector<double>> dict;
 
@@ -670,7 +670,7 @@ namespace wrench {
       dict.insert(std::make_pair("ttl", ttl));
 
       // Send the reply
-      ComputeServiceResourceDescriptionAnswerMessage *answer_message = new ComputeServiceResourceDescriptionAnswerMessage(
+      ComputeServiceResourceInformationAnswerMessage *answer_message = new ComputeServiceResourceInformationAnswerMessage(
               dict,
               this->getPropertyValueAsDouble(
                       ComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));

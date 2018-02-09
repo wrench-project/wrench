@@ -89,7 +89,7 @@ namespace wrench {
 
     protected:
 
-        virtual void processGetResourceDescription(const std::string &answer_mailbox);
+        virtual void processGetResourceInformation(const std::string &answer_mailbox);
 
 //        virtual void processGetNumCores(const std::string &answer_mailbox);
 //
@@ -109,7 +109,7 @@ namespace wrench {
 
     private:
 
-        std::map<std::string, std::vector<double>> getServiceResourceDescription();
+        std::map<std::string, std::vector<double>> getServiceResourceInformation();
 
         /***********************/
         /** \endcond          **/
