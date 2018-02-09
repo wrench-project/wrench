@@ -529,9 +529,11 @@ namespace wrench {
 
       for (auto &vm : vm_list) {
         ComputeService *cs = std::get<1>(vm.second).get();
+        unsigned long sum_num_idle_cores;
+        std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
+        sum_num_idle_cores = (unsigned long)std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
         if (std::get<2>(vm.second) >= job->getMinimumRequiredNumCores() &&
-            std::accumulate(cs->getNumIdleCores().begin(), cs->getNumIdleCores().end(), 0)
-            >= job->getMinimumRequiredNumCores()) {
+            sum_num_idle_cores >= job->getMinimumRequiredNumCores()) {
           cs->submitStandardJob(job, service_specific_args);
           try {
             S4U_Mailbox::dputMessage(
