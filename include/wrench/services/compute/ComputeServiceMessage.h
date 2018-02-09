@@ -295,9 +295,9 @@ namespace wrench {
     /**
      * @brief ComputeServiceResourceDescriptionRequestMessage class
     */
-    class ComputeServiceResourceDescriptionRequestMessage : public ComputeServiceMessage {
+    class ComputeServiceResourceInformationRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceResourceDescriptionRequestMessage(std::string answer_mailbox, double payload);
+        ComputeServiceResourceInformationRequestMessage(std::string answer_mailbox, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
@@ -306,9 +306,9 @@ namespace wrench {
     /**
      * @brief ComputeServiceNumIdleCoresAnswerMessage class
      */
-    class ComputeServiceResourceDescriptionAnswerMessage : public ComputeServiceMessage {
+    class ComputeServiceResourceInformationAnswerMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceResourceDescriptionAnswerMessage(std::map<std::string, std::vector<double>> info, double payload);
+        ComputeServiceResourceInformationAnswerMessage(std::map<std::string, std::vector<double>> info, double payload);
 
         std::map<std::string, std::vector<double>> info;
     };

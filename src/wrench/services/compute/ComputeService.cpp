@@ -196,7 +196,7 @@ namespace wrench {
 
       std::map<std::string, std::vector<double>> dict;
       try {
-        dict = this->getServiceResourceDescription();
+        dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
         throw;
       } catch (std::runtime_error &e) {
@@ -231,7 +231,7 @@ namespace wrench {
 
       std::map<std::string, std::vector<double>> dict;
       try {
-        dict = this->getServiceResourceDescription();
+        dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
         throw;
       } catch (std::runtime_error &e) {
@@ -262,7 +262,7 @@ namespace wrench {
 
       std::map<std::string, std::vector<double>> dict;
       try {
-        dict = this->getServiceResourceDescription();
+        dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
         throw;
       } catch (std::runtime_error &e) {
@@ -289,7 +289,7 @@ namespace wrench {
 
       std::map<std::string, std::vector<double>> dict;
       try {
-        dict = this->getServiceResourceDescription();
+        dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
         throw;
       } catch (std::runtime_error &e) {
@@ -320,7 +320,7 @@ namespace wrench {
 
       std::map<std::string, std::vector<double>> dict;
       try {
-        dict = this->getServiceResourceDescription();
+        dict = this->getServiceResourceInformation();
       } catch (WorkflowExecutionException &e) {
         throw;
       } catch (std::runtime_error &e) {
@@ -387,8 +387,8 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void ComputeService::processGetResourceDescription(const std::string &answer_mailbox) {
-      throw std::runtime_error("ComputeService::processGetResourceDescription(): Not implemented here");
+    void ComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
+      throw std::runtime_error("ComputeService::processGetResourceInformation(): Not implemented here");
     }
 
 
@@ -455,7 +455,7 @@ namespace wrench {
      * @brief Get information about the compute service as a dictionary of vectors
      * @return service information
      */
-    std::map<std::string, std::vector<double>> ComputeService::getServiceResourceDescription() {
+    std::map<std::string, std::vector<double>> ComputeService::getServiceResourceInformation() {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
@@ -465,7 +465,7 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
 
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceDescriptionRequestMessage(
+        S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceInformationRequestMessage(
                 answer_mailbox,
                 this->getPropertyValueAsDouble(
                         ComputeServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
@@ -481,7 +481,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceResourceDescriptionAnswerMessage *>(message.get())) {
+      if (auto *msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage *>(message.get())) {
         return msg->info;
 
       } else {

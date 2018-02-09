@@ -949,8 +949,8 @@ namespace wrench {
         }
         return false;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceResourceDescriptionRequestMessage *>(message.get())) {
-        processGetResourceDescription(msg->answer_mailbox);
+      } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+        processGetResourceInformation(msg->answer_mailbox);
         return true;
 
       } else if (auto *msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
@@ -1810,7 +1810,7 @@ namespace wrench {
   * @brief Process a "get resource description message"
   * @param answer_mailbox: the mailbox to which the description message should be sent
   */
-    void BatchService::processGetResourceDescription(const std::string &answer_mailbox) {
+    void BatchService::processGetResourceInformation(const std::string &answer_mailbox) {
       // Build a dictionary
       std::map<std::string, std::vector<double>> dict;
 
@@ -1852,7 +1852,7 @@ namespace wrench {
 
 
       // Send the reply
-      ComputeServiceResourceDescriptionAnswerMessage *answer_message = new ComputeServiceResourceDescriptionAnswerMessage(
+      ComputeServiceResourceInformationAnswerMessage *answer_message = new ComputeServiceResourceInformationAnswerMessage(
               dict,
               this->getPropertyValueAsDouble(
                       ComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));

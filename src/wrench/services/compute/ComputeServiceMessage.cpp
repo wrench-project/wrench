@@ -414,12 +414,12 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServiceResourceDescriptionRequestMessage::ComputeServiceResourceDescriptionRequestMessage(std::string answer_mailbox,
+    ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(std::string answer_mailbox,
                                                                                        double payload)
             : ComputeServiceMessage("RESOURCE_DESCRIPTION_REQUEST", payload) {
       if (answer_mailbox.empty()) {
         throw std::invalid_argument(
-                "ComputeServiceResourceDescriptionRequestMessage::ComputeServiceResourceDescriptionRequestMessage(): Invalid arguments");
+                "ComputeServiceResourceInformationRequestMessage::ComputeServiceResourceInformationRequestMessage(): Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
     }
@@ -431,7 +431,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServiceResourceDescriptionAnswerMessage::ComputeServiceResourceDescriptionAnswerMessage(std::map<std::string, std::vector<double>> info, double payload)
+    ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(std::map<std::string, std::vector<double>> info, double payload)
             : ComputeServiceMessage("RESOURCE_DESCRIPTION_ANSWER", payload), info(info) {}
     
     
