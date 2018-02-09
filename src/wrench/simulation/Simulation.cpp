@@ -564,7 +564,25 @@ namespace wrench {
      * @return the memory capacity in bytes
      */
     double Simulation::getHostMemoryCapacity(std::string hostname) {
-      return S4U_Simulation::getHostMemoryCapacity(hostname);
+      return S4U_Simulation::getMemoryCapacity(hostname);
+    }
+
+    /**
+    * @brief Get the number of cores of a host given a hostname
+    * @param hostname: the hostname
+    * @return the number of cores
+    */
+    unsigned long Simulation::getNumCores(std::string hostname) {
+      return S4U_Simulation::getNumCores(hostname);
+    }
+
+    /**
+     * @brief Get the flop rate of one core of a host given a hostname
+     * @param hostname: the hostname
+     * @return the flop rate (flop / sec)
+     */
+    double Simulation::getFlopRate(std::string hostname) {
+      return S4U_Simulation::getFlopRate(hostname);
     }
 
     /**
@@ -574,5 +592,6 @@ namespace wrench {
     double Simulation::getMemoryCapacity() {
       return S4U_Simulation::getMemoryCapacity();
     }
+
 
 };

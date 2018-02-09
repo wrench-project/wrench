@@ -53,13 +53,15 @@ namespace wrench {
 
         bool supportsPilotJobs();
 
-        unsigned long getNumCores();
+        std::vector<unsigned long> getNumCores();
 
-        unsigned long getNumIdleCores();
+        std::vector<unsigned long> getNumIdleCores();
 
-        virtual double getCoreFlopRate();
+        std::vector<double> getMemoryCapacity();
 
-        virtual double getTTL();
+        std::vector<double> getCoreFlopRate();
+
+        double getTTL();
 
         void setDefaultStorageService(StorageService *storage_service);
 
@@ -87,9 +89,11 @@ namespace wrench {
 
     protected:
 
-        virtual void processGetNumCores(const std::string &answer_mailbox);
+        virtual void processGetResourceInformation(const std::string &answer_mailbox);
 
-        virtual void processGetNumIdleCores(const std::string &answer_mailbox);
+//        virtual void processGetNumCores(const std::string &answer_mailbox);
+//
+//        virtual void processGetNumIdleCores(const std::string &answer_mailbox);
 
         virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                               std::map<std::string, std::string> &service_specific_args);
@@ -102,6 +106,10 @@ namespace wrench {
         bool supports_standard_jobs;
         /** @brief The default storage service associated to the compute service (nullptr if none) */
         StorageService *default_storage_service;
+
+    private:
+
+        std::map<std::string, std::vector<double>> getServiceResourceInformation();
 
         /***********************/
         /** \endcond          **/

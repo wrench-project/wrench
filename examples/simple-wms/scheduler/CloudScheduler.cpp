@@ -10,6 +10,7 @@
 
 #include "CloudScheduler.h"
 #include <climits>
+#include <numeric>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_scheduler, "Log category for Cloud Scheduler");
 
@@ -61,11 +62,12 @@ namespace wrench {
       for (auto itc : ready_tasks) {
         //TODO add support to pilot jobs
 
-        long num_idle_cores = 0;
+        long sum_num_idle_cores = 0;
 
         // Check that it can run it right now in terms of idle cores
         try {
-          num_idle_cores = this->cloud_service->getNumIdleCores();
+          std::vector<unsigned long> num_idle_cores = this->cloud_service->getNumIdleCores();
+          sum_num_idle_cores = std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
         } catch (WorkflowExecutionException &e) {
           // The service has some problem, forget it
           throw std::runtime_error("Unable to get the number of idle cores.");
@@ -73,7 +75,7 @@ namespace wrench {
 
         // Decision making
         WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
-        if (num_idle_cores - scheduled <= 0) {
+        if (sum_num_idle_cores - scheduled <= 0) {
           try {
             std::string pm_host = choosePMHostname();
             std::string vm_host = "vm" + std::to_string(VM_ID++) + "_" + pm_host;
