@@ -9,6 +9,7 @@
  */
 
 #include <cfloat>
+#include <numeric>
 #include "wrench/services/compute/cloud/CloudService.h"
 #include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
@@ -529,7 +530,8 @@ namespace wrench {
       for (auto &vm : vm_list) {
         ComputeService *cs = std::get<1>(vm.second).get();
         if (std::get<2>(vm.second) >= job->getMinimumRequiredNumCores() &&
-            cs->getNumIdleCores() >= job->getMinimumRequiredNumCores()) {
+            std::accumulate(cs->getNumIdleCores().begin(), cs->getNumIdleCores().end(), 0)
+            >= job->getMinimumRequiredNumCores()) {
           cs->submitStandardJob(job, service_specific_args);
           try {
             S4U_Mailbox::dputMessage(
@@ -642,7 +644,9 @@ namespace wrench {
       // Num idle cores per vm
       std::vector<double> num_idle_cores;
       for (auto &vm : this->vm_list) {
-        num_idle_cores.push_back(std::get<1>(vm.second)->getNumIdleCores());
+        std::vector<unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
+        num_idle_cores.push_back(
+                std::accumulate(idle_core_counts.begin(), idle_core_counts.end(), 0));
       }
 
       dict.insert(std::make_pair("num_idle_cores",num_idle_cores));

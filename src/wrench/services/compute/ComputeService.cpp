@@ -186,13 +186,13 @@ namespace wrench {
     }
 
     /**
-      * @brief Get the number of physical cores on the compute service's host
-      * @return the core count
+      * @brief Get core counts for each of the compute service's host
+      * @return the core counts (could be empty)
       *
       * @throw WorkflowExecutionException
       * @throw std::runtime_error
       */
-    unsigned long ComputeService::getNumCores() {
+    std::vector<unsigned long> ComputeService::getNumCores() {
 
       std::map<std::string, std::vector<double>> dict;
       try {
@@ -203,31 +203,25 @@ namespace wrench {
         throw;
       }
 
+      std::vector<unsigned long> to_return;
 
-      if (dict.find("num_cores") == dict.end() or dict["num_cores"].size() <= 0) {
-        return 0; // TODO: bad idea?
-        throw std::runtime_error("ComputeService::getNumCores(): Invalid resource description returned by service");
+      if (dict.find("num_cores") != dict.end()) {
+        for (auto x : dict["num_cores"]) {
+          to_return.push_back((unsigned long)x);
+        }
       }
 
-      //TODO: No longer return the sum!!
-      unsigned long sum_cores = 0;
-      for (auto num : dict["num_cores"]) {
-        sum_cores += (unsigned long)(num);
-      }
-
-      return sum_cores;
-
-
+      return to_return;
     }
 
     /**
-     * @brief Get the number of currently idle cores on the compute service's host
-     * @return the idle core count
+     * @brief Get idle core counts for each of the compute service's host
+     * @return the idle core counts (could be empty)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      */
-    unsigned long ComputeService::getNumIdleCores() {
+    std::vector<unsigned long> ComputeService::getNumIdleCores() {
 
       std::map<std::string, std::vector<double>> dict;
       try {
@@ -238,18 +232,15 @@ namespace wrench {
         throw;
       }
 
-      if (dict.find("num_idle_cores") == dict.end() or dict["num_idle_cores"].size() <= 0) {
-        return 0; // BAD IDEA?
-        throw std::runtime_error("ComputeService::getNumIdleCores(): Invalid resource description returned by service");
+      std::vector<unsigned long> to_return;
+
+      if (dict.find("num_idle_cores") != dict.end()) {
+        for (auto x : dict["num_idle_cores"]) {
+          to_return.push_back((unsigned long)x);
+        }
       }
 
-      //TODO: No longer return the sum!!
-      unsigned long sum_cores = 0;
-      for (auto num : dict["num_idle_cores"]) {
-        sum_cores += (unsigned long)(num);
-      }
-
-      return sum_cores;
+      return to_return;
     }
 
     /**
@@ -258,7 +249,7 @@ namespace wrench {
     *
     * @throw std::runtime_error
     */
-    double ComputeService::getCoreFlopRate() {
+    std::vector<double> ComputeService::getCoreFlopRate() {
 
       std::map<std::string, std::vector<double>> dict;
       try {
@@ -269,23 +260,23 @@ namespace wrench {
         throw;
       }
 
-      if (dict.find("flop_rates") == dict.end() or dict["flop_rates"].size() <= 0) {
-        throw std::runtime_error("ComputeService::getCoreFlopRate(): Invalid resource description returned by service");
+      std::vector<double> to_return;
+      if (dict.find("flop_rates") != dict.end()) {
+        for (auto x : dict["flop_rates"]) {
+          to_return.push_back(x);
+        }
       }
 
-      //TODO: No longer return just one!!
-
-
-      return dict["flop_rates"][0];
+      return to_return;
     }
 
     /**
-    * @brief Get the sum RAM capacity of the compute service's hosts
-    * @return  the sum RAM capacity
+    * @brief Get the  RAM capacities of the compute service's hosts
+    * @return the RAM capacities
     *
     * @throw std::runtime_error
     */
-    double ComputeService::getMemoryCapacities() {
+    std::vector<double> ComputeService::getMemoryCapacity() {
 
       std::map<std::string, std::vector<double>> dict;
       try {
@@ -296,18 +287,15 @@ namespace wrench {
         throw;
       }
 
-      if (dict.find("ram_capacities") == dict.end() or dict["ram_capacities"].size() <= 0) {
-        throw std::runtime_error("ComputeService::getMemoryCapacities(): Invalid resource description returned by service");
+      std::vector<double> to_return;
+
+      if (dict.find("ram_capacities") != dict.end()) {
+        for (auto x : dict["ram_capacities"]) {
+          to_return.push_back(x);
+        }
       }
 
-
-      //TODO: No longer return the sum!!
-      double sum_capacities = 0;
-      for (auto num : dict["ram_capacities"]) {
-        sum_capacities += num;
-      }
-
-      return sum_capacities;
+      return to_return;
     }
 
     /**

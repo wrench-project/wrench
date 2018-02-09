@@ -53,15 +53,15 @@ namespace wrench {
 
         bool supportsPilotJobs();
 
-        unsigned long getNumCores();
+        std::vector<unsigned long> getNumCores();
 
-        unsigned long getNumIdleCores();
+        std::vector<unsigned long> getNumIdleCores();
 
-        double getMemoryCapacities();
+        std::vector<double> getMemoryCapacity();
 
-        virtual double getCoreFlopRate();
+        std::vector<double> getCoreFlopRate();
 
-        virtual double getTTL();
+        double getTTL();
 
         void setDefaultStorageService(StorageService *storage_service);
 
