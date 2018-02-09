@@ -136,91 +136,91 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Synchronously ask the service for its TTL
-     *
-     * @return the TTL in seconds
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
-    double MultihostMulticoreComputeService::getTTL() {
+//    /**
+//     * @brief Synchronously ask the service for its TTL
+//     *
+//     * @return the TTL in seconds
+//     *
+//     * @throw WorkflowExecutionException
+//     * @throw std::runtime_error
+//     */
+//    double MultihostMulticoreComputeService::getTTL() {
+//
+//      if (this->state == Service::DOWN) {
+//        throw WorkflowExecutionException(new ServiceIsDown(this));
+//      }
+//
+//      // send a "ttl request" message to the daemon's mailbox
+//      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_ttl");
+//
+//      try {
+//        S4U_Mailbox::dputMessage(this->mailbox_name,
+//                                 new MulticoreComputeServiceTTLRequestMessage(
+//                                         answer_mailbox,
+//                                         this->getPropertyValueAsDouble(
+//                                                 MultihostMulticoreComputeServiceProperty::TTL_REQUEST_MESSAGE_PAYLOAD)));
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        throw WorkflowExecutionException(cause);
+//      }
+//
+//      // Get the reply
+//      std::unique_ptr<SimulationMessage> message = nullptr;
+//
+//      try {
+//        message = S4U_Mailbox::getMessage(answer_mailbox);
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        throw WorkflowExecutionException(cause);
+//      }
+//
+//      if (auto *msg = dynamic_cast<MulticoreComputeServiceTTLAnswerMessage *>(message.get())) {
+//        return msg->ttl;
+//      } else {
+//        throw std::runtime_error(
+//                "MultihostMulticoreComputeService::getTTL(): Unexpected [" + msg->getName() + "] message");
+//      }
+//    }
 
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
-
-      // send a "ttl request" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_ttl");
-
-      try {
-        S4U_Mailbox::dputMessage(this->mailbox_name,
-                                 new MulticoreComputeServiceTTLRequestMessage(
-                                         answer_mailbox,
-                                         this->getPropertyValueAsDouble(
-                                                 MultihostMulticoreComputeServiceProperty::TTL_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      // Get the reply
-      std::unique_ptr<SimulationMessage> message = nullptr;
-
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (auto *msg = dynamic_cast<MulticoreComputeServiceTTLAnswerMessage *>(message.get())) {
-        return msg->ttl;
-      } else {
-        throw std::runtime_error(
-                "MultihostMulticoreComputeService::getTTL(): Unexpected [" + msg->getName() + "] message");
-      }
-    }
-
-    /**
-     * @brief Synchronously ask the service for its per-core flop rate
-     *
-     * @return the rate in Flops/sec
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
-    double MultihostMulticoreComputeService::getCoreFlopRate() {
-
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
-
-      // send a "floprate request" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_core_flop_rate");
-      try {
-        S4U_Mailbox::dputMessage(this->mailbox_name,
-                                 new MulticoreComputeServiceFlopRateRequestMessage(
-                                         answer_mailbox,
-                                         this->getPropertyValueAsDouble(
-                                                 MultihostMulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      // Get the reply
-      std::unique_ptr<SimulationMessage> message = nullptr;
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (auto *msg = dynamic_cast<MulticoreComputeServiceFlopRateAnswerMessage *>(message.get())) {
-        return msg->flop_rate;
-      } else {
-        throw std::runtime_error(
-                "MultihostMulticoreComputeService::getCoreFLopRate(): unexpected [" + msg->getName() + "] message");
-      }
-    }
+//    /**
+//     * @brief Synchronously ask the service for its per-core flop rate
+//     *
+//     * @return the rate in Flops/sec
+//     *
+//     * @throw WorkflowExecutionException
+//     * @throw std::runtime_error
+//     */
+//    double MultihostMulticoreComputeService::getCoreFlopRate() {
+//
+//      if (this->state == Service::DOWN) {
+//        throw WorkflowExecutionException(new ServiceIsDown(this));
+//      }
+//
+//      // send a "floprate request" message to the daemon's mailbox
+//      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_core_flop_rate");
+//      try {
+//        S4U_Mailbox::dputMessage(this->mailbox_name,
+//                                 new MulticoreComputeServiceFlopRateRequestMessage(
+//                                         answer_mailbox,
+//                                         this->getPropertyValueAsDouble(
+//                                                 MultihostMulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD)));
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        throw WorkflowExecutionException(cause);
+//      }
+//
+//      // Get the reply
+//      std::unique_ptr<SimulationMessage> message = nullptr;
+//      try {
+//        message = S4U_Mailbox::getMessage(answer_mailbox);
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        throw WorkflowExecutionException(cause);
+//      }
+//
+//      if (auto *msg = dynamic_cast<MulticoreComputeServiceFlopRateAnswerMessage *>(message.get())) {
+//        return msg->flop_rate;
+//      } else {
+//        throw std::runtime_error(
+//                "MultihostMulticoreComputeService::getCoreFLopRate(): unexpected [" + msg->getName() + "] message");
+//      }
+//    }
 
     /**
      * @brief Constructor
@@ -739,35 +739,39 @@ namespace wrench {
         processPilotJobCompletion(msg->job);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceNumCoresRequestMessage *>(message.get())) {
-        processGetNumCores(msg->answer_mailbox);
-        return true;
+//      } else if (auto *msg = dynamic_cast<ComputeServiceNumCoresRequestMessage *>(message.get())) {
+//        processGetNumCores(msg->answer_mailbox);
+//        return true;
+//
+//      } else if (auto *msg = dynamic_cast<ComputeServiceNumIdleCoresRequestMessage *>(message.get())) {
+//        processGetNumIdleCores(msg->answer_mailbox);
+//        return true;
+//
+//      } else if (auto *msg = dynamic_cast<MulticoreComputeServiceTTLRequestMessage *>(message.get())) {
+//        MulticoreComputeServiceTTLAnswerMessage *answer_message = new MulticoreComputeServiceTTLAnswerMessage(
+//                this->death_date - S4U_Simulation::getClock(),
+//                this->getPropertyValueAsDouble(
+//                        MultihostMulticoreComputeServiceProperty::TTL_ANSWER_MESSAGE_PAYLOAD));
+//        try {
+//          S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//          return true;
+//        }
+//        return true;
+//      } else if (auto *msg = dynamic_cast<MulticoreComputeServiceFlopRateRequestMessage *>(message.get())) {
+//        MulticoreComputeServiceFlopRateAnswerMessage *answer_message = new MulticoreComputeServiceFlopRateAnswerMessage(
+//                S4U_Simulation::getFlopRate(this->hostname),
+//                this->getPropertyValueAsDouble(
+//                        MultihostMulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD));
+//        try {
+//          S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
+//        } catch (std::shared_ptr<NetworkError> &cause) {
+//          return true;
+//        }
+//        return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceNumIdleCoresRequestMessage *>(message.get())) {
-        processGetNumIdleCores(msg->answer_mailbox);
-        return true;
-
-      } else if (auto *msg = dynamic_cast<MulticoreComputeServiceTTLRequestMessage *>(message.get())) {
-        MulticoreComputeServiceTTLAnswerMessage *answer_message = new MulticoreComputeServiceTTLAnswerMessage(
-                this->death_date - S4U_Simulation::getClock(),
-                this->getPropertyValueAsDouble(
-                        MultihostMulticoreComputeServiceProperty::TTL_ANSWER_MESSAGE_PAYLOAD));
-        try {
-          S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return true;
-        }
-        return true;
-      } else if (auto *msg = dynamic_cast<MulticoreComputeServiceFlopRateRequestMessage *>(message.get())) {
-        MulticoreComputeServiceFlopRateAnswerMessage *answer_message = new MulticoreComputeServiceFlopRateAnswerMessage(
-                S4U_Simulation::getFlopRate(this->hostname),
-                this->getPropertyValueAsDouble(
-                        MultihostMulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD));
-        try {
-          S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return true;
-        }
+      } else if (auto *msg = dynamic_cast<ComputeServiceResourceDescriptionRequestMessage *>(message.get())) {
+        processGetResourceDescription(msg->answer_mailbox);
         return true;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage *>(message.get())) {
@@ -1349,45 +1353,45 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Process a get number of cores request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     *
-     * @throw std::runtime_error
-     */
-    void MultihostMulticoreComputeService::processGetNumCores(const std::string &answer_mailbox) {
-      ComputeServiceNumCoresAnswerMessage *answer_message = new ComputeServiceNumCoresAnswerMessage(
-              this->total_num_cores,
-              this->getPropertyValueAsDouble(
-                      ComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
-      try {
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
+//    /**
+//     * @brief Process a get number of cores request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void MultihostMulticoreComputeService::processGetNumCores(const std::string &answer_mailbox) {
+//      ComputeServiceNumCoresAnswerMessage *answer_message = new ComputeServiceNumCoresAnswerMessage(
+//              this->total_num_cores,
+//              this->getPropertyValueAsDouble(
+//                      ComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
+//      try {
+//        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        return;
+//      }
+//    }
 
-    /**
-     * @brief Process a get number of idle cores request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     */
-    void MultihostMulticoreComputeService::processGetNumIdleCores(const std::string &answer_mailbox) {
-      unsigned long num_available_cores = 0;
-      for (auto r : this->core_availabilities) {
-        num_available_cores += r.second;
-      }
-      ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
-              num_available_cores,
-              this->getPropertyValueAsDouble(
-                      MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
-      try {
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
+//    /**
+//     * @brief Process a get number of idle cores request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     */
+//    void MultihostMulticoreComputeService::processGetNumIdleCores(const std::string &answer_mailbox) {
+//      unsigned long num_available_cores = 0;
+//      for (auto r : this->core_availabilities) {
+//        num_available_cores += r.second;
+//      }
+//      ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
+//              num_available_cores,
+//              this->getPropertyValueAsDouble(
+//                      MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
+//      try {
+//        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        return;
+//      }
+//    }
 
     /**
      * @brief Process a submit standard job request
@@ -1518,4 +1522,59 @@ namespace wrench {
         return;
       }
     }
+
+    /**
+     * @brief Process a "get resource description message"
+     * @param answer_mailbox: the mailbox to which the description message should be sent
+     */
+    void MultihostMulticoreComputeService::processGetResourceDescription(const std::string &answer_mailbox) {
+      // Build a dictionary
+      std::map<std::string, std::vector<double>> dict;
+
+      // Num cores per hosts
+      std::vector<double> num_cores;
+      for (auto h : this->compute_resources) {
+        num_cores.push_back((double)(h.second));
+      }
+      dict.insert(std::make_pair("num_cores",num_cores));
+
+      // Num idle cores per hosts
+      std::vector<double> num_idle_cores;
+      for (auto h : this->core_availabilities) {
+        num_idle_cores.push_back((double)(h.second));
+      }
+      dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
+
+      // Flop rate per host
+      std::vector<double> flop_rates;
+      for (auto h : this->compute_resources) {
+        flop_rates.push_back(S4U_Simulation::getFlopRate(h.first));
+      }
+      dict.insert(std::make_pair("flop_rates", flop_rates));
+
+      // RAM capacity per host
+      std::vector<double> ram_capacities;
+      for (auto h : this->compute_resources) {
+        ram_capacities.push_back(S4U_Simulation::getMemoryCapacity(h.first));
+      }
+      dict.insert(std::make_pair("ram_capacities", ram_capacities));
+
+      std::vector<double> ttl;
+      ttl.push_back(this->death_date - S4U_Simulation::getClock());
+      dict.insert(std::make_pair("ttl", ttl));
+
+
+      // Send the reply
+      ComputeServiceResourceDescriptionAnswerMessage *answer_message = new ComputeServiceResourceDescriptionAnswerMessage(
+              dict,
+              this->getPropertyValueAsDouble(
+                      ComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
+      try {
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
+
+
 };

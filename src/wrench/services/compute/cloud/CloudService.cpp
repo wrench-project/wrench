@@ -8,6 +8,7 @@
  *
  */
 
+#include <cfloat>
 #include "wrench/services/compute/cloud/CloudService.h"
 #include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
@@ -314,13 +315,17 @@ namespace wrench {
         }
         return false;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceNumCoresRequestMessage *>(message.get())) {
-        processGetNumCores(msg->answer_mailbox);
+      } else if (auto *msg = dynamic_cast<ComputeServiceResourceDescriptionRequestMessage *>(message.get())) {
+        processGetResourceDescription(msg->answer_mailbox);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceNumIdleCoresRequestMessage *>(message.get())) {
-        processGetNumIdleCores(msg->answer_mailbox);
-        return true;
+//      } else if (auto *msg = dynamic_cast<ComputeServiceNumCoresRequestMessage *>(message.get())) {
+//        processGetNumCores(msg->answer_mailbox);
+//        return true;
+//
+//      } else if (auto *msg = dynamic_cast<ComputeServiceNumIdleCoresRequestMessage *>(message.get())) {
+//        processGetNumIdleCores(msg->answer_mailbox);
+//        return true;
 
       } else if (auto *msg = dynamic_cast<CloudServiceGetExecutionHostsRequestMessage *>(message.get())) {
         processGetExecutionHosts(msg->answer_mailbox);
@@ -444,55 +449,55 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Process a get number of cores request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     *
-     * @throw std::runtime_error
-     */
-    void CloudService::processGetNumCores(const std::string &answer_mailbox) {
+//    /**
+//     * @brief Process a get number of cores request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void CloudService::processGetNumCores(const std::string &answer_mailbox) {
+//
+//      unsigned int total_num_cores = 0;
+//      for (auto &vm : this->vm_list) {
+//        total_num_cores += std::get<2>(vm.second);
+//      }
+//
+//      ComputeServiceNumCoresAnswerMessage *answer_message = new ComputeServiceNumCoresAnswerMessage(
+//              total_num_cores,
+//              this->getPropertyValueAsDouble(
+//                      ComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
+//      try {
+//        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        return;
+//      }
+//    }
 
-      unsigned int total_num_cores = 0;
-      for (auto &vm : this->vm_list) {
-        total_num_cores += std::get<2>(vm.second);
-      }
-
-      ComputeServiceNumCoresAnswerMessage *answer_message = new ComputeServiceNumCoresAnswerMessage(
-              total_num_cores,
-              this->getPropertyValueAsDouble(
-                      ComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
-      try {
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
-
-    /**
-     * @brief Process a get number of idle cores request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     *
-     * @throw std::runtime_error
-     */
-    void CloudService::processGetNumIdleCores(const std::string &answer_mailbox) {
-
-      unsigned int total_num_available_cores = 0;
-      for (auto &vm : this->vm_list) {
-        total_num_available_cores += std::get<1>(vm.second)->getNumIdleCores();
-      }
-
-      ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
-              total_num_available_cores,
-              this->getPropertyValueAsDouble(
-                      MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
-      try {
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
+//    /**
+//     * @brief Process a get number of idle cores request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void CloudService::processGetNumIdleCores(const std::string &answer_mailbox) {
+//
+//      unsigned int total_num_available_cores = 0;
+//      for (auto &vm : this->vm_list) {
+//        total_num_available_cores += std::get<1>(vm.second)->getNumIdleCores();
+//      }
+//
+//      ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
+//              total_num_available_cores,
+//              this->getPropertyValueAsDouble(
+//                      MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
+//      try {
+//        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+//      } catch (std::shared_ptr<NetworkError> &cause) {
+//        return;
+//      }
+//    }
 
     /**
      * @brief Process a submit standard job request
@@ -617,6 +622,77 @@ namespace wrench {
         return;
       }
     }
+
+    /**
+     * @brief Process a "get resource description message"
+     * @param answer_mailbox: the mailbox to which the description message should be sent
+     */
+    void CloudService::processGetResourceDescription(const std::string &answer_mailbox) {
+      // Build a dictionary
+      std::map<std::string, std::vector<double>> dict;
+
+
+      // TODO: HENRI WROTE THIS BELOW, MATCHING THE ORIGINAL IMPLEMENTATION BUT RAFAEL
+      // TODO: BUT RAFAEL NEEDS TO MAKE SURE IT MAKES SENSE
+      // TODO: IN PARTICULAR THE DISTINCTION BETWEEN HOSTS AND VMs
+
+      // Num cores per host
+      std::vector<double> num_cores;
+      // TODO: HENRI SAYS "Shouldn't this below be about hosts instead of VMs?"
+//      for (auto &host : this->execution_hosts) {
+//        num_cores.push_back(Simulation::getNumCores(host));
+//      }
+      for (auto &vm : this->vm_list) {
+        num_cores.push_back(std::get<2>(vm.second));
+      }
+
+      dict.insert(std::make_pair("num_cores",num_cores));
+
+      // Num idle cores per hosts
+      std::vector<double> num_idle_cores;
+      // TODO: HENRI SAYS "Shouldn't this below be about hosts instead of VMs?"
+//      for (auto &host : this->execution_hosts) {
+//        num_idle_cores.push_back(666);
+//      }
+      for (auto &vm : this->vm_list) {
+        num_idle_cores.push_back(std::get<1>(vm.second)->getNumIdleCores());
+      }
+
+      dict.insert(std::make_pair("num_idle_cores",num_idle_cores));
+
+      // Flop rate per host
+      std::vector<double> flop_rates;
+      for (auto &host : this->execution_hosts) {
+        flop_rates.push_back(Simulation::getFlopRate(host));
+      }
+      dict.insert(std::make_pair("flop_rates", flop_rates));
+
+      // RAM capacity per host
+      std::vector<double> ram_capacities;
+      for (auto &host : this->execution_hosts) {
+        ram_capacities.push_back(Simulation::getHostMemoryCapacity(host));
+      }
+      dict.insert(std::make_pair("ram_capacities", ram_capacities));
+
+      std::vector<double> ttl;
+      ttl.push_back(DBL_MAX);
+      dict.insert(std::make_pair("ttl", ttl));
+
+      WRENCH_INFO("SENDING REPLY");
+      // Send the reply
+      ComputeServiceResourceDescriptionAnswerMessage *answer_message = new ComputeServiceResourceDescriptionAnswerMessage(
+              dict,
+              this->getPropertyValueAsDouble(
+                      ComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
+      try {
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        WRENCH_INFO("CRAP!");
+        return;
+      }
+    }
+
+
 
     /**
     * @brief Terminate the daemon.

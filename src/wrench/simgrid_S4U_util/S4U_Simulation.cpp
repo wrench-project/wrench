@@ -184,7 +184,7 @@ namespace wrench {
      * @param hostname: the hostname
      * @return the memory capacity in bytes
      */
-    double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
+    double S4U_Simulation::getMemoryCapacity(std::string hostname) {
       return getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
     }
 
@@ -209,11 +209,11 @@ namespace wrench {
         const char *capacity_string = host->getProperty(tag.c_str());
         if (capacity_string) {
           if (capacity_value != DBL_MAX) {
-            throw std::invalid_argument("S4U_Simulation::getHostMemoryCapacity(): Host '" + host->getName() + "' has multiple memory capacity specifications");
+            throw std::invalid_argument("S4U_Simulation::getMemoryCapacity(): Host '" + host->getName() + "' has multiple memory capacity specifications");
           }
           if (sscanf(capacity_string, "%lf", &capacity_value) != 1) {
             throw std::invalid_argument(
-                    "S4U_Simulation::getHostMemoryCapacity(): Host '" + host->getName() + "'has invalid memory capacity specification '" + tag +":" +
+                    "S4U_Simulation::getMemoryCapacity(): Host '" + host->getName() + "'has invalid memory capacity specification '" + tag +":" +
                     std::string(capacity_string) + "'");
           }
         }

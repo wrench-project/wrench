@@ -193,36 +193,31 @@ namespace wrench {
       * @throw std::runtime_error
       */
     unsigned long ComputeService::getNumCores() {
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
 
-      // send a "num cores" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_num_cores");
-
+      std::map<std::string, std::vector<double>> dict;
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new ComputeServiceNumCoresRequestMessage(answer_mailbox,
-                                                                         this->getPropertyValueAsDouble(
-                                                                                 ComputeServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
+        dict = this->getServiceResourceDescription();
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      } catch (std::runtime_error &e) {
+        throw;
       }
 
-      // Wait for a reply
-      std::unique_ptr<SimulationMessage> message = nullptr;
 
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
+      if (dict.find("num_cores") == dict.end() or dict["num_cores"].size() <= 0) {
+        return 0; // TODO: bad idea?
+        throw std::runtime_error("ComputeService::getNumCores(): Invalid resource description returned by service");
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceNumCoresAnswerMessage *>(message.get())) {
-        return msg->num_cores;
-      } else {
-        throw std::runtime_error("ComputeService::getNumCores(): Unexpected [" + msg->getName() + "] message");
+      //TODO: No longer return the sum!!
+      unsigned long sum_cores = 0;
+      for (auto num : dict["num_cores"]) {
+        sum_cores += (unsigned long)(num);
       }
+
+      return sum_cores;
+
+
     }
 
     /**
@@ -233,37 +228,108 @@ namespace wrench {
      * @throw std::runtime_error
      */
     unsigned long ComputeService::getNumIdleCores() {
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
 
-      // send a "num idle cores" message to the daemon's mailbox
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_num_idle_cores");
-
+      std::map<std::string, std::vector<double>> dict;
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceNumIdleCoresRequestMessage(
-                answer_mailbox,
-                this->getPropertyValueAsDouble(
-                        ComputeServiceProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
+        dict = this->getServiceResourceDescription();
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      } catch (std::runtime_error &e) {
+        throw;
       }
 
-      // Get the reply
-      std::unique_ptr<SimulationMessage> message = nullptr;
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
+      if (dict.find("num_idle_cores") == dict.end() or dict["num_idle_cores"].size() <= 0) {
+        return 0; // BAD IDEA?
+        throw std::runtime_error("ComputeService::getNumIdleCores(): Invalid resource description returned by service");
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceNumIdleCoresAnswerMessage *>(message.get())) {
-        return msg->num_idle_cores;
-      } else {
-        throw std::runtime_error(
-                "MultihostMulticoreComputeService::getNumIdleCores(): unexpected [" + msg->getName() + "] message");
+      //TODO: No longer return the sum!!
+      unsigned long sum_cores = 0;
+      for (auto num : dict["num_idle_cores"]) {
+        sum_cores += (unsigned long)(num);
       }
+
+      return sum_cores;
     }
+
+    /**
+    * @brief Get the flop/sec rate of one core of the compute service's host
+    * @return  the flop rate
+    *
+    * @throw std::runtime_error
+    */
+    double ComputeService::getCoreFlopRate() {
+
+      std::map<std::string, std::vector<double>> dict;
+      try {
+        dict = this->getServiceResourceDescription();
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      } catch (std::runtime_error &e) {
+        throw;
+      }
+
+      if (dict.find("flop_rates") == dict.end() or dict["flop_rates"].size() <= 0) {
+        throw std::runtime_error("ComputeService::getCoreFlopRate(): Invalid resource description returned by service");
+      }
+
+      //TODO: No longer return just one!!
+
+
+      return dict["flop_rates"][0];
+    }
+
+    /**
+    * @brief Get the sum RAM capacity of the compute service's hosts
+    * @return  the sum RAM capacity
+    *
+    * @throw std::runtime_error
+    */
+    double ComputeService::getMemoryCapacities() {
+
+      std::map<std::string, std::vector<double>> dict;
+      try {
+        dict = this->getServiceResourceDescription();
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      } catch (std::runtime_error &e) {
+        throw;
+      }
+
+      if (dict.find("ram_capacities") == dict.end() or dict["ram_capacities"].size() <= 0) {
+        throw std::runtime_error("ComputeService::getMemoryCapacities(): Invalid resource description returned by service");
+      }
+
+
+      //TODO: No longer return the sum!!
+      double sum_capacities = 0;
+      for (auto num : dict["ram_capacities"]) {
+        sum_capacities += num;
+      }
+
+      return sum_capacities;
+    }
+
+    /**
+     * @brief Get the time-to-live, in seconds, of the compute service
+     * @return the ttl
+     *
+     * @throw std::runtime_error
+     */
+    double ComputeService::getTTL() {
+
+      std::map<std::string, std::vector<double>> dict;
+      try {
+        dict = this->getServiceResourceDescription();
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      } catch (std::runtime_error &e) {
+        throw;
+      }
+
+      return dict["ttl"][0];
+    }
+
 
     /**
      * @brief Submit a standard job to a batch service (virtual)
@@ -315,26 +381,38 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a get number of cores request
+     * @brief Process a get resource description request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      *
      * @throw std::runtime_error
      */
-    void ComputeService::processGetNumCores(const std::string &answer_mailbox) {
-      throw std::runtime_error("ComputeService::processGetNumCores(): Not implemented here");
+    void ComputeService::processGetResourceDescription(const std::string &answer_mailbox) {
+      throw std::runtime_error("ComputeService::processGetResourceDescription(): Not implemented here");
     }
 
-    /**
-     * @brief Process a get number of idle cores request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     *
-     * @throw std::runtime_error
-     */
-    void ComputeService::processGetNumIdleCores(const std::string &answer_mailbox) {
-      throw std::runtime_error("ComputeService::processGetNumIdleCores(): Not implemented here");
-    }
+
+//    /**
+//     * @brief Process a get number of cores request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void ComputeService::processGetNumCores(const std::string &answer_mailbox) {
+//      throw std::runtime_error("ComputeService::processGetNumCores(): Not implemented here");
+//    }
+
+//    /**
+//     * @brief Process a get number of idle cores request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void ComputeService::processGetNumIdleCores(const std::string &answer_mailbox) {
+//      throw std::runtime_error("ComputeService::processGetNumIdleCores(): Not implemented here");
+//    }
 
     /**
     * @brief Terminate a standard job to the compute service (virtual)
@@ -356,25 +434,6 @@ namespace wrench {
       throw std::runtime_error("ComputeService::terminatePilotJob(): Not implemented here");
     }
 
-    /**
-     * @brief Get the flop/sec rate of one core of the compute service's host
-     * @return  the flop rate
-     *
-     * @throw std::runtime_error
-     */
-    double ComputeService::getCoreFlopRate() {
-      throw std::runtime_error("ComputeService::getCoreFlopRate(): Not implemented here");
-    }
-
-    /**
-     * @brief Get the time-to-live, in seconds, of the compute service
-     * @return the ttl
-     *
-     * @throw std::runtime_error
-     */
-    double ComputeService::getTTL() {
-      throw std::runtime_error("ComputeService::getTTL(): Not implemented");
-    }
 
     /**
      * @brief Set the default StorageService for the ComputeService
@@ -390,5 +449,44 @@ namespace wrench {
     */
     StorageService *ComputeService::getDefaultStorageService() {
       return this->default_storage_service;
+    }
+
+    /**
+     * @brief Get information about the compute service as a dictionary of vectors
+     * @return service information
+     */
+    std::map<std::string, std::vector<double>> ComputeService::getServiceResourceDescription() {
+
+      if (this->state == Service::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      // send a "info request" message to the daemon's mailbox
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
+
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceDescriptionRequestMessage(
+                answer_mailbox,
+                this->getPropertyValueAsDouble(
+                        ComputeServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      // Get the reply
+      std::unique_ptr<SimulationMessage> message = nullptr;
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto *msg = dynamic_cast<ComputeServiceResourceDescriptionAnswerMessage *>(message.get())) {
+        return msg->info;
+
+      } else {
+        throw std::runtime_error(
+                "MultihostMulticoreComputeService::getResourceDescription(): unexpected [" + msg->getName() + "] message");
+      }
     }
 };
