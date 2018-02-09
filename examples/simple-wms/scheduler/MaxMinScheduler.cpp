@@ -9,6 +9,7 @@
 
 #include <xbt.h>
 #include <set>
+#include <numeric>
 
 #include "MaxMinScheduler.h"
 
@@ -65,16 +66,17 @@ namespace wrench {
           }
 
           // Get the number of currently idle cores
-          unsigned long num_idle_cores;
+          unsigned long sum_num_idle_cores;
           try {
-            num_idle_cores = cs->getNumIdleCores();
+            std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
+            sum_num_idle_cores = (unsigned long)std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
           } catch (WorkflowExecutionException &e) {
             // The service has some problem, forget it
             continue;
           }
 
           // Decision making
-          if (num_idle_cores <= 0) {
+          if (sum_num_idle_cores <= 0) {
             continue;
           }
 

@@ -9,6 +9,7 @@
 
 #include <xbt.h>
 #include <set>
+#include <numeric>
 
 #include "wrench/simulation/Simulation.h"
 #include "RandomScheduler.h"
@@ -51,7 +52,8 @@ namespace wrench {
 
           // Check that it can run it right now in terms of idle cores
           try {
-            unsigned long num_idle_cores = cs->getNumIdleCores();
+            std::vector<unsigned long> idle_cores = cs->getNumIdleCores();
+            unsigned long num_idle_cores = (unsigned long) std::accumulate(idle_cores.begin(), idle_cores.end(), 0);
 //            WRENCH_INFO("The compute service says it has %ld idle cores", num_idle_cores);
             if (num_idle_cores <= 0) {
               continue;
@@ -71,7 +73,7 @@ namespace wrench {
             // sequentially, we say it can't run it at all. Something to fix at some point.
             // One option is to ask the user to provide the maximum amount of flop that will
             // be required on ONE core assuming min_num_cores cores are available?
-            double duration = (total_flops / cs->getCoreFlopRate());
+            double duration = (total_flops / cs->getCoreFlopRate()[0]);
             if ((ttl > 0) && (ttl < duration)) {
               continue;
             }
@@ -105,19 +107,20 @@ namespace wrench {
             continue;
           }
 
-          // Get the number of idle cores
-          unsigned long num_idle_cores;
+          // Get the sum number of idle cores
+          unsigned long sum_num_idle_cores;
 
           // Check that it can run it right now in terms of idle cores
           try {
-            num_idle_cores = cs->getNumIdleCores();
+            std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
+            sum_num_idle_cores = (unsigned  long)std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
           } catch (WorkflowExecutionException &e) {
             // The service has some problem, forget it
             continue;
           }
 
           // Decision making
-          if (num_idle_cores <= 0) {
+          if (sum_num_idle_cores <= 0) {
             continue;
           }
 
