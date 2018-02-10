@@ -9,8 +9,9 @@
 
 #include <map>
 #include <wrench/util/PointerUtil.h>
+#include <cfloat>
 
-#include "services/ServiceMessage.h"
+#include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/compute/multihost_multicore/MulticoreComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
@@ -1561,7 +1562,11 @@ namespace wrench {
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
       std::vector<double> ttl;
-      ttl.push_back(this->death_date - S4U_Simulation::getClock());
+      if (this->has_ttl) {
+        ttl.push_back(this->death_date - S4U_Simulation::getClock());
+      } else {
+        ttl.push_back(DBL_MAX);
+      }
       dict.insert(std::make_pair("ttl", ttl));
 
 
