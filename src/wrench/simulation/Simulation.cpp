@@ -582,4 +582,14 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Sleep for a number of (simulated) seconds
+     * @param duration
+     * @return
+     */
+    double Simulation::sleep(double duration) {
+      S4U_Simulation::sleep(duration);
+    }
+
+
 };
