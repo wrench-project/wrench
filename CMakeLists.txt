@@ -136,7 +136,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
-        src/wrench/services/ServiceMessage.h
+        include/wrench/services/ServiceMessage.h
         src/wrench/services/compute/ComputeServiceMessage.cpp
         src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.cpp
         src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.h

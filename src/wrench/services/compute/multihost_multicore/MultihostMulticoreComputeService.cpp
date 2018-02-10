@@ -11,7 +11,7 @@
 #include <wrench/util/PointerUtil.h>
 #include <cfloat>
 
-#include "services/ServiceMessage.h"
+#include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/compute/multihost_multicore/MulticoreComputeServiceMessage.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
