@@ -14,7 +14,7 @@
 
 #include <memory>
 
-#include <services/ServiceMessage.h>
+#include <wrench/services/ServiceMessage.h>
 #include <wrench/workflow/execution_events/FailureCause.h>
 
 
