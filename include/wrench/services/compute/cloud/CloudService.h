@@ -120,6 +120,7 @@ namespace wrench {
 
         std::vector<std::string> execution_hosts;
 
+
         /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
         std::map<std::string, std::tuple<simgrid::s4u::VirtualMachine *, std::unique_ptr<ComputeService>, int>> vm_list;
     };

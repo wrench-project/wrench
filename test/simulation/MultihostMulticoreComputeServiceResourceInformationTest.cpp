@@ -118,7 +118,7 @@ private:
       wrench::StandardJob *job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
       job_manager->submitJob(job, this->test->compute_service1);
 
-      wrench::Simulation::sleep(1.0);
+      wrench::S4U_Simulation::sleep(1.0);
       std::vector<unsigned long> num_idle_cores = this->test->compute_service1->getNumIdleCores();
       std::sort(num_idle_cores.begin(), num_idle_cores.end());
       if ((num_idle_cores.size() != 2) or
