@@ -14,7 +14,7 @@
 #include <memory>
 #include <vector>
 #include "wrench/workflow/execution_events/FailureCause.h"
-#include "services/ServiceMessage.h"
+#include "wrench/services/ServiceMessage.h"
 
 namespace wrench {
 
