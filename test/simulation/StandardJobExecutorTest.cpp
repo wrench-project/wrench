@@ -1822,7 +1822,7 @@ private:
         ));
 
         // Sleep 1 second
-        wrench::S4U_Simulation::sleep(80);
+        wrench::Simulation::sleep(80);
 
         // Terminate the job
         executor->kill();
@@ -1987,7 +1987,7 @@ private:
 
 
         // Sleep 48.20 second
-        wrench::S4U_Simulation::sleep(48.20);
+        wrench::Simulation::sleep(48.20);
 
         // Terminate the job
         executor->kill();
@@ -2176,7 +2176,7 @@ private:
           // Sleep some random number of seconds
           double sleep_time = dist(rng);
           WRENCH_INFO("Sleeping for %.3lf seconds", sleep_time);
-          wrench::S4U_Simulation::sleep(sleep_time);
+          wrench::Simulation::sleep(sleep_time);
 
           // Terminate the executor
           WRENCH_INFO("Killing the standard executor");
