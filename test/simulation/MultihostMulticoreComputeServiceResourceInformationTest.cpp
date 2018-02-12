@@ -112,13 +112,13 @@ private:
       wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 2, 2, 1.0);
 
       std::vector<wrench::WorkflowTask *> tasks;
-
+.
       tasks.push_back(t1);
       tasks.push_back(t2);
       wrench::StandardJob *job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
       job_manager->submitJob(job, this->test->compute_service1);
 
-      wrench::S4U_Simulation::sleep(1.0);
+      wrench::Simulation::sleep(1.0);
       std::vector<unsigned long> num_idle_cores = this->test->compute_service1->getNumIdleCores();
       std::sort(num_idle_cores.begin(), num_idle_cores.end());
       if ((num_idle_cores.size() != 2) or

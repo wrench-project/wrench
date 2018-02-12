@@ -92,7 +92,7 @@ namespace wrench {
 
         static double getMemoryCapacity();
 
-        static double sleep(double duration);
+        static void sleep(double duration);
 
         /***********************/
         /** \endcond            */

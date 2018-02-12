@@ -178,7 +178,7 @@ namespace wrench {
      * @param duration: the number of seconds to sleep
      */
     void S4U_Simulation::sleep(double duration) {
-      return simgrid::s4u::this_actor::sleep_for(duration);
+      simgrid::s4u::this_actor::sleep_for(duration);
     }
 
     /**
