@@ -120,7 +120,7 @@ private:
 
       while (proximity < 0 && count < max_count) {
         count++;
-        wrench::S4U_Simulation::sleep(10.0);
+        wrench::Simulation::sleep(10.0);
         proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
       }
 
@@ -254,7 +254,7 @@ private:
 
       while (first_pair_proximity < 0 && count < max_count) {
         count++;
-        wrench::S4U_Simulation::sleep(10.0);
+        wrench::Simulation::sleep(10.0);
         first_pair_proximity = this->simulation->getNetworkProximityService()->query(first_pair_to_compute_proximity);
       }
 
@@ -274,11 +274,11 @@ private:
       double second_pair_proximity = this->simulation->getNetworkProximityService()->query(
               second_pair_to_compute_proximity);
 
-      while (second_pair_proximity < 0 && count < max_count) {
-        count++;
-        wrench::S4U_Simulation::sleep(10.0);
-        second_pair_proximity = this->simulation->getNetworkProximityService()->query(second_pair_to_compute_proximity);
-      }
+        while (second_pair_proximity < 0 && count < max_count) {
+            count++;
+            wrench::Simulation::sleep(10.0);
+            second_pair_proximity = this->simulation->getNetworkProximityService()->query(second_pair_to_compute_proximity);
+        }
 
       if (count == max_count) {
         throw std::runtime_error("Never got an answer to proximity query");
