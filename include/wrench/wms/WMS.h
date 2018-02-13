@@ -52,8 +52,9 @@ namespace wrench {
 
         WMS(Workflow *workflow,
             std::unique_ptr<Scheduler> scheduler,
-            std::string &hostname,
-            std::string suffix,
+            const std::set<ComputeService *> &compute_services,
+            const std::string &hostname,
+            const std::string suffix,
             double start_time = 0);
 
         void start();
@@ -61,6 +62,10 @@ namespace wrench {
         void runDynamicOptimizations();
 
         void runStaticOptimizations();
+
+        std::set<ComputeService *> getRunningComputeServices();
+
+        void shutdownAllServices();
 
         void waitForAndProcessNextEvent();
 
@@ -93,6 +98,8 @@ namespace wrench {
         Workflow *workflow;
         /** @brief the WMS simulated start time */
         double start_time;
+        /** @brief List of available compute services */
+        std::set<ComputeService *> compute_services;
 
         /** @brief The selected scheduler */
         std::unique_ptr<Scheduler> scheduler;

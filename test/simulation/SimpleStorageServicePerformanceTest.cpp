@@ -87,8 +87,9 @@ public:
     SimpleStorageServiceConcurrencyFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
                                                      wrench::Workflow *workflow,
                                                      std::unique_ptr<wrench::Scheduler> scheduler,
+                                                     std::set<wrench::ComputeService *> compute_services,
                                                      std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -150,9 +151,9 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
-      this->simulation->getFileRegistryService()->stop();
+      this->shutdownAllServices();
+      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_1);
+      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_2);
       return 0;
     }
 };
@@ -174,18 +175,20 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   // Setting up the platform
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesTestWMS(this, workflow,
-                                                                                            std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), "WMSHost"))));
-
   // Create a (unused) Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("WMSHost", true, true,
-                                                      {std::make_pair("WMSHost",0)},
-                                                      nullptr, {}))));
+                                                               {std::make_pair("WMSHost", 0)},
+                                                               nullptr, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesTestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, "WMSHost"))));
 
   // Create Two Storage Services
   EXPECT_NO_THROW(storage_service_1 = simulation->add(
@@ -211,5 +214,3 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   free(argv[0]);
   free(argv);
 }
-
-

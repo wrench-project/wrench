@@ -78,11 +78,11 @@ public:
     ResourceInformationTestWMS(MultihostMulticoreComputeServiceTestResourceInformation *test,
                                wrench::Workflow *workflow,
                                std::unique_ptr<wrench::Scheduler> scheduler,
+                               std::set<wrench::ComputeService *> compute_services,
                                std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
-
 
 private:
 
@@ -133,7 +133,7 @@ private:
         throw std::runtime_error("Unexpected workflow execution event!");
       }
 
-      std::vector<double>ram_capacities;
+      std::vector<double> ram_capacities;
 
       ram_capacities = this->test->compute_service1->getMemoryCapacity();
       std::sort(ram_capacities.begin(), ram_capacities.end());
@@ -146,8 +146,8 @@ private:
       std::vector<double> core_flop_rates = this->test->compute_service1->getCoreFlopRate();
       std::sort(core_flop_rates.begin(), core_flop_rates.end());
       if ((core_flop_rates.size() != 2) or
-              (fabs(core_flop_rates[0] - 1.0) > EPSILON) or
-              (fabs(core_flop_rates[1] - 1e+10) > EPSILON)) {
+          (fabs(core_flop_rates[0] - 1.0) > EPSILON) or
+          (fabs(core_flop_rates[1] - 1e+10) > EPSILON)) {
         throw std::runtime_error("getCoreFlopRate() should return {1,10} or {10,1} for compute service #1");
 
       }
@@ -156,13 +156,11 @@ private:
         throw std::runtime_error("getTTL() should return +inf for compute service #1");
       }
 
-
       workflow->removeTask(t1);
       workflow->removeTask(t2);
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -185,13 +183,6 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   // Setting up the platform
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-  // Create the WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->setWMS(
-          std::unique_ptr<wrench::WMS>(new ResourceInformationTestWMS(this, workflow,
-                                                                      std::unique_ptr<wrench::Scheduler>(
-                                                                              new NoopScheduler()),
-                          "Host1"))));
-
   // Create 1 Compute Service that manages Host1 and Host2
   EXPECT_NO_THROW(compute_service1 = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
@@ -209,7 +200,15 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
                                                                 std::make_pair("Host4", 8)},
                                                                nullptr
                   ))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service1);
+  compute_services.insert(compute_service2);
 
+  // Create the WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new ResourceInformationTestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, "Host1"))));
 
   EXPECT_NO_THROW(simulation->launch());
 

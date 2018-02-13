@@ -16,18 +16,21 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 namespace wrench {
 
     /**
-     * @brief Create a Simple WMS with a workflow instance and a scheduler implementation
+     * @brief Create a Simple WMS with a workflow instance, a scheduler implementation, and a list of compute services
      *
      * @param workflow: a workflow to execute
      * @param scheduler: a scheduler implementation
+     * @param compute_services: a set of compute services available to run jobs
      * @param hostname: the name of the host on which to start the WMS
      */
     SimpleWMS::SimpleWMS(Workflow *workflow,
                          std::unique_ptr<Scheduler> scheduler,
-                         std::string hostname) : WMS(workflow,
-                                                     std::move(scheduler),
-                                                     hostname,
-                                                     "simple") {}
+                         const std::set<ComputeService *> &compute_services,
+                         const std::string hostname) : WMS(workflow,
+                                                           std::move(scheduler),
+                                                           compute_services,
+                                                           hostname,
+                                                           "simple") {}
 
     /**
      * @brief main method of the SimpleWMS daemon
@@ -61,7 +64,7 @@ namespace wrench {
         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks = this->workflow->getReadyTasks();
 
         // Get the available compute services
-        std::set<ComputeService *> compute_services = this->simulation->getRunningComputeServices();
+        std::set<ComputeService *> compute_services = this->getRunningComputeServices();
 
         if (compute_services.empty()) {
           WRENCH_INFO("Aborting - No compute services available!");
@@ -72,7 +75,7 @@ namespace wrench {
         if (this->pilot_job_scheduler) {
           WRENCH_INFO("Scheduling pilot jobs...");
           this->pilot_job_scheduler.get()->schedule(this->scheduler.get(), this->workflow, this->job_manager.get(),
-                                                    this->simulation->getRunningComputeServices());
+                                                    this->getRunningComputeServices());
         }
 
         // Perform dynamic optimizations
@@ -82,7 +85,7 @@ namespace wrench {
         WRENCH_INFO("Scheduling tasks...");
         this->scheduler->scheduleTasks(this->job_manager.get(),
                                        ready_tasks,
-                                       this->simulation->getRunningComputeServices());
+                                       this->getRunningComputeServices());
 
         // Wait for a workflow execution event, and process it
         try {
@@ -110,14 +113,8 @@ namespace wrench {
 //      simgrid::s4u::Actor::killAll();
 //      return 0;
 
-      WRENCH_INFO("Simple WMS Daemon is shutting down all Compute Services");
-      this->simulation->shutdownAllComputeServices();
-
-      WRENCH_INFO("Simple WMS Daemon is shutting down all Data Services");
-      this->simulation->shutdownAllStorageServices();
-
-      WRENCH_INFO("Simple WMS Daemon is shutting down the File Registry Service");
-      this->simulation->getFileRegistryService()->stop();
+      WRENCH_INFO("Simple WMS Daemon is shutting all services");
+      this->shutdownAllServices();
 
       /***
        *** NO NEED TO stop/kill the Managers (will soon be out of scope, and

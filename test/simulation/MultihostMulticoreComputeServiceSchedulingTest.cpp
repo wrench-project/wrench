@@ -33,6 +33,7 @@ public:
     wrench::ComputeService *cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit = nullptr;
 
     void do_OneJob_test();
+
     void do_MultiJob_test();
 
 
@@ -78,8 +79,9 @@ public:
     OneJobTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
                   wrench::Workflow *workflow,
                   std::unique_ptr<wrench::Scheduler> scheduler,
+                  std::set<wrench::ComputeService *> &compute_services,
                   std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -283,10 +285,11 @@ private:
         if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(30, task1_makespan) ||
             !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(60, task2_makespan) ||
             !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(30, task3_makespan)) {
-          throw std::runtime_error("DEFAULT PROPERTIES BUT MINIMUM CORE ALLOCATION / CASE 1: Unexpected task execution times "
-                                           "t1: " + std::to_string(task1_makespan) +
-                                   " t2: " + std::to_string(task2_makespan) +
-                                   " t3: " + std::to_string(task3_makespan));
+          throw std::runtime_error(
+                  "DEFAULT PROPERTIES BUT MINIMUM CORE ALLOCATION / CASE 1: Unexpected task execution times "
+                          "t1: " + std::to_string(task1_makespan) +
+                  " t2: " + std::to_string(task2_makespan) +
+                  " t3: " + std::to_string(task3_makespan));
         }
 
         workflow->removeTask(t1);
@@ -348,10 +351,11 @@ private:
         if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(15, task1_makespan) ||
             !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(45, task2_makespan) ||
             !MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(15, task3_makespan)) {
-          throw std::runtime_error("DEFAULT PROPERTIES BUT MAX_MIN_CORES TASK SELECTION / CASE 1 : Unexpected task execution times "
-                                           "t1: " + std::to_string(task1_makespan) +
-                                   " t2: " + std::to_string(task2_makespan) +
-                                   " t3: " + std::to_string(task3_makespan));
+          throw std::runtime_error(
+                  "DEFAULT PROPERTIES BUT MAX_MIN_CORES TASK SELECTION / CASE 1 : Unexpected task execution times "
+                          "t1: " + std::to_string(task1_makespan) +
+                  " t2: " + std::to_string(task2_makespan) +
+                  " t3: " + std::to_string(task3_makespan));
         }
 
         workflow->removeTask(t1);
@@ -361,8 +365,7 @@ private:
 
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -374,9 +377,9 @@ TEST_F(MultihostMulticoreComputeServiceTestScheduling, OneJob) {
 void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto *simulation = new wrench::Simulation();
   int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
+  auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("one_task_test");
 
   simulation->init(&argc, argv);
@@ -384,55 +387,60 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
   // Setting up the platform
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new OneJobTestWMS(this, workflow,
-                                                         std::unique_ptr<wrench::Scheduler>(
-                                                                 new NoopScheduler()),
-                          "Host1"))));
-
+  std::set<wrench::ComputeService *> compute_services;
   // Create a Compute Service
   EXPECT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-                  new wrench::MultihostMulticoreComputeService("Host1", true, true,
-                                                               {std::make_pair("Host1", 0),
-                                                                std::make_pair("Host2", 0)},
-                                                               nullptr,
-                                                               {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY, "FCFS"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY, "aggressive"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "maximum"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM, "maximum_flops"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM, "best_fit"}
-                                                               }))));
+                  new wrench::MultihostMulticoreComputeService(
+                          "Host1", true, true,
+                          {std::make_pair("Host1", 0),
+                           std::make_pair("Host2", 0)},
+                          nullptr,
+                          {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "maximum"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM,  "maximum_flops"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM,  "best_fit"}
+                          }))));
+  compute_services.insert(cs_fcfs_aggressive_maximum_maximum_flops_best_fit);
 
   // Create a Compute Service
   EXPECT_NO_THROW(cs_fcfs_aggressive_minimum_maximum_flops_best_fit = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-                  new wrench::MultihostMulticoreComputeService("Host1", true, true,
-                                                               {std::make_pair("Host1", 0),
-                                                                std::make_pair("Host2", 0)},
-                                                               nullptr,
-                                                               {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY, "FCFS"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY, "aggressive"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "minimum"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM, "maximum_flops"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM, "best_fit"}
-                                                               }))));
+                  new wrench::MultihostMulticoreComputeService(
+                          "Host1", true, true,
+                          {std::make_pair("Host1", 0),
+                           std::make_pair("Host2", 0)},
+                          nullptr,
+                          {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "minimum"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM,  "maximum_flops"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM,  "best_fit"}
+                          }))));
+  compute_services.insert(cs_fcfs_aggressive_minimum_maximum_flops_best_fit);
 
   // Create a Compute Service
   EXPECT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-                  new wrench::MultihostMulticoreComputeService("Host1", true, true,
-                                                               {std::make_pair("Host1", 0),
-                                                                std::make_pair("Host2", 0)},
-                                                               nullptr,
-                                                               {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY, "FCFS"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY, "aggressive"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "maximum"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM, "maximum_minimum_cores"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM, "best_fit"}
-                                                               }))));
+                  new wrench::MultihostMulticoreComputeService(
+                          "Host1", true, true,
+                          {std::make_pair("Host1", 0),
+                           std::make_pair("Host2", 0)},
+                          nullptr,
+                          {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "maximum"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM,  "maximum_minimum_cores"},
+                           {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM,  "best_fit"}
+                          }))));
+  compute_services.insert(cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit);
 
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new OneJobTestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, "Host1"))));
 
   EXPECT_NO_THROW(simulation->launch());
 
@@ -441,11 +449,6 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
   free(argv[0]);
   free(argv);
 }
-
-
-
-
-
 
 
 /**********************************************************************/
@@ -458,8 +461,9 @@ public:
     MultiJobTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
                     wrench::Workflow *workflow,
                     std::unique_ptr<wrench::Scheduler> scheduler,
+                    std::set<wrench::ComputeService *> &compute_services,
                     std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -483,7 +487,7 @@ private:
         double now = wrench::S4U_Simulation::getClock();
 
         // Submit a PilotJob that lasts 3600 seconds and takes 2 cores per host
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow,2,2,3600);
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 2, 2, 3600);
 
         job_manager->submitJob(pilot_job, this->test->cs_fcfs_aggressive_maximum_maximum_flops_best_fit);
 
@@ -530,7 +534,8 @@ private:
             }
           }
 
-          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(0, wrench::S4U_Simulation::getClock())) {
+          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(0,
+                                                                                 wrench::S4U_Simulation::getClock())) {
             throw std::runtime_error("Pilot job should start_daemon at time 0");
           }
         }
@@ -554,7 +559,8 @@ private:
             }
           }
 
-          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(3600, wrench::S4U_Simulation::getClock())) {
+          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(3600,
+                                                                                 wrench::S4U_Simulation::getClock())) {
             throw std::runtime_error("Pilot job should expire at time 3600");
           }
         }
@@ -580,7 +586,8 @@ private:
               throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
             }
           }
-          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(3600 + 60, wrench::S4U_Simulation::getClock())) {
+          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(3600 + 60,
+                                                                                 wrench::S4U_Simulation::getClock())) {
             throw std::runtime_error("Standard job #2 should complete at time 3600 + 60");
           }
         }
@@ -606,7 +613,8 @@ private:
             }
           }
 
-          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(4000, wrench::S4U_Simulation::getClock())) {
+          if (!MultihostMulticoreComputeServiceTestScheduling::isJustABitGreater(4000,
+                                                                                 wrench::S4U_Simulation::getClock())) {
             throw std::runtime_error("Standard job #1 should complete at time 4000");
           }
         }
@@ -618,8 +626,7 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -631,22 +638,15 @@ TEST_F(MultihostMulticoreComputeServiceTestScheduling, MultiJob) {
 void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto *simulation = new wrench::Simulation();
   int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
+  auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("one_task_test");
 
   simulation->init(&argc, argv);
 
   // Setting up the platform
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MultiJobTestWMS(this, workflow,
-                                                           std::unique_ptr<wrench::Scheduler>(
-                                                                   new NoopScheduler()),
-                          "Host1"))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
@@ -655,12 +655,20 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
                                                                {std::make_pair("Host1", 0),
                                                                 std::make_pair("Host2", 0)},
                                                                nullptr,
-                                                               {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY, "FCFS"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY, "aggressive"},
+                                                               {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
+                                                                {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
                                                                 {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "maximum"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM, "maximum_flops"},
-                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM, "best_fit"}
+                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM,  "maximum_flops"},
+                                                                {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM,  "best_fit"}
                                                                }))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(cs_fcfs_aggressive_maximum_maximum_flops_best_fit);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new MultiJobTestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, "Host1"))));
 
   EXPECT_NO_THROW(simulation->launch());
 
@@ -669,4 +677,3 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
   free(argv[0]);
   free(argv);
 }
-

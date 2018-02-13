@@ -106,6 +106,10 @@ int main(int argc, char **argv) {
     std::exit(1);
   }
 
+  /* Create a list of compute services that will be used by the WMS */
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(cloud_service);
+
   /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
    * for executing the workflow, and uses a scheduler (CloudScheduler). That scheduler
    * is instantiated with the cloud service, the list of hosts available for running
@@ -118,7 +122,9 @@ int main(int argc, char **argv) {
           std::unique_ptr<wrench::WMS>(
                   new wrench::SimpleWMS(&workflow,
                                         std::unique_ptr<wrench::Scheduler>(
-                                                new wrench::CloudScheduler(cloud_service, &simulation)), wms_host)));
+                                                new wrench::CloudScheduler(cloud_service, &simulation)),
+                                        compute_services,
+                                        wms_host)));
 
   /* Instantiate a file registry service to be started on some host. This service is
    * essentially a replica catalog that stores <file , storage service> pairs so that
