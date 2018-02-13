@@ -29,7 +29,7 @@ before_install:
       docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
       docker run -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
       export BRANCH=`git rev-parse --abbrev-ref HEAD`;
-      if [[ "BRANCH" == "HEAD" ]]; then
+      if [[ "$BRANCH" == "HEAD" ]]; then
         docker exec -it wrench git clone https://github.com/wrench-project/wrench;
       else
         docker exec -it wrench git clone -b ${BRANCH} https://github.com/wrench-project/wrench;
