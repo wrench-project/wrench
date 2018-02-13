@@ -55,6 +55,7 @@ set(HEADER_FILES
         include/wrench/managers/JobManager.h
         include/wrench/managers/DataMovementManager.h
         include/wrench/services/Service.h
+        include/wrench/services/ServiceMessage.h
         include/wrench/services/ServiceProperty.h
         include/wrench/services/compute/ComputeService.h
         include/wrench/services/compute/ComputeServiceProperty.h
@@ -82,6 +83,7 @@ set(HEADER_FILES
         include/wrench/simulation/SimulationOutput.h
         include/wrench/simulation/SimulationTimestamp.h
         include/wrench/simulation/SimulationTrace.h
+        include/wrench/simulation/Terminator.h
         include/wrench.h
         include/wrench-dev.h
         include/wrench/services/compute/batch/BatchJob.h
@@ -124,6 +126,7 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTimestamp.cpp
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/simulation/SimulationOutput.cpp
+        src/wrench/simulation/Terminator.cpp
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/storage/StorageService.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
@@ -136,7 +139,6 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
-        include/wrench/services/ServiceMessage.h
         src/wrench/services/compute/ComputeServiceMessage.cpp
         src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.cpp
         src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.h

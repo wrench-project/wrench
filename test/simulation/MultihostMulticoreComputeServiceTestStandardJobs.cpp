@@ -125,8 +125,9 @@ public:
     MulticoreComputeServiceUnsupportedJobTypeTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                      wrench::Workflow *workflow,
                                                      std::unique_ptr<wrench::Scheduler> scheduler,
+                                                     std::set<wrench::ComputeService *> compute_services,
                                                      std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -166,9 +167,7 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
-      this->simulation->getFileRegistryService()->stop();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -193,12 +192,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceUnsupportedJobTypeTestWMS(this, workflow,
-                                                                                            std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), hostname))));
-
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -208,8 +201,16 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service, {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               storage_service, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceUnsupportedJobTypeTestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, hostname))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -239,8 +240,9 @@ public:
     MulticoreComputeServiceTwoSingleCoreTasksTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                      wrench::Workflow *workflow,
                                                      std::unique_ptr<wrench::Scheduler> scheduler,
+                                                     std::set<wrench::ComputeService *> compute_services,
                                                      std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -299,9 +301,7 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
-      this->simulation->getFileRegistryService()->stop();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -326,11 +326,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(this, workflow,
-                                                                                            std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), hostname))));
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -340,8 +335,16 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service, {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               storage_service, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, hostname))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -371,8 +374,9 @@ public:
     MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                         wrench::Workflow *workflow,
                                                         std::unique_ptr<wrench::Scheduler> scheduler,
+                                                        std::set<wrench::ComputeService *> compute_services,
                                                         std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -431,9 +435,7 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
-      this->simulation->getFileRegistryService()->stop();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -459,12 +461,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(this, workflow,
-                                                                                               std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), hostname))));
-
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -474,8 +470,16 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service, {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               storage_service, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, hostname))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -506,8 +510,9 @@ public:
     MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                         wrench::Workflow *workflow,
                                                         std::unique_ptr<wrench::Scheduler> scheduler,
+                                                        std::set<wrench::ComputeService *> compute_services,
                                                         std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -570,9 +575,7 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
-      this->simulation->getFileRegistryService()->stop();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -598,12 +601,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   // Get a hostname
   std::string hostname = "QuadCoreHost";
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(this, workflow,
-                                                                                               std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), hostname))));
-
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -613,8 +610,16 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service, {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               storage_service, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, hostname))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -645,8 +650,9 @@ public:
     MulticoreComputeServiceJobTerminationTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                  wrench::Workflow *workflow,
                                                  std::unique_ptr<wrench::Scheduler> scheduler,
+                                                 std::set<wrench::ComputeService *> compute_services,
                                                  std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -692,9 +698,7 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
-      this->simulation->getFileRegistryService()->stop();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -706,9 +710,9 @@ TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, JobTermination) {
 void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto *simulation = new wrench::Simulation();
   int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
+  auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -719,12 +723,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceJobTerminationTestWMS(this, workflow,
-                                                                                        std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), hostname))));
-
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -734,8 +732,16 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service, {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               storage_service, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceJobTerminationTestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, hostname))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -784,8 +790,9 @@ public:
     MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                              wrench::Workflow *workflow,
                                                              std::unique_ptr<wrench::Scheduler> scheduler,
+                                                             std::set<wrench::ComputeService *> compute_services,
                                                              std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -830,9 +837,7 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
-      this->simulation->getFileRegistryService()->stop();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -844,9 +849,9 @@ TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, NonSubmittedJobTerminat
 void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermination_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto *simulation = new wrench::Simulation();
   int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
+  auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -857,12 +862,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(this, workflow,
-                                                                                                    std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), hostname))));
-
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -872,8 +871,16 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service, {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               storage_service, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, hostname))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -905,7 +912,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
                              this->task2->getId() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
   }
 
-
   delete simulation;
   free(argv[0]);
   free(argv);
@@ -922,8 +928,9 @@ public:
     MulticoreComputeServiceCompletedJobTerminationTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
                                                           wrench::Workflow *workflow,
                                                           std::unique_ptr<wrench::Scheduler> scheduler,
+                                                          std::set<wrench::ComputeService *> compute_services,
                                                           std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -979,9 +986,7 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->shutdownAllStorageServices();
-      this->simulation->getFileRegistryService()->stop();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -993,9 +998,9 @@ TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, CompletedJobTermination
 void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTermination_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto *simulation = new wrench::Simulation();
   int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
+  auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -1006,12 +1011,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceCompletedJobTerminationTestWMS(this, workflow,
-                                                                                                 std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), hostname))));
-
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -1021,8 +1020,16 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service, {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               storage_service, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new MulticoreComputeServiceCompletedJobTerminationTestWMS(
+                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, hostname))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -1054,7 +1061,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
                              this->task2->getId() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
   }
 
-
   delete simulation;
   free(argv[0]);
   free(argv);
@@ -1068,11 +1074,13 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
 class MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS : public wrench::WMS {
 
 public:
-    MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(MultihostMulticoreComputeServiceTestStandardJobs *test,
-                                                                          wrench::Workflow *workflow,
-                                                                          std::unique_ptr<wrench::Scheduler> scheduler,
-                                                                          std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+    MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
+            MultihostMulticoreComputeServiceTestStandardJobs *test,
+            wrench::Workflow *workflow,
+            std::unique_ptr<wrench::Scheduler> scheduler,
+            std::set<wrench::ComputeService *> compute_services,
+            std::string hostname) :
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -1100,7 +1108,7 @@ private:
       job_manager->submitJob(two_task_job, this->test->compute_service);
 
       // Shutdown all compute services
-      this->simulation->shutdownAllComputeServices();
+      this->shutdownAllServices();
 
       // Wait for the job failure notification
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -1114,7 +1122,7 @@ private:
           if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
             throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
           }
-          wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
+          auto *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
           if (real_cause->getService() != this->test->compute_service) {
             std::runtime_error(
                     "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
@@ -1127,8 +1135,6 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllStorageServices();
-      this->simulation->getFileRegistryService()->stop();
       return 0;
     }
 };
@@ -1140,9 +1146,9 @@ TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, ShutdownComputeServiceW
 void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeServiceWhileJobIsRunning_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto *simulation = new wrench::Simulation();
   int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
+  auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -1153,13 +1159,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(
-                  new MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(this, workflow,
-                                                                                            std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), hostname))));
-
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -1169,8 +1168,17 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service, {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               storage_service, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(
+                  new MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
+                          this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, hostname))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -1219,8 +1227,9 @@ public:
             MultihostMulticoreComputeServiceTestStandardJobs *test,
             wrench::Workflow *workflow,
             std::unique_ptr<wrench::Scheduler> scheduler,
+            std::set<wrench::ComputeService *> compute_services,
             std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
     }
 
@@ -1245,7 +1254,7 @@ private:
                                                                          {}, {});
 
       // Shutdown all storage services
-      this->simulation->shutdownAllStorageServices();
+      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service);
 
       // Submit the 2-task job for execution
       job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -1262,7 +1271,7 @@ private:
           if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
             std::runtime_error("Got the correct failure event, but the cause seems wrong");
           }
-          wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
+          auto *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
           if (real_cause->getService() != this->test->storage_service) {
             std::runtime_error(
                     "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
@@ -1275,8 +1284,7 @@ private:
       }
 
       // Terminate
-      this->simulation->shutdownAllComputeServices();
-      this->simulation->getFileRegistryService()->stop();
+      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1288,9 +1296,9 @@ TEST_F(MultihostMulticoreComputeServiceTestStandardJobs, ShutdownStorageServiceB
 void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageServiceBeforeJobIsSubmitted_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto *simulation = new wrench::Simulation();
   int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
+  auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
@@ -1301,13 +1309,6 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(
-                  new MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(this, workflow,
-                                                                                               std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), hostname))));
-
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
@@ -1317,8 +1318,17 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                      {std::make_pair(hostname,0)},
-                                                      storage_service, {}))));
+                                                               {std::make_pair(hostname, 0)},
+                                                               storage_service, {}))));
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(compute_service);
+
+  // Create a WMS
+  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(
+                  new MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
+                          this, workflow, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), compute_services, hostname))));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(

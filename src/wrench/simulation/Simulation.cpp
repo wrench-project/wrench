@@ -53,6 +53,8 @@ namespace wrench {
       // Create the S4U simulation wrapper
       this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
 
+      // create the simulation terminator daemon
+      this->terminator = std::unique_ptr<Terminator>(new Terminator());
     }
 
     /**
@@ -265,7 +267,6 @@ namespace wrench {
       }
     }
 
-
     /**
      * @brief Start all services
      *
@@ -273,9 +274,7 @@ namespace wrench {
      */
     void Simulation::start_all_processes() {
 
-
       try {
-
         // Start the WMSes
         for (auto it = this->wmses.begin(); it != this->wmses.end(); ++it) {
           it->get()->start();
@@ -303,7 +302,6 @@ namespace wrench {
       } catch (std::runtime_error &e) {
         throw;
       }
-
     }
 
     /**
@@ -327,10 +325,10 @@ namespace wrench {
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
+      this->terminator->registerComputeService(service.get());
       this->compute_services.insert(std::move(service));
       return raw_ptr;
     }
-
 
     /**
     * @brief Add a StorageService to the simulation
@@ -352,6 +350,7 @@ namespace wrench {
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
+      this->terminator->registerStorageService(service.get());
       this->storage_services.insert(std::move(service));
       return raw_ptr;
     }
@@ -391,6 +390,7 @@ namespace wrench {
       if (file_registry_service == nullptr) {
         throw std::invalid_argument("Simulation::setFileRegistryService(): invalid arguments");
       }
+      this->terminator->registerFileRegistryService(file_registry_service.get());
       this->file_registry_service = std::move(file_registry_service);
     }
 
@@ -405,61 +405,8 @@ namespace wrench {
       if (network_proximity_service == nullptr) {
         throw std::invalid_argument("Simulation::setNetworkProximityService(): invalid arguments");
       }
+      this->terminator->registerNetworkProximityService(network_proximity_service.get());
       this->network_proximity_service = std::move(network_proximity_service);
-    }
-
-    /**
-     * @brief Obtain the list of compute services
-     *
-     * @return a vector of compute services
-     */
-    std::set<ComputeService *> Simulation::getRunningComputeServices() {
-      std::set<ComputeService *> set = {};
-      for (auto it = this->compute_services.begin(); it != this->compute_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          set.insert((*it).get());
-        }
-      }
-      return set;
-    }
-
-    /**
-     * @brief Shutdown all running compute services on the platform
-     */
-    void Simulation::shutdownAllComputeServices() {
-
-      for (auto it = this->compute_services.begin(); it != this->compute_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          (*it)->stop();
-        }
-      }
-    }
-
-    /**
-    * @brief Obtain the list of storage services
-    *
-    * @return a vector of storage services
-    */
-    std::set<StorageService *> Simulation::getRunningStorageServices() {
-      std::set<StorageService *> set = {};
-      for (auto it = this->storage_services.begin(); it != this->storage_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          set.insert((*it).get());
-        }
-      }
-      return set;
-    }
-
-    /**
-     * @brief Shutdown all running storage services on the platform
-     */
-    void Simulation::shutdownAllStorageServices() {
-
-      for (auto it = this->storage_services.begin(); it != this->storage_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          (*it)->stop();
-        }
-      }
     }
 
     /**
@@ -468,7 +415,7 @@ namespace wrench {
      * @return a file registry service, or nullptr
      */
     FileRegistryService *Simulation::getFileRegistryService() {
-      return this->file_registry_service.get();
+      return this->file_registry_service ? this->file_registry_service.get() : nullptr;
     }
 
     /**
@@ -477,7 +424,7 @@ namespace wrench {
      * @return a network proximity service, or nullptr
      */
     NetworkProximityService *Simulation::getNetworkProximityService() {
-      return this->network_proximity_service.get();
+      return this->network_proximity_service ? this->network_proximity_service.get() : nullptr;
     }
 
     /**
@@ -593,15 +540,19 @@ namespace wrench {
       return S4U_Simulation::getMemoryCapacity();
     }
 
-
     /**
      * @brief Sleep for a number of (simulated) seconds
-     * @param duration
-     * @return
+     * @param duration in seconds
      */
-    double Simulation::sleep(double duration) {
+    void Simulation::sleep(double duration) {
       S4U_Simulation::sleep(duration);
     }
 
-
+    /**
+     * @brief Get a pointer to the Terminator object
+     * @return a pointer to the Terminator object
+     */
+    Terminator *Simulation::getTerminator() {
+      return this->terminator.get();
+    }
 };

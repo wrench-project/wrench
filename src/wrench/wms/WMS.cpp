@@ -9,18 +9,18 @@
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/wms/WMS.h"
-#include "wrench/workflow/job/StandardJob.h"
+#include "wrench/simulation/Simulation.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
 
 namespace wrench {
 
     /**
-     * @brief Create a WMS with a workflow instance and a scheduler implementation
+     * @brief Create a WMS with a workflow instance, a scheduler implementation, and a list of compute services
      *
      * @param workflow: a workflow to execute
      * @param scheduler: a scheduler implementation
+     * @param compute_services: a set of compute services available to run jobs
      * @param hostname: the name of the host on which to run the WMS
      * @param suffix: a string to append to the process name
      * @param start_time: the simulated time when the WMS should start running
@@ -29,11 +29,12 @@ namespace wrench {
      */
     WMS::WMS(Workflow *workflow,
              std::unique_ptr<Scheduler> scheduler,
-             std::string &hostname,
-             std::string suffix,
+             const std::set<ComputeService *> &compute_services,
+             const std::string &hostname,
+             const std::string suffix,
              double start_time) :
             S4U_Daemon("wms_" + suffix, "wms_" + suffix),
-            workflow(workflow), start_time(start_time),
+            workflow(workflow), start_time(start_time), compute_services(compute_services),
             scheduler(std::move(scheduler)) {
 
       this->hostname = hostname;
@@ -84,6 +85,36 @@ namespace wrench {
       for (auto &opt : this->static_optimizations) {
         opt->process(this->workflow);
       }
+    }
+
+    /**
+     * @brief Obtain the list of compute services
+     *
+     * @return a set of compute services
+     */
+    std::set<ComputeService *> WMS::getRunningComputeServices() {
+      std::set<ComputeService *> set = {};
+      for (auto compute_service : this->compute_services) {
+        if (compute_service->isUp()) {
+          set.insert(compute_service);
+        }
+      }
+      return set;
+    }
+
+    /**
+     * @brief Shutdown all services
+     */
+    void WMS::shutdownAllServices() {
+      WRENCH_INFO("WMS Daemon is shutting down all Compute and Storage Services");
+      this->simulation->getTerminator()->shutdownComputeService(this->compute_services);
+
+      WRENCH_INFO("WMS Daemon is shutting down the File Registry Service");
+      this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
+
+      WRENCH_INFO("WMS Daemon is shutting down the Network Proximity Service");
+      this->simulation->getTerminator()->shutdownNetworkProximityService(
+              this->simulation->getNetworkProximityService());
     }
 
     /**
@@ -205,6 +236,11 @@ namespace wrench {
       } catch (std::invalid_argument &e) {
         throw std::runtime_error("WMS:start(): " + std::string(e.what()));
       }
+      // register services into terminator (the storage service is obtained from the compute service)
+      this->simulation->getTerminator()->registerComputeService(this->compute_services);
+      this->simulation->getTerminator()->registerFileRegistryService(this->simulation->getFileRegistryService());
+      this->simulation->getTerminator()->registerNetworkProximityService(
+              this->simulation->getNetworkProximityService());
     }
 
     /**
