@@ -112,7 +112,6 @@ private:
       wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 2, 2, 1.0);
 
       std::vector<wrench::WorkflowTask *> tasks;
-
       tasks.push_back(t1);
       tasks.push_back(t2);
       wrench::StandardJob *job = job_manager->createStandardJob(tasks, {}, {}, {}, {});
