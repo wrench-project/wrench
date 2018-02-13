@@ -18,6 +18,7 @@ env:
   - DIST=ubuntu-trusty COMPILER=clang3-6 BATSCHED=off
   - DIST=ubuntu-trusty COMPILER=clang3-7 BATSCHED=off
   - DIST=ubuntu-xenial COMPILER=gcc5 BATSCHED=off
+  - DIST=debian-stretch COMPILER=gcc6 BATSCHED=off
 
 services:
   - docker
@@ -27,7 +28,8 @@ before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
       docker run -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
-      docker exec -it wrench git clone https://github.com/wrench-project/wrench;
+      export BRANCH=`git rev-parse --abbrev-ref HEAD`
+      docker exec -it wrench git clone -b ${BRANCH} https://github.com/wrench-project/wrench;
       docker exec -it wrench mkdir wrench/build;
     fi
 
