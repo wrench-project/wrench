@@ -30,6 +30,7 @@ namespace wrench {
      */
     NetworkProximityService::~NetworkProximityService() {
       this->default_property_values.clear(); // To avoid memory leaks
+      this->network_daemons.clear();
     }
 
     /**
@@ -191,6 +192,7 @@ namespace wrench {
           (*it)->start();
         }
         this->start_daemon(this->hostname, false);
+        this->state = Service::UP;
       } catch (std::runtime_error &e) {
         throw;
       }
