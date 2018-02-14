@@ -9,7 +9,10 @@
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/helpers/Alarm.h"
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simulation/Simulation.h"
+#include "wms/WMSMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
 
@@ -67,6 +70,39 @@ namespace wrench {
      */
     void WMS::setPilotJobScheduler(std::unique_ptr<PilotJobScheduler> pilot_job_scheduler) {
       this->pilot_job_scheduler = std::move(pilot_job_scheduler);
+    }
+
+    /**
+     * @brief Check whether the WMS has a deferred start simulation time
+     *
+     * @throw std::runtime_error
+     */
+    void WMS::checkDeferredStart() {
+      if (S4U_Simulation::getClock() < this->start_time) {
+        new Alarm(this->start_time, this->hostname, this->mailbox_name,
+                  new AlarmWMSDeferredStartMessage(this->mailbox_name, this->start_time, 0), "wms_start");
+
+        // Wait for a message
+        std::unique_ptr<SimulationMessage> message = nullptr;
+
+        try {
+          message = S4U_Mailbox::getMessage(this->mailbox_name);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          throw std::runtime_error(cause->toString());
+        } catch (std::shared_ptr<NetworkTimeout> &cause) {
+          throw std::runtime_error(cause->toString());
+        }
+
+        if (message == nullptr) {
+          std::runtime_error("Got a NULL message... Likely this means the WMS cannot be started. Aborting!");
+        }
+
+        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+
+        if (auto *msg = dynamic_cast<AlarmWMSDeferredStartMessage *>(message.get())) {
+          // The WMS can be started
+        }
+      }
     }
 
     /**
@@ -157,14 +193,13 @@ namespace wrench {
       }
     }
 
-
     /**
      * @brief Process a WorkflowExecutionEvent::STANDARD_JOB_COMPLETION
      *
      * @param event: a workflow execution event
      */
     void WMS::processEventStandardJobCompletion(std::unique_ptr<WorkflowExecutionEvent> event) {
-      StandardJob *job = (StandardJob *) (event->job);
+      auto job = (StandardJob *) (event->job);
       WRENCH_INFO("Notified that a %ld-task job has completed", job->getNumTasks());
     }
 
