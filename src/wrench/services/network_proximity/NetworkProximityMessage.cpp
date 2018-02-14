@@ -70,12 +70,12 @@ namespace wrench {
 
     /**
      * @brief NextContactDaemonRequestMessage class
-     * @param answer_mailbox: the mailbox to return the request to
+     * @param damone: the network proximity daemon to return the request to
      * @param payload: the message size in bytes
      */
-    NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(std::string answer_mailbox, double payload) :
+    NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(NetworkProximityDaemon *daemon, double payload) :
             NetworkProximityMessage("NEXT_CONTACT_DAEMON_REQUEST", payload) {
-        this->answer_mailbox = answer_mailbox;
+        this->daemon = daemon;
     }
 
     /**

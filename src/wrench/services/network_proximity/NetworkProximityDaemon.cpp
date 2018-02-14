@@ -89,7 +89,7 @@ namespace wrench {
       double time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
       S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                               new NextContactDaemonRequestMessage(this->mailbox_name,
+                               new NextContactDaemonRequestMessage(this,
                                                                    this->getPropertyValueAsDouble(
                                                                            NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
 
@@ -141,7 +141,7 @@ namespace wrench {
 
 
             S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                     new NextContactDaemonRequestMessage(this->mailbox_name,
+                                     new NextContactDaemonRequestMessage(this,
                                                                          this->getPropertyValueAsDouble(
                                                                                  NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
           }

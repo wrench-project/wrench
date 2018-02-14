@@ -11,6 +11,7 @@
 #define WRENCH_NETWORKPROXIMITYMESSAGE_H
 
 #include <services/ServiceMessage.h>
+#include <wrench/services/network_proximity/NetworkProximityDaemon.h>
 
 namespace wrench {
 
@@ -98,10 +99,10 @@ namespace wrench {
      */
     class NextContactDaemonRequestMessage : public NetworkProximityMessage {
     public:
-        NextContactDaemonRequestMessage(std::string answer_mailbox, double payload);
+        NextContactDaemonRequestMessage(NetworkProximityDaemon *daemon, double payload);
 
-        /** @brief The mailbox to return the answer to */
-        std::string answer_mailbox;
+        /** @brief The network proximity daemon to return the answer to */
+        NetworkProximityDaemon *daemon;
     };
 
     /**
