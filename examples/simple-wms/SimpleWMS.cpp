@@ -26,11 +26,11 @@ namespace wrench {
     SimpleWMS::SimpleWMS(Workflow *workflow,
                          std::unique_ptr<Scheduler> scheduler,
                          const std::set<ComputeService *> &compute_services,
-                         const std::string hostname) : WMS(workflow,
+                         const std::string &hostname, double start_time) : WMS(workflow,
                                                            std::move(scheduler),
                                                            compute_services,
                                                            hostname,
-                                                           "simple") {}
+                                                           "simple", start_time) {}
 
     /**
      * @brief main method of the SimpleWMS daemon
@@ -42,6 +42,9 @@ namespace wrench {
     int SimpleWMS::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
+
+      // Check whether the WMS has a deferred start time
+      checkDeferredStart();
 
       WRENCH_INFO("Starting on host %s listening on mailbox %s",
                   S4U_Simulation::getHostName().c_str(),

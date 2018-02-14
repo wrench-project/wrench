@@ -59,6 +59,8 @@ namespace wrench {
 
         void start();
 
+        void checkDeferredStart();
+
         void runDynamicOptimizations();
 
         void runStaticOptimizations();

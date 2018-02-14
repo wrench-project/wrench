@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,24 +22,25 @@ namespace wrench {
     class SimpleWMS : public WMS {
 
     public:
-        SimpleWMS(Workflow *,
-                  std::unique_ptr<Scheduler>,
+        SimpleWMS(Workflow * workflow,
+                  std::unique_ptr<Scheduler> scheduler,
                   const std::set<ComputeService *> &compute_services,
-                  const std::string);
+                  const std::string &hostname,
+                  double start_time = 0);
 
     protected:
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        void processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent>);
+        void processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent>) override;
 
         /***********************/
         /** \endcond           */
         /***********************/
 
     private:
-        int main();
+        int main() override;
 
         /** @brief The job manager */
         std::unique_ptr<JobManager> job_manager;

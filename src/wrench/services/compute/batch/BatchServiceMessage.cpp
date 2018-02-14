@@ -1,6 +1,11 @@
-//
-// Created by suraj on 9/16/17.
-//
+/**
+ * Copyright (c) 2017-2018. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 
 #include "wrench/services/compute/batch/BatchServiceMessage.h"
 
@@ -16,7 +21,6 @@ namespace wrench {
             ComputeServiceMessage("BatchServiceMessage::" + name, payload) {
     }
 
-
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
@@ -26,13 +30,15 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(std::string answer_mailbox,
-                                                                                     std::string job_args_to_scheduler, double payload)
+                                                                                     std::string job_args_to_scheduler,
+                                                                                     double payload)
             : BatchServiceMessage("BATCH_SIMULATION_BEGINS", payload) {
-        if (job_args_to_scheduler.empty()) {
-            throw std::invalid_argument("BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(): Empty job arguments to scheduler");
-        }
-        this->answer_mailbox = answer_mailbox;
-        this->job_args_to_scheduler = job_args_to_scheduler;
+      if (job_args_to_scheduler.empty()) {
+        throw std::invalid_argument(
+                "BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(): Empty job arguments to scheduler");
+      }
+      this->answer_mailbox = answer_mailbox;
+      this->job_args_to_scheduler = job_args_to_scheduler;
     }
 
     /**
@@ -44,7 +50,7 @@ namespace wrench {
      */
     BatchSchedReadyMessage::BatchSchedReadyMessage(std::string answer_mailbox, double payload)
             : BatchServiceMessage("BATCH_SCHED_READY", payload) {
-        this->answer_mailbox = answer_mailbox;
+      this->answer_mailbox = answer_mailbox;
     }
 
     /**
@@ -55,10 +61,12 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(std::string answer_mailbox, std::string batsched_decision_reply, double payload)
+    BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(std::string answer_mailbox,
+                                                                           std::string batsched_decision_reply,
+                                                                           double payload)
             : BatchServiceMessage("BATCH_EXECUTE_JOB", payload) {
-        this->answer_mailbox = answer_mailbox;
-        this->batsched_decision_reply = batsched_decision_reply;
+      this->answer_mailbox = answer_mailbox;
+      this->batsched_decision_reply = batsched_decision_reply;
     }
 
     /**
@@ -70,15 +78,18 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(std::string answer_mailbox, WorkflowJob* job,
-                                                                               std::string job_args_to_scheduler, double payload)
+    BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(std::string answer_mailbox,
+                                                                               WorkflowJob *job,
+                                                                               std::string job_args_to_scheduler,
+                                                                               double payload)
             : BatchServiceMessage("BATCH_JOB_SUBMISSION_TO_SCHEDULER", payload) {
-        if (job_args_to_scheduler.empty()) {
-            throw std::invalid_argument("BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): Empty job arguments to scheduler");
-        }
-        this->job_args_to_scheduler = job_args_to_scheduler;
-        this->answer_mailbox = answer_mailbox;
-        this->job = job;
+      if (job_args_to_scheduler.empty()) {
+        throw std::invalid_argument(
+                "BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): Empty job arguments to scheduler");
+      }
+      this->job_args_to_scheduler = job_args_to_scheduler;
+      this->answer_mailbox = answer_mailbox;
+      this->job = job;
     }
 
 
@@ -92,7 +103,7 @@ namespace wrench {
      */
     BatchFakeJobSubmissionReplyMessage::BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload)
             : BatchServiceMessage("BATCH_FAKE_JOB_SUBMISSION_REPLY", payload) {
-        this->json_data_string = json_data_string;
+      this->json_data_string = json_data_string;
     }
 
     /**
@@ -103,9 +114,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchJobReplyFromSchedulerMessage::BatchJobReplyFromSchedulerMessage(std::string reply, double payload)
-            : BatchServiceMessage("BATCH_JOB_REPLY_FROM_SCHEDULER", payload) {
-        this->reply = reply;
-    }
+            : BatchServiceMessage("BATCH_JOB_REPLY_FROM_SCHEDULER", payload), reply(reply) {}
 
     /**
      * @brief Constructor
@@ -116,13 +125,14 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(std::string answer_mailbox,
-                                                                 BatchJob* job,double payload)
+                                                                 BatchJob *job, double payload)
             : BatchServiceMessage("SUBMIT_BATCH_JOB_REQUEST", payload) {
-        if (job == nullptr) {
-            throw std::invalid_argument("BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(): Invalid arguments");
-        }
-        this->job = job;
-        this->answer_mailbox = answer_mailbox;
+      if (job == nullptr) {
+        throw std::invalid_argument(
+                "BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(): Invalid arguments");
+      }
+      this->job = job;
+      this->answer_mailbox = answer_mailbox;
     }
 
     /**
@@ -132,10 +142,8 @@ namespace wrench {
      *
      * @throw std::invalid_arguments
      */
-    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(WorkflowJob* job,double payload)
-            : ServiceMessage("ALARM_JOB_TIMED_OUT", payload) {
-        this->job = job;
-    }
+    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(WorkflowJob *job, double payload)
+            : ServiceMessage("ALARM_JOB_TIMED_OUT", payload), job(job) {}
 
     /**
      * @brief Constructor
@@ -144,9 +152,7 @@ namespace wrench {
      *
      * @throw std::invalid_arguments
      */
-    AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id,double payload)
-            : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload) {
-        this->job_id = job_id;
-    }
+    AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id, double payload)
+            : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload), job_id(job_id) {}
 
 }

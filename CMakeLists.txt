@@ -115,6 +115,8 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/wms/WMS.cpp
         src/wrench/wms/Scheduler.cpp
+        src/wrench/wms/WMSMessage.h
+        src/wrench/wms/WMSMessage.cpp
         src/wrench/services/compute/ComputeService.cpp
         src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.cpp
         src/wrench/workflow/job/PilotJob.cpp
