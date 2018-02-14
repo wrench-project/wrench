@@ -11,6 +11,7 @@
 #define WRENCH_NETWORKPROXIMITYSERVICE_H
 
 #include <complex>
+#include <random>
 #include "wrench/services/Service.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 #include "wrench/services/network_proximity/NetworkProximityDaemon.h"
@@ -66,6 +67,8 @@ namespace wrench{
         std::vector<std::shared_ptr<NetworkProximityDaemon>> network_daemons;
         std::vector<std::string> hosts_in_network;
 
+        std::default_random_engine master_rng;
+
         int main();
 
         bool processNextMessage();
@@ -76,9 +79,10 @@ namespace wrench{
 
         std::map<std::string, std::complex<double>> coordinate_lookup_table;
 
-        std::shared_ptr<NetworkProximityDaemon> getCommunicationPeer(std::string);
+        std::shared_ptr<NetworkProximityDaemon> getCommunicationPeer(NetworkProximityDaemon *daemon);
 
         void validateProperties();
+
     };
 }
 

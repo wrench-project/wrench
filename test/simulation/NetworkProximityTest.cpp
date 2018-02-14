@@ -115,12 +115,16 @@ private:
       hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
                                                   this->simulation->getHostnameList()[1]);
       int count = 0, max_count = 100;
-      double proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
+      std::set<wrench::NetworkProximityService *> network_proximity_services = this->simulation->getRunningNetworkProximityServices();
+
+      // Test only the first proximity service
+      wrench::NetworkProximityService *network_proximity_service = *(network_proximity_services.begin());
+      double proximity = network_proximity_service->query(hosts_to_compute_proximity);
 
       while (proximity < 0 && count < max_count) {
         count++;
         wrench::S4U_Simulation::sleep(10.0);
-        proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
+        proximity = network_proximity_service->query(hosts_to_compute_proximity);
       }
 
       if (count == max_count) {
@@ -134,8 +138,8 @@ private:
       // Terminate
       this->simulation->shutdownAllComputeServices();
       this->simulation->shutdownAllStorageServices();
+      this->simulation->shutdownAllNetworkProximityServices();
       this->simulation->getFileRegistryService()->stop();
-      this->simulation->getNetworkProximityService()->stop();
       return 0;
     }
 };
@@ -199,12 +203,17 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
     std::string network_daemon4 = simulation->getHostnameList()[3];
   std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
-  // Create a network proximity service
-  std::unique_ptr<wrench::NetworkProximityService> network_proximity_service(
-          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, 1, 2, 1)
-  );
+  std::unique_ptr<wrench::NetworkProximityService> network_proximity_service = nullptr;
 
-  EXPECT_NO_THROW(simulation->setNetworkProximityService(std::move(network_proximity_service)));
+  // Create a network proximity service
+  EXPECT_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "BOGUS"}})),
+               std::invalid_argument);
+
+  EXPECT_NO_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
+
+  EXPECT_NO_THROW(simulation->add(std::move(network_proximity_service)));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -249,12 +258,18 @@ private:
         first_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[0],
                                                     this->simulation->getHostnameList()[1]);
         int count = 0, max_count = 100;
-        double first_pair_proximity = this->simulation->getNetworkProximityService()->query(first_pair_to_compute_proximity);
+
+      std::set<wrench::NetworkProximityService *> network_proximity_services = this->simulation->getRunningNetworkProximityServices();
+
+      // Test only the first proximity service
+      wrench::NetworkProximityService *network_proximity_service = *(network_proximity_services.begin());
+
+        double first_pair_proximity = network_proximity_service->query(first_pair_to_compute_proximity);
 
         while (first_pair_proximity < 0 && count < max_count) {
             count++;
             wrench::S4U_Simulation::sleep(10.0);
-            first_pair_proximity = this->simulation->getNetworkProximityService()->query(first_pair_to_compute_proximity);
+            first_pair_proximity = network_proximity_service->query(first_pair_to_compute_proximity);
         }
 
         if (count == max_count) {
@@ -270,12 +285,12 @@ private:
         second_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
                                                          this->simulation->getHostnameList()[3]);
         count = 0, max_count = 100;
-        double second_pair_proximity = this->simulation->getNetworkProximityService()->query(second_pair_to_compute_proximity);
+        double second_pair_proximity = network_proximity_service->query(second_pair_to_compute_proximity);
 
         while (second_pair_proximity < 0 && count < max_count) {
             count++;
             wrench::S4U_Simulation::sleep(10.0);
-            second_pair_proximity = this->simulation->getNetworkProximityService()->query(second_pair_to_compute_proximity);
+            second_pair_proximity = network_proximity_service->query(second_pair_to_compute_proximity);
         }
 
         if (count == max_count) {
@@ -295,8 +310,8 @@ private:
         // Terminate
         this->simulation->shutdownAllComputeServices();
         this->simulation->shutdownAllStorageServices();
+        this->simulation->shutdownAllNetworkProximityServices();
         this->simulation->getFileRegistryService()->stop();
-        this->simulation->getNetworkProximityService()->stop();
         return 0;
     }
 };
@@ -360,10 +375,10 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
     std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
     std::unique_ptr<wrench::NetworkProximityService> network_proximity_service(
-            new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, 1, 2, 1)
+            new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {})
     );
 
-    EXPECT_NO_THROW(simulation->setNetworkProximityService(std::move(network_proximity_service)));
+    EXPECT_NO_THROW(simulation->add(std::move(network_proximity_service)));
 
     // Running a "run a single task" simulation
     EXPECT_NO_THROW(simulation->launch());
