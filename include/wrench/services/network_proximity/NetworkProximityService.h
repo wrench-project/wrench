@@ -31,7 +31,7 @@ namespace wrench{
                  {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                            "0.0"},
                  {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE,             "ALLTOALL"}, // how are we error checking bad properties?
                  {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE,             "1024"}, // how are we error checking bad properties?
-                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,       "60"}, // how are we error checking bad properties?
+                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,       "10"}, // how are we error checking bad properties?
                  {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "20"}, // how are we error checking bad properties?
                  {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE,    "1.0"}, // how are we error checking bad properties?
                 };
@@ -63,7 +63,7 @@ namespace wrench{
 
         friend class Simulation;
 
-        std::vector<std::unique_ptr<NetworkProximityDaemon>> network_daemons;
+        std::vector<std::shared_ptr<NetworkProximityDaemon>> network_daemons;
         std::vector<std::string> hosts_in_network;
 
         int main();
@@ -76,7 +76,9 @@ namespace wrench{
 
         std::map<std::string, std::complex<double>> coordinate_lookup_table;
 
-        std::map<std::string, std::vector<std::string>> communication_lookup_table;
+        std::shared_ptr<NetworkProximityDaemon> getCommunicationPeer(std::string);
+
+        void validateProperties();
     };
 }
 
