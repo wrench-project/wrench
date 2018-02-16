@@ -229,8 +229,8 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
-      // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 60.0);
+      // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 60.0);
 
       // Submit the pilot job for execution
       try {

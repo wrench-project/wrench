@@ -277,8 +277,8 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
       {
-        // Create a pilot job
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 30);
+        // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM and 30 seconds
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 30);
 
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
@@ -481,8 +481,8 @@ private:
       }
 
       {
-        // Create a pilot job
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 30);
+        // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM, and 30 seconds
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 30);
 
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
@@ -1068,8 +1068,8 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
       {
-        // Create a pilot job
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 90);
+        // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 90);
 
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
@@ -1445,8 +1445,8 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
       {
-        // Create a pilot job
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 90);
+        // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 90);
 
         // Create a sequential task that lasts one min and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
@@ -1636,8 +1636,8 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
       {
-        // Create a pilot job
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 90);
+        // Create a pilot job tbat needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 90);
 
         // Create a sequential task that lasts one min and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
@@ -1832,8 +1832,8 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
       {
-        // Create a pilot job
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 90);
+        // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 90);
 
         // Create a sequential task that lasts one min and requires 5 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 5, 5, 1.0);

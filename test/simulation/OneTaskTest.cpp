@@ -210,7 +210,7 @@ void OneTaskTest::do_Noop_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                nullptr,
                                                                {}))));
 
@@ -330,7 +330,7 @@ void OneTaskTest::do_HostMemory_test() {
   compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname1, true, true,
-                                                               {std::make_pair(hostname1, 0)},
+                                                               {std::make_tuple(hostname1, ULONG_MAX, DBL_MAX)},
                                                                nullptr,
                                                                {})));
   std::set<wrench::ComputeService *> compute_services;
@@ -475,7 +475,7 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                nullptr,
                                                                {}))));
   std::set<wrench::ComputeService *> compute_services;
@@ -608,7 +608,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                storage_service1,
                                                                {}))));
   std::set<wrench::ComputeService *> compute_services;
@@ -771,7 +771,7 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                storage_service2,
                                                                {}))));
   std::set<wrench::ComputeService *> compute_services;

@@ -416,9 +416,10 @@ namespace wrench {
                                                                                       pm_hostname), num_cores);
 
           // create a multihost multicore computer service for the VM
+          // TODO: Don't pass DBL_MAX for the RAM perhaps?
           std::unique_ptr<ComputeService> cs(
                   new MultihostMulticoreComputeService(vm_hostname, supports_standard_jobs, supports_pilot_jobs,
-                                                       {std::make_pair(vm_hostname, num_cores)},
+                                                       {std::make_tuple(vm_hostname, num_cores, DBL_MAX)},
                                                        default_storage_service, plist));
 
           cs->setSimulation(this->simulation);

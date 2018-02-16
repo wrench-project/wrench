@@ -77,7 +77,7 @@ namespace wrench {
         MultihostMulticoreComputeService(const std::string &hostname,
                                          bool supports_standard_jobs,
                                          bool supports_pilot_jobs,
-                                         std::set<std::pair<std::string, unsigned long>> compute_resources,
+                                         std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                          StorageService *default_storage_service,
                                          std::map<std::string, std::string> plist = {});
 
@@ -125,15 +125,16 @@ namespace wrench {
         MultihostMulticoreComputeService(const std::string &hostname,
                                          bool supports_standard_jobs,
                                          bool supports_pilot_jobs,
-                                         std::set<std::pair<std::string, unsigned long>> compute_resources,
+                                         std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                          std::map<std::string, std::string> plist,
                                          double ttl,
                                          PilotJob *pj, std::string suffix,
                                          StorageService *default_storage_service);
 
-        std::set<std::pair<std::string, unsigned long>> compute_resources;
-        // Core availabilities (for each hosts, how many cores are currently available on it)
-        std::map<std::string, unsigned long> core_availabilities;
+        std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
+
+        // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
+        std::map<std::string, std::pair<unsigned long, double>> core_and_ram_availabilities;
         unsigned long total_num_cores;
 
         double ttl;
@@ -185,9 +186,9 @@ namespace wrench {
 
         bool dispatchPilotJob(PilotJob *job);
 
-        std::set<std::pair<std::string, unsigned long>> computeResourceAllocation(StandardJob *job);
+        std::set<std::tuple<std::string, unsigned long, double>> computeResourceAllocation(StandardJob *job);
 
-        std::set<std::pair<std::string, unsigned long>> computeResourceAllocationAggressive(StandardJob *job);
+        std::set<std::tuple<std::string, unsigned long, double>> computeResourceAllocationAggressive(StandardJob *job);
 
 
 //        void createWorkForNewlyDispatchedJob(StandardJob *job);

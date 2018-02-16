@@ -156,7 +156,7 @@ namespace wrench {
 
         std::string convertAvailableResourcesToJsonString(std::map<std::string, unsigned long>);
 
-        std::string convertResourcesToJsonString(std::set<std::pair<std::string, unsigned long>>);
+        std::string convertResourcesToJsonString(std::set<std::tuple<std::string, unsigned long, double>>);
 
         //submits the standard job
         //overriden function of parent Compute Service
@@ -188,7 +188,7 @@ namespace wrench {
 
         void terminatePilotJob(PilotJob *job) override;
 
-        std::set<std::pair<std::string, unsigned long>> scheduleOnHosts(std::string host_selection_algorithm,
+        std::set<std::tuple<std::string, unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
                                                                         unsigned long, unsigned long);
 
         BatchJob *scheduleJob(std::string);
@@ -215,7 +215,7 @@ namespace wrench {
         void notifyJobSubmitters(PilotJob *job);
 
         //update the resources
-        void updateResources(std::set<std::pair<std::string, unsigned long>> resources);
+        void updateResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
 
         void updateResources(StandardJob *job);
 
@@ -232,7 +232,7 @@ namespace wrench {
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
         //process execution of job
-        void processExecution(std::set<std::pair<std::string, unsigned long>>, WorkflowJob *,
+        void processExecution(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
                               BatchJob *, unsigned long, unsigned long, unsigned long);
 
         //notify batsched about job completion/failure/killed events

@@ -163,7 +163,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                nullptr,
                                                                {}))));
   std::set<wrench::ComputeService *> compute_services;
@@ -325,7 +325,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                nullptr,
                                                                {}))));
   std::set<wrench::ComputeService *> compute_services;

@@ -450,13 +450,13 @@ namespace wrench {
       }
     }
 
-    void BatchService::updateResources(std::set<std::pair<std::string, unsigned long>> resources) {
+    void BatchService::updateResources(std::set<std::tuple<std::string, unsigned long, double>> resources) {
       if (resources.empty()) {
         return;
       }
       std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
-      for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
-        this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
+      for (auto r : resources) {
+        this->available_nodes_to_cores[std::get<0>(r)] += std::get<1>(r);
       }
     }
 
@@ -469,10 +469,10 @@ namespace wrench {
         if ((*it)->getWorkflowJob() == job) {
           job_on_the_list = true;
           // Update the cores count in the available resources
-          std::set<std::pair<std::string, unsigned long>> resources = (*it)->getResourcesAllocated();
-          std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
-          for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
-            this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
+          std::set<std::tuple<std::string, unsigned long, double>> resources = (*it)->getResourcesAllocated();
+//          std::set<std::tuple<std::string, unsigned long, double>>::iterator resource_it;
+          for (auto r : resources) {
+            this->available_nodes_to_cores[std::get<0>(r)] += std::get<1>(r);
           }
           this->running_jobs.erase(it);
           break;
@@ -493,7 +493,7 @@ namespace wrench {
       for (it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
         if ((*it)->getWorkflowJob() == job) {
           // Update the cores count in the available resources
-          std::set<std::pair<std::string, unsigned long>> resources = (*it)->getResourcesAllocated();
+          std::set<std::tuple<std::string, unsigned long, double>> resources = (*it)->getResourcesAllocated();
           job_id = std::to_string((*it)->getJobID());
           this->updateResources(resources);
           this->running_jobs.erase(it);
@@ -588,10 +588,10 @@ namespace wrench {
       return;
     }
 
-    std::set<std::pair<std::string, unsigned long>> BatchService::scheduleOnHosts(std::string host_selection_algorithm,
+    std::set<std::tuple<std::string, unsigned long, double>> BatchService::scheduleOnHosts(std::string host_selection_algorithm,
                                                                                   unsigned long num_nodes,
                                                                                   unsigned long cores_per_node) {
-      std::set<std::pair<std::string, unsigned long>> resources = {};
+      std::set<std::tuple<std::string, unsigned long, double>> resources = {};
       std::vector<std::string> hosts_assigned = {};
       if (host_selection_algorithm == "FIRSTFIT") {
         std::map<std::string, unsigned long>::iterator it;
@@ -602,7 +602,7 @@ namespace wrench {
             //Remove that many cores from the available_nodes_to_core
             (*it).second -= cores_per_node;
             hosts_assigned.push_back((*it).first);
-            resources.insert(std::make_pair((*it).first, cores_per_node));
+            resources.insert(std::make_tuple((*it).first, cores_per_node, 0));  // TODO: RAM is set to 0 here for now
             if (++host_count >= num_nodes) {
               break;
             }
@@ -651,7 +651,7 @@ namespace wrench {
           }
           this->available_nodes_to_cores[target_host] -= cores_per_node;
           hosts_assigned.push_back(target_host);
-          resources.insert(std::make_pair(target_host, cores_per_node));
+          resources.insert(std::make_tuple(target_host, cores_per_node, 0)); // TODO: RAM is set to 0 for now
         }
       } else {
         throw std::invalid_argument(
@@ -729,7 +729,7 @@ namespace wrench {
 
 
       //Try to schedule hosts based on FIRSTFIT OR BESTFIT
-      std::set<std::pair<std::string,unsigned long>> resources = this->scheduleOnHosts(this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
+      std::set<std::tuple<std::string,unsigned long,double>> resources = this->scheduleOnHosts(this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
                                                                                        num_nodes_asked_for,cores_per_node_asked_for);
 
       if(resources.empty()){
@@ -1102,10 +1102,9 @@ namespace wrench {
           job_on_the_list = true;
           job_id = std::to_string((*it)->getJobID());
           // Update the cores count in the available resources
-          std::set<std::pair<std::string, unsigned long>> resources = (*it)->getResourcesAllocated();
-          std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
-          for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
-            this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
+          std::set<std::tuple<std::string, unsigned long, double>> resources = (*it)->getResourcesAllocated();
+          for (auto r : resources) {
+            this->available_nodes_to_cores[std::get<0>(r)] += std::get<1>(r);
           }
           this->running_jobs.erase(it);
           break;
@@ -1200,10 +1199,9 @@ namespace wrench {
           job_id = std::to_string(it1->get()->getJobID());
           this->processPilotJobTimeout((PilotJob *) (*it1)->getWorkflowJob());
           // Update the cores count in the available resources
-          std::set<std::pair<std::string, unsigned long>> resources = (*it1)->getResourcesAllocated();
-          std::set<std::pair<std::string, unsigned long>>::iterator resource_it;
-          for (resource_it = resources.begin(); resource_it != resources.end(); resource_it++) {
-            this->available_nodes_to_cores[(*resource_it).first] += (*resource_it).second;
+          std::set<std::tuple<std::string, unsigned long, double>> resources = (*it1)->getResourcesAllocated();
+          for (auto r : resources) {
+            this->available_nodes_to_cores[std::get<0>(r)] += std::get<1>(r);
           }
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                   job, this, true, nullptr,
@@ -1435,7 +1433,7 @@ namespace wrench {
 
 
     void
-    BatchService::processExecution(std::set<std::pair<std::string, unsigned long>> resources, WorkflowJob *workflow_job,
+    BatchService::processExecution(std::set<std::tuple<std::string, unsigned long, double>> resources, WorkflowJob *workflow_job,
                                    BatchJob *batch_job, unsigned long num_nodes_allocated,
                                    unsigned long time_in_minutes,
                                    unsigned long cores_per_node_asked_for) {
@@ -1482,11 +1480,11 @@ namespace wrench {
           WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job",
                       num_nodes_allocated, cores_per_node_asked_for);
 
-          std::string host_to_run_on = resources.begin()->first;
           std::vector<std::string> nodes_for_pilot_job = {};
-          for (auto it = resources.begin(); it != resources.end(); it++) {
-            nodes_for_pilot_job.push_back(it->first);
+          for (auto r : resources) {
+            nodes_for_pilot_job.push_back(std::get<0>(r));
           }
+          std::string host_to_run_on = nodes_for_pilot_job[0];
 
           //set the ending timestamp of the batchjob (pilotjob)
 
@@ -1598,7 +1596,7 @@ namespace wrench {
       unsigned long time_in_minutes = batch_job->getAllocatedTime();
       unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
 
-      std::set<std::pair<std::string, unsigned long>> resources = {};
+      std::set<std::tuple<std::string, unsigned long, double>> resources = {};
       std::vector<std::string> hosts_assigned = {};
       std::map<std::string, unsigned long>::iterator it;
 
@@ -1607,7 +1605,7 @@ namespace wrench {
                 BatchServiceProperty::BATCH_FAKE_SUBMISSION) == "false") {
           this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
         }
-        resources.insert(std::make_pair(this->host_id_to_names[node], cores_per_node_asked_for));
+        resources.insert(std::make_tuple(this->host_id_to_names[node], cores_per_node_asked_for, 0)); // TODO: Is setting RAM to 0 ok here?
       }
 
       if (this->getPropertyValueAsString(
@@ -1794,13 +1792,14 @@ namespace wrench {
       return result;
     }
 
-    std::string BatchService::convertResourcesToJsonString(std::set<std::pair<std::string, unsigned long>> resources) {
+    std::string BatchService::convertResourcesToJsonString(std::set<std::tuple<std::string, unsigned long, double>> resources) {
+      // We completely ignore RAM here
       std::string output = "";
       std::string convrt = "";
       std::string result = "";
-      for (auto it = resources.cbegin(); it != resources.cend(); it++) {
-        convrt = std::to_string(it->second);
-        output += (it->first) + ":" + (convrt) + ", ";
+      for (auto r : resources) {
+        convrt = std::to_string(std::get<1>(r));
+        output += std::get<0>(r) + ":" + (convrt) + ", ";
       }
       result = output.substr(0, output.size() - 2);
       return result;

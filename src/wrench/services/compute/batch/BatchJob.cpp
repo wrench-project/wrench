@@ -65,11 +65,11 @@ namespace wrench {
       this->ending_time_stamp = time_stamp;
     }
 
-    std::set<std::pair<std::string, unsigned long>> BatchJob::getResourcesAllocated() {
+    std::set<std::tuple<std::string, unsigned long, double>> BatchJob::getResourcesAllocated() {
       return this->resources_allocated;
     }
 
-    void BatchJob::setAllocatedResources(std::set<std::pair<std::string, unsigned long>> resources) {
+    void BatchJob::setAllocatedResources(std::set<std::tuple<std::string, unsigned long, double>> resources) {
       if (resources.empty()) {
         throw std::invalid_argument(
                 "BatchJob::setAllocatedResources(): Empty Resources allocated"
