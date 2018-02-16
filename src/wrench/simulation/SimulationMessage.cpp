@@ -8,7 +8,7 @@
  *
  */
 
-#include "SimulationMessage.h"
+#include "wrench/simulation/SimulationMessage.h"
 #include "wrench/workflow/WorkflowFile.h"
 
 namespace wrench {

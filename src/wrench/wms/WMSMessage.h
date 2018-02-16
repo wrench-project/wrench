@@ -10,7 +10,7 @@
 #ifndef WRENCH_WMSMESSAGE_H
 #define WRENCH_WMSMESSAGE_H
 
-#include "simulation/SimulationMessage.h"
+#include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 
