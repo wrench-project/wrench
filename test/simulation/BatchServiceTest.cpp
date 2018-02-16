@@ -2221,6 +2221,7 @@ private:
 
       // Terminate everything
       this->shutdownAllServices();
+      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service2);
       return 0;
     }
 };
@@ -2385,6 +2386,7 @@ private:
 
       // Terminate everything
       this->shutdownAllServices();
+      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service2);
       return 0;
     }
 };
@@ -2547,11 +2549,11 @@ private:
           try {
             std::cout << "Listening to mailbox " << this->workflow->getCallbackMailbox() << "\n";
             message = wrench::S4U_Mailbox::getMessage(this->workflow->getCallbackMailbox());
-          } catch (std::shared_ptr<wrench::NetworkError> cause) {
+          } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw wrench::WorkflowExecutionException(cause);
           }
 
-          if (wrench::ComputeServiceInformationMessage *m = dynamic_cast<wrench::ComputeServiceInformationMessage *>(message.get())) {
+          if (auto *m = dynamic_cast<wrench::ComputeServiceInformationMessage *>(message.get())) {
             std::cout << "Resources information obtained " << m->information << "\n";
           } else {
             throw std::runtime_error(
@@ -2564,6 +2566,7 @@ private:
 
       // Terminate everything
       this->shutdownAllServices();
+      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service2);
       return 0;
     }
 };
@@ -2584,9 +2587,9 @@ TEST_F(BatchServiceTest, DISABLED_BatchTraceFileJobSubmissionTest) {
 void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto simulation = new wrench::Simulation();
   int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
+  auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
