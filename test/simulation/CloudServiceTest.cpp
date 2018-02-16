@@ -140,6 +140,23 @@ private:
         throw std::runtime_error(e.what());
       }
 
+      // Wait for a workflow execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+      try {
+        event = this->workflow->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
+      }
+
       // Terminate
       this->shutdownAllServices();
       return 0;
@@ -208,7 +225,7 @@ public:
     CloudPilotJobTestWMS(CloudServiceTest *test,
                          wrench::Workflow *workflow,
                          std::unique_ptr<wrench::Scheduler> scheduler,
-                         std::set<wrench::ComputeService *> compute_services,
+                         std::set<wrench::ComputeService *> &compute_services,
                          std::string &hostname) :
             wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
@@ -246,6 +263,27 @@ private:
 
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
+      }
+
+      // Wait for a workflow execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+      try {
+        event = this->workflow->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          // success, do nothing for now
+          break;
+        }
+        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
       }
 
       // Terminate
@@ -316,7 +354,7 @@ public:
     CloudNumCoresTestWMS(CloudServiceTest *test,
                          wrench::Workflow *workflow,
                          std::unique_ptr<wrench::Scheduler> scheduler,
-                         std::set<wrench::ComputeService *> compute_services,
+                         std::set<wrench::ComputeService *> &compute_services,
                          std::string &hostname) :
             wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
       this->test = test;
