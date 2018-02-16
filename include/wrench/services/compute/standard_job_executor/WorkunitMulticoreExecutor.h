@@ -43,6 +43,7 @@ namespace wrench {
                      Simulation *simulation,
                      std::string hostname,
                      unsigned long num_cores,
+                     double ram_utilization,
                      std::string callback_mailbox,
                      Workunit *workunit,
                      StorageService *default_storage_service,
@@ -52,6 +53,7 @@ namespace wrench {
 
         std::string getHostname();
         unsigned long getNumCores();
+        double getMemoryUtilization();
 
         /** @brief The Workunit this WorkunitExecutor is supposed to perform */
         Workunit *workunit;
@@ -68,6 +70,7 @@ namespace wrench {
         std::string callback_mailbox;
         std::string hostname;
         unsigned long num_cores;
+        double ram_utilization;
         double thread_startup_overhead;
 
         StorageService *default_storage_service;

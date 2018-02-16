@@ -347,7 +347,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                nullptr, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);
@@ -462,11 +462,11 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a Compute Service
+  // Create a  Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, 1, 0)},
                                                                nullptr, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);
@@ -628,7 +628,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                nullptr, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);
@@ -848,7 +848,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                nullptr, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);
@@ -1085,7 +1085,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
                                                                nullptr, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);

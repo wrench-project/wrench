@@ -229,16 +229,17 @@ namespace wrench {
      * @param hostname: the name of the host on which the job executor should be started
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param compute_resources: compute_resources: a list of <hostname, num_cores> pairs, which represent
-     *        the compute resources available to this service. A number of cores equal to 0 means
-     *        that all cores on the host are used.
+     * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
+     *        the compute resources available to this service.
+     *          - num_cores = ULONG_MAX: use all cores available on the host
+     *          - memory = DBL_MAX: use all RAM available on the host
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
                                                                        bool supports_standard_jobs,
                                                                        bool supports_pilot_jobs,
-                                                                       std::set<std::pair<std::string, unsigned long>> compute_resources,
+                                                                       std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                                                        StorageService *default_storage_service,
                                                                        std::map<std::string, std::string> plist) :
             MultihostMulticoreComputeService::MultihostMulticoreComputeService(hostname,
@@ -255,7 +256,7 @@ namespace wrench {
      * @param hostname: the name of the host
      * @param supports_standard_jobs: true if the job executor should support standard jobs
      * @param supports_pilot_jobs: true if the job executor should support pilot jobs
-     * @param compute_resources: compute_resources: a list of <hostname, num_cores> pairs, which represent
+     * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
      *        the compute resources available to this service
      * @param plist: a property list
      * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
@@ -269,7 +270,7 @@ namespace wrench {
             const std::string &hostname,
             bool supports_standard_jobs,
             bool supports_pilot_jobs,
-            std::set<std::pair<std::string, unsigned long>> compute_resources,
+            std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
             std::map<std::string, std::string> plist,
             double ttl,
             PilotJob *pj,
@@ -290,25 +291,44 @@ namespace wrench {
         std::string hname = std::get<0>(host);
         unsigned long requested_cores = std::get<1>(host);
         unsigned long available_cores = S4U_Simulation::getNumCores(hname);
-        if (requested_cores == 0) {
+        if (requested_cores == ULONG_MAX) {
           requested_cores = available_cores;
+        }
+        if (requested_cores == 0) {
+          throw std::invalid_argument(
+                  "MultihostMulticoreComputeService::MultihostMulticoreComputeService(): at least 1 core should be requested");
         }
         if (requested_cores > available_cores) {
           throw std::invalid_argument(
                   "MultihostMulticoreComputeService::MultihostMulticoreComputeService(): host " + hname + "only has " +
-                  std::to_string(available_cores) + " but " +
+                  std::to_string(available_cores) + " cores but " +
                   std::to_string(requested_cores) + " are requested");
         }
 
-        this->compute_resources.insert(std::make_pair(hname, requested_cores));
+        double requested_ram = std::get<2>(host);
+        double available_ram = S4U_Simulation::getMemoryCapacity(hname);
+        if (requested_ram < 0) {
+          throw std::invalid_argument(
+                  "MultihostMulticoreComputeService::MultihostMulticoreComputeService(): requested ram should be non-negative");
+        }
+        if (requested_ram == DBL_MAX) {
+          requested_ram = available_ram;
+        }
+        if (requested_ram > available_ram) {
+          throw std::invalid_argument(
+                  "MultihostMulticoreComputeService::MultihostMulticoreComputeService(): host " + hname + "only has " +
+                  std::to_string(available_ram) + " bytes of RAM but " +
+                  std::to_string(requested_ram) + " are requested");
+        }
+
+        this->compute_resources.insert(std::make_tuple(hname, requested_cores, requested_ram));
       }
 
-      // Compute the total number of cores and set initial core availabilities
+      // Compute the total number of cores and set initial core (and ram) availabilities
       this->total_num_cores = 0;
       for (auto host : this->compute_resources) {
         this->total_num_cores += std::get<1>(host);
-        this->core_availabilities.insert(std::make_pair(std::get<0>(host), std::get<1>(host)));
-//        this->core_availabilities[std::get<0>(host)] = std::get<1>(host);
+        this->core_and_ram_availabilities.insert(std::make_pair(std::get<0>(host), std::make_pair(std::get<1>(host), S4U_Simulation::getMemoryCapacity(std::get<0>(host)))));
       }
 
       this->ttl = ttl;
@@ -404,7 +424,7 @@ namespace wrench {
      * @param job: the job
      * @return the resource allocation
      */
-    std::set<std::pair<std::string, unsigned long>>
+    std::set<std::tuple<std::string, unsigned long, double>>
     MultihostMulticoreComputeService::computeResourceAllocation(StandardJob *job) {
 
       std::string resource_allocation_policy =
@@ -424,14 +444,14 @@ namespace wrench {
      * @param job: the job
      * @return the resource allocation
      */
-    std::set<std::pair<std::string, unsigned long>>
+    std::set<std::tuple<std::string, unsigned long, double>>
     MultihostMulticoreComputeService::computeResourceAllocationAggressive(StandardJob *job) {
 
-      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION: %ld", this->core_availabilities.size());
-      // Make a copy of core_availabilities
-      std::map<std::string, unsigned long> tentative_availabilities;
-      for (auto r : this->core_availabilities) {
-        tentative_availabilities.insert(std::make_pair(r.first, r.second));
+      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION: %ld", this->core_and_ram_availabilities.size());
+      // Make a copy of core_and_ram_availabilities
+      std::map<std::string, std::pair<unsigned long, double>> tentative_core_and_ram_availabilities;
+      for (auto r : this->core_and_ram_availabilities) {
+        tentative_core_and_ram_availabilities.insert(std::make_pair(r.first, std::make_pair(std::get<0>(r.second), std::get<1>(r.second))));
       }
 
       // Make a copy of the tasks
@@ -448,19 +468,22 @@ namespace wrench {
         WorkflowTask *picked_task = nullptr;
         std::string picked_picked_host;
         unsigned long picked_picked_num_cores = 0;
+        double picked_picked_ram = 0.0;
 
         for (auto t : tasks) {
 //          WRENCH_INFO("LOOKING AT TASK %s", t->getId().c_str());
           std::string picked_host;
           unsigned long picked_num_cores = 0;
+          double picked_ram = 0.0;
 
 //          WRENCH_INFO("---> %ld", tentative_availabilities.size());
-          for (auto r : tentative_availabilities) {
+          for (auto r : tentative_core_and_ram_availabilities) {
 //            WRENCH_INFO("   LOOKING AT HOST %s", r.first.c_str());
             std::string hostname = r.first;
-            unsigned long num_available_cores = r.second;
+            unsigned long num_available_cores = std::get<0>(r.second);
+            double available_ram = std::get<1>(r.second);
 
-            if (num_available_cores < t->getMinNumCores()) {
+            if ((num_available_cores < t->getMinNumCores()) or (available_ram < t->getMemoryRequirement())) {
 //              WRENCH_INFO("      NO DICE");
               continue;
             }
@@ -476,6 +499,7 @@ namespace wrench {
             if ((picked_num_cores == 0) || (picked_num_cores < MIN(num_available_cores, desired_num_cores))) {
               picked_host = hostname;
               picked_num_cores = MIN(num_available_cores, desired_num_cores);
+              picked_ram = t->getMemoryRequirement();
             }
           }
 
@@ -489,13 +513,15 @@ namespace wrench {
 //                        t->getId().c_str(), picked_host.c_str(), picked_num_cores);
             picked_task = t;
             picked_picked_num_cores = picked_num_cores;
+            picked_picked_ram = picked_ram;
             picked_picked_host = picked_host;
           }
         }
 
         if (picked_picked_num_cores != 0) {
           // Update availabilities
-          tentative_availabilities[picked_picked_host] -= picked_picked_num_cores;
+          std::get<0>(tentative_core_and_ram_availabilities[picked_picked_host]) -= picked_picked_num_cores;
+          std::get<1>(tentative_core_and_ram_availabilities[picked_picked_host]) -= picked_picked_ram;
           // Remove the task
           tasks.erase(picked_task);
           // We should keep trying!
@@ -503,15 +529,19 @@ namespace wrench {
         }
       }
 
-      // Come up with allocation based on tentative availabilities!
-      std::set<std::pair<std::string, unsigned long>> allocation;
-      for (auto r : tentative_availabilities) {
-        std::string hostname = r.first;
-        unsigned long num_cores = r.second;
 
-        if (num_cores < this->core_availabilities[hostname]) {
-//          WRENCH_INFO("ALLOCATION %s/%ld", hostname.c_str(), this->core_availabilities[hostname] - num_cores);
-          allocation.insert(std::make_pair(hostname, this->core_availabilities[hostname] - num_cores));
+      // Come up with allocation based on tentative availabilities!
+      std::set<std::tuple<std::string, unsigned long, double>> allocation;
+      for (auto r : tentative_core_and_ram_availabilities) {
+        std::string hostname = r.first;
+        unsigned long num_cores = std::get<0>(r.second);
+        double ram = std::get<1>(r.second);
+
+        if ((num_cores <= std::get<0>(this->core_and_ram_availabilities[hostname])) and
+                (ram <= std::get<1>(this->core_and_ram_availabilities[hostname]))) {
+//          WRENCH_INFO("ALLOCATION %s/%ld-%.2lf", hostname.c_str(), std::get<0>(this->core_and_ram_availabilities[hostname]) - num_cores, std::get<1>(this->core_and_ram_availabilities[hostname]) - ram);
+          allocation.insert(std::make_tuple(hostname, std::get<0>(this->core_and_ram_availabilities[hostname]) - num_cores,
+                                            std::get<1>(this->core_and_ram_availabilities[hostname]) - ram));
         }
       }
 
@@ -526,22 +556,23 @@ namespace wrench {
     bool MultihostMulticoreComputeService::dispatchStandardJob(StandardJob *job) {
 
       // Compute the required minimum number of cores
-      unsigned long minimum_required_num_cores = 1;
-
-//      WRENCH_INFO("IN DISPATCH");
-//      for (auto r : this->core_availabilities) {
-//        WRENCH_INFO("   --> %s %ld", std::get<0>(r).c_str(), std::get<1>(r));
-//      }
-
+      unsigned long max_min_required_num_cores = 1;
       for (auto t : (job)->getTasks()) {
-        minimum_required_num_cores = MAX(minimum_required_num_cores, t->getMinNumCores());
+        max_min_required_num_cores = MAX(max_min_required_num_cores, t->getMinNumCores());
       }
 
-      // Find the list of hosts with the required number of cores
+      // Compute the required minimum ram
+      double max_min_required_ram = 0.0;
+      for (auto t : (job)->getTasks()) {
+        max_min_required_ram = MAX(max_min_required_ram, t->getMemoryRequirement());
+      }
+
+      // Find the list of hosts with the required number of cores AND the required RAM
       std::set<std::string> possible_hosts;
-      for (auto it = this->core_availabilities.begin(); it != this->core_availabilities.end(); it++) {
-        WRENCH_INFO("%s: %ld", it->first.c_str(), it->second);
-        if (it->second >= minimum_required_num_cores) {
+      for (auto it = this->core_and_ram_availabilities.begin(); it != this->core_and_ram_availabilities.end(); it++) {
+        WRENCH_INFO("%s: %ld %.2lf", it->first.c_str(), std::get<0>(it->second), std::get<1>(it->second));
+        if ((std::get<0>(it->second) >= max_min_required_num_cores) and
+                (std::get<1>(it->second) >= max_min_required_ram)) {
           possible_hosts.insert(it->first);
         }
       }
@@ -569,18 +600,21 @@ namespace wrench {
 //      WRENCH_INFO("MAXIMUM NUMBER OF CORES = %ld", maximum_num_cores);
 
       // Allocate resources for the job based on resource allocation strategies
-      std::set<std::pair<std::string, unsigned long>> compute_resources;
+      std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
       compute_resources = computeResourceAllocation(job);
 
       // Update core availabilities (and compute total number of cores for printing)
       unsigned long total_cores = 0;
+      double total_ram = 0.0;
       for (auto r : compute_resources) {
-        this->core_availabilities[std::get<0>(r)] -= std::get<1>(r);
+        std::get<0>(this->core_and_ram_availabilities[std::get<0>(r)]) -= std::get<1>(r);
+        std::get<1>(this->core_and_ram_availabilities[std::get<0>(r)]) -= std::get<2>(r);
         total_cores += std::get<1>(r);
+        total_ram += std::get<2>(r);
       }
 
-      WRENCH_INFO("Creating a StandardJobExecutor on %ld hosts (%ld cores in total) for a standard job",
-                  compute_resources.size(), total_cores);
+      WRENCH_INFO("Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2lf bytes of RAM) for a standard job",
+                  compute_resources.size(), total_cores, total_ram);
       // Create a standard job executor
       StandardJobExecutor *executor = new StandardJobExecutor(
               this->simulation,
@@ -614,10 +648,10 @@ namespace wrench {
      */
     bool MultihostMulticoreComputeService::dispatchPilotJob(PilotJob *job) {
 
-      // Find a list of hosts with the required number of cores
+      // Find a list of hosts with the required number of cores and ram
       std::vector<std::string> chosen_hosts;
-      for (auto &core_availability : this->core_availabilities) {
-        if (core_availability.second >= job->getNumCoresPerHost()) {
+      for (auto &core_availability : this->core_and_ram_availabilities) {
+        if ((std::get<0>(core_availability.second) >= job->getNumCoresPerHost()) and (std::get<1>(core_availability.second) >= job->getMemoryPerHost())){
           chosen_hosts.push_back(core_availability.first);
           if (chosen_hosts.size() == job->getNumHosts()) {
             break;
@@ -633,15 +667,16 @@ namespace wrench {
       /* Allocate resources to the job */
       WRENCH_INFO("Allocating %ld/%ld hosts/cores to a pilot job", job->getNumHosts(), job->getNumCoresPerHost());
 
-      // Update core availabilities
+      // Update core and ram availabilities
       for (auto h : chosen_hosts) {
-        this->core_availabilities[h] -= job->getNumCoresPerHost();
+        std::get<0>(this->core_and_ram_availabilities[h]) -= job->getNumCoresPerHost();
+        std::get<1>(this->core_and_ram_availabilities[h]) -= job->getMemoryPerHost();
       }
 
       // Creates a compute service (that does not support pilot jobs!!)
-      std::set<std::pair<std::string, unsigned long>> compute_resources;
+      std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
       for (auto h : chosen_hosts) {
-        compute_resources.insert(std::make_pair(h, job->getNumCoresPerHost()));
+        compute_resources.insert(std::make_tuple(h, job->getNumCoresPerHost(), job->getMemoryPerHost()));
       }
 
       ComputeService *cs = new MultihostMulticoreComputeService(this->hostname,
@@ -955,7 +990,7 @@ namespace wrench {
         std::string hostname = std::get<0>(r);
         unsigned long num_cores = std::get<1>(r);
 
-        this->core_availabilities[hostname] -= num_cores;
+        std::get<0>(this->core_and_ram_availabilities[hostname]) -= num_cores;
       }
     }
 
@@ -992,9 +1027,13 @@ namespace wrench {
     void
     MultihostMulticoreComputeService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
 
-      // Update core availabilities
+      // Update core and ram availabilities
       for (auto r : executor->getComputeResources()) {
-        this->core_availabilities[r.first] += r.second;
+        std::string hostname = std::get<0>(r);
+        unsigned long num_cores = std::get<1>(r);
+        double ram = std::get<2>(r);
+        std::get<0>(this->core_and_ram_availabilities[hostname]) += num_cores;
+        std::get<1>(this->core_and_ram_availabilities[hostname]) += ram;
 
       }
 
@@ -1048,11 +1087,16 @@ namespace wrench {
                                                                      StandardJob *job,
                                                                      std::shared_ptr<FailureCause> cause) {
 
-      // Update core availabilities
+      // Update core and ram availabilities
       for (auto r : executor->getComputeResources()) {
-        this->core_availabilities[r.first] += r.second;
+        std::string hostname = std::get<0>(r);
+        unsigned long num_cores = std::get<1>(r);
+        double ram = std::get<2>(r);
+        std::get<0>(this->core_and_ram_availabilities[hostname]) += num_cores;
+        std::get<1>(this->core_and_ram_availabilities[hostname]) += ram;
 
       }
+
 
       // Remove the executor from the executor list
       bool found_it = false;
@@ -1130,12 +1174,14 @@ namespace wrench {
 
       auto *cs = (MultihostMulticoreComputeService *) job->getComputeService();
 
-      // Update core availabilities
+      // Update core and ram availabilities
       for (auto r : cs->compute_resources) {
         std::string hostname = std::get<0>(r);
-        unsigned long num_cores = std::get<1>(r);
+        unsigned long num_cores = job->getNumCoresPerHost();
+        double ram = job->getMemoryPerHost();
 
-        this->core_availabilities[hostname] += num_cores;
+        std::get<0>(this->core_and_ram_availabilities[hostname]) += num_cores;
+        std::get<1>(this->core_and_ram_availabilities[hostname]) += ram;
       }
 
       // Forward the notification
@@ -1381,7 +1427,7 @@ namespace wrench {
 //     */
 //    void MultihostMulticoreComputeService::processGetNumIdleCores(const std::string &answer_mailbox) {
 //      unsigned long num_available_cores = 0;
-//      for (auto r : this->core_availabilities) {
+//      for (auto r : this->core_and_ram_availabilities) {
 //        num_available_cores += r.second;
 //      }
 //      ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
@@ -1425,15 +1471,18 @@ namespace wrench {
       }
 
       // Can we run this job assuming the whole set of resources is available?
-      unsigned long max_min_num_cores = 0;
-      for (auto t : job->getTasks()) {
-        max_min_num_cores = MAX(max_min_num_cores, t->getMinNumCores());
-      }
+      // Let's check for each task
       bool enough_resources = false;
-      for (auto r : this->compute_resources) {
-        unsigned long num_cores = r.second;
-        if (num_cores >= max_min_num_cores) {
-          enough_resources = true;
+      for (auto t : job->getTasks()) {
+        unsigned long required_num_cores = t->getMinNumCores();
+        double required_ram = t->getMemoryRequirement();
+
+        for (auto r : this->compute_resources) {
+          unsigned long num_cores = std::get<1>(r);
+          double ram = std::get<2>(r);
+          if ((num_cores >= required_num_cores) and (ram >= required_ram)) {
+            enough_resources = true;
+          }
         }
       }
 
@@ -1493,7 +1542,7 @@ namespace wrench {
       // count the number of hosts that have enough cores
       unsigned long num_possible_hosts = 0;
       for (const auto &compute_resource : this->compute_resources) {
-        if (compute_resource.second >= job->getNumCoresPerHost()) {
+        if (std::get<1>(compute_resource) >= job->getNumCoresPerHost()) {
           num_possible_hosts++;
         }
       }
@@ -1535,29 +1584,29 @@ namespace wrench {
 
       // Num cores per hosts
       std::vector<double> num_cores;
-      for (auto h : this->compute_resources) {
-        num_cores.push_back((double)(h.second));
+      for (auto r : this->compute_resources) {
+        num_cores.push_back((double)(std::get<1>(r)));
       }
       dict.insert(std::make_pair("num_cores",num_cores));
 
       // Num idle cores per hosts
       std::vector<double> num_idle_cores;
-      for (auto h : this->core_availabilities) {
-        num_idle_cores.push_back((double)(h.second));
+      for (auto r : this->core_and_ram_availabilities) {
+        num_idle_cores.push_back(std::get<0>(r.second));
       }
       dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
 
       // Flop rate per host
       std::vector<double> flop_rates;
       for (auto h : this->compute_resources) {
-        flop_rates.push_back(S4U_Simulation::getFlopRate(h.first));
+        flop_rates.push_back(S4U_Simulation::getFlopRate(std::get<0>(h)));
       }
       dict.insert(std::make_pair("flop_rates", flop_rates));
 
       // RAM capacity per host
       std::vector<double> ram_capacities;
       for (auto h : this->compute_resources) {
-        ram_capacities.push_back(S4U_Simulation::getMemoryCapacity(h.first));
+        ram_capacities.push_back(S4U_Simulation::getMemoryCapacity(std::get<0>(h)));
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
