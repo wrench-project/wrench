@@ -45,8 +45,8 @@ namespace wrench {
      * @param job: the job to execute
      * @param compute_resources: a non-empty list of <hostname, num_cores, memory> tuples, which represent
      *           the compute resources the job should execute on
-     *              - If num_cores == ULONG_MAX, then ALL the cores of the host are used
-     *              - If memory == DBL_MAX, then ALL the ram of the host is used
+     *              - If num_cores == ComputeService::ALL_CORES, then ALL the cores of the host are used
+     *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list
      *
@@ -71,7 +71,7 @@ namespace wrench {
         if (std::get<1>(host) == 0) {
           throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): there should be at least one core per host");
         }
-        if (std::get<1>(host) < ULONG_MAX) {
+        if (std::get<1>(host) < ComputeService::ALL_CORES) {
           if (std::get<1>(host) > S4U_Simulation::getNumCores(std::get<0>(host))) {
             throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
                                                 " has only " + std::to_string(S4U_Simulation::getNumCores(std::get<0>(host))) + " cores");
@@ -87,7 +87,7 @@ namespace wrench {
         if (std::get<2>(host) < 0) {
           throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): the number of bytes per host should be non-negative");
         }
-        if (std::get<2>(host) < DBL_MAX) {
+        if (std::get<2>(host) < ComputeService::ALL_RAM) {
           if (std::get<2>(host) > S4U_Simulation::getMemoryCapacity(std::get<0>(host))) {
             throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
                                                 " has only " + std::to_string(S4U_Simulation::getMemoryCapacity(std::get<0>(host))) + " bytes of RAM");

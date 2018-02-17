@@ -24,7 +24,7 @@ namespace wrench {
      * @param id: the task id
      * @param flops: the task's number of flops
      * @param min_cores: the minimum number of cores required for running the task
-     * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
+     * @param max_cores: the maximum number of cores that the task can use (infinity: ComputeService::ALL_CORES)
      * @param parallel_efficiency: the multi-core parallel efficiency
      * @param memory_requirement: memory requirement in bytes
      */

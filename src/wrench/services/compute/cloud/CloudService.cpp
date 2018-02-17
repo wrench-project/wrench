@@ -416,10 +416,10 @@ namespace wrench {
                                                                                       pm_hostname), num_cores);
 
           // create a multihost multicore computer service for the VM
-          // TODO: Don't pass DBL_MAX for the RAM perhaps?
+          // TODO: Don't pass ComputeService::ALL_RAM for the RAM perhaps?
           std::unique_ptr<ComputeService> cs(
                   new MultihostMulticoreComputeService(vm_hostname, supports_standard_jobs, supports_pilot_jobs,
-                                                       {std::make_tuple(vm_hostname, num_cores, DBL_MAX)},
+                                                       {std::make_tuple(vm_hostname, num_cores, ComputeService::ALL_RAM)},
                                                        default_storage_service, plist));
 
           cs->setSimulation(this->simulation);
@@ -668,12 +668,12 @@ namespace wrench {
       // RAM capacity per host
       std::vector<double> ram_capacities;
       for (auto &vm : this->vm_list) {
-        ram_capacities.push_back(DBL_MAX);  // TODO: What about VM memory capacities???
+        ram_capacities.push_back(ComputeService::ALL_RAM);  // TODO: What about VM memory capacities???
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
       std::vector<double> ttl;
-      ttl.push_back(DBL_MAX);
+      ttl.push_back(ComputeService::ALL_RAM);
       dict.insert(std::make_pair("ttl", ttl));
 
       // Send the reply

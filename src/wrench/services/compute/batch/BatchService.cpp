@@ -1846,7 +1846,7 @@ namespace wrench {
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
       std::vector<double> ttl;
-      ttl.push_back(DBL_MAX);
+      ttl.push_back(ComputeService::ALL_RAM);
       dict.insert(std::make_pair("ttl", ttl));
 
 
