@@ -99,6 +99,10 @@ int main(int argc, char **argv) {
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(batch_service);
 
+  /* Create a list of storage services that will be used by the WMS */
+  std::set<wrench::StorageService *> storage_services;
+  storage_services.insert(storage_service);
+
   /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
    * for executing the workflow, and uses a scheduler (BatchScheduler). That scheduler
    * is instantiated with the batch service, the list of hosts available for running
@@ -112,8 +116,7 @@ int main(int argc, char **argv) {
                   new wrench::SimpleWMS(&workflow,
                                         std::unique_ptr<wrench::Scheduler>(
                                                 new wrench::BatchScheduler(batch_service, &simulation)),
-                                        compute_services,
-                                        wms_host)));
+                                        compute_services, storage_services, wms_host)));
 
   /* Instantiate a file registry service to be started on some host. This service is
    * essentially a replica catalog that stores <file , storage service> pairs so that

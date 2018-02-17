@@ -21,16 +21,19 @@ namespace wrench {
      * @param workflow: a workflow to execute
      * @param scheduler: a scheduler implementation
      * @param compute_services: a set of compute services available to run jobs
+     * @param storage_services: a set of storage services available to the WMS
      * @param hostname: the name of the host on which to start the WMS
      */
     SimpleWMS::SimpleWMS(Workflow *workflow,
                          std::unique_ptr<Scheduler> scheduler,
                          const std::set<ComputeService *> &compute_services,
+                         const std::set<StorageService *> &storage_services,
                          const std::string &hostname, double start_time) : WMS(workflow,
-                                                           std::move(scheduler),
-                                                           compute_services,
-                                                           hostname,
-                                                           "simple", start_time) {}
+                                                                               std::move(scheduler),
+                                                                               compute_services,
+                                                                               storage_services,
+                                                                               hostname,
+                                                                               "simple", start_time) {}
 
     /**
      * @brief main method of the SimpleWMS daemon
