@@ -79,9 +79,10 @@ public:
     OneJobTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
                   wrench::Workflow *workflow,
                   std::unique_ptr<wrench::Scheduler> scheduler,
-                  std::set<wrench::ComputeService *> &compute_services,
+                  const std::set<wrench::ComputeService *> &compute_services,
+                  const std::set<wrench::StorageService *> &storage_services,
                   std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -440,7 +441,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneJobTestWMS(
                   this, workflow, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), compute_services, "Host1"))));
+                          new NoopScheduler()), compute_services, {}, "Host1"))));
 
   EXPECT_NO_THROW(simulation->launch());
 
@@ -461,9 +462,10 @@ public:
     MultiJobTestWMS(MultihostMulticoreComputeServiceTestScheduling *test,
                     wrench::Workflow *workflow,
                     std::unique_ptr<wrench::Scheduler> scheduler,
-                    std::set<wrench::ComputeService *> &compute_services,
+                    const std::set<wrench::ComputeService *> &compute_services,
+                    const std::set<wrench::StorageService *> &storage_services,
                     std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -668,7 +670,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MultiJobTestWMS(
                   this, workflow, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), compute_services, "Host1"))));
+                          new NoopScheduler()), compute_services, {}, "Host1"))));
 
   EXPECT_NO_THROW(simulation->launch());
 

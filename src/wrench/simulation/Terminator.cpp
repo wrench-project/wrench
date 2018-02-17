@@ -32,11 +32,6 @@ namespace wrench {
      */
     void Terminator::registerComputeService(ComputeService *compute_service) {
       this->registerService(this->compute_services, compute_service);
-
-      // register default storage service from compute service
-      if (compute_service->getDefaultStorageService()) {
-        registerStorageService(compute_service->getDefaultStorageService());
-      }
     }
 
     /**
@@ -65,10 +60,16 @@ namespace wrench {
       if (this->shutdownService(this->compute_services, compute_service)) {
         WRENCH_INFO("Terminator shut down compute service: %s", compute_service->getName().c_str());
       }
+    }
 
-      // shutdown default storage service from compute service
-      if (compute_service->getDefaultStorageService() && compute_service->getDefaultStorageService()->isUp()) {
-        shutdownStorageService(compute_service->getDefaultStorageService());
+    /**
+     * @brief Register a list of references to StorageService
+     *
+     * @param storage_services: a list of pointers to StorageService objects
+     */
+    void Terminator::registerStorageService(std::set<StorageService *> storage_services) {
+      for (auto storage_service : storage_services) {
+        this->registerStorageService(storage_service);
       }
     }
 
@@ -79,6 +80,20 @@ namespace wrench {
      */
     void Terminator::registerStorageService(StorageService *storage_service) {
       this->registerService(this->storage_services, storage_service);
+    }
+
+    /**
+     * @brief Shutdown a list of StorageService references. If the StorageService has only one reference it will
+     * be stopped, otherwise the counter is decreased.
+     *
+     * @param storage_services: a list of pointers to StorageService objects
+     *
+     * @throw std::runtime_error
+     */
+    void Terminator::shutdownStorageService(std::set<StorageService *> storage_services) {
+      for (auto storage_service : storage_services) {
+        this->shutdownStorageService(storage_service);
+      }
     }
 
     /**

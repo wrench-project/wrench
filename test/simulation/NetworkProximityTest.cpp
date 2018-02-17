@@ -93,9 +93,10 @@ public:
     ProxTestWMS(NetworkProximityTest *test,
                 wrench::Workflow *workflow,
                 std::unique_ptr<wrench::Scheduler> scheduler,
-                std::set<wrench::ComputeService *> compute_services,
+                const std::set<wrench::ComputeService *> &compute_services,
+                const std::set<wrench::StorageService *> &storage_services,
                 std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -134,7 +135,6 @@ private:
 
       // Terminate
       this->shutdownAllServices();
-      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service1);
       return 0;
     }
 };
@@ -166,19 +166,16 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                                                                {std::make_pair(hostname, 0)},
                                                                nullptr,
                                                                {}))));
-  std::set<wrench::ComputeService *> compute_services;
-  compute_services.insert(compute_service);
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ProxTestWMS(
                   this, workflow, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()),
-                          compute_services, hostname))));
-
-  // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  {compute_service}, {storage_service1}, hostname))));
 
   // Create a file registry service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -226,9 +223,10 @@ public:
     CompareProxTestWMS(NetworkProximityTest *test,
                        wrench::Workflow *workflow,
                        std::unique_ptr<wrench::Scheduler> scheduler,
-                       std::set<wrench::ComputeService *> compute_services,
+                       const std::set<wrench::ComputeService *> &compute_services,
+                       const std::set<wrench::StorageService *> &storage_services,
                        std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, hostname, "test") {
+            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -296,7 +294,6 @@ private:
 
       // Terminate
       this->shutdownAllServices();
-      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service1);
       return 0;
     }
 };
@@ -328,19 +325,16 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
                                                                {std::make_pair(hostname, 0)},
                                                                nullptr,
                                                                {}))));
-  std::set<wrench::ComputeService *> compute_services;
-  compute_services.insert(compute_service);
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new CompareProxTestWMS(
                   this, workflow, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()),
-                          compute_services, hostname))));
-
-  // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  {compute_service}, {storage_service1}, hostname))));
 
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
           new wrench::FileRegistryService(hostname));
