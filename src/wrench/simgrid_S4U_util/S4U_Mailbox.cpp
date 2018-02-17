@@ -20,7 +20,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
-#include "simulation/SimulationMessage.h"
+#include "wrench/simulation/SimulationMessage.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(mailbox, "Mailbox");
 
