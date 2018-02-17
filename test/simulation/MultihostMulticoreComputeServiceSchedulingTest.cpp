@@ -393,8 +393,8 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(
                           "Host1", true, true,
-                          {std::make_tuple("Host1", ULONG_MAX, DBL_MAX),
-                           std::make_tuple("Host2", ULONG_MAX, DBL_MAX)},
+                          {std::make_tuple("Host1", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM),
+                           std::make_tuple("Host2", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                           nullptr,
                           {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
                            {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
@@ -409,8 +409,8 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(
                           "Host1", true, true,
-                          {std::make_tuple("Host1", ULONG_MAX, DBL_MAX),
-                           std::make_tuple("Host2", ULONG_MAX, DBL_MAX)},
+                          {std::make_tuple("Host1", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM),
+                           std::make_tuple("Host2", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                           nullptr,
                           {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
                            {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
@@ -425,8 +425,8 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(
                           "Host1", true, true,
-                          {std::make_tuple("Host1", ULONG_MAX, DBL_MAX),
-                           std::make_tuple("Host2", ULONG_MAX, DBL_MAX)},
+                          {std::make_tuple("Host1", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM),
+                           std::make_tuple("Host2", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                           nullptr,
                           {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
                            {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
@@ -652,8 +652,8 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
   EXPECT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host1", true, true,
-                                                               {std::make_tuple("Host1", ULONG_MAX, DBL_MAX),
-                                                                std::make_tuple("Host2", ULONG_MAX, DBL_MAX)},
+                                                               {std::make_tuple("Host1", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM),
+                                                                std::make_tuple("Host2", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
                                                                 {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},

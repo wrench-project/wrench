@@ -186,8 +186,8 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   EXPECT_NO_THROW(compute_service1 = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host1", true, true,
-                                                               {std::make_tuple("Host1", 4, DBL_MAX),
-                                                                std::make_tuple("Host2", 4, DBL_MAX)},
+                                                               {std::make_tuple("Host1", 4, wrench::ComputeService::ALL_RAM),
+                                                                std::make_tuple("Host2", 4, wrench::ComputeService::ALL_RAM)},
                                                                nullptr
                   ))));
 
@@ -195,8 +195,8 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   EXPECT_NO_THROW(compute_service2 = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host1", true, true,
-                                                               {std::make_tuple("Host3", 8, DBL_MAX),
-                                                                std::make_tuple("Host4", 8, DBL_MAX)},
+                                                               {std::make_tuple("Host3", 8, wrench::ComputeService::ALL_RAM),
+                                                                std::make_tuple("Host4", 8, wrench::ComputeService::ALL_RAM)},
                                                                nullptr
                   ))));
   std::set<wrench::ComputeService *> compute_services;

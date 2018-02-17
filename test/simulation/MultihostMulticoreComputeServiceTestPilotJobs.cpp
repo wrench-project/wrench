@@ -170,7 +170,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, false,
-                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);
@@ -345,7 +345,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);
@@ -502,7 +502,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);
@@ -619,7 +619,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);
@@ -783,7 +783,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);
@@ -955,7 +955,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_tuple(hostname, ULONG_MAX, DBL_MAX)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service);

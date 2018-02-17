@@ -231,8 +231,8 @@ namespace wrench {
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
      *        the compute resources available to this service.
-     *          - num_cores = ULONG_MAX: use all cores available on the host
-     *          - memory = DBL_MAX: use all RAM available on the host
+     *          - num_cores = ComputeService::ALL_CORES: use all cores available on the host
+     *          - memory = ComputeService::ALL_RAM: use all RAM available on the host
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      */
@@ -291,7 +291,7 @@ namespace wrench {
         std::string hname = std::get<0>(host);
         unsigned long requested_cores = std::get<1>(host);
         unsigned long available_cores = S4U_Simulation::getNumCores(hname);
-        if (requested_cores == ULONG_MAX) {
+        if (requested_cores == ComputeService::ALL_CORES) {
           requested_cores = available_cores;
         }
         if (requested_cores == 0) {
@@ -311,7 +311,7 @@ namespace wrench {
           throw std::invalid_argument(
                   "MultihostMulticoreComputeService::MultihostMulticoreComputeService(): requested ram should be non-negative");
         }
-        if (requested_ram == DBL_MAX) {
+        if (requested_ram == ComputeService::ALL_RAM) {
           requested_ram = available_ram;
         }
         if (requested_ram > available_ram) {
@@ -1614,7 +1614,7 @@ namespace wrench {
       if (this->has_ttl) {
         ttl.push_back(this->death_date - S4U_Simulation::getClock());
       } else {
-        ttl.push_back(DBL_MAX);
+        ttl.push_back(ComputeService::ALL_RAM);
       }
       dict.insert(std::make_pair("ttl", ttl));
 
