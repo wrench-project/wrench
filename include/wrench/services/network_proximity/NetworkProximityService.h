@@ -81,6 +81,8 @@ namespace wrench{
 
         std::shared_ptr<NetworkProximityDaemon> getCommunicationPeer(NetworkProximityDaemon *daemon);
 
+        void vivaldiUpdate(double proximityValue, std::string sender_hostname, std::string peer_hostname);
+
         void validateProperties();
 
     };
