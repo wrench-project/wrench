@@ -335,11 +335,13 @@ namespace wrench {
 
         WRENCH_INFO("Obtaining communication peer for %s", sender_daemon->mailbox_name);
 
-        std::string network_service_type = this-> getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
-
-        // coverage will be (0 < coverage <= 1.0)
+        // coverage will be (0 < coverage <= 1.0) if this is a 'vivaldi' network service
+        // else if it is an 'alltoall' network service, coverage is set at 1.0
         double coverage = this->getPropertyValueAsDouble("NETWORK_DAEMON_COMMUNICATION_COVERAGE");
         unsigned long max_pool_size = this->network_daemons.size() - 1;
+
+        // if the network_service type is 'alltoall', sender_daemon selects from a pool of all other network daemons
+        // if the network_service type is 'vivaldi', sender_daemon selects from a subset of the max_pool_size
         unsigned long pool_size = (unsigned long)(std::ceil(coverage * max_pool_size));
 
         std::hash<std::string> hash_func;
@@ -363,7 +365,7 @@ namespace wrench {
         sender_rng.seed((unsigned long)hash_func(sender_daemon->mailbox_name));
 
         std::shuffle(peer_list.begin(), peer_list.end(), sender_rng);
-        
+
         unsigned long chosen_peer_index = peer_list.at(m_udist(master_rng));
 
         return std::shared_ptr<NetworkProximityDaemon>(this->network_daemons.at(chosen_peer_index));
