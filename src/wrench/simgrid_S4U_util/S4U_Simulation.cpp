@@ -13,6 +13,7 @@
 #include <set>
 #include <cfloat>
 #include <wrench/services/compute/ComputeService.h>
+#include <wrench/util/UnitParser.h>
 
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -214,7 +215,9 @@ namespace wrench {
           if (capacity_value != ComputeService::ALL_RAM) {
             throw std::invalid_argument("S4U_Simulation::getMemoryCapacity(): Host '" + host->getName() + "' has multiple memory capacity specifications");
           }
-          if (sscanf(capacity_string, "%lf", &capacity_value) != 1) {
+          try {
+            capacity_value = UnitParser::parse_size(capacity_string);
+          } catch (std::runtime_error &e) {
             throw std::invalid_argument(
                     "S4U_Simulation::getMemoryCapacity(): Host '" + host->getName() + "'has invalid memory capacity specification '" + tag +":" +
                     std::string(capacity_string) + "'");

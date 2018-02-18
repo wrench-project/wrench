@@ -200,7 +200,7 @@ set(TEST_FILES
         test/simulation/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/NoopScheduler.h
         test/simulation/MultipleWMSTest.cpp
-        )
+        src/wrench/util/UnitParser.cpp include/wrench/util/UnitParser.h)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
@@ -208,7 +208,7 @@ find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(LEMON_LIBRARY NAMES emon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
-add_library(wrench STATIC ${SOURCE_FILES})
+add_library(wrench STATIC ${SOURCE_FILES} src/wrench/util/UnitParser.cpp include/wrench/util/UnitParser.h)
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
 target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 
