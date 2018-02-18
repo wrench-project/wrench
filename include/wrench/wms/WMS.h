@@ -53,6 +53,7 @@ namespace wrench {
         WMS(Workflow *workflow,
             std::unique_ptr<Scheduler> scheduler,
             const std::set<ComputeService *> &compute_services,
+            const std::set<StorageService *> &storage_services,
             const std::string &hostname,
             const std::string suffix,
             double start_time = 0);
@@ -102,6 +103,8 @@ namespace wrench {
         double start_time;
         /** @brief List of available compute services */
         std::set<ComputeService *> compute_services;
+        /** @brief List of available storage services */
+        std::set<StorageService *> storage_services;
 
         /** @brief The selected scheduler */
         std::unique_ptr<Scheduler> scheduler;

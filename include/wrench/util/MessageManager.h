@@ -11,7 +11,7 @@
 #define WRENCH_MESSAGEMANAGER_H
 
 #include <wrench/services/Service.h>
-#include <simulation/SimulationMessage.h>
+#include <wrench/simulation/SimulationMessage.h>
 
 namespace wrench {
 

@@ -16,6 +16,7 @@
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
 namespace wrench {
 
@@ -42,7 +43,11 @@ namespace wrench {
 
         void shutdownComputeService(ComputeService *compute_service);
 
+        void registerStorageService(std::set<StorageService *> storage_services);
+
         void registerStorageService(StorageService *storage_service);
+
+        void shutdownStorageService(std::set<StorageService *> storage_services);
 
         void shutdownStorageService(StorageService *storage_service);
 
@@ -69,7 +74,7 @@ namespace wrench {
           if (not service) {
             return;
           }
-          services_map.find(service) == services_map.end() ? services_map[service]++ : services_map[service] = 0;
+          services_map.find(service) == services_map.end() ? services_map[service] = 0 : services_map[service]++;
         }
 
         /**
