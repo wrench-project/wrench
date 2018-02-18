@@ -89,7 +89,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Look up the current (x,y) coordinates of a given host
+     * @brief Look up the current (x,y) coordinates of a given host for Vivaldi network service type 
      * @param requested_host: the host whose coordinates are being requested
      * @return The pair (x,y) coordinate values
      *
@@ -97,7 +97,14 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::pair<double, double> NetworkProximityService::getCoordinate(std::string requested_host) {
-        WRENCH_INFO("IN query()");
+        if (boost::iequals(
+                this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                "alltoall")) {
+            throw std::runtime_error(
+                    "NetworkProximityService::getCoordinate() cannot be called with NETWORK_PROXIMITY_SERVICE_TYPE of ALLTOALL");
+        }
+
+        WRENCH_INFO("Obtaining current coordinates of network daemon on host %", requested_host);
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_get_coordinate_entry");
 
@@ -136,7 +143,14 @@ namespace wrench {
      */
     double NetworkProximityService::query(std::pair<std::string, std::string> hosts) {
 
-        WRENCH_INFO("IN query()");
+        std::string network_service_type = this->getPropertyValueAsString(
+                NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
+
+        if (boost::iequals(network_service_type, "alltoall")) {
+            WRENCH_INFO("Obtaining the proximity value between %s and %s", hosts.first, hosts.second);
+        } else {
+            WRENCH_INFO("Obtaining the approximate distance between %s and %s", hosts.first, hosts.second);
+        }
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_query_entry");
 
@@ -373,7 +387,7 @@ namespace wrench {
 
     /**
      * @brief Internal method to validate Network Proximity Service Properties
-     * @throw std::invalid_argument 
+     * @throw std::invalid_argument
      */
     void NetworkProximityService::validateProperties() {
         std::string error_prefix = "NetworkProximityService::NetworkProximityService(): ";
