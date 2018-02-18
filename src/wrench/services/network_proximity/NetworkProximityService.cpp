@@ -17,7 +17,6 @@
 
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <random>
-#include <set>
 
 #include <boost/algorithm/string.hpp>
 
@@ -89,7 +88,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Look up the current (x,y) coordinates of a given host for Vivaldi network service type 
+     * @brief Look up the current (x,y) coordinates of a given host for Vivaldi network service type
      * @param requested_host: the host whose coordinates are being requested
      * @return The pair (x,y) coordinate values
      *
@@ -147,9 +146,9 @@ namespace wrench {
                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
 
         if (boost::iequals(network_service_type, "alltoall")) {
-            WRENCH_INFO("Obtaining the proximity value between %s and %s", hosts.first, hosts.second);
+            WRENCH_INFO("Obtaining the proximity value between %s and %s", hosts.first.c_str(), hosts.second.c_str());
         } else {
-            WRENCH_INFO("Obtaining the approximate distance between %s and %s", hosts.first, hosts.second);
+            WRENCH_INFO("Obtaining the approximate distance between %s and %s", hosts.first.c_str(), hosts.second.c_str());
         }
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_query_entry");
@@ -293,7 +292,9 @@ namespace wrench {
                         msg->hosts.first.c_str(), msg->hosts.second.c_str());
                 this->addEntryToDatabase(msg->hosts, msg->proximityValue);
 
-                // TODO: adding vivaldi next
+                if (boost::iequals(this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE), "vivaldi")) {
+                    vivaldiUpdate(msg->proximityValue, msg->hosts.first, msg->hosts.second);
+                }
 
             }
             catch (std::shared_ptr<NetworkError> cause) {
@@ -347,7 +348,7 @@ namespace wrench {
     std::shared_ptr<NetworkProximityDaemon>
     NetworkProximityService::getCommunicationPeer(NetworkProximityDaemon *sender_daemon) {
 
-        WRENCH_INFO("Obtaining communication peer for %s", sender_daemon->mailbox_name);
+        WRENCH_INFO("Obtaining communication peer for %s", sender_daemon->mailbox_name.c_str());
 
         // coverage will be (0 < coverage <= 1.0) if this is a 'vivaldi' network service
         // else if it is an 'alltoall' network service, coverage is set at 1.0
@@ -383,6 +384,62 @@ namespace wrench {
         unsigned long chosen_peer_index = peer_list.at(m_udist(master_rng));
 
         return std::shared_ptr<NetworkProximityDaemon>(this->network_daemons.at(chosen_peer_index));
+    }
+
+    /**
+     * @brief Internal method to compute and update coordinates based on Vivaldi algorithm
+     * @param proximity_value: one way elapsed time to send a message from the sender to the receiving peer
+     * @param sender_hostname: the host at which the sending network daemon resides
+     * @param peer_hostname: the host at which the receiving network daemon resides
+     */
+    void NetworkProximityService::vivaldiUpdate(double proximity_value, std::string sender_hostname, std::string peer_hostname) {
+
+        // TODO: possibly make this a property
+        // TODO: sensitivity is constant, maybe we need to use Vivaldi with dynamic sensitivity (hosts don't get added in dynamically so maybe not)
+        const std::complex<double> sensitivity(0.25, 0.25);
+
+        std::complex<double> sender_coordinates, peer_coordinates;
+
+        std::map<std::string, std::complex<double>>::iterator search = this->coordinate_lookup_table.find(sender_hostname);
+        if (search != this->coordinate_lookup_table.end()) {
+            sender_coordinates = search->second;
+        }
+
+        search = this->coordinate_lookup_table.find(peer_hostname);
+        if (search != this->coordinate_lookup_table.end()) {
+            peer_coordinates = search->second;
+        }
+
+        double estimated_distance = std::sqrt(norm(peer_coordinates - sender_coordinates));
+        double error =  proximity_value - estimated_distance;
+
+        std::complex<double> error_direction, scaled_direction;
+
+        // if both coordinates are at the origin, we need a random direction vector
+        if (estimated_distance == 0.0) {
+            // TODO: maybe use time(0) from <ctime> as seed
+            static std::default_random_engine direction_rng(0);
+            std::uniform_real_distribution<double> dir_dist(-1, 1);
+
+            error_direction.real(dir_dist(direction_rng));
+            error_direction.imag(dir_dist(direction_rng));
+        }
+        else {
+            error_direction = sender_coordinates - peer_coordinates;
+        }
+
+        scaled_direction = error_direction * error;
+
+        // compute the updated sender coordinates
+        auto updated_sender_coordinates = sender_coordinates + (scaled_direction * sensitivity);
+
+        // update the coordinate_lookup_table with the updated sender_coordinates
+        search = this->coordinate_lookup_table.find(sender_hostname);
+        if (search != this->coordinate_lookup_table.end()) {
+            search->second = updated_sender_coordinates;
+        }
+
+        WRENCH_INFO("Vivaldi updated coordinates of %s from (%f,%f) to (%f,%f)", sender_hostname.c_str(), sender_coordinates.real(), sender_coordinates.imag(), updated_sender_coordinates.real(), updated_sender_coordinates.imag());
     }
 
     /**
