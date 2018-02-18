@@ -120,7 +120,7 @@ namespace wrench {
       this->simulation->getFileRegistryService()->stop();
 
       WRENCH_INFO("Simple WMS Daemon is shutting down the Network Proximity Service");
-      this->simulation->getNetworkProximityService()->stop();
+      this->simulation->shutdownAllNetworkProximityServices();
 
       /***
        *** NO NEED TO stop/kill the Managers (will soon be out of scope, and
