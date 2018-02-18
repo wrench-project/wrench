@@ -66,116 +66,6 @@ namespace wrench {
                                            this->getPropertyValueAsDouble(
                                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE))));
       }
-
-//      // NEED TO STORE SHARED POINTERS TO THESE NETWORK DAEMONS INSTEAD...
-//      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//      //        VIVALDI STARTUP STUFF, PROBABLY SHOULD PUT THIS IN A FUNCTION so the ifelse block is smaller        //
-//      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//      std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
-//
-//      if (boost::iequals(network_service_type, "vivaldi")) {
-//
-//        // set up the coordinate_lookup_table
-//        for (auto const &host: this->hosts_in_network) {
-//          this->coordinate_lookup_table.insert(std::make_pair(host, std::make_pair(0.0, 0.0)));
-//        }
-//
-//        if (this->hosts_in_network.size() > 1) {
-//          double communication_percentage = this->getPropertyValueAsDouble("NETWORK_DAEMON_COMMUNICATION_COVERAGE");
-//
-//          /* Each network daemon can communicate with a maximum of (n-1) other daemons.
-//           * The size of a network daemon's communication pool will a percentage of (n-1) other daemons.
-//           */
-//          int communication_pool_size = std::ceil(communication_percentage * this->hosts_in_network.size() - 1);
-//
-//          /* Set up the communication look up table.
-//           * Maybe I need to switch this to an unordered_map for faster lookup times. What happens if
-//           * load factor gets bad? That won't really be a problem if I use map, but lookup times are
-//           * logn..
-//           *
-//           */
-//          std::vector<std::string> empty_vector;
-//          for (auto const &host: this->hosts_in_network) {
-//            this->communication_lookup_table.insert(std::make_pair(host, empty_vector));
-//          }
-//
-//          // used for some randomness
-//          std::hash<std::string> hash_func;
-//          std::default_random_engine rng;
-//          std::uniform_int_distribution<unsigned> u(0, this->hosts_in_network.size() - 1);
-//
-//          std::list<std::pair<std::string, int>> possible_peers;
-//          std::list<std::pair<std::string, int>>::const_iterator stop_itr;
-//
-//          /* For each host that a network daemon will run on, create a linked list of all the OTHER network
-//           * daemons and give each node a random number.
-//           * Sort that linked list by the random number.
-//           * Each network daemon's communication pool will be the first 'communication_pool_size' nodes
-//           * from the linked list.
-//           *
-//           * This whole nested for loop looks like n^2logn, that seems bad. Maybe if I pick
-//           * communication_pool_size random numbers, it could be faster, but would have to account for
-//           * duplicate random numbers being chosen.
-//           */
-//          for (auto current_host = this->hosts_in_network.cbegin();
-//               current_host != this->hosts_in_network.cend(); ++current_host) {
-//            possible_peers.clear();
-//            rng.seed(hash_func(*current_host));
-//            for (auto it = this->hosts_in_network.cbegin(); it != this->hosts_in_network.cend(); ++it) {
-//              if (current_host != it) {
-//                possible_peers.push_front(std::make_pair(*it, u(rng)));
-//              }
-//            }
-//
-//            // Sort based on random value assigned to each node. Is this random enough?
-//            possible_peers.sort([](const std::pair<std::string, int> &f, const std::pair<std::string, int> &s) {
-//                return f.second <= s.second;
-//            });
-//
-//            // Pick communication_pool_size network daemons
-//            stop_itr = possible_peers.cbegin();
-//            std::advance(stop_itr, communication_pool_size);
-//
-//            auto search = this->communication_lookup_table.find(*current_host);
-//            if (search != this->communication_lookup_table.end()) {
-//              for (auto vec_itr = possible_peers.cbegin(); vec_itr != stop_itr; ++vec_itr) {
-//                (search->second).push_back(vec_itr->first);
-//              }
-//            }
-//          }
-
-//          }
-//        }
-//          // DEBUGING: printing comm lookup table
-//          WRENCH_INFO("--------NETWORK DAEMON COMMUNICATION POOLS---------");
-//          for (auto const &pool: this->communication_lookup_table) {
-//            WRENCH_INFO("%s network daemon talks to:", pool.first.c_str());
-//            for (auto const &peer: pool.second) {
-//              WRENCH_INFO("peer: %s", peer.c_str());
-//            }
-//            WRENCH_INFO("---------------------------------------------------");
-
-      // TODO: IMPLEMENT THE IDEA BELOW IN THE NETWORK PROXIMITY SERVICE AS IT RUNS
-      // TODO:  Put all this in a pickCommunicationPeer() method, inside of which there is a test
-      // TODO:  on the coverage: if == 1, just pick a number, otherwise do the algorithm below
-      // TODO:  that way no need to test ALLTOALL/VIVALDI in main()
-
-      // IDEA FOR SEEDING:
-      //    num_peers = ceil(total_peers * coverage)
-      //    master_rng;  // to pick numbers between 0 and num_peers-1
-
-      //    peer i asks: "who do I talk too?":
-      //          create rng
-      //          rng.seed(hash(hostname));
-      //          pick a number randomly between 0 and num_peers -1 : X  (master rng)
-      //            for (j=0; j < X; j++)
-      //                peer = rng.get_random_number() % total_num_peers
-      //           "talk to peer peer";
-      //
-      //      peer "foo":   78, 6, 12, 42, 12, 66, ...
-      //      peer "faa":   1, 12, 43, 64, 73, 34, ...
-      //      num_peers = 3
-
     }
 
 
@@ -355,30 +245,13 @@ namespace wrench {
 
         std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
 
-        // should i use a typedefd struct for coordinates? if so, where would i put the definition?
         if (boost::iequals(network_service_type, "vivaldi")) {
           auto host1 = this->coordinate_lookup_table.find(msg->hosts.first);
           auto host2 = this->coordinate_lookup_table.find(msg->hosts.second);
 
           if (host1 != this->coordinate_lookup_table.end() && host2 != this->coordinate_lookup_table.end()) {
-//            double h1_x, h1_y, h2_x, h2_y;
-
-//            std::complex<double> h1_complex = std::complex<double>(h1_x, h1_y);
-//            std::complex<double> h2_complex = std::complex<double>(h2_x, h2_y);
-
             proximityValue = std::sqrt(norm(host2->second - host1->second));
-//
-//            h1_x = host1->second.first;
-//            h1_y = host1->second.second;
-//
-//            h2_x = host2->second.first;
-//            h2_y = host2->second.second;
-//
-//            double x, y;
-//            x = h1_x - h2_x;
-//            y = h1_y - h2_y;
-//
-//            proximityValue = std::sqrt(std::pow(x, 2) + std::pow(y, 2));
+
           }
         } else {
           if (this->entries.find(msg->hosts) != this->entries.end()) {
@@ -452,75 +325,48 @@ namespace wrench {
       return false;
     }
 
+    /**
+     * @brief Internal method to choose a communication peer for the requesting network proximity daemon
+     * @param sender_daemon: the network daemon requesting a peer to communicate with next
+     * @return a shared_ptr to the network daemon that is the selected communication peer
+     */
     std::shared_ptr<NetworkProximityDaemon>
     NetworkProximityService::getCommunicationPeer(NetworkProximityDaemon *sender_daemon) {
-      std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
 
-      std::shared_ptr<NetworkProximityDaemon> chosen_peer;
-      std::uniform_int_distribution<unsigned long> idist(0, (this->hosts_in_network.size() - 1)), idist_2(1,
-                                                                                                          this->hosts_in_network.size() -
-                                                                                                          1);
-      if (boost::iequals(network_service_type, "alltoall")) {
-        std::random_device rdev;
-        std::mt19937 rgen(rdev());
+        WRENCH_INFO("Obtaining communication peer for %s", sender_daemon->mailbox_name);
 
-        unsigned long random_number = idist(rgen);
+        std::string network_service_type = this-> getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
 
-        if (this->network_daemons.at(random_number).get() == sender_daemon) {
-          chosen_peer = this->network_daemons.at((random_number + idist_2(rgen)) % this->hosts_in_network.size());
-        }
-
-        chosen_peer = this->network_daemons.at(random_number);
-      } else {
+        // coverage will be (0 < coverage <= 1.0)
         double coverage = this->getPropertyValueAsDouble("NETWORK_DAEMON_COMMUNICATION_COVERAGE");
-        unsigned long max_pool_size = this->network_daemons.size();
+        unsigned long max_pool_size = this->network_daemons.size() - 1;
         unsigned long pool_size = (unsigned long)(std::ceil(coverage * max_pool_size));
 
         std::hash<std::string> hash_func;
         std::default_random_engine sender_rng;
+        // uniform distribution to be used by the sending daemon's rng
         std::uniform_int_distribution<unsigned long> s_udist;
 
-        static std::uniform_int_distribution<unsigned long> m_udist(0, pool_size - 1);
-
-        sender_rng.seed((unsigned int) hash_func(sender_daemon->mailbox_name));
-
-#if 0
-        int pool_current_index = 0;
-            int pool_target_peer_index = m_udist(master_rng);
-
-            for (int i = 0; i < max_pool_size; ++i) {
-                 if (this->network_daemons.at(i)->mailbox_name != sender_mailbox_name) {
-                     if (s_udist(sender_rng) % (max_pool_size - i) < pool_size) {
-                         if (pool_target_peer_index == pool_current_index) {
-                             chosen_peer = this->network_daemons.at(i);
-                             break;
-                         }
-                         ++pool_current_index;
-                         --pool_size;
-                     }
-                 }
-            }
-#endif
+        // uniform distribution to be used by master rng
+        static std::uniform_int_distribution<unsigned long> m_udist(0, pool_size -1);
 
         std::vector<unsigned long> peer_list;
-        for (unsigned long index = 0; index < this->network_daemons.size(); index++) {
-          if (this->network_daemons[index]->mailbox_name != sender_daemon->mailbox_name) {
-            peer_list.push_back(index);
-          }
+
+        // all the network daemons EXCEPT the sender get pushed into this vector
+        for (unsigned long index = 0; index < this->network_daemons.size(); ++index) {
+            if (this->network_daemons[index]->mailbox_name != sender_daemon->mailbox_name) {
+                peer_list.push_back(index);
+            }
         }
 
-        // TODO: Make this seen a property some day?
-        std::shuffle(peer_list.begin(), peer_list.end(), std::default_random_engine(0));
+        // set the seed unique to the sending daemon
+        sender_rng.seed((unsigned long)hash_func(sender_daemon->mailbox_name));
 
-        unsigned long picked_peer_index = m_udist(master_rng) % pool_size;
+        std::shuffle(peer_list.begin(), peer_list.end(), sender_rng);
+        
+        unsigned long chosen_peer_index = peer_list.at(m_udist(master_rng));
 
-        unsigned long chosen_peer_index = peer_list[picked_peer_index];
-
-        chosen_peer = this->network_daemons.at(picked_peer_index);
-
-      }
-
-      return chosen_peer;
+        return std::shared_ptr<NetworkProximityDaemon>(this->network_daemons.at(chosen_peer_index));
     }
 
 
@@ -570,8 +416,7 @@ namespace wrench {
         throw std::invalid_argument(error_prefix + "Invalid NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE value " + this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE));
       }
 
-
-
+        // TODO: check that the coverage is 100 for all to all....
       double coverage = this->getPropertyValueAsDouble(NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE);
 
       if (coverage <= 0 || coverage > 1) {
