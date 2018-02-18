@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ namespace wrench {
     class BatchScheduler : public Scheduler {
 
     public:
-        BatchScheduler(ComputeService *cloud_service, Simulation *simulation);
+        BatchScheduler(ComputeService *batch_service, Simulation *simulation);
 
         /***********************/
         /** \cond DEVELOPER    */

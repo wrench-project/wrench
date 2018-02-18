@@ -24,6 +24,7 @@ namespace wrench {
      * @param workflow: a workflow to execute
      * @param scheduler: a scheduler implementation
      * @param compute_services: a set of compute services available to run jobs
+     * @param storage_services: a set of storage services available to the WMS
      * @param hostname: the name of the host on which to run the WMS
      * @param suffix: a string to append to the process name
      * @param start_time: the simulated time when the WMS should start running
@@ -33,12 +34,13 @@ namespace wrench {
     WMS::WMS(Workflow *workflow,
              std::unique_ptr<Scheduler> scheduler,
              const std::set<ComputeService *> &compute_services,
+             const std::set<StorageService *> &storage_services,
              const std::string &hostname,
              const std::string suffix,
              double start_time) :
             S4U_Daemon("wms_" + suffix, "wms_" + suffix),
             workflow(workflow), start_time(start_time), compute_services(compute_services),
-            scheduler(std::move(scheduler)) {
+            storage_services(storage_services), scheduler(std::move(scheduler)) {
 
       this->hostname = hostname;
     }
@@ -142,13 +144,16 @@ namespace wrench {
      * @brief Shutdown all services
      */
     void WMS::shutdownAllServices() {
-      WRENCH_INFO("WMS Daemon is shutting down all Compute and Storage Services");
+      WRENCH_INFO("WMS %s Daemon is shutting down all Compute Services", this->getName().c_str());
       this->simulation->getTerminator()->shutdownComputeService(this->compute_services);
 
-      WRENCH_INFO("WMS Daemon is shutting down the File Registry Service");
+      WRENCH_INFO("WMS %s Daemon is shutting down all Storage Services", this->getName().c_str());
+      this->simulation->getTerminator()->shutdownStorageService(this->storage_services);
+
+      WRENCH_INFO("WMS %s Daemon is shutting down the File Registry Service", this->getName().c_str());
       this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
 
-      WRENCH_INFO("WMS Daemon is shutting down the Network Proximity Service");
+      WRENCH_INFO("WMS %s Daemon is shutting down the Network Proximity Service", this->getName().c_str());
       this->simulation->getTerminator()->shutdownNetworkProximityService(
               this->simulation->getNetworkProximityService());
     }
@@ -273,6 +278,7 @@ namespace wrench {
       }
       // register services into terminator (the storage service is obtained from the compute service)
       this->simulation->getTerminator()->registerComputeService(this->compute_services);
+      this->simulation->getTerminator()->registerStorageService(this->storage_services);
       this->simulation->getTerminator()->registerFileRegistryService(this->simulation->getFileRegistryService());
       this->simulation->getTerminator()->registerNetworkProximityService(
               this->simulation->getNetworkProximityService());

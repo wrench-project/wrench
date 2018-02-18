@@ -35,6 +35,7 @@ include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/lo
 set(HEADER_FILES
         include/wrench/exceptions/WorkflowExecutionException.h
         include/wrench/simgrid_S4U_util/S4U_Simulation.h
+        include/wrench/simulation/SimulationMessage.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
         include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
@@ -101,7 +102,6 @@ set(HEADER_FILES
 # source files
 set(SOURCE_FILES
         src/wrench/simulation/SimulationMessage.cpp
-        src/wrench/simulation/SimulationMessage.h
         src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp

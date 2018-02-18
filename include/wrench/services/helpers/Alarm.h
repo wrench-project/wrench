@@ -13,7 +13,7 @@
 #include <string>
 #include <memory>
 #include <wrench/services/Service.h>
-#include "simulation/SimulationMessage.h"
+#include "wrench/simulation/SimulationMessage.h"
 
 namespace wrench {
 

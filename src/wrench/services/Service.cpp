@@ -9,7 +9,7 @@
 
 
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <simulation/SimulationMessage.h>
+#include <wrench/simulation/SimulationMessage.h>
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/services/Service.h"
