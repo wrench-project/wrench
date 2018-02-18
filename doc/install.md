@@ -9,7 +9,7 @@ Installing WRENCH                  {#install}
 
 # Prerequisites #                 {#install-prerequisites}
 
-WRENCH is developed in C++. The code follows the C++11 standard, and thus older 
+WRENCH is developed in `C++`. The code follows the C++11 standard, and thus older 
 compilers may fail to compile it. Therefore, we strongly recommend
 users to satisfy the following requirements:
 
@@ -22,13 +22,12 @@ And, one of the following:
 
 ## Dependencies ##                  {#install-prerequisites-dependencies}
 
-- [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.17 or higher
-- [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
-- [PugiXML](http://pugixml.org/) - version 1.8 or higher 
-- [JSON for Modern C++](https://github.com/nlohmann/json) - version 2.1.1 or higher 
-- [Google Test](https://github.com/google/googletest) - version 1.8 or higher (only required for running test cases)
-- [Doxygen](http://www.doxygen.org) - version 1.8 or higher (only required for generating documentation)
-
+- [SimGrid](http://simgrid.gforge.inria.fr/) -- version 3.17 or higher
+- [Lemon C++ library](http://lemon.cs.elte.hu/) -- version 1.3.1 or higher 
+- [PugiXML](http://pugixml.org/) -- version 1.8 or higher 
+- [JSON for Modern C++](https://github.com/nlohmann/json) -- version 2.1.1 or higher 
+- [Google Test](https://github.com/google/googletest) -- version 1.8 or higher (only required for running test cases)
+- [Doxygen](http://www.doxygen.org) -- version 1.8 or higher (only required for generating documentation)
 - [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for batch-scheduled resource simulation
 
 
