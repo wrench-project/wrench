@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_MULTICORECOMPUTESERVICE_H
-#define WRENCH_MULTICORECOMPUTESERVICE_H
+#ifndef WRENCH_MULTIHOSTMULTICORECOMPUTESERVICE_H
+#define WRENCH_MULTIHOSTMULTICORECOMPUTESERVICE_H
 
 
 #include <queue>
@@ -86,22 +86,13 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        // Running jobs
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
-        // Terminating jobs
         void terminateStandardJob(StandardJob *job) override;
 
         void terminatePilotJob(PilotJob *job) override;
-
-
-//        // Getting information
-//        double getTTL() override;
-//
-//        double getCoreFlopRate() override;
-
 
         /***********************/
         /** \endcond           */
@@ -122,7 +113,7 @@ namespace wrench {
         friend class Simulation;
 
         // Low-level Constructor
-        void initiateInstance(const std::string &hostname,
+        MultihostMulticoreComputeService(const std::string &hostname,
                                          bool supports_standard_jobs,
                                          bool supports_pilot_jobs,
                                          std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
@@ -130,6 +121,16 @@ namespace wrench {
                                          double ttl,
                                          PilotJob *pj, std::string suffix,
                                          StorageService *default_storage_service);
+
+        // Low-level constructor helper method
+        void initiateInstance(const std::string &hostname,
+                              bool supports_standard_jobs,
+                              bool supports_pilot_jobs,
+                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                              std::map<std::string, std::string> plist,
+                              double ttl,
+                              PilotJob *pj, std::string suffix,
+                              StorageService *default_storage_service);
 
         std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
 
@@ -154,7 +155,6 @@ namespace wrench {
 
         // Queue of pending jobs (standard or pilot) that haven't begun executing
         std::deque<WorkflowJob *> pending_jobs;
-
 
         int main() override;
 
@@ -201,11 +201,7 @@ namespace wrench {
 
         void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
 
-//        void processGetNumCores(const std::string &answer_mailbox) override;
-
         void processGetResourceInformation(const std::string &answer_mailbox) override;
-
-//        void processGetNumIdleCores(const std::string &answer_mailbox) override;
 
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                       std::map<std::string, std::string> &service_specific_arguments) override;
@@ -215,4 +211,4 @@ namespace wrench {
 };
 
 
-#endif //WRENCH_MULTICORECOMPUTESERVICE_H
+#endif //WRENCH_MULTIHOSTMULTICORECOMPUTESERVICE_H
