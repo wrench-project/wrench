@@ -668,9 +668,16 @@ namespace wrench {
       // RAM capacity per host
       std::vector<double> ram_capacities;
       for (auto &vm : this->vm_list) {
-        ram_capacities.push_back(ComputeService::ALL_RAM);  // TODO: What about VM memory capacities???
+        ram_capacities.push_back(ComputeService::ALL_RAM);  // TODO FOR RAFAEL : What about VM memory capacities???
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
+
+      // RAM capacity per host
+      std::vector<double> ram_availabilities;
+      for (auto &vm : this->vm_list) {
+        ram_availabilities.push_back(ComputeService::ALL_RAM);  // TODO FOR RAFAEL : What about VM memory capacities???
+      }
+      dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
       std::vector<double> ttl;
       ttl.push_back(ComputeService::ALL_RAM);
