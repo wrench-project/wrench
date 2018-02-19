@@ -137,91 +137,6 @@ namespace wrench {
       }
     }
 
-//    /**
-//     * @brief Synchronously ask the service for its TTL
-//     *
-//     * @return the TTL in seconds
-//     *
-//     * @throw WorkflowExecutionException
-//     * @throw std::runtime_error
-//     */
-//    double MultihostMulticoreComputeService::getTTL() {
-//
-//      if (this->state == Service::DOWN) {
-//        throw WorkflowExecutionException(new ServiceIsDown(this));
-//      }
-//
-//      // send a "ttl request" message to the daemon's mailbox
-//      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_ttl");
-//
-//      try {
-//        S4U_Mailbox::dputMessage(this->mailbox_name,
-//                                 new MulticoreComputeServiceTTLRequestMessage(
-//                                         answer_mailbox,
-//                                         this->getPropertyValueAsDouble(
-//                                                 MultihostMulticoreComputeServiceProperty::TTL_REQUEST_MESSAGE_PAYLOAD)));
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//        throw WorkflowExecutionException(cause);
-//      }
-//
-//      // Get the reply
-//      std::unique_ptr<SimulationMessage> message = nullptr;
-//
-//      try {
-//        message = S4U_Mailbox::getMessage(answer_mailbox);
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//        throw WorkflowExecutionException(cause);
-//      }
-//
-//      if (auto *msg = dynamic_cast<MulticoreComputeServiceTTLAnswerMessage *>(message.get())) {
-//        return msg->ttl;
-//      } else {
-//        throw std::runtime_error(
-//                "MultihostMulticoreComputeService::getTTL(): Unexpected [" + msg->getName() + "] message");
-//      }
-//    }
-
-//    /**
-//     * @brief Synchronously ask the service for its per-core flop rate
-//     *
-//     * @return the rate in Flops/sec
-//     *
-//     * @throw WorkflowExecutionException
-//     * @throw std::runtime_error
-//     */
-//    double MultihostMulticoreComputeService::getCoreFlopRate() {
-//
-//      if (this->state == Service::DOWN) {
-//        throw WorkflowExecutionException(new ServiceIsDown(this));
-//      }
-//
-//      // send a "floprate request" message to the daemon's mailbox
-//      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_core_flop_rate");
-//      try {
-//        S4U_Mailbox::dputMessage(this->mailbox_name,
-//                                 new MulticoreComputeServiceFlopRateRequestMessage(
-//                                         answer_mailbox,
-//                                         this->getPropertyValueAsDouble(
-//                                                 MultihostMulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD)));
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//        throw WorkflowExecutionException(cause);
-//      }
-//
-//      // Get the reply
-//      std::unique_ptr<SimulationMessage> message = nullptr;
-//      try {
-//        message = S4U_Mailbox::getMessage(answer_mailbox);
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//        throw WorkflowExecutionException(cause);
-//      }
-//
-//      if (auto *msg = dynamic_cast<MulticoreComputeServiceFlopRateAnswerMessage *>(message.get())) {
-//        return msg->flop_rate;
-//      } else {
-//        throw std::runtime_error(
-//                "MultihostMulticoreComputeService::getCoreFLopRate(): unexpected [" + msg->getName() + "] message");
-//      }
-//    }
 
     /**
      * @brief Constructor
@@ -242,16 +157,51 @@ namespace wrench {
                                                                        std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                                                        StorageService *default_storage_service,
                                                                        std::map<std::string, std::string> plist) :
-            MultihostMulticoreComputeService::MultihostMulticoreComputeService(hostname,
-                                                                               supports_standard_jobs,
-                                                                               supports_pilot_jobs,
-                                                                               compute_resources,
-                                                                               plist, -1, nullptr, "",
-                                                                               default_storage_service) {}
+            ComputeService(hostname,
+                           "multihost_multicore",
+                           "multihost_multicore",
+                           supports_standard_jobs,
+                           supports_pilot_jobs,
+                           default_storage_service) {
+
+      initiateInstance(hostname,
+                       supports_standard_jobs,
+                       supports_pilot_jobs,
+                       compute_resources,
+                       plist, -1, nullptr, "",
+                       default_storage_service);
+    }
+
+    // Public Constructor
+    MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
+                                                                       bool supports_standard_jobs,
+                                                                       bool supports_pilot_jobs,
+                                                                       std::set<std::string> compute_hosts,
+                                                                       StorageService *default_storage_service,
+                                                                       std::map<std::string, std::string> plist) :
+            ComputeService(hostname,
+                           "multihost_multicore",
+                           "multihost_multicore",
+                           supports_standard_jobs,
+                           supports_pilot_jobs,
+                           default_storage_service) {
+
+      std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
+      for (auto h : compute_hosts) {
+        compute_resources.insert(std::make_tuple(h, ComputeService::ALL_CORES, ComputeService::ALL_RAM));
+      }
+
+      initiateInstance(hostname,
+                       supports_standard_jobs,
+                       supports_pilot_jobs,
+                       compute_resources,
+                       plist, -1, nullptr, "",
+                       default_storage_service);
+    }
+
 
     /**
-     * @brief Constructor that starts the daemon for the service on a host,
-     *        registering it with a WRENCH Simulation
+     * @brief Internal "Constructor"
      *
      * @param hostname: the name of the host
      * @param supports_standard_jobs: true if the job executor should support standard jobs
@@ -266,7 +216,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    MultihostMulticoreComputeService::MultihostMulticoreComputeService(
+    void MultihostMulticoreComputeService::initiateInstance(
             const std::string &hostname,
             bool supports_standard_jobs,
             bool supports_pilot_jobs,
@@ -275,13 +225,7 @@ namespace wrench {
             double ttl,
             PilotJob *pj,
             std::string suffix,
-            StorageService *default_storage_service) :
-            ComputeService(hostname,
-                           "multihost_multicore" + suffix,
-                           "multihost_multicore" + suffix,
-                           supports_standard_jobs,
-                           supports_pilot_jobs,
-                           default_storage_service) {
+            StorageService *default_storage_service) {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
@@ -538,7 +482,7 @@ namespace wrench {
         double ram = std::get<1>(r.second);
 
         if ((num_cores <= std::get<0>(this->core_and_ram_availabilities[hostname])) and
-                (ram <= std::get<1>(this->core_and_ram_availabilities[hostname]))) {
+            (ram <= std::get<1>(this->core_and_ram_availabilities[hostname]))) {
 //          WRENCH_INFO("ALLOCATION %s/%ld-%.2lf", hostname.c_str(), std::get<0>(this->core_and_ram_availabilities[hostname]) - num_cores, std::get<1>(this->core_and_ram_availabilities[hostname]) - ram);
           allocation.insert(std::make_tuple(hostname, std::get<0>(this->core_and_ram_availabilities[hostname]) - num_cores,
                                             std::get<1>(this->core_and_ram_availabilities[hostname]) - ram));
@@ -572,7 +516,7 @@ namespace wrench {
       for (auto it = this->core_and_ram_availabilities.begin(); it != this->core_and_ram_availabilities.end(); it++) {
         WRENCH_INFO("%s: %ld %.2lf", it->first.c_str(), std::get<0>(it->second), std::get<1>(it->second));
         if ((std::get<0>(it->second) >= max_min_required_num_cores) and
-                (std::get<1>(it->second) >= max_min_required_ram)) {
+            (std::get<1>(it->second) >= max_min_required_ram)) {
           possible_hosts.insert(it->first);
         }
       }
@@ -685,7 +629,6 @@ namespace wrench {
                                                                 this->property_list,
                                                                 job->getDuration(),
                                                                 job,
-                                                                "_pilot",
                                                                 this->default_storage_service);
 
       cs->setSimulation(this->simulation);
@@ -807,7 +750,7 @@ namespace wrench {
 //        return true;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
-        
+
         processGetResourceInformation(msg->answer_mailbox);
         return true;
 
@@ -1609,6 +1552,13 @@ namespace wrench {
         ram_capacities.push_back(S4U_Simulation::getMemoryCapacity(std::get<0>(h)));
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
+
+      // RAM availability per host
+      std::vector<double> ram_availabilities;
+      for (auto r : this->core_and_ram_availabilities) {
+        ram_availabilities.push_back(std::get<1>(r.second));
+      }
+      dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
       std::vector<double> ttl;
       if (this->has_ttl) {

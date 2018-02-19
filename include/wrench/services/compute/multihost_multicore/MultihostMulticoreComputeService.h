@@ -52,14 +52,6 @@ namespace wrench {
                 {MultihostMulticoreComputeServiceProperty::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,               "1024"},
                 {MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
                 {MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
-//                {MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD,         "1024"},
-//                {MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD,          "1024"},
-//                {MultihostMulticoreComputeServiceProperty::NUM_CORES_REQUEST_MESSAGE_PAYLOAD,              "1024"},
-//                {MultihostMulticoreComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD,               "1024"},
-//                {MultihostMulticoreComputeServiceProperty::TTL_REQUEST_MESSAGE_PAYLOAD,                    "1024"},
-//                {MultihostMulticoreComputeServiceProperty::TTL_ANSWER_MESSAGE_PAYLOAD,                     "1024"},
-//                {MultihostMulticoreComputeServiceProperty::FLOP_RATE_REQUEST_MESSAGE_PAYLOAD,              "1024"},
-//                {MultihostMulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD,               "1024"},
                 {MultihostMulticoreComputeServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,     "1024"},
                 {MultihostMulticoreComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,      "1024"},
                 {MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                        "0.0"},
@@ -78,6 +70,14 @@ namespace wrench {
                                          bool supports_standard_jobs,
                                          bool supports_pilot_jobs,
                                          std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                         StorageService *default_storage_service,
+                                         std::map<std::string, std::string> plist = {});
+
+        // Public Constructor
+        MultihostMulticoreComputeService(const std::string &hostname,
+                                         bool supports_standard_jobs,
+                                         bool supports_pilot_jobs,
+                                         std::set<std::string> compute_hosts,
                                          StorageService *default_storage_service,
                                          std::map<std::string, std::string> plist = {});
 
@@ -122,7 +122,7 @@ namespace wrench {
         friend class Simulation;
 
         // Low-level Constructor
-        MultihostMulticoreComputeService(const std::string &hostname,
+        void initiateInstance(const std::string &hostname,
                                          bool supports_standard_jobs,
                                          bool supports_pilot_jobs,
                                          std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
