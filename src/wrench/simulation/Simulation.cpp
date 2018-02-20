@@ -519,7 +519,7 @@ namespace wrench {
     * @param hostname: the hostname
     * @return the number of cores
     */
-    unsigned long Simulation::getNumCores(std::string hostname) {
+    unsigned long Simulation::getHostNumCores(std::string hostname) {
       return S4U_Simulation::getNumCores(hostname);
     }
 
@@ -528,7 +528,7 @@ namespace wrench {
      * @param hostname: the hostname
      * @return the flop rate (flop / sec)
      */
-    double Simulation::getFlopRate(std::string hostname) {
+    double Simulation::getHostFlopRate(std::string hostname) {
       return S4U_Simulation::getFlopRate(hostname);
     }
 

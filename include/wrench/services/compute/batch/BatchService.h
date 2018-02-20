@@ -78,11 +78,11 @@ namespace wrench {
 
     private:
         BatchService(std::string hostname,
-                     std::vector<std::string> nodes_in_network,
-                     StorageService *default_storage_service,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
-                     unsigned long reduced_cores,
+                     std::vector<std::string> compute_hosts,
+                     StorageService *default_storage_service,
+                     unsigned long cores_per_host,
                      std::map<std::string, std::string> plist,
                      std::string suffix);
 

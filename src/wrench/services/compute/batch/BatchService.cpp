@@ -57,27 +57,36 @@ namespace wrench {
                                std::vector<std::string> nodes_in_network,
                                StorageService *default_storage_service,
                                std::map<std::string, std::string> plist) :
-            BatchService(hostname, nodes_in_network, default_storage_service, supports_standard_jobs,
-                         supports_pilot_jobs, 0, plist, "") {
+            BatchService(hostname, supports_standard_jobs,
+                         supports_pilot_jobs, nodes_in_network,
+                         default_storage_service, ComputeService::ALL_CORES, plist, "") {
 
     }
+
+    // TODO: Comment "num_cores below", do we actually need this?
+    // TODO: Perhaps it would be fine to have the user pass just hostname for this services?
 
 
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
-     * @param nodes_in_network: the hosts running in the network
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
+     * @param compute_hosts: the hosts running in the network
+     * @param default_storage_service: the default storage service (or nullptr)
+     * @param cores_per_host: number of cores used per host
+     *              - ComputeService::ALL_CORES to use all cores
      * @param plist: a property list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
+     *
+     * @throw std::invalid_argument
      */
     BatchService::BatchService(std::string hostname,
-                               std::vector<std::string> nodes_in_network,
-                               StorageService *default_storage_service,
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
-                               unsigned long reduced_cores,
+                               std::vector<std::string> compute_hosts,
+                               StorageService *default_storage_service,
+                               unsigned long cores_per_host,
                                std::map<std::string, std::string> plist, std::string suffix) :
             ComputeService(hostname,
                            "batch" + suffix,
@@ -85,24 +94,62 @@ namespace wrench {
                            supports_standard_jobs,
                            supports_pilot_jobs,
                            default_storage_service) {
+
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(plist));
 
-      //create a map for host to cores
-      int i = 0;
-      std::vector<std::string>::iterator it;
-      for (it = nodes_in_network.begin(); it != nodes_in_network.end(); it++) {
-        if (reduced_cores > 0 && not this->supports_pilot_jobs) {
-          this->nodes_to_cores_map.insert({*it, reduced_cores});
-          this->available_nodes_to_cores.insert({*it, reduced_cores});
-        } else {
-          this->nodes_to_cores_map.insert({*it, S4U_Simulation::getNumCores(*it)});
-          this->available_nodes_to_cores.insert({*it, S4U_Simulation::getNumCores(*it)});
-        }
-        this->host_id_to_names[i++] = *it;
+      if (cores_per_host == 0) {
+        throw std::invalid_argument("BatchService::BatchService(): compute hosts should have at least one core");
       }
 
-      this->total_num_of_nodes = nodes_in_network.size();
+      if (compute_hosts.size() == 0) {
+        throw std::invalid_argument("BatchService::BatchService(): at least one compute hosts must be provided");
+      }
+
+      // Check Platform homogeneity
+      double num_cores = Simulation::getHostNumCores(*(compute_hosts.begin()));
+      double speed = Simulation::getHostFlopRate(*(compute_hosts.begin()));
+      double ram = Simulation::getHostMemoryCapacity(*(compute_hosts.begin()));
+
+      for (auto h : compute_hosts) {
+        // Compute speed
+        if (fabs(speed - Simulation::getHostFlopRate(h)) > DBL_EPSILON) {
+          throw std::invalid_argument("BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different flop rates detected)");
+        }
+        // RAM
+        if (fabs(ram - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
+
+          throw std::invalid_argument("BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different RAM capacities detected)");
+        }
+        // Num cores
+        if (cores_per_host == ComputeService::ALL_CORES) {
+          if (Simulation::getHostNumCores(h) != num_cores) {
+            throw std::invalid_argument(
+                    "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different numbers of cores detected");
+          }
+        } else {
+          if (Simulation::getHostNumCores(h) < cores_per_host) {
+            throw std::invalid_argument(
+                    "BatchService::BatchService(): Compute host has less thatn the specified number of cores (" +
+                    std::to_string(cores_per_host) + "'");
+          }
+        }
+      }
+
+      //create a map for host to cores
+      int i = 0;
+      for (auto h : compute_hosts) {
+        if (cores_per_host > 0 && not this->supports_pilot_jobs) {
+          this->nodes_to_cores_map.insert({h, cores_per_host});
+          this->available_nodes_to_cores.insert({h, cores_per_host});
+        } else {
+          this->nodes_to_cores_map.insert({h, S4U_Simulation::getNumCores(h)});
+          this->available_nodes_to_cores.insert({h, S4U_Simulation::getNumCores(h)});
+        }
+        this->host_id_to_names[i++] = h;
+      }
+
+      this->total_num_of_nodes = compute_hosts.size();
 
       this->generateUniqueJobId();
 
@@ -114,15 +161,15 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Synchronously submit a standard job to the batch service
-     *
-     * @param job: a standard job
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     *
-     */
+/**
+ * @brief Synchronously submit a standard job to the batch service
+ *
+ * @param job: a standard job
+ *
+ * @throw WorkflowExecutionException
+ * @throw std::runtime_error
+ *
+ */
     void BatchService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
@@ -236,15 +283,15 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Synchronously submit a pilot job to the compute service
-     *
-     * @param job: a pilot job
-     * @param batch_job_args: arguments to the batch job
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Synchronously submit a pilot job to the compute service
+ *
+ * @param job: a pilot job
+ * @param batch_job_args: arguments to the batch job
+ *
+ * @throw WorkflowExecutionException
+ * @throw std::runtime_error
+ */
     void BatchService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
@@ -348,11 +395,11 @@ namespace wrench {
       return;
     }
 
-    /**
-     * @brief Main method of the daemon
-     *
-     * @return 0 on termination
-     */
+/**
+ * @brief Main method of the daemon
+ *
+ * @return 0 on termination
+ */
     int BatchService::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
@@ -537,11 +584,11 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief fail a running standard job
-     * @param job: the job
-     * @param cause: the failure cause
-     */
+/**
+ * @brief fail a running standard job
+ * @param job: the job
+ * @param cause: the failure cause
+ */
     void BatchService::failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
 
       WRENCH_INFO("Failing running job %s", job->getName().c_str());
@@ -561,10 +608,10 @@ namespace wrench {
       }
     }
 
-    /**
-    * @brief terminate a running standard job
-    * @param job: the job
-    */
+/**
+* @brief terminate a running standard job
+* @param job: the job
+*/
     void BatchService::terminateRunningStandardJob(StandardJob *job) {
 
       StandardJobExecutor *executor = nullptr;
@@ -590,8 +637,8 @@ namespace wrench {
     }
 
     std::set<std::tuple<std::string, unsigned long, double>> BatchService::scheduleOnHosts(std::string host_selection_algorithm,
-                                                                                  unsigned long num_nodes,
-                                                                                  unsigned long cores_per_node) {
+                                                                                           unsigned long num_nodes,
+                                                                                           unsigned long cores_per_node) {
       std::set<std::tuple<std::string, unsigned long, double>> resources = {};
       std::vector<std::string> hosts_assigned = {};
       if (host_selection_algorithm == "FIRSTFIT") {
@@ -731,7 +778,7 @@ namespace wrench {
 
       //Try to schedule hosts based on FIRSTFIT OR BESTFIT
       std::set<std::tuple<std::string,unsigned long,double>> resources = this->scheduleOnHosts(this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
-                                                                                       num_nodes_asked_for,cores_per_node_asked_for);
+                                                                                               num_nodes_asked_for,cores_per_node_asked_for);
 
       if(resources.empty()){
         return false;
@@ -743,10 +790,10 @@ namespace wrench {
       return false;
     }
 
-    /**
-    * @brief Declare all current jobs as failed (likely because the daemon is being terminated
-    * or has timed out (because it's in fact a pilot job))
-    */
+/**
+* @brief Declare all current jobs as failed (likely because the daemon is being terminated
+* or has timed out (because it's in fact a pilot job))
+*/
     void BatchService::failCurrentStandardJobs(std::shared_ptr<FailureCause> cause) {
 
 
@@ -781,9 +828,9 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Notify upper level job submitters
-     */
+/**
+ * @brief Notify upper level job submitters
+ */
     void BatchService::notifyJobSubmitters(PilotJob *job) {
 
       WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox %s",
@@ -799,14 +846,14 @@ namespace wrench {
     }
 
 
-    /**
- * @brief Synchronously terminate a pilot job to the compute service
- *
- * @param job: a pilot job
- *
- * @throw WorkflowExecutionException
- * @throw std::runtime_error
- */
+/**
+* @brief Synchronously terminate a pilot job to the compute service
+*
+* @param job: a pilot job
+*
+* @throw WorkflowExecutionException
+* @throw std::runtime_error
+*/
     void BatchService::terminatePilotJob(PilotJob *job) {
 
       if (this->state == Service::DOWN) {
@@ -849,9 +896,9 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Terminate the daemon, dealing with pending/running jobs
-     */
+/**
+ * @brief Terminate the daemon, dealing with pending/running jobs
+ */
     void BatchService::terminate() {
       this->setStateToDown();
 
@@ -1087,11 +1134,11 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Process a pilot job completion
-     *
-     * @param job: the pilot job
-     */
+/**
+ * @brief Process a pilot job completion
+ *
+ * @param job: the pilot job
+ */
     void BatchService::processPilotJobCompletion(PilotJob *job) {
 
       std::string job_id;
@@ -1140,12 +1187,12 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Process a pilot job termination request
-     *
-     * @param job: the job to terminate
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     */
+/**
+ * @brief Process a pilot job termination request
+ *
+ * @param job: the job to terminate
+ * @param answer_mailbox: the mailbox to which the answer message should be sent
+ */
     void BatchService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
 
 
@@ -1238,13 +1285,13 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Process a standard job completion
-     * @param executor: the standard job executor
-     * @param job: the job
-     *
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Process a standard job completion
+ * @param executor: the standard job executor
+ * @param job: the job
+ *
+ * @throw std::runtime_error
+ */
     void BatchService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
       bool executor_on_the_list = false;
       std::set<std::unique_ptr<StandardJobExecutor>>::iterator it;
@@ -1290,12 +1337,12 @@ namespace wrench {
       return;
     }
 
-    /**
-     * @brief Process a work failure
-     * @param worker_thread: the worker thread that did the work
-     * @param work: the work
-     * @param cause: the cause of the failure
-     */
+/**
+ * @brief Process a work failure
+ * @param worker_thread: the worker thread that did the work
+ * @param work: the work
+ * @param cause: the cause of the failure
+ */
     void BatchService::processStandardJobFailure(StandardJobExecutor *executor,
                                                  StandardJob *job,
                                                  std::shared_ptr<FailureCause> cause) {
@@ -1337,11 +1384,11 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief fail a pending standard job
-     * @param job: the job
-     * @param cause: the failure cause
-     */
+/**
+ * @brief fail a pending standard job
+ * @param job: the job
+ * @param cause: the failure cause
+ */
     void BatchService::failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
       // Send back a job failed message
       WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
@@ -1361,12 +1408,12 @@ namespace wrench {
       return jobid++;
     }
 
-    /**
- * @brief: Start a batsched process
- *           - exit code 1: unsupported algorithm
- *           - exit code 2: unsupported queuing option
- *           - exit code 3: execvp error
- */
+/**
+* @brief: Start a batsched process
+*           - exit code 1: unsupported algorithm
+*           - exit code 2: unsupported queuing option
+*           - exit code 3: execvp error
+*/
     void BatchService::run_batsched() {
       this->pid = fork();
 
@@ -1806,10 +1853,10 @@ namespace wrench {
       return result;
     }
 
-    /**
-  * @brief Process a "get resource description message"
-  * @param answer_mailbox: the mailbox to which the description message should be sent
-  */
+/**
+* @brief Process a "get resource description message"
+* @param answer_mailbox: the mailbox to which the description message should be sent
+*/
     void BatchService::processGetResourceInformation(const std::string &answer_mailbox) {
       // Build a dictionary
       std::map<std::string, std::vector<double>> dict;
