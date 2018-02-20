@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <cfloat>
+#include <climits>
 
 #include "wrench/services/Service.h"
 #include "wrench/workflow/job/WorkflowJob.h"

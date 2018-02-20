@@ -1105,27 +1105,56 @@ namespace wrench {
 
       WRENCH_INFO("Asked to run a batch job with id %ld", job->getJobID());
 
-      if (job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-        if (not this->supports_standard_jobs) {
-          try {
-            S4U_Mailbox::dputMessage(answer_mailbox,
-                                     new ComputeServiceSubmitStandardJobAnswerMessage(
-                                             (StandardJob *) job->getWorkflowJob(),
-                                             this,
-                                             false,
-                                             std::shared_ptr<FailureCause>(
-                                                     new JobTypeNotSupported(
-                                                             job->getWorkflowJob(),
-                                                             this)),
-                                             this->getPropertyValueAsDouble(
-                                                     BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-          }
+      // Check whether the job type is supported
+      if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and (not this->supports_standard_jobs)) {
+        try {
+          S4U_Mailbox::dputMessage(answer_mailbox,
+                                   new ComputeServiceSubmitStandardJobAnswerMessage(
+                                           (StandardJob *) job->getWorkflowJob(),
+                                           this,
+                                           false,
+                                           std::shared_ptr<FailureCause>(
+                                                   new JobTypeNotSupported(
+                                                           job->getWorkflowJob(),
+                                                           this)),
+                                           this->getPropertyValueAsDouble(
+                                                   BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
-      } else if (job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-        if (not this->supports_pilot_jobs) {
+        return;
+      } else if ((job->getWorkflowJob()->getType() == WorkflowJob::PILOT) and (not this->supports_pilot_jobs)) {
+        try {
+          S4U_Mailbox::dputMessage(answer_mailbox,
+                                   new ComputeServiceSubmitPilotJobAnswerMessage(
+                                           (PilotJob *) job->getWorkflowJob(),
+                                           this,
+                                           false,
+                                           std::shared_ptr<FailureCause>(
+                                                   new JobTypeNotSupported(
+                                                           job->getWorkflowJob(),
+                                                           this)),
+                                           this->getPropertyValueAsDouble(
+                                                   BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          return;
+        }
+        return;
+      }
+
+      // Check that the job can be admitted in terms of resources:
+      //      - number of nodes,
+      //      - number of cores per host
+      //      - RAM
+      unsigned long requested_hosts = job->getNumNodes();
+      unsigned long requested_num_cores_per_host = job->getAllocatedCoresPerNode();
+      double required_ram_per_host = 0;
+
+      if ((requested_hosts > this->available_nodes_to_cores.size()) or
+          (requested_num_cores_per_host > Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first)) or
+          (required_ram_per_host > Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
+
+        {
           try {
             S4U_Mailbox::dputMessage(answer_mailbox,
                                      new ComputeServiceSubmitPilotJobAnswerMessage(
@@ -1133,7 +1162,7 @@ namespace wrench {
                                              this,
                                              false,
                                              std::shared_ptr<FailureCause>(
-                                                     new JobTypeNotSupported(
+                                                     new NotEnoughComputeResources(
                                                              job->getWorkflowJob(),
                                                              this)),
                                              this->getPropertyValueAsDouble(
@@ -1141,11 +1170,9 @@ namespace wrench {
           } catch (std::shared_ptr<NetworkError> &cause) {
             return;
           }
-          return;
         }
       }
 
-      // Check that the job can be admitted
 
       if (job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
 
@@ -1176,11 +1203,11 @@ namespace wrench {
       this->pending_jobs.push_back(std::unique_ptr<BatchJob>(job));
     }
 
-/**
- * @brief Process a pilot job completion
- *
- * @param job: the pilot job
- */
+    /**
+     * @brief Process a pilot job completion
+     *
+     * @param job: the pilot job
+     */
     void BatchService::processPilotJobCompletion(PilotJob *job) {
 
       std::string job_id;
