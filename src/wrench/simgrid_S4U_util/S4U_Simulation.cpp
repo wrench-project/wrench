@@ -213,13 +213,13 @@ namespace wrench {
         const char *capacity_string = host->getProperty(tag.c_str());
         if (capacity_string) {
           if (capacity_value != ComputeService::ALL_RAM) {
-            throw std::invalid_argument("S4U_Simulation::getMemoryCapacity(): Host '" + host->getName() + "' has multiple memory capacity specifications");
+            throw std::invalid_argument("S4U_Simulation::getMemoryCapacity(): Host '" + std::string(host->getCname()) + "' has multiple memory capacity specifications");
           }
           try {
             capacity_value = UnitParser::parse_size(capacity_string);
           } catch (std::runtime_error &e) {
             throw std::invalid_argument(
-                    "S4U_Simulation::getMemoryCapacity(): Host '" + host->getName() + "'has invalid memory capacity specification '" + tag +":" +
+                    "S4U_Simulation::getMemoryCapacity(): Host '" + std::string(host->getCname()) + "'has invalid memory capacity specification '" + tag +":" +
                     std::string(capacity_string) + "'");
           }
         }
