@@ -798,7 +798,7 @@ namespace wrench {
 //        return true;
 //      } else if (auto *msg = dynamic_cast<MulticoreComputeServiceFlopRateRequestMessage *>(message.get())) {
 //        MulticoreComputeServiceFlopRateAnswerMessage *answer_message = new MulticoreComputeServiceFlopRateAnswerMessage(
-//                S4U_Simulation::getFlopRate(this->hostname),
+//                S4U_Simulation::getHostFlopRate(this->hostname),
 //                this->getPropertyValueAsDouble(
 //                        MultihostMulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD));
 //        try {
