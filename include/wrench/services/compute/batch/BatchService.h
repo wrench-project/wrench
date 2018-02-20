@@ -61,10 +61,10 @@ namespace wrench {
 
     public:
         BatchService(std::string &hostname,
-                     std::vector<std::string> nodes_in_network,
-                     StorageService *default_storage_service,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
+                     std::vector<std::string> nodes_in_network,
+                     StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {});
 
         //cancels the job

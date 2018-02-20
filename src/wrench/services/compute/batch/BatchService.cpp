@@ -45,16 +45,17 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
-     * @param nodes_in_network: the hosts running in the network
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
+     * @param nodes_in_network: the hosts running in the network
+     * @param default_storage_service: the default storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      */
     BatchService::BatchService(std::string &hostname,
-                               std::vector<std::string> nodes_in_network,
-                               StorageService *default_storage_service,
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
+                               std::vector<std::string> nodes_in_network,
+                               StorageService *default_storage_service,
                                std::map<std::string, std::string> plist) :
             BatchService(hostname, nodes_in_network, default_storage_service, supports_standard_jobs,
                          supports_pilot_jobs, 0, plist, "") {
