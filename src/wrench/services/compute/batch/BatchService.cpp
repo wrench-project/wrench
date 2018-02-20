@@ -25,6 +25,9 @@
 #include <boost/algorithm/string.hpp>
 #include <wrench/util/MessageManager.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
@@ -1148,29 +1151,53 @@ namespace wrench {
       //      - RAM
       unsigned long requested_hosts = job->getNumNodes();
       unsigned long requested_num_cores_per_host = job->getAllocatedCoresPerNode();
-      double required_ram_per_host = job->getMemoryRequirement();
 
-      if ((requested_hosts > this->available_nodes_to_cores.size()) or
-          (requested_num_cores_per_host > Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first)) or
-          (required_ram_per_host > Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
+      if (job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
 
-        {
-          try {
-            S4U_Mailbox::dputMessage(answer_mailbox,
-                                     new ComputeServiceSubmitPilotJobAnswerMessage(
-                                             (PilotJob *) job->getWorkflowJob(),
-                                             this,
-                                             false,
-                                             std::shared_ptr<FailureCause>(
-                                                     new NotEnoughComputeResources(
-                                                             job->getWorkflowJob(),
-                                                             this)),
-                                             this->getPropertyValueAsDouble(
-                                                     BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-          } catch (std::shared_ptr<NetworkError> &cause) {
+        double required_ram_per_host = job->getMemoryRequirement();
+
+        if ((requested_hosts > this->available_nodes_to_cores.size()) or
+            (requested_num_cores_per_host >
+             Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first)) or
+            (required_ram_per_host >
+             Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first))) {
+
+          {
+            try {
+              S4U_Mailbox::dputMessage(answer_mailbox,
+                                       new ComputeServiceSubmitStandardJobAnswerMessage(
+                                               (StandardJob *) job->getWorkflowJob(),
+                                               this,
+                                               false,
+                                               std::shared_ptr<FailureCause>(
+                                                       new NotEnoughComputeResources(
+                                                               job->getWorkflowJob(),
+                                                               this)),
+                                               this->getPropertyValueAsDouble(
+                                                       BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) { }
             return;
           }
         }
+      }
+
+      if ((requested_hosts > this->available_nodes_to_cores.size()) or
+          (requested_num_cores_per_host >
+           Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first))) {
+        try {
+          S4U_Mailbox::dputMessage(answer_mailbox,
+                                   new ComputeServiceSubmitPilotJobAnswerMessage(
+                                           (PilotJob *) job->getWorkflowJob(),
+                                           this,
+                                           false,
+                                           std::shared_ptr<FailureCause>(
+                                                   new NotEnoughComputeResources(
+                                                           job->getWorkflowJob(),
+                                                           this)),
+                                           this->getPropertyValueAsDouble(
+                                                   BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) { }
+        return;
       }
 
 

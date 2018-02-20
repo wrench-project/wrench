@@ -52,8 +52,8 @@ namespace wrench {
                     SERVICE_DOWN,
             /** @brief The compute service does not support this job type */
                     JOB_TYPE_NOT_SUPPORTED,
-            /** @brief The compute service cannot run the job due to insufficient total number of cores */
-                    NOT_ENOUGH_CORES,
+            /** @brief The compute service cannot run the job (ever) due to insufficient resources */
+                    NOT_ENOUGH_COMPUTE_RESOURCES,
             /** @brief There was a network error, or an endpoint was down */
                     NETWORK_ERROR,
             /** @brief There was a network timeout (for a "with timeout" network operation) */
