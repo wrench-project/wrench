@@ -76,7 +76,7 @@ namespace wrench {
                              std::map<std::string, std::string>,
                              std::string suffix);
 
-        int main();
+        int main() override;
 
         bool processControlMessage(std::unique_ptr<S4U_PendingCommunication> comm);
 
@@ -91,7 +91,6 @@ namespace wrench {
 
         bool processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox);
 
-//        std::vector<S4U_PendingCommunication *> pending_communications;
         std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_communications;
 
         std::map<S4U_PendingCommunication *, std::unique_ptr<IncomingFile>> incoming_files;
