@@ -34,15 +34,32 @@ and modules for users who wish to contribute to WRENCH's core code.
 
 
 
-# Building a WRENCH's simulation #         {#wrench-101-simulation}
+# Building a WRENCH's Simulation #         {#wrench-101-simulation}
 
-In WRENCH, a user simulation is defined via the wrench::Simulation class. 
+In WRENCH, a user simulation is defined via the wrench::Simulation class. Briefly,
+a simulation is described by the following actions: 
 
-- `init()`: 
-- `instantiatePlatform()`:
-- `add()`:
-- `set()`:
-- `launch()`:
+-# `init(int *, char **)`: Initialize the simulation, which parses out WRENCH-specific 
+and [SimGrid-specific](http://simgrid.gforge.inria.fr/simgrid/3.18/doc/options.html) 
+command-line arguments.
+
+-# `instantiatePlatform(std::string &)`: Instantiate a simulated platform. It requires a 
+[SimGrid virtual platform description file](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html).
+Any [SimGrid](http://simgrid.gforge.inria.fr) simulation must be provided with the description 
+of the platform on which an application execution is to be simulates. This is done via
+a platform description file that includes definitions of compute hosts, clusters of hosts, 
+storage resources, network links, routes between hosts, etc.
+
+-# `add(std::unique_ptr<wrench::ComputeService>)`, `add(std::unique_ptr<wrench::StorageService>)`, 
+and `add(std::unique_ptr<wrench::WMS>)`: Add a compute service (jobs can be scheduled to these
+resources), a storage service (may represent a disk in a compute service or an external storage
+system), or a workflow management system.
+
+-# `setFileRegistryService(std::unique_ptr<wrench::FileRegistryService>` or 
+`setNetworkProximityService(std::unique_ptr<wrench::NetworkProximityService>`: Set the
+simulation's file registry service (required) and network proximity service (optional). 
+
+-# `launch()`: Sanity check of simulation elements and simulation execution.
 
 ![Overview of the WRENCH simulation components.](images/wrench-simulation.png)
 
