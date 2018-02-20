@@ -351,13 +351,13 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   // Create Three Storage Services
   EXPECT_NO_THROW(storage_service_100 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0))));
+                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
   EXPECT_NO_THROW(storage_service_500 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 500.0))));
+                  new wrench::SimpleStorageService(hostname, 500.0, ULONG_MAX))));
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 1000.0))));
+                  new wrench::SimpleStorageService(hostname, 1000.0, ULONG_MAX))));
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
@@ -473,11 +473,11 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   // Create 2 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 1000.0))));
+                  new wrench::SimpleStorageService(hostname, 1000.0, ULONG_MAX))));
 
   EXPECT_NO_THROW(storage_service_500 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 500.0))));
+                  new wrench::SimpleStorageService(hostname, 500.0, ULONG_MAX))));
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
@@ -633,11 +633,11 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   // Create 2 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 1000.0))));
+                  new wrench::SimpleStorageService(hostname, 1000.0, ULONG_MAX))));
 
   EXPECT_NO_THROW(storage_service_500 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 500.0))));
+                  new wrench::SimpleStorageService(hostname, 500.0, ULONG_MAX))));
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
@@ -857,15 +857,15 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   // Create 3 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 1000.0))));
+                  new wrench::SimpleStorageService(hostname, 1000.0, ULONG_MAX))));
 
   EXPECT_NO_THROW(storage_service_500 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 500.0))));
+                  new wrench::SimpleStorageService(hostname, 500.0, ULONG_MAX))));
 
   EXPECT_NO_THROW(storage_service_100 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0))));
+                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
@@ -1102,15 +1102,15 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   // Create 3 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 1000.0))));
+                  new wrench::SimpleStorageService(hostname, 1000.0, ULONG_MAX))));
 
   EXPECT_NO_THROW(storage_service_500 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 500.0))));
+                  new wrench::SimpleStorageService(hostname, 500.0, ULONG_MAX))));
 
   EXPECT_NO_THROW(storage_service_100 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0))));
+                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(

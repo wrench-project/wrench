@@ -169,7 +169,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
@@ -328,7 +328,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a WMS
   EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(

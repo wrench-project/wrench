@@ -44,12 +44,16 @@ namespace wrench {
      *
      * @param hostname: the name of the host on which to start the service
      * @param capacity: the storage capacity in bytes
+     * @param num_concurrent_connections: the maximum number of concurrent connections (use ULONG_MAX for no limit)
      * @param plist: a property list ({} means "use all defaults")
      */
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                double capacity,
+                                               unsigned long num_concurrent_connections,
                                                std::map<std::string, std::string> plist) :
-            SimpleStorageService(hostname, capacity, plist, "_" + std::to_string(getNewUniqueNumber())) {}
+            SimpleStorageService(hostname, capacity, plist, "_" + std::to_string(getNewUniqueNumber())) {
+      this->num_concurrent_connections = num_concurrent_connections;
+    }
 
     /**
      * @brief Private constructor
@@ -117,16 +121,16 @@ namespace wrench {
             WRENCH_INFO("Can't even place an asynchronous get...something must be really wrong...aborting");
             break;
           }
-          this->pending_communications.push_back(std::move(comm));
+          this->pending_incoming_communications.push_back(std::move(comm));
           should_post_a_receive_on_my_standard_mailbox = false;
         }
 
         // Wait for a message
-        unsigned long target = S4U_PendingCommunication::waitForSomethingToHappen(&(this->pending_communications));
+        unsigned long target = S4U_PendingCommunication::waitForSomethingToHappen(&(this->pending_incoming_communications));
 
         // Extract the pending comm
-        std::unique_ptr<S4U_PendingCommunication> target_comm = std::move(this->pending_communications[target]);
-        this->pending_communications.erase(this->pending_communications.begin() + target);
+        std::unique_ptr<S4U_PendingCommunication> target_comm = std::move(this->pending_incoming_communications[target]);
+        this->pending_incoming_communications.erase(this->pending_incoming_communications.begin() + target);
 
 
         if (target_comm->comm_ptr->getMailbox()->getName() == this->mailbox_name) {
@@ -139,7 +143,7 @@ namespace wrench {
 
       //probably we have to remove everything leftover on the pending communications
       std::vector<std::unique_ptr<S4U_PendingCommunication>>::iterator it;
-      for(it=this->pending_communications.begin();it!=this->pending_communications.end();it++){
+      for(it=this->pending_incoming_communications.begin();it!=this->pending_incoming_communications.end();it++){
         if(it->get()!= nullptr){
           it->reset();
         }
@@ -342,8 +346,8 @@ namespace wrench {
       // Create an "incoming file" record: TODO   RAW POINTER HERE FOR INCOMING FILE!!
       this->incoming_files.insert(std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(new IncomingFile(file, false, ""))));
 
-      // Add the communication to the list of pending_communications
-      this->pending_communications.push_back(std::move(pending_comm));
+      // Add the communication to the list of pending_incoming_communications
+      this->pending_incoming_communications.push_back(std::move(pending_comm));
 
       return true;
     }
@@ -487,8 +491,8 @@ namespace wrench {
       // Create an "incoming file" record
       this->incoming_files.insert(std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(new IncomingFile(file, true, answer_mailbox))));
 
-      // Add the communication to the list of pending_communications
-      this->pending_communications.push_back(std::move(pending_comm));
+      // Add the communication to the list of pending_incoming_communications
+      this->pending_incoming_communications.push_back(std::move(pending_comm));
 
 
       return true;

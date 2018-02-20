@@ -220,7 +220,7 @@ void OneTaskTest::do_Noop_test() {
   ASSERT_THROW(simulation->launch(), std::runtime_error);
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a WMS
   ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -341,7 +341,7 @@ void OneTaskTest::do_HostMemory_test() {
   // Create a Storage Service
   storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname1, 10000000000000.0)));
+                  new wrench::SimpleStorageService(hostname1, 10000000000000.0, ULONG_MAX)));
 
   // Start a file registry service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -484,7 +484,7 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a File Registry Service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -607,7 +607,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -761,12 +761,12 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create another Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
 
   // Create a Compute Service with default Storage Service #2
