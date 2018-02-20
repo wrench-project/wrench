@@ -652,23 +652,27 @@ private:
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
         batch_job_args["-t"] = "2"; //time in minutes
-        batch_job_args["-c"] = "12"; //number of cores per node
-        bool success = false;
+        batch_job_args["-c"] = "12"; //number of cores per node, which is too many!
+
+        bool success = true;
         try {
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-        } catch (std::runtime_error e) {
-          success = true;
+        } catch (wrench::WorkflowExecutionException &e) {
+          success = false;
+          if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_COMPUTE_RESOURCES) {
+            throw std::runtime_error("Got an exception, as expected, but the failure cause seems wrong");
+          }
         }
-        if (not success) {
-          throw std::runtime_error(
-                  "Expecting a runtime error of not enough arugments but did not get any"
-          );
+
+        if (success) {
+          throw std::runtime_error("Job Submission should have generated an exception");
         }
+
 
         workflow->removeTask(task);
       }
 
-      // Terminate everything
+// Terminate everything
       this->shutdownAllServices();
       return 0;
     }
