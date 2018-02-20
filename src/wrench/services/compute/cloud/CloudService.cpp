@@ -416,7 +416,7 @@ namespace wrench {
                                                                                       pm_hostname), num_cores);
 
           // create a multihost multicore computer service for the VM
-          // TODO: Don't pass ComputeService::ALL_RAM for the RAM perhaps?
+          // TODO FOR RAFAEL: Don't pass ComputeService::ALL_RAM for the RAM perhaps?
           std::unique_ptr<ComputeService> cs(
                   new MultihostMulticoreComputeService(vm_hostname, supports_standard_jobs, supports_pilot_jobs,
                                                        {std::make_tuple(vm_hostname, num_cores, ComputeService::ALL_RAM)},
@@ -672,10 +672,10 @@ namespace wrench {
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
-      // RAM capacity per host
+      // RAM availability per host
       std::vector<double> ram_availabilities;
       for (auto &vm : this->vm_list) {
-        ram_availabilities.push_back(ComputeService::ALL_RAM);  // TODO FOR RAFAEL : What about VM memory capacities???
+        ram_availabilities.push_back(ComputeService::ALL_RAM);  // TODO FOR RAFAEL : What about VM memory availabilities???
       }
       dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
