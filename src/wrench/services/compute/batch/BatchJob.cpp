@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "wrench/services/compute/batch/BatchJob.h"
+#include "wrench/workflow/WorkflowTask.h"
 
 namespace wrench {
     BatchJob::BatchJob(WorkflowJob *job, unsigned long jobid, unsigned long time_in_minutes, unsigned long num_nodes,
@@ -34,6 +35,20 @@ namespace wrench {
 
     unsigned long BatchJob::getAllocatedTime() {
       return this->time_in_minutes;
+    }
+
+    double BatchJob::getMemoryRequirement() {
+      WorkflowJob *workflow_job = this->job;
+      double memory_requirement = 0.0;
+      if (workflow_job->getType() == WorkflowJob::STANDARD) {
+        auto standard_job = (StandardJob *)workflow_job;
+        for (auto const &t : standard_job->getTasks()) {
+          double ram = t->getMemoryRequirement();
+          memory_requirement = (memory_requirement < ram ? ram : memory_requirement);
+        }
+      }
+      return memory_requirement;
+
     }
 
     double BatchJob::getAppearedTimeStamp() {

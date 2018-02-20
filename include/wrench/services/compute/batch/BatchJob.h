@@ -27,6 +27,7 @@ namespace wrench {
         unsigned long getJobID();
         unsigned long getAllocatedTime();
         unsigned long getAllocatedCoresPerNode();
+        double getMemoryRequirement();
         double getEndingTimeStamp();
         double getAppearedTimeStamp();
         unsigned long getNumNodes();

@@ -209,7 +209,7 @@ namespace wrench {
       std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory", "Memory", "MEMORY"};
       double capacity_value = ComputeService::ALL_RAM;
 
-      for (auto tag : tags) {
+      for (auto const &tag : tags) {
         const char *capacity_string = host->getProperty(tag.c_str());
         if (capacity_string) {
           if (capacity_value != ComputeService::ALL_RAM) {

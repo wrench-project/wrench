@@ -1148,7 +1148,7 @@ namespace wrench {
       //      - RAM
       unsigned long requested_hosts = job->getNumNodes();
       unsigned long requested_num_cores_per_host = job->getAllocatedCoresPerNode();
-      double required_ram_per_host = 0;
+      double required_ram_per_host = job->getMemoryRequirement();
 
       if ((requested_hosts > this->available_nodes_to_cores.size()) or
           (requested_num_cores_per_host > Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first)) or
