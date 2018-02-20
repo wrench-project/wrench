@@ -2233,7 +2233,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a Compute Service (we don't use it)
-  wrench::ComputeService *compute_service;
+  wrench::ComputeService *compute_service = nullptr;
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host3", true, true,
