@@ -189,7 +189,7 @@ namespace wrench {
         void terminatePilotJob(PilotJob *job) override;
 
         std::set<std::tuple<std::string, unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
-                                                                        unsigned long, unsigned long);
+                                                                        unsigned long, unsigned long, double);
 
         BatchJob *scheduleJob(std::string);
 

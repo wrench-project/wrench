@@ -667,7 +667,19 @@ namespace wrench {
     std::set<std::tuple<std::string, unsigned long, double>>
     BatchService::scheduleOnHosts(std::string host_selection_algorithm,
                                   unsigned long num_nodes,
-                                  unsigned long cores_per_node) {
+                                  unsigned long cores_per_node,
+                                  double ram_per_node) {
+
+      if (ram_per_node > Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first)) {
+        throw std::runtime_error("BatchService::scheduleOnHosts(): Asking for too much RAM per host");
+      }
+      if (num_nodes > this->available_nodes_to_cores.size()) {
+        throw std::runtime_error("BatchService::scheduleOnHosts(): Asking for too many hosts");
+      }
+      if (cores_per_node > Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first)) {
+        throw std::runtime_error("BatchService::scheduleOnHosts(): Asking for too many cores per host");
+      }
+
       std::set<std::tuple<std::string, unsigned long, double>> resources = {};
       std::vector<std::string> hosts_assigned = {};
       if (host_selection_algorithm == "FIRSTFIT") {
@@ -679,7 +691,7 @@ namespace wrench {
             //Remove that many cores from the available_nodes_to_core
             (*it).second -= cores_per_node;
             hosts_assigned.push_back((*it).first);
-            resources.insert(std::make_tuple((*it).first, cores_per_node, 0));  // TODO: RAM is set to 0 here for now
+            resources.insert(std::make_tuple((*it).first, cores_per_node, ram_per_node));
             if (++host_count >= num_nodes) {
               break;
             }
@@ -806,9 +818,10 @@ namespace wrench {
 
 
       //Try to schedule hosts based on FIRSTFIT OR BESTFIT
+      // Asking for the FULL RAM (TODO: Change this?)
       std::set<std::tuple<std::string, unsigned long, double>> resources = this->scheduleOnHosts(
               this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
-              num_nodes_asked_for, cores_per_node_asked_for);
+              num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_CORES);
 
       if (resources.empty()) {
         return false;
@@ -1991,6 +2004,17 @@ namespace wrench {
         ram_capacities.push_back(S4U_Simulation::getMemoryCapacity(h.first));
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
+
+      // RAM availability per host  (0 if something is running, full otherwise)
+      std::vector<double> ram_availabilities;
+      for (auto h : this->available_nodes_to_cores) {
+        if (h.second < S4U_Simulation::getMemoryCapacity(h.first)) {
+          ram_availabilities.push_back(0.0);
+        } else {
+          ram_availabilities.push_back(S4U_Simulation::getMemoryCapacity(h.first));
+        }
+      }
+
 
       std::vector<double> ttl;
       ttl.push_back(ComputeService::ALL_RAM);
