@@ -42,6 +42,7 @@ namespace wrench {
      * @param simulation: the simulation
      * @param hostname: the name of the host
      * @param num_cores: the number of cores available to the executor
+     * @param ram_utilization: the number of bytes of RAM used by the executor
      * @param callback_mailbox: the callback mailbox to which the worker
      *        thread can send "work done" messages
      * @param workunit: the workunit to perform
@@ -52,6 +53,7 @@ namespace wrench {
             Simulation *simulation,
             std::string hostname,
             unsigned long num_cores,
+            double ram_utilization,
             std::string callback_mailbox,
             Workunit *workunit,
             StorageService *default_storage_service,
@@ -71,6 +73,7 @@ namespace wrench {
       this->workunit = workunit;
       this->thread_startup_overhead = thread_startup_overhead;
       this->num_cores = num_cores;
+      this->ram_utilization = ram_utilization;
       this->default_storage_service = default_storage_service;
 
       // Start my daemon on the host
@@ -389,6 +392,14 @@ namespace wrench {
      */
     unsigned long WorkunitMulticoreExecutor::getNumCores() {
       return this->num_cores;
+    }
+
+    /**
+     * @brief Returns the RAM the executor is utilizing
+     * @return number of bytes
+     */
+    double WorkunitMulticoreExecutor::getMemoryUtilization() {
+      return this->ram_utilization;
     }
 
 };

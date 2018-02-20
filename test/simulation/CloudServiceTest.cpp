@@ -246,8 +246,8 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
-      // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 60.0);
+      // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 60.0);
 
       // Submit the pilot job for execution
       try {
@@ -373,7 +373,7 @@ private:
         unsigned long sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_cores.end(), 0);
 
         if (sum_num_cores != 0 || sum_num_idle_cores != 0) {
-          throw std::runtime_error("getNumCores() and getNumIdleCores() should be 0.");
+          throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 0.");
         }
 
         // create a VM with the PM number of cores
@@ -388,7 +388,7 @@ private:
         sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
 
         if (sum_num_cores != 4 || sum_num_idle_cores != 4) {
-          throw std::runtime_error("getNumCores() and getNumIdleCores() should be 4.");
+          throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 4.");
         }
 
         // create a VM with two cores
@@ -400,7 +400,7 @@ private:
         sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
 
         if (sum_num_cores != 6 || sum_num_idle_cores != 6) {
-          throw std::runtime_error("getNumCores() and getNumIdleCores() should be 6.");
+          throw std::runtime_error("getHostNumCores() and getNumIdleCores() should be 6.");
         }
 
       } catch (wrench::WorkflowExecutionException &e) {

@@ -55,7 +55,8 @@ namespace wrench {
       double pilot_job_duration = 2.0 * flops / target_service->getCoreFlopRate()[0];
       WRENCH_INFO("Submitting a pilot job (1 host, 1 core, %lf seconds)", pilot_job_duration);
 
-      WorkflowJob *job = (WorkflowJob *) job_manager->createPilotJob(workflow, 1, 1, pilot_job_duration);
+      //TODO: For now we are asking for a pilot job that requires no RAM
+      WorkflowJob *job = (WorkflowJob *) job_manager->createPilotJob(workflow, 1, 1, 0.0, pilot_job_duration);
       job_manager->submitJob(job, target_service);
     }
 

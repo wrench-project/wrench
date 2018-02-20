@@ -193,7 +193,7 @@ namespace wrench {
      * @param compute_service: the compute service that didn't have enough cores
      */
     NotEnoughComputeResources::NotEnoughComputeResources(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
-            NOT_ENOUGH_CORES) {
+            NOT_ENOUGH_COMPUTE_RESOURCES) {
       this->job = job;
       this->compute_service = compute_service;
     }

@@ -61,10 +61,10 @@ namespace wrench {
 
     public:
         BatchService(std::string &hostname,
-                     std::vector<std::string> nodes_in_network,
-                     StorageService *default_storage_service,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
+                     std::vector<std::string> compute_hosts,
+                     StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {});
 
         //cancels the job
@@ -78,11 +78,11 @@ namespace wrench {
 
     private:
         BatchService(std::string hostname,
-                     std::vector<std::string> nodes_in_network,
-                     StorageService *default_storage_service,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
-                     unsigned long reduced_cores,
+                     std::vector<std::string> compute_hosts,
+                     StorageService *default_storage_service,
+                     unsigned long cores_per_host,
                      std::map<std::string, std::string> plist,
                      std::string suffix);
 
@@ -156,7 +156,7 @@ namespace wrench {
 
         std::string convertAvailableResourcesToJsonString(std::map<std::string, unsigned long>);
 
-        std::string convertResourcesToJsonString(std::set<std::pair<std::string, unsigned long>>);
+        std::string convertResourcesToJsonString(std::set<std::tuple<std::string, unsigned long, double>>);
 
         //submits the standard job
         //overriden function of parent Compute Service
@@ -188,8 +188,8 @@ namespace wrench {
 
         void terminatePilotJob(PilotJob *job) override;
 
-        std::set<std::pair<std::string, unsigned long>> scheduleOnHosts(std::string host_selection_algorithm,
-                                                                        unsigned long, unsigned long);
+        std::set<std::tuple<std::string, unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
+                                                                        unsigned long, unsigned long, double);
 
         BatchJob *scheduleJob(std::string);
 
@@ -215,7 +215,7 @@ namespace wrench {
         void notifyJobSubmitters(PilotJob *job);
 
         //update the resources
-        void updateResources(std::set<std::pair<std::string, unsigned long>> resources);
+        void updateResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
 
         void updateResources(StandardJob *job);
 
@@ -228,11 +228,14 @@ namespace wrench {
         //send all the jobs in the queue to the batscheduler
         bool scheduleAllQueuedJobs();
 
+        // process a job submission
+        void processJobSubmission(BatchJob *job, std::string answer_mailbox);
+
         //process execute events from batsched
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
         //process execution of job
-        void processExecution(std::set<std::pair<std::string, unsigned long>>, WorkflowJob *,
+        void processExecution(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
                               BatchJob *, unsigned long, unsigned long, unsigned long);
 
         //notify batsched about job completion/failure/killed events

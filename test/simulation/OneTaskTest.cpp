@@ -212,7 +212,7 @@ void OneTaskTest::do_Noop_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
 
@@ -283,18 +283,18 @@ private:
       double ram_capacity;
 
       ram_capacity = wrench::Simulation::getHostMemoryCapacity("SingleHost");
-      if (ram_capacity != DBL_MAX) {
+      if (ram_capacity != wrench::ComputeService::ALL_RAM) {
         throw std::runtime_error("RAM Capacity of SingleHost should be +infty");
       }
 
       ram_capacity = wrench::Simulation::getMemoryCapacity();
-      if (ram_capacity != DBL_MAX) {
+      if (ram_capacity != wrench::ComputeService::ALL_RAM) {
         throw std::runtime_error("RAM Capacity of SingleHost should be +infty");
       }
 
 
       ram_capacity = wrench::Simulation::getHostMemoryCapacity("OtherHost");
-      if (ram_capacity == DBL_MAX) {
+      if (ram_capacity == wrench::ComputeService::ALL_RAM) {
         throw std::runtime_error("RAM Capacity of OtherHost should not be +infty");
       }
       if (fabs(ram_capacity - 1024) > 0.01) {
@@ -334,7 +334,7 @@ void OneTaskTest::do_HostMemory_test() {
   compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname1, true, true,
-                                                               {std::make_pair(hostname1, 0)},
+                                                               {std::make_tuple(hostname1, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {})));
 
@@ -477,7 +477,7 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
 
@@ -613,7 +613,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service1,
                                                                {}))));
 
@@ -773,7 +773,7 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service2,
                                                                {}))));
 

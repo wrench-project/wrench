@@ -13,6 +13,8 @@
 #include <map>
 
 #include <iostream>
+#include <cfloat>
+#include <climits>
 
 #include "wrench/services/Service.h"
 #include "wrench/workflow/job/WorkflowJob.h"
@@ -34,16 +36,16 @@ namespace wrench {
 
     public:
 
+        static constexpr unsigned long ALL_CORES = ULONG_MAX;
+        static constexpr double ALL_RAM = DBL_MAX;
+
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
 
-
         virtual ~ComputeService(){}
 
         void stop() override;
-
-//        void runJob(WorkflowJob *job);
 
         void runJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args = {});
 

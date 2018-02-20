@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <cfloat>
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h"
 #include "wrench/services/compute/standard_job_executor/Workunit.h"
@@ -42,8 +43,10 @@ namespace wrench {
      * @param simulation: the simulation
      * @param hostname: the hostname of the host that should run this executor (could be the first compute resources - see below)
      * @param job: the job to execute
-     * @param compute_resources: a list of <hostname, num_cores> pairs, which represent
+     * @param compute_resources: a non-empty list of <hostname, num_cores, memory> tuples, which represent
      *           the compute resources the job should execute on
+     *              - If num_cores == ComputeService::ALL_CORES, then ALL the cores of the host are used
+     *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list
      *
@@ -54,7 +57,7 @@ namespace wrench {
                                              std::string callback_mailbox,
                                              std::string hostname,
                                              StandardJob *job,
-                                             std::set<std::pair<std::string, unsigned long>> compute_resources,
+                                             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                              StorageService *default_storage_service,
                                              std::map<std::string, std::string> plist) :
             S4U_Daemon("standard_job_executor", "standard_job_executor") {
@@ -63,30 +66,73 @@ namespace wrench {
         throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): invalid arguments");
       }
 
-      // Check that there is at least one core per host
+      // Check that there is at least one core per host but not too many cores
       for (auto host : compute_resources) {
-        if (std::get<1>(host) <= 0) {
+        if (std::get<1>(host) == 0) {
           throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): there should be at least one core per host");
+        }
+        if (std::get<1>(host) < ComputeService::ALL_CORES) {
+          if (std::get<1>(host) > S4U_Simulation::getNumCores(std::get<0>(host))) {
+            throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
+                                                " has only " + std::to_string(S4U_Simulation::getNumCores(std::get<0>(host))) + " cores");
+          }
+        } else {
+          // Set the num_cores to the maximum
+          std::get<1>(host) = S4U_Simulation::getNumCores(std::get<0>(host));
+        }
+      }
+
+      // Check that there is at least zero byte of memory per host, but not too many bytes
+      for (auto host : compute_resources) {
+        if (std::get<2>(host) < 0) {
+          throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): the number of bytes per host should be non-negative");
+        }
+        if (std::get<2>(host) < ComputeService::ALL_RAM) {
+          if (std::get<2>(host) > S4U_Simulation::getMemoryCapacity(std::get<0>(host))) {
+            throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
+                                                " has only " + std::to_string(S4U_Simulation::getMemoryCapacity(std::get<0>(host))) + " bytes of RAM");
+          }
+        } else {
+          // Set the memory to the maximum
+          std::get<2>(host) = S4U_Simulation::getMemoryCapacity(std::get<0>(host));
         }
       }
 
 
       // Check that there are enough cores to run the computational tasks
-      unsigned long min_required_num_cores = 0;
+      unsigned long max_min_required_num_cores = 0;
       for (auto task : job->tasks) {
-        min_required_num_cores = (min_required_num_cores < task->getMinNumCores() ? task->getMinNumCores() : min_required_num_cores);
+        max_min_required_num_cores = (max_min_required_num_cores < task->getMinNumCores() ? task->getMinNumCores() : max_min_required_num_cores);
       }
 
       bool enough_cores = false;
       for (auto host : compute_resources) {
-        if (std::get<1>(host) >= min_required_num_cores) {
+        if (std::get<1>(host) >= max_min_required_num_cores) {
           enough_cores = true;
           break;
         }
       }
 
       if (!enough_cores) {
-        throw std::runtime_error("StandardJobExecutor::StandardJobExecutor(): insufficient resources to run jobs");
+        throw std::runtime_error("StandardJobExecutor::StandardJobExecutor(): insufficient core resources to run the job");
+      }
+
+      // Check that there is enough RAM to run the computational tasks
+      double max_required_ram = 0.0;
+      for (auto task : job->tasks) {
+        max_required_ram = (max_required_ram < task->getMemoryRequirement() ? task->getMemoryRequirement() : max_required_ram);
+      }
+
+      bool enough_ram = false;
+      for (auto host : compute_resources) {
+        if (std::get<2>(host) >= max_required_ram) {
+          enough_ram = true;
+          break;
+        }
+      }
+
+      if (!enough_ram) {
+        throw std::runtime_error("StandardJobExecutor::StandardJobExecutor(): insufficient memory resources to run the job");
       }
 
       // Set instance variables
@@ -97,7 +143,6 @@ namespace wrench {
       this->default_storage_service = default_storage_service;
 
 
-      // Set properties
       // Set default properties
       for (auto p : this->default_property_values) {
         this->setProperty(p.first, p.second);
@@ -114,6 +159,13 @@ namespace wrench {
       for (auto host : compute_resources) {
         this->total_num_cores += std::get<1>(host);
         this->core_availabilities[std::get<0>(host)] = std::get<1>(host);
+      }
+
+      // Compute the total ram and set initial ram availabilities
+      this->total_ram = 0.0;
+      for (auto host : compute_resources) {
+        this->total_ram += std::get<2>(host);
+        this->ram_availabilities[std::get<0>(host)] = std::get<2>(host);
       }
 
       // Start the daemon
@@ -154,8 +206,8 @@ namespace wrench {
     int StandardJobExecutor::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
-      WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores over %ld hosts: ",
-                  this->mailbox_name.c_str(), this->total_num_cores, this->compute_resources.size());
+      WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores and %.2lf bytes of RAM over %ld hosts: ",
+                  this->mailbox_name.c_str(), this->total_num_cores, this->total_ram, this->compute_resources.size());
       for (auto h : this->compute_resources) {
         WRENCH_INFO("  %s: %ld cores", std::get<0>(h).c_str(), std::get<1>(h));
       }
@@ -196,6 +248,78 @@ namespace wrench {
     }
 
     /**
+     * @brief Computes the minimum number of cores required to execute a work unit
+     * @param wu: the work unit
+     * @return a number of cores
+     *
+     * @throw std::runtime_error
+     */
+    unsigned long StandardJobExecutor::computeWorkUnitMinNumCores(Workunit *wu) {
+      unsigned long minimum_num_cores;
+      if (wu->tasks.size() == 0) {
+        minimum_num_cores = 1;
+      } else if (wu->tasks.size() == 1) {
+        minimum_num_cores = wu->tasks[0]->getMinNumCores();
+      } else {
+        throw std::runtime_error(
+                "StandardJobExecutor::computeWorkUnitMinNumCores(): Found a workunit with more than one computational tasks!!");
+      }
+      return minimum_num_cores;
+    }
+
+    /**
+     * @brief Computes the desired number of cores required to execute a work unit
+     * @param wu: the work unit
+     * @return a number of cores
+     *
+     * @throw std::runtime_error
+     */
+    unsigned long StandardJobExecutor::computeWorkUnitDesiredNumCores(Workunit *wu) {
+      unsigned long desired_num_cores;
+      if (wu->tasks.size() == 0) {
+        desired_num_cores = 1;
+
+      } else if (wu->tasks.size() == 1) {
+        std::string core_allocation_algorithm =
+                this->getPropertyValueAsString(StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM);
+
+        if (core_allocation_algorithm == "maximum") {
+          desired_num_cores = wu->tasks[0]->getMaxNumCores();
+        } else if (core_allocation_algorithm == "minimum") {
+          desired_num_cores = wu->tasks[0]->getMinNumCores();
+        } else {
+          throw std::runtime_error("StandardjobExecutor::computeWorkUnitDesiredNumCores(): Unknown StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
+                                   + core_allocation_algorithm + "'");
+        }
+      } else {
+        throw std::runtime_error(
+                "StandardjobExecutor::computeWorkUnitDesiredNumCores(): Found a workunit with more than one computational tasks!!");
+      }
+      return desired_num_cores;
+    }
+
+    /**
+    * @brief Computes the desired amount of RAM required to execute a work unit
+    * @param wu: the work unit
+    * @return a number of bytes
+    *
+    * @throw std::runtime_error
+    */
+    double StandardJobExecutor::computeWorkUnitMinMemory(Workunit *wu) {
+      double  min_ram;
+      if (wu->tasks.size() == 0) {
+        min_ram  = 0.0;
+
+      } else if (wu->tasks.size() == 1) {
+        min_ram = wu->tasks[0]->getMemoryRequirement();
+      } else {
+        throw std::runtime_error(
+                "StandardjobExecutor::computeWorkUnitMinMemory(): Found a workunit with more than one computational tasks!!");
+      }
+      return min_ram;
+    }
+
+    /**
      * @brief Dispatch ready work units to hosts/cores, while possible
      */
     void StandardJobExecutor::dispatchReadyWorkunits() {
@@ -228,42 +352,54 @@ namespace wrench {
       // hosts/cores, if possible
       for (auto wu : sorted_ready_workunits) {
 
-        unsigned long target_num_cores = 0;
-        std::string target_host = "";
 
-        // Compute the workunit's desired number of cores
-        unsigned long desired_num_cores, minimum_num_cores;
 
-        if (wu->tasks.size() == 0) {
-          desired_num_cores = 1;
-          minimum_num_cores = 1;
+        // Compute the workunit's minimum number os cores, desired number of cores, and minimum amount of ram
+        unsigned long minimum_num_cores;
+        unsigned long desired_num_cores;
+        double required_ram;
 
-        } else if (wu->tasks.size() == 1) {
-          std::string core_allocation_algorithm =
-                  this->getPropertyValueAsString(StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM);
-
-          minimum_num_cores = wu->tasks[0]->getMinNumCores();
-
-          if (core_allocation_algorithm == "maximum") {
-            desired_num_cores = wu->tasks[0]->getMaxNumCores();
-          } else if (core_allocation_algorithm == "minimum") {
-            desired_num_cores = wu->tasks[0]->getMinNumCores();
-          } else {
-            throw std::runtime_error("Unknown StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
-                                     + core_allocation_algorithm + "'");
-          }
-        } else {
-          throw std::runtime_error(
-                  "StandardJobExecutor::dispatchNextPendingWork(): Found a workunit with more than one computational tasks!!");
+        try {
+          minimum_num_cores = computeWorkUnitMinNumCores(wu);
+          desired_num_cores = computeWorkUnitDesiredNumCores(wu);
+          required_ram = computeWorkUnitMinMemory(wu);
+        } catch (std::runtime_error &e) {
+          throw;
         }
+
+
+//        if (wu->tasks.size() == 0) {
+//          desired_num_cores = 1;
+//          minimum_num_cores = 1;
+//
+//        } else if (wu->tasks.size() == 1) {
+//          std::string core_allocation_algorithm =
+//                  this->getPropertyValueAsString(StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM);
+//
+//          minimum_num_cores = wu->tasks[0]->getMinNumCores();
+//
+//          if (core_allocation_algorithm == "maximum") {
+//            desired_num_cores = wu->tasks[0]->getMaxNumCores();
+//          } else if (core_allocation_algorithm == "minimum") {
+//            desired_num_cores = wu->tasks[0]->getMinNumCores();
+//          } else {
+//            throw std::runtime_error("Unknown StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
+//                                     + core_allocation_algorithm + "'");
+//          }
+//        } else {
+//          throw std::runtime_error(
+//                  "StandardJobExecutor::dispatchNextPendingWork(): Found a workunit with more than one computational tasks!!");
+//        }
 
 //        std::cerr << "** ITS DESIRED NUM CORES: " << desired_num_cores << "\n";
 
 
-        // Find a host on which to run the workunit
+        // Find a host on which to run the workunit, and on how many cores
+        std::string target_host = "";
+        unsigned long target_num_cores = 0;
 
-
-        WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores and would like %ld cores", minimum_num_cores, desired_num_cores);
+        WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and required %.2lf bytes of RAM",
+                    minimum_num_cores, desired_num_cores, required_ram);
         std::string host_selection_algorithm =
                 this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
 
@@ -273,12 +409,20 @@ namespace wrench {
           unsigned long target_slack = 0;
 
           for (auto h : this->compute_resources) {
-            std::string hostname = h.first;
-            unsigned long num_available_cores = this->core_availabilities[hostname];
+            std::string hostname = std::get<0>(h);
 //              WRENCH_INFO("Looking at host %s", hostname.c_str());
 
+            // Does the host have enough cores?
+            unsigned long num_available_cores = this->core_availabilities[hostname];
             if (num_available_cores < minimum_num_cores) {
 //              WRENCH_INFO("Not enough cores!");
+              continue;
+            }
+
+            // Does the host have enough RAM?
+            double available_ram = this->ram_availabilities[hostname];
+            if (available_ram < required_ram) {
+              WRENCH_INFO("Not enough RAM!");
               continue;
             }
 
@@ -321,6 +465,7 @@ namespace wrench {
                 new WorkunitMulticoreExecutor(this->simulation,
                                               target_host,
                                               target_num_cores,
+                                              required_ram,
                                               this->mailbox_name,
                                               wu,
                                               this->default_storage_service,
@@ -329,6 +474,8 @@ namespace wrench {
 
         // Update core availabilities
         this->core_availabilities[target_host] -= target_num_cores;
+        // Update RAM availabilities
+        this->ram_availabilities[target_host] -= required_ram;
 
 
         // Update data structures
@@ -410,6 +557,8 @@ namespace wrench {
 
       // Update core availabilities
       this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
+      // Update RAM availabilities
+      this->ram_availabilities[workunit_executor->getHostname()] += workunit_executor->getMemoryUtilization();
 
       // Remove the workunit executor from the workunit executor list
 //      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
@@ -420,7 +569,7 @@ namespace wrench {
         }
       }
 
-      // Find the workunit in the running workunig queue
+      // Find the workunit in the running workunit queue
       bool found_it = false;
       for (auto it = this->running_workunits.begin(); it != this->running_workunits.end(); it++) {
         if ((*it).get() == workunit) {
@@ -522,6 +671,8 @@ namespace wrench {
 
       // Update core availabilities
       this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
+      // Update RAM availabilities
+      this->ram_availabilities[workunit_executor->getHostname()] += workunit_executor->getMemoryUtilization();
 
       // Remove the work from the running work queue
       bool found_it = false;
@@ -769,7 +920,7 @@ namespace wrench {
      * @brief Retrieve the executor's compute resources
      * @return a a set of compute resources
      */
-    std::set<std::pair<std::string, unsigned long>>  StandardJobExecutor::getComputeResources() {
+    std::set<std::tuple<std::string, unsigned long, double>>  StandardJobExecutor::getComputeResources() {
       return this->compute_resources;
     }
 

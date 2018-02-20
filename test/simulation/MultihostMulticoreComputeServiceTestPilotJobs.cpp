@@ -118,7 +118,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 3600);  // Asking for 0 RAM
 
       // Submit a pilot job
       bool success = true;
@@ -171,7 +171,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, false,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
 
   // Create a WMS
@@ -236,8 +236,8 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
-      // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
+      // Create a pilot job that requires 1 host, 1 core per host, 0 bytes of RAM per host, and 1 hour
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 3600);
 
       // Submit a pilot job
       try {
@@ -349,7 +349,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
 
   // Create a WMS
@@ -413,8 +413,8 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
-      // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
+      // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 1 hour
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
 
       // Submit a pilot job
       try {
@@ -509,7 +509,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
 
   // Create a WMS
@@ -574,8 +574,8 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
-      // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
+      // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM, and 1 hour
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
 
       // Try to terminate it right now, which is stupid
 //      bool success = true;
@@ -629,7 +629,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
 
   // Create a WMS
@@ -694,8 +694,8 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
-      // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
+      // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, 1 hour
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
 
       // Submit a pilot job
       try {
@@ -797,7 +797,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
 
   // Create a WMS
@@ -858,8 +858,8 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
-      // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 3600);
+      // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, 1 hour
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
 
       // Submit a pilot job
       try {
@@ -968,7 +968,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                storage_service, {}))));
 
   // Create a WMS
