@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
   std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];
   std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
   wrench::StorageService *storage_service = simulation.add(std::unique_ptr<wrench::SimpleStorageService>(
-          new wrench::SimpleStorageService(storage_host, 10000000000000.0)));
+          new wrench::SimpleStorageService(storage_host, 10000000000000.0, ULONG_MAX)));
 
   /* Construct a list of hosts (in the example only one host) on which the
    * cloud service will be able to run tasks
