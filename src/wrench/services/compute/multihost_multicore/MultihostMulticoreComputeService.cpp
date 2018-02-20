@@ -777,37 +777,6 @@ namespace wrench {
         processPilotJobCompletion(msg->job);
         return true;
 
-//      } else if (auto *msg = dynamic_cast<ComputeServiceNumCoresRequestMessage *>(message.get())) {
-//        processGetNumCores(msg->answer_mailbox);
-//        return true;
-//
-//      } else if (auto *msg = dynamic_cast<ComputeServiceNumIdleCoresRequestMessage *>(message.get())) {
-//        processGetNumIdleCores(msg->answer_mailbox);
-//        return true;
-//
-//      } else if (auto *msg = dynamic_cast<MulticoreComputeServiceTTLRequestMessage *>(message.get())) {
-//        MulticoreComputeServiceTTLAnswerMessage *answer_message = new MulticoreComputeServiceTTLAnswerMessage(
-//                this->death_date - S4U_Simulation::getClock(),
-//                this->getPropertyValueAsDouble(
-//                        MultihostMulticoreComputeServiceProperty::TTL_ANSWER_MESSAGE_PAYLOAD));
-//        try {
-//          S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//          return true;
-//        }
-//        return true;
-//      } else if (auto *msg = dynamic_cast<MulticoreComputeServiceFlopRateRequestMessage *>(message.get())) {
-//        MulticoreComputeServiceFlopRateAnswerMessage *answer_message = new MulticoreComputeServiceFlopRateAnswerMessage(
-//                S4U_Simulation::getHostFlopRate(this->hostname),
-//                this->getPropertyValueAsDouble(
-//                        MultihostMulticoreComputeServiceProperty::FLOP_RATE_ANSWER_MESSAGE_PAYLOAD));
-//        try {
-//          S4U_Mailbox::dputMessage(msg->answer_mailbox, answer_message);
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//          return true;
-//        }
-//        return true;
-
       } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
 
         processGetResourceInformation(msg->answer_mailbox);
