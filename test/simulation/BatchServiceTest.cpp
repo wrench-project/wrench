@@ -209,12 +209,12 @@ void BatchServiceTest::do_StandardJobTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
@@ -357,12 +357,12 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -558,12 +558,12 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -701,12 +701,12 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -837,12 +837,12 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -990,12 +990,12 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -1141,12 +1141,12 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -1358,12 +1358,12 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -1556,12 +1556,12 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -1749,12 +1749,12 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -1925,12 +1925,12 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -2082,12 +2082,12 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -2247,12 +2247,12 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -2415,12 +2415,12 @@ void BatchServiceTest::do_BatchFakeJobSubmissionTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -2596,12 +2596,12 @@ void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(

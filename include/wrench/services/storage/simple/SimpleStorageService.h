@@ -52,6 +52,7 @@ namespace wrench {
         // Public Constructor
         SimpleStorageService(std::string hostname,
                              double capacity,
+                             unsigned long num_concurrent_connections,
                              std::map<std::string, std::string> = {});
 
         /***********************/
@@ -91,9 +92,14 @@ namespace wrench {
 
         bool processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox);
 
-        std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_communications;
+        unsigned long num_concurrent_connections;
 
+        std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_incoming_communications;
         std::map<S4U_PendingCommunication *, std::unique_ptr<IncomingFile>> incoming_files;
+
+        std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_outgoing_communications;
+
+
 
     };
 
