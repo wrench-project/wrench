@@ -63,7 +63,7 @@ namespace wrench {
         BatchService(std::string &hostname,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
-                     std::vector<std::string> nodes_in_network,
+                     std::vector<std::string> compute_hosts,
                      StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {});
 
@@ -227,6 +227,9 @@ namespace wrench {
 
         //send all the jobs in the queue to the batscheduler
         bool scheduleAllQueuedJobs();
+
+        // process a job submission
+        void processJobSubmission(BatchJob *job, std::string answer_mailbox);
 
         //process execute events from batsched
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
