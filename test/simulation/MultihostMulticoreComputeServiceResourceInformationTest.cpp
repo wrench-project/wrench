@@ -100,12 +100,12 @@ private:
 
       num_cores = this->test->compute_service1->getNumCores();
       if ((num_cores.size() != 2) or (num_cores[0] != 4) or (num_cores[1] != 4)) {
-        throw std::runtime_error("getNumCores() should return {4,4} for compute service #1");
+        throw std::runtime_error("getHostNumCores() should return {4,4} for compute service #1");
       }
 
       num_cores = this->test->compute_service2->getNumCores();
       if ((num_cores.size() != 2) or (num_cores[0] != 8) or (num_cores[1] != 8)) {
-        throw std::runtime_error("getNumCores() should return {8,8} for compute service #1");
+        throw std::runtime_error("getHostNumCores() should return {8,8} for compute service #1");
       }
 
       // Create a job that will use cores on compute service #1
@@ -187,8 +187,8 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   EXPECT_NO_THROW(compute_service1 = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host1", true, true,
-                                                               {std::make_pair("Host1", 4),
-                                                                std::make_pair("Host2", 4)},
+                                                               {{std::make_tuple("Host1", 4, wrench::ComputeService::ALL_RAM)},
+                                                                {std::make_tuple("Host2", 4, wrench::ComputeService::ALL_RAM)}},
                                                                nullptr
                   ))));
 
@@ -196,8 +196,8 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   EXPECT_NO_THROW(compute_service2 = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host1", true, true,
-                                                               {std::make_pair("Host3", 8),
-                                                                std::make_pair("Host4", 8)},
+                                                               {{std::make_tuple("Host3", 8, wrench::ComputeService::ALL_RAM)},
+                                                                {std::make_tuple("Host4", 8, wrench::ComputeService::ALL_RAM)}},
                                                                nullptr
                   ))));
   std::set<wrench::ComputeService *> compute_services;

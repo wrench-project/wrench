@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "wrench/services/compute/batch/BatchJob.h"
+#include "wrench/workflow/WorkflowTask.h"
 
 namespace wrench {
     BatchJob::BatchJob(WorkflowJob *job, unsigned long jobid, unsigned long time_in_minutes, unsigned long num_nodes,
@@ -36,6 +37,20 @@ namespace wrench {
       return this->time_in_minutes;
     }
 
+    double BatchJob::getMemoryRequirement() {
+      WorkflowJob *workflow_job = this->job;
+      double memory_requirement = 0.0;
+      if (workflow_job->getType() == WorkflowJob::STANDARD) {
+        auto standard_job = (StandardJob *)workflow_job;
+        for (auto const &t : standard_job->getTasks()) {
+          double ram = t->getMemoryRequirement();
+          memory_requirement = (memory_requirement < ram ? ram : memory_requirement);
+        }
+      }
+      return memory_requirement;
+
+    }
+
     double BatchJob::getAppearedTimeStamp() {
       return this->appeared_time_stamp;
     }
@@ -65,11 +80,11 @@ namespace wrench {
       this->ending_time_stamp = time_stamp;
     }
 
-    std::set<std::pair<std::string, unsigned long>> BatchJob::getResourcesAllocated() {
+    std::set<std::tuple<std::string, unsigned long, double>> BatchJob::getResourcesAllocated() {
       return this->resources_allocated;
     }
 
-    void BatchJob::setAllocatedResources(std::set<std::pair<std::string, unsigned long>> resources) {
+    void BatchJob::setAllocatedResources(std::set<std::tuple<std::string, unsigned long, double>> resources) {
       if (resources.empty()) {
         throw std::invalid_argument(
                 "BatchJob::setAllocatedResources(): Empty Resources allocated"

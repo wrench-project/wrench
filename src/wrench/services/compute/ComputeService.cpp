@@ -19,6 +19,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(compute_service, "Log category for Compute Service"
 
 namespace wrench {
 
+    constexpr unsigned long ComputeService::ALL_CORES;
+    constexpr double ComputeService::ALL_RAM;
+
     /**
      * @brief Stop the compute service - must be called by the stop()
      *        method of derived classes

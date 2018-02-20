@@ -12,6 +12,8 @@
 #include <xbt/ex.hpp>
 #include <set>
 #include <cfloat>
+#include <wrench/services/compute/ComputeService.h>
+#include <wrench/util/UnitParser.h>
 
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -205,17 +207,19 @@ namespace wrench {
      */
     double S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
       std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory", "Memory", "MEMORY"};
-      double capacity_value = DBL_MAX;
+      double capacity_value = ComputeService::ALL_RAM;
 
-      for (auto tag : tags) {
+      for (auto const &tag : tags) {
         const char *capacity_string = host->getProperty(tag.c_str());
         if (capacity_string) {
-          if (capacity_value != DBL_MAX) {
-            throw std::invalid_argument("S4U_Simulation::getMemoryCapacity(): Host '" + host->getName() + "' has multiple memory capacity specifications");
+          if (capacity_value != ComputeService::ALL_RAM) {
+            throw std::invalid_argument("S4U_Simulation::getMemoryCapacity(): Host '" + std::string(host->getCname()) + "' has multiple memory capacity specifications");
           }
-          if (sscanf(capacity_string, "%lf", &capacity_value) != 1) {
+          try {
+            capacity_value = UnitParser::parse_size(capacity_string);
+          } catch (std::runtime_error &e) {
             throw std::invalid_argument(
-                    "S4U_Simulation::getMemoryCapacity(): Host '" + host->getName() + "'has invalid memory capacity specification '" + tag +":" +
+                    "S4U_Simulation::getMemoryCapacity(): Host '" + std::string(host->getCname()) + "'has invalid memory capacity specification '" + tag +":" +
                     std::string(capacity_string) + "'");
           }
         }

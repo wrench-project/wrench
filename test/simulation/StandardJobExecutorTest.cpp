@@ -150,7 +150,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[0],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[0], 2)},
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
@@ -240,7 +240,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
 
@@ -351,7 +351,7 @@ private:
                   my_mailbox,
                   test->simulation->getHostnameList()[0],
                   job,
-                  {std::make_pair(test->simulation->getHostnameList()[0], 2)},
+                  {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
                   nullptr,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
@@ -401,7 +401,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskNotEnoughCoresTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
   // Create a Storage Service
@@ -513,7 +513,7 @@ private:
                   my_mailbox,
                   test->simulation->getHostnameList()[0],
                   job,
-                  {std::make_pair(test->simulation->getHostnameList()[0], 2)},
+                  {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
                   nullptr,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
@@ -590,7 +590,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
 
@@ -703,7 +703,7 @@ private:
                   my_mailbox,
                   test->simulation->getHostnameList()[1],
                   job,
-                  {std::make_pair(test->simulation->getHostnameList()[1], 2)},
+                  {std::make_tuple(test->simulation->getHostnameList()[1], 2, wrench::ComputeService::ALL_RAM)},
                   nullptr,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
@@ -776,7 +776,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
   // Create a Storage Service
@@ -880,7 +880,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[1],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[1], 6)},
+                        {std::make_tuple(test->simulation->getHostnameList()[1], 6, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
@@ -943,7 +943,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[1],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[1], 10)},
+                        {std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
@@ -1009,7 +1009,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[1],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[1], 10)},
+                        {std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
@@ -1080,7 +1080,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
   // Create a Storage Service
@@ -1188,7 +1188,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[0],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[0], 10)},
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
@@ -1272,7 +1272,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[0],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[0], 10)},
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
@@ -1358,7 +1358,7 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[0],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[0], 10)},
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
@@ -1443,7 +1443,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
   // Create a Storage Services
@@ -1554,8 +1554,8 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[0],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[0], 10),
-                         std::make_pair(test->simulation->getHostnameList()[1], 10)},
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM),
+                         std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
@@ -1639,8 +1639,8 @@ private:
                         my_mailbox,
                         test->simulation->getHostnameList()[0],
                         job,
-                        {std::make_pair(test->simulation->getHostnameList()[0], 10),
-                         std::make_pair(test->simulation->getHostnameList()[1], 10)},
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM),
+                         std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
@@ -1724,7 +1724,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_pair(hostname, 0)},
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
   // Create a Storage Services
@@ -1841,8 +1841,8 @@ private:
                         my_mailbox,
                         "Host3",
                         job,
-                        {std::make_pair("Host3", 10),
-                         std::make_pair("Host4", 10)},
+                        {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
+                         std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
@@ -1890,7 +1890,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host3", true, true,
-                                                               {std::make_pair("Host3", 0)},
+                                                               {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
   // Create a Storage Services
@@ -2005,8 +2005,8 @@ private:
                         my_mailbox,
                         "Host3",
                         job,
-                        {std::make_pair("Host3", 10),
-                         std::make_pair("Host4", 10)},
+                        {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
+                         std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
@@ -2054,7 +2054,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host3", true, true,
-                                                               {std::make_pair("Host3", 0)},
+                                                               {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
   // Create a Storage Services
@@ -2185,8 +2185,8 @@ private:
                           my_mailbox,
                           "Host3",
                           job,
-                          {std::make_pair("Host3", 10),
-                           std::make_pair("Host4", 10)},
+                          {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
+                           std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
                           nullptr,
                           {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                   ));
@@ -2237,7 +2237,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host3", true, true,
-                                                               {std::make_pair("Host3", 0)},
+                                                               {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr,
                                                                {}))));
   // Create a Storage Services

@@ -27,13 +27,14 @@ namespace wrench {
         unsigned long getJobID();
         unsigned long getAllocatedTime();
         unsigned long getAllocatedCoresPerNode();
+        double getMemoryRequirement();
         double getEndingTimeStamp();
         double getAppearedTimeStamp();
         unsigned long getNumNodes();
         WorkflowJob* getWorkflowJob();
         void setEndingTimeStamp(double);
-        std::set<std::pair<std::string,unsigned long>> getResourcesAllocated();
-        void setAllocatedResources(std::set<std::pair<std::string,unsigned long>>);
+        std::set<std::tuple<std::string,unsigned long, double>> getResourcesAllocated();
+        void setAllocatedResources(std::set<std::tuple<std::string,unsigned long, double>>);
 
     private:
         unsigned long jobid;
@@ -43,7 +44,7 @@ namespace wrench {
         unsigned long cores_per_node;
         double ending_time_stamp;
         double appeared_time_stamp;
-        std::set<std::pair<std::string,unsigned long>> resources_allocated;
+        std::set<std::tuple<std::string,unsigned long, double>> resources_allocated;
     };
 
     /***********************/

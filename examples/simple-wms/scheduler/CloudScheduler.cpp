@@ -102,7 +102,7 @@ namespace wrench {
      */
     std::string CloudScheduler::choosePMHostname() {
 
-      std::pair<std::string, unsigned long> min_pm("", ULONG_MAX);
+      std::pair<std::string, unsigned long> min_pm("", ComputeService::ALL_CORES);
 
       for (auto &host : this->execution_hosts) {
         auto entry = this->vm_list.find(host);

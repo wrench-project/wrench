@@ -261,6 +261,8 @@ namespace wrench {
         if (this->entries.find(msg->file) != this->entries.end()) {
           locations = this->entries[msg->file];
         }
+        // Simulate a lookup overhead
+        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_OVERHEAD));
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new FileRegistryFileLookupAnswerMessage(msg->file, locations,
