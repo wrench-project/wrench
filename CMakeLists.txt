@@ -176,7 +176,7 @@ set(SOURCE_FILES
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/util/TraceFileLoader.cpp
-        )
+        src/wrench/services/storage/simple/DataConnectionManager.cpp src/wrench/services/storage/simple/DataConnectionManager.h src/wrench/services/storage/simple/DataConnection.cpp src/wrench/services/storage/simple/DataConnection.h)
 
 # test files
 set(TEST_FILES

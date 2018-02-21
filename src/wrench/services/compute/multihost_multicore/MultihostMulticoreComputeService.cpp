@@ -152,9 +152,9 @@ namespace wrench {
      * @param plist: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
-                                                                       bool supports_standard_jobs,
-                                                                       bool supports_pilot_jobs,
-                                                                       std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                                                       const bool supports_standard_jobs,
+                                                                       const bool supports_pilot_jobs,
+                                                                       const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                                                        StorageService *default_storage_service,
                                                                        std::map<std::string, std::string> plist) :
             ComputeService(hostname,
@@ -167,8 +167,8 @@ namespace wrench {
       initiateInstance(hostname,
                        supports_standard_jobs,
                        supports_pilot_jobs,
-                       compute_resources,
-                       plist, -1, nullptr, "",
+                       std::move(compute_resources),
+                       plist, -1, nullptr,
                        default_storage_service);
     }
 
@@ -184,9 +184,9 @@ namespace wrench {
      * @param plist: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
-                                                                       bool supports_standard_jobs,
-                                                                       bool supports_pilot_jobs,
-                                                                       std::set<std::string> compute_hosts,
+                                                                       const bool supports_standard_jobs,
+                                                                       const bool supports_pilot_jobs,
+                                                                       const std::set<std::string> compute_hosts,
                                                                        StorageService *default_storage_service,
                                                                        std::map<std::string, std::string> plist) :
             ComputeService(hostname,
@@ -205,7 +205,7 @@ namespace wrench {
                        supports_standard_jobs,
                        supports_pilot_jobs,
                        compute_resources,
-                       plist, -1, nullptr, "",
+                       std::move(plist), -1, nullptr,
                        default_storage_service);
     }
 
@@ -244,11 +244,10 @@ namespace wrench {
       initiateInstance(hostname,
                        supports_standard_jobs,
                        supports_pilot_jobs,
-                       compute_resources,
-                       plist,
+                       std::move(compute_resources),
+                       std::move(plist),
                        ttl,
                        pj,
-                       suffix,
                        default_storage_service);
     }
 
@@ -263,7 +262,6 @@ namespace wrench {
  * @param plist: a property list
  * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
  * @param pj: a containing PilotJob  (nullptr if none)
- * @param suffix: a string to append to the process name
  * @param default_storage_service: a storage service
  *
  * @throw std::invalid_argument
@@ -276,11 +274,13 @@ namespace wrench {
             std::map<std::string, std::string> plist,
             double ttl,
             PilotJob *pj,
-            std::string suffix,
             StorageService *default_storage_service) {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
+
+      this->supports_pilot_jobs = supports_pilot_jobs;
+      this->supports_standard_jobs = supports_standard_jobs;
 
       // Check that there is at least one core per host and that hosts have enough cores
       for (auto host : compute_resources) {

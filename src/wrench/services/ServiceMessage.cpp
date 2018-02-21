@@ -27,7 +27,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     ServiceStopDaemonMessage::ServiceStopDaemonMessage(std::string ack_mailbox, double payload)
-            : ServiceMessage("STOP_DAEMON", payload), ack_mailbox(ack_mailbox) {}
+            : ServiceMessage("STOP_DAEMON", payload), ack_mailbox(std::move(ack_mailbox)) {}
 
     /**
      * @brief Constructor
