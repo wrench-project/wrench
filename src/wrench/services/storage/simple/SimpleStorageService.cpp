@@ -473,7 +473,7 @@ namespace wrench {
                                   new StorageServiceFileCopyAnswerMessage(file, this, false, e.getCause(),
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
       }
@@ -482,10 +482,9 @@ namespace wrench {
       std::unique_ptr<S4U_PendingCommunication> pending_comm;
       try {
         pending_comm = S4U_Mailbox::igetMessage(file_reception_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
-
 
 
       // Create an "incoming file" record
@@ -525,7 +524,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message;
       try {
         message = comm->wait();
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         WRENCH_INFO("SimpleStorageService::processDataMessage(): Communication failure when receiving file '%s",
                     file->getId().c_str());
         // Process the failure, meaning, just re-decrease the occupied space
@@ -540,7 +539,7 @@ namespace wrench {
                                   new StorageServiceFileCopyAnswerMessage(file, this, false, cause,
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
         return true;
@@ -553,7 +552,7 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      if (StorageServiceFileContentMessage *msg = dynamic_cast<StorageServiceFileContentMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<StorageServiceFileContentMessage *>(message.get())) {
 
         if (msg->file != file) {
           throw std::runtime_error(
@@ -572,7 +571,7 @@ namespace wrench {
                                     new StorageServiceFileCopyAnswerMessage(file, this, true, nullptr,
                                                                             this->getPropertyValueAsDouble(
                                                                                     SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
           }
         }
