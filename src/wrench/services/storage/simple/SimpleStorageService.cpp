@@ -11,7 +11,6 @@
 #include "wrench/services/ServiceMessage.h"
 #include "services/storage/StorageServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
-#include "wrench/services/storage/simple/IncomingFile.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/workflow/WorkflowFile.h"
@@ -51,7 +50,7 @@ namespace wrench {
                                                double capacity,
                                                unsigned long num_concurrent_connections,
                                                std::map<std::string, std::string> plist) :
-            SimpleStorageService(hostname, capacity, plist, "_" + std::to_string(getNewUniqueNumber())) {
+            SimpleStorageService(std::move(hostname), capacity, plist, "_" + std::to_string(getNewUniqueNumber())) {
       this->num_concurrent_connections = num_concurrent_connections;
     }
 
@@ -70,7 +69,7 @@ namespace wrench {
             double capacity,
             std::map<std::string, std::string> plist,
             std::string suffix) :
-            StorageService(hostname, "simple" + suffix, "simple" + suffix, capacity) {
+            StorageService(std::move(hostname), "simple" + suffix, "simple" + suffix, capacity) {
 
       // Set default properties
       for (auto p : this->default_property_values) {
@@ -81,13 +80,6 @@ namespace wrench {
       for (auto p : plist) {
         this->setProperty(p.first, p.second);
       }
-
-//      // Start the daemon on the same host
-//      try {
-//        this->start_daemon(hostname);
-//      } catch (std::invalid_argument &e) {
-//        throw;
-//      }
     }
 
     /**
@@ -117,7 +109,7 @@ namespace wrench {
           std::unique_ptr<S4U_PendingCommunication> comm = nullptr;
           try {
             comm = S4U_Mailbox::igetMessage(this->mailbox_name);
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             WRENCH_INFO("Can't even place an asynchronous get...something must be really wrong...aborting");
             break;
           }
@@ -126,10 +118,12 @@ namespace wrench {
         }
 
         // Wait for a message
-        unsigned long target = S4U_PendingCommunication::waitForSomethingToHappen(&(this->pending_incoming_communications));
+        unsigned long target = S4U_PendingCommunication::waitForSomethingToHappen(
+                &(this->pending_incoming_communications));
 
         // Extract the pending comm
-        std::unique_ptr<S4U_PendingCommunication> target_comm = std::move(this->pending_incoming_communications[target]);
+        std::unique_ptr<S4U_PendingCommunication> target_comm = std::move(
+                this->pending_incoming_communications[target]);
         this->pending_incoming_communications.erase(this->pending_incoming_communications.begin() + target);
 
 
@@ -143,8 +137,9 @@ namespace wrench {
 
       //probably we have to remove everything leftover on the pending communications
       std::vector<std::unique_ptr<S4U_PendingCommunication>>::iterator it;
-      for(it=this->pending_incoming_communications.begin();it!=this->pending_incoming_communications.end();it++){
-        if(it->get()!= nullptr){
+      for (it = this->pending_incoming_communications.begin();
+           it != this->pending_incoming_communications.end(); it++) {
+        if (it->get() != nullptr) {
           it->reset();
         }
       }
@@ -169,7 +164,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message;
       try {
         message = comm->wait();
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         WRENCH_INFO("Network error while receiving a control message... ignoring");
         return true;
       }
@@ -181,29 +176,29 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
                                   new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                           SimpleStorageServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
         return false;
 
-      } else if (StorageServiceFreeSpaceRequestMessage *msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StorageServiceFreeSpaceRequestMessage *>(message.get())) {
         double free_space = this->capacity - this->occupied_space;
 
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new StorageServiceFreeSpaceAnswerMessage(free_space, this->getPropertyValueAsDouble(
                                            SimpleStorageServiceProperty::FREE_SPACE_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
         return true;
 
-      } else if (StorageServiceFileDeleteRequestMessage *msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StorageServiceFileDeleteRequestMessage *>(message.get())) {
 
         bool success = true;
         std::shared_ptr<FailureCause> failure_cause = nullptr;
@@ -223,13 +218,13 @@ namespace wrench {
                                                                              failure_cause,
                                                                              this->getPropertyValueAsDouble(
                                                                                      SimpleStorageServiceProperty::FILE_DELETE_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
 
         return true;
 
-      } else if (StorageServiceFileLookupRequestMessage *msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
 
         bool file_found = (this->stored_files.find(msg->file) != this->stored_files.end());
         try {
@@ -237,21 +232,21 @@ namespace wrench {
                                    new StorageServiceFileLookupAnswerMessage(msg->file, file_found,
                                                                              this->getPropertyValueAsDouble(
                                                                                      SimpleStorageServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
 
         return true;
 
-      } else if (StorageServiceFileWriteRequestMessage *msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StorageServiceFileWriteRequestMessage *>(message.get())) {
 
         return processFileWriteRequest(msg->file, msg->answer_mailbox);
 
-      } else if (StorageServiceFileReadRequestMessage *msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StorageServiceFileReadRequestMessage *>(message.get())) {
 
         return processFileReadRequest(msg->file, msg->answer_mailbox, msg->mailbox_to_receive_the_file_content);
 
-      } else if (StorageServiceFileCopyRequestMessage *msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
 
         return processFileCopyRequest(msg->file, msg->src, msg->answer_mailbox);
 
@@ -332,19 +327,20 @@ namespace wrench {
                                                                          file_reception_mailbox,
                                                                          this->getPropertyValueAsDouble(
                                                                                  SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
 
       std::unique_ptr<S4U_PendingCommunication> pending_comm = nullptr;
       try {
         pending_comm = S4U_Mailbox::igetMessage(file_reception_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
 
       // Create an "incoming file" record: TODO   RAW POINTER HERE FOR INCOMING FILE!!
-      this->incoming_files.insert(std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(new IncomingFile(file, false, ""))));
+      this->incoming_files.insert(
+              std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(new IncomingFile(file, false, ""))));
 
       // Add the communication to the list of pending_incoming_communications
       this->pending_incoming_communications.push_back(std::move(pending_comm));
@@ -380,18 +376,18 @@ namespace wrench {
                                  new StorageServiceFileReadAnswerMessage(file, this, success, failure_cause,
                                                                          this->getPropertyValueAsDouble(
                                                                                  SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
 
 
       // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
       if (success) {
-      WRENCH_INFO("Asynchronously sending file %s to mailbox %s...", file->getId().c_str(), answer_mailbox.c_str());
+        WRENCH_INFO("Asynchronously sending file %s to mailbox %s...", file->getId().c_str(), answer_mailbox.c_str());
         try {
           S4U_Mailbox::dputMessage(mailbox_to_receive_the_file_content, new
                   StorageServiceFileContentMessage(file));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
       }
@@ -489,7 +485,8 @@ namespace wrench {
 
 
       // Create an "incoming file" record
-      this->incoming_files.insert(std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(new IncomingFile(file, true, answer_mailbox))));
+      this->incoming_files.insert(std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(
+              new IncomingFile(file, true, answer_mailbox))));
 
       // Add the communication to the list of pending_incoming_communications
       this->pending_incoming_communications.push_back(std::move(pending_comm));
