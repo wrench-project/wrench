@@ -27,6 +27,7 @@ namespace wrench {
       this->workflow = workflow;
       this->name = "pilot_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
 
+      this->ram_per_host = ram_per_host;
       this->num_hosts = num_hosts;
       this->num_cores_per_host = num_cores_per_host;
       this->duration = duration;
