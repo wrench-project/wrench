@@ -355,8 +355,8 @@ namespace wrench {
      * @param sender_daemon: the network daemon requesting a peer to communicate with next
      * @return a shared_ptr to the network daemon that is the selected communication peer
      */
-    std::shared_ptr<NetworkProximityDaemon>
-    NetworkProximityService::getCommunicationPeer(NetworkProximityDaemon *sender_daemon) {
+    std::shared_ptr<NetworkProximityDaemon> // TODO:
+    NetworkProximityService::getCommunicationPeer(const NetworkProximityDaemon * sender_daemon) {
 
         WRENCH_INFO("Obtaining communication peer for %s", sender_daemon->mailbox_name.c_str());
 
@@ -428,7 +428,6 @@ namespace wrench {
         std::complex<double> error_direction, scaled_direction;
 
         // if both coordinates are at the origin, we need a random direction vector
-        // TODO: is this comparison okay?
         if (estimated_distance == 0.0) {
             // TODO: maybe use time(0) from <ctime> as seed
             static std::default_random_engine direction_rng(0);
@@ -440,6 +439,7 @@ namespace wrench {
             error_direction = sender_coordinates - peer_coordinates;
         }
 
+        // scaled_direction will get start to approach 0 when error_direction gets small
         scaled_direction = error_direction * error;
 
         // compute the updated sender coordinates
@@ -455,7 +455,7 @@ namespace wrench {
                     sender_coordinates.real(), sender_coordinates.imag(), updated_sender_coordinates.real(),
                     updated_sender_coordinates.imag());
 
-        // TESTING VIVALDI RESULTS
+        // WRITING VIVALDI RESULTS FOR DEBUGGING
         std::ofstream output("/home/ryan/Dropbox/Spring18/GRAD_PROJECT/vivaldi_visual/coordinate_table.txt", std::ofstream::app);
 
         std::map<std::string, std::complex<double>>::iterator it;
@@ -465,6 +465,7 @@ namespace wrench {
         }
         output << "*" << std::endl;
         output.close();
+        // END WRITING VIVALDI RESULTS
 
     }
 

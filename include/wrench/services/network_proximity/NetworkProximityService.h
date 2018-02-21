@@ -79,7 +79,7 @@ namespace wrench{
 
         std::map<std::string, std::complex<double>> coordinate_lookup_table;
 
-        std::shared_ptr<NetworkProximityDaemon> getCommunicationPeer(NetworkProximityDaemon *daemon);
+        std::shared_ptr<NetworkProximityDaemon> getCommunicationPeer(const NetworkProximityDaemon * sender_daemon);
 
         void vivaldiUpdate(double proximityValue, std::string sender_hostname, std::string peer_hostname);
 
