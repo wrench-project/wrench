@@ -49,7 +49,7 @@ namespace wrench {
      *
      * @param task: a workflow task
      */
-    void WorkflowFile::setOutputOf(WorkflowTask *task) {
+    void WorkflowFile::setOutputOf(WorkflowTask * const task) {
       this->output_of = task;
     }
 

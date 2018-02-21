@@ -110,7 +110,7 @@ namespace wrench {
                     "NetworkProximityService::getCoordinate() cannot be called with NETWORK_PROXIMITY_SERVICE_TYPE of ALLTOALL");
         }
 
-        WRENCH_INFO("Obtaining current coordinates of network daemon on host %", requested_host);
+        WRENCH_INFO("Obtaining current coordinates of network daemon on host %s", requested_host.c_str());
 
         std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("network_get_coordinate_entry");
 
@@ -166,7 +166,7 @@ namespace wrench {
                                     new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
                                                                              this->getPropertyValueAsDouble(
                                                                                      NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
@@ -174,11 +174,11 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox);
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
-        if (NetworkProximityLookupAnswerMessage *msg = dynamic_cast<NetworkProximityLookupAnswerMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<NetworkProximityLookupAnswerMessage *>(message.get())) {
             return msg->proximityValue;
         } else {
             throw std::runtime_error(
@@ -307,12 +307,12 @@ namespace wrench {
                 }
 
             }
-            catch (std::shared_ptr<NetworkError> cause) {
+            catch (std::shared_ptr<NetworkError> &cause) {
                 return true;
             }
             return true;
 
-        } else if (NextContactDaemonRequestMessage *msg = dynamic_cast<NextContactDaemonRequestMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<NextContactDaemonRequestMessage *>(message.get())) {
 
             std::shared_ptr<NetworkProximityDaemon> chosen_peer = NetworkProximityService::getCommunicationPeer(
                     msg->daemon);
@@ -325,7 +325,7 @@ namespace wrench {
                                                                         this->getPropertyValueAsDouble(
                                                                                 NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
             return true;
-        } else if (CoordinateLookupRequestMessage *msg = dynamic_cast<CoordinateLookupRequestMessage *> (message.get())) {
+        } else if (auto msg = dynamic_cast<CoordinateLookupRequestMessage *> (message.get())) {
             std::string requested_host = msg->requested_host;
             auto const coordinate_itr = this->coordinate_lookup_table.find(requested_host);
             if (coordinate_itr != this->coordinate_lookup_table.cend()) {
@@ -338,7 +338,7 @@ namespace wrench {
                                                                                this->getPropertyValueAsDouble(
                                                                                        NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
                 }
-                catch (std::shared_ptr<NetworkError> cause) {
+                catch (std::shared_ptr<NetworkError> &cause) {
                     return true;
                 }
             }
