@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,8 @@ namespace wrench {
             std::string pm_host = choosePMHostname();
             std::string vm_host = "vm" + std::to_string(VM_ID++) + "_" + pm_host;
 
-            if (this->cloud_service->createVM(pm_host, vm_host, ((StandardJob *) (job))->getMinimumRequiredNumCores())) {
+            // TODO: provide proper VM RAM requests
+            if (this->cloud_service->createVM(pm_host, vm_host, ((StandardJob *) (job))->getMinimumRequiredNumCores(), 1000)) {
               this->vm_list[pm_host].push_back(vm_host);
             }
 

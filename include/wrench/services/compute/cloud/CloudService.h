@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,6 +11,7 @@
 #ifndef WRENCH_CLOUDSERVICE_H
 #define WRENCH_CLOUDSERVICE_H
 
+#include <map>
 #include <simgrid/s4u/VirtualMachine.hpp>
 
 #include "wrench/services/Service.h"
@@ -32,25 +33,25 @@ namespace wrench {
 
     private:
         std::map<std::string, std::string> default_property_values =
-                {{CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
-                 {CloudServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,              "1024"},
-                 {CloudServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                {{CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                  "1024"},
+                 {CloudServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,               "1024"},
+                 {CloudServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, "1024"},
                  {CloudServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {CloudServiceProperty::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {CloudServiceProperty::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {CloudServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
-                 {CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
-                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {CloudServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
-                 {CloudServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"}
+                 {CloudServiceProperty::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                 {CloudServiceProperty::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
+                 {CloudServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
+                 {CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
+                 {CloudServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
+                 {CloudServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      "1024"}
                 };
 
     public:
         CloudService(const std::string &hostname,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
-                     std::vector<std::string> execution_hosts,
+                     std::vector<std::string> &execution_hosts,
                      StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {});
 
@@ -61,6 +62,7 @@ namespace wrench {
         bool createVM(const std::string &pm_hostname,
                       const std::string &vm_hostname,
                       unsigned long num_cores,
+                      double ram_memory = ComputeService::ALL_RAM,
                       std::map<std::string, std::string> plist = {});
 
         std::vector<std::string> getExecutionHosts();
@@ -91,10 +93,6 @@ namespace wrench {
 
         bool processNextMessage();
 
-//        void processGetNumCores(const std::string &answer_mailbox) override;
-//
-//        void processGetNumIdleCores(const std::string &answer_mailbox) override;
-
         void processGetResourceInformation(const std::string &answer_mailbox) override;
 
         void processGetExecutionHosts(const std::string &answer_mailbox);
@@ -102,9 +100,10 @@ namespace wrench {
         void processCreateVM(const std::string &answer_mailbox,
                              const std::string &pm_hostname,
                              const std::string &vm_hostname,
-                             int num_cores,
                              bool supports_standard_jobs,
                              bool supports_pilot_jobs,
+                             unsigned long num_cores,
+                             double ram_memory,
                              std::map<std::string, std::string> plist);
 
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
@@ -115,6 +114,8 @@ namespace wrench {
         void terminate();
 
         std::vector<std::string> execution_hosts;
+
+        std::map<std::string, double> cs_available_ram;
 
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
