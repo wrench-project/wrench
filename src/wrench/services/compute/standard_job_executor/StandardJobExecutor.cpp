@@ -29,7 +29,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard J
 
 namespace wrench {
 
-
     /**
      * @brief Destructor
      */
@@ -186,7 +185,6 @@ namespace wrench {
       // WEIRDLY, KILLING IN THIS ORDER WORKS BETTER IT SEEMS....
       // TODO: INVESTIGATE?
 
-
       // Kill all Workunit executors
       std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
       for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
@@ -226,18 +224,17 @@ namespace wrench {
           break;
         }
 
-
-
         /** Detect Termination **/
         if (this->non_ready_workunits.size() + this->ready_workunits.size() +  this->running_workunits.size() == 0) {
 //          std::cerr << "CANARY 1: " << (*(this->completed_workunits. begin())).use_count() << "\n";
 //          std::shared_ptr<Workunit> canary = std::move(*(this->completed_workunits.begin()));
 //          std::cerr << "CANARY 2: " << canary.use_count() << "\n";
-////          this->completed_workunits.erase(*(this->completed_workunits. begin()));
+//          this->completed_workunits.erase(*(this->completed_workunits. begin()));
 //          this->completed_workunits.erase(canary);
 //          std::cerr << "WTF: " << this->completed_workunits.size() << "\n";
 //          std::cerr << "CANARY 3: " << canary.use_count() << "\n";
           this->completed_workunits.clear();
+
           break;
         }
 
@@ -660,19 +657,19 @@ namespace wrench {
 
       WRENCH_INFO("A workunit executor has failed to complete a workunit on behalf of job '%s'", this->job->getName().c_str());
 
-      // Remove the workunit executor from the workunit executor list
-      for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
-//      for (auto wt : this->running_workunit_executors) {
-        if ((*it).get() == workunit_executor) {
-          this->running_workunit_executors.erase((it));
-          break;
-        }
-      }
-
       // Update core availabilities
       this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
       // Update RAM availabilities
       this->ram_availabilities[workunit_executor->getHostname()] += workunit_executor->getMemoryUtilization();
+
+      // Remove the workunit executor from the workunit executor list and put it in the failed list
+      for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
+//      for (auto wt : this->running_workunit_executors) {
+        if ((*it).get() == workunit_executor) {
+          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunit_executors), &(this->failed_workunit_executors));
+          break;
+        }
+      }
 
       // Remove the work from the running work queue
       bool found_it = false;
@@ -687,7 +684,6 @@ namespace wrench {
         throw std::runtime_error(
                 "StandardJobExecutor::processWorkunitExecutorCompletion(): couldn't find a recently failed workunit in the running workunit list");
       }
-
 
       // Remove all other workunits for the job in the "not ready" state
       this->non_ready_workunits.clear();
@@ -715,7 +711,6 @@ namespace wrench {
 
       // Deal with completed workunits
       this->completed_workunits.clear();
-
 
       // Send the notification back
       try {
@@ -865,7 +860,7 @@ namespace wrench {
      */
     std::vector<Workunit*> StandardJobExecutor::sortReadyWorkunits() {
 
-//      std::cerr << "IN sortReadyWorkunits()\n";
+//      std::cerr << "In sortReadyWorkunits()\n";
 
       std::vector<Workunit *> sorted_workunits;
 
@@ -886,10 +881,10 @@ namespace wrench {
                 {
 //                    std::cerr << "IN LAMBDA\n";
                     // Non-computational workunits have higher priority
-                    if (wu1->tasks.size() == 0) {
+                    if (wu1->tasks.empty()) {
                       return true;
                     }
-                    if (wu2->tasks.size() == 0) {
+                    if (wu2->tasks.empty()) {
                       return false;
                     }
 
