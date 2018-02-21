@@ -151,12 +151,13 @@ namespace wrench {
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      */
-    MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
-                                                                       bool supports_standard_jobs,
-                                                                       bool supports_pilot_jobs,
-                                                                       std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                                                       StorageService *default_storage_service,
-                                                                       std::map<std::string, std::string> plist) :
+    MultihostMulticoreComputeService::MultihostMulticoreComputeService(
+            const std::string &hostname,
+            bool supports_standard_jobs,
+            bool supports_pilot_jobs,
+            std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+            StorageService *default_storage_service,
+            std::map<std::string, std::string> plist) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
