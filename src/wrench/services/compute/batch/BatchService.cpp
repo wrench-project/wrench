@@ -959,7 +959,7 @@ namespace wrench {
         }
       }
 
-      //remove standard job alarms
+      //remove pilot job alarms
       for (it = this->pilot_job_alarms.begin(); it != this->pilot_job_alarms.end(); it++) {
         if ((*it)->isUp()) {
           it->reset();

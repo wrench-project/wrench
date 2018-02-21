@@ -33,7 +33,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Mult
 namespace wrench {
 
     WorkunitMulticoreExecutor::~WorkunitMulticoreExecutor() {
-//      WRENCH_INFO("In WORKUNIT_MULTICORE_EXECUTOR DESTRUCTOR");
     }
 
     /**
@@ -175,7 +174,6 @@ namespace wrench {
       }
 
       WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
-      this->workunit = nullptr; // To decrease the ref count
       return 0;
     }
 
