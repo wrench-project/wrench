@@ -67,9 +67,9 @@ namespace wrench {
 
         // Public Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
-                                         bool supports_standard_jobs,
-                                         bool supports_pilot_jobs,
-                                         std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                         const bool supports_standard_jobs,
+                                         const bool supports_pilot_jobs,
+                                         const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                          StorageService *default_storage_service,
                                          std::map<std::string, std::string> plist = {});
 
@@ -77,7 +77,7 @@ namespace wrench {
         MultihostMulticoreComputeService(const std::string &hostname,
                                          bool supports_standard_jobs,
                                          bool supports_pilot_jobs,
-                                         std::set<std::string> compute_hosts,
+                                         const std::set<std::string> compute_hosts,
                                          StorageService *default_storage_service,
                                          std::map<std::string, std::string> plist = {});
 
@@ -129,7 +129,7 @@ namespace wrench {
                               std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                               std::map<std::string, std::string> plist,
                               double ttl,
-                              PilotJob *pj, std::string suffix,
+                              PilotJob *pj,
                               StorageService *default_storage_service);
 
         std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
