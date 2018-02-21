@@ -18,7 +18,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
 namespace wrench {
 
     /**
-     * @brief Constructor
+     * @brief Constructor  (which starts the daemon!)
+     *
      * @param date: the date at this the message should be sent
      * @param hostname: the name of the host on which the Alarm daemon should run
      * @param reply_mailbox_name: the mailbox to which the message should be sent
@@ -41,6 +42,7 @@ namespace wrench {
       try {
         WRENCH_INFO("Alarm Service starting...");
         this->start_daemon(hostname, true);
+        this->state = UP;
       } catch (std::invalid_argument &e) {
         throw e;
       }
