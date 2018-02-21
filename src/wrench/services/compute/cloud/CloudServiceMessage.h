@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,17 +59,19 @@ namespace wrench {
         CloudServiceCreateVMRequestMessage(const std::string &answer_mailbox,
                                            const std::string &pm_hostname,
                                            const std::string &vm_hostname,
-                                           int num_cores,
                                            bool supports_standard_jobs,
                                            bool supports_pilot_jobs,
+                                           unsigned long num_cores,
+                                           double ram_memory,
                                            std::map<std::string, std::string> &plist,
                                            double payload);
 
         std::string pm_hostname;
         std::string vm_hostname;
-        int num_cores;
         bool supports_standard_jobs;
         bool supports_pilot_jobs;
+        unsigned long num_cores;
+        double ram_memory;
         std::map<std::string, std::string> plist;
         std::string answer_mailbox;
     };

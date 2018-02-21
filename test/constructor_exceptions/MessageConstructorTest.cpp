@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -196,12 +196,10 @@ TEST_F(MessageConstructorTest, CloudServiceMessages) {
   EXPECT_NO_THROW(new wrench::CloudServiceGetExecutionHostsAnswerMessage(arg, 600));
 
   std::map<std::string, std::string> plist;
-  EXPECT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "host", 42, true, true, plist, 666));
-  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("", "host", "host", 42, true, true, plist, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "", "host", 42, true, true, plist, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "", 42, true, true, plist, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "host", -1, true, true, plist, 666), std::invalid_argument);
-
+  EXPECT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "host", true, true, 42, 10, plist, 666));
+  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("", "host", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "", true, true, 42, 0, plist, 666), std::invalid_argument);
 }
 
 
