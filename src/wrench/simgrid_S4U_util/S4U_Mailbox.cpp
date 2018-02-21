@@ -119,7 +119,7 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      * @throw std::shared_ptr<FatalFailure>
      */
-    void S4U_Mailbox::putMessage(std::string mailbox_name, SimulationMessage *msg) {
+    void S4U_Mailbox::putMessage(const std::string mailbox_name, SimulationMessage *msg) {
       WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to mailbox '%s'",
                    msg->getName().c_str(), msg->payload,
                    mailbox_name.c_str());
@@ -150,7 +150,7 @@ namespace wrench {
      * @throw std::shared_ptr<NetworkError>
      * @throw std::shared_ptr<FatalFailure>
      */
-    void S4U_Mailbox::dputMessage(std::string mailbox_name, SimulationMessage *msg) {
+    void S4U_Mailbox::dputMessage(const std::string mailbox_name, SimulationMessage *msg) {
 
       WRENCH_DEBUG("Dputting a %s message (%.2lf bytes) to mailbox '%s'",
                    msg->getName().c_str(), msg->payload,
