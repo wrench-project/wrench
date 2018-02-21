@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,6 +81,8 @@ namespace wrench {
 
         void setProperties(std::map<std::string, std::string> default_property_values,
                            std::map<std::string, std::string> plist);
+
+        void serviceSanityCheck();
 
         /** @brief The service's property list */
         std::map<std::string, std::string> property_list;

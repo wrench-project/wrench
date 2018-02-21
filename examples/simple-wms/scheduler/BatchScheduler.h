@@ -16,15 +16,13 @@
 
 namespace wrench {
 
-    class Simulation;
-
     /**
      * @brief A batch Scheduler
      */
     class BatchScheduler : public Scheduler {
 
     public:
-        BatchScheduler(ComputeService *batch_service, Simulation *simulation);
+        BatchScheduler();
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -40,8 +38,6 @@ namespace wrench {
 
     private:
 
-        ComputeService *batch_service;
-        Simulation *simulation;
     };
 }
 

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +35,11 @@ namespace wrench {
       this->name = process_name_prefix;
     }
 
- /**
-   * @brief Set a property of the Service
-   * @param property: the property
-   * @param value: the property value
-   */
+    /**
+      * @brief Set a property of the Service
+      * @param property: the property
+      * @param value: the property value
+      */
     void Service::setProperty(std::string property, std::string value) {
       if (this->property_list.find(property) != this->property_list.end()) {
         this->property_list[property] = value;
@@ -73,8 +73,9 @@ namespace wrench {
     double Service::getPropertyValueAsDouble(std::string property) {
       double value;
       if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
-        throw std::runtime_error("Service::getPropertyValueAsDouble(): Invalid double property value " + property + " " +
-                                 this->getPropertyValueAsString(property));
+        throw std::runtime_error(
+                "Service::getPropertyValueAsDouble(): Invalid double property value " + property + " " +
+                this->getPropertyValueAsString(property));
       }
       return value;
     }
@@ -95,11 +96,11 @@ namespace wrench {
     }
 
     /**
-    * @brief Synchronously stop the service (does nothing if the service is already stopped)
-    *
-    * @throw WorkflowExecutionException
-    * @throw std::runtime_error
-    */
+     * @brief Synchronously stop the service (does nothing if the service is already stopped)
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
     void Service::stop() {
 
       // Do nothing if the service is already down
@@ -117,7 +118,7 @@ namespace wrench {
                                         ack_mailbox,
                                         this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> cause) {
-          throw WorkflowExecutionException(cause);
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for the ack
@@ -172,12 +173,12 @@ namespace wrench {
     }
 
     /**
- * @brief Set default and user defined properties
- * @param default_property_values: list of default properties
- * @param plist: user defined list of properties
- */
+     * @brief Set default and user defined properties
+     * @param default_property_values: list of default properties
+     * @param plist: user defined list of properties
+     */
     void Service::setProperties(std::map<std::string, std::string> default_property_values,
-                                       std::map<std::string, std::string> plist) {
+                                std::map<std::string, std::string> plist) {
       // Set default properties
       for (auto p : default_property_values) {
         this->setProperty(p.first, p.second);
@@ -186,6 +187,17 @@ namespace wrench {
       // Set specified properties
       for (auto p : plist) {
         this->setProperty(p.first, p.second);
+      }
+    }
+
+    /**
+     * @brief Check whether the service is properly configured and running
+     *
+     * @throws WorkflowExecutionException
+     */
+    void Service::serviceSanityCheck() {
+      if (this->state == Service::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
       }
     }
 };

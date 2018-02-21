@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
           std::unique_ptr<wrench::WMS>(
                   new wrench::SimpleWMS(&workflow,
                                         std::unique_ptr<wrench::Scheduler>(
-                                                new wrench::BatchScheduler(batch_service, &simulation)),
+                                                new wrench::BatchScheduler()),
                                         compute_services, storage_services, wms_host)));
 
   /* Instantiate a file registry service to be started on some host. This service is
