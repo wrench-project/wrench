@@ -79,6 +79,7 @@ namespace wrench {
      * @brief Destructor
      */
     MultihostMulticoreComputeService::~MultihostMulticoreComputeService() {
+//      std::cerr << "IN MHMC DESTRUCTOR\n";
       this->default_property_values.clear();
     }
 
@@ -570,7 +571,7 @@ namespace wrench {
       // Find the list of hosts with the required number of cores AND the required RAM
       std::set<std::string> possible_hosts;
       for (auto it = this->core_and_ram_availabilities.begin(); it != this->core_and_ram_availabilities.end(); it++) {
-        WRENCH_INFO("%s: %ld %.2lf", it->first.c_str(), std::get<0>(it->second), std::get<1>(it->second));
+//        WRENCH_INFO("%s: %ld %.2lf", it->first.c_str(), std::get<0>(it->second), std::get<1>(it->second));
         if ((std::get<0>(it->second) >= max_min_required_num_cores) and
             (std::get<1>(it->second) >= max_min_required_ram)) {
           possible_hosts.insert(it->first);

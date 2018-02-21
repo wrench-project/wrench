@@ -664,9 +664,10 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
 
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      // WARNING: The StandardJobExecutor unique_ptr is declared here, so that
+      // it's not automatically freed after the next basic block is over. In the internals
+      // of WRENCH, this is typically take care in various ways (e.g., keep a list of "finished" executors)
+      std::unique_ptr<wrench::StandardJobExecutor> executor;
 
       {
         // Create a sequential task that lasts one hour and requires 1 cores
@@ -693,7 +694,6 @@ private:
         // Create a StandardJobExecutor that will run stuff on one host and two core
         double thread_startup_overhead = 10.0;
         bool success = true;
-        std::unique_ptr<wrench::StandardJobExecutor> executor;
 
         try {
           executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
@@ -1513,10 +1513,11 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
 
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
 
+      // WARNING: The StandardJobExecutor unique_ptr is declared here, so that
+      // it's not automatically freed after the next basic block is over. In the internals
+      // of WRENCH, this is typically take care in various ways (e.g., keep a list of "finished" executors)
+      std::unique_ptr<wrench::StandardJobExecutor> executor;
 
       /** Case 1: Create two tasks that will each run on a different host **/
       {
@@ -1546,7 +1547,7 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
                         test->simulation,
                         my_mailbox,
@@ -1631,7 +1632,7 @@ private:
         double before = wrench::S4U_Simulation::getClock();
 
         // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
                         test->simulation,
                         my_mailbox,
