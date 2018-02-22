@@ -22,12 +22,10 @@ namespace wrench {
     class SimpleWMS : public WMS {
 
     public:
-        SimpleWMS(Workflow *workflow,
-                  std::unique_ptr<Scheduler> scheduler,
+        SimpleWMS(std::unique_ptr<Scheduler> scheduler,
                   const std::set<ComputeService *> &compute_services,
                   const std::set<StorageService *> &storage_services,
-                  const std::string &hostname,
-                  double start_time = 0);
+                  const std::string &hostname);
 
     protected:
         /***********************/

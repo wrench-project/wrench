@@ -124,10 +124,11 @@ int main(int argc, char **argv) {
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
   wrench::WMS *wms = simulation.add(
           std::unique_ptr<wrench::WMS>(
-                  new wrench::SimpleWMS(&workflow,
-                                        std::unique_ptr<wrench::Scheduler>(
+                  new wrench::SimpleWMS(std::unique_ptr<wrench::Scheduler>(
                                                 new wrench::CloudScheduler()),
                                         compute_services, storage_services, wms_host)));
+
+  wms->addWorkflow(&workflow);
 
   /* Instantiate a file registry service to be started on some host. This service is
    * essentially a replica catalog that stores <file , storage service> pairs so that
