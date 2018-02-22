@@ -21,28 +21,27 @@ namespace wrench {
     /**
      * @brief Create a WMS with a workflow instance, a scheduler implementation, and a list of compute services
      *
-     * @param workflow: a workflow to execute
      * @param scheduler: a scheduler implementation
      * @param compute_services: a set of compute services available to run jobs
      * @param storage_services: a set of storage services available to the WMS
      * @param hostname: the name of the host on which to run the WMS
      * @param suffix: a string to append to the process name
-     * @param start_time: the simulated time when the WMS should start running
+
      *
      * @throw std::invalid_argument
      */
-    WMS::WMS(Workflow *workflow,
-             std::unique_ptr<Scheduler> scheduler,
+    WMS::WMS(std::unique_ptr<Scheduler> scheduler,
              const std::set<ComputeService *> &compute_services,
              const std::set<StorageService *> &storage_services,
              const std::string &hostname,
-             const std::string suffix,
-             double start_time) :
+             const std::string suffix) :
             S4U_Daemon("wms_" + suffix, "wms_" + suffix),
-            workflow(workflow), start_time(start_time), compute_services(compute_services),
-            storage_services(storage_services), scheduler(std::move(scheduler)) {
+            compute_services(std::move(compute_services)),
+            storage_services(std::move(storage_services)),
+            scheduler(std::move(scheduler)) {
 
       this->hostname = hostname;
+      this->workflow = nullptr;
     }
 
     /**
@@ -292,5 +291,36 @@ namespace wrench {
     std::string WMS::getHostname() {
       return this->hostname;
     }
+
+    /**
+     * @brief Set the workflow to be executed by the WMS
+     * @param workflow: a workflow to execute
+     * @param start_time: the simulated time when the WMS should start executed the workflow (0 if not specified)
+     *
+     * @throw std::invalid_argument
+     */
+    void WMS::addWorkflow(Workflow *workflow, double start_time) {
+
+      if ((workflow == nullptr) || (start_time < 0.0)) {
+        throw std::invalid_argument("WMS::addWorkflow(): Invalid arguments");
+      }
+
+      if (this->workflow) {
+        throw std::invalid_argument("WMS::addWorkflow(): The WMS has already been given a workflow");
+      } else {
+        this->workflow = workflow;
+      }
+      this->start_time = start_time;
+    }
+
+    /**
+     * @brief Get the workflow that was assigned to the WMS
+     *
+     * @return a workflow
+     */
+    Workflow *WMS::getWorkflow() {
+      return this->workflow;
+    }
+
 
 };
