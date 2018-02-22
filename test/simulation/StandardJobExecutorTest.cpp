@@ -270,7 +270,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -430,7 +430,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskNotEnoughCoresTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -618,7 +618,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -803,7 +803,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -1102,7 +1102,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -1470,7 +1470,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -1752,7 +1752,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -1918,7 +1918,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -2082,7 +2082,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -2265,7 +2265,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation

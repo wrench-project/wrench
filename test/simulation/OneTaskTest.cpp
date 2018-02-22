@@ -233,17 +233,17 @@ void OneTaskTest::do_Noop_test() {
 
   // Without a file registry service this should fail
   ASSERT_THROW(simulation->launch(), std::runtime_error);
-  ASSERT_THROW(simulation->stageFiles({input_file}, storage_service1), std::runtime_error);
+  ASSERT_THROW(simulation->stageFiles({{input_file->getId(),input_file}}, storage_service1), std::runtime_error);
 
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
           new wrench::FileRegistryService(hostname));
   simulation->setFileRegistryService(std::move(file_registry_service));
 
-  ASSERT_THROW(simulation->stageFiles({input_file}, nullptr), std::invalid_argument);
-  ASSERT_THROW(simulation->stageFiles({nullptr}, storage_service1), std::invalid_argument);
+  ASSERT_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->stageFiles({{"foo", nullptr}}, storage_service1), std::invalid_argument);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1));
 
   // Running a "do nothing" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -355,7 +355,7 @@ void OneTaskTest::do_HostMemory_test() {
                           new NoopScheduler()), {compute_service}, {storage_service1}, hostname1, hostname2)));
 
   // Staging the input_file on the storage service
-  simulation->stageFiles({input_file}, storage_service1);
+  simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1);
 
   // Running a "do nothing" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -503,7 +503,7 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
                   }, hostname))));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -629,7 +629,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -792,7 +792,7 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
   EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
 
   // Staging the input_file on storage service #1
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
