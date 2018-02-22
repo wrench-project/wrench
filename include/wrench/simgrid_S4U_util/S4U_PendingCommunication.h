@@ -30,7 +30,12 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> wait();
 
         static unsigned long waitForSomethingToHappen(
-                std::vector<std::unique_ptr<S4U_PendingCommunication>> *pending_comms);
+                std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_comms,
+                double timeout);
+
+        static unsigned long waitForSomethingToHappen(
+                std::vector<S4U_PendingCommunication*> pending_comms,
+                double timeout);
 
         simgrid::s4u::CommPtr comm_ptr;
         SimulationMessage *simulation_message;

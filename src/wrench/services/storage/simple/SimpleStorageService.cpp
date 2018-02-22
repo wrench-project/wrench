@@ -119,7 +119,7 @@ namespace wrench {
 
         // Wait for a message
         unsigned long target = S4U_PendingCommunication::waitForSomethingToHappen(
-                &(this->pending_incoming_communications));
+                this->pending_incoming_communications, -1);
 
         // Extract the pending comm
         std::unique_ptr<S4U_PendingCommunication> target_comm = std::move(
