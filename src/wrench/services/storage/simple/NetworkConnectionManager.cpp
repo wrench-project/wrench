@@ -15,18 +15,16 @@ namespace wrench {
 
     NetworkConnectionManager::NetworkConnectionManager(unsigned long num_connections) {
       this->num_connections = num_connections;
-
     }
 
     /**
      *
-     * @return a NetworkConnection, or nullptr if none is currently running, and true if that connection
-     *         has successfully completed, false otherwise
+     * @return a NetworkConnection that has finished and its status, or {nullptr, false}
      */
     std::pair<std::unique_ptr<NetworkConnection>, bool> NetworkConnectionManager::waitForNetworkConnection() {
 
       if (this->running_connections.empty()) {
-        return nullptr;
+        throw std::runtime_error("NetworkConnectionManager::waitForNetworkConnection(): there is no running connection!");
       }
 
       // Create an array of S4U_Pending_Connections
@@ -43,23 +41,17 @@ namespace wrench {
       this->running_connections.erase(this->running_connections.begin() + target_index);
 
       // Get its status
-      bool success = not target_connection->hasFailed();
-      
-      try {
-        target_connection->comm->comm_ptr->test();
-      } catch (xbt_ex &e) {
-        if (e.category == network_error) {
-          break;
+      bool status = not target_connection->hasFailed();
 
+      this->startQueuedConnections();
 
-
-
-      return nullptr;
+      return {std::move(target_connection), status};
 
     }
 
     void NetworkConnectionManager::addConnection(std::unique_ptr<NetworkConnection> connection) {
       this->queued_connections.push_front(std::move(connection));
+      this->startQueuedConnections();
     }
 
     void NetworkConnectionManager::startQueuedConnections() {
