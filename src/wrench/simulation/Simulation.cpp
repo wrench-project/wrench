@@ -195,6 +195,8 @@ namespace wrench {
         throw std::runtime_error(
                 "A WMS should have been instantiated and passed to Simulation.setWMS()");
       }
+
+
       for (auto it = this->wmses.begin(); it != this->wmses.end(); ++it) {
         auto wms = it->get();
         if (not this->hostExists(wms->getHostname())) {
@@ -218,7 +220,6 @@ namespace wrench {
         throw std::runtime_error(
                 "At least one ComputeService should have been instantiated add passed to Simulation.add()");
       }
-
 
       for (auto it = this->wmses.begin(); it != this->wmses.end(); ++it) {
         auto wms = it->get();

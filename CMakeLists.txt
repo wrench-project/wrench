@@ -188,6 +188,7 @@ set(TEST_FILES
         test/simulation/OneTaskTest.cpp
         test/simulation/SimpleStorageServiceFunctionalTest.cpp
         test/simulation/SimpleStorageServicePerformanceTest.cpp
+        test/simulation/SimpleStorageServiceLimitedConnectionsTest.cpp
         test/simulation/MultihostMulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MultihostMulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/MultihostMulticoreComputeServiceSchedulingTest.cpp
