@@ -28,7 +28,11 @@ namespace wrench {
     class WMS : public S4U_Daemon {
 
     public:
-        void addStaticOptimization(std::unique_ptr<StaticOptimization>);
+        void addWorkflow(Workflow *workflow, double start_time = 0);
+        Workflow *getWorkflow();
+
+
+          void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
         void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
 
@@ -50,13 +54,12 @@ namespace wrench {
         /** \cond DEVELOPER */
         /***********************/
 
-        WMS(Workflow *workflow,
-            std::unique_ptr<Scheduler> scheduler,
+        WMS(std::unique_ptr<Scheduler> scheduler,
             const std::set<ComputeService *> &compute_services,
             const std::set<StorageService *> &storage_services,
             const std::string &hostname,
-            const std::string suffix,
-            double start_time = 0);
+            const std::string suffix);
+
 
         void start();
 
