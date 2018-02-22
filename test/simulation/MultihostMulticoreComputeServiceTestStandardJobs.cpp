@@ -219,7 +219,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -352,7 +352,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -486,7 +486,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -625,7 +625,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -746,7 +746,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -884,7 +884,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -1032,7 +1032,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -1180,7 +1180,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -1333,7 +1333,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());

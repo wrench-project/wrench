@@ -184,7 +184,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   simulation->setFileRegistryService(std::move(file_registry_service));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
   // Get a host for network proximity host
   std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
@@ -342,7 +342,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   simulation->setFileRegistryService(std::move(file_registry_service));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
   // Get a host for network proximity host
   std::string network_proximity_db_hostname = simulation->getHostnameList()[1];

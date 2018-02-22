@@ -378,7 +378,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   simulation->setFileRegistryService(std::move(file_registry_service));
 
   // Staging all files on the 1000 storage service
-  EXPECT_NO_THROW(simulation->stageFiles({file_1, file_10, file_100, file_500}, storage_service_1000));
+  EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(), file_1},
+                                          {file_10->getId(), file_10},
+                                          {file_100->getId(), file_100},
+                                          {file_500->getId(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -493,7 +496,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   simulation->setFileRegistryService(std::move(file_registry_service));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({file_500}, storage_service_1000));
+  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getId(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -653,7 +656,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   simulation->setFileRegistryService(std::move(file_registry_service));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({file_500}, storage_service_1000));
+  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getId(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -885,7 +888,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   simulation->setFileRegistryService(std::move(file_registry_service));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({file_500}, storage_service_1000));
+  EXPECT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -1130,7 +1133,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   simulation->setFileRegistryService(std::move(file_registry_service));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({file_500}, storage_service_1000));
+  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getId(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());

@@ -55,7 +55,7 @@ namespace wrench {
 
         void exportToEPS(std::string);
 
-        std::set<WorkflowFile *>getInputFiles();
+        std::map<std::string, WorkflowFile *>getInputFiles();
 
         /***********************/
         /** \cond DEVELOPER    */
