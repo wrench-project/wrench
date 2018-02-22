@@ -76,12 +76,11 @@ class ResourceInformationTestWMS : public wrench::WMS {
 
 public:
     ResourceInformationTestWMS(MultihostMulticoreComputeServiceTestResourceInformation *test,
-                               wrench::Workflow *workflow,
                                std::unique_ptr<wrench::Scheduler> scheduler,
                                const std::set<wrench::ComputeService *> &compute_services,
                                const std::set<wrench::StorageService *> &storage_services,
                                std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -205,10 +204,13 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   compute_services.insert(compute_service2);
 
   // Create the WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ResourceInformationTestWMS(
-                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                  this, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), compute_services, {}, "Host1"))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   EXPECT_NO_THROW(simulation->launch());
 

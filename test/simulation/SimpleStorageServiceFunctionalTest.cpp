@@ -78,12 +78,11 @@ class SimpleStorageServiceBasicFunctionalityTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceBasicFunctionalityTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                  wrench::Workflow *workflow,
                                                   std::unique_ptr<wrench::Scheduler> scheduler,
                                                   const std::set<wrench::ComputeService *> &compute_services,
                                                   const std::set<wrench::StorageService *> &storage_services,
                                                   std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -360,9 +359,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                   new wrench::SimpleStorageService(hostname, 1000.0, ULONG_MAX))));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(
-                  new SimpleStorageServiceBasicFunctionalityTestWMS(this, workflow,
+                  new SimpleStorageServiceBasicFunctionalityTestWMS(this,
                                                                     std::unique_ptr<wrench::Scheduler>(
                                                                             new NoopScheduler()),
                                                                     {compute_service},
@@ -370,6 +370,8 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                             storage_service_100, storage_service_500,
                                     storage_service_1000
                           }, hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -400,12 +402,11 @@ class SimpleStorageServiceSynchronousFileCopyTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceSynchronousFileCopyTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                   wrench::Workflow *workflow,
                                                    std::unique_ptr<wrench::Scheduler> scheduler,
                                                    const std::set<wrench::ComputeService *> &compute_services,
                                                    const std::set<wrench::StorageService *> &storage_services,
                                                    std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -483,11 +484,14 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
                   new wrench::SimpleStorageService(hostname, 500.0, ULONG_MAX))));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceSynchronousFileCopyTestWMS(
-                  this, workflow,
+                  this,
                   std::unique_ptr<wrench::Scheduler>(new NoopScheduler()), {compute_service},
                           { storage_service_1000, storage_service_500 }, hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -515,12 +519,11 @@ class SimpleStorageServiceAsynchronousFileCopyTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceAsynchronousFileCopyTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                    wrench::Workflow *workflow,
                                                     std::unique_ptr<wrench::Scheduler> scheduler,
                                                     const std::set<wrench::ComputeService *> &compute_services,
                                                     const std::set<wrench::StorageService *> &storage_services,
                                                     std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -643,11 +646,14 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
                   new wrench::SimpleStorageService(hostname, 500.0, ULONG_MAX))));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceAsynchronousFileCopyTestWMS(
-                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                  this, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), {compute_service}, {storage_service_1000, storage_service_500},
                           hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -675,12 +681,11 @@ class SimpleStorageServiceSynchronousFileCopyFailuresTestWMS : public wrench::WM
 
 public:
     SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                           wrench::Workflow *workflow,
                                                            std::unique_ptr<wrench::Scheduler> scheduler,
                                                            const std::set<wrench::ComputeService *> compute_services,
                                                            const std::set<wrench::StorageService *> &storage_services,
                                                            std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -871,15 +876,18 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
                   new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(
-                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                  this, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), {
                           compute_service
                   }, {
                           storage_service_100, storage_service_500,
                           storage_service_1000
                   }, hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -908,12 +916,11 @@ class SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS : public wrench::W
 
 public:
     SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(SimpleStorageServiceFunctionalTest *test,
-                                                            wrench::Workflow *workflow,
                                                             std::unique_ptr<wrench::Scheduler> scheduler,
                                                             const std::set<wrench::ComputeService *> compute_services,
                                                             const std::set<wrench::StorageService *> &storage_services,
                                                             std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -1116,15 +1123,18 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
                   new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(
-                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                  this, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), {
                           compute_service
                   }, {
                           storage_service_100, storage_service_500,
                           storage_service_1000
                   }, hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(

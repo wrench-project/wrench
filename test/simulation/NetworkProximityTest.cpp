@@ -91,12 +91,11 @@ class ProxTestWMS : public wrench::WMS {
 
 public:
     ProxTestWMS(NetworkProximityTest *test,
-                wrench::Workflow *workflow,
                 std::unique_ptr<wrench::Scheduler> scheduler,
                 const std::set<wrench::ComputeService *> &compute_services,
                 const std::set<wrench::StorageService *> &storage_services,
                 std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -172,10 +171,13 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                   new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ProxTestWMS(
-                  this, workflow, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()),
+                  this, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()),
                   {compute_service}, {storage_service1}, hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -221,12 +223,11 @@ class CompareProxTestWMS : public wrench::WMS {
 
 public:
     CompareProxTestWMS(NetworkProximityTest *test,
-                       wrench::Workflow *workflow,
                        std::unique_ptr<wrench::Scheduler> scheduler,
                        const std::set<wrench::ComputeService *> &compute_services,
                        const std::set<wrench::StorageService *> &storage_services,
                        std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -331,10 +332,13 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
                   new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new CompareProxTestWMS(
-                  this, workflow, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()),
+                  this, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()),
                   {compute_service}, {storage_service1}, hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
           new wrench::FileRegistryService(hostname));

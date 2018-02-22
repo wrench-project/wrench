@@ -85,12 +85,11 @@ class SimpleStorageServiceConcurrencyFileCopiesTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceConcurrencyFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
-                                                     wrench::Workflow *workflow,
                                                      std::unique_ptr<wrench::Scheduler> scheduler,
                                                      const std::set<wrench::ComputeService *> compute_services,
                                                      const std::set<wrench::StorageService *> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -190,11 +189,14 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
                   new wrench::SimpleStorageService("DstHost", STORAGE_SIZE, ULONG_MAX))));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesTestWMS(
-                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                  this, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), {compute_service}, {storage_service_1, storage_service_2},
                           "WMSHost"))));
+
+  wms->addWorkflow(this->workflow);
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(

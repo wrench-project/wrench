@@ -200,6 +200,9 @@ namespace wrench {
         if (not this->hostExists(wms->getHostname())) {
           throw std::runtime_error("A WMS cannot be started on host '" + wms->getHostname() + "'");
         }
+        if (wms->getWorkflow() == nullptr) {
+          throw std::runtime_error("The WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
+        }
       }
 
       // Check that at least one ComputeService is created, and that all services are on valid hosts
