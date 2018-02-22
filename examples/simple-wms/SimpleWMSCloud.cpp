@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
    * These files are then staged on the storage service.
    */
   std::cerr << "Staging input files..." << std::endl;
-  std::set<wrench::WorkflowFile *> input_files = workflow.getInputFiles();
+  std::map<std::string, wrench::WorkflowFile *> input_files = workflow.getInputFiles();
   try {
     simulation.stageFiles(input_files, storage_service);
   } catch (std::runtime_error &e) {

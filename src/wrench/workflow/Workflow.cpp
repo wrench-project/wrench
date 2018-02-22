@@ -569,16 +569,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the set of input files for a workflow (i.e., those files
+     * @brief Retrieve a map (indexed by file id) of input files for a workflow (i.e., those files
      *        that are input to some tasks but output from none)
      *
-     * @return a std::set of files
+     * @return a std::map of files
      */
-    std::set<WorkflowFile *> Workflow::getInputFiles() {
-      std::set<WorkflowFile *> input_files;
+    std::map<std::string, WorkflowFile *> Workflow::getInputFiles() {
+      std::map<std::string, WorkflowFile *> input_files;
       for (auto const &x : this->files) {
         if ((x.second->output_of == nullptr) && (x.second->input_of.size() > 0)) {
-          input_files.insert(x.second.get());
+          input_files.insert({x.first, x.second.get()});
         }
       }
       return input_files;
