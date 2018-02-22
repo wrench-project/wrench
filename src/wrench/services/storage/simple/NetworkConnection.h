@@ -13,6 +13,7 @@
 
 #include <string>
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
+#include <wrench/workflow/execution_events/FailureCause.h>
 
 namespace wrench {
 
@@ -28,12 +29,16 @@ namespace wrench {
 
         NetworkConnection(int type, WorkflowFile* file, std::string mailbox, std::string ack_mailbox);
         bool start();
+        bool hasFailed();
+        std::unique_ptr<SimulationMessage> getMessage();
+
 
         int type;
         WorkflowFile *file;
         std::string mailbox;
         std::string ack_mailbox;
         std::unique_ptr<S4U_PendingCommunication> comm;
+        std::shared_ptr<FailureCause> failure_cause;
     };
 
 };

@@ -15,6 +15,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
+#include "NetworkConnectionManager.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
 
@@ -52,6 +53,9 @@ namespace wrench {
                                                std::map<std::string, std::string> plist) :
             SimpleStorageService(std::move(hostname), capacity, plist, "_" + std::to_string(getNewUniqueNumber())) {
       this->num_concurrent_connections = num_concurrent_connections;
+      this->network_connection_manager =  std::unique_ptr<NetworkConnectionManager>(
+              new NetworkConnectionManager(this->num_concurrent_connections));
+
     }
 
     /**
@@ -100,49 +104,41 @@ namespace wrench {
                   this->mailbox_name.c_str());
 
       /** Main loop **/
-      bool should_post_a_receive_on_my_standard_mailbox = true;
+      bool should_add_incoming_control_connection = true;
       bool should_continue = true;
+
+
       while (should_continue) {
 
         // Post a recv on my standard mailbox in case there is none pending
-        if (should_post_a_receive_on_my_standard_mailbox) {
-          std::unique_ptr<S4U_PendingCommunication> comm = nullptr;
-          try {
-            comm = S4U_Mailbox::igetMessage(this->mailbox_name);
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            WRENCH_INFO("Can't even place an asynchronous get...something must be really wrong...aborting");
-            break;
-          }
-          this->pending_incoming_communications.push_back(std::move(comm));
-          should_post_a_receive_on_my_standard_mailbox = false;
+        if (should_add_incoming_control_connection) {
+          this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
+                  new NetworkConnection(NetworkConnection::INCOMING_CONTROL, nullptr, this->mailbox_name, "")
+          ));
+          should_add_incoming_control_connection = false;
         }
 
-        // Wait for a message
-        unsigned long target = S4U_PendingCommunication::waitForSomethingToHappen(
-                this->pending_incoming_communications, -1);
+        // Wait a connection
+        std::pair<std::unique_ptr<NetworkConnection>, bool> finished_connection;
 
-        // Extract the pending comm
-        std::unique_ptr<S4U_PendingCommunication> target_comm = std::move(
-                this->pending_incoming_communications[target]);
-        this->pending_incoming_communications.erase(this->pending_incoming_communications.begin() + target);
+        finished_connection = this->network_connection_manager->waitForNetworkConnection();
 
-
-        if (target_comm->comm_ptr->getMailbox()->getName() == this->mailbox_name) {
-          should_continue = processControlMessage(std::move(target_comm));
-          should_post_a_receive_on_my_standard_mailbox = true;
+        if (std::get<0>(finished_connection)->type == NetworkConnection::INCOMING_CONTROL) {
+          should_continue = processControlMessage(std::move(std::get<0>(finished_connection)));
+          should_add_incoming_control_connection = true;
         } else {
-          should_continue = processDataMessage(std::move(target_comm));
+          should_continue = processDataConnection(std::move(std::move(std::get<0>(finished_connection))));
         }
       }
-
-      //probably we have to remove everything leftover on the pending communications
-      std::vector<std::unique_ptr<S4U_PendingCommunication>>::iterator it;
-      for (it = this->pending_incoming_communications.begin();
-           it != this->pending_incoming_communications.end(); it++) {
-        if (it->get() != nullptr) {
-          it->reset();
-        }
-      }
+//
+//      //probably we have to remove everything leftover on the pending communications
+//      std::vector<std::unique_ptr<S4U_PendingCommunication>>::iterator it;
+//      for (it = this->pending_incoming_communications.begin();
+//           it != this->pending_incoming_communications.end(); it++) {
+//        if (it->get() != nullptr) {
+//          it->reset();
+//        }
+//      }
 
       WRENCH_INFO("Simple Storage Service %s on host %s terminated!",
                   this->getName().c_str(),
@@ -158,12 +154,12 @@ namespace wrench {
      * @param comm: the pending communication
      * @return false if the daemon should terminate
      */
-    bool SimpleStorageService::processControlMessage(std::unique_ptr<S4U_PendingCommunication> comm) {
+    bool SimpleStorageService::processControlMessage(std::unique_ptr<NetworkConnection> connection) {
 
       // Get the message
       std::unique_ptr<SimulationMessage> message;
       try {
-        message = comm->wait();
+        message = connection->comm->wait();
       } catch (std::shared_ptr<NetworkError> &cause) {
         WRENCH_INFO("Network error while receiving a control message... ignoring");
         return true;
@@ -331,19 +327,8 @@ namespace wrench {
         return true;
       }
 
-      std::unique_ptr<S4U_PendingCommunication> pending_comm = nullptr;
-      try {
-        pending_comm = S4U_Mailbox::igetMessage(file_reception_mailbox);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return true;
-      }
-
-      // Create an "incoming file" record: TODO   RAW POINTER HERE FOR INCOMING FILE!!
-      this->incoming_files.insert(
-              std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(new IncomingFile(file, false, ""))));
-
-      // Add the communication to the list of pending_incoming_communications
-      this->pending_incoming_communications.push_back(std::move(pending_comm));
+      this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
+              new NetworkConnection(NetworkConnection::INCOMING_DATA, file, file_reception_mailbox, "")));
 
       return true;
     }
@@ -383,13 +368,9 @@ namespace wrench {
 
       // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
       if (success) {
-        WRENCH_INFO("Asynchronously sending file %s to mailbox %s...", file->getId().c_str(), answer_mailbox.c_str());
-        try {
-          S4U_Mailbox::dputMessage(mailbox_to_receive_the_file_content, new
-                  StorageServiceFileContentMessage(file));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return true;
-        }
+          this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
+             new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, mailbox_to_receive_the_file_content, "")
+          ));
       }
 
       return true;
@@ -443,7 +424,7 @@ namespace wrench {
                                                                                             this)),
                                                                             this->getPropertyValueAsDouble(
                                                                                     SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
           }
           return true;
@@ -474,66 +455,50 @@ namespace wrench {
         }
       }
 
-      // Post the receive operation
-      std::unique_ptr<S4U_PendingCommunication> pending_comm;
-      try {
-        pending_comm = S4U_Mailbox::igetMessage(file_reception_mailbox);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return true;
-      }
 
-
-      // Create an "incoming file" record
-      this->incoming_files.insert(std::make_pair(pending_comm.get(), std::unique_ptr<IncomingFile>(
-              new IncomingFile(file, true, answer_mailbox))));
-
-      // Add the communication to the list of pending_incoming_communications
-      this->pending_incoming_communications.push_back(std::move(pending_comm));
-
+      this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
+              new NetworkConnection(NetworkConnection::INCOMING_DATA, file, file_reception_mailbox, answer_mailbox)
+      ));
 
       return true;
     }
 
 
     /**
-    * @brief Process a received data message
+    * @brief Process a completed data connection
     *
-    * @param comm: the pending communication
+    * @param connection: the completed data connection
     * @return false if the daemon should terminate
     *
     * @throw std::runtime_error
     */
-    bool SimpleStorageService::processDataMessage(std::unique_ptr<S4U_PendingCommunication> comm) {
+    bool SimpleStorageService::processDataConnection(std::unique_ptr<NetworkConnection> connection) {
 
-      // Find the Incoming File record
-      if (this->incoming_files.find(comm.get()) == this->incoming_files.end()) {
-        throw std::runtime_error(
-                "SimpleStorageService::processDataMessage(): Cannot find incoming file record for communications...");
+      if (connection->type == NetworkConnection::INCOMING_DATA) {
+        return processIncomingDataConnection(std::move(connection));
+      } else if (connection->type == NetworkConnection::OUTGOING_DATA) {
+        return processOutgoingDataConnection(std::move(connection));
       }
+    }
 
-      IncomingFile *incoming_file = this->incoming_files[comm.get()].get();
-      WorkflowFile *file = incoming_file->file;
-      std::string ack_mailbox = incoming_file->ack_mailbox;
-      bool send_file_copy_ack = incoming_file->send_file_copy_ack;
-      this->incoming_files.erase(comm.get());
+    bool SimpleStorageService::processIncomingDataConnection(std::unique_ptr<NetworkConnection> connection) {
 
       // Get the message
-      std::unique_ptr<SimulationMessage> message;
-      try {
-        message = comm->wait();
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        WRENCH_INFO("SimpleStorageService::processDataMessage(): Communication failure when receiving file '%s",
-                    file->getId().c_str());
+      std::unique_ptr<SimulationMessage> message = connection->getMessage();
+
+      if (message == nullptr) {
+        WRENCH_INFO("SimpleStorageService::processDataConnection(): Communication failure when receiving file '%s",
+                    connection->file->getId().c_str());
         // Process the failure, meaning, just re-decrease the occupied space
-        this->occupied_space -= file->getSize();
+        this->occupied_space -= connection->file->getSize();
         // And if this was an overwrite, now we lost the file!!!
-        this->stored_files.erase(file);
+        this->stored_files.erase(connection->file);
 
         WRENCH_INFO(
                 "Sending back an ack since this was a file copy and some client is waiting for me to say something");
         try {
-          S4U_Mailbox::putMessage(ack_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(file, this, false, cause,
+          S4U_Mailbox::putMessage(connection->ack_mailbox,
+                                  new StorageServiceFileCopyAnswerMessage(connection->file, this, false, connection->failure_cause,
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -542,30 +507,25 @@ namespace wrench {
         return true;
       }
 
-      if (message == nullptr) {
-        WRENCH_INFO("Got a NULL message. This likely means that we're all done...Aborting!");
-        return false;
-      }
-
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
       if (auto msg = dynamic_cast<StorageServiceFileContentMessage *>(message.get())) {
 
-        if (msg->file != file) {
+        if (msg->file != connection->file) {
           throw std::runtime_error(
-                  "SimpleStorageService::processDataMessage(): Mismatch between received file and expected file... a bug in SimpleStorageService");
+                  "SimpleStorageService::processDataConnection(): Mismatch between received file and expected file... a bug in SimpleStorageService");
         }
 
         // Add the file to my storage (this will not add a duplicate in case of an overwrite, because it's a set)
-        this->stored_files.insert(file);
+        this->stored_files.insert(connection->file);
 
         // Send back the corresponding ack?
-        if (send_file_copy_ack) {
+        if (not connection->ack_mailbox.empty()) {
           WRENCH_INFO(
                   "Sending back an ack since this was a file copy and some client is waiting for me to say something");
           try {
-            S4U_Mailbox::putMessage(ack_mailbox,
-                                    new StorageServiceFileCopyAnswerMessage(file, this, true, nullptr,
+            S4U_Mailbox::putMessage(connection->ack_mailbox,
+                                    new StorageServiceFileCopyAnswerMessage(connection->file, this, true, nullptr,
                                                                             this->getPropertyValueAsDouble(
                                                                                     SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::shared_ptr<NetworkError> &cause) {
@@ -581,4 +541,10 @@ namespace wrench {
       }
 
     }
+
+    bool SimpleStorageService::processOutgoingDataConnection(std::unique_ptr<NetworkConnection> connection) {
+      // Nothing to do
+      return true;
+    }
+
 };

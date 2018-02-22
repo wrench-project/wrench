@@ -12,6 +12,8 @@
 #include <wrench-dev.h>
 #include <services/storage/StorageServiceMessage.h>
 #include "NetworkConnection.h"
+#include <xbt/ex.hpp>
+
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_data_connection, "Log category for Data Connection");
 
@@ -21,8 +23,7 @@ namespace wrench {
     constexpr int NetworkConnection::OUTGOING_DATA;
     constexpr int NetworkConnection::INCOMING_CONTROL;
 
-    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string mailbox, std::string ack_mailbox):
-    {
+    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string mailbox, std::string ack_mailbox) {
       this->type = type;
       this->file = file;
       this->mailbox = mailbox;
@@ -77,16 +78,58 @@ namespace wrench {
           }
           break;
         case NetworkConnection::INCOMING_CONTROL:
-          WRENCH_INFO("Asynchronously receiving a control message...");
+        WRENCH_INFO("Asynchronously receiving a control message...");
           try {
             this->comm = S4U_Mailbox::igetMessage(this->mailbox);
           } catch (std::shared_ptr<NetworkError> &cause) {
             WRENCH_INFO("NetworkConnection::start(): got a NetworkError... giving up");
             return false;
           }
+          break;
         default:
           throw std::runtime_error("NetworkConnection::start(): Invalid connection type");
       }
       return true;
     }
+
+    /**
+     * @brief Determine whether the connection has failed
+     * @return true if failed
+     */
+    bool NetworkConnection::hasFailed() {
+      try {
+        this->comm->comm_ptr->test();
+      } catch (xbt_ex &e) {
+        if (e.category == network_error) {
+          if (this->type == NetworkConnection::OUTGOING_DATA) {
+            this->failure_cause = std::shared_ptr<FailureCause>(new NetworkError(NetworkError::SENDING, this->mailbox));
+          } else {
+            this->failure_cause = std::shared_ptr<FailureCause>(new NetworkError(NetworkError::RECEIVING, this->mailbox));
+          }
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * @brief Retrieve the message for a communication
+     * @return  the message, or nullptr if the connection has failed
+     */
+    std::unique_ptr<SimulationMessage> NetworkConnection::getMessage() {
+      if (this->type == NetworkConnection::OUTGOING_DATA) {
+        throw std::runtime_error("NetworkConnection::getMessage(): Cannot be called on an outgoing connection");
+      }
+      if (this->hasFailed()) {
+        return nullptr;
+      }
+      std::unique_ptr<SimulationMessage> message;
+      try {
+        message = this->comm->wait();
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return nullptr;
+      }
+      return std::move(message);
+    }
+
 };
