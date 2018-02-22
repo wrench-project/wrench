@@ -259,9 +259,9 @@ namespace wrench {
 
         // Check that each input file is staged somewhere
         for (auto f : wms->workflow->getInputFiles()) {
-          if (this->file_registry_service->entries.find(f) == this->file_registry_service->entries.end()) {
+          if (this->file_registry_service->entries.find(f.second) == this->file_registry_service->entries.end()) {
             throw std::runtime_error(
-                    "Workflow input file " + f->getId() + " is not staged on any storage service!");
+                    "Workflow input file " + f.second->getId() + " is not staged on any storage service!");
           }
         }
       }
@@ -468,13 +468,13 @@ namespace wrench {
     /**
    * @brief Stage a set of a file copies on a storage service
      *
-   * @param files: a set of files to stage on a storage service
+   * @param files: a map of files (indexed by file ids) to stage on a storage service
    * @param storage_service: the storage service
    *
    * @throw std::runtime_error
    * @throw std::invalid_argument
    */
-    void Simulation::stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service) {
+    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service) {
 
       if (storage_service == nullptr) {
         throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
@@ -488,7 +488,7 @@ namespace wrench {
 
       try {
         for (auto f : files) {
-          this->stageFile(f, storage_service);
+          this->stageFile(f.second, storage_service);
         }
       } catch (std::runtime_error &e) {
         throw;

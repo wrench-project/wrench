@@ -322,18 +322,6 @@ namespace wrench {
         processSubmitPilotJob(msg->answer_mailbox, msg->job);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-        this->terminate();
-        // This is Synchronous
-        try {
-          S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                  new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                          CloudServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return false;
-        }
-        return false;
-
       } else {
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");
       }

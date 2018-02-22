@@ -204,7 +204,7 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
           std::unique_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService(hostname))));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -332,7 +332,7 @@ void CloudServiceTest::do_PilotJobTaskTest_test() {
           std::unique_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService(hostname))));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -453,7 +453,7 @@ void CloudServiceTest::do_NumCoresTest_test() {
           std::unique_ptr<wrench::FileRegistryService>(new wrench::FileRegistryService(hostname))));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({input_file}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());

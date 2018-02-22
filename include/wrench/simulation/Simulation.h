@@ -59,7 +59,7 @@ namespace wrench {
 
         void stageFile(WorkflowFile *file, StorageService *storage_service);
 
-        void stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service);
+        void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service);
 
         /** @brief The simulation post-mortem output */
         SimulationOutput output;

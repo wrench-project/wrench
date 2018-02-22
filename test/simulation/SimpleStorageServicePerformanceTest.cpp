@@ -203,7 +203,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   simulation->setFileRegistryService(std::move(file_registry_service));
 
   // Staging all files on the Src storage service
-  EXPECT_NO_THROW(simulation->stageFiles({file_1, file_2, file_3}, storage_service_1));
+  EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(), file_1}, {file_2->getId(), file_2}, {file_3->getId(), file_3}}, storage_service_1));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
