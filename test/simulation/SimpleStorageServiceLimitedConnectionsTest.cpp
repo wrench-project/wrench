@@ -30,7 +30,7 @@ public:
     wrench::StorageService *storage_service_1 = nullptr;
     wrench::StorageService *storage_service_2 = nullptr;
 
-    void do_ConcurrencyFileCopies_test();
+    void do_ConcurrencyFileCopies_test();
 
 
 protected:
@@ -81,12 +81,11 @@ class SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS : publi
 
 public:
     SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(SimpleStorageServiceLimitedConnectionsTest *test,
-                                                                       wrench::Workflow *workflow,
                                                                        std::unique_ptr<wrench::Scheduler> scheduler,
                                                                        const std::set<wrench::ComputeService *> &compute_services,
                                                                        const std::set<wrench::StorageService *> &storage_services,
                                                                        const std::string &hostname) :
-            wrench::WMS(workflow, std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -107,54 +106,71 @@ private:
       // Reading
       for (auto dst_storage_service : {this->test->storage_service_1, this->test->storage_service_2}) {
 
-        // Initiate 10 asynchronous file copies to storage_service_1 (unlimited)
-        double start = this->simulation->getCurrentSimulatedDate();
-        for (int i = 0; i < 10; i++) {
-          std::cerr << "I = " << i << "\n";
-          data_movement_manager->initiateAsynchronousFileCopy(this->test->files[i],
-                                                              this->test->storage_service_wms,
-                                                              dst_storage_service);
-        }
+        for (auto reading : {true, false}) {
 
-        double completion_dates[10];
-        for (int i = 0; i < 10; i++) {
-          std::unique_ptr<wrench::WorkflowExecutionEvent> event1 = workflow->waitForNextExecutionEvent();
-          if (event1->type != wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION) {
-            throw std::runtime_error("Unexpected Workflow Execution Event " + std::to_string(event1->type));
-          }
-          completion_dates[i] = this->simulation->getCurrentSimulatedDate();
-        }
-
-        for (int i = 0; i < 10; i++) {
-          std::cerr << "COMPLETION DATE #" << i << ":  " << completion_dates[i] << "\n";
-        }
-
-        // Check results for the unlimited storage service
-        if (dst_storage_service == this->test->storage_service_1) {
-          double baseline_elapsed = completion_dates[0] - start;
-          std::cerr << "BASELINE ELAPSED " << baseline_elapsed << "\n";
-          for (int i=1; i < 10; i++) {
-            if (fabs(baseline_elapsed - (completion_dates[i] - start)) > 0.1) {
-              throw std::runtime_error("Incoherent transfer elapsed times for the unlimited storage service");
+          // Initiate 10 asynchronous file copies to/from storage_service_1 (unlimited)
+          double start = this->simulation->getCurrentSimulatedDate();
+          for (int i = 0; i < 10; i++) {
+            if (reading) {
+              data_movement_manager->initiateAsynchronousFileCopy(this->test->files[i],
+                                                                  this->test->storage_service_wms,
+                                                                  dst_storage_service);
+            } else {
+              data_movement_manager->initiateAsynchronousFileCopy(this->test->files[i],
+                                                                  dst_storage_service,
+                                                                  this->test->storage_service_wms);
             }
           }
-        }
 
-        // Check results for the limited storage service
-        if (dst_storage_service == this->test->storage_service_2) {
-          bool success = true;
-
-          if ((fabs(completion_dates[0] - completion_dates[1]) > 0.01) ||
-              (fabs(completion_dates[2] - completion_dates[1]) > 0.01) ||
-              (fabs(completion_dates[4] - completion_dates[3]) > 0.01) ||
-              (fabs(completion_dates[5] - completion_dates[4]) > 0.01) ||
-              (fabs(completion_dates[7] - completion_dates[6]) > 0.01) ||
-              (fabs(completion_dates[8] - completion_dates[7]) > 0.01)) {
-            success = false;
+          double completion_dates[10];
+          for (int i = 0; i < 10; i++) {
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event1 = workflow->waitForNextExecutionEvent();
+            if (event1->type != wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION) {
+              throw std::runtime_error("Unexpected Workflow Execution Event " + std::to_string(event1->type));
+            }
+            completion_dates[i] = this->simulation->getCurrentSimulatedDate();
           }
 
-          if (not success) {
-            throw std::runtime_error("Incoherent transfer elapsed times for the limited storage service");
+          // Check results for the unlimited storage service
+          if (dst_storage_service == this->test->storage_service_1) {
+            double baseline_elapsed = completion_dates[0] - start;
+            for (int i=1; i < 10; i++) {
+              if (fabs(baseline_elapsed - (completion_dates[i] - start)) > 1) {
+                throw std::runtime_error("Incoherent transfer elapsed times for the unlimited storage service");
+              }
+            }
+          }
+
+          // Check results for the limited storage service
+          if (dst_storage_service == this->test->storage_service_2) {
+            bool success = true;
+
+            if ((fabs(completion_dates[0] - completion_dates[1]) > 1) ||
+                (fabs(completion_dates[2] - completion_dates[1]) > 1) ||
+                (fabs(completion_dates[4] - completion_dates[3]) > 1) ||
+                (fabs(completion_dates[5] - completion_dates[4]) > 1) ||
+                (fabs(completion_dates[7] - completion_dates[6]) > 1) ||
+                (fabs(completion_dates[8] - completion_dates[7]) > 1)) {
+              success = false;
+            }
+
+            double elapsed_1 = completion_dates[0] - start;
+            double elapsed_2 = completion_dates[3] - completion_dates[0];
+            double elapsed_3 = completion_dates[6] - completion_dates[3];
+            double elapsed_4 = completion_dates[9] - completion_dates[8];
+
+            if ((fabs(elapsed_2 - elapsed_1) > 1) ||
+                (fabs(elapsed_3 - elapsed_2) > 1)) {
+              success = false;
+            }
+
+            if (fabs(3.0 * elapsed_4 - elapsed_3) > 1) {
+              success = false;
+            }
+
+            if (not success) {
+              throw std::runtime_error("Incoherent transfer elapsed times for the limited storage service");
+            }
           }
         }
       }
@@ -206,11 +222,14 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
                   new wrench::SimpleStorageService("Host2", STORAGE_SIZE, 3))));
 
   // Create a WMS
-  EXPECT_NO_THROW(wrench::WMS *wms = simulation->add(
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
-                  this, workflow, std::unique_ptr<wrench::Scheduler>(
+                  this, std::unique_ptr<wrench::Scheduler>(
                           new NoopScheduler()), {compute_service}, {storage_service_wms, storage_service_1, storage_service_2},
-                          "WMSHost"))));
+                  "WMSHost"))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
