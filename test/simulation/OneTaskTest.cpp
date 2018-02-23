@@ -403,8 +403,8 @@ private:
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}},
-                                             {{nullptr, test->storage_service1, test->storage_service2
-                                              }},
+                                             {std::make_tuple(nullptr, test->storage_service1, test->storage_service2)
+                                              },
                                              {},
                                              {}
         );
@@ -421,8 +421,8 @@ private:
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}},
-                                             {{test->output_file, nullptr, test->storage_service2
-                                              }},
+                                             {std::make_tuple(test->output_file, nullptr, test->storage_service2)
+                                              },
                                              {},
                                              {}
         );
@@ -439,8 +439,7 @@ private:
         job = job_manager->createStandardJob({test->task},
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}},
-                                             {{test->output_file, test->storage_service1, nullptr
-                                              }},
+                                             {std::make_tuple(test->output_file, test->storage_service1, nullptr)},
                                              {},
                                              {}
         );
@@ -458,8 +457,7 @@ private:
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}},
                                              {},
-                                             {{nullptr, test->storage_service1, test->storage_service2
-                                              }},
+                                             {std::make_tuple(nullptr, test->storage_service1, test->storage_service2)},
                                              {}
         );
       } catch (std::invalid_argument &e) {
@@ -476,8 +474,7 @@ private:
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}},
                                              {},
-                                             {{test->output_file, nullptr, test->storage_service2
-                                              }},
+                                             {std::make_tuple(test->output_file, nullptr, test->storage_service2)},
                                              {}
         );
       } catch (std::invalid_argument &e) {
@@ -494,8 +491,8 @@ private:
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}},
                                              {},
-                                             {{test->output_file, test->storage_service1, nullptr
-                                              }},
+                                             {std::make_tuple(test->output_file, test->storage_service1, nullptr)
+                                              },
                                              {}
         );
       } catch (std::invalid_argument &e) {
