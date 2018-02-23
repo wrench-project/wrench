@@ -11,7 +11,7 @@
 #define WRENCH_SIMPLESTORAGESERVICE_H
 
 
-#include <services/storage/simple/NetworkConnection.h>
+#include <wrench/services/storage/simple/NetworkConnection.h>
 #include <services/storage/simple/NetworkConnectionManager.h>
 #include "wrench/services/storage/StorageService.h"
 #include "SimpleStorageServiceProperty.h"
