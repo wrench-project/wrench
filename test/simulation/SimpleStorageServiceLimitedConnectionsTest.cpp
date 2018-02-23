@@ -30,7 +30,7 @@ public:
     wrench::StorageService *storage_service_1 = nullptr;
     wrench::StorageService *storage_service_2 = nullptr;
 
-    void do_ConcurrencyFileCopies_test();
+    void do_ConcurrencyFileCopies_test();
 
 
 protected:
