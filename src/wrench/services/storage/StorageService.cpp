@@ -315,7 +315,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (StorageServiceFileWriteAnswerMessage *msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
         // If not a success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
