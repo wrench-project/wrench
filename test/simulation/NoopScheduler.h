@@ -21,6 +21,11 @@ public:
                        std::map<std::string, std::vector<wrench::WorkflowTask *>> ready_tasks,
                        const std::set<wrench::ComputeService *> &compute_services) override;
 
+    void schedulePilotJobs(wrench::JobManager *job_manager,
+                           wrench::Workflow *workflow,
+                           double pilot_job_duration,
+                           const std::set<wrench::ComputeService *> &compute_services) override;
+
 };
 
 #endif //WRENCH_NOOPSCHEDULER_H

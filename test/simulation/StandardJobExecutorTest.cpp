@@ -159,7 +159,7 @@ private:
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> cause) {
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
           throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
         }
 
@@ -530,7 +530,7 @@ private:
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> cause) {
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
           throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
         }
 
@@ -719,7 +719,7 @@ private:
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
-        } catch (std::shared_ptr<wrench::NetworkError> cause) {
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
           throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
         }
 

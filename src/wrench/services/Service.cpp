@@ -117,7 +117,7 @@ namespace wrench {
                                 new ServiceStopDaemonMessage(
                                         ack_mailbox,
                                         this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -127,7 +127,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(ack_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 

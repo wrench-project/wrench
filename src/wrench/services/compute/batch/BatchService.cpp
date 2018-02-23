@@ -1439,7 +1439,7 @@ namespace wrench {
                                  new ComputeServiceStandardJobDoneMessage(job, this,
                                                                           this->getPropertyValueAsDouble(
                                                                                   BatchServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
 
@@ -1507,7 +1507,7 @@ namespace wrench {
                                 new ComputeServiceStandardJobFailedMessage(job, this, cause,
                                                                            this->getPropertyValueAsDouble(
                                                                                    BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
     }
@@ -1683,7 +1683,7 @@ namespace wrench {
                                      new ComputeServicePilotJobStartedMessage(job, this,
                                                                               this->getPropertyValueAsDouble(
                                                                                       BatchServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
           }
 
@@ -1797,7 +1797,7 @@ namespace wrench {
                                                                        this->getPropertyValueAsDouble(
                                                                                BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD
                                                                        )));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           throw std::runtime_error(
                   "BatchService::processExecuteJobFromBatSched():: Network Error while sending the fake job submission reply"
           );
@@ -1892,7 +1892,7 @@ namespace wrench {
 //                                             new ComputeServicePilotJobStartedMessage(job, this,
 //                                                                                      this->getPropertyValueAsDouble(
 //                                                                                              BatchServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
-//                } catch (std::shared_ptr<NetworkError> cause) {
+//                } catch (std::shared_ptr<NetworkError> &cause) {
 //                    throw WorkflowExecutionException(cause);
 //                }
 //

@@ -32,6 +32,11 @@ namespace wrench {
         void scheduleTasks(JobManager *job_manager, std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
                            const std::set<ComputeService *> &compute_services) override;
 
+        void schedulePilotJobs(JobManager *job_manager,
+                                               Workflow *workflow,
+                                               double pilot_job_duration,
+                                               const std::set<ComputeService *> &compute_services) override;
+
         /***********************/
         /** \endcond           */
         /***********************/

@@ -61,7 +61,7 @@ namespace wrench {
     void DataMovementManager::stop() {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
     }
@@ -145,9 +145,9 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
-      }  catch (std::shared_ptr<FatalFailure> cause) {
+      }  catch (std::shared_ptr<FatalFailure> &cause) {
         return true;
       }
 
@@ -158,11 +158,11 @@ namespace wrench {
 
       WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
-      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         // There shouldn't be any need to clean any state up
         return false;
 
-      } else if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
         // Forward it back
         try {
@@ -170,7 +170,7 @@ namespace wrench {
                                    new StorageServiceFileCopyAnswerMessage(msg->file,
                                                                            msg->storage_service, msg->success,
                                                                            std::move(msg->failure_cause), 0));
-        } catch  (std::shared_ptr<NetworkError> cause) {
+        } catch  (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
         return true;
