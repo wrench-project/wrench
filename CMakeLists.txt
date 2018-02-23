@@ -183,7 +183,7 @@ set(SOURCE_FILES
 # test files
 set(TEST_FILES
         test/main.cpp
-        test/constructor_exceptions/MessageConstructorTest.cpp
+        test/simulation_message_constructors/MessageConstructorTest.cpp
         test/workflow/WorkflowTest.cpp
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp

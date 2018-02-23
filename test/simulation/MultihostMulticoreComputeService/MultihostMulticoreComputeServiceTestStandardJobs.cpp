@@ -159,6 +159,17 @@ private:
         if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_TYPE_NOT_SUPPORTED) {
           throw std::runtime_error("Didn't get the expected exception");
         }
+        wrench::JobTypeNotSupported *real_cause = (wrench::JobTypeNotSupported *)e.getCause().get();
+        if (real_cause->getJob() != two_task_job) {
+          throw std::runtime_error(
+                  "Got the expected exception and failure cause, but the failure cause does not point to the right job");
+        }
+        if (real_cause->getComputeService() != this->test->compute_service) {
+          throw std::runtime_error(
+                  "Got the expected exception and failure cause, but the failure cause does not point to the right compute service");
+        }
+        std::string error_msg = real_cause->toString();
+
         success = false;
       }
       if (success) {

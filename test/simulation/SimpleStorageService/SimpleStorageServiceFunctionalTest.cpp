@@ -747,6 +747,7 @@ private:
         }
         // Check Exception details
         wrench::StorageServiceNotEnoughSpace *real_cause = (wrench::StorageServiceNotEnoughSpace *) e.getCause().get();
+        std::string error_msg = real_cause->toString();
         if (real_cause->getFile() != this->test->file_500) {
           throw std::runtime_error(
                   "Got the expected 'not enough space' exception, but the failure cause does not point to the correct file");
