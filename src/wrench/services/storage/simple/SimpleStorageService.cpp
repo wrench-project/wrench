@@ -478,6 +478,8 @@ namespace wrench {
         return processIncomingDataConnection(std::move(connection));
       } else if (connection->type == NetworkConnection::OUTGOING_DATA) {
         return processOutgoingDataConnection(std::move(connection));
+      } else {
+        throw std::invalid_argument("SimpleStorageService::processDataConnection(): invalid connection type");
       }
     }
 

@@ -69,7 +69,6 @@ set(HEADER_FILES
         include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h
         include/wrench/services/compute/cloud/CloudService.h
         include/wrench/services/compute/cloud/CloudServiceProperty.h
-        include/wrench/services/storage/simple/IncomingFile.h
         include/wrench/services/storage/StorageService.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageService.h
@@ -152,7 +151,6 @@ set(SOURCE_FILES
         src/wrench/services/compute/cloud/CloudServiceProperty.cpp
         src/wrench/services/compute/cloud/CloudServiceMessage.h
         src/wrench/services/compute/cloud/CloudServiceMessage.cpp
-        src/wrench/services/storage/simple/IncomingFile.cpp
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp
