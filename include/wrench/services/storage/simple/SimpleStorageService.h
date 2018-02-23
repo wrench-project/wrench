@@ -16,7 +16,6 @@
 #include "wrench/services/storage/StorageService.h"
 #include "SimpleStorageServiceProperty.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
-#include "IncomingFile.h"
 
 namespace wrench {
 
@@ -97,11 +96,6 @@ namespace wrench {
         bool processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox);
 
         unsigned long num_concurrent_connections;
-
-        std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_incoming_communications;
-        std::map<S4U_PendingCommunication *, std::unique_ptr<IncomingFile>> incoming_files;
-
-        std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_outgoing_communications;
 
         std::unique_ptr<NetworkConnectionManager> network_connection_manager;
 
