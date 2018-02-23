@@ -23,9 +23,9 @@ namespace wrench {
 
     public:
 
-        static constexpr int INCOMING_DATA = 0;
-        static constexpr int OUTGOING_DATA = 1;
-        static constexpr int INCOMING_CONTROL = 2;
+        static constexpr unsigned char INCOMING_DATA = 0;
+        static constexpr unsigned char OUTGOING_DATA = 1;
+        static constexpr unsigned char INCOMING_CONTROL = 2;
 
         NetworkConnection(int type, WorkflowFile* file, std::string mailbox, std::string ack_mailbox);
         bool start();
