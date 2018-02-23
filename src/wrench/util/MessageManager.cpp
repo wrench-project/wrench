@@ -28,7 +28,7 @@ namespace wrench {
       std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
       for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
         if ((*msg_itr).first == mailbox) {
-          for (int i = 0; i < (*msg_itr).second.size(); i++) {
+          for (size_t i = 0; i < (*msg_itr).second.size(); i++) {
             delete (*msg_itr).second[i];
           }
           (*msg_itr).second.clear();
