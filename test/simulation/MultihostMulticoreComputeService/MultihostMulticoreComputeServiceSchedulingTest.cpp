@@ -51,12 +51,12 @@ protected:
       std::string xml = "<?xml version='1.0'?>"
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
               "<platform version=\"4.1\"> "
-              "   <AS id=\"AS0\" routing=\"Full\"> "
+              "   <zone id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"Host1\" speed=\"1f\" core=\"4\"/> "
               "       <host id=\"Host2\" speed=\"1f\" core=\"4\"/> "
               "        <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
-              "   </AS> "
+              "   </zone> "
               "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
