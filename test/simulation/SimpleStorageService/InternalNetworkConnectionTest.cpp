@@ -55,11 +55,14 @@ TEST_F(InternalNetworkConnectionTest, Constructor) {
 void InternalNetworkConnectionTest::do_Constructor_test() {
 
   wrench::NetworkConnection *conn = nullptr;
-  wrench::Workflow *workflow = new wrench::Workflow();
+  auto *workflow = new wrench::Workflow();
   wrench::WorkflowFile *file = workflow->addFile("file", 10);
 
   // Bogus type
-  EXPECT_THROW(conn = new wrench::NetworkConnection(-10, nullptr, "", ""), std::invalid_argument);
+  EXPECT_THROW(conn = new wrench::NetworkConnection(3, nullptr, "", ""), std::invalid_argument);
+  EXPECT_THROW(conn = new wrench::NetworkConnection(4, nullptr, "", ""), std::invalid_argument);
+  EXPECT_THROW(conn = new wrench::NetworkConnection(5, nullptr, "", ""), std::invalid_argument);
+  EXPECT_THROW(conn = new wrench::NetworkConnection(6, nullptr, "", ""), std::invalid_argument);
 
   // Empty mailbox
   EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, file, "", "ack"), std::invalid_argument);

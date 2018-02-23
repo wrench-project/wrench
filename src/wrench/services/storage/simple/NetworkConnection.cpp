@@ -19,9 +19,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_data_connection, "Log catego
 
 namespace wrench {
 
-    constexpr int NetworkConnection::INCOMING_DATA;
-    constexpr int NetworkConnection::OUTGOING_DATA;
-    constexpr int NetworkConnection::INCOMING_CONTROL;
+    constexpr unsigned char NetworkConnection::INCOMING_DATA;
+    constexpr unsigned char NetworkConnection::OUTGOING_DATA;
+    constexpr unsigned char NetworkConnection::INCOMING_CONTROL;
 
     NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string mailbox, std::string ack_mailbox) {
       this->type = type;
