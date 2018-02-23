@@ -13,8 +13,8 @@
 #include <wrench-dev.h>
 
 #include "wrench/workflow/job/PilotJob.h"
-#include "NoopScheduler.h"
-#include "TestWithFork.h"
+#include "../NoopScheduler.h"
+#include "../TestWithFork.h"
 
 
 class MultihostMulticoreComputeServiceTestPilotJobs : public ::testing::Test {

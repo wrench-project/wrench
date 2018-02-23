@@ -15,7 +15,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
-#include "NetworkConnectionManager.h"
+#include "wrench/services/storage/simple/NetworkConnectionManager.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
 

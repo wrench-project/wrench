@@ -217,14 +217,8 @@ void OneTaskTest::do_Noop_test() {
 
   ASSERT_THROW(simulation->launch(), std::runtime_error);
 
-  ASSERT_THROW(simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-                  new wrench::MultihostMulticoreComputeService("SingleHost", true, true,
-                                                               {std::make_tuple("SingleHost",
-                                                                                wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {}))), std::invalid_argument);
+//  ASSERT_THROW(simulation->add(
+//          std::unique_ptr<wrench::MultihostMulticoreComputeService>((wrench::MultihostMulticoreComputeService *)666), std::invalid_argument);
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 
