@@ -174,7 +174,10 @@ set(SOURCE_FILES
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/util/TraceFileLoader.cpp
-        src/wrench/services/storage/simple/NetworkConnectionManager.cpp src/wrench/services/storage/simple/NetworkConnectionManager.h src/wrench/services/storage/simple/NetworkConnection.cpp src/wrench/services/storage/simple/NetworkConnection.h)
+        src/wrench/services/storage/simple/NetworkConnectionManager.cpp
+        src/wrench/services/storage/simple/NetworkConnectionManager.h
+        src/wrench/services/storage/simple/NetworkConnection.cpp
+        include/wrench/services/storage/simple/NetworkConnection.h)
 
 # test files
 set(TEST_FILES
@@ -199,7 +202,8 @@ set(TEST_FILES
         test/simulation/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/NoopScheduler.h
         test/simulation/MultipleWMSTest.cpp
-        src/wrench/util/UnitParser.cpp include/wrench/util/UnitParser.h)
+        src/wrench/util/UnitParser.cpp
+        include/wrench/util/UnitParser.h)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)

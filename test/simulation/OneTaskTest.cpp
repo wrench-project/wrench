@@ -195,18 +195,46 @@ void OneTaskTest::do_Noop_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
-  int argc = 1;
+
+
+  int argc = 0;
   auto **argv = (char **) calloc(1, sizeof(char *));
+
+  ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
+  free(argv);
+
+  argc = 1;
+  ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
+
+  argv = (char **) calloc(1, sizeof(char *));
+  ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
+
+  argc = 1;
+  argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("one_task_test");
+
+  ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
   ASSERT_THROW(simulation->launch(), std::runtime_error);
 
-  simulation->init(&argc, argv);
+  ASSERT_THROW(simulation->add(
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService("SingleHost", true, true,
+                                                               {std::make_tuple("SingleHost",
+                                                                                wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM)},
+                                                               nullptr,
+                                                               {}))), std::invalid_argument);
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
 
   // Setting up the platform
   ASSERT_THROW(simulation->launch(), std::runtime_error);
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
   ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+  ASSERT_THROW(simulation->add((std::unique_ptr<wrench::MultihostMulticoreComputeService>)nullptr), std::invalid_argument);
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];

@@ -11,7 +11,7 @@
 #include <wrench/workflow/execution_events/FailureCause.h>
 #include <wrench-dev.h>
 #include <services/storage/StorageServiceMessage.h>
-#include "NetworkConnection.h"
+#include "wrench/services/storage/simple/NetworkConnection.h"
 #include <xbt/ex.hpp>
 
 

@@ -13,7 +13,7 @@
 
 #include <string>
 #include <deque>
-#include "NetworkConnection.h"
+#include "wrench/services/storage/simple/NetworkConnection.h"
 
 namespace wrench {
 
