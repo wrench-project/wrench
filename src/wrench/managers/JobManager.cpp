@@ -93,9 +93,6 @@ namespace wrench {
                                                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                                                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                                                std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
-      if (tasks.size() < 1) {
-        throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
-      }
 
       // Do a sanity check of everything (looking for nullptr)
       for (auto t : tasks) {
@@ -118,10 +115,10 @@ namespace wrench {
           throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the pre_file_copies set");
         }
         if (std::get<1>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the pre_file_copies set");
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr src storage service in the pre_file_copies set");
         }
         if (std::get<2>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the pre_file_copies set");
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr dst storage service in the pre_file_copies set");
         }
       }
 
@@ -130,10 +127,10 @@ namespace wrench {
           throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the post_file_copies set");
         }
         if (std::get<1>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the post_file_copies set");
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr src storage service in the post_file_copies set");
         }
         if (std::get<2>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the post_file_copies set");
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr dst storage service in the post_file_copies set");
         }
       }
 
