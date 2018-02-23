@@ -775,7 +775,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Compute Service (we don't use it)
-  wrench::ComputeService *compute_service;
+  wrench::ComputeService *compute_service = nullptr;
   EXPECT_NO_THROW(compute_service = simulation->add(
           std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,

@@ -478,7 +478,7 @@ namespace wrench {
         // Update data structures
         this->running_workunit_executors.insert(std::move(workunit_executor));
 
-        for (std::set<std::unique_ptr<Workunit>>::iterator it = this->ready_workunits.begin();
+        for (auto it = this->ready_workunits.begin();
                 it != this->ready_workunits.end(); it++) {
           if ((*it).get() == wu) {
             PointerUtil::moveUniquePtrFromSetToSet(it, &(this->ready_workunits), &(this->running_workunits));

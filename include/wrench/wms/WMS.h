@@ -32,7 +32,7 @@ namespace wrench {
         Workflow *getWorkflow();
 
 
-          void addStaticOptimization(std::unique_ptr<StaticOptimization>);
+        void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
         void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
 
