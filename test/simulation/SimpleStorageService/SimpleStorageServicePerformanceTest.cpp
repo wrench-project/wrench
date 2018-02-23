@@ -14,8 +14,8 @@
 
 #include <wrench-dev.h>
 
-#include "NoopScheduler.h"
-#include "TestWithFork.h"
+#include "../NoopScheduler.h"
+#include "../TestWithFork.h"
 
 
 #define FILE_SIZE 10000000000.00

@@ -12,9 +12,9 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "NoopScheduler.h"
+#include "../NoopScheduler.h"
 
-#include "TestWithFork.h"
+#include "../TestWithFork.h"
 
 #define EPSILON 0.05
 

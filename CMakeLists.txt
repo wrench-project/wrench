@@ -96,6 +96,8 @@ set(HEADER_FILES
         include/wrench/util/PointerUtil.h
         include/wrench/util/MessageManager.h
         include/wrench/util/TraceFileLoader.h
+        include/wrench/services/storage/simple/NetworkConnectionManager.h
+        include/wrench/services/storage/simple/NetworkConnection.h
         )
 
 # source files
@@ -175,9 +177,8 @@ set(SOURCE_FILES
         src/wrench/util/MessageManager.cpp
         src/wrench/util/TraceFileLoader.cpp
         src/wrench/services/storage/simple/NetworkConnectionManager.cpp
-        src/wrench/services/storage/simple/NetworkConnectionManager.h
         src/wrench/services/storage/simple/NetworkConnection.cpp
-        include/wrench/services/storage/simple/NetworkConnection.h)
+        )
 
 # test files
 set(TEST_FILES
@@ -187,19 +188,19 @@ set(TEST_FILES
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
         test/simulation/OneTaskTest.cpp
-        test/simulation/SimpleStorageServiceFunctionalTest.cpp
-        test/simulation/SimpleStorageServicePerformanceTest.cpp
-        test/simulation/SimpleStorageServiceLimitedConnectionsTest.cpp
-        test/simulation/MultihostMulticoreComputeServiceTestStandardJobs.cpp
-        test/simulation/MultihostMulticoreComputeServiceTestPilotJobs.cpp
-        test/simulation/MultihostMulticoreComputeServiceSchedulingTest.cpp
+        test/simulation/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
+        test/simulation/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
+        test/simulation/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestStandardJobs.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestPilotJobs.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceSchedulingTest.cpp
         test/simulation/TestWithFork.h
         test/simulation/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
         test/simulation/BatchServiceTest.cpp
         test/simulation/CloudServiceTest.cpp
         test/simulation/NoopScheduler.cpp
-        test/simulation/MultihostMulticoreComputeServiceResourceInformationTest.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/NoopScheduler.h
         test/simulation/MultipleWMSTest.cpp
         src/wrench/util/UnitParser.cpp
