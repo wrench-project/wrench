@@ -510,7 +510,7 @@ private:
                                               {test->output_file, test->storage_service1}},
                                              {},
                                              {},
-                                             {{nullptr, test->storage_service1}}
+                                             {std::make_tuple(nullptr, test->storage_service1)}
         );
       } catch (std::invalid_argument &e) {
         success = false;
@@ -528,7 +528,7 @@ private:
                                               {test->output_file, test->storage_service1}},
                                              {},
                                              {},
-                                             {{test->input_file, nullptr}}
+                                             {std::make_tuple(test->input_file, nullptr)}
         );
       } catch (std::invalid_argument &e) {
         success = false;
