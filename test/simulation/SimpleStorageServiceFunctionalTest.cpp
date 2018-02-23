@@ -92,6 +92,17 @@ private:
 
     int main() {
 
+      // Bogus staging (can only be done in maestro)
+      bool success = true;
+      try {
+        this->simulation->stageFile(this->test->file_1, this->test->storage_service_100);
+      } catch (std::runtime_error &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be possible to call stageFile() from a non-maestro process");
+      }
+
       // Create a data movement manager
       std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
               std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
@@ -119,7 +130,7 @@ private:
       }
 
       // Copy a file to a storage service that doesn't have enough space
-      bool success = true;
+      success = true;
       try {
         this->test->storage_service_100->copyFile(this->test->file_500, this->test->storage_service_1000);
       } catch (wrench::WorkflowExecutionException &e) {
@@ -314,6 +325,17 @@ private:
         }
       }
 
+      // Do a bogus file removal
+      success = true;
+      try {
+        this->test->storage_service_100->deleteFile(nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to delete a nullptr file from a storage service");
+      }
+
       // Terminate
       this->shutdownAllServices();
       return 0;
@@ -346,6 +368,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                                nullptr, {}))));
+  // Create a bad Storage Service
+  EXPECT_THROW(storage_service_100 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, -100.0, ULONG_MAX))), std::invalid_argument);
 
   // Create Three Storage Services
   EXPECT_NO_THROW(storage_service_100 = simulation->add(
@@ -359,7 +385,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                   new wrench::SimpleStorageService(hostname, 1000.0, ULONG_MAX))));
 
   // Create a WMS
-  wrench::WMS *wms;
+  wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(
                   new SimpleStorageServiceBasicFunctionalityTestWMS(this,
@@ -378,6 +404,12 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
           new wrench::FileRegistryService(hostname));
 
   simulation->setFileRegistryService(std::move(file_registry_service));
+
+  // A bogus staging
+  EXPECT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
+
+  // Another bogus staging
+  EXPECT_THROW(simulation->stageFile(file_500, storage_service_100), std::runtime_error);
 
   // Staging all files on the 1000 storage service
   EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(), file_1},
