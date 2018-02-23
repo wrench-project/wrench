@@ -120,4 +120,20 @@ namespace wrench {
 
       return min_pm.first;
     }
+
+    /**
+     * @brief Schedule and run pilot jobs
+     *
+     * @param job_manager: a job manager
+     * @param workflow: a workflow
+     * @param pilot_job_duration: a long pilot jobs should last
+     * @param flops: the number of flops that the pilot jobs should be able to do (assuming it constantly uses the CPU) before terminating
+     * @param compute_services: a set of compute services available to run jobs
+     */
+    void CloudScheduler::schedulePilotJobs(JobManager *job_manager,
+                                           Workflow *workflow,
+                                           double pilot_job_duration,
+                                           const std::set<ComputeService *> &compute_services) {
+      throw std::runtime_error("CloudScheduler::schedulerPilotJobs(): Not implemented (yet) - don't use pilot jobs for now");
+    }
 }

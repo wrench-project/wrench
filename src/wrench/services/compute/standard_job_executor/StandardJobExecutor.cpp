@@ -511,10 +511,10 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         // TODO: Send an exception above, and then send some "I failed" message to the service that created me?
         return true;
-      } catch (std::shared_ptr<FatalFailure> cause) {
+      } catch (std::shared_ptr<FatalFailure> &cause) {
         WRENCH_INFO("Got a Unknown Failure during a communication... likely this means we're all done. Aborting");
         return false;
       }
@@ -602,7 +602,7 @@ namespace wrench {
                                   new StandardJobExecutorDoneMessage(this->job, this,
                                                                      this->getPropertyValueAsDouble(
                                                                              StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           WRENCH_INFO("Failed to send the callback... oh well");
           return;
         }
@@ -718,7 +718,7 @@ namespace wrench {
                                 new StandardJobExecutorFailedMessage(this->job, this, cause,
                                                                      this->getPropertyValueAsDouble(
                                                                              StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
 

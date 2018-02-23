@@ -92,7 +92,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
                                                                                              this->getPropertyValueAsDouble(
                                                                                                      FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
           throw WorkflowExecutionException(cause);
       }
 
@@ -100,7 +100,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -138,7 +138,7 @@ namespace wrench {
                                 new FileRegistryAddEntryRequestMessage(answer_mailbox, file, storage_service,
                                                                        this->getPropertyValueAsDouble(
                                                                                FileRegistryServiceProperty::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
           throw WorkflowExecutionException(cause);
       }
 
@@ -146,7 +146,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -178,7 +178,7 @@ namespace wrench {
                                 new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, storage_service,
                                                                           this->getPropertyValueAsDouble(
                                                                                   FileRegistryServiceProperty::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -186,7 +186,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -234,7 +234,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
 
@@ -251,7 +251,7 @@ namespace wrench {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
                                   new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                           FileRegistryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
         return false;
@@ -268,7 +268,7 @@ namespace wrench {
                                    new FileRegistryFileLookupAnswerMessage(msg->file, locations,
                                                                            this->getPropertyValueAsDouble(
                                                                                    FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
         return true;
@@ -279,7 +279,7 @@ namespace wrench {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new FileRegistryAddEntryAnswerMessage(this->getPropertyValueAsDouble(
                                            FileRegistryServiceProperty::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
         return true;
@@ -292,7 +292,7 @@ namespace wrench {
                                    new FileRegistryRemoveEntryAnswerMessage(success,
                                                                             this->getPropertyValueAsDouble(
                                                                                     FileRegistryServiceProperty::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
         return true;

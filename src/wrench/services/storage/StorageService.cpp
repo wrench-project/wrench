@@ -241,7 +241,7 @@ namespace wrench {
       if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
         // If it's not a success, throw an exception
         if (not msg->success) {
-          std::shared_ptr<FailureCause> cause = msg->failure_cause;
+          std::shared_ptr<FailureCause> &cause = msg->failure_cause;
           msg->failure_cause = nullptr; // TODO: Why this is needed to avoid a memory leak?
           throw WorkflowExecutionException(cause);
         }

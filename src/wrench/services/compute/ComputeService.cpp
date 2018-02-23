@@ -171,7 +171,6 @@ namespace wrench {
         throw;
       }
 
-
       if (dict.find("num_hosts") != dict.end()) {
         return (unsigned long)(*(dict["num_hosts"].begin()));
       } else {

@@ -275,7 +275,7 @@ namespace wrench {
 //                                                                           "",
 //                                                                           this->getPropertyValueAsDouble(
 //                                                                                   SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-//        } catch (std::shared_ptr<NetworkError> cause) {
+//        } catch (std::shared_ptr<NetworkError> &cause) {
 //          return true;
 //        }
 //        return true;
@@ -300,7 +300,7 @@ namespace wrench {
                                                                              "",
                                                                              this->getPropertyValueAsDouble(
                                                                                      SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
           }
           return true;
@@ -400,7 +400,7 @@ namespace wrench {
 //                                                                                           this)),
 //                                                                           this->getPropertyValueAsDouble(
 //                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-//        } catch (std::shared_ptr<NetworkError> cause) {
+//        } catch (std::shared_ptr<NetworkError> &cause) {
 //          return true;
 //        }
 //        return true;

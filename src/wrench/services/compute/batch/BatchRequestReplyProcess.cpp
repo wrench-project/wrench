@@ -81,9 +81,9 @@ namespace wrench{
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
-      } catch (std::shared_ptr<NetworkTimeout> cause) {
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         return true;
       }
 
@@ -106,7 +106,7 @@ namespace wrench{
                                           //TODO::property value to stop this daemon is used same as that of BatchServiceProperty
                                           BatchServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
         return false;

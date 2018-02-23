@@ -36,7 +36,7 @@ namespace wrench {
         virtual void schedulePilotJobs(JobManager *job_manager,
                                        Workflow *workflow,
                                        double pilot_job_duration,
-                                       const std::set<ComputeService *> &compute_services);
+                                       const std::set<ComputeService *> &compute_services) = 0;
 
         static double getTotalFlops(std::vector<WorkflowTask *> tasks);
         /***********************/

@@ -163,11 +163,11 @@ namespace wrench {
 
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         WRENCH_INFO("Work unit executor on can't report back due to network error.. aborting!");
         this->workunit = nullptr; // To decrease the ref count
         return 0;
-      } catch (std::shared_ptr<FatalFailure> cause) {
+      } catch (std::shared_ptr<FatalFailure> &cause) {
         WRENCH_INFO("Work unit executor got a fatal failure... aborting!");
         this->workunit = nullptr; // To decrease the ref count
         return 0;

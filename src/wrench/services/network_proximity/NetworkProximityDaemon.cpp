@@ -105,7 +105,7 @@ namespace wrench {
                                                                                             NetworkProximityServiceProperty::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD)));
 
 
-                    } catch (std::shared_ptr<NetworkError> cause) {
+                    } catch (std::shared_ptr<NetworkError> &cause) {
                         time_for_next_measurement = S4U_Simulation::getClock()+measurement_period+
                                                     (rand()%((this->noise)-(-this->noise) + 1) + (this->noise));
                         continue;
@@ -158,9 +158,9 @@ namespace wrench {
 //                std::cout<<"Timeout very less "<<this->mailbox_name<<"\n";
 //            }
             message = S4U_Mailbox::getMessage(this->mailbox_name,timeout);
-        } catch (std::shared_ptr<NetworkTimeout> cause) {
+        } catch (std::shared_ptr<NetworkTimeout> &cause) {
             return true;
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
 
@@ -177,7 +177,7 @@ namespace wrench {
                 S4U_Mailbox::putMessage(msg->ack_mailbox,
                                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                                 NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> cause) {
+            } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
             return false;

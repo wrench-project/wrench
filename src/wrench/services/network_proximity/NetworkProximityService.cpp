@@ -123,7 +123,7 @@ namespace wrench {
             S4U_Mailbox::putMessage(this->mailbox_name, new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
                                                                                                  this->getPropertyValueAsDouble(
                                                                                                          NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
@@ -131,7 +131,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(answer_mailbox);
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
             throw WorkflowExecutionException(cause);
         }
 
@@ -183,7 +183,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
 
@@ -212,7 +212,7 @@ namespace wrench {
                                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                                 NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 
-            } catch (std::shared_ptr<NetworkError> cause) {
+            } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
             return false;
@@ -231,7 +231,7 @@ namespace wrench {
                                                                                  this->getPropertyValueAsDouble(
                                                                                          NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
             }
-            catch (std::shared_ptr<NetworkError> cause) {
+            catch (std::shared_ptr<NetworkError> &cause) {
                 return true;
             }
             return true;
@@ -241,7 +241,7 @@ namespace wrench {
                 WRENCH_INFO("NetworkProximityService::processNextMessage()::Adding proximity value between %s and %s into the database",msg->hosts.first.c_str(),msg->hosts.second.c_str());
                 this->addEntryToDatabase(msg->hosts,msg->proximityValue);
             }
-            catch (std::shared_ptr<NetworkError> cause) {
+            catch (std::shared_ptr<NetworkError> &cause) {
                 return true;
             }
             return true;
