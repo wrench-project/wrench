@@ -29,6 +29,8 @@ public:
 
     void do_Noop_test();
 
+    void do_StandardJobConstructor_test();
+
     void do_HostMemory_test();
 
     void do_ExecutionWithLocationMap_test();
@@ -157,9 +159,9 @@ void OneTaskTest::do_BadSetup_test() {
   ASSERT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new BadSetupTestWMS(this,
                                                            std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {
-                  }, {
-                  }, hostname))));
+                                                                   new NoopScheduler()), {
+                                                           }, {
+                                                           }, hostname))));
 
   EXPECT_THROW(wms->addWorkflow(nullptr), std::invalid_argument);
   EXPECT_NO_THROW(wms->addWorkflow(this->workflow));
@@ -207,6 +209,9 @@ private:
       // Create a data movement manager
       std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
               std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+
+      // Stop the Job Manager manually, just for kicks
+      job_manager->stop();
 
       // Terminate
       this->shutdownAllServices();
@@ -264,7 +269,7 @@ void OneTaskTest::do_Noop_test() {
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new NoopTestWMS(
                   this, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()),
-                          { compute_service }, {
+                  { compute_service }, {
                           storage_service1
                   }, hostname))));
 
@@ -291,6 +296,321 @@ void OneTaskTest::do_Noop_test() {
 
   free(argv[0]);
   free(argv);
+}
+
+
+/**********************************************************************/
+/**  STANDARD JOB CONSTRUCTOR TEST                                   **/
+/**********************************************************************/
+
+class StandardJobConstructorTestWMS : public wrench::WMS {
+
+public:
+    StandardJobConstructorTestWMS(
+            OneTaskTest *test,
+            std::unique_ptr<wrench::Scheduler> scheduler,
+            const std::set<wrench::ComputeService *> &compute_services,
+            const std::set<wrench::StorageService *> &storage_services,
+            std::string &hostname) :
+            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    OneTaskTest *test;
+
+
+    int main() {
+
+      // Create a job manager
+      std::unique_ptr<wrench::JobManager> job_manager =
+              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+
+      bool success;
+
+      wrench::StandardJob *job = nullptr;
+
+      // Create a job with nullptr task (and no file copies)
+      success = true;
+      try {
+        job = job_manager->createStandardJob(nullptr,
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with an empty task");
+      }
+
+      // Create a job with an empty vector of tasks (and no file copies)
+      success = true;
+      try {
+        job = job_manager->createStandardJob({},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with an empty task vector");
+      }
+
+      // Create a job with a vector of empty tasks (and no file copies)
+      success = true;
+      try {
+        job = job_manager->createStandardJob({nullptr},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with a vector of empty tasks");
+      }
+
+      // Create a job with nullptrs in file locations
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{nullptr,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with an nullptr file in file locations");
+      }
+
+      // Create a job with nullptrs in file locations
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{test->input_file,  nullptr},
+                                              {test->output_file, test->storage_service1}});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with an nullptr storage service in file locations");
+      }
+
+      // Create a job with nullptrs in pre file copies
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}},
+                                             {{nullptr, test->storage_service1, test->storage_service2
+                                              }},
+                                             {},
+                                             {}
+        );
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with a nullptr file in pre file copies");
+      }
+
+      // Create a job with nullptrs in pre file copies
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}},
+                                             {{test->output_file, nullptr, test->storage_service2
+                                              }},
+                                             {},
+                                             {}
+        );
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with a nullptr src storage service in pre file copies");
+      }
+
+      // Create a job with nullptrs in pre file copies
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}},
+                                             {{test->output_file, test->storage_service1, nullptr
+                                              }},
+                                             {},
+                                             {}
+        );
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with a nullptr dst storage service in pre file copies");
+      }
+
+      // Create a job with nullptrs in post file copies
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}},
+                                             {},
+                                             {{nullptr, test->storage_service1, test->storage_service2
+                                              }},
+                                             {}
+        );
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with a nullptr file in post file copies");
+      }
+
+      // Create a job with nullptrs in post file copies
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}},
+                                             {},
+                                             {{test->output_file, nullptr, test->storage_service2
+                                              }},
+                                             {}
+        );
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with a nullptr src storage service in post file copies");
+      }
+
+      // Create a job with nullptrs in post file copies
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}},
+                                             {},
+                                             {{test->output_file, test->storage_service1, nullptr
+                                              }},
+                                             {}
+        );
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with a nullptr dst storage service in post file copies");
+      }
+
+      // Create a job with nullptrs in post file deletions
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}},
+                                             {},
+                                             {},
+                                             {{nullptr, test->storage_service1}}
+        );
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with a nullptr file in file deletions");
+      }
+
+
+      // Create a job with nullptrs in post file deletions
+      success = true;
+      try {
+        job = job_manager->createStandardJob({test->task},
+                                             {{test->input_file,  test->storage_service1},
+                                              {test->output_file, test->storage_service1}},
+                                             {},
+                                             {},
+                                             {{test->input_file, nullptr}}
+        );
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with a nullptr storage service in file deletions");
+      }
+
+
+
+      // Stop the Job Manager manually, just for kicks
+      job_manager->stop();
+
+      // Terminate
+      this->shutdownAllServices();
+      return 0;
+    }
+};
+
+
+TEST_F(OneTaskTest, StandardJobConstructor) {
+  DO_TEST_WITH_FORK(do_StandardJobConstructor_test);
+}
+
+void OneTaskTest::do_StandardJobConstructor_test() {
+
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  simulation->instantiatePlatform(platform_file_path);
+
+  // Get a hostname
+  std::string hostname1 = "SingleHost";
+  std::string hostname2 = "OtherHost";
+
+  // Create a Compute Service
+  compute_service = simulation->add(
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname1, true, true,
+                                                               {std::make_tuple(hostname1, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                               nullptr,
+                                                               {})));
+
+  // Create a Storage Service
+  storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname1, 10000000000000.0, ULONG_MAX)));
+
+  // Start a file registry service
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname1));
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+  // Create a WMS
+  wrench::WMS *wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new StandardJobConstructorTestWMS(
+                  this, std::unique_ptr<wrench::Scheduler>(
+                          new NoopScheduler()), {compute_service}, {storage_service1}, hostname1)));
+
+  wms->addWorkflow(workflow);
+
+  // Staging the input_file on the storage service
+  simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1);
+
+  // Running a "do nothing" simulation
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+
+
 }
 
 /**********************************************************************/
@@ -434,10 +754,15 @@ private:
       std::unique_ptr<wrench::JobManager> job_manager =
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
 
+      wrench::StandardJob *job = nullptr;
+
+      bool success;
+
+
       // Create a job
-      wrench::StandardJob *job = job_manager->createStandardJob(test->task,
-                                                                {{test->input_file,  test->storage_service1},
-                                                                 {test->output_file, test->storage_service1}});
+      job = job_manager->createStandardJob(test->task,
+                                           {{test->input_file,  test->storage_service1},
+                                            {test->output_file, test->storage_service1}});
 
       // Submit the job
       job_manager->submitJob(job, test->compute_service);
@@ -454,7 +779,7 @@ private:
 
 
       /* Do a bogus lookup of the file registry service */
-      bool success = true;
+      success = true;
       try {
         this->simulation->getFileRegistryService()->lookupEntry(nullptr);
       } catch (std::invalid_argument &e) {
@@ -663,7 +988,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ExecutionWithDefaultStorageServiceTestWMS(
                   this, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()), {compute_service},
-                          { storage_service1 }, hostname))));
+                  { storage_service1 }, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -826,9 +1151,9 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
           std::unique_ptr<wrench::WMS>(new ExecutionWithPrePostCopiesAndCleanupTestWMS(this,
                                                                                        std::unique_ptr<wrench::Scheduler>(
                                                                                                new NoopScheduler()),
-                          { compute_service }, {
-                          storage_service1, storage_service2
-                  }, hostname))));
+                                                                                       { compute_service }, {
+                                                                                               storage_service1, storage_service2
+                                                                                       }, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
