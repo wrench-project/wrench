@@ -1973,15 +1973,16 @@ namespace wrench {
       // Build a dictionary
       std::map<std::string, std::vector<double>> dict;
 
+      // Num hosts
+      std::vector<double> num_hosts;
+      num_hosts.push_back((double)(this->nodes_to_cores_map.size()));
+      dict.insert(std::make_pair("num_hosts", num_hosts));
+
       // Num cores per hosts
       std::vector<double> num_cores;
       for (auto h : this->nodes_to_cores_map) {
         num_cores.push_back((double) (h.second));
       }
-
-      std::map<std::string, unsigned long> available_nodes_to_cores;
-      num_cores.push_back(666);
-      num_cores.push_back(777);
       dict.insert(std::make_pair("num_cores", num_cores));
 
       // Num idle cores per hosts
