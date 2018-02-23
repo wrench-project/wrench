@@ -735,6 +735,7 @@ private:
         }
 
         wrench::FileNotFound *real_cause = (wrench::FileNotFound *) msg->cause.get();
+        std::string error_msg = real_cause->toString();
         if (real_cause->getFile() != workflow->getFileById("input_file")) {
           throw std::runtime_error(
                   "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");

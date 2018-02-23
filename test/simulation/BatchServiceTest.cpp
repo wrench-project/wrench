@@ -1528,6 +1528,7 @@ private:
               throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
             }
             wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
+            std::string error_msg = real_cause->toString();
             if (real_cause->getService() != this->test->compute_service) {
               std::runtime_error(
                       "Got the correct failure even, a correct cause type, but the cause points to the wrong service");

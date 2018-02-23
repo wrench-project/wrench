@@ -95,16 +95,58 @@ private:
               std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
 
       // Ask questions about resources
+
+      // Get number of Hosts
+      unsigned long num_hosts;
+
+      num_hosts = this->test->compute_service1->getNumHosts();
+      if (num_hosts != 2) {
+        throw std::runtime_error("getNumHosts() should return 2 for compute service #1");
+      }
+
+      num_hosts = this->test->compute_service2->getNumHosts();
+      if (num_hosts != 2) {
+        throw std::runtime_error("getNumHosts() should return 2 for compute service #2");
+      }
+
+
+      // Get number of Cores
       std::vector<unsigned long> num_cores;
 
       num_cores = this->test->compute_service1->getNumCores();
       if ((num_cores.size() != 2) or (num_cores[0] != 4) or (num_cores[1] != 4)) {
-        throw std::runtime_error("getHostNumCores() should return {4,4} for compute service #1");
+        throw std::runtime_error("getNumCores() should return {4,4} for compute service #1");
       }
 
       num_cores = this->test->compute_service2->getNumCores();
       if ((num_cores.size() != 2) or (num_cores[0] != 8) or (num_cores[1] != 8)) {
-        throw std::runtime_error("getHostNumCores() should return {8,8} for compute service #1");
+        throw std::runtime_error("getNumCores() should return {8,8} for compute service #1");
+      }
+
+      // Get Ram capacities
+      std::vector<double> ram_capacities;
+
+      ram_capacities = this->test->compute_service1->getMemoryCapacity();
+      std::sort(ram_capacities.begin(), ram_capacities.end());
+      if ((ram_capacities.size() != 2) or
+          (fabs(ram_capacities[0] - 1024) > EPSILON) or
+          (fabs(ram_capacities[1] - 2048) > EPSILON)) {
+        throw std::runtime_error("getMemoryCapacity() should return {1024,2048} or {2048,1024} for compute service #1");
+      }
+
+      // Get Core flop rates
+      std::vector<double> core_flop_rates = this->test->compute_service1->getCoreFlopRate();
+      std::sort(core_flop_rates.begin(), core_flop_rates.end());
+      if ((core_flop_rates.size() != 2) or
+          (fabs(core_flop_rates[0] - 1.0) > EPSILON) or
+          (fabs(core_flop_rates[1] - 1e+10) > EPSILON)) {
+        throw std::runtime_error("getCoreFlopRate() should return {1,10} or {10,1} for compute service #1");
+
+      }
+
+      // Get the TTL
+      if (this->test->compute_service1->getTTL() < DBL_MAX) {
+        throw std::runtime_error("getTTL() should return +inf for compute service #1");
       }
 
       // Create a job that will use cores on compute service #1
@@ -118,6 +160,8 @@ private:
       job_manager->submitJob(job, this->test->compute_service1);
 
       wrench::Simulation::sleep(1.0);
+
+      // Get number of idle cores
       std::vector<unsigned long> num_idle_cores = this->test->compute_service1->getNumIdleCores();
       std::sort(num_idle_cores.begin(), num_idle_cores.end());
       if ((num_idle_cores.size() != 2) or
@@ -132,28 +176,6 @@ private:
         throw std::runtime_error("Unexpected workflow execution event!");
       }
 
-      std::vector<double> ram_capacities;
-
-      ram_capacities = this->test->compute_service1->getMemoryCapacity();
-      std::sort(ram_capacities.begin(), ram_capacities.end());
-      if ((ram_capacities.size() != 2) or
-          (fabs(ram_capacities[0] - 1024) > EPSILON) or
-          (fabs(ram_capacities[1] - 2048) > EPSILON)) {
-        throw std::runtime_error("getMemoryCapacity() should return {1024,2048} or {2048,1024} for compute service #1");
-      }
-
-      std::vector<double> core_flop_rates = this->test->compute_service1->getCoreFlopRate();
-      std::sort(core_flop_rates.begin(), core_flop_rates.end());
-      if ((core_flop_rates.size() != 2) or
-          (fabs(core_flop_rates[0] - 1.0) > EPSILON) or
-          (fabs(core_flop_rates[1] - 1e+10) > EPSILON)) {
-        throw std::runtime_error("getCoreFlopRate() should return {1,10} or {10,1} for compute service #1");
-
-      }
-
-      if (this->test->compute_service1->getTTL() < DBL_MAX) {
-        throw std::runtime_error("getTTL() should return +inf for compute service #1");
-      }
 
       workflow->removeTask(t1);
       workflow->removeTask(t2);
@@ -172,7 +194,7 @@ TEST_F(MultihostMulticoreComputeServiceTestResourceInformation, ResourceInformat
 void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInformation_test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto simulation = new wrench::Simulation();
   int argc = 1;
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("one_task_test");
