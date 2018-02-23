@@ -1730,7 +1730,7 @@ namespace wrench {
       std::string nodes_allocated_by_batsched = execute_events["alloc"];
       std::vector<std::string> allocations;
       boost::split(allocations, nodes_allocated_by_batsched, boost::is_any_of(" "));
-      std::vector<int> node_resources;
+      std::vector<unsigned long> node_resources;
       for (auto alloc:allocations) {
         std::vector<std::string> each_allocations;
         boost::split(each_allocations, alloc, boost::is_any_of("-"));
@@ -1745,7 +1745,7 @@ namespace wrench {
           std::string::size_type sz;
           unsigned long start = std::stoi(start_node, &sz);
           unsigned long end = std::stoi(end_node, &sz);
-          for (int i = start; i < end; i++) {
+          for (unsigned long i = start; i < end; i++) {
             node_resources.push_back(i);
           }
         }
