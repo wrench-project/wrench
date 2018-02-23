@@ -283,11 +283,17 @@ namespace wrench {
       this->supports_pilot_jobs = supports_pilot_jobs;
       this->supports_standard_jobs = supports_standard_jobs;
 
+
       // Check that there is at least one core per host and that hosts have enough cores
       for (auto host : compute_resources) {
         std::string hname = std::get<0>(host);
         unsigned long requested_cores = std::get<1>(host);
-        unsigned long available_cores = S4U_Simulation::getNumCores(hname);
+        unsigned long available_cores;
+        try {
+          available_cores = S4U_Simulation::getNumCores(hname);
+        } catch (std::runtime_error &e) {
+          throw std::invalid_argument("MultihostMulticoreComputeService::initiateInstance(): Host '" + hname + "' does not exist");
+        }
         if (requested_cores == ComputeService::ALL_CORES) {
           requested_cores = available_cores;
         }
@@ -302,15 +308,18 @@ namespace wrench {
                   std::to_string(requested_cores) + " are requested");
         }
 
+
         double requested_ram = std::get<2>(host);
         double available_ram = S4U_Simulation::getMemoryCapacity(hname);
         if (requested_ram < 0) {
           throw std::invalid_argument(
                   "MultihostMulticoreComputeService::MultihostMulticoreComputeService(): requested ram should be non-negative");
         }
+
         if (requested_ram == ComputeService::ALL_RAM) {
           requested_ram = available_ram;
         }
+
         if (requested_ram > available_ram) {
           throw std::invalid_argument(
                   "MultihostMulticoreComputeService::MultihostMulticoreComputeService(): host " + hname + "only has " +

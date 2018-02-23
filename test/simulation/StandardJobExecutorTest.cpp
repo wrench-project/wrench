@@ -62,7 +62,7 @@ protected:
       std::string xml = "<?xml version='1.0'?>"
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
               "<platform version=\"4.1\"> "
-              "   <AS id=\"AS0\" routing=\"Full\"> "
+              "   <zone id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
@@ -71,7 +71,7 @@ protected:
               "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
               "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
-              "   </AS> "
+              "   </zone> "
               "</platform>";
       // Create a four-host 10-core platform file
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");

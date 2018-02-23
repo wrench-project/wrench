@@ -57,12 +57,12 @@ protected:
       std::string xml = "<?xml version='1.0'?>"
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
               "<platform version=\"4.1\"> "
-              "   <AS id=\"AS0\" routing=\"Full\"> "
+              "   <zone id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"SingleHost\" speed=\"1f\"/> "
               "       <host id=\"OtherHost\" speed=\"1f\"> "
               "         <prop id=\"ram\" value=\"1024\"/> "
               "       </host>"
-              "   </AS> "
+              "   </zone> "
               "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
@@ -112,14 +112,42 @@ void OneTaskTest::do_BadSetup_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
-  int argc = 1;
+
+  int argc = 0;
   auto **argv = (char **) calloc(1, sizeof(char *));
+
+  ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
+  free(argv);
+
+  argc = 1;
+  ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
+
+  argv = (char **) calloc(1, sizeof(char *));
+  ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
+
+  ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+  ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+
+  argc = 1;
+  argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("one_task_test");
 
   simulation->init(&argc, argv);
 
   // Setting up the platform
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Bad hostname
+  ASSERT_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService("bogus", true, true,
+                                                               {std::make_tuple("bogus",
+                                                                                wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM)},
+                                                               nullptr,
+                                                               {}))), std::invalid_argument);
 
   // Get a hostname
   auto hostname = simulation->getHostnameList()[0];
@@ -197,28 +225,10 @@ void OneTaskTest::do_Noop_test() {
   auto *simulation = new wrench::Simulation();
 
 
-  int argc = 0;
-  auto **argv = (char **) calloc(1, sizeof(char *));
-
-  ASSERT_THROW(simulation->init(&argc, argv), std::invalid_argument);
-  free(argv);
-
-  argc = 1;
-  ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
-
-  argv = (char **) calloc(1, sizeof(char *));
-  ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
-
-  argc = 1;
-  argv = (char **) calloc(1, sizeof(char *));
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("one_task_test");
 
-  ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
-
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
-
-//  ASSERT_THROW(simulation->add(
-//          std::unique_ptr<wrench::MultihostMulticoreComputeService>((wrench::MultihostMulticoreComputeService *)666), std::invalid_argument);
 
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 

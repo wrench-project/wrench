@@ -46,7 +46,7 @@ protected:
       std::string xml = "<?xml version='1.0'?>"
               "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
               "<platform version=\"4.1\"> "
-              "   <AS id=\"AS0\" routing=\"Full\"> "
+              "   <zone id=\"AS0\" routing=\"Full\"> "
               "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
@@ -69,7 +69,7 @@ protected:
               "/> </route>"
               "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"6\""
               "/> </route>"
-              "   </AS> "
+              "   </zone> "
               "</platform>";
 
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
