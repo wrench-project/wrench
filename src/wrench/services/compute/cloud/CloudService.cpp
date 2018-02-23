@@ -569,6 +569,11 @@ namespace wrench {
       // Build a dictionary
       std::map<std::string, std::vector<double>> dict;
 
+      // Num hosts
+      std::vector<double> num_hosts;
+      num_hosts.push_back((double)(this->vm_list.size()));
+      dict.insert(std::make_pair("num_hosts", num_hosts));
+
       // Num cores per vm
       std::vector<double> num_cores;
       for (auto &vm : this->vm_list) {

@@ -33,41 +33,6 @@ namespace wrench {
 
     }
 
-//    /**
-//     * @brief Submit a job to the compute service
-//     * @param job: the job
-//     *
-//     * @throw WorkflowExecutionException
-//     * @throw std::invalid_argument
-//     * @throw std::runtime_error
-//     */
-//    void ComputeService::runJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args) {
-//
-//      if (job == nullptr) {
-//        throw std::invalid_argument("ComputeService::runJob(): invalid argument");
-//      }
-//
-//      if (this->state == ComputeService::DOWN) {
-//        throw WorkflowExecutionException(new ServiceIsDown(this));
-//      }
-//
-//      try {
-//        switch (job->getType()) {
-//          case WorkflowJob::STANDARD: {
-//            this->submitStandardJob((StandardJob *) job, service_specific_args);
-//            break;
-//          }
-//          case WorkflowJob::PILOT: {
-//            this->submitPilotJob((PilotJob *) job, service_specific_args);
-//            break;
-//          }
-//        }
-//      } catch (WorkflowExecutionException &e) {
-//        throw;
-//      } catch (std::runtime_error &e) {
-//        throw;
-//      }
-//    }
 
     /**
      * @brief Submit a job to the batch service
@@ -189,8 +154,35 @@ namespace wrench {
     }
 
     /**
+     * @brief Get host (compute node) counts for the compute service
+     * @return the host counts
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    unsigned long ComputeService::getNumHosts() {
+
+      std::map<std::string, std::vector<double>> dict;
+      try {
+        dict = this->getServiceResourceInformation();
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      } catch (std::runtime_error &e) {
+        throw;
+      }
+
+
+      if (dict.find("num_hosts") != dict.end()) {
+        return (unsigned long)(*(dict["num_hosts"].begin()));
+      } else {
+        return 0;
+      }
+    }
+
+
+    /**
       * @brief Get core counts for each of the compute service's host
-      * @return the core counts (could be empty)
+      * @return the core counts
       *
       * @throw WorkflowExecutionException
       * @throw std::runtime_error
@@ -381,29 +373,6 @@ namespace wrench {
     void ComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
       throw std::runtime_error("ComputeService::processGetResourceInformation(): Not implemented here");
     }
-
-
-//    /**
-//     * @brief Process a get number of cores request
-//     *
-//     * @param answer_mailbox: the mailbox to which the answer message should be sent
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void ComputeService::processGetNumCores(const std::string &answer_mailbox) {
-//      throw std::runtime_error("ComputeService::processGetNumCores(): Not implemented here");
-//    }
-
-//    /**
-//     * @brief Process a get number of idle cores request
-//     *
-//     * @param answer_mailbox: the mailbox to which the answer message should be sent
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void ComputeService::processGetNumIdleCores(const std::string &answer_mailbox) {
-//      throw std::runtime_error("ComputeService::processGetNumIdleCores(): Not implemented here");
-//    }
 
     /**
     * @brief Terminate a standard job to the compute service (virtual)

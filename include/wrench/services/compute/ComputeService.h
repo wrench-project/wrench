@@ -55,6 +55,8 @@ namespace wrench {
 
         bool supportsPilotJobs();
 
+        unsigned long getNumHosts();
+
         std::vector<unsigned long> getNumCores();
 
         std::vector<unsigned long> getNumIdleCores();
