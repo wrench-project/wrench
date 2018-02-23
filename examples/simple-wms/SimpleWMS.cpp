@@ -92,11 +92,12 @@ namespace wrench {
                       (e.getCause()->toString().c_str()));
           continue;
         }
-
         if (this->abort || workflow->isDone()) {
           break;
         }
       }
+
+      S4U_Simulation::sleep(10);
 
       WRENCH_INFO("--------------------------------------------------------");
       if (workflow->isDone()) {
