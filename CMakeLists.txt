@@ -100,6 +100,7 @@ set(HEADER_FILES
         include/wrench/services/storage/simple/NetworkConnection.h
         include/wrench/wms/scheduler/PilotJobScheduler.h
         include/wrench/wms/scheduler/StandardJobScheduler.h
+        include/wrench/util/UnitParser.h
         )
 
 # source files
@@ -179,6 +180,7 @@ set(SOURCE_FILES
         src/wrench/util/TraceFileLoader.cpp
         src/wrench/services/storage/simple/NetworkConnectionManager.cpp
         src/wrench/services/storage/simple/NetworkConnection.cpp
+        src/wrench/util/UnitParser.cpp
         )
 
 # test files
@@ -203,8 +205,9 @@ set(TEST_FILES
         test/simulation/CloudServiceTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/MultipleWMSTest.cpp
-        src/wrench/util/UnitParser.cpp
-        include/wrench/util/UnitParser.h)
+        test/pilot_job/CriticalPathSchedulerTest.cpp
+        examples/simple-wms/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
+        )
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
@@ -212,7 +215,7 @@ find_library(PUGIXML_LIBRARY NAMES pugixml)
 find_library(LEMON_LIBRARY NAMES emon)
 find_library(GTEST_LIBRARY NAMES gtest)
 
-add_library(wrench STATIC ${SOURCE_FILES} src/wrench/util/UnitParser.cpp include/wrench/util/UnitParser.h)
+add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
 target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 
