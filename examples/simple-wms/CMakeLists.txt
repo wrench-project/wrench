@@ -17,8 +17,8 @@ set(SOURCE_FILES
         scheduler/MaxMinStandardJobScheduler.cpp
         scheduler/BatchStandardJobScheduler.cpp
         scheduler/BatchStandardJobScheduler.h
-        scheduler/pilot_job/CriticalPathScheduler.h
-        scheduler/pilot_job/CriticalPathScheduler.cpp
+        scheduler/pilot_job/CriticalPathPilotJobScheduler.h
+        scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
         )
 
 # cloud example

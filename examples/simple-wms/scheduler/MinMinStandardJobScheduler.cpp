@@ -26,7 +26,7 @@ namespace wrench {
      * @return whether the number of flops from the left-hand-side workflow tasks is smaller
      */
     bool MinMinStandardJobScheduler::MinMinComparator::operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
-                                                       std::pair<std::string, std::vector<WorkflowTask *>> &rhs) {
+                                                                  std::pair<std::string, std::vector<WorkflowTask *>> &rhs) {
 
       return Workflow::getSumFlops(lhs.second) < Workflow::getSumFlops(rhs.second);
     }
@@ -40,8 +40,8 @@ namespace wrench {
      */
     void MinMinStandardJobScheduler::scheduleTasks(
             const std::set<ComputeService *> &compute_services,
-                                        std::map<std::string, std::vector<WorkflowTask *>> &ready_tasks
-                                        ) {
+            const std::map<std::string, std::vector<WorkflowTask *>> &ready_tasks
+    ) {
 
       WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
 
