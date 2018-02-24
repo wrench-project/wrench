@@ -21,6 +21,8 @@
 #include "wrench/workflow/WorkflowTask.h"
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/PilotJob.h"
+#include "wrench/wms/WMS.h"
+
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 
@@ -29,12 +31,20 @@ namespace wrench {
     /**
      * @brief Constructor, which starts a job manager daemon
      *
-     * @param workflow: the workflow whose jobs are to be managed
+     * @param wms: the wms for which this manager is working
      */
-    JobManager::JobManager(Workflow *workflow) :
+    JobManager::JobManager(WMS *wms) :
             S4U_Daemon("job_manager", "job_manager") {
 
-      this->workflow = workflow;
+      this->wms = wms;
+
+      // Get myself known to schedulers
+      if (this->wms->standard_job_scheduler) {
+        this->wms->standard_job_scheduler->setJobManager(this);
+      }
+      if (this->wms->pilot_job_scheduler) {
+        this->wms->pilot_job_scheduler->setJobManager(this);
+      }
 
       // Start the daemon
       std::string localhost = S4U_Simulation::getHostName();

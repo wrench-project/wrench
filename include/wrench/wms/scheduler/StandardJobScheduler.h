@@ -7,12 +7,13 @@
  * (at your option) any later version.
  */
 
-
-#ifndef WRENCH_PILOTJOBSCHEDULER_H
-#define WRENCH_PILOTJOBSCHEDULER_H
+#ifndef WRENCH_STANDARDJOBSCHEDULER_H
+#define WRENCH_STANDARDJOBSCHEDULER_H
 
 
 #include <set>
+#include <vector>
+#include <map>
 
 namespace wrench {
 
@@ -20,11 +21,12 @@ namespace wrench {
     class DataMovementManager;
     class JobManager;
 
-    class PilotJobScheduler {
-
+    class StandardJobScheduler {
 
     public:
-        virtual void schedulePilotJobs(const std::set<ComputeService *> &compute_services) = 0;
+
+        virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
+                                   const std::map<std::string, std::vector<WorkflowTask *>> &tasks) = 0;
 
         void setDataMovementManager(DataMovementManager *data_movement_manager) {
           this->data_movement_manager = data_movement_manager;
@@ -39,9 +41,9 @@ namespace wrench {
         DataMovementManager *data_movement_manager;
         JobManager *job_manager;
 
-
     };
+
 };
 
 
-#endif //WRENCH_PILOTJOBSCHEDULER_H
+#endif //WRENCH_STANDARDJOBSCHEDULER_H

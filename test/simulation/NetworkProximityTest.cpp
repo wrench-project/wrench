@@ -10,7 +10,6 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
-#include "NoopScheduler.h"
 
 #include "TestWithFork.h"
 
@@ -91,11 +90,10 @@ class ProxTestWMS : public wrench::WMS {
 
 public:
     ProxTestWMS(NetworkProximityTest *test,
-                std::unique_ptr<wrench::Scheduler> scheduler,
                 const std::set<wrench::ComputeService *> &compute_services,
                 const std::set<wrench::StorageService *> &storage_services,
                 std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -105,12 +103,10 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       std::pair<std::string, std::string> hosts_to_compute_proximity;
       hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
@@ -174,7 +170,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ProxTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()),
+                  this,
                   {compute_service}, {storage_service1}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
@@ -223,11 +219,10 @@ class CompareProxTestWMS : public wrench::WMS {
 
 public:
     CompareProxTestWMS(NetworkProximityTest *test,
-                       std::unique_ptr<wrench::Scheduler> scheduler,
                        const std::set<wrench::ComputeService *> &compute_services,
                        const std::set<wrench::StorageService *> &storage_services,
                        std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -237,12 +232,10 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       std::pair<std::string, std::string> first_pair_to_compute_proximity;
       first_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[0],
@@ -335,7 +328,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new CompareProxTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(new NoopScheduler()),
+                  this,
                   {compute_service}, {storage_service1}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));

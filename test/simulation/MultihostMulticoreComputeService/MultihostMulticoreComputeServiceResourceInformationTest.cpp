@@ -12,7 +12,6 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "../NoopScheduler.h"
 #include "../TestWithFork.h"
 
 #define EPSILON 0.005
@@ -76,11 +75,10 @@ class ResourceInformationTestWMS : public wrench::WMS {
 
 public:
     ResourceInformationTestWMS(MultihostMulticoreComputeServiceTestResourceInformation *test,
-                               std::unique_ptr<wrench::Scheduler> scheduler,
                                const std::set<wrench::ComputeService *> &compute_services,
                                const std::set<wrench::StorageService *> &storage_services,
                                std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -91,8 +89,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Ask questions about resources
 
@@ -229,8 +226,7 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new ResourceInformationTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), compute_services, {}, "Host1"))));
+                  this,  compute_services, {}, "Host1"))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 

@@ -10,6 +10,7 @@
 #ifndef WRENCH_CRITICALPATHSCHEDULER_H
 #define WRENCH_CRITICALPATHSCHEDULER_H
 
+#if 0
 #include <gtest/gtest_prod.h>
 #include <set>
 #include <vector>
@@ -46,5 +47,7 @@ namespace wrench {
     };
 
 }
+
+#endif
 
 #endif //WRENCH_CRITICALPATHSCHEDULER_H

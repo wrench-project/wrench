@@ -13,15 +13,18 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simulation/Simulation.h"
 #include "wms/WMSMessage.h"
+#include "wrench/managers/JobManager.h"
+#include "wrench/managers/DataMovementManager.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
 
 namespace wrench {
 
     /**
-     * @brief Create a WMS with a workflow instance, a scheduler implementation, and a list of compute services
+     * @brief Constructor:  a WMS with a workflow instance, a scheduler implementation, and a list of compute services
      *
-     * @param scheduler: a scheduler implementation
+     * @param scheduler: a standard job scheduler implementation (if nullptr then none is used)
+     * @param scheduler: a pilot job scheduler implementation (if nullptr then none is used)
      * @param compute_services: a set of compute services available to run jobs
      * @param storage_services: a set of storage services available to the WMS
      * @param hostname: the name of the host on which to run the WMS
@@ -30,7 +33,8 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    WMS::WMS(std::unique_ptr<Scheduler> scheduler,
+    WMS::WMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
+             std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
              const std::set<ComputeService *> &compute_services,
              const std::set<StorageService *> &storage_services,
              const std::string &hostname,
@@ -38,7 +42,9 @@ namespace wrench {
             S4U_Daemon("wms_" + suffix, "wms_" + suffix),
             compute_services(std::move(compute_services)),
             storage_services(std::move(storage_services)),
-            scheduler(std::move(scheduler)) {
+            standard_job_scheduler(std::move(standard_job_scheduler)),
+            pilot_job_scheduler(std::move(pilot_job_scheduler))
+             {
 
       this->hostname = hostname;
       this->workflow = nullptr;
@@ -62,15 +68,6 @@ namespace wrench {
      */
     void WMS::addStaticOptimization(std::unique_ptr<StaticOptimization> optimization) {
       this->static_optimizations.push_back(std::move(optimization));
-    }
-
-    /**
-     * @brief Set a pilot job scheduler strategy
-     *
-     * @param pilot_job_scheduler: a pilot job scheduler implementation
-     */
-    void WMS::setPilotJobScheduler(std::unique_ptr<PilotJobScheduler> pilot_job_scheduler) {
-      this->pilot_job_scheduler = std::move(pilot_job_scheduler);
     }
 
     /**
@@ -320,6 +317,24 @@ namespace wrench {
      */
     Workflow *WMS::getWorkflow() {
       return this->workflow;
+    }
+
+
+    /**
+     * @brief Instantiate a job manager
+     * @return a job manager
+     */
+    std::unique_ptr<JobManager> WMS::createJobManager() {
+      return std::unique_ptr<JobManager>(new JobManager(this));
+    }
+
+
+    /**
+     * @brief Instantiate a data movement manager
+     * @return a data movement manager
+     */
+    std::unique_ptr<DataMovementManager> WMS::createDataMovementManager() {
+      return std::unique_ptr<DataMovementManager>(new DataMovementManager(this));
     }
 
 

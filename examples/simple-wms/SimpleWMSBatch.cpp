@@ -11,7 +11,7 @@
 #include <wrench.h>
 
 #include "SimpleWMS.h"
-#include "scheduler/BatchScheduler.h"
+#include "scheduler/BatchStandardJobScheduler.h"
 
 int main(int argc, char **argv) {
 
@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
   storage_services.insert(storage_service);
 
   /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
-   * for executing the workflow, and uses a scheduler (BatchScheduler). That scheduler
+   * for executing the workflow, and uses a scheduler (BatchStandardJobScheduler). That scheduler
    * is instantiated with the batch service, the list of hosts available for running
    * tasks, and also provided a pointer to the simulation object.
    *
@@ -113,8 +113,9 @@ int main(int argc, char **argv) {
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
   wrench::WMS *wms = simulation.add(
           std::unique_ptr<wrench::WMS>(
-                  new wrench::SimpleWMS(std::unique_ptr<wrench::Scheduler>(
-                                                new wrench::BatchScheduler()),
+                  new wrench::SimpleWMS(std::unique_ptr<wrench::BatchStandardJobScheduler>(
+                                                new wrench::BatchStandardJobScheduler()),
+                                        nullptr,
                                         compute_services, storage_services, wms_host)));
 
   wms->addWorkflow(&workflow);

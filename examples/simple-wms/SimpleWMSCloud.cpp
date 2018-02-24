@@ -11,7 +11,7 @@
 #include <wrench.h>
 
 #include "SimpleWMS.h"
-#include "scheduler/CloudScheduler.h"
+#include "scheduler/CloudStandardJobScheduler.h"
 
 /**
  * @brief An example that demonstrate how to run a simulation of a simple Workflow
@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
   storage_services.insert(storage_service);
 
   /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
-   * for executing the workflow, and uses a scheduler (CloudScheduler). That scheduler
+   * for executing the workflow, and uses a scheduler (CloudStandardJobScheduler). That scheduler
    * is instantiated with the cloud service, the list of hosts available for running
    * tasks, and also provided a pointer to the simulation object.
    *
@@ -124,9 +124,9 @@ int main(int argc, char **argv) {
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
   wrench::WMS *wms = simulation.add(
           std::unique_ptr<wrench::WMS>(
-                  new wrench::SimpleWMS(std::unique_ptr<wrench::Scheduler>(
-                                                new wrench::CloudScheduler()),
-                                        compute_services, storage_services, wms_host)));
+                  new wrench::SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(
+                                                new wrench::CloudStandardJobScheduler()),
+                                        nullptr, compute_services, storage_services, wms_host)));
 
   wms->addWorkflow(&workflow);
 

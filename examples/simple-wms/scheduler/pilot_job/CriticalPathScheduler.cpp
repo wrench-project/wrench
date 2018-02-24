@@ -7,11 +7,13 @@
  * (at your option) any later version.
  */
 
+#if 0
 #include <map>
 
 #include "CriticalPathScheduler.h"
 
 namespace wrench {
+
 
     /**
      * @brief Schedule a pilot job for the length of the critical path
@@ -90,3 +92,5 @@ namespace wrench {
       return count;
     }
 }
+
+#endif

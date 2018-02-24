@@ -11,7 +11,7 @@
 #include <set>
 #include <numeric>
 
-#include "MinMinScheduler.h"
+#include "MinMinStandardJobScheduler.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(minmin_scheduler, "Log category for Min-Min Scheduler");
 
@@ -25,10 +25,10 @@ namespace wrench {
      *
      * @return whether the number of flops from the left-hand-side workflow tasks is smaller
      */
-    bool MinMinScheduler::MinMinComparator::operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
+    bool MinMinStandardJobScheduler::MinMinComparator::operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
                                                        std::pair<std::string, std::vector<WorkflowTask *>> &rhs) {
 
-      return getTotalFlops(lhs.second) < getTotalFlops(rhs.second);
+      return Workflow::getSumFlops(lhs.second) < Workflow::getSumFlops(rhs.second);
     }
 
     /**
@@ -38,9 +38,10 @@ namespace wrench {
      * @param ready_tasks: a vector of ready workflow tasks
      * @param compute_services: a set of compute services available to run jobs
      */
-    void MinMinScheduler::scheduleTasks(JobManager *job_manager,
-                                        std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
-                                        const std::set<ComputeService *> &compute_services) {
+    void MinMinStandardJobScheduler::scheduleTasks(
+            const std::set<ComputeService *> &compute_services,
+                                        std::map<std::string, std::vector<WorkflowTask *>> &ready_tasks
+                                        ) {
 
       WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
 

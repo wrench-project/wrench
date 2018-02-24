@@ -11,6 +11,7 @@
 #define WRENCH_MAXMINSCHEDULER_H
 
 #include <wrench-dev.h>
+#include <map>
 
 namespace wrench {
 
@@ -18,24 +19,27 @@ namespace wrench {
     /**
      * @brief A max-min Scheduler
      */
-    class MaxMinScheduler : public Scheduler {
+    class MaxMinStandardJobScheduler : public StandardJobScheduler {
 
 
     public:
+
+        MaxMinStandardJobScheduler(JobManager *job_manager) : job_manager(job_manager) {}
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        void scheduleTasks(JobManager *job_manager,
-                           std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
-                           const std::set<ComputeService *> &compute_services);
+        void scheduleTasks(const std::set<ComputeService *> &compute_services,
+                           std::map<std::string, std::vector<WorkflowTask *>> &tasks);
 
     private:
         struct MaxMinComparator {
             bool operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
                             std::pair<std::string, std::vector<WorkflowTask *>> &rhs);
         };
+
+        JobManager *job_manager;
     /***********************/
     /** \endcond           */
     /***********************/

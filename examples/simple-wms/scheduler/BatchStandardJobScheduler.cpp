@@ -8,31 +8,23 @@
  *
  */
 
-#include "BatchScheduler.h"
+#include "BatchStandardJobScheduler.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_scheduler, "Log category for Batch Scheduler");
 
 namespace wrench {
 
-    /**
-     * @brief Constructor
-     *
-     */
-    BatchScheduler::BatchScheduler() {
-    }
 
     /**
      * @brief Schedule and run a set of ready tasks on the batch service
      *
-     * @param job_manager: a job manager
-     * @param ready_tasks: a map of ready workflow tasks
      * @param compute_services: a set of compute services available to run jobs
+     * @param ready_tasks: a map of (ready) workflow tasks
      *
      * @throw std::runtime_error
      */
-    void BatchScheduler::scheduleTasks(JobManager *job_manager,
-                                       std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
-                                       const std::set<ComputeService *> &compute_services) {
+    void BatchStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
+                                                  const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
 
       // Check that the right compute_services is passed
       if (compute_services.size() != 1) {
@@ -45,9 +37,9 @@ namespace wrench {
         throw std::runtime_error("This example Batch Scheduler can only handle a batch service");
       }
 
-      WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
+      WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());
 
-      for (auto itc : ready_tasks) {
+      for (auto itc : tasks) {
         //TODO add support to pilot jobs
 
         WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
@@ -60,19 +52,5 @@ namespace wrench {
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }
 
-    /**
-     * @brief Schedule and run pilot jobs
-     *
-     * @param job_manager: a job manager
-     * @param workflow: a workflow
-     * @param pilot_job_duration: a long pilot jobs should last
-     * @param flops: the number of flops that the pilot jobs should be able to do (assuming it constantly uses the CPU) before terminating
-     * @param compute_services: a set of compute services available to run jobs
-     */
-    void BatchScheduler::schedulePilotJobs(JobManager *job_manager,
-                          Workflow *workflow,
-                          double pilot_job_duration,
-                          const std::set<ComputeService *> &compute_services) {
-      throw std::runtime_error("BatchScheduler::schedulerPilotJobs(): Not implemented (yet) - don't use pilot jobs for now");
-    }
+
 }

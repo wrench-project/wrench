@@ -11,7 +11,7 @@
 #include <set>
 #include <numeric>
 
-#include "MaxMinScheduler.h"
+#include "MaxMinStandardJobScheduler.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(maxmin_scheduler, "Log category for Max-Min Scheduler");
 
@@ -25,28 +25,27 @@ namespace wrench {
      *
     * @return whether the number of flops from the left-hand-side workflow tasks is larger
     */
-    bool MaxMinScheduler::MaxMinComparator::operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
+    bool MaxMinStandardJobScheduler::MaxMinComparator::operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
                                                        std::pair<std::string, std::vector<WorkflowTask *>> &rhs) {
 
-      return getTotalFlops(lhs.second) > getTotalFlops(rhs.second);
+      return Workflow::getSumFlops(lhs.second) > Workflow::getSumFlops(rhs.second);
     }
 
     /**
      * @brief Schedule and run a set of ready tasks on available compute resources
      *
-     * @param job_manager: a job manager
-     * @param ready_tasks: a vector of ready workflow tasks
      * @param compute_services: a set of compute services available to run jobs
+     * @param tasks: a vector of (ready) workflow tasks
      */
-    void MaxMinScheduler::scheduleTasks(JobManager *job_manager,
-                                        std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
-                                        const std::set<ComputeService *> &compute_services) {
+    void MaxMinStandardJobScheduler::scheduleTasks(
+                                        const std::set<ComputeService *> &compute_services, 
+                                        std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
 
-      WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
+      WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());
 
       // Sorting tasks
-      std::vector<std::pair<std::string, std::vector<WorkflowTask *>>> max_vector(ready_tasks.begin(),
-                                                                                  ready_tasks.end());
+      std::vector<std::pair<std::string, std::vector<WorkflowTask *>>> max_vector(tasks.begin(),
+                                                                                  tasks.end());
       std::sort(max_vector.begin(), max_vector.end(), MaxMinComparator());
 
       for (auto itc : max_vector) {

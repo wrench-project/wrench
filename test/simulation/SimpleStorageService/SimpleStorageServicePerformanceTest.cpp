@@ -14,7 +14,6 @@
 
 #include <wrench-dev.h>
 
-#include "../NoopScheduler.h"
 #include "../TestWithFork.h"
 
 
@@ -85,11 +84,10 @@ class SimpleStorageServiceConcurrencyFileCopiesTestWMS : public wrench::WMS {
 
 public:
     SimpleStorageServiceConcurrencyFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
-                                                     std::unique_ptr<wrench::Scheduler> scheduler,
                                                      const std::set<wrench::ComputeService *> compute_services,
                                                      const std::set<wrench::StorageService *> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -100,8 +98,7 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -192,8 +189,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service_1, storage_service_2},
+                  this, {compute_service}, {storage_service_1, storage_service_2},
                           "WMSHost"))));
 
   wms->addWorkflow(this->workflow);

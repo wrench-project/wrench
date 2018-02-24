@@ -12,36 +12,35 @@
 #include <numeric>
 
 #include "wrench/simulation/Simulation.h"
-#include "RandomScheduler.h"
+#include "RandomStandardJobScheduler.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/workflow/job/PilotJob.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(random_scheduler, "Log category for Random Scheduler");
+XBT_LOG_NEW_DEFAULT_CATEGORY(random_standard_job_scheduler, "Log category for Random Scheduler");
 
 namespace wrench {
 
     /**
      * @brief Schedule and run a set of ready tasks on available compute resources
      *
-     * @param job_manager: a job manager
-     * @param ready_tasks: a map of ready workflow tasks
      * @param compute_services: a set of compute services available to run jobs
+     * @param ready_tasks: a map of (ready) workflow tasks
      */
-    void RandomScheduler::scheduleTasks(JobManager *job_manager,
-                                        std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
-                                        const std::set<ComputeService *> &compute_services) {
 
-      WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
-      for (auto itc : ready_tasks) {
+    void RandomStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
+                       const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
+
+      WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());
+      for (auto itc : tasks) {
         bool successfully_scheduled = false;
 
         // First: attempt to run the task on a running pilot job
         WRENCH_INFO("Trying to submit task '%s' to a pilot job...", itc.first.c_str());
 
-        double total_flops = getTotalFlops((*ready_tasks.begin()).second);
+        double total_flops = Workflow::getSumFlops((*tasks.begin()).second);
 
-        std::set<PilotJob *> running_pilot_jobs = job_manager->getRunningPilotJobs();
+        std::set<PilotJob *> running_pilot_jobs = this->job_manager->getRunningPilotJobs();
         for (auto pj : running_pilot_jobs) {
           ComputeService *cs = pj->getComputeService();
 
@@ -140,4 +139,6 @@ namespace wrench {
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }
+
+
 }
