@@ -14,7 +14,6 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 
-#include "NoopScheduler.h"
 #include "TestWithFork.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple SandardJobExecutorTest");
@@ -93,11 +92,10 @@ class OneSingleCoreTaskTestWMS : public wrench::WMS {
 
 public:
     OneSingleCoreTaskTestWMS(StandardJobExecutorTest *test,
-                             std::unique_ptr<wrench::Scheduler> scheduler,
                              const std::set<wrench::ComputeService *> &compute_services,
                              const std::set<wrench::StorageService *> &storage_services,
                              std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -109,12 +107,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
-
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
 
       {
@@ -257,8 +250,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1, storage_service2}, hostname))));
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -294,11 +286,10 @@ class OneSingleCoreTaskNotEnoughCoresTestWMS : public wrench::WMS {
 
 public:
     OneSingleCoreTaskNotEnoughCoresTestWMS(StandardJobExecutorTest *test,
-                                           std::unique_ptr<wrench::Scheduler> scheduler,
                                            const std::set<wrench::ComputeService *> &compute_services,
                                            const std::set<wrench::StorageService *> &storage_services,
                                            std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -310,12 +301,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
-
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one hour and requires 12 cores
@@ -419,8 +405,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskNotEnoughCoresTest_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskNotEnoughCoresTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1, storage_service2}, hostname))));
+                  this, {compute_service}, {storage_service1, storage_service2}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -458,11 +443,10 @@ class OneSingleCoreTaskBogusPreFileCopyTestWMS : public wrench::WMS {
 
 public:
     OneSingleCoreTaskBogusPreFileCopyTestWMS(StandardJobExecutorTest *test,
-                                             std::unique_ptr<wrench::Scheduler> scheduler,
                                              const std::set<wrench::ComputeService *> &compute_services,
                                              const std::set<wrench::StorageService *> &storage_services,
                                              std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -474,8 +458,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // WARNING: The StandardJobExecutor unique_ptr is declared here, so that
       // it's not automatically freed after the next basic block is over. In the internals
@@ -609,8 +592,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskBogusPreFileCopyTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1, storage_service2}, hostname))));
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -650,11 +632,10 @@ class OneSingleCoreTaskMissingFileTestWMS : public wrench::WMS {
 
 public:
     OneSingleCoreTaskMissingFileTestWMS(StandardJobExecutorTest *test,
-                                        std::unique_ptr<wrench::Scheduler> scheduler,
                                         const std::set<wrench::ComputeService *> &compute_services,
                                         const std::set<wrench::StorageService *> &storage_services,
                                         std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -666,8 +647,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // WARNING: The StandardJobExecutor unique_ptr is declared here, so that
       // it's not automatically freed after the next basic block is over. In the internals
@@ -797,8 +777,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskMissingFileTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1, storage_service2}, hostname))));
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -837,11 +816,10 @@ class OneMultiCoreTaskTestWMS : public wrench::WMS {
 
 public:
     OneMultiCoreTaskTestWMS(StandardJobExecutorTest *test,
-                            std::unique_ptr<wrench::Scheduler> scheduler,
                             const std::set<wrench::ComputeService *> &compute_services,
                             const std::set<wrench::StorageService *> &storage_services,
                             std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -853,12 +831,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
-
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
 
       /** Case 1: Create a multicore task with perfect parallel efficiency that lasts one hour **/
@@ -1098,8 +1071,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneMultiCoreTaskTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1}, hostname))));
+                  this,  {compute_service}, {storage_service1}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -1138,11 +1110,10 @@ class TwoMultiCoreTasksTestWMS : public wrench::WMS {
 
 public:
     TwoMultiCoreTasksTestWMS(StandardJobExecutorTest *test,
-                             std::unique_ptr<wrench::Scheduler> scheduler,
                              const std::set<wrench::ComputeService *> &compute_services,
                              const std::set<wrench::StorageService *> &storage_services,
                              std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -1154,12 +1125,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
-
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
 
       /** Case 1: Create two tasks that will run in sequence with the default scheduling options **/
@@ -1468,8 +1434,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new TwoMultiCoreTasksTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1, storage_service2}, hostname))));
+                  this, {compute_service}, {storage_service1, storage_service2}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -1506,11 +1471,10 @@ class MultiHostTestWMS : public wrench::WMS {
 
 public:
     MultiHostTestWMS(StandardJobExecutorTest *test,
-                     std::unique_ptr<wrench::Scheduler> scheduler,
                      const std::set<wrench::ComputeService *> &compute_services,
                      const std::set<wrench::StorageService *> &storage_services,
                      std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -1521,8 +1485,7 @@ public:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
 
       // WARNING: The StandardJobExecutor unique_ptr is declared here, so that
@@ -1751,8 +1714,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MultiHostTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1, storage_service2}, hostname))));
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -1791,11 +1753,10 @@ class JobTerminationTestDuringAComputationWMS : public wrench::WMS {
 
 public:
     JobTerminationTestDuringAComputationWMS(StandardJobExecutorTest *test,
-                                            std::unique_ptr<wrench::Scheduler> scheduler,
                                             const std::set<wrench::ComputeService *> &compute_services,
                                             const std::set<wrench::StorageService *> &storage_services,
                                             std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -1807,12 +1768,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
-
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
 
       /**  Create a 4-task job and kill it **/
@@ -1919,8 +1875,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new JobTerminationTestDuringAComputationWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1, storage_service2}, "Host3"))));
+                  this,  {compute_service}, {storage_service1, storage_service2}, "Host3"))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -1958,11 +1913,10 @@ class JobTerminationTestDuringATransferWMS : public wrench::WMS {
 
 public:
     JobTerminationTestDuringATransferWMS(StandardJobExecutorTest *test,
-                                         std::unique_ptr<wrench::Scheduler> scheduler,
                                          const std::set<wrench::ComputeService *> &compute_services,
                                          const std::set<wrench::StorageService *> &storage_services,
                                          std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -1974,12 +1928,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
-
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
 
       /**  Create a 4-task job and kill it **/
@@ -2085,8 +2034,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new JobTerminationTestDuringATransferWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1, storage_service2}, "Host3"))));
+                  this, {compute_service}, {storage_service1, storage_service2}, "Host3"))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -2123,11 +2071,10 @@ class JobTerminationTestAtRandomTimesWMS : public wrench::WMS {
 
 public:
     JobTerminationTestAtRandomTimesWMS(StandardJobExecutorTest *test,
-                                       std::unique_ptr<wrench::Scheduler> scheduler,
                                        const std::set<wrench::ComputeService *> &compute_services,
                                        const std::set<wrench::StorageService *> &storage_services,
                                        std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -2138,12 +2085,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
-
-//      // Create a data movement manager
-//      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-//              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       //Type of random number distribution
       std::uniform_real_distribution<double> dist(0, 600);  //(min, max)
@@ -2270,8 +2212,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new JobTerminationTestAtRandomTimesWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service1, storage_service2}, "Host3"))));
+                  this,  {compute_service}, {storage_service1, storage_service2}, "Host3"))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 

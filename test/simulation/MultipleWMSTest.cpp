@@ -11,7 +11,6 @@
 #include <wrench-dev.h>
 #include <numeric>
 
-#include "NoopScheduler.h"
 #include "TestWithFork.h"
 
 class MultipleWMSTest : public ::testing::Test {
@@ -83,11 +82,10 @@ class DeferredWMSStartTestWMS : public wrench::WMS {
 
 public:
     DeferredWMSStartTestWMS(MultipleWMSTest *test,
-                            std::unique_ptr<wrench::Scheduler> scheduler,
                             const std::set<wrench::ComputeService *> &compute_services,
                             const std::set<wrench::StorageService *> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test"
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test"
                         ) {
       this->test = test;
     }
@@ -101,12 +99,10 @@ private:
       checkDeferredStart();
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Create a file registry service
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
@@ -182,8 +178,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
   wrench::Workflow *workflow = this->createWorkflow();
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(std::unique_ptr<wrench::WMS>(
-          new DeferredWMSStartTestWMS(this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service}, hostname))));
+          new DeferredWMSStartTestWMS(this,  {compute_service}, {storage_service}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow, 100));
 
@@ -234,8 +229,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
   wrench::Workflow *workflow = this->createWorkflow();
   wrench::WMS *wms1 = nullptr;
   EXPECT_NO_THROW(wms1 = simulation->add(std::unique_ptr<wrench::WMS>(
-          new DeferredWMSStartTestWMS(this, std::unique_ptr<wrench::Scheduler>(
-                  new NoopScheduler()), {compute_service}, {storage_service}, hostname))));
+          new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname))));
 
   EXPECT_NO_THROW(wms1->addWorkflow(workflow, 100));
 
@@ -243,8 +237,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
   wrench::Workflow *workflow2 = this->createWorkflow();
   wrench::WMS *wms2 = nullptr;
   EXPECT_NO_THROW(wms2 = simulation->add(std::unique_ptr<wrench::WMS>(
-          new DeferredWMSStartTestWMS(this, std::unique_ptr<wrench::Scheduler>(
-                  new NoopScheduler()), {compute_service}, {storage_service}, hostname))));
+          new DeferredWMSStartTestWMS(this,  {compute_service}, {storage_service}, hostname))));
 
   EXPECT_NO_THROW(wms2->addWorkflow(workflow2, 10000));
 

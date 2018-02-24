@@ -18,16 +18,19 @@ namespace wrench {
     /**
      * @brief Create a Simple WMS with a workflow instance, a scheduler implementation, and a list of compute services
      *
-     * @param scheduler: a scheduler implementation
+     * @param standard_job_scheduler: a standard job scheduler implementation (if nullptr none is used)
+     * @param pilot_job_scheduler: a pilot job scheduler implementation if nullptr none is used)
      * @param compute_services: a set of compute services available to run jobs
      * @param storage_services: a set of storage services available to the WMS
      * @param hostname: the name of the host on which to start the WMS
      */
-    SimpleWMS::SimpleWMS(std::unique_ptr<Scheduler> scheduler,
+    SimpleWMS::SimpleWMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
+                         std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
                          const std::set<ComputeService *> &compute_services,
                          const std::set<StorageService *> &storage_services,
                          const std::string &hostname) : WMS(
-            std::move(scheduler),
+            std::move(standard_job_scheduler),
+            std::move(pilot_job_scheduler),
             compute_services,
             storage_services,
             hostname,
@@ -53,11 +56,11 @@ namespace wrench {
       WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
       // Create a job manager
-      this->job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
+
+      this->job_manager = this->createJobManager();
 
       // Create a data movement manager
-      std::unique_ptr<DataMovementManager> data_movement_manager = std::unique_ptr<DataMovementManager>(
-              new DataMovementManager(this->workflow));
+      std::unique_ptr<DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Perform static optimizations
       runStaticOptimizations();
@@ -78,7 +81,7 @@ namespace wrench {
         // Submit pilot jobs
         if (this->pilot_job_scheduler) {
           WRENCH_INFO("Scheduling pilot jobs...");
-          this->pilot_job_scheduler.get()->schedule(this->scheduler.get(), this->workflow, this->job_manager.get(),
+          this->pilot_job_scheduler->schedulePilotJobs(
                                                     this->getRunningComputeServices());
         }
 
@@ -87,9 +90,9 @@ namespace wrench {
 
         // Run ready tasks with defined scheduler implementation
         WRENCH_INFO("Scheduling tasks...");
-        this->scheduler->scheduleTasks(this->job_manager.get(),
-                                       ready_tasks,
-                                       this->getRunningComputeServices());
+        this->standard_job_scheduler->scheduleTasks(
+                                       this->getRunningComputeServices(),
+                                       ready_tasks);
 
         // Wait for a workflow execution event, and process it
         try {

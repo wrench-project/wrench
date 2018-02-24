@@ -13,14 +13,16 @@
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
 #include "wrench/wms/DynamicOptimization.h"
 #include "wrench/wms/StaticOptimization.h"
-#include "wrench/wms/scheduler/Scheduler.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
+#include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/workflow/Workflow.h"
 #include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
 
 namespace wrench {
 
     class Simulation;
+    class JobManager;
+    class DataMovementManager;
 
     /**
      * @brief A top-level class that defines a workflow management system (WMS)
@@ -35,8 +37,6 @@ namespace wrench {
         void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
         void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
-
-        void setPilotJobScheduler(std::unique_ptr<PilotJobScheduler>);
 
         /***********************/
         /** \cond DEVELOPER */
@@ -54,16 +54,20 @@ namespace wrench {
         /** \cond DEVELOPER */
         /***********************/
 
-        WMS(std::unique_ptr<Scheduler> scheduler,
+        WMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
+            std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
             const std::set<ComputeService *> &compute_services,
             const std::set<StorageService *> &storage_services,
             const std::string &hostname,
             const std::string suffix);
 
-
         void start();
 
         void checkDeferredStart();
+
+        std::unique_ptr<JobManager> createJobManager();
+
+        std::unique_ptr<DataMovementManager> createDataMovementManager();
 
         void runDynamicOptimizations();
 
@@ -97,6 +101,8 @@ namespace wrench {
         /***********************/
 
         friend class Simulation;
+        friend class DataMovementManager;
+        friend class JobManager;
 
         /** @brief The current simulation */
         Simulation *simulation;
@@ -109,10 +115,11 @@ namespace wrench {
         /** @brief List of available storage services */
         std::set<StorageService *> storage_services;
 
-        /** @brief The selected scheduler */
-        std::unique_ptr<Scheduler> scheduler;
-        /** @brief The pilot job scheduler */
+        /** @brief The standard job scheduler */
+        std::unique_ptr<StandardJobScheduler> standard_job_scheduler = nullptr;
+        /** @brief The standard job scheduler */
         std::unique_ptr<PilotJobScheduler> pilot_job_scheduler = nullptr;
+
         /** @brief The enabled dynamic optimizations */
         std::vector<std::unique_ptr<DynamicOptimization>> dynamic_optimizations;
         /** @brief The enabled static optimizations */

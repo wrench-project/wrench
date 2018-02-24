@@ -29,7 +29,7 @@
 #include "wrench/wms/WMS.h"
 
 // Scheduler
-#include "wrench/wms/scheduler/Scheduler.h"
+#include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 
 // Scheduling Optimizations

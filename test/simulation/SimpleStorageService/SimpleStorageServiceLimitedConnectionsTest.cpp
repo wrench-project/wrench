@@ -14,7 +14,6 @@
 
 #include <wrench-dev.h>
 
-#include "../NoopScheduler.h"
 #include "../TestWithFork.h"
 
 
@@ -81,11 +80,10 @@ class SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS : publi
 
 public:
     SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(SimpleStorageServiceLimitedConnectionsTest *test,
-                                                                       std::unique_ptr<wrench::Scheduler> scheduler,
                                                                        const std::set<wrench::ComputeService *> &compute_services,
                                                                        const std::set<wrench::StorageService *> &storage_services,
                                                                        const std::string &hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -97,8 +95,7 @@ private:
 
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Get a file registry
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
@@ -225,8 +222,7 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service_wms, storage_service_1, storage_service_2},
+                  this, {compute_service}, {storage_service_wms, storage_service_1, storage_service_2},
                   "WMSHost"))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));

@@ -597,4 +597,19 @@ namespace wrench {
       }
     }
 
+    /**
+     * @brief Get the total number of flops for a list of tasks
+     *
+     * @param tasks: list of tasks
+     *
+     * @return the total number of flops
+     */
+    double Workflow::getSumFlops(std::vector<WorkflowTask *> tasks) {
+      double total_flops = 0;
+      for (auto it : tasks) {
+        total_flops += (*it).getFlops();
+      }
+      return total_flops;
+    }
+
 };

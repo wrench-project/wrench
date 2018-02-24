@@ -45,6 +45,8 @@ namespace wrench {
 
         WorkflowFile *getWorkflowFileByID(const std::string);
 
+        static double getSumFlops(std::vector<WorkflowTask *> tasks);
+
         void addControlDependency(WorkflowTask *, WorkflowTask *);
 
         void loadFromDAX(const std::string &filename);

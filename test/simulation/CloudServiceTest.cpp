@@ -11,7 +11,6 @@
 #include <wrench-dev.h>
 #include <numeric>
 
-#include "NoopScheduler.h"
 #include "TestWithFork.h"
 
 class CloudServiceTest : public ::testing::Test {
@@ -102,11 +101,10 @@ class CloudStandardJobTestWMS : public wrench::WMS {
 
 public:
     CloudStandardJobTestWMS(CloudServiceTest *test,
-                            std::unique_ptr<wrench::Scheduler> scheduler,
                             const std::set<wrench::ComputeService *> &compute_services,
                             const std::set<wrench::StorageService *> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -116,12 +114,10 @@ private:
 
     int main() {
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Create a file registry service
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
@@ -196,8 +192,7 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(std::unique_ptr<wrench::WMS>(
-          new CloudStandardJobTestWMS(this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service}, hostname))));
+          new CloudStandardJobTestWMS(this,  {compute_service}, {storage_service}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -224,11 +219,10 @@ class CloudPilotJobTestWMS : public wrench::WMS {
 
 public:
     CloudPilotJobTestWMS(CloudServiceTest *test,
-                         std::unique_ptr<wrench::Scheduler> scheduler,
                          const std::set<wrench::ComputeService *> &compute_services,
                          const std::set<wrench::StorageService *> &storage_services,
                          std::string &hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -238,12 +232,10 @@ private:
 
     int main() {
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -326,8 +318,7 @@ void CloudServiceTest::do_PilotJobTaskTest_test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(std::unique_ptr<wrench::WMS>(
-          new CloudPilotJobTestWMS(this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service}, hostname))));
+          new CloudPilotJobTestWMS(this,  {compute_service}, {storage_service}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -354,11 +345,10 @@ class CloudNumCoresTestWMS : public wrench::WMS {
 
 public:
     CloudNumCoresTestWMS(CloudServiceTest *test,
-                         std::unique_ptr<wrench::Scheduler> scheduler,
                          const std::set<wrench::ComputeService *> &compute_services,
                          const std::set<wrench::StorageService *> &storage_services,
                          std::string &hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -449,8 +439,7 @@ void CloudServiceTest::do_NumCoresTest_test() {
   // Create a WMS
   wrench::WMS  *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(std::unique_ptr<wrench::WMS>(
-          new CloudNumCoresTestWMS(this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service}, hostname))));
+          new CloudNumCoresTestWMS(this,  {compute_service}, {storage_service}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 

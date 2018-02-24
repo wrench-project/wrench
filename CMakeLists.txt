@@ -44,7 +44,7 @@ set(HEADER_FILES
         include/wrench/wms/StaticOptimization.h
         include/wrench/wms/DynamicOptimization.h
         include/wrench/wms/scheduler/PilotJobScheduler.h
-        include/wrench/wms/scheduler/Scheduler.h
+        include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
@@ -98,6 +98,8 @@ set(HEADER_FILES
         include/wrench/util/TraceFileLoader.h
         include/wrench/services/storage/simple/NetworkConnectionManager.h
         include/wrench/services/storage/simple/NetworkConnection.h
+        include/wrench/wms/scheduler/PilotJobScheduler.h
+        include/wrench/wms/scheduler/StandardJobScheduler.h
         )
 
 # source files
@@ -115,7 +117,6 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowTask.cpp
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/wms/WMS.cpp
-        src/wrench/wms/Scheduler.cpp
         src/wrench/wms/WMSMessage.h
         src/wrench/wms/WMSMessage.cpp
         src/wrench/services/compute/ComputeService.cpp
@@ -200,9 +201,7 @@ set(TEST_FILES
         test/simulation/NetworkProximityTest.cpp
         test/simulation/BatchServiceTest.cpp
         test/simulation/CloudServiceTest.cpp
-        test/simulation/NoopScheduler.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
-        test/simulation/NoopScheduler.h
         test/simulation/MultipleWMSTest.cpp
         src/wrench/util/UnitParser.cpp
         include/wrench/util/UnitParser.h)

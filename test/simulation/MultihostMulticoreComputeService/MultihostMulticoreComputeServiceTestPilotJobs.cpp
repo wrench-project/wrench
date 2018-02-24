@@ -13,7 +13,6 @@
 #include <wrench-dev.h>
 
 #include "wrench/workflow/job/PilotJob.h"
-#include "../NoopScheduler.h"
 #include "../TestWithFork.h"
 
 
@@ -92,11 +91,10 @@ class MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS : public wrenc
 
 public:
     MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS(MultihostMulticoreComputeServiceTestPilotJobs *test,
-                                                                std::unique_ptr<wrench::Scheduler> scheduler,
                                                                 const std::set<wrench::ComputeService *> &compute_services,
                                                                 const std::set<wrench::StorageService *> &storage_services,
                                                                 std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -108,11 +106,10 @@ private:
 
       // Create a data movement manager
       std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+              this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -177,8 +174,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
   wrench::WMS *wms;
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS(
-                  this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {
+                  this,  {
                           compute_service
                   }, {
                           storage_service
@@ -213,11 +209,10 @@ class MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestW
 public:
     MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(
             MultihostMulticoreComputeServiceTestPilotJobs *test,
-            std::unique_ptr<wrench::Scheduler> scheduler,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -228,12 +223,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -358,8 +351,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(
-                          this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {
+                          this,  {
                           compute_service
                   }, {
                           storage_service
@@ -392,11 +384,10 @@ class MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS
 public:
     MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(
             MultihostMulticoreComputeServiceTestPilotJobs *test,
-            std::unique_ptr<wrench::Scheduler> scheduler,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -407,12 +398,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -520,8 +509,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(
-                          this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {
+                          this,  {
                           compute_service
                   }, {
                           storage_service
@@ -555,11 +543,10 @@ class MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS : p
 public:
     MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(
             MultihostMulticoreComputeServiceTestPilotJobs *test,
-            std::unique_ptr<wrench::Scheduler> scheduler,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -570,12 +557,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -642,8 +627,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(
-                          this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {
+                          this,  {
                           compute_service
                   }, {
                           storage_service
@@ -677,11 +661,10 @@ class MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS : public wr
 public:
     MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS(
             MultihostMulticoreComputeServiceTestPilotJobs *test,
-            std::unique_ptr<wrench::Scheduler> scheduler,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -692,12 +675,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -812,8 +793,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS(
-                          this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service}, hostname))));
+                          this,  {compute_service}, {storage_service}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -843,11 +823,10 @@ class MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS : public
 public:
     MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(
             MultihostMulticoreComputeServiceTestPilotJobs *test,
-            std::unique_ptr<wrench::Scheduler> scheduler,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
-            wrench::WMS(std::move(scheduler), compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
 
@@ -858,12 +837,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
-              std::unique_ptr<wrench::DataMovementManager>(new wrench::DataMovementManager(this->workflow));
+      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager =
-              std::unique_ptr<wrench::JobManager>(new wrench::JobManager(this->workflow));
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -985,8 +962,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(
-                          this, std::unique_ptr<wrench::Scheduler>(
-                          new NoopScheduler()), {compute_service}, {storage_service}, hostname))));
+                          this,  {compute_service}, {storage_service}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 

@@ -20,22 +20,19 @@ namespace wrench {
     /**
      * @brief A cloud Scheduler
      */
-    class CloudScheduler : public Scheduler {
+    class CloudStandardJobScheduler : public StandardJobScheduler {
+
 
     public:
-        CloudScheduler();
+        CloudStandardJobScheduler() {}
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        void scheduleTasks(JobManager *job_manager, std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
-                           const std::set<ComputeService *> &compute_services) override;
-
-        void schedulePilotJobs(JobManager *job_manager,
-                                               Workflow *workflow,
-                                               double pilot_job_duration,
-                                               const std::set<ComputeService *> &compute_services) override;
+        virtual void scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,
+                           const std::map<std::string, std::vector<wrench::WorkflowTask *>> &tasks
+                           );
 
         /***********************/
         /** \endcond           */

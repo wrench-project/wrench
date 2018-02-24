@@ -19,29 +19,21 @@ namespace wrench {
     /**
      * @brief A batch Scheduler
      */
-    class BatchScheduler : public Scheduler {
+    class BatchStandardJobScheduler : public StandardJobScheduler {
 
     public:
-        BatchScheduler();
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        void scheduleTasks(JobManager *job_manager,
-                           std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
-                           const std::set<ComputeService *> &compute_services) override;
+        void scheduleTasks(const std::set<ComputeService *> &compute_services,
+                           const std::map<std::string, std::vector<WorkflowTask *>> &tasks) override;
 
-        void schedulePilotJobs(JobManager *job_manager,
-                               Workflow *workflow,
-                               double pilot_job_duration,
-                               const std::set<ComputeService *> &compute_services) override;
 
         /***********************/
         /** \endcond           */
         /***********************/
-
-    private:
 
     };
 }

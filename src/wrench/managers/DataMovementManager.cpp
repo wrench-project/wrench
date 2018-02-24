@@ -16,6 +16,7 @@
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <services/storage/StorageServiceMessage.h>
 #include <wrench/workflow/WorkflowFile.h>
+#include <wrench/wms/WMS.h>
 #include "wrench/workflow/Workflow.h"
 #include "wrench/managers/DataMovementManager.h"
 
@@ -28,10 +29,18 @@ namespace wrench {
      *
      * @param workflow: the workflow whose data (files) are to be managed
      */
-    DataMovementManager::DataMovementManager(Workflow *workflow) :
+    DataMovementManager::DataMovementManager(WMS *wms) :
             S4U_Daemon("data_movement_manager", "data_movement_manager") {
 
-      this->workflow = workflow;
+      this->wms = wms;
+
+      // Get myself known to schedulers
+      if (this->wms->standard_job_scheduler) {
+        this->wms->standard_job_scheduler->setDataMovementManager(this);
+      }
+      if (this->wms->pilot_job_scheduler) {
+        this->wms->pilot_job_scheduler->setDataMovementManager(this);
+      }
 
       // Start the daemon
       std::string localhost = S4U_Simulation::getHostName();

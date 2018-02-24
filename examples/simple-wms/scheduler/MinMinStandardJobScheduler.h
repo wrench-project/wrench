@@ -18,25 +18,32 @@ namespace wrench {
     /**
       * @brief A min-min Scheduler
       */
-    class MinMinScheduler : public Scheduler {
+    class MinMinStandardJobScheduler : public StandardJobScheduler {
 
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
 
     public:
-        void scheduleTasks(JobManager *job_manager,
-                           std::map<std::string, std::vector<WorkflowTask *>> ready_tasks,
-                           const std::set<ComputeService *> &compute_services);
+
+        MinMinStandardJobScheduler(JobManager *job_manager) : job_manager(job_manager) {}
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
+        virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
+                           std::map<std::string, std::vector<WorkflowTask *>> &ready_tasks
+        );
 
     private:
         struct MinMinComparator {
             bool operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
                             std::pair<std::string, std::vector<WorkflowTask *>> &rhs);
         };
-    /***********************/
-    /** \endcond           */
-    /***********************/
+
+        JobManager *job_manager;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 
 
