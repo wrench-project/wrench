@@ -39,7 +39,7 @@ namespace wrench {
      */
     void MaxMinStandardJobScheduler::scheduleTasks(
                                         const std::set<ComputeService *> &compute_services, 
-                                        std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
+                                        const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
 
       WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());
 

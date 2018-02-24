@@ -10,7 +10,6 @@
 #ifndef WRENCH_CRITICALPATHSCHEDULER_H
 #define WRENCH_CRITICALPATHSCHEDULER_H
 
-#if 0
 #include <gtest/gtest_prod.h>
 #include <set>
 #include <vector>
@@ -22,13 +21,16 @@ namespace wrench {
     /**
      * @brief A critical path pilot job Scheduler
      */
-    class CriticalPathScheduler : public PilotJobScheduler {
+    class CriticalPathPilotJobScheduler : public PilotJobScheduler {
 
     public:
+
+        CriticalPathPilotJobScheduler(Workflow *workflow) : workflow(workflow) {}
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
-        void schedule(Scheduler *, Workflow *, JobManager *, const std::set<ComputeService *> &);
+        void schedulePilotJobs(const std::set<ComputeService *> &compute_services) override;
 
     protected:
         double getFlops(Workflow *, const std::vector<WorkflowTask *> &);
@@ -39,6 +41,8 @@ namespace wrench {
         /***********************/
 
     private:
+        Workflow *workflow;
+
         std::map<WorkflowTask *, double> flopsMap;
 
         FRIEND_TEST(CriticalPathSchedulerTest, GetTotalFlops);
@@ -48,6 +52,5 @@ namespace wrench {
 
 }
 
-#endif
 
 #endif //WRENCH_CRITICALPATHSCHEDULER_H

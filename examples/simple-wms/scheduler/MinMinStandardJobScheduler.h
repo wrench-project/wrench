@@ -30,8 +30,8 @@ namespace wrench {
         /***********************/
 
         virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
-                           std::map<std::string, std::vector<WorkflowTask *>> &ready_tasks
-        );
+                           const std::map<std::string, std::vector<WorkflowTask *>> &ready_tasks
+        ) override;
 
     private:
         struct MinMinComparator {

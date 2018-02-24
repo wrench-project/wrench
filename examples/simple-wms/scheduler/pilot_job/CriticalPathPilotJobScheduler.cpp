@@ -7,10 +7,12 @@
  * (at your option) any later version.
  */
 
-#if 0
 #include <map>
+#include <xbt/log.h>
 
-#include "CriticalPathScheduler.h"
+#include "CriticalPathPilotJobScheduler.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(critical_path_scheduler, "Log category for Critical Path Scheduler");
 
 namespace wrench {
 
@@ -23,12 +25,9 @@ namespace wrench {
      * @param job_manager: a job manager
      * @param compute_services: a set of compute services available to run jobs
      */
-    void CriticalPathScheduler::schedule(Scheduler *scheduler,
-                                         Workflow *workflow,
-                                         JobManager *job_manager,
-                                         const std::set<ComputeService *> &compute_services) {
+    void CriticalPathPilotJobScheduler::schedulePilotJobs(const std::set<ComputeService *> &compute_services) {
 
-      double flops = 0;
+    double flops = 0;
       std::set<WorkflowTask *> root_tasks;
 
       for (auto task : workflow->getTasks()) {
@@ -44,7 +43,36 @@ namespace wrench {
       double total_flops = flops * (max_parallel <= compute_services.size() ?
                                     max_parallel : max_parallel - compute_services.size());
 
-      scheduler->schedulePilotJobs(job_manager, workflow, total_flops, compute_services);
+      // If there is always a pilot job in the system, do nothing
+      if ((job_manager->getRunningPilotJobs().size() > 0)) {
+        WRENCH_INFO("There is already a pilot job in the system...");
+        return;
+      }
+
+      // Submit a pilot job to the first compute service that can support it
+      ComputeService *target_service = nullptr;
+      for (auto cs : compute_services) {
+        if (cs->isUp() && cs->supportsPilotJobs()) {
+          target_service = cs;
+          break;
+        }
+      }
+      if (target_service == nullptr) {
+        WRENCH_INFO("No compute service supports pilot jobs");
+        return;
+      }
+
+      // Submit a pilot job
+      // TODO: Henri added the factor 2 below because running with the "one task" example,
+      // TODO: the pilot job was just a bit too short and the WMS was in an infinite loop
+      // TODO: (which is an annoying but simulation-valid behavior)
+      double pilot_job_duration = 2.0 * flops / target_service->getCoreFlopRate()[0];
+      WRENCH_INFO("Submitting a pilot job (1 host, 1 core, %lf seconds)", pilot_job_duration);
+
+      //TODO: For now we are asking for a pilot job that requires no RAM
+      WorkflowJob *job = (WorkflowJob *) job_manager->createPilotJob(workflow, 1, 1, 0.0, pilot_job_duration);
+      job_manager->submitJob(job, target_service);
+
     }
 
     /**
@@ -55,7 +83,7 @@ namespace wrench {
      *
      * @return
      */
-    double CriticalPathScheduler::getFlops(Workflow *workflow, const std::vector<WorkflowTask *> &tasks) {
+    double CriticalPathPilotJobScheduler::getFlops(Workflow *workflow, const std::vector<WorkflowTask *> &tasks) {
       double max_flops = 0;
 
       for (auto task : tasks) {
@@ -77,7 +105,7 @@ namespace wrench {
      * @return the maximal number of jobs that can run in parallel
      */
     unsigned long
-    CriticalPathScheduler::getMaxParallelization(Workflow *workflow, const std::set<WorkflowTask *> &tasks) {
+    CriticalPathPilotJobScheduler::getMaxParallelization(Workflow *workflow, const std::set<WorkflowTask *> &tasks) {
       unsigned long count = tasks.size();
       std::set<WorkflowTask *> children;
 
@@ -92,5 +120,3 @@ namespace wrench {
       return count;
     }
 }
-
-#endif

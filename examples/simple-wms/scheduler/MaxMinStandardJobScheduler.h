@@ -31,7 +31,7 @@ namespace wrench {
         /***********************/
 
         void scheduleTasks(const std::set<ComputeService *> &compute_services,
-                           std::map<std::string, std::vector<WorkflowTask *>> &tasks);
+                           const std::map<std::string, std::vector<WorkflowTask *>> &tasks) override;
 
     private:
         struct MaxMinComparator {
