@@ -228,11 +228,24 @@ namespace wrench {
         std::string name = job.attribute("name").value();
         double flops = std::strtod(job.attribute("runtime").value(), NULL);
         int num_procs = 1;
-        if (job.attribute("num_procs")) {
-          num_procs = std::stoi(job.attribute("num_procs").value());
+        bool found_one = false;
+        for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
+          if (job.attribute(tag.c_str())) {
+            if (found_one) {
+              std::cerr << "THROWING\n";
+              throw std::invalid_argument(
+                      "Workflow::loadFromDAX(): multiple \"number of cores/procs\" specification for task " + id);
+            } else {
+              found_one = true;
+              num_procs = std::stoi(job.attribute("num_procs").value());
+            }
+          }
         }
+
+
         // Create the task
-        task = this->addTask(id, flops, num_procs);
+        // If the DAX says num_procs = x, then we set min_cores=1, min_cores=x, efficiency=1.0
+        task = this->addTask(id, flops, 1, num_procs, 1.0);
 
         // Go through the children "uses" nodes
         for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {

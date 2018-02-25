@@ -22,7 +22,7 @@ protected:
               "<adag xmlns=\"http://pegasus.isi.edu/schema/DAX\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://pegasus.isi.edu/schema/DAX http://pegasus.isi.edu/schema/dax-2.1.xsd\" version=\"2.1\" count=\"1\" index=\"0\" name=\"test\" jobCount=\"36\" fileCount=\"0\" childCount=\"35\">"
               "<!-- part 1: list of all referenced files (may be empty) -->"
               "<!-- part 2: definition of all jobs (at least one) -->"
-              "  <job id=\"ID00000\" namespace=\"Genome\" name=\"fastqSplit_chr21\" version=\"1.0\" runtime=\"35.79\" numprocs=\"3\">"
+              "  <job id=\"ID00000\" namespace=\"Genome\" name=\"fastqSplit_chr21\" version=\"1.0\" runtime=\"35.79\" num_procs=\"3\">"
               "    <uses file=\"chr210.sfq\" link=\"input\" register=\"true\" transfer=\"true\" optional=\"false\" type=\"data\" size=\"249228055\"/>"
               "    <uses file=\"chr21.0.0.sfq\" link=\"output\" register=\"true\" transfer=\"true\" optional=\"false\" type=\"data\" size=\"30755085\"/>"
               "    <uses file=\"chr21.0.1.sfq\" link=\"output\" register=\"true\" transfer=\"true\" optional=\"false\" type=\"data\" size=\"31101555\"/>"
@@ -332,6 +332,17 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
   EXPECT_NO_THROW(workflow->loadFromDAX(this->dax_file_path));
   ASSERT_EQ(workflow->getNumberOfTasks(), 36);
   ASSERT_EQ(workflow->getFiles().size(), 56);
+
+  unsigned long num_input_files = workflow->getWorkflowTaskByID("ID00000")->getInputFiles().size();
+  unsigned long num_output_files = workflow->getWorkflowTaskByID("ID00000")->getOutputFiles().size();
+
+  ASSERT_EQ(num_input_files, 1);
+  ASSERT_EQ(num_output_files, 8);
+
+  ASSERT_NEAR(workflow->getWorkflowTaskByID("ID00000")->getFlops(), 35.79, 0.001);
+  ASSERT_EQ(workflow->getWorkflowTaskByID("ID00000")->getMinNumCores(), 1);
+  ASSERT_EQ(workflow->getWorkflowTaskByID("ID00000")->getMaxNumCores(), 3);
+
 
 }
 
