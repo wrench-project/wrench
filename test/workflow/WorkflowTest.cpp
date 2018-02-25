@@ -142,3 +142,11 @@ TEST_F(WorkflowTest, IsDone) {
 
   EXPECT_TRUE(workflow->isDone());
 }
+
+TEST_F(WorkflowTest, SumFlops) {
+
+  double sum_flops = 0;
+
+  EXPECT_NO_THROW(sum_flops = wrench::Workflow::getSumFlops(workflow->getTasks()));
+  ASSERT_EQ(sum_flops, 4.0);
+}
