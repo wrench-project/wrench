@@ -44,6 +44,8 @@ public:
     void do_ExecutionWithNotEnoughCores_test();
     
     void do_ExecutionWithNotEnoughRAM_test();
+    
+    void do_ExecutionWithDownService_test();
 
 
 protected:
@@ -635,7 +637,7 @@ private:
 
 
       double ram_capacity;
-
+      
       ram_capacity = wrench::Simulation::getHostMemoryCapacity("SingleHost");
       if (ram_capacity != wrench::ComputeService::ALL_RAM) {
         throw std::runtime_error("RAM Capacity of SingleHost should be +infty");
@@ -1561,6 +1563,137 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_t
 
   // Staging the input_file on storage service #1
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+  // Running a "run a single task" simulation
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+/**********************************************************************/
+/** EXECUTION WITH DOWN SERVICE SIMULATION TEST                      **/
+/**********************************************************************/
+
+class ExecutionWithDownServiceTestWMS : public wrench::WMS {
+
+public:
+    ExecutionWithDownServiceTestWMS(MultihostMulticoreComputeServiceOneTaskTest *test,
+                                    const std::set<wrench::ComputeService *> &compute_services,
+                                    const std::set<wrench::StorageService *> &storage_services,
+                                    std::string &hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    MultihostMulticoreComputeServiceOneTaskTest *test;
+
+    int main() {
+
+      // Create a job manager
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      wrench::StandardJob *job = nullptr;
+
+      bool success;
+
+      // Shutdown the service
+      test->compute_service->stop();
+
+      // Create a job
+      job = job_manager->createStandardJob(test->task,
+                                           {{test->input_file,  test->storage_service1},
+                                            {test->output_file, test->storage_service1}});
+
+      // Submit the job
+      success = true;
+      try {
+        job_manager->submitJob(job, test->compute_service);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got the expected exception, but the failure cause is wrong");
+        }
+        auto real_cause = (wrench::ServiceIsDown *) e.getCause().get();
+        std::string error_msg = real_cause->toString();
+        if (real_cause->getService() != test->compute_service) {
+          throw std::runtime_error(
+                  "Got the expected failure, but the failure cause does not point to the right compute service");
+        }
+      }
+
+      if (success) {
+        throw std::runtime_error("Should not be able to submit a job to a service that is down");
+      }
+
+      test->compute_service->start();  // Otherwise the shutdown will fail
+
+      // Terminate
+      this->shutdownAllServices();
+      return 0;
+    }
+};
+
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, ExecutionWithDownService) {
+  DO_TEST_WITH_FORK(do_ExecutionWithDownService_test);
+}
+
+void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDownService_test() {
+
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Compute Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                               nullptr,
+                                                               {}))));
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+
+  // Create a File Registry Service
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname));
+
+  EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new ExecutionWithDownServiceTestWMS(
+                  this,  {
+                          compute_service
+                  }, {
+                          storage_service1
+                  }, hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
