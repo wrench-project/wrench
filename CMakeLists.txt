@@ -201,6 +201,7 @@ set(TEST_FILES
         test/simulation/TestWithFork.h
         test/simulation/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
+        test/simulation/FileRegistryTest.cpp
         test/simulation/BatchServiceTest.cpp
         test/simulation/CloudServiceTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
