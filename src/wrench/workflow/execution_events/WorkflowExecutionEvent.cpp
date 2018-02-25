@@ -45,6 +45,7 @@ namespace wrench {
       std::unique_ptr<WorkflowExecutionEvent> event =
               std::unique_ptr<WorkflowExecutionEvent>(new WorkflowExecutionEvent());
 
+
       if (ComputeServiceStandardJobDoneMessage *m = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
         event->type = WorkflowExecutionEvent::STANDARD_JOB_COMPLETION;
         event->job = (WorkflowJob *) m->job;

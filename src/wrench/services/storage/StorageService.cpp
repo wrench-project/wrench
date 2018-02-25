@@ -306,7 +306,6 @@ namespace wrench {
       }
 
       // Wait for a reply
-      WRENCH_INFO("GETTING A REPLY");
       std::unique_ptr<SimulationMessage> message;
 
       try {
@@ -388,7 +387,6 @@ namespace wrench {
      * @param files: the set of files to read/write
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
-     * @return nullptr on success, or a workflow execution failure cause on failure
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -398,6 +396,16 @@ namespace wrench {
                                           std::map<WorkflowFile *, StorageService *> file_locations,
                                           StorageService *default_storage_service) {
 
+      for (auto f : files) {
+        if (f == nullptr) {
+          throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid files argument");
+        }
+      }
+      for (auto l : file_locations) {
+        if ((l.first == nullptr) || (l.second == nullptr)) {
+          throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid file location argument");
+        }
+      }
       for (auto f : files) {
 
         // Identify the Storage Service
