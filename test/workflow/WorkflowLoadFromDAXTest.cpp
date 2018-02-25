@@ -22,7 +22,7 @@ protected:
               "<adag xmlns=\"http://pegasus.isi.edu/schema/DAX\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://pegasus.isi.edu/schema/DAX http://pegasus.isi.edu/schema/dax-2.1.xsd\" version=\"2.1\" count=\"1\" index=\"0\" name=\"test\" jobCount=\"36\" fileCount=\"0\" childCount=\"35\">"
               "<!-- part 1: list of all referenced files (may be empty) -->"
               "<!-- part 2: definition of all jobs (at least one) -->"
-              "  <job id=\"ID00000\" namespace=\"Genome\" name=\"fastqSplit_chr21\" version=\"1.0\" runtime=\"35.79\">"
+              "  <job id=\"ID00000\" namespace=\"Genome\" name=\"fastqSplit_chr21\" version=\"1.0\" runtime=\"35.79\" numprocs=\"3\">"
               "    <uses file=\"chr210.sfq\" link=\"input\" register=\"true\" transfer=\"true\" optional=\"false\" type=\"data\" size=\"249228055\"/>"
               "    <uses file=\"chr21.0.0.sfq\" link=\"output\" register=\"true\" transfer=\"true\" optional=\"false\" type=\"data\" size=\"30755085\"/>"
               "    <uses file=\"chr21.0.1.sfq\" link=\"output\" register=\"true\" transfer=\"true\" optional=\"false\" type=\"data\" size=\"31101555\"/>"
@@ -328,6 +328,7 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
 
   auto *workflow = new wrench::Workflow();
 
+  EXPECT_THROW(workflow->loadFromDAX("bogus"), std::invalid_argument);
   EXPECT_NO_THROW(workflow->loadFromDAX(this->dax_file_path));
 
 }
