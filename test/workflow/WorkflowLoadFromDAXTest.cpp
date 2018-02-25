@@ -330,6 +330,8 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
 
   EXPECT_THROW(workflow->loadFromDAX("bogus"), std::invalid_argument);
   EXPECT_NO_THROW(workflow->loadFromDAX(this->dax_file_path));
+  ASSERT_EQ(workflow->getNumberOfTasks(), 36);
+  ASSERT_EQ(workflow->getFiles().size(), 56);
 
 }
 
