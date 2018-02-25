@@ -52,7 +52,6 @@ public:
 
     void do_ShutdownStorageServiceBeforeJobIsSubmitted_test();
 
-
 protected:
     MultihostMulticoreComputeServiceTestStandardJobs() {
 

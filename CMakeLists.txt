@@ -191,7 +191,7 @@ set(TEST_FILES
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowLoadFromDAXTest.cpp
-        test/simulation/OneTaskTest.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceOneTaskTest.cpp
         test/simulation/SimpleStorageService/InternalNetworkConnectionTest.cpp
         test/simulation/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/simulation/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp

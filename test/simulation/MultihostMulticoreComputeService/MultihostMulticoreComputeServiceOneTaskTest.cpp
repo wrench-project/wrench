@@ -11,10 +11,10 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "TestWithFork.h"
+#include "../TestWithFork.h"
 
 
-class OneTaskTest : public ::testing::Test {
+class MultihostMulticoreComputeServiceOneTaskTest : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
@@ -38,9 +38,11 @@ public:
 
     void do_ExecutionWithPrePostCopies_test();
 
+    void do_ExecutionWithMissingFile_test();
+
 
 protected:
-    OneTaskTest() {
+    MultihostMulticoreComputeServiceOneTaskTest() {
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -84,7 +86,7 @@ protected:
 class BadSetupTestWMS : public wrench::WMS {
 
 public:
-    BadSetupTestWMS(OneTaskTest *test,
+    BadSetupTestWMS(MultihostMulticoreComputeServiceOneTaskTest *test,
                     const std::set<wrench::ComputeService *> &compute_services,
                     const std::set<wrench::StorageService *> &storage_services,
                     std::string &hostname) :
@@ -95,7 +97,7 @@ public:
 
 private:
 
-    OneTaskTest *test;
+    MultihostMulticoreComputeServiceOneTaskTest *test;
 
     int main() {
 
@@ -103,11 +105,11 @@ private:
     }
 };
 
-TEST_F(OneTaskTest, BadSetup) {
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, BadSetup) {
   DO_TEST_WITH_FORK(do_BadSetup_test);
 }
 
-void OneTaskTest::do_BadSetup_test() {
+void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
 
 
   // Create and initialize a simulation
@@ -181,7 +183,7 @@ void OneTaskTest::do_BadSetup_test() {
 class NoopTestWMS : public wrench::WMS {
 
 public:
-    NoopTestWMS(OneTaskTest *test,
+    NoopTestWMS(MultihostMulticoreComputeServiceOneTaskTest *test,
                 const std::set<wrench::ComputeService *> &compute_services,
                 const std::set<wrench::StorageService *> &storage_services,
                 std::string &hostname) :
@@ -192,7 +194,7 @@ public:
 
 private:
 
-    OneTaskTest *test;
+    MultihostMulticoreComputeServiceOneTaskTest *test;
 
     int main() {
 
@@ -211,11 +213,11 @@ private:
     }
 };
 
-TEST_F(OneTaskTest, Noop) {
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, Noop) {
   DO_TEST_WITH_FORK(do_Noop_test);
 }
 
-void OneTaskTest::do_Noop_test() {
+void MultihostMulticoreComputeServiceOneTaskTest::do_Noop_test() {
 
 
   // Create and initialize a simulation
@@ -299,7 +301,7 @@ class StandardJobConstructorTestWMS : public wrench::WMS {
 
 public:
     StandardJobConstructorTestWMS(
-            OneTaskTest *test,
+            MultihostMulticoreComputeServiceOneTaskTest *test,
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string &hostname) :
@@ -310,7 +312,7 @@ public:
 
 private:
 
-    OneTaskTest *test;
+    MultihostMulticoreComputeServiceOneTaskTest *test;
 
 
     int main() {
@@ -394,7 +396,7 @@ private:
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}},
                                              {std::make_tuple(nullptr, test->storage_service1, test->storage_service2)
-                                              },
+                                             },
                                              {},
                                              {}
         );
@@ -412,7 +414,7 @@ private:
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}},
                                              {std::make_tuple(test->output_file, nullptr, test->storage_service2)
-                                              },
+                                             },
                                              {},
                                              {}
         );
@@ -482,7 +484,7 @@ private:
                                               {test->output_file, test->storage_service1}},
                                              {},
                                              {std::make_tuple(test->output_file, test->storage_service1, nullptr)
-                                              },
+                                             },
                                              {}
         );
       } catch (std::invalid_argument &e) {
@@ -539,11 +541,11 @@ private:
 };
 
 
-TEST_F(OneTaskTest, StandardJobConstructor) {
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, StandardJobConstructor) {
   DO_TEST_WITH_FORK(do_StandardJobConstructor_test);
 }
 
-void OneTaskTest::do_StandardJobConstructor_test() {
+void MultihostMulticoreComputeServiceOneTaskTest::do_StandardJobConstructor_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -606,7 +608,7 @@ void OneTaskTest::do_StandardJobConstructor_test() {
 class HostMemoryTestWMS : public wrench::WMS {
 
 public:
-    HostMemoryTestWMS(OneTaskTest *test,
+    HostMemoryTestWMS(MultihostMulticoreComputeServiceOneTaskTest *test,
                       const std::set<wrench::ComputeService *> &compute_services,
                       const std::set<wrench::StorageService *> &storage_services,
                       std::string &hostname1,
@@ -618,7 +620,7 @@ public:
 
 private:
 
-    OneTaskTest *test;
+    MultihostMulticoreComputeServiceOneTaskTest *test;
 
     int main() {
 
@@ -651,11 +653,11 @@ private:
     }
 };
 
-TEST_F(OneTaskTest, HostMemory) {
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, HostMemory) {
   DO_TEST_WITH_FORK(do_HostMemory_test);
 }
 
-void OneTaskTest::do_HostMemory_test() {
+void MultihostMulticoreComputeServiceOneTaskTest::do_HostMemory_test() {
 
 
   // Create and initialize a simulation
@@ -718,7 +720,7 @@ void OneTaskTest::do_HostMemory_test() {
 class ExecutionWithLocationMapTestWMS : public wrench::WMS {
 
 public:
-    ExecutionWithLocationMapTestWMS(OneTaskTest *test,
+    ExecutionWithLocationMapTestWMS(MultihostMulticoreComputeServiceOneTaskTest *test,
                                     const std::set<wrench::ComputeService *> &compute_services,
                                     const std::set<wrench::StorageService *> &storage_services,
                                     std::string &hostname) :
@@ -729,7 +731,7 @@ public:
 
 private:
 
-    OneTaskTest *test;
+    MultihostMulticoreComputeServiceOneTaskTest *test;
 
     int main() {
 
@@ -799,11 +801,11 @@ private:
     }
 };
 
-TEST_F(OneTaskTest, ExecutionWithLocationMap) {
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, ExecutionWithLocationMap) {
   DO_TEST_WITH_FORK(do_ExecutionWithLocationMap_test);
 }
 
-void OneTaskTest::do_ExecutionWithLocationMap_test() {
+void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithLocationMap_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -884,7 +886,7 @@ void OneTaskTest::do_ExecutionWithLocationMap_test() {
 class ExecutionWithDefaultStorageServiceTestWMS : public wrench::WMS {
 
 public:
-    ExecutionWithDefaultStorageServiceTestWMS(OneTaskTest *test,
+    ExecutionWithDefaultStorageServiceTestWMS(MultihostMulticoreComputeServiceOneTaskTest *test,
                                               const std::set<wrench::ComputeService *> &compute_services,
                                               const std::set<wrench::StorageService *> &storage_services,
                                               std::string &hostname) :
@@ -895,7 +897,7 @@ public:
 
 private:
 
-    OneTaskTest *test;
+    MultihostMulticoreComputeServiceOneTaskTest *test;
 
     int main() {
 
@@ -925,12 +927,12 @@ private:
     }
 };
 
-TEST_F(OneTaskTest, ExecutionWithDefaultStorageService) {
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, ExecutionWithDefaultStorageService) {
 
   DO_TEST_WITH_FORK(do_ExecutionWithDefaultStorageService_test);
 }
 
-void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
+void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDefaultStorageService_test() {
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
   int argc = 1;
@@ -1011,7 +1013,7 @@ void OneTaskTest::do_ExecutionWithDefaultStorageService_test() {
 class ExecutionWithPrePostCopiesAndCleanupTestWMS : public wrench::WMS {
 
 public:
-    ExecutionWithPrePostCopiesAndCleanupTestWMS(OneTaskTest *test,
+    ExecutionWithPrePostCopiesAndCleanupTestWMS(MultihostMulticoreComputeServiceOneTaskTest *test,
                                                 const std::set<wrench::ComputeService *> &compute_services,
                                                 const std::set<wrench::StorageService *> &storage_services,
                                                 std::string &hostname) :
@@ -1022,7 +1024,7 @@ public:
 
 private:
 
-    OneTaskTest *test;
+    MultihostMulticoreComputeServiceOneTaskTest *test;
 
     int main() {
 
@@ -1032,16 +1034,10 @@ private:
       // Create a job
       wrench::StandardJob *job = job_manager->createStandardJob({test->task},
                                                                 {},
-                                                                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *> {
-                                                                        test->input_file, test->storage_service1,
-                                                                        test->storage_service2}},
-                                                                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *> {
-                                                                        test->output_file, test->storage_service2,
-                                                                        test->storage_service1}},
-                                                                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *> {
-                                                                        test->input_file, test->storage_service2},
-                                                                 std::tuple<wrench::WorkflowFile *, wrench::StorageService *> {
-                                                                         test->output_file, test->storage_service2}});
+                                                                {std::make_tuple(test->input_file, test->storage_service1, test->storage_service2)},
+                                                                {std::make_tuple(test->output_file, test->storage_service2, test->storage_service1)},
+                                                                {std::make_tuple(test->input_file, test->storage_service2),
+                                                                 std::make_tuple(test->output_file, test->storage_service2)});
       // Submit the job
       job_manager->submitJob(job, test->compute_service);
 
@@ -1079,11 +1075,11 @@ private:
     }
 };
 
-TEST_F(OneTaskTest, ExecutionWithPrePostCopies) {
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, ExecutionWithPrePostCopies) {
   DO_TEST_WITH_FORK(do_ExecutionWithPrePostCopies_test)
 }
 
-void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
+void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithPrePostCopies_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -1157,6 +1153,139 @@ void OneTaskTest::do_ExecutionWithPrePostCopies_test() {
             task->getEndDate());
   ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
             task);
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+/********************************************************/
+/** EXECUTION WITH MISSING FILE  SIMULATION TEST       **/
+/********************************************************/
+
+class ExecutionWithMissingFileTestWMS : public wrench::WMS {
+
+public:
+    ExecutionWithMissingFileTestWMS(MultihostMulticoreComputeServiceOneTaskTest *test,
+                                    const std::set<wrench::ComputeService *> &compute_services,
+                                    const std::set<wrench::StorageService *> &storage_services,
+                                    std::string &hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    MultihostMulticoreComputeServiceOneTaskTest *test;
+
+    int main() {
+
+      // Create a job manager
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Remove the staged file!
+      this->test->storage_service1->deleteFile(test->input_file);
+
+      // Create a job
+      wrench::StandardJob *job = job_manager->createStandardJob({test->task},
+                                                                {},
+                                                                {},
+                                                                {},
+                                                                {});
+      // Submit the job
+      job_manager->submitJob(job, test->compute_service);
+
+      // Wait for the workflow execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+          bool success = false;
+          if (event->failure_cause->getCauseType() != wrench::FailureCause::NO_STORAGE_SERVICE_FOR_FILE) {
+            throw std::runtime_error(
+                    "Got an Standard Job Failure as expected, but it does not have the correct failure cause type");
+          }
+          auto real_cause = (wrench::NoStorageServiceForFile *) event->failure_cause.get();
+          if (real_cause->getFile() != test->input_file) {
+            throw std::runtime_error(
+                    "Got the expected failure, but the failure cause does not point to the right file");
+          }
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
+        }
+      }
+
+      // Terminate
+      this->shutdownAllServices();
+      return 0;
+    }
+};
+
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, ExecutionWithMissingFile) {
+  DO_TEST_WITH_FORK(do_ExecutionWithMissingFile_test)
+}
+
+void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithMissingFile_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  ASSERT_THROW(simulation->launch(), std::runtime_error);
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+
+  // Create another Storage Service
+  EXPECT_NO_THROW(storage_service2 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+
+
+  // Create a Compute Service with no default Storage Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                               nullptr,
+                                                               {}))));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new ExecutionWithMissingFileTestWMS(this,
+                                                                           { compute_service }, {storage_service1, storage_service2
+                                                                           }, hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Create a File Registry Service
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname));
+  EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
+
+  // Staging the input_file on storage service #1
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+  // Running a "run a single task" simulation
+  EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
 
