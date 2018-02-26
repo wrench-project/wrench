@@ -14,7 +14,7 @@
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 
-#include "TestWithFork.h"
+#include "../TestWithFork.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor_test, "Log category for Simple SandardJobExecutorTest");
 
@@ -28,9 +28,9 @@ public:
     wrench::Simulation *simulation;
 
 
-    void do_OneSingleCoreTaskTest_test();
+    void do_ConstructorTest_test();
 
-    void do_OneSingleCoreTaskNotEnoughCoresTest_test();
+    void do_OneSingleCoreTaskTest_test();
 
     void do_OneSingleCoreTaskBogusPreFileCopyTest_test();
 
@@ -65,11 +65,14 @@ protected:
               "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-              "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
+              "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
+              "         <prop id=\"ram\" value=\"1024\"/> "
+              "       </host>  "
               "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
               "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
               "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+              "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
               "   </zone> "
               "</platform>";
       // Create a four-host 10-core platform file
@@ -83,6 +86,411 @@ protected:
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
+
+
+/**********************************************************************/
+/**  DO CONSTRUCTOR TEST                                             **/
+/**********************************************************************/
+
+class ConstructorTestWMS : public wrench::WMS {
+
+public:
+    ConstructorTestWMS(StandardJobExecutorTest *test,
+                       const std::set<wrench::ComputeService *> &compute_services,
+                       const std::set<wrench::StorageService *> &storage_services,
+                       std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    StandardJobExecutorTest *test;
+
+    int main() {
+
+      // Create a job manager
+      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      std::unique_ptr<wrench::StandardJobExecutor> executor;
+
+      // Create a sequential task that lasts one hour
+      wrench::WorkflowTask *task = this->workflow->addTask("task", 3600);
+      task->addInputFile(workflow->getFileById("input_file"));
+      task->addOutputFile(workflow->getFileById("output_file"));
+
+      // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+      wrench::StandardJob *job = job_manager->createStandardJob(
+              {task},
+              {
+                      {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                      {*(task->getOutputFiles().begin()), this->test->storage_service2}
+              },
+              {},
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                      workflow->getFileById("output_file"), this->test->storage_service2,
+                      this->test->storage_service1)},
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+                                                                            this->test->storage_service2)});
+
+      std::string my_mailbox = "test_callback_mailbox";
+
+      double before = wrench::S4U_Simulation::getClock();
+      double thread_startup_overhead = 10.0;
+
+      bool success;
+
+      // Create a bogus StandardJobExecutor (nullptr job)
+      success = true;
+      try {
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        nullptr,
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job executor with a nullptr job");
+      }
+
+      // Create a bogus StandardJobExecutor (no compute resources specified)
+      success = true;
+      try {
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        job,
+                        {},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job executor with no compute resources");
+      }
+
+      // Create a bogus StandardJobExecutor (no cores resources specified)
+      success = true;
+      try {
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        job,
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 0, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job executor with zero cores on a resource");
+      }
+
+      // Create a bogus StandardJobExecutor (too many cores specified)
+      success = true;
+      try {
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        job,
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 100, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job executor with more cores than available on a resource");
+      }
+
+      // Create a bogus StandardJobExecutor (negative RAM specified)
+      success = true;
+      try {
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        job,
+                        {std::make_tuple(test->simulation->getHostnameList()[0], wrench::ComputeService::ALL_CORES, -1)},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job executor with negative RAM on a resource");
+      }
+
+      // Create a bogus StandardJobExecutor (too much RAM specified)
+      success = true;
+      try {
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        job,
+                        {std::make_tuple("Host4", wrench::ComputeService::ALL_CORES, 2048)},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job executor with more RAM than available on a resource");
+      }
+
+
+      // Create a bogus StandardJobExecutor (not enough Cores specified)
+      wrench::WorkflowTask *task_too_many_cores = this->workflow->addTask("task_too_many_cores", 3600, 20, 20, 1.0);
+      task_too_many_cores->addInputFile(workflow->getFileById("input_file"));
+      task_too_many_cores->addOutputFile(workflow->getFileById("output_file"));
+
+//        // Forget the previous job!
+        job_manager->forgetJob(job);
+
+      // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+      job = job_manager->createStandardJob(
+              {task_too_many_cores},
+              {
+                      {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                      {*(task->getOutputFiles().begin()), this->test->storage_service2}
+              },
+              {},
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                      workflow->getFileById("output_file"), this->test->storage_service2,
+                      this->test->storage_service1)},
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+                                                                            this->test->storage_service2)});
+
+      success = true;
+      try {
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        job,
+                        {std::make_tuple("Host4", wrench::ComputeService::ALL_CORES, 100.00)},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job executor with insufficient RAM to run the job");
+      }
+
+
+      // Create a bogus StandardJobExecutor (not enough RAM specified)
+
+      success = true;
+
+      wrench::WorkflowTask *task_too_much_ram = this->workflow->addTask("task_too_much_ram", 3600, 1, 1, 1.0, 500.00);
+      task_too_much_ram->addInputFile(workflow->getFileById("input_file"));
+      task_too_much_ram->addOutputFile(workflow->getFileById("output_file"));
+
+      // Forget the previous job!
+      job_manager->forgetJob(job);
+
+      // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+      job = job_manager->createStandardJob(
+              {task_too_much_ram},
+              {
+                      {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                      {*(task->getOutputFiles().begin()), this->test->storage_service2}
+              },
+              {},
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                      workflow->getFileById("output_file"), this->test->storage_service2,
+                      this->test->storage_service1)},
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+                                                                            this->test->storage_service2)});
+
+      try {
+        std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        job,
+                        {std::make_tuple("Host4", wrench::ComputeService::ALL_CORES, 100.00)},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job executor with insufficient RAM to run the job");
+      }
+
+      // Finally do one that works
+
+      // Forget the previous job!
+      job_manager->forgetJob(job);
+
+      // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+      job = job_manager->createStandardJob(
+              {task},
+              {
+                      {*(task->getInputFiles().begin()),  this->test->storage_service1},
+                      {*(task->getOutputFiles().begin()), this->test->storage_service2}
+              },
+              {},
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                      workflow->getFileById("output_file"), this->test->storage_service2,
+                      this->test->storage_service1)},
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+                                                                            this->test->storage_service2)});
+
+      success = true;
+      try {
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        job,
+                        {std::make_tuple("Host1", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (not success) {
+        throw std::runtime_error("Should  be able to create a valid standard job executor!");
+      }
+
+
+      // Wait for a message on my mailbox
+      std::unique_ptr<wrench::SimulationMessage> message;
+      try {
+        message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+      } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+        throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+      }
+
+      // Did we get the expected message?
+      auto msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+      if (!msg) {
+        throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+      }
+
+      job_manager->forgetJob(job);
+
+
+
+
+      // Terminate everything
+      this->shutdownAllServices();
+      return 0;
+    }
+};
+
+TEST_F(StandardJobExecutorTest, ConstructorTest) {
+  DO_TEST_WITH_FORK(do_ConstructorTest_test);
+}
+
+void StandardJobExecutorTest::do_ConstructorTest_test() {
+
+  // Create and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Compute Service (we don't use it)
+  wrench::ComputeService *compute_service;
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                               nullptr,
+                                                               {}))));
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+
+  // Create another Storage Service
+  EXPECT_NO_THROW(storage_service2 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new ConstructorTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname));
+
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+  // Create two workflow files
+  wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
+  wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
 
 /**********************************************************************/
 /**  ONE SINGLE-CORE TASK SIMULATION TEST ON ONE HOST                **/
@@ -133,9 +541,10 @@ private:
         std::string my_mailbox = "test_callback_mailbox";
 
         double before = wrench::S4U_Simulation::getClock();
+        double thread_startup_overhead = 10.0;
+
 
         // Create a StandardJobExecutor that will run stuff on one host and one core
-        double thread_startup_overhead = 10.0;
         std::unique_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
                         test->simulation,
@@ -251,161 +660,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
-
-  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
-
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
-
-  // Create two workflow files
-  wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
-  wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
-
-  // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
-
-
-  // Running a "run a single task" simulation
-  // Note that in these tests the WMS creates workflow tasks, which a user would
-  // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
-
-  delete simulation;
-
-  free(argv[0]);
-  free(argv);
-}
-
-/*************************************************************************/
-/**  ONE SINGLE-CORE TASK SIMULATION TEST ON ONE HOST: NOT ENOUGH CORES **/
-/*************************************************************************/
-
-class OneSingleCoreTaskNotEnoughCoresTestWMS : public wrench::WMS {
-
-public:
-    OneSingleCoreTaskNotEnoughCoresTestWMS(StandardJobExecutorTest *test,
-                                           const std::set<wrench::ComputeService *> &compute_services,
-                                           const std::set<wrench::StorageService *> &storage_services,
-                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
-      this->test = test;
-    }
-
-
-private:
-
-    StandardJobExecutorTest *test;
-
-    int main() {
-
-      // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
-
-      {
-        // Create a sequential task that lasts one hour and requires 12 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 12, 12, 1.0);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
-
-        // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
-
-        wrench::StandardJob *job = job_manager->createStandardJob(
-                {task},
-                {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service2}
-                },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service1,
-                        this->test->storage_service2)},
-                {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
-                                                                              this->test->storage_service2)});
-
-
-        std::string my_mailbox = "test_callback_mailbox";
-
-
-        // Create a StandardJobExecutor that will run stuff on one host and two core
-        double thread_startup_overhead = 10.0;
-        bool success = true;
-        std::unique_ptr<wrench::StandardJobExecutor> executor;
-        try {
-          executor = std::unique_ptr<wrench::StandardJobExecutor>(new wrench::StandardJobExecutor(
-                  test->simulation,
-                  my_mailbox,
-                  test->simulation->getHostnameList()[0],
-                  job,
-                  {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
-                  nullptr,
-                  {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
-                          thread_startup_overhead)}}
-          ));
-        } catch (std::runtime_error &e) {
-          // Expected exception
-          success = false;
-        }
-
-
-        if (success) {
-          throw std::runtime_error("Should have gotten an exception due to not enough cores");
-        }
-
-        workflow->removeTask(task);
-
-      }
-
-      // Terminate everything
-      this->shutdownAllServices();
-      return 0;
-    }
-};
-
-TEST_F(StandardJobExecutorTest, OneSingleCoreTaskNotEnoughCoresTest) {
-  DO_TEST_WITH_FORK(do_OneSingleCoreTaskNotEnoughCoresTest_test);
-}
-
-void StandardJobExecutorTest::do_OneSingleCoreTaskNotEnoughCoresTest_test() {
-
-  // Create and initialize a simulation
-  simulation = new wrench::Simulation();
-  int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("one_task_test");
-
-  simulation->init(&argc, argv);
-
-  // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-
-  // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
-
-  // Create a Compute Service (we don't use it)
-  wrench::ComputeService *compute_service;
-  EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {}))));
-  // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
-
-  // Create another Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
-
-  // Create a WMS
-  wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new OneSingleCoreTaskNotEnoughCoresTestWMS(
-                  this, {compute_service}, {storage_service1, storage_service2}, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -939,7 +1193,7 @@ private:
         auto *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
         if (!msg) {
           auto *msg = dynamic_cast<wrench::StandardJobExecutorFailedMessage *>(message.get());
-          std::cerr << msg->cause->toString() << "\n";
+          std::string error_msg = msg->cause->toString();
           throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
 
@@ -999,6 +1253,7 @@ private:
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+          std::string error_msg = cause->toString();
           throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
         }
 
@@ -1630,7 +1885,7 @@ public:
         auto *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
         if (!msg) {
           auto *msg = dynamic_cast<wrench::StandardJobExecutorFailedMessage *>(message.get());
-//          std::cerr << "----> " << msg->cause->toString() << "\n";
+          std::string error_msg = msg->cause->toString();
 
           throw std::runtime_error("Unexpected '" + msg->cause->toString() + "' error");
 

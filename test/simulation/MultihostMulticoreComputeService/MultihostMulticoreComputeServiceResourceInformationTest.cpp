@@ -128,7 +128,7 @@ private:
       if ((ram_capacities.size() != 2) or
           (fabs(ram_capacities[0] - 1024) > EPSILON) or
           (fabs(ram_capacities[1] - 2048) > EPSILON)) {
-        throw std::runtime_error("getMemoryCapacity() should return {1024,2048} or {2048,1024} for compute service #1");
+        throw std::runtime_error("getHostMemoryCapacity() should return {1024,2048} or {2048,1024} for compute service #1");
       }
 
       // Get Core flop rates

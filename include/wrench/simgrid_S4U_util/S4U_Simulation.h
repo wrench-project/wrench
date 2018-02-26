@@ -33,7 +33,7 @@ namespace wrench {
 				bool hostExists(std::string hostname);
 				static unsigned int getNumCores(std::string hostname);
 				static double getFlopRate(std::string hostname);
-				static double getMemoryCapacity(std::string hostname);
+				static double getHostMemoryCapacity(std::string hostname);
 				static double getMemoryCapacity();
 				static void compute(double);
 				static void sleep(double);

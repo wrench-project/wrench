@@ -84,7 +84,6 @@ namespace wrench {
                                                            S4U_DaemonActor(this));
       } catch (std::exception &e) {
         // Some internal SimGrid exceptions...
-        WRENCH_INFO("CRAP");
         std::abort();
       }
 

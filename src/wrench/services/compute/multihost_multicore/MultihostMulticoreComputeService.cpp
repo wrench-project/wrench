@@ -310,7 +310,7 @@ namespace wrench {
 
 
         double requested_ram = std::get<2>(host);
-        double available_ram = S4U_Simulation::getMemoryCapacity(hname);
+        double available_ram = S4U_Simulation::getHostMemoryCapacity(hname);
         if (requested_ram < 0) {
           throw std::invalid_argument(
                   "MultihostMulticoreComputeService::MultihostMulticoreComputeService(): requested ram should be non-negative");
@@ -335,7 +335,7 @@ namespace wrench {
       for (auto host : this->compute_resources) {
         this->total_num_cores += std::get<1>(host);
         this->core_and_ram_availabilities.insert(std::make_pair(std::get<0>(host), std::make_pair(std::get<1>(host),
-                                                                                                  S4U_Simulation::getMemoryCapacity(
+                                                                                                  S4U_Simulation::getHostMemoryCapacity(
                                                                                                           std::get<0>(
                                                                                                                   host)))));
       }
@@ -1593,7 +1593,7 @@ namespace wrench {
       // RAM capacity per host
       std::vector<double> ram_capacities;
       for (auto h : this->compute_resources) {
-        ram_capacities.push_back(S4U_Simulation::getMemoryCapacity(std::get<0>(h)));
+        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(std::get<0>(h)));
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 

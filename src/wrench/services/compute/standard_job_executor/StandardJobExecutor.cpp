@@ -61,8 +61,15 @@ namespace wrench {
                                              std::map<std::string, std::string> plist) :
             S4U_Daemon("standard_job_executor", "standard_job_executor") {
 
-      if ((job == nullptr) || (compute_resources.size() <= 0)) {
+      if ((job == nullptr) || (compute_resources.empty())) {
         throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): invalid arguments");
+      }
+
+      // Check that hosts exist!
+      for (auto h : compute_resources) {
+        if (not simulation->hostExists(std::get<0>(h))) {
+          throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): Host '" + std::get<0>(h) + "' does not exit!");
+        }
       }
 
       // Check that there is at least one core per host but not too many cores
@@ -87,13 +94,15 @@ namespace wrench {
           throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): the number of bytes per host should be non-negative");
         }
         if (std::get<2>(host) < ComputeService::ALL_RAM) {
-          if (std::get<2>(host) > S4U_Simulation::getMemoryCapacity(std::get<0>(host))) {
+          double host_memory_capacity = S4U_Simulation::getHostMemoryCapacity(std::get<0>(host));
+          if (std::get<2>(host) > host_memory_capacity) {
             throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
-                                                " has only " + std::to_string(S4U_Simulation::getMemoryCapacity(std::get<0>(host))) + " bytes of RAM");
+                                                " has only " + std::to_string(
+                    S4U_Simulation::getHostMemoryCapacity(std::get<0>(host))) + " bytes of RAM");
           }
         } else {
           // Set the memory to the maximum
-          std::get<2>(host) = S4U_Simulation::getMemoryCapacity(std::get<0>(host));
+          std::get<2>(host) = S4U_Simulation::getHostMemoryCapacity(std::get<0>(host));
         }
       }
 
@@ -106,21 +115,28 @@ namespace wrench {
 
       bool enough_cores = false;
       for (auto host : compute_resources) {
-        if (std::get<1>(host) >= max_min_required_num_cores) {
+        unsigned long num_cores_on_hosts = std::get<1>(host);
+        if (num_cores_on_hosts == ComputeService::ALL_CORES) {
+          num_cores_on_hosts = S4U_Simulation::getNumCores(std::get<0>(host));
+        }
+
+        if (num_cores_on_hosts >= max_min_required_num_cores) {
           enough_cores = true;
           break;
         }
       }
 
       if (!enough_cores) {
-        throw std::runtime_error("StandardJobExecutor::StandardJobExecutor(): insufficient core resources to run the job");
+        throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): insufficient core resources to run the job");
       }
+
 
       // Check that there is enough RAM to run the computational tasks
       double max_required_ram = 0.0;
       for (auto task : job->tasks) {
         max_required_ram = (max_required_ram < task->getMemoryRequirement() ? task->getMemoryRequirement() : max_required_ram);
       }
+
 
       bool enough_ram = false;
       for (auto host : compute_resources) {
@@ -130,8 +146,9 @@ namespace wrench {
         }
       }
 
+
       if (!enough_ram) {
-        throw std::runtime_error("StandardJobExecutor::StandardJobExecutor(): insufficient memory resources to run the job");
+        throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): insufficient memory resources to run the job");
       }
 
       // Set instance variables
@@ -156,22 +173,32 @@ namespace wrench {
       // Compute the total number of cores and set initial core availabilities
       this->total_num_cores = 0;
       for (auto host : compute_resources) {
-        this->total_num_cores += std::get<1>(host);
-        this->core_availabilities[std::get<0>(host)] = std::get<1>(host);
+        unsigned long num_cores = std::get<1>(host);
+        if (num_cores == ComputeService::ALL_CORES) {
+          num_cores = simulation->getHostNumCores(std::get<0>(host));
+        }
+        this->total_num_cores += num_cores;
+        this->core_availabilities.insert(std::make_pair(std::get<0>(host), num_cores));
       }
+
+
 
       // Compute the total ram and set initial ram availabilities
       this->total_ram = 0.0;
       for (auto host : compute_resources) {
-        this->total_ram += std::get<2>(host);
-        this->ram_availabilities[std::get<0>(host)] = std::get<2>(host);
+        double ram = std::get<2>(host);
+        if (ram == ComputeService::ALL_RAM) {
+          ram = simulation->getHostMemoryCapacity(std::get<0>(host));
+        }
+        this->total_ram += ram;
+        this->ram_availabilities.insert(std::make_pair(std::get<0>(host),  ram));
       }
 
       // Start the daemon
       try {
         this->start_daemon(hostname);
       } catch (std::invalid_argument &e) {
-        throw &e;
+        throw;
       }
     }
 
@@ -489,8 +516,6 @@ namespace wrench {
       }
 
       sorted_ready_workunits.clear();
-
-//      std::cerr << "RETURNING\n";
 
       return;
     }
