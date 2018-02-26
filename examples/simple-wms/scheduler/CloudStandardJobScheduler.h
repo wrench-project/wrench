@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,9 +30,8 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        virtual void scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,
-                           const std::map<std::string, std::vector<wrench::WorkflowTask *>> &tasks
-                           );
+        void scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,
+                           const std::map<std::string, std::vector<wrench::WorkflowTask *>> &tasks) override;
 
         /***********************/
         /** \endcond           */
