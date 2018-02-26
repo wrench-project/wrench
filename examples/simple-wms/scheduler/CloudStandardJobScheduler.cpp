@@ -27,8 +27,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void CloudStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
-                                       const std::map<std::string, std::vector<WorkflowTask *>> &tasks
-                                       ) {
+                                                  const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
 
       // Check that the right compute_services is passed
       if (compute_services.size() != 1) {
@@ -42,14 +41,12 @@ namespace wrench {
         throw std::runtime_error("This example Cloud Scheduler can only handle a cloud service");
       }
 
-
       // obtain list of execution hosts, if not already done
       if (this->execution_hosts.empty()) {
         this->execution_hosts = cloud_service->getExecutionHosts();
       }
 
       WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());
-      long scheduled = 0;
 
       for (auto itc : tasks) {
         //TODO add support to pilot jobs
@@ -59,7 +56,7 @@ namespace wrench {
         // Check that it can run it right now in terms of idle cores
         try {
           std::vector<unsigned long> num_idle_cores = compute_service->getNumIdleCores();
-          sum_num_idle_cores = (unsigned long)std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+          sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
         } catch (WorkflowExecutionException &e) {
           // The service has some problem, forget it
           throw std::runtime_error("Unable to get the number of idle cores.");
@@ -67,13 +64,15 @@ namespace wrench {
 
         // Decision making
         WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
-        if (sum_num_idle_cores - scheduled <= 0) {
+        unsigned long mim_num_cores = ((StandardJob *) (job))->getMinimumRequiredNumCores();
+
+        if (sum_num_idle_cores < mim_num_cores) {
           try {
             std::string pm_host = choosePMHostname();
             std::string vm_host = "vm" + std::to_string(VM_ID++) + "_" + pm_host;
 
             // TODO: provide proper VM RAM requests
-            if (cloud_service->createVM(pm_host, vm_host, ((StandardJob *) (job))->getMinimumRequiredNumCores(), 1000)) {
+            if (cloud_service->createVM(pm_host, vm_host, mim_num_cores, 1000)) {
               this->vm_list[pm_host].push_back(vm_host);
             }
 
@@ -83,7 +82,6 @@ namespace wrench {
           }
         }
         job_manager->submitJob(job, cloud_service);
-        scheduled++;
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }
@@ -111,6 +109,4 @@ namespace wrench {
 
       return min_pm.first;
     }
-
-
 }
