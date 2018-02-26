@@ -515,7 +515,7 @@ namespace wrench {
      * @return the memory capacity in bytes
      */
     double Simulation::getHostMemoryCapacity(std::string hostname) {
-      return S4U_Simulation::getMemoryCapacity(hostname);
+      return S4U_Simulation::getHostMemoryCapacity(hostname);
     }
 
     /**

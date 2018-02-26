@@ -385,11 +385,13 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void JobManager::forgetJob(WorkflowJob *job) {
+
       if (job == nullptr) {
         throw std::invalid_argument("JobManager::forgetJob(): invalid argument");
       }
 
       if (job->getType() == WorkflowJob::STANDARD) {
+
         if ((this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) ||
             (this->running_standard_jobs.find((StandardJob *) job) != this->running_standard_jobs.end())) {
           throw WorkflowExecutionException(new JobCannotBeForgotten(job));
@@ -404,6 +406,11 @@ namespace wrench {
           this->jobs.erase(job);
           return;
         }
+        // At this point, it's a job that was never submitted!
+        if (this->jobs.find(job) != this->jobs.end()) {
+          this->jobs.erase(job);
+          return;
+        }
         throw std::invalid_argument("JobManager::forgetJob(): unknown standard job");
       }
 
@@ -414,6 +421,12 @@ namespace wrench {
         }
         if (this->completed_pilot_jobs.find((PilotJob *) job) != this->completed_pilot_jobs.end()) {
           this->jobs.erase(job);
+          return;
+        }
+        // At this point, it's a job that was never submitted!
+        if (this->jobs.find(job) != this->jobs.end()) {
+          this->jobs.erase(job);
+          return;
         }
         throw std::invalid_argument("JobManager::forgetJob(): unknown pilot job");
       }

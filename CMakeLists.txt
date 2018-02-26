@@ -200,7 +200,7 @@ set(TEST_FILES
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceSchedulingTest.cpp
         test/simulation/TestWithFork.h
-        test/simulation/StandardJobExecutorTest.cpp
+        test/simulation/MultihostMulticoreComputeService/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
         test/simulation/FileRegistryTest.cpp
         test/simulation/BatchServiceTest.cpp

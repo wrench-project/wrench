@@ -2002,17 +2002,17 @@ namespace wrench {
       // RAM capacity per host
       std::vector<double> ram_capacities;
       for (auto h : this->nodes_to_cores_map) {
-        ram_capacities.push_back(S4U_Simulation::getMemoryCapacity(h.first));
+        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(h.first));
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
       // RAM availability per host  (0 if something is running, full otherwise)
       std::vector<double> ram_availabilities;
       for (auto h : this->available_nodes_to_cores) {
-        if (h.second < S4U_Simulation::getMemoryCapacity(h.first)) {
+        if (h.second < S4U_Simulation::getHostMemoryCapacity(h.first)) {
           ram_availabilities.push_back(0.0);
         } else {
-          ram_availabilities.push_back(S4U_Simulation::getMemoryCapacity(h.first));
+          ram_availabilities.push_back(S4U_Simulation::getHostMemoryCapacity(h.first));
         }
       }
 

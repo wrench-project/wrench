@@ -380,7 +380,7 @@ namespace wrench {
 
           // RAM memory management
           if (this->cs_available_ram.find(pm_hostname) == this->cs_available_ram.end()) {
-            this->cs_available_ram[pm_hostname] = S4U_Simulation::getMemoryCapacity(pm_hostname);
+            this->cs_available_ram[pm_hostname] = S4U_Simulation::getHostMemoryCapacity(pm_hostname);
           }
           if (ram_memory <= 0 || ram_memory == ComputeService::ALL_RAM) {
             ram_memory = this->cs_available_ram[pm_hostname];
@@ -605,7 +605,7 @@ namespace wrench {
       // RAM capacity per host
       std::vector<double> ram_capacities;
       for (auto &vm : this->vm_list) {
-        ram_capacities.push_back(S4U_Simulation::getMemoryCapacity(std::get<0>(vm)));
+        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(std::get<0>(vm)));
       }
       dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
@@ -641,7 +641,7 @@ namespace wrench {
 
       WRENCH_INFO("Stopping VMs Compute Service");
       for (auto &vm : this->vm_list) {
-        this->cs_available_ram[(std::get<0>(vm.second))->getPm()->getName()] += S4U_Simulation::getMemoryCapacity(
+        this->cs_available_ram[(std::get<0>(vm.second))->getPm()->getName()] += S4U_Simulation::getHostMemoryCapacity(
                 std::get<0>(vm));
         std::get<1>(vm.second)->stop();
       }
