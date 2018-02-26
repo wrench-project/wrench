@@ -141,6 +141,27 @@ private:
 
       bool success;
 
+      // Create a bogus StandardJobExecutor (invalid host)
+      success = true;
+      try {
+        executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        nullptr,
+                        {std::make_tuple("bogus", 2, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job executor with a bogus host");
+      }
+
       // Create a bogus StandardJobExecutor (nullptr job)
       success = true;
       try {
@@ -393,7 +414,6 @@ private:
       if (not success) {
         throw std::runtime_error("Should  be able to create a valid standard job executor!");
       }
-
 
       // Wait for a message on my mailbox
       std::unique_ptr<wrench::SimulationMessage> message;
