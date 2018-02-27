@@ -47,51 +47,6 @@ namespace wrench {
         ComputeService *compute_service;
     };
 
-    /**
-     * @brief MulticoreComputeServiceTTLRequestMessage class
-     */
-    class MulticoreComputeServiceTTLRequestMessage : public MulticoreComputeServiceMessage {
-    public:
-        MulticoreComputeServiceTTLRequestMessage(std::string answer_mailbox, double payload);
-
-        /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
-    };
-
-    /**
-     * @brief MulticoreComputeServiceTTLAnswerMessage class
-     */
-    class MulticoreComputeServiceTTLAnswerMessage : public MulticoreComputeServiceMessage {
-    public:
-        MulticoreComputeServiceTTLAnswerMessage(double ttl, double payload);
-
-        /** @brief The time-to-live */
-        double ttl;
-    };
-
-    /**
-     * @brief MulticoreComputeServiceFlopRateRequestMessage class
-     */
-    class MulticoreComputeServiceFlopRateRequestMessage : public MulticoreComputeServiceMessage {
-    public:
-        MulticoreComputeServiceFlopRateRequestMessage(std::string answer_mailbox, double payload);
-
-        /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
-    };
-
-    /**
-     * @brief MulticoreComputeServiceFlopRateAnswerMessage class
-     */
-    class MulticoreComputeServiceFlopRateAnswerMessage : public MulticoreComputeServiceMessage {
-    public:
-        MulticoreComputeServiceFlopRateAnswerMessage(double flop_rate, double payload);
-
-        /** @brief The flop rate */
-        double flop_rate;
-    };
-
-
 
     /***********************/
     /** \endcond           */
