@@ -71,7 +71,7 @@ namespace wrench {
 
       serviceSanityCheck();
 
-      // send a "get execution hosts" message to the daemon's mailbox
+      // send a "get execution hosts" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_execution_hosts");
 
       try {
@@ -121,7 +121,7 @@ namespace wrench {
 
       serviceSanityCheck();
 
-      // send a "create vm" message to the daemon's mailbox
+      // send a "create vm" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
 
       try {
@@ -166,7 +166,7 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
-      //  send a "run a standard job" message to the daemon's mailbox
+      //  send a "run a standard job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceSubmitStandardJobRequestMessage(
@@ -211,7 +211,7 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
 
-      // Send a "run a pilot job" message to the daemon's mailbox
+      // Send a "run a pilot job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(
                 this->mailbox_name,
@@ -253,7 +253,7 @@ namespace wrench {
     int CloudService::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
-      WRENCH_INFO("Cloud Service starting on host %s listening on mailbox %s", this->hostname.c_str(),
+      WRENCH_INFO("Cloud Service starting on host %s listening on mailbox_name %s", this->hostname.c_str(),
                   this->mailbox_name.c_str());
 
       /** Main loop **/

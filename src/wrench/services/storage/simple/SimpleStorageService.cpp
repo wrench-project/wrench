@@ -110,7 +110,7 @@ namespace wrench {
 
       while (should_continue) {
 
-        // Post a recv on my standard mailbox in case there is none pending
+        // Post a recv on my standard mailbox_name in case there is none pending
         if (should_add_incoming_control_connection) {
           this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
                   new NetworkConnection(NetworkConnection::INCOMING_CONTROL, nullptr, this->mailbox_name, "")
@@ -310,7 +310,7 @@ namespace wrench {
         this->occupied_space += file->getSize();
       }
 
-      // Generate a mailbox name on which to receive the file
+      // Generate a mailbox_name name on which to receive the file
       std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
 
       // Reply with a "go ahead, send me the file" message
@@ -438,7 +438,7 @@ namespace wrench {
                   file->getId().c_str(),
                   src->getName().c_str());
 
-      // Create a unique mailbox on which to receive the file
+      // Create a unique mailbox_name on which to receive the file
       std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
 
       // Initiate an ASYNCHRONOUS file read from the source

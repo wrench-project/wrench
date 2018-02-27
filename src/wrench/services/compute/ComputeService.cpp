@@ -420,7 +420,7 @@ namespace wrench {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      // send a "info request" message to the daemon's mailbox
+      // send a "info request" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_service_info");
 
       try {

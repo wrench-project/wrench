@@ -2358,7 +2358,7 @@ private:
         // Wait for a fake job submission reply
         std::unique_ptr<wrench::SimulationMessage> message = nullptr;
         try {
-          std::cout << "Listening to mailbox " << this->workflow->getCallbackMailbox() << "\n";
+          std::cout << "Listening to mailbox_name " << this->workflow->getCallbackMailbox() << "\n";
           message = wrench::S4U_Mailbox::getMessage(this->workflow->getCallbackMailbox());
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
           throw wrench::WorkflowExecutionException(cause);
@@ -2539,7 +2539,7 @@ private:
           // Wait for a fake job submission reply
           std::unique_ptr<wrench::SimulationMessage> message = nullptr;
           try {
-            std::cout << "Listening to mailbox " << this->workflow->getCallbackMailbox() << "\n";
+            std::cout << "Listening to mailbox_name " << this->workflow->getCallbackMailbox() << "\n";
             message = wrench::S4U_Mailbox::getMessage(this->workflow->getCallbackMailbox());
           } catch (std::shared_ptr<wrench::NetworkError> &cause) {
             throw wrench::WorkflowExecutionException(cause);

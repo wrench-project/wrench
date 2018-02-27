@@ -44,7 +44,7 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
-      //  send a "run a standard job" message to the daemon's mailbox
+      //  send a "run a standard job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceSubmitStandardJobRequestMessage(
@@ -102,7 +102,7 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
 
-      // Send a "run a pilot job" message to the daemon's mailbox
+      // Send a "run a pilot job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(
                 this->mailbox_name,
@@ -726,7 +726,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      // Push my own mailbox onto the pilot job!
+      // Push my own mailbox_name onto the pilot job!
       job->pushCallbackMailbox(this->mailbox_name);
 
       // Tell the caller that a job was dispatched!
@@ -1129,7 +1129,7 @@ namespace wrench {
       // Am I myself a pilot job?
       if (notify_pilot_job_submitters && this->containing_pilot_job) {
 
-        WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox %s",
+        WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox_name %s",
                     this->containing_pilot_job->getCallbackMailbox().c_str());
         // NOTE: This is synchronous so that the process doesn't fall off the end
         try {
@@ -1192,7 +1192,7 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_standard_job");
 
-      //  send a "terminate a standard job" message to the daemon's mailbox
+      //  send a "terminate a standard job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceTerminateStandardJobRequestMessage(
@@ -1238,7 +1238,7 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_pilot_job");
 
-      // Send a "terminate a pilot job" message to the daemon's mailbox
+      // Send a "terminate a pilot job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceTerminatePilotJobRequestMessage(
@@ -1386,7 +1386,7 @@ namespace wrench {
 //    /**
 //     * @brief Process a get number of cores request
 //     *
-//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     * @param answer_mailbox: the mailbox_name to which the answer message should be sent
 //     *
 //     * @throw std::runtime_error
 //     */
@@ -1405,7 +1405,7 @@ namespace wrench {
 //    /**
 //     * @brief Process a get number of idle cores request
 //     *
-//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     * @param answer_mailbox: the mailbox_name to which the answer message should be sent
 //     */
 //    void MultihostMulticoreComputeService::processGetNumIdleCores(const std::string &answer_mailbox) {
 //      unsigned long num_available_cores = 0;

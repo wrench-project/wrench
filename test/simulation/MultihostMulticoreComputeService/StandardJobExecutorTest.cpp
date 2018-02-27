@@ -415,7 +415,7 @@ private:
         throw std::runtime_error("Should  be able to create a valid standard job executor!");
       }
 
-      // Wait for a message on my mailbox
+      // Wait for a message on my mailbox_name
       std::unique_ptr<wrench::SimulationMessage> message;
       try {
         message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -577,7 +577,7 @@ private:
                                 thread_startup_overhead)}}
                 ));
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -783,7 +783,7 @@ private:
         }
 
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -969,7 +969,7 @@ private:
           throw std::runtime_error("Should have been able to create standard job executor!");
         }
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -1139,7 +1139,7 @@ private:
                 ));
 
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -1201,7 +1201,7 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -1268,7 +1268,7 @@ private:
                                 thread_startup_overhead)}}
                 ));
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -1442,7 +1442,7 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -1527,7 +1527,7 @@ private:
                 ));
 
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -1612,7 +1612,7 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -1808,7 +1808,7 @@ public:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
@@ -1893,7 +1893,7 @@ public:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
 
-        // Wait for a message on my mailbox
+        // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);

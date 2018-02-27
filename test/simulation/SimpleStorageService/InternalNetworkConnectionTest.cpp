@@ -63,28 +63,28 @@ void InternalNetworkConnectionTest::do_Constructor_test() {
   EXPECT_THROW(conn = new wrench::NetworkConnection(5, nullptr, "", ""), std::invalid_argument);
   EXPECT_THROW(conn = new wrench::NetworkConnection(6, nullptr, "", ""), std::invalid_argument);
 
-  // Empty mailbox
+  // Empty mailbox_name
   EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, file, "", "ack"), std::invalid_argument);
 
   // Empty file
-  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, nullptr, "mailbox", "ack"), std::invalid_argument);
-  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, nullptr, "mailbox", ""), std::invalid_argument);
+  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, nullptr, "mailbox_name", "ack"), std::invalid_argument);
+  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, nullptr, "mailbox_name", ""), std::invalid_argument);
 
-  // Ack mailbox should be empty
-  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, nullptr, "mailbox", "ack"), std::invalid_argument);
-  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, nullptr, "mailbox", "ack"), std::invalid_argument);
+  // Ack mailbox_name should be empty
+  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, nullptr, "mailbox_name", "ack"), std::invalid_argument);
+  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, nullptr, "mailbox_name", "ack"), std::invalid_argument);
 
   // Non-Empty file
-  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, file, "mailbox", ""), std::invalid_argument);
+  EXPECT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, file, "mailbox_name", ""), std::invalid_argument);
 
-  EXPECT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, nullptr, "mailbox", ""));
+  EXPECT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, nullptr, "mailbox_name", ""));
   delete conn;
-  EXPECT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, file, "mailbox", "ack"));
+  EXPECT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, file, "mailbox_name", "ack"));
   delete conn;
-  EXPECT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, file, "mailbox", ""));
+  EXPECT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, file, "mailbox_name", ""));
   delete conn;
 
-  EXPECT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, file, "mailbox", ""));
+  EXPECT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, file, "mailbox_name", ""));
   EXPECT_THROW(conn->getMessage(), std::runtime_error);
   delete conn;
 

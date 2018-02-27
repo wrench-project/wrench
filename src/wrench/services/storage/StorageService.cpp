@@ -692,7 +692,7 @@ namespace wrench {
                                  message->getName() + "] message!");
       }
 
-      WRENCH_INFO("File read request accepted (will receive file content on mailbox %s)",
+      WRENCH_INFO("File read request accepted (will receive file content on mailbox_name %s)",
                   mailbox_that_should_receive_file_content.c_str());
       // At this point, the file should show up at some point on the mailbox_that_should_receive_file_content
       return;

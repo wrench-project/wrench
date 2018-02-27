@@ -258,7 +258,7 @@ namespace wrench {
       auto *batch_job = new BatchJob(job, jobid, time_asked_for,
                                      num_hosts, num_cores_per_host, -1, S4U_Simulation::getClock());
 
-      // Send a "run a batch job" message to the daemon's mailbox
+      // Send a "run a batch job" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
@@ -391,7 +391,7 @@ namespace wrench {
       auto *batch_job = new BatchJob(job, jobid, time_asked_for,
                                      nodes_asked_for, num_cores_per_hosts, -1, S4U_Simulation::getClock());
 
-      //  send a "run a batch job" message to the daemon's mailbox
+      //  send a "run a batch job" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_pilot_job_mailbox");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
@@ -877,7 +877,7 @@ namespace wrench {
  */
     void BatchService::notifyJobSubmitters(PilotJob *job) {
 
-      WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox %s",
+      WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox_name %s",
                   job->getCallbackMailbox().c_str());
       try {
         S4U_Mailbox::putMessage(job->popCallbackMailbox(),
@@ -906,7 +906,7 @@ namespace wrench {
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_pilot_job");
 
-      // Send a "terminate a pilot job" message to the daemon's mailbox
+      // Send a "terminate a pilot job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceTerminatePilotJobRequestMessage(answer_mailbox, job,
@@ -1696,7 +1696,7 @@ namespace wrench {
           this->pilot_job_alarms.push_back(
                   std::move(alarm_ptr));
 
-          // Push my own mailbox onto the pilot job!
+          // Push my own mailbox_name onto the pilot job!
 //          job->pushCallbackMailbox(this->mailbox_name);
 
           return;
@@ -1904,7 +1904,7 @@ namespace wrench {
 //                this->pilot_job_alarms.push_back(
 //                        std::move(alarm_ptr));
 //
-//                // Push my own mailbox onto the pilot job!
+//                // Push my own mailbox_name onto the pilot job!
 ////          job->pushCallbackMailbox(this->mailbox_name);
 //
 //                return;
