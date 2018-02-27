@@ -153,16 +153,11 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
   EXPECT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, compute_service, true, failure_cause, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, compute_service, false, nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::ComputeServiceNumCoresRequestMessage("mailbox_name", 666));
-  EXPECT_THROW(new wrench::ComputeServiceNumCoresRequestMessage("", 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::ComputeServiceNumCoresAnswerMessage(42, 666));
+  EXPECT_NO_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("mailbox_name", 666));
+  EXPECT_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("", 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::ComputeServiceNumIdleCoresRequestMessage("mailbox_name", 666));
-  EXPECT_THROW(new wrench::ComputeServiceNumIdleCoresRequestMessage("", 666), std::invalid_argument);
-
-  EXPECT_NO_THROW(new wrench::ComputeServiceNumIdleCoresAnswerMessage(42, 666));
-
+  EXPECT_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::make_pair("something", std::vector<double>({2.3, 4.5}))}, 666));
 
 }
 
@@ -171,18 +166,6 @@ TEST_F(MessageConstructorTest, MulticoreComputeServiceMessages) {
   EXPECT_NO_THROW(new wrench::MulticoreComputeServiceNotEnoughCoresMessage(workflow_job, compute_service, 666));
   EXPECT_THROW(new wrench::MulticoreComputeServiceNotEnoughCoresMessage(nullptr, compute_service, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::MulticoreComputeServiceNotEnoughCoresMessage(workflow_job, nullptr, 666), std::invalid_argument);
-
-  EXPECT_NO_THROW(new wrench::MulticoreComputeServiceTTLRequestMessage("mailbox_name", 666));
-  EXPECT_THROW(new wrench::MulticoreComputeServiceTTLRequestMessage("", 666), std::invalid_argument);
-
-  EXPECT_NO_THROW(new wrench::MulticoreComputeServiceTTLAnswerMessage(0.1, 666));
-
-  EXPECT_NO_THROW(new wrench::MulticoreComputeServiceFlopRateRequestMessage("mailbox_name", 666));
-  EXPECT_THROW(new wrench::MulticoreComputeServiceFlopRateRequestMessage("", 666), std::invalid_argument);
-
-  EXPECT_NO_THROW(new wrench::MulticoreComputeServiceFlopRateAnswerMessage(0.1, 666));
-  EXPECT_THROW(new wrench::MulticoreComputeServiceFlopRateAnswerMessage(-0.1, 666), std::invalid_argument);
-
 }
 
 
