@@ -110,7 +110,7 @@ namespace wrench {
 
       WRENCH_INFO("Telling the daemon listening on (%s) to terminate", this->mailbox_name.c_str());
 
-      // Send a termination message to the daemon's mailbox - SYNCHRONOUSLY
+      // Send a termination message to the daemon's mailbox_name - SYNCHRONOUSLY
       std::string ack_mailbox = S4U_Mailbox::generateUniqueMailboxName("stop");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,

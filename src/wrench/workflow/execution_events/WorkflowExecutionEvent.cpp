@@ -34,7 +34,7 @@ namespace wrench {
      */
     std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
 
-      // Get the message from the mailbox
+      // Get the message from the mailbox_name
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(mailbox);

@@ -153,10 +153,10 @@ namespace wrench {
 
       // Send the callback
       if (success) {
-        WRENCH_INFO("Notifying mailbox %s that work has completed",
+        WRENCH_INFO("Notifying mailbox_name %s that work has completed",
                     this->callback_mailbox.c_str());
       } else {
-        WRENCH_INFO("Notifying mailbox %s that work has failed",
+        WRENCH_INFO("Notifying mailbox_name %s that work has failed",
                     this->callback_mailbox.c_str());
       }
 

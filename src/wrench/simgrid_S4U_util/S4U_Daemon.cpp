@@ -94,7 +94,7 @@ namespace wrench {
       this->s4u_actor->onExit(daemon_goodbye, (void *) (this->process_name.c_str()));
 
 
-      // Set the mailbox receiver
+      // Set the mailbox_name receiver
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
       mailbox->setReceiver(this->s4u_actor);
 

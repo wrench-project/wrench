@@ -40,7 +40,7 @@ namespace wrench {
      *
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name) {
-      WRENCH_DEBUG("Getting a message from mailbox '%s'", mailbox_name.c_str());
+      WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox_name.c_str());
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       SimulationMessage *msg = nullptr;
       try {
@@ -61,7 +61,7 @@ namespace wrench {
 
       //Remove this message from the message manager list
       MessageManager::removeReceivedMessages(mailbox_name,msg);
-      WRENCH_DEBUG("Received a '%s' message from mailbox %s", msg->getName().c_str(), mailbox_name.c_str());
+      WRENCH_DEBUG("Received a '%s' message from mailbox_name %s", msg->getName().c_str(), mailbox_name.c_str());
       return std::unique_ptr<SimulationMessage>(msg);
     }
 
@@ -77,7 +77,7 @@ namespace wrench {
      * @throw std::shared_ptr<FatalFailure>
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name, double timeout) {
-      WRENCH_DEBUG("Getting a message from mailbox '%s' with timeout %lf sec", mailbox_name.c_str(), timeout);
+      WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox_name.c_str(), timeout);
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       void *data = nullptr;
       try {
@@ -105,7 +105,7 @@ namespace wrench {
       //Remove this message from the message manager list
       MessageManager::removeReceivedMessages(mailbox_name,msg);
 
-      WRENCH_INFO("Received a '%s' message from mailbox '%s'", msg->getName().c_str(), mailbox_name.c_str());
+      WRENCH_INFO("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
 
       return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -120,7 +120,7 @@ namespace wrench {
      * @throw std::shared_ptr<FatalFailure>
      */
     void S4U_Mailbox::putMessage(std::string mailbox_name, SimulationMessage *msg) {
-      WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to mailbox '%s'",
+      WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to mailbox_name '%s'",
                    msg->getName().c_str(), msg->payload,
                    mailbox_name.c_str());
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
@@ -152,7 +152,7 @@ namespace wrench {
      */
     void S4U_Mailbox::dputMessage(std::string mailbox_name, SimulationMessage *msg) {
 
-      WRENCH_DEBUG("Dputting a %s message (%.2lf bytes) to mailbox '%s'",
+      WRENCH_DEBUG("Dputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                    msg->getName().c_str(), msg->payload,
                    mailbox_name.c_str());
 
@@ -190,7 +190,7 @@ namespace wrench {
     */
     std::unique_ptr<S4U_PendingCommunication> S4U_Mailbox::iputMessage(std::string mailbox_name, SimulationMessage *msg) {
 
-      WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to mailbox '%s'",
+      WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                    msg->getName().c_str(), msg->payload,
                    mailbox_name.c_str());
 
@@ -208,7 +208,7 @@ namespace wrench {
       } catch (std::exception &e) {
         throw std::shared_ptr<FatalFailure>(new FatalFailure());
       }
-      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication());
+      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication(mailbox_name));
       pending_communication->comm_ptr = comm_ptr;
       return pending_communication;
     }
@@ -227,9 +227,9 @@ namespace wrench {
 
       simgrid::s4u::CommPtr comm_ptr = nullptr;
 
-      WRENCH_DEBUG("Igetting a message from mailbox '%s'", mailbox_name.c_str());
+      WRENCH_DEBUG("Igetting a message from mailbox_name '%s'", mailbox_name.c_str());
 
-      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication());
+      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication(mailbox_name));
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       try {

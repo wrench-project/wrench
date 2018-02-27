@@ -50,7 +50,7 @@ namespace wrench {
       // Check whether the WMS has a deferred start time
       checkDeferredStart();
 
-      WRENCH_INFO("Starting on host %s listening on mailbox %s",
+      WRENCH_INFO("Starting on host %s listening on mailbox_name %s",
                   S4U_Simulation::getHostName().c_str(),
                   this->mailbox_name.c_str());
       WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());

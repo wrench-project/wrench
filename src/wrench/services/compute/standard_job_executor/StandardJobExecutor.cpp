@@ -422,7 +422,7 @@ namespace wrench {
         std::string target_host = "";
         unsigned long target_num_cores = 0;
 
-        WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and required %.2lf bytes of RAM",
+        WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2lf bytes of RAM",
                     minimum_num_cores, desired_num_cores, required_ram);
         std::string host_selection_algorithm =
                 this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);

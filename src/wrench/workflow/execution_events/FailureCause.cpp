@@ -266,7 +266,7 @@ namespace wrench {
       } else {
         operation = "receiving from";
       }
-      return "Network error (link failure, or communication peer died) while " + operation + " mailbox " + this->mailbox;
+      return "Network error (link failure, or communication peer died) while " + operation + " mailbox_name " + this->mailbox;
     };
 
     /**
@@ -312,7 +312,7 @@ namespace wrench {
       } else {
         operation = "receiving from";
       }
-      return "Network timeout while " + operation + " mailbox " + this->mailbox;
+      return "Network timeout while " + operation + " mailbox_name " + this->mailbox;
     };
 
     /**

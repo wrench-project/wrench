@@ -25,7 +25,7 @@ namespace wrench {
     /** @brief This is a simple wrapper class around S4U */
     class S4U_PendingCommunication {
     public:
-        S4U_PendingCommunication();
+        S4U_PendingCommunication(std::string mailbox);
 
         std::unique_ptr<SimulationMessage> wait();
 
@@ -39,6 +39,7 @@ namespace wrench {
 
         simgrid::s4u::CommPtr comm_ptr;
         SimulationMessage *simulation_message;
+        std::string mailbox_name;
     };
 
     /** \endcond */

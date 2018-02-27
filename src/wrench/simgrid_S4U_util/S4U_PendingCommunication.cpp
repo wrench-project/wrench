@@ -36,8 +36,11 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           WRENCH_INFO("Network error while doing a dputMessage()");
+//          throw std::shared_ptr<NetworkError>(
+//                  new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName()));throw std::shared_ptr<NetworkError>(
+          // TODO: Why isn't the above working anymore???
           throw std::shared_ptr<NetworkError>(
-                  new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName()));
+                  new NetworkError(NetworkError::RECEIVING, this->mailbox_name));
         } else {
           throw std::runtime_error(
                   "S4U_PendingCommunication::wait(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
@@ -130,7 +133,7 @@ namespace wrench {
     /**
      * @brief Constructor
      */
-    S4U_PendingCommunication::S4U_PendingCommunication() {
+    S4U_PendingCommunication::S4U_PendingCommunication(std::string mailbox) : mailbox_name(mailbox) {
     }
 
 

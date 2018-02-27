@@ -30,7 +30,7 @@ namespace wrench {
       this->ack_mailbox = ack_mailbox;
 
       if (this->mailbox.empty()) {
-        throw std::invalid_argument("NetworkConnection::NetworkConnection(): empty mailbox");
+        throw std::invalid_argument("NetworkConnection::NetworkConnection(): empty mailbox_name");
       }
       if (type == NetworkConnection::INCOMING_DATA or this->type == NetworkConnection::OUTGOING_DATA) {
         if (this->file == nullptr) {
@@ -67,7 +67,7 @@ namespace wrench {
           }
           break;
         case NetworkConnection::OUTGOING_DATA:
-        WRENCH_INFO("Asynchronously sending file %s to mailbox %s...",
+        WRENCH_INFO("Asynchronously sending file %s to mailbox_name %s...",
                     this->file->getId().c_str(), this->mailbox.c_str() );
           try {
             this->comm = S4U_Mailbox::iputMessage(this->mailbox, new

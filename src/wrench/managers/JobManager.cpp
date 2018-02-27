@@ -247,7 +247,7 @@ namespace wrench {
 //        throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
 //      }
 //
-//      // Push back the mailbox of the manager,
+//      // Push back the mailbox_name of the manager,
 //      // so that it will getMessage the initial callback
 //      job->pushCallbackMailbox(this->mailbox_name);
 //
@@ -298,7 +298,7 @@ namespace wrench {
         throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
       }
 
-      // Push back the mailbox of the manager,
+      // Push back the mailbox_name of the manager,
       // so that it will getMessage the initial callback
       job->pushCallbackMailbox(this->mailbox_name);
 
