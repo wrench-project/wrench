@@ -267,7 +267,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_Noop_test() {
   ASSERT_THROW(simulation->launch(), std::runtime_error);
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create a WMS
   ASSERT_THROW(simulation->launch(), std::runtime_error);
@@ -584,7 +584,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_StandardJobConstructor_test
   // Create a Storage Service
   storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname1, 10000000000000.0, ULONG_MAX)));
+                  new wrench::SimpleStorageService(hostname1, 10000000000000.0)));
 
   // Start a file registry service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -697,7 +697,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_HostMemory_test() {
   // Create a Storage Service
   storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname1, 10000000000000.0, ULONG_MAX)));
+                  new wrench::SimpleStorageService(hostname1, 10000000000000.0)));
 
   // Start a file registry service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -843,7 +843,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithLocationMap_te
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create a File Registry Service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(
@@ -965,7 +965,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDefaultStorage
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -1113,12 +1113,12 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithPrePostCopies_
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create another Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
 
   // Create a Compute Service with default Storage Service #2
@@ -1263,12 +1263,12 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithMissingFile_te
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create another Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
 
   // Create a Compute Service with no default Storage Service
@@ -1397,12 +1397,12 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create another Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
 
   // Create a Compute Service with no default Storage Service
@@ -1531,12 +1531,12 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_t
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create another Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
 
   // Create a Compute Service with no default Storage Service
@@ -1672,7 +1672,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDownService_te
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create a File Registry Service
   std::unique_ptr<wrench::FileRegistryService> file_registry_service(

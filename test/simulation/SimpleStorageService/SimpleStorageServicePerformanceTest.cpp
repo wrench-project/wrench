@@ -180,10 +180,10 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   // Create Two Storage Services
   EXPECT_NO_THROW(storage_service_1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE, ULONG_MAX))));
+                  new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE))));
   EXPECT_NO_THROW(storage_service_2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("DstHost", STORAGE_SIZE, ULONG_MAX))));
+                  new wrench::SimpleStorageService("DstHost", STORAGE_SIZE))));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

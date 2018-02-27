@@ -200,7 +200,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -331,7 +331,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -463,7 +463,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -600,7 +600,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -719,7 +719,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -855,7 +855,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -1001,7 +1001,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -1146,7 +1146,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -1297,7 +1297,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(

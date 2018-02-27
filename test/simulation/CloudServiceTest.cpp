@@ -181,7 +181,7 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
@@ -307,7 +307,7 @@ void CloudServiceTest::do_PilotJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
@@ -428,7 +428,7 @@ void CloudServiceTest::do_NumCoresTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0, ULONG_MAX))));
+          std::unique_ptr<wrench::SimpleStorageService>(new wrench::SimpleStorageService(hostname, 100.0))));
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};

@@ -36,5 +36,7 @@ namespace wrench {
 
     SET_PROPERTY_NAME(StorageServiceProperty, NOT_ENOUGH_STORAGE_SPACE_MESSAGE_PAYLOAD);
 
+    SET_PROPERTY_NAME(StorageServiceProperty, MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+
 };
 

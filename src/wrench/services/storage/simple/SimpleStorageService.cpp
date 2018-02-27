@@ -44,15 +44,17 @@ namespace wrench {
      *
      * @param hostname: the name of the host on which to start the service
      * @param capacity: the storage capacity in bytes
-     * @param num_concurrent_connections: the maximum number of concurrent connections (use ULONG_MAX for no limit)
      * @param plist: a property list ({} means "use all defaults")
      */
     SimpleStorageService::SimpleStorageService(std::string hostname,
                                                double capacity,
-                                               unsigned long num_concurrent_connections,
                                                std::map<std::string, std::string> plist) :
             SimpleStorageService(std::move(hostname), capacity, plist, "_" + std::to_string(getNewUniqueNumber())) {
-      this->num_concurrent_connections = num_concurrent_connections;
+      if (this->getPropertyValueAsString("MAX_NUM_CONCURRENT_DATA_CONNECTIONS") == "infinity") {
+        this->num_concurrent_connections = ULONG_MAX;
+      } else {
+      this->num_concurrent_connections = (unsigned long) (this->getPropertyValueAsDouble("MAX_NUM_CONCURRENT_DATA_CONNECTIONS"));
+      }
       this->network_connection_manager =  std::unique_ptr<NetworkConnectionManager>(
               new NetworkConnectionManager(this->num_concurrent_connections));
 
@@ -84,6 +86,7 @@ namespace wrench {
       for (auto p : plist) {
         this->setProperty(p.first, p.second);
       }
+
     }
 
     /**
