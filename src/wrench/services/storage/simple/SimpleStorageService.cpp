@@ -7,6 +7,8 @@
  * (at your option) any later version.
  */
 
+#include <climits>
+
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/ServiceMessage.h"
 #include "services/storage/StorageServiceMessage.h"
@@ -16,6 +18,7 @@
 #include "wrench/workflow/WorkflowFile.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/services/storage/simple/NetworkConnectionManager.h"
+
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service, "Log category for Simple Storage Service");
 
