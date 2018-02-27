@@ -46,6 +46,7 @@ namespace wrench {
                  {SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                  {SimpleStorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD,   "1024"},
                  {SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD,    "1024"},
+                 {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS,  "infinity"},
                 };
 
     public:
@@ -53,7 +54,6 @@ namespace wrench {
         // Public Constructor
         SimpleStorageService(std::string hostname,
                              double capacity,
-                             unsigned long num_concurrent_connections,
                              std::map<std::string, std::string> = {});
 
         /***********************/

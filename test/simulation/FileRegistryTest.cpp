@@ -228,12 +228,12 @@ void FileRegistryTest::do_FileRegistry_Test() {
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0, ULONG_MAX))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

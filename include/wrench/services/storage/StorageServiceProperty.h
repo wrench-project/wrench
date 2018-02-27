@@ -59,6 +59,9 @@ namespace wrench {
         /** @brief The number of bytes in the control message sent by the daemon to say "not enough space" **/
         DECLARE_PROPERTY_NAME(NOT_ENOUGH_STORAGE_SPACE_MESSAGE_PAYLOAD);
 
+        /** @brief The maximum number of concurrent data connections supported by the service (default = "infinity") **/
+        DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+
     };
 
 };

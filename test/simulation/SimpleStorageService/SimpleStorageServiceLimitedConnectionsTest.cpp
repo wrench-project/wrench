@@ -206,17 +206,17 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
   // Create a Local storage service with unlimited connections
   EXPECT_NO_THROW(storage_service_wms = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE, ULONG_MAX))));
+                  new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE))));
 
   // Create a Storage service with unlimited connections
   EXPECT_NO_THROW(storage_service_1 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("Host1", STORAGE_SIZE, ULONG_MAX))));
+                  new wrench::SimpleStorageService("Host1", STORAGE_SIZE))));
 
   // Create a Storage Service limited to 3 connections
   EXPECT_NO_THROW(storage_service_2 = simulation->add(
           std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("Host2", STORAGE_SIZE, 3))));
+                  new wrench::SimpleStorageService("Host2", STORAGE_SIZE, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}}))));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
