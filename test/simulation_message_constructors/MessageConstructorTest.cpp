@@ -12,7 +12,6 @@
 
 #include "wrench/workflow/Workflow.h"
 #include "../../src/wrench/services/file_registry/FileRegistryMessage.h"
-#include "../../src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "../../src/wrench/services/storage/StorageServiceMessage.h"
 #include "../../src/wrench/services/compute/cloud/CloudServiceMessage.h"
@@ -159,13 +158,6 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 
   EXPECT_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::make_pair("something", std::vector<double>({2.3, 4.5}))}, 666));
 
-}
-
-TEST_F(MessageConstructorTest, MulticoreComputeServiceMessages) {
-
-  EXPECT_NO_THROW(new wrench::MulticoreComputeServiceNotEnoughCoresMessage(workflow_job, compute_service, 666));
-  EXPECT_THROW(new wrench::MulticoreComputeServiceNotEnoughCoresMessage(nullptr, compute_service, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::MulticoreComputeServiceNotEnoughCoresMessage(workflow_job, nullptr, 666), std::invalid_argument);
 }
 
 

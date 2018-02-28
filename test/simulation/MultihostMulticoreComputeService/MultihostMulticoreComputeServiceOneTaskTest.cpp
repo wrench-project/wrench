@@ -345,9 +345,13 @@ private:
       } catch (std::invalid_argument &e) {
         success = false;
       }
+
       if (success) {
         throw std::runtime_error("Should not be able to create a job with an empty task");
       }
+
+
+
 
       // Create a job with an empty vector of tasks (and no file copies)
       success = true;
@@ -758,6 +762,12 @@ private:
       job = job_manager->createStandardJob(test->task,
                                            {{test->input_file,  test->storage_service1},
                                             {test->output_file, test->storage_service1}});
+
+      // Get the job type as a string
+      std::string job_type_as_string = job->getTypeAsString();
+      if (job_type_as_string != "Standard") {
+        throw std::runtime_error("Job type as a string should be 'Standard'");
+      }
 
       // Submit the job
       job_manager->submitJob(job, test->compute_service);
