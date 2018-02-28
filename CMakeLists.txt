@@ -145,8 +145,6 @@ set(SOURCE_FILES
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/compute/ComputeServiceMessage.cpp
-        src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.cpp
-        src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.h
         src/wrench/services/storage/StorageServiceMessage.cpp
         src/wrench/services/storage/StorageServiceMessage.h
         src/wrench/services/file_registry/FileRegistryMessage.cpp

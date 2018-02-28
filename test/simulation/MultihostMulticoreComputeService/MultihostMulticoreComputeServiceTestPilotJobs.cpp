@@ -233,6 +233,11 @@ private:
       // Create a pilot job that requires 1 host, 1 core per host, 0 bytes of RAM per host, and 1 hour
       wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 3600);
 
+      std::string job_type_as_string = pilot_job->getTypeAsString();
+      if (job_type_as_string != "Pilot") {
+        throw std::runtime_error("Job type as string should be 'Pilot'");
+      }
+
       // Submit a pilot job
       try {
         job_manager->submitJob(pilot_job, this->test->compute_service);
