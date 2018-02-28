@@ -493,8 +493,8 @@ namespace wrench {
             if (coverage != 1.0) {
                 throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_COMMUNICATION_COVERAGE value "
                                             + this->getPropertyValueAsString(
-                        NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE +
-                        " for NETWORK_PROXIMITY_SERVICE_TYPE: " + network_service_type));
+                        NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE) +
+                        " for NETWORK_PROXIMITY_SERVICE_TYPE: " + network_service_type);
             }
         } else if (boost::iequals(network_service_type, "vivaldi")) {
             if (coverage <= 0 || coverage > 1) {
