@@ -270,7 +270,7 @@ namespace wrench {
 //
 //      // Submit the job to the service
 //      try {
-//        compute_service->runJob(job);
+//        compute_service->submitJob(job);
 //        job->setParentComputeService(compute_service);
 //      } catch (WorkflowExecutionException &e) {
 //        throw;
@@ -321,7 +321,7 @@ namespace wrench {
 
       // Submit the job to the service
       try {
-        compute_service->runJob(job, service_specific_args);
+        compute_service->submitJob(job, service_specific_args);
         job->setParentComputeService(compute_service);
       } catch (WorkflowExecutionException &e) {
         throw;

@@ -47,7 +47,7 @@ namespace wrench {
 
         void stop() override;
 
-        void runJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args = {});
+        void submitJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args = {});
 
         void terminateJob(WorkflowJob *job);
 
@@ -72,17 +72,17 @@ namespace wrench {
         StorageService *getDefaultStorageService();
 
         virtual void
-        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments);
+        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
-        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments);
+        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual void terminateStandardJob(StandardJob *job);
+        virtual void terminateStandardJob(StandardJob *job) = 0;
 
-        virtual void terminatePilotJob(PilotJob *job);
+        virtual void terminatePilotJob(PilotJob *job) = 0;
 
         ComputeService(std::string hostname,
                        std::string service_name,
@@ -93,16 +93,12 @@ namespace wrench {
 
     protected:
 
-        virtual void processGetResourceInformation(const std::string &answer_mailbox);
+//        virtual void processGetResourceInformation(const std::string &answer_mailbox) = 0;
 
-//        virtual void processGetNumCores(const std::string &answer_mailbox);
+//        virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+//                                              std::map<std::string, std::string> &service_specific_args) = 0;
 //
-//        virtual void processGetNumIdleCores(const std::string &answer_mailbox);
-
-        virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-                                              std::map<std::string, std::string> &service_specific_args);
-
-        virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
+//        virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) = 0;
 
         /** @brief Whether the compute service supports pilot jobs */
         bool supports_pilot_jobs;

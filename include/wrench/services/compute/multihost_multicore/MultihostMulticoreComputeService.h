@@ -201,12 +201,12 @@ namespace wrench {
 
         void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
 
-        void processGetResourceInformation(const std::string &answer_mailbox) override;
+        void processGetResourceInformation(const std::string &answer_mailbox);
 
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-                                      std::map<std::string, std::string> &service_specific_arguments) override;
+                                      std::map<std::string, std::string> &service_specific_arguments);
 
-        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) override;
+        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
     };
 };
 

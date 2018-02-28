@@ -245,6 +245,28 @@ namespace wrench {
       }
     }
 
+
+    /**
+     * @brief Terminate a standard job to the compute service (virtual)
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
+    void CloudService::terminateStandardJob(StandardJob *job) {
+      throw std::runtime_error("CloudService::terminateStandardJob(): Not implemented yet!");
+    }
+
+    /**
+     * @brief Terminate a pilot job to the compute service (virtual)
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
+    void CloudService::terminatePilotJob(PilotJob *job) {
+      throw std::runtime_error("CloudService::terminatePilotJob(): Not implemented yet!");
+    }
+
+
     /**
     * @brief Main method of the daemon
     *
@@ -646,4 +668,6 @@ namespace wrench {
         std::get<1>(vm.second)->stop();
       }
     }
+
+
 }
