@@ -27,6 +27,8 @@ public:
 
     void do_CompareNetworkProximity_Test();
 
+    void do_ValidateNetworkProximityServiceProperties_Test();
+
 protected:
     NetworkProximityTest() {
 
@@ -84,7 +86,7 @@ protected:
 };
 
 /**********************************************************************/
-/**  SIMPLE PROXIMITY TEST                                            **/
+/**  SIMPLE PROXIMITY TEST                                           **/
 /**********************************************************************/
 
 class ProxTestWMS : public wrench::WMS {
@@ -212,6 +214,12 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                                               {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "BOGUS"}})),
                std::invalid_argument);
 
+    EXPECT_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
+            new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                                 {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.5"}})),
+                 std::invalid_argument);
+
   EXPECT_NO_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
           new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
                                               {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
@@ -226,7 +234,6 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   free(argv[0]);
   free(argv);
 }
-
 
 /**********************************************************************/
 /**  COMPARE PROXIMITY TEST                                          **/
