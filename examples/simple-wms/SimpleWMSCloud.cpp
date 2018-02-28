@@ -135,8 +135,8 @@ int main(int argc, char **argv) {
   std::vector<std::string> hostname_list_copy(hostname_list);
   std::string hostname_copy(hostname_list[0]);
   wrench::NetworkProximityService *NPS = new wrench::NetworkProximityService(hostname_copy, hostname_list_copy, {
-          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "vivaldi"},
-          {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"},
+          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "alltoall"},
+          {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.4"},
           {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "0"},
           {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}});
 
