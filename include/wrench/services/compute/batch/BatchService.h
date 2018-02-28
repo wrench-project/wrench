@@ -158,13 +158,17 @@ namespace wrench {
 
         std::string convertResourcesToJsonString(std::set<std::tuple<std::string, unsigned long, double>>);
 
-        //submits the standard job
-        //overriden function of parent Compute Service
+        //submits a standard job
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) override;
 
-        //submits the standard job
-        //overriden function of parent Compute Service
+        //submits a standard job
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &batch_job_args) override;
+
+        // terminate a standard job
+        void terminateStandardJob(StandardJob *job) override;
+
+        // terminate a pilot job
+        void terminatePilotJob(PilotJob *job) override;
 
         int main() override;
 
@@ -172,7 +176,7 @@ namespace wrench {
 
         bool dispatchNextPendingJob();
 
-        void processGetResourceInformation(const std::string &answer_mailbox) override;
+        void processGetResourceInformation(const std::string &answer_mailbox);
 
         void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
 
@@ -185,8 +189,6 @@ namespace wrench {
         void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
 
         void terminateRunningStandardJob(StandardJob *job);
-
-        void terminatePilotJob(PilotJob *job) override;
 
         std::set<std::tuple<std::string, unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
                                                                         unsigned long, unsigned long, double);

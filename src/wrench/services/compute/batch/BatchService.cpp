@@ -424,11 +424,20 @@ namespace wrench {
       return;
     }
 
-/**
- * @brief Main method of the daemon
- *
- * @return 0 on termination
- */
+    /**
+     * @brief Terminate a standard job submitted to the compute service
+     * @param job: the job
+     */
+    void BatchService::terminateStandardJob(StandardJob *job) {
+      throw std::runtime_error("BatchService::terminateStandardJob(): Not implemented yet!");
+    }
+
+
+    /**
+     * @brief Main method of the daemon
+     *
+     * @return 0 on termination
+     */
     int BatchService::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);

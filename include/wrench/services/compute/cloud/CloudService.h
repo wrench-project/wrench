@@ -71,6 +71,9 @@ namespace wrench {
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
+        void terminateStandardJob(StandardJob *job) override;
+        void terminatePilotJob(PilotJob *job) override;
+
         /***********************/
         /** \endcond          **/
         /***********************/
@@ -93,7 +96,7 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void processGetResourceInformation(const std::string &answer_mailbox) override;
+        void processGetResourceInformation(const std::string &answer_mailbox);
 
         void processGetExecutionHosts(const std::string &answer_mailbox);
 
@@ -107,9 +110,9 @@ namespace wrench {
                              std::map<std::string, std::string> plist);
 
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-                                      std::map<std::string, std::string> &service_specific_args) override;
+                                      std::map<std::string, std::string> &service_specific_args);
 
-        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) override;
+        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
 
         void terminate();
 

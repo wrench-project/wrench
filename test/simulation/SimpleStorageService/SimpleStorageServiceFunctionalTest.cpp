@@ -765,7 +765,7 @@ private:
 
       // Do the file copy for a file that's not there
 
-      // First delete the file to avoid the (already there error)
+      // First delete the file (we used to have an "already there" error)
       this->test->storage_service_1000->deleteFile(this->test->file_500);
 
       success = true;

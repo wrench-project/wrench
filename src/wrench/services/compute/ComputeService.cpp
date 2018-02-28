@@ -47,10 +47,10 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    void ComputeService::runJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args) {
+    void ComputeService::submitJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args) {
 
       if (job == nullptr) {
-        throw std::invalid_argument("ComputeService::runJob(): invalid argument");
+        throw std::invalid_argument("ComputeService::submitJob(): invalid argument");
       }
 
       if (this->state == ComputeService::DOWN) {
@@ -313,85 +313,62 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Submit a standard job to a batch service (virtual)
-     * @param job: the job
-     * @param service_specific_arguments: arguments specific for the compute service
-     *
-     * @throw std::runtime_error
-     */
-    void ComputeService::submitStandardJob(StandardJob *job,
-                                           std::map<std::string, std::string> &service_specific_arguments) {
-      throw std::runtime_error("ComputeService::submitStandardJob(): Not implemented here");
-    }
-
-    /**
-    * @brief Submit a pilot job to a batch service (virtual)
-    * @param job: the job
-    * @param service_specific_arguments: arguments specific for the compute service
-    *
-    * @throw std::runtime_error
-    */
-    void ComputeService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) {
-      throw std::runtime_error("ComputeService::submitPilotJob(): Not implemented here");
-    }
-
-    /**
-     * @brief Process a submit standard job request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param job: the job
-     * @param service_specific_arguments: arguments specific for the compute service
-     *
-     * @throw std::runtime_error
-     */
-    void ComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-                                                  std::map<std::string, std::string> &service_specific_args) {
-      throw std::runtime_error("ComputeService::processSubmitStandardJob(): Not implemented here");
-    }
-
-    /**
-     * @brief Process a submit pilot job request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param job: the job
-     *
-     * @throw std::runtime_error
-     */
-    void ComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) {
-      throw std::runtime_error("ComputeService::processSubmitPilotJob(): Not implemented here");
-    }
-
-    /**
-     * @brief Process a get resource description request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     *
-     * @throw std::runtime_error
-     */
-    void ComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
-      throw std::runtime_error("ComputeService::processGetResourceInformation(): Not implemented here");
-    }
-
-    /**
-    * @brief Terminate a standard job to the compute service (virtual)
-    * @param job: the job
-    *
-    * @throw std::runtime_error
-    */
-    void ComputeService::terminateStandardJob(StandardJob *job) {
-      throw std::runtime_error("ComputeService::terminateStandardJob(): Not implemented here");
-    }
-
-    /**
-     * @brief Terminate a pilot job to the compute service (virtual)
-     * @param job: the job
-     *
-     * @throw std::runtime_error
-     */
-    void ComputeService::terminatePilotJob(PilotJob *job) {
-      throw std::runtime_error("ComputeService::terminatePilotJob(): Not implemented here");
-    }
+////    /**
+////     * @brief Process a submit standard job request
+////     *
+////     * @param answer_mailbox: the mailbox to which the answer message should be sent
+////     * @param job: the job
+////     * @param service_specific_arguments: arguments specific for the compute service
+////     *
+////     * @throw std::runtime_error
+////     */
+////    void ComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+////                                                  std::map<std::string, std::string> &service_specific_args) {
+////      throw std::runtime_error("ComputeService::processSubmitStandardJob(): Not implemented here");
+////    }
+////
+////    /**
+////     * @brief Process a submit pilot job request
+////     *
+////     * @param answer_mailbox: the mailbox to which the answer message should be sent
+////     * @param job: the job
+////     *
+////     * @throw std::runtime_error
+////     */
+////    void ComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) {
+////      throw std::runtime_error("ComputeService::processSubmitPilotJob(): Not implemented here");
+////    }
+////
+//    /**
+//     * @brief Process a get resource description request
+//     *
+//     * @param answer_mailbox: the mailbox to which the answer message should be sent
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void ComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
+//      throw std::runtime_error("ComputeService::processGetResourceInformation(): Not implemented here");
+//    }
+//
+//    /**
+//    * @brief Terminate a standard job to the compute service (virtual)
+//    * @param job: the job
+//    *
+//    * @throw std::runtime_error
+//    */
+//    void ComputeService::terminateStandardJob(StandardJob *job) {
+//      throw std::runtime_error("ComputeService::terminateStandardJob(): Not implemented here");
+//    }
+//
+//    /**
+//     * @brief Terminate a pilot job to the compute service (virtual)
+//     * @param job: the job
+//     *
+//     * @throw std::runtime_error
+//     */
+//    void ComputeService::terminatePilotJob(PilotJob *job) {
+//      throw std::runtime_error("ComputeService::terminatePilotJob(): Not implemented here");
+//    }
 
 
     /**
@@ -445,7 +422,7 @@ namespace wrench {
 
       } else {
         throw std::runtime_error(
-                "MultihostMulticoreComputeService::getResourceDescription(): unexpected [" + msg->getName() + "] message");
+                "MultihostMulticoreComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() + "] message");
       }
     }
 };
