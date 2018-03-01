@@ -294,15 +294,16 @@ namespace wrench {
           storage_service->start();
         }
 
+        // Start the network proximity services
+        for (const auto &network_proximity_service : this->network_proximity_services) {
+          network_proximity_service->start();
+        }
+
         // Start the file registry service
         if (this->file_registry_service) {
           this->file_registry_service->start();
         }
 
-        // Start the network proximity service
-        if (this->network_proximity_service) {
-          this->network_proximity_service->start();
-        }
       } catch (std::runtime_error &e) {
         throw;
       }
@@ -333,6 +334,32 @@ namespace wrench {
       this->compute_services.insert(std::move(service));
       return raw_ptr;
     }
+
+    /**
+     * @brief Add a NetworkProximityService to the simulation
+     *
+     * @param service: a network proximity service
+     *
+     * @return the network proximity service
+     *
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    NetworkProximityService *Simulation::add(std::unique_ptr<NetworkProximityService> service) {
+      if (service == nullptr) {
+        throw std::invalid_argument("Simulation::add(): invalid arguments");
+      }
+      if (not this->s4u_simulation->isInitialized()) {
+        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
+      }
+      NetworkProximityService *raw_ptr = service.get();
+
+      service->setSimulation(this);
+      // Add a unique ptr to the list of Compute Services
+      this->network_proximity_services.insert(std::move(service));
+      return raw_ptr;
+    }
+
 
     /**
     * @brief Add a StorageService to the simulation
@@ -398,19 +425,46 @@ namespace wrench {
       this->file_registry_service = std::move(file_registry_service);
     }
 
+//    /**
+//     * @brief Set a NetworkProximityService for the simulation
+//     *
+//     * @param network_proximity_service: a network proximity service
+//     *
+//     * @throw std::invalid_argument
+//     */
+//    void Simulation::setNetworkProximityService(std::unique_ptr<NetworkProximityService> network_proximity_service) {
+//      if (network_proximity_service == nullptr) {
+//        throw std::invalid_argument("Simulation::setNetworkProximityService(): invalid arguments");
+//      }
+//      this->terminator->registerNetworkProximityService(network_proximity_service.get());
+//      this->network_proximity_service = std::move(network_proximity_service);
+//    }
+
     /**
-     * @brief Set a NetworkProximityService for the simulation
+     * @brief Retrieves all running network proximity services on the platform
      *
-     * @param network_proximity_service: a network proximity service
-     *
-     * @throw std::invalid_argument
+     * @return a vector of network proximity services
      */
-    void Simulation::setNetworkProximityService(std::unique_ptr<NetworkProximityService> network_proximity_service) {
-      if (network_proximity_service == nullptr) {
-        throw std::invalid_argument("Simulation::setNetworkProximityService(): invalid arguments");
+    std::set<NetworkProximityService *> Simulation::getRunningNetworkProximityServices() {
+      std::set<NetworkProximityService *> set = {};
+      for (auto it = this->network_proximity_services.begin(); it != this->network_proximity_services.end(); it++) {
+        if ((*it)->state == Service::UP) {
+          set.insert((*it).get());
+        }
       }
-      this->terminator->registerNetworkProximityService(network_proximity_service.get());
-      this->network_proximity_service = std::move(network_proximity_service);
+      return set;
+    }
+
+    /**
+    * @brief Shutdown all running network proximity services on the platform
+    */
+    void Simulation::shutdownAllNetworkProximityServices() {
+
+      for (auto it = this->network_proximity_services.begin(); it != this->network_proximity_services.end(); it++) {
+        if ((*it)->state == Service::UP) {
+          (*it)->stop();
+        }
+      }
     }
 
     /**
@@ -419,17 +473,9 @@ namespace wrench {
      * @return a file registry service, or nullptr
      */
     FileRegistryService *Simulation::getFileRegistryService() {
-      return this->file_registry_service ? this->file_registry_service.get() : nullptr;
+      return this->file_registry_service.get();
     }
 
-    /**
-     * @brief Retrieves the NetworkProximityService
-     *
-     * @return a network proximity service, or nullptr
-     */
-    NetworkProximityService *Simulation::getNetworkProximityService() {
-      return this->network_proximity_service ? this->network_proximity_service.get() : nullptr;
-    }
 
     /**
      * @brief Stage a copy of a file on a storage service

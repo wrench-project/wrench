@@ -92,6 +92,7 @@ namespace wrench {
      */
     void Terminator::shutdownStorageService(std::set<StorageService *> storage_services) {
       for (auto storage_service : storage_services) {
+        WRENCH_INFO("Shutting down storage service %s", storage_service->getName().c_str());
         this->shutdownStorageService(storage_service);
       }
     }
@@ -138,19 +139,24 @@ namespace wrench {
      *
      * @param network_proximity_service: a pointer to a NetworkProximityService
      */
-    void Terminator::registerNetworkProximityService(NetworkProximityService *network_proximity_service) {
-      this->registerService(this->network_proximity_services, network_proximity_service);
+    void Terminator::registerNetworkProximityService(std::set<NetworkProximityService *> network_proximity_services) {
+      for (auto nps : network_proximity_services) {
+        this->registerService(this->network_proximity_services, nps);
+      }
     }
 
     /**
      * @brief Shutdown a NetworkProximityService. If the FileRegistryService has only one reference it will be stopped,
      * otherwise the counter is decreased
      *
-     * @param network_proximity_service: a pointer to a NetworkProximityService to be stopped
+     * @param network_proximity_services: a set of NetworkProximityServices to be stopped
      */
-    void Terminator::shutdownNetworkProximityService(NetworkProximityService *network_proximity_service) {
-      if (this->shutdownService(this->network_proximity_services, network_proximity_service)) {
-        WRENCH_INFO("Terminator shut down network proximity service: %s", network_proximity_service->getName().c_str());
+    void Terminator::shutdownNetworkProximityService(std::set<NetworkProximityService *> network_proximity_services) {
+      for (auto nps : network_proximity_services) {
+        if (this->shutdownService(this->network_proximity_services, nps)) {
+          WRENCH_INFO("Terminator shut down network proximity service: %s",
+                      nps->getName().c_str());
+        }
       }
     }
 

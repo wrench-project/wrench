@@ -1269,7 +1269,7 @@ private:
       this->simulation->getTerminator()->shutdownComputeService(this->compute_services);
       this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
       this->simulation->getTerminator()->shutdownNetworkProximityService(
-              this->simulation->getNetworkProximityService());
+              this->simulation->getRunningNetworkProximityServices());
       return 0;
     }
 };

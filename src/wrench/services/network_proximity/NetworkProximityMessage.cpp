@@ -70,12 +70,12 @@ namespace wrench {
 
     /**
      * @brief NextContactDaemonRequestMessage class
-     * @param answer_mailbox: the mailbox to return the request to
+     * @param damone: the network proximity daemon to return the request to
      * @param payload: the message size in bytes
      */
-    NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(std::string answer_mailbox, double payload) :
+    NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(NetworkProximityDaemon *daemon, double payload) :
             NetworkProximityMessage("NEXT_CONTACT_DAEMON_REQUEST", payload) {
-        this->answer_mailbox = answer_mailbox;
+        this->daemon = daemon;
     }
 
     /**
@@ -96,8 +96,33 @@ namespace wrench {
      * @param message_to_transfer: the message to transfer to measure proximity
      * @param payload: the message size in bytes
      */
-    NetworkProximityTransferMessage::NetworkProximityTransferMessage(std::string message_to_transfer,double payload) :
+    NetworkProximityTransferMessage::NetworkProximityTransferMessage(double payload) :
             NetworkProximityMessage("NETWORK_PROXIMITY_TRANSFER", payload) {
-        this->message_to_transfer = message_to_transfer;
+    }
+
+    /**
+     * @brief CoordinateLookupRequestMessage class
+     * @param the mailbox to return the answer to
+     * @param requested_host: the host whose coordinates are being requested
+     * @param payload: the message size in bytes
+     */
+    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string answer_mailbox, std::string requested_host, double payload) :
+            NetworkProximityMessage("COORDINATE_LOOKUP_REQUEST", payload) {
+        this->answer_mailbox = answer_mailbox;
+        this->requested_host = requested_host;
+    }
+
+    /**
+     * @brief CoordinateLookupAnswerMessage class
+     * @param requested_host: the host whose coordinates are being requested
+     * @param xy_coordinate: the (x,y) coordinate corresponding to the requested_host
+     * @param payload: the message size in bytes
+     */
+    CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(std::string requested_host,
+                                                                 std::pair<double, double> xy_coordinate,
+                                                                 double payload) :
+            NetworkProximityMessage("COORDINATE_LOOKUP_ANSWER", payload) {
+        this->requested_host = requested_host;
+        this->xy_coordinate = xy_coordinate;
     }
 }

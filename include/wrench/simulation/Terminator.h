@@ -55,9 +55,9 @@ namespace wrench {
 
         void shutdownFileRegistryService(FileRegistryService *file_registry_service);
 
-        void registerNetworkProximityService(NetworkProximityService *network_proximity_service);
+        void registerNetworkProximityService(std::set<NetworkProximityService *> network_proximity_services);
 
-        void shutdownNetworkProximityService(NetworkProximityService *network_proximity_service);
+        void shutdownNetworkProximityService(std::set<NetworkProximityService *> network_proximity_service);
 
     private:
 

@@ -102,11 +102,12 @@ namespace wrench {
                       (e.getCause()->toString().c_str()));
           continue;
         }
-
         if (this->abort || workflow->isDone()) {
           break;
         }
       }
+
+      S4U_Simulation::sleep(10);
 
       WRENCH_INFO("--------------------------------------------------------");
       if (workflow->isDone()) {
@@ -122,6 +123,9 @@ namespace wrench {
 
       WRENCH_INFO("Simple WMS Daemon is shutting all services");
       this->shutdownAllServices();
+
+      WRENCH_INFO("Simple WMS Daemon is shutting down the Network Proximity Service");
+      this->simulation->shutdownAllNetworkProximityServices();
 
       /***
        *** NO NEED TO stop/kill the Managers (will soon be out of scope, and
