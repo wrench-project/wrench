@@ -116,6 +116,7 @@ TEST_F(WorkflowTaskTest, StateToString) {
   EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::RUNNING), "RUNNING");
   EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::COMPLETED), "COMPLETED");
   EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::FAILED), "FAILED");
+  EXPECT_EQ(wrench::WorkflowTask::stateToString((wrench::WorkflowTask::State)100), "UNKNOWN STATE");
 }
 
 
