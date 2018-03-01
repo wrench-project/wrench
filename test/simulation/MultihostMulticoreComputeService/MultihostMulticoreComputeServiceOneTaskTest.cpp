@@ -210,6 +210,8 @@ private:
 
     int main() {
 
+      wrench::TerminalOutput::disableColor(); // just for increasing stupid coverage
+
       // Create a job manager
       std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
