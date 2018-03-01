@@ -47,6 +47,10 @@ namespace wrench {
             Service(hostname, "network_proximity", "network_proximity") {
 
         this->hosts_in_network = std::move(hosts_in_network);
+		
+		if (this->hosts_in_network.size() < 2) {
+			throw std::invalid_argument("NetworkProximityService requires at least 2 hosts to run");
+		}
 
         this->setProperties(default_property_values, plist);
 
