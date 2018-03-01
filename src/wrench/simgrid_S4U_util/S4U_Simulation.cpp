@@ -115,7 +115,7 @@ namespace wrench {
      * @return true or false
      */
     bool S4U_Simulation::hostExists(std::string hostname) {
-      return (simgrid::s4u::Host::by_name(hostname) != nullptr);
+      return (simgrid::s4u::Host::by_name_or_null(hostname) != nullptr);
     }
 
     /**

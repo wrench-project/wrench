@@ -149,7 +149,7 @@ private:
                         test->simulation,
                         my_mailbox,
                         test->simulation->getHostnameList()[0],
-                        nullptr,
+                        job,
                         {std::make_tuple("bogus", 2, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
