@@ -33,8 +33,8 @@ namespace wrench {
 				/** @brief The name of the host on which the daemon is running */
 				std::string hostname;
 
-				S4U_Daemon(std::string process_name, std::string mailbox_prefix);
-				S4U_Daemon(std::string process_name);
+				S4U_Daemon(std::string process_name_prefix, std::string mailbox_prefix);
+				S4U_Daemon(std::string process_name_prefix);
 
 				virtual ~S4U_Daemon();
 

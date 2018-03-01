@@ -18,6 +18,7 @@
 
 namespace wrench {
 
+    class WMS;
 		class Workflow;
 		class WorkflowTask;
 		class WorkflowFile;
@@ -39,7 +40,6 @@ namespace wrench {
 
 		public:
 
-				JobManager(Workflow *workflow);
 
 				~JobManager();
 
@@ -62,7 +62,7 @@ namespace wrench {
 								                               StorageService *> file_locations);
 
 				PilotJob *createPilotJob(Workflow *workflow, unsigned long num_hosts,
-				                         unsigned long num_cores_per_hosts, double duration);
+				                         unsigned long num_cores_per_hosts, double ram_per_host, double duration);
 
 //				void submitJob(WorkflowJob *job, ComputeService *compute_service);
 
@@ -76,6 +76,12 @@ namespace wrench {
 
 				std::set<PilotJob *> getRunningPilotJobs();
 
+		protected:
+
+				friend class WMS;
+
+				JobManager(WMS *wms);
+
 		private:
 
 				/***********************/
@@ -85,7 +91,7 @@ namespace wrench {
 				int main();
 
 				// Relevant workflow
-				Workflow *workflow;
+				WMS *wms;
 
 				// Job map
 				std::map<WorkflowJob*, std::unique_ptr<WorkflowJob>> jobs;

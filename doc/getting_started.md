@@ -40,9 +40,9 @@ description file](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html)
 
 **SimGrid virtual platform description file:** 
 Any [SimGrid](http://simgrid.gforge.inria.fr) simulation must be provided with the description 
-of the platform on which an application exeuction is to be simulates. This is done via
-a platform desctription file that includes 
-definitions of compute hosts, clusters of hosts, storage resources, network links, routes between hosts, etc.
+of the platform on which an application execution is to be simulates. This is done via
+a platform description file that includes definitions of compute hosts, clusters of hosts, 
+storage resources, network links, routes between hosts, etc.
 A detailed description on how to create a platform description file can be found
 [here](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html).
 

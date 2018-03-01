@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,8 @@ namespace wrench {
       // Create the S4U simulation wrapper
       this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
 
+      // create the simulation terminator daemon
+      this->terminator = std::unique_ptr<Terminator>(new Terminator());
     }
 
     /**
@@ -138,9 +140,9 @@ namespace wrench {
      *
      * @return true or false
      */
-     bool Simulation::hostExists(std::string hostname) {
-       return this->s4u_simulation->hostExists(hostname);
-     }
+    bool Simulation::hostExists(std::string hostname) {
+      return this->s4u_simulation->hostExists(hostname);
+    }
 
     /**
      * @brief Launch the simulation
@@ -189,12 +191,20 @@ namespace wrench {
       }
 
       // Check that there is a WMS
-      if (not this->wms) {
+      if (this->wmses.empty()) {
         throw std::runtime_error(
                 "A WMS should have been instantiated and passed to Simulation.setWMS()");
       }
-      if (not this->hostExists(wms->getHostname())) {
-        throw std::runtime_error("A WMS cannot be started on host '" + wms->getHostname() + "'");
+
+
+      for (auto it = this->wmses.begin(); it != this->wmses.end(); ++it) {
+        auto wms = it->get();
+        if (not this->hostExists(wms->getHostname())) {
+          throw std::runtime_error("A WMS cannot be started on host '" + wms->getHostname() + "'");
+        }
+        if (wms->getWorkflow() == nullptr) {
+          throw std::runtime_error("The WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
+        }
       }
 
       // Check that at least one ComputeService is created, and that all services are on valid hosts
@@ -205,7 +215,8 @@ namespace wrench {
           break;
         }
         if (not this->hostExists(compute_service->getHostname())) {
-          throw std::runtime_error("A ComputeService cannot be started on host '" + compute_service->getHostname() + "'");
+          throw std::runtime_error(
+                  "A ComputeService cannot be started on host '" + compute_service->getHostname() + "'");
         }
       }
       if (!one_compute_service_running) {
@@ -213,46 +224,52 @@ namespace wrench {
                 "At least one ComputeService should have been instantiated add passed to Simulation.add()");
       }
 
-      // Check that at least one StorageService is running (only needed if there are files in the workflow),
-      // and that each StorageService is on a valid host
-      if (!this->wms->workflow->getFiles().empty()) {
-        bool one_storage_service_running = false;
-        for (const auto &storage_service : this->storage_services) {
-          if (storage_service->state == Service::UP) {
-            one_storage_service_running = true;
-          }
-          if (not this->hostExists(storage_service->getHostname())) {
-            WRENCH_INFO("HOST DOES NOT EXIST: %s", storage_service->getHostname().c_str());
-            throw std::runtime_error("A StorageService cannot be started on host '" + storage_service->getHostname() + "'");
-          }
-        }
-        if (!one_storage_service_running) {
-          throw std::runtime_error(
-                  "At least one StorageService should have been instantiated add passed to Simulation.add()");
-        }
-      }
+      for (auto it = this->wmses.begin(); it != this->wmses.end(); ++it) {
+        auto wms = it->get();
 
-      // Check that a FileRegistryService is running if needed, and is on a valid host
-      if (!this->wms->workflow->getInputFiles().empty()) {
-        if (not this->file_registry_service) {
-          throw std::runtime_error(
-                  "A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()"
-                          "because there are workflow input files to be staged.");
+        // Check that at least one StorageService is running (only needed if there are files in the workflow),
+        // and that each StorageService is on a valid host
+        if (not wms->workflow->getFiles().empty()) {
+          bool one_storage_service_running = false;
+          for (const auto &storage_service : this->storage_services) {
+            if (not this->hostExists(storage_service->getHostname())) {
+              WRENCH_INFO("HOST DOES NOT EXIST: %s", storage_service->getHostname().c_str());
+              throw std::runtime_error(
+                      "A StorageService cannot be started on host '" + storage_service->getHostname() + "'");
+            }
+            if (storage_service->state == Service::UP) {
+              one_storage_service_running = true;
+              break;
+            }
+          }
+          if (not one_storage_service_running) {
+            throw std::runtime_error(
+                    "At least one StorageService should have been instantiated add passed to Simulation.add()");
+          }
         }
-        if (not this->hostExists(file_registry_service->getHostname())) {
-          throw std::runtime_error("A FileRegistry service cannot be started on host '" + file_registry_service->getHostname() + "'");
-        }
-      }
 
-      // Check that each input file is staged somewhere
-      for (auto f : this->wms->workflow->getInputFiles()) {
-        if (this->file_registry_service->entries.find(f) == this->file_registry_service->entries.end()) {
-          throw std::runtime_error(
-                  "Workflow input file " + f->getId() + " is not staged on any storage service!");
+        // Check that a FileRegistryService is running if needed, and is on a valid host
+        if (not wms->workflow->getInputFiles().empty()) {
+          if (not this->file_registry_service) {
+            throw std::runtime_error(
+                    "A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()"
+                            "because there are workflow input files to be staged.");
+          }
+          if (not this->hostExists(file_registry_service->getHostname())) {
+            throw std::runtime_error(
+                    "A FileRegistry service cannot be started on host '" + file_registry_service->getHostname() + "'");
+          }
+        }
+
+        // Check that each input file is staged somewhere
+        for (auto f : wms->workflow->getInputFiles()) {
+          if (this->file_registry_service->entries.find(f.second) == this->file_registry_service->entries.end()) {
+            throw std::runtime_error(
+                    "Workflow input file " + f.second->getId() + " is not staged on any storage service!");
+          }
         }
       }
     }
-
 
     /**
      * @brief Start all services
@@ -261,11 +278,11 @@ namespace wrench {
      */
     void Simulation::start_all_processes() {
 
-
       try {
-
-        // Start the WMS
-        this->wms->start();
+        // Start the WMSes
+        for (auto it = this->wmses.begin(); it != this->wmses.end(); ++it) {
+          it->get()->start();
+        }
 
         // Start the compute services
         for (const auto &compute_service : this->compute_services) {
@@ -290,7 +307,6 @@ namespace wrench {
       } catch (std::runtime_error &e) {
         throw;
       }
-
     }
 
     /**
@@ -314,6 +330,7 @@ namespace wrench {
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
+      this->terminator->registerComputeService(service.get());
       this->compute_services.insert(std::move(service));
       return raw_ptr;
     }
@@ -364,30 +381,33 @@ namespace wrench {
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
+      this->terminator->registerStorageService(service.get());
       this->storage_services.insert(std::move(service));
       return raw_ptr;
     }
 
     /**
-     * @brief Set a WMS for the simulation
+     * @brief Add a WMS for the simulation
      *
      * @param wms: a WMS
-     * @return the WMS
+     * @return a pointer to the WMS
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    WMS *Simulation::setWMS(std::unique_ptr<WMS> wms) {
+    WMS *Simulation::add(std::unique_ptr<WMS> wms) {
       if (wms == nullptr) {
-        throw std::invalid_argument("Simulation::setWMS(): invalid arguments");
+        throw std::invalid_argument("Simulation::addWMS(): invalid arguments");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::setWMS(): Simulation is not initialized");
       }
+      WMS *raw_ptr = wms.get();
 
       wms->setSimulation(this);
-      this->wms = std::move(wms);
-      return this->wms.get();
+      // Add a unique ptr to the list of WMSes
+      this->wmses.insert(std::move(wms));
+      return raw_ptr;
     }
 
     /**
@@ -401,9 +421,9 @@ namespace wrench {
       if (file_registry_service == nullptr) {
         throw std::invalid_argument("Simulation::setFileRegistryService(): invalid arguments");
       }
+      this->terminator->registerFileRegistryService(file_registry_service.get());
       this->file_registry_service = std::move(file_registry_service);
     }
-
 
 //    /**
 //     * @brief Set a NetworkProximityService for the simulation
@@ -416,64 +436,9 @@ namespace wrench {
 //      if (network_proximity_service == nullptr) {
 //        throw std::invalid_argument("Simulation::setNetworkProximityService(): invalid arguments");
 //      }
+//      this->terminator->registerNetworkProximityService(network_proximity_service.get());
 //      this->network_proximity_service = std::move(network_proximity_service);
 //    }
-
-
-
-    /**
-     * @brief Obtain the list of compute services
-     *
-     * @return a vector of compute services
-     */
-    std::set<ComputeService *> Simulation::getRunningComputeServices() {
-      std::set<ComputeService *> set = {};
-      for (auto it = this->compute_services.begin(); it != this->compute_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          set.insert((*it).get());
-        }
-      }
-      return set;
-    }
-
-    /**
-     * @brief Shutdown all running compute services on the platform
-     */
-    void Simulation::shutdownAllComputeServices() {
-
-      for (auto it = this->compute_services.begin(); it != this->compute_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          (*it)->stop();
-        }
-      }
-    }
-
-    /**
-    * @brief Obtain the list of storage services
-    *
-    * @return a vector of storage services
-    */
-    std::set<StorageService *> Simulation::getRunningStorageServices() {
-      std::set<StorageService *> set = {};
-      for (auto it = this->storage_services.begin(); it != this->storage_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          set.insert((*it).get());
-        }
-      }
-      return set;
-    }
-
-    /**
-     * @brief Shutdown all running storage services on the platform
-     */
-    void Simulation::shutdownAllStorageServices() {
-
-      for (auto it = this->storage_services.begin(); it != this->storage_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          (*it)->stop();
-        }
-      }
-    }
 
     /**
      * @brief Retrieves all running network proximity services on the platform
@@ -510,7 +475,6 @@ namespace wrench {
     FileRegistryService *Simulation::getFileRegistryService() {
       return this->file_registry_service.get();
     }
-
 
 
     /**
@@ -554,13 +518,13 @@ namespace wrench {
     /**
    * @brief Stage a set of a file copies on a storage service
      *
-   * @param files: a set of files to stage on a storage service
+   * @param files: a map of files (indexed by file ids) to stage on a storage service
    * @param storage_service: the storage service
    *
    * @throw std::runtime_error
    * @throw std::invalid_argument
    */
-    void Simulation::stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service) {
+    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service) {
 
       if (storage_service == nullptr) {
         throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
@@ -574,7 +538,7 @@ namespace wrench {
 
       try {
         for (auto f : files) {
-          this->stageFile(f, storage_service);
+          this->stageFile(f.second, storage_service);
         }
       } catch (std::runtime_error &e) {
         throw;
@@ -591,4 +555,54 @@ namespace wrench {
       return S4U_Simulation::getClock();
     }
 
+    /**
+     * @brief Get the memory capacity of a host given a hostname
+     * @param hostname: the hostname
+     * @return the memory capacity in bytes
+     */
+    double Simulation::getHostMemoryCapacity(std::string hostname) {
+      return S4U_Simulation::getHostMemoryCapacity(hostname);
+    }
+
+    /**
+    * @brief Get the number of cores of a host given a hostname
+    * @param hostname: the hostname
+    * @return the number of cores
+    */
+    unsigned long Simulation::getHostNumCores(std::string hostname) {
+      return S4U_Simulation::getNumCores(hostname);
+    }
+
+    /**
+     * @brief Get the flop rate of one core of a host given a hostname
+     * @param hostname: the hostname
+     * @return the flop rate (flop / sec)
+     */
+    double Simulation::getHostFlopRate(std::string hostname) {
+      return S4U_Simulation::getFlopRate(hostname);
+    }
+
+    /**
+     * @brief Get the memory capacity of the current host
+     * @return the memory capacity in bytes
+     */
+    double Simulation::getMemoryCapacity() {
+      return S4U_Simulation::getMemoryCapacity();
+    }
+
+    /**
+     * @brief Sleep for a number of (simulated) seconds
+     * @param duration in seconds
+     */
+    void Simulation::sleep(double duration) {
+      S4U_Simulation::sleep(duration);
+    }
+
+    /**
+     * @brief Get a pointer to the Terminator object
+     * @return a pointer to the Terminator object
+     */
+    Terminator *Simulation::getTerminator() {
+      return this->terminator.get();
+    }
 };

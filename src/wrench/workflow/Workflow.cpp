@@ -11,9 +11,10 @@
 #include <lemon/graph_to_eps.h>
 #include <lemon/bfs.h>
 #include <pugixml.hpp>
+#include <json.hpp>
 
 #include "wrench/logging/TerminalOutput.h"
-#include "simulation/SimulationMessage.h"
+#include "wrench/simulation/SimulationMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/workflow/Workflow.h"
 
@@ -27,8 +28,9 @@ namespace wrench {
      * @param id: a unique string id
      * @param flops: number of flops
      * @param min_num_cores: the minimum number of cores required to run the task
-     * @param max_num_cores: the maximum number of cores that can be used by the task (0 meanx infinity)
-     * @param parallel_efficiency: the multi-core parallel efficiency
+     * @param max_num_cores: the maximum number of cores that can be used by the task (0 means infinity)
+     * @param parallel_efficiency: the multi-core parallel efficiency (number between 0.0 and 1.0)
+     * @param memory_requirement: memory requirement (in bytes)
      *
      * @return the WorkflowTask instance
      *
@@ -38,9 +40,11 @@ namespace wrench {
                                     double flops,
                                     int min_num_cores,
                                     int max_num_cores,
-                                    double parallel_efficiency) {
+                                    double parallel_efficiency,
+                                    double memory_requirement) {
 
-      if ((flops < 0.0) || (min_num_cores < 1) || (max_num_cores < 0) || ((max_num_cores > 0) && (min_num_cores > max_num_cores))) {
+      if ((flops < 0.0) || (min_num_cores < 1) || (max_num_cores < 0) ||
+          ((max_num_cores > 0) && (min_num_cores > max_num_cores))) {
         throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
       }
 
@@ -50,7 +54,7 @@ namespace wrench {
       }
 
       // Create the WorkflowTask object
-      WorkflowTask *task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency);
+      WorkflowTask *task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency, memory_requirement);
       // Create a DAG node for it
       task->workflow = this;
       task->DAG = this->DAG.get();
@@ -207,7 +211,6 @@ namespace wrench {
      */
     void Workflow::loadFromDAX(const std::string &filename) {
 
-
       pugi::xml_document dax_tree;
 
       if (not dax_tree.load_file(filename.c_str())) {
@@ -225,12 +228,24 @@ namespace wrench {
         std::string name = job.attribute("name").value();
         double flops = std::strtod(job.attribute("runtime").value(), NULL);
         int num_procs = 1;
-        if (job.attribute("num_procs")) {
-          num_procs = std::stoi(job.attribute("num_procs").value());
+        bool found_one = false;
+        for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
+          if (job.attribute(tag.c_str())) {
+            if (found_one) {
+              std::cerr << "THROWING\n";
+              throw std::invalid_argument(
+                      "Workflow::loadFromDAX(): multiple \"number of cores/procs\" specification for task " + id);
+            } else {
+              found_one = true;
+              num_procs = std::stoi(job.attribute("num_procs").value());
+            }
+          }
         }
-        // Create the task
-        task = this->addTask(id, flops, num_procs);
 
+
+        // Create the task
+        // If the DAX says num_procs = x, then we set min_cores=1, min_cores=x, efficiency=1.0
+        task = this->addTask(id, flops, 1, num_procs, 1.0);
 
         // Go through the children "uses" nodes
         for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
@@ -245,7 +260,7 @@ namespace wrench {
 
           try {
             file = this->getWorkflowFileByID(id);
-          } catch (std::invalid_argument) {
+          } catch (std::invalid_argument &e) {
             file = this->addFile(id, size);
           }
           if (link == "input") {
@@ -269,10 +284,74 @@ namespace wrench {
 
           WorkflowTask *parent_task = this->getWorkflowTaskByID(parent_id);
           this->addControlDependency(parent_task, child_task);
-
         }
       }
-      
+    }
+
+    /**
+     * @brief Create a workflow based on a JSON file
+     *
+     * @param filename: the path to the JSON file
+     *
+     * @throw std::invalid_argument
+     */
+    void Workflow::loadFromJSON(const std::string &filename) {
+      ///make workflow task
+      wrench::WorkflowTask *task;
+
+      /// read a JSON file
+      std::ifstream file;
+      nlohmann::json j;
+
+      //handle the exceptions of opening the json file
+      file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+      try {
+        file.open(filename);
+        file >> j;
+      } catch (const std::ifstream::failure &e) {
+        throw std::invalid_argument("Workflow::loadFromJson(): Invalid Json file");
+      }
+
+      nlohmann::json workflowJobs;
+      try {
+        workflowJobs = j.at("workflow");
+      } catch (std::out_of_range &e) {
+        std::cerr << "out of range" << '\n';
+      }
+
+      for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
+        if (it.key() == "jobs") {
+          std::vector<nlohmann::json> jobs = it.value();
+
+          for (auto &job : jobs) {
+            std::string name = job.at("name");
+            double flops = job.at("runtime");
+            int num_procs = 1;
+            task = this->addTask(name, flops, num_procs);
+            std::vector<nlohmann::json> files = job.at("files");
+
+            for (auto &f : files) {
+              double size = f.at("size");
+              std::string link = f.at("link");
+              std::string id = f.at("name");
+              wrench::WorkflowFile *file = nullptr;
+              try {
+                file = this->getWorkflowFileByID(id);
+              } catch (const std::invalid_argument &ia) {
+                // making a new file
+                file = this->addFile(id, size);
+              }
+              if (link == "input") {
+                task->addInputFile(file);
+              }
+              if (link == "output") {
+                task->addOutputFile(file);
+              }
+            }
+          }
+        }
+      }
+      file.close();
     }
 
     /**
@@ -503,16 +582,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the set of input files for a workflow (i.e., those files
+     * @brief Retrieve a map (indexed by file id) of input files for a workflow (i.e., those files
      *        that are input to some tasks but output from none)
      *
-     * @return a std::set of files
+     * @return a std::map of files
      */
-    std::set<WorkflowFile *> Workflow::getInputFiles() {
-      std::set<WorkflowFile *> input_files;
+    std::map<std::string, WorkflowFile *> Workflow::getInputFiles() {
+      std::map<std::string, WorkflowFile *> input_files;
       for (auto const &x : this->files) {
         if ((x.second->output_of == nullptr) && (x.second->input_of.size() > 0)) {
-          input_files.insert(x.second.get());
+          input_files.insert({x.first, x.second.get()});
         }
       }
       return input_files;
@@ -529,6 +608,21 @@ namespace wrench {
       } else {
         return nullptr;
       }
+    }
+
+    /**
+     * @brief Get the total number of flops for a list of tasks
+     *
+     * @param tasks: list of tasks
+     *
+     * @return the total number of flops
+     */
+    double Workflow::getSumFlops(std::vector<WorkflowTask *> tasks) {
+      double total_flops = 0;
+      for (auto it : tasks) {
+        total_flops += (*it).getFlops();
+      }
+      return total_flops;
     }
 
 };

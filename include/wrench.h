@@ -31,7 +31,7 @@
 #include "wrench/wms/WMS.h"
 
 // Scheduler
-#include "wrench/wms/scheduler/Scheduler.h"
+#include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 
 // Scheduling Optimizations
@@ -41,9 +41,6 @@
 // Simulation Output Analysis
 #include "wrench/simulation/SimulationTimestamp.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
-
-// WorkflowUtil Namespace
-#include "wrench/util/WorkflowUtil.h"
 
 
 

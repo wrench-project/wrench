@@ -4,9 +4,9 @@
 
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <simulation/SimulationMessage.h>
+#include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <services/ServiceMessage.h>
+#include <wrench/services/ServiceMessage.h>
 #include <wrench/services/compute/batch/BatchServiceMessage.h>
 #include <wrench/services/compute/batch/BatchNetworkListener.h>
 #include "wrench/services/compute/batch/BatchRequestReplyProcess.h"
@@ -81,9 +81,9 @@ namespace wrench{
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
-      } catch (std::shared_ptr<NetworkTimeout> cause) {
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         return true;
       }
 
@@ -106,7 +106,7 @@ namespace wrench{
                                           //TODO::property value to stop this daemon is used same as that of BatchServiceProperty
                                           BatchServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
         return false;

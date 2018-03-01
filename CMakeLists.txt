@@ -35,6 +35,7 @@ include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/lo
 set(HEADER_FILES
         include/wrench/exceptions/WorkflowExecutionException.h
         include/wrench/simgrid_S4U_util/S4U_Simulation.h
+        include/wrench/simulation/SimulationMessage.h
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
         include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
@@ -43,7 +44,7 @@ set(HEADER_FILES
         include/wrench/wms/StaticOptimization.h
         include/wrench/wms/DynamicOptimization.h
         include/wrench/wms/scheduler/PilotJobScheduler.h
-        include/wrench/wms/scheduler/Scheduler.h
+        include/wrench/wms/scheduler/StandardJobScheduler.h
         include/wrench/workflow/Workflow.h
         include/wrench/workflow/WorkflowFile.h
         include/wrench/workflow/WorkflowTask.h
@@ -55,6 +56,7 @@ set(HEADER_FILES
         include/wrench/managers/JobManager.h
         include/wrench/managers/DataMovementManager.h
         include/wrench/services/Service.h
+        include/wrench/services/ServiceMessage.h
         include/wrench/services/ServiceProperty.h
         include/wrench/services/compute/ComputeService.h
         include/wrench/services/compute/ComputeServiceProperty.h
@@ -67,7 +69,6 @@ set(HEADER_FILES
         include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h
         include/wrench/services/compute/cloud/CloudService.h
         include/wrench/services/compute/cloud/CloudServiceProperty.h
-        include/wrench/services/storage/simple/IncomingFile.h
         include/wrench/services/storage/StorageService.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/simple/SimpleStorageService.h
@@ -82,6 +83,7 @@ set(HEADER_FILES
         include/wrench/simulation/SimulationOutput.h
         include/wrench/simulation/SimulationTimestamp.h
         include/wrench/simulation/SimulationTrace.h
+        include/wrench/simulation/Terminator.h
         include/wrench.h
         include/wrench-dev.h
         include/wrench/services/compute/batch/BatchJob.h
@@ -90,17 +92,20 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchServiceProperty.h
         include/wrench/services/compute/batch/BatchRequestReplyProcess.h
         include/wrench/services/compute/batch/BatchNetworkListener.h
-        include/wrench/util/WorkflowUtil.h
         include/wrench/services/helpers/Alarm.h
         include/wrench/util/PointerUtil.h
         include/wrench/util/MessageManager.h
         include/wrench/util/TraceFileLoader.h
+        include/wrench/services/storage/simple/NetworkConnectionManager.h
+        include/wrench/services/storage/simple/NetworkConnection.h
+        include/wrench/wms/scheduler/PilotJobScheduler.h
+        include/wrench/wms/scheduler/StandardJobScheduler.h
+        include/wrench/util/UnitParser.h
         )
 
 # source files
 set(SOURCE_FILES
         src/wrench/simulation/SimulationMessage.cpp
-        src/wrench/simulation/SimulationMessage.h
         src/wrench/workflow/execution_events/WorkflowExecutionEvent.cpp
         src/wrench/simgrid_S4U_util/S4U_Daemon.cpp
         src/wrench/simgrid_S4U_util/S4U_DaemonActor.cpp
@@ -113,7 +118,8 @@ set(SOURCE_FILES
         src/wrench/workflow/WorkflowTask.cpp
         src/wrench/workflow/WorkflowFile.cpp
         src/wrench/wms/WMS.cpp
-        src/wrench/wms/Scheduler.cpp
+        src/wrench/wms/WMSMessage.h
+        src/wrench/wms/WMSMessage.cpp
         src/wrench/services/compute/ComputeService.cpp
         src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.cpp
         src/wrench/workflow/job/PilotJob.cpp
@@ -125,6 +131,7 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTimestamp.cpp
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/simulation/SimulationOutput.cpp
+        src/wrench/simulation/Terminator.cpp
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/storage/StorageService.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp
@@ -137,10 +144,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
-        src/wrench/services/ServiceMessage.h
         src/wrench/services/compute/ComputeServiceMessage.cpp
-        src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.cpp
-        src/wrench/services/compute/multihost_multicore/MulticoreComputeServiceMessage.h
         src/wrench/services/storage/StorageServiceMessage.cpp
         src/wrench/services/storage/StorageServiceMessage.h
         src/wrench/services/file_registry/FileRegistryMessage.cpp
@@ -149,7 +153,6 @@ set(SOURCE_FILES
         src/wrench/services/compute/cloud/CloudServiceProperty.cpp
         src/wrench/services/compute/cloud/CloudServiceMessage.h
         src/wrench/services/compute/cloud/CloudServiceMessage.cpp
-        src/wrench/services/storage/simple/IncomingFile.cpp
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp
@@ -170,32 +173,40 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchRequestReplyProcess.cpp
         src/wrench/services/compute/batch/BatchNetworkListener.cpp
         src/wrench/services/helpers/Alarm.cpp
-        src/wrench/util/WorkflowUtil.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
         src/wrench/util/TraceFileLoader.cpp
+        src/wrench/services/storage/simple/NetworkConnectionManager.cpp
+        src/wrench/services/storage/simple/NetworkConnection.cpp
+        src/wrench/util/UnitParser.cpp
         )
 
 # test files
 set(TEST_FILES
         test/main.cpp
-        test/constructor_exceptions/MessageConstructorTest.cpp
+        test/simulation_message_constructors/MessageConstructorTest.cpp
         test/workflow/WorkflowTest.cpp
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
-        test/simulation/OneTaskTest.cpp
-        test/simulation/SimpleStorageServiceFunctionalTest.cpp
-        test/simulation/SimpleStorageServicePerformanceTest.cpp
-        test/simulation/MultihostMulticoreComputeServiceTestStandardJobs.cpp
-        test/simulation/MultihostMulticoreComputeServiceTestPilotJobs.cpp
-        test/simulation/MultihostMulticoreComputeServiceSchedulingTest.cpp
+        test/workflow/WorkflowLoadFromDAXTest.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceOneTaskTest.cpp
+        test/simulation/SimpleStorageService/InternalNetworkConnectionTest.cpp
+        test/simulation/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
+        test/simulation/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
+        test/simulation/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestStandardJobs.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestPilotJobs.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceSchedulingTest.cpp
         test/simulation/TestWithFork.h
-        test/simulation/StandardJobExecutorTest.cpp
+        test/simulation/MultihostMulticoreComputeService/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
+        test/simulation/FileRegistryTest.cpp
         test/simulation/BatchServiceTest.cpp
         test/simulation/CloudServiceTest.cpp
-        test/simulation/NoopScheduler.cpp
-        test/simulation/NoopScheduler.h
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
+        test/simulation/MultipleWMSTest.cpp
+        test/pilot_job/CriticalPathSchedulerTest.cpp
+        examples/simple-wms/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
         )
 
 # wrench library

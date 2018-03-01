@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/SimulationOutput.h"
+#include "wrench/simulation/Terminator.h"
 #include "wrench/wms/WMS.h"
 #include "wrench/workflow/job/StandardJob.h"
 
@@ -51,6 +52,7 @@ namespace wrench {
         StorageService *add(std::unique_ptr<StorageService> executor);
 
         NetworkProximityService *add(std::unique_ptr<NetworkProximityService> executor);
+        WMS *add(std::unique_ptr<WMS>);
 
         void setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service);
 
@@ -58,9 +60,7 @@ namespace wrench {
 
         void stageFile(WorkflowFile *file, StorageService *storage_service);
 
-        void stageFiles(std::set<WorkflowFile *> files, StorageService *storage_service);
-
-        WMS *setWMS(std::unique_ptr<WMS>);
+        void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service);
 
         /** @brief The simulation post-mortem output */
         SimulationOutput output;
@@ -72,21 +72,26 @@ namespace wrench {
         template<class T>
         void newTimestamp(SimulationTimestamp<T> *event);
 
-        void shutdownAllComputeServices();
-
-        void shutdownAllStorageServices();
+        FileRegistryService *getFileRegistryService();
 
         void shutdownAllNetworkProximityServices();
 
         std::set<ComputeService *> getRunningComputeServices();
+        double getCurrentSimulatedDate();
 
-        std::set<StorageService *> getRunningStorageServices();
+        static double getHostMemoryCapacity(std::string hostname);
 
-        FileRegistryService *getFileRegistryService();
+        static unsigned long getHostNumCores(std::string hostname);
 
         std::set<NetworkProximityService *> getRunningNetworkProximityServices();
 
-        double getCurrentSimulatedDate();
+        static double getHostFlopRate(std::string hostname);
+
+        static double getMemoryCapacity();
+
+        static void sleep(double duration);
+
+        Terminator* getTerminator();
 
         /***********************/
         /** \endcond            */
@@ -105,7 +110,9 @@ namespace wrench {
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 
-        std::unique_ptr<WMS> wms = nullptr;
+        std::unique_ptr<Terminator> terminator;
+
+        std::set<std::unique_ptr<WMS>> wmses;
 
         std::unique_ptr<FileRegistryService> file_registry_service = nullptr;
 
@@ -116,6 +123,7 @@ namespace wrench {
         std::set<std::unique_ptr<StorageService>> storage_services;
 
         void check_simulation_setup();
+
         void start_all_processes();
 
     };

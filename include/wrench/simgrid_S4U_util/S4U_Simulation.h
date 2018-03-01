@@ -26,13 +26,15 @@ namespace wrench {
 
 		public:
 				void initialize(int *argc, char **argv);
-				void setupPlatform(std::string);
+				void setupPlatform(std::string&);
 				void runSimulation();
 				static double getClock();
 				static std::string getHostName();
 				bool hostExists(std::string hostname);
 				static unsigned int getNumCores(std::string hostname);
 				static double getFlopRate(std::string hostname);
+				static double getHostMemoryCapacity(std::string hostname);
+				static double getMemoryCapacity();
 				static void compute(double);
 				static void sleep(double);
 				bool isInitialized();
@@ -40,7 +42,9 @@ namespace wrench {
         std::vector<std::string> getAllHostnames();
         void shutdown();
 
+
 		private:
+				static double getHostMemoryCapacity(simgrid::s4u::Host *host);
 				simgrid::s4u::Engine *engine;
 				bool initialized = false;
 				bool platform_setup = false;

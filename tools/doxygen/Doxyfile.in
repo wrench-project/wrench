@@ -801,6 +801,7 @@ WARN_LOGFILE           =
 INPUT                  = @CMAKE_HOME_DIRECTORY@/doc/index.md \
                          @CMAKE_HOME_DIRECTORY@/doc/install.md \
                          @CMAKE_HOME_DIRECTORY@/doc/getting_started.md \
+                         @CMAKE_HOME_DIRECTORY@/doc/wrench_101.md \
                          @CMAKE_HOME_DIRECTORY@/src \
                          @CMAKE_HOME_DIRECTORY@/include
 

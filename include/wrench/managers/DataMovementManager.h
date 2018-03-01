@@ -31,7 +31,6 @@ namespace wrench {
 
     public:
 
-        DataMovementManager(Workflow *workflow);
 
         ~DataMovementManager();
 
@@ -43,13 +42,18 @@ namespace wrench {
 
         void doSynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst);
 
+    protected:
+
+        friend class WMS;
+
+        DataMovementManager(WMS *wms);
+
     private:
 
 
         int main();
 
-        // Relevant workflow
-        Workflow *workflow;
+        WMS *wms = nullptr;
 
         bool processNextMessage();
 

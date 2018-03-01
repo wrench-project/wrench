@@ -13,14 +13,16 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/managers/JobManager.h"
 #include "wrench/services/compute/ComputeService.h"
-#include "services/ServiceMessage.h"
+#include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "simulation/SimulationMessage.h"
+#include "wrench/simulation/SimulationMessage.h"
 #include "wrench/workflow/WorkflowTask.h"
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/PilotJob.h"
+#include "wrench/wms/WMS.h"
+
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 
@@ -29,12 +31,20 @@ namespace wrench {
     /**
      * @brief Constructor, which starts a job manager daemon
      *
-     * @param workflow: the workflow whose jobs are to be managed
+     * @param wms: the wms for which this manager is working
      */
-    JobManager::JobManager(Workflow *workflow) :
+    JobManager::JobManager(WMS *wms) :
             S4U_Daemon("job_manager", "job_manager") {
 
-      this->workflow = workflow;
+      this->wms = wms;
+
+      // Get myself known to schedulers
+      if (this->wms->standard_job_scheduler) {
+        this->wms->standard_job_scheduler->setJobManager(this);
+      }
+      if (this->wms->pilot_job_scheduler) {
+        this->wms->pilot_job_scheduler->setJobManager(this);
+      }
 
       // Start the daemon
       std::string localhost = S4U_Simulation::getHostName();
@@ -66,7 +76,7 @@ namespace wrench {
     void JobManager::stop() {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
     }
@@ -93,9 +103,6 @@ namespace wrench {
                                                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
                                                std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                                                std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) {
-      if (tasks.size() < 1) {
-        throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
-      }
 
       // Do a sanity check of everything (looking for nullptr)
       for (auto t : tasks) {
@@ -118,10 +125,10 @@ namespace wrench {
           throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the pre_file_copies set");
         }
         if (std::get<1>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the pre_file_copies set");
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr src storage service in the pre_file_copies set");
         }
         if (std::get<2>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the pre_file_copies set");
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr dst storage service in the pre_file_copies set");
         }
       }
 
@@ -130,10 +137,10 @@ namespace wrench {
           throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the post_file_copies set");
         }
         if (std::get<1>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the post_file_copies set");
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr src storage service in the post_file_copies set");
         }
         if (std::get<2>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the post_file_copies set");
+          throw std::invalid_argument("JobManager::createStandardJob(): nullptr dst storage service in the post_file_copies set");
         }
       }
 
@@ -205,6 +212,7 @@ namespace wrench {
      * @param workflow: a workflow
      * @param num_hosts: the number of hosts required by the pilot job
      * @param num_cores_per_host: the number of cores per host required by the pilot job
+     * @param ram_per_host: the number of bytes of RAM required by the pilot job on each host
      * @param duration: the pilot job's duration in seconds
      * @return the pilot job
      *
@@ -213,11 +221,12 @@ namespace wrench {
     PilotJob *JobManager::createPilotJob(Workflow *workflow,
                                          unsigned long num_hosts,
                                          unsigned long num_cores_per_host,
+                                         double ram_per_host,
                                          double duration) {
       if ((workflow == nullptr) ||  (duration <= 0.0)) {
         throw std::invalid_argument("JobManager::createPilotJob(): Invalid arguments");
       }
-      PilotJob *raw_ptr = new PilotJob(workflow, num_hosts, num_cores_per_host, duration);
+      PilotJob *raw_ptr = new PilotJob(workflow, num_hosts, num_cores_per_host, ram_per_host, duration);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
       this->jobs[raw_ptr] = std::move(job);
       return raw_ptr;
@@ -238,7 +247,7 @@ namespace wrench {
 //        throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
 //      }
 //
-//      // Push back the mailbox of the manager,
+//      // Push back the mailbox_name of the manager,
 //      // so that it will getMessage the initial callback
 //      job->pushCallbackMailbox(this->mailbox_name);
 //
@@ -261,7 +270,7 @@ namespace wrench {
 //
 //      // Submit the job to the service
 //      try {
-//        compute_service->runJob(job);
+//        compute_service->submitJob(job);
 //        job->setParentComputeService(compute_service);
 //      } catch (WorkflowExecutionException &e) {
 //        throw;
@@ -289,7 +298,7 @@ namespace wrench {
         throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
       }
 
-      // Push back the mailbox of the manager,
+      // Push back the mailbox_name of the manager,
       // so that it will getMessage the initial callback
       job->pushCallbackMailbox(this->mailbox_name);
 
@@ -312,7 +321,7 @@ namespace wrench {
 
       // Submit the job to the service
       try {
-        compute_service->runJob(job, service_specific_args);
+        compute_service->submitJob(job, service_specific_args);
         job->setParentComputeService(compute_service);
       } catch (WorkflowExecutionException &e) {
         throw;
@@ -376,11 +385,13 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void JobManager::forgetJob(WorkflowJob *job) {
+
       if (job == nullptr) {
         throw std::invalid_argument("JobManager::forgetJob(): invalid argument");
       }
 
       if (job->getType() == WorkflowJob::STANDARD) {
+
         if ((this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) ||
             (this->running_standard_jobs.find((StandardJob *) job) != this->running_standard_jobs.end())) {
           throw WorkflowExecutionException(new JobCannotBeForgotten(job));
@@ -395,6 +406,11 @@ namespace wrench {
           this->jobs.erase(job);
           return;
         }
+        // At this point, it's a job that was never submitted!
+        if (this->jobs.find(job) != this->jobs.end()) {
+          this->jobs.erase(job);
+          return;
+        }
         throw std::invalid_argument("JobManager::forgetJob(): unknown standard job");
       }
 
@@ -405,6 +421,12 @@ namespace wrench {
         }
         if (this->completed_pilot_jobs.find((PilotJob *) job) != this->completed_pilot_jobs.end()) {
           this->jobs.erase(job);
+          return;
+        }
+        // At this point, it's a job that was never submitted!
+        if (this->jobs.find(job) != this->jobs.end()) {
+          this->jobs.erase(job);
+          return;
         }
         throw std::invalid_argument("JobManager::forgetJob(): unknown pilot job");
       }
@@ -426,9 +448,9 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
           message = S4U_Mailbox::getMessage(this->mailbox_name);
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           continue;
-        } catch (std::shared_ptr<FatalFailure> cause) {
+        } catch (std::shared_ptr<FatalFailure> &cause) {
           continue;
         }
 
@@ -468,7 +490,7 @@ namespace wrench {
 //          try {
 //            S4U_Mailbox::dputMessage(msg->job->popCallbackMailbox(),
 //                                     new ComputeServiceJobTypeNotSupportedMessage(msg->job, msg->compute_service, 0));
-//          } catch (std::shared_ptr<NetworkError> cause) {
+//          } catch (std::shared_ptr<NetworkError> &cause) {
 //            keep_going = true;
 //          }
 
@@ -485,7 +507,7 @@ namespace wrench {
           try {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                      new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;
           }
         } else if (ComputeServiceStandardJobFailedMessage *msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
@@ -510,7 +532,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
                                      new ComputeServiceStandardJobFailedMessage(job, msg->compute_service, std::move(msg->cause),
                                                                                 0.0));
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;
           }
 
@@ -529,7 +551,7 @@ namespace wrench {
           try {
             S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                      new ComputeServicePilotJobStartedMessage(job, msg->compute_service, 0.0));
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;
           }
 
@@ -547,7 +569,7 @@ namespace wrench {
           try {
             S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                      new ComputeServicePilotJobExpiredMessage(job, msg->compute_service, 0.0));
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;
           }
 
@@ -561,7 +583,7 @@ namespace wrench {
           try {
             S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
                                      new ComputeServiceInformationMessage(job, msg->information, msg->payload));
-          } catch (std::shared_ptr<NetworkError> cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;
           }
 

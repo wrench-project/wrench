@@ -25,23 +25,23 @@ namespace wrench {
     /**
      * @brief Constructor (daemon with a mailbox)
      *
-     * @param process_name: the name of the simulated process/actor
+     * @param process_name_prefix: the prefix of the name of the simulated process/actor
      * @param mailbox_prefix: the prefix of the mailbox (to which a unique integer is appended)
      */
-    S4U_Daemon::S4U_Daemon(std::string process_name, std::string mailbox_prefix)
-            : process_name(process_name),
-              mailbox_name(S4U_Mailbox::generateUniqueMailboxName(mailbox_prefix)) {
+    S4U_Daemon::S4U_Daemon(std::string process_name_prefix, std::string mailbox_prefix) {
+      unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
+      this->mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
+      this->process_name = process_name_prefix + "_" + std::to_string(seq);
       this->terminated = false;
     }
 
     /**
      * @brief Constructor (daemon without a mailbox)
      *
-     * @param process_name: the name of the simulated process/actor
+     * @param process_name: the prefix of the name of the simulated process/actor
      */
-    S4U_Daemon::S4U_Daemon(std::string process_name)
-            {
-      this->process_name = process_name; // TODO: Why does this leak?
+    S4U_Daemon::S4U_Daemon(std::string process_name_prefix) {
+      this->process_name = process_name_prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
       this->mailbox_name="";
       this->terminated = false;
     }
@@ -84,7 +84,6 @@ namespace wrench {
                                                            S4U_DaemonActor(this));
       } catch (std::exception &e) {
         // Some internal SimGrid exceptions...
-        WRENCH_INFO("CRAP");
         std::abort();
       }
 
@@ -95,7 +94,7 @@ namespace wrench {
       this->s4u_actor->onExit(daemon_goodbye, (void *) (this->process_name.c_str()));
 
 
-      // Set the mailbox receiver
+      // Set the mailbox_name receiver
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
       mailbox->setReceiver(this->s4u_actor);
 

@@ -11,7 +11,7 @@
 #include <wrench.h>
 
 #include "SimpleWMS.h"
-#include "scheduler/BatchScheduler.h"
+#include "scheduler/BatchStandardJobScheduler.h"
 
 int main(int argc, char **argv) {
 
@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   /* Reading and parsing the workflow description file to create a wrench::Workflow object */
   std::cerr << "Loading workflow..." << std::endl;
   wrench::Workflow workflow;
-  wrench::WorkflowUtil::loadFromDAX(workflow_file, &workflow);
+  workflow.loadFromDAX(workflow_file);
   std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
   std::cerr.flush();
 
@@ -83,7 +83,7 @@ int main(int argc, char **argv) {
    * configurable properties for each kind of service.
    */
   wrench::ComputeService *batch_service = new wrench::BatchService(
-          wms_host, hostname_list, storage_service, true, true,
+          wms_host, true, true, hostname_list, storage_service,
           {{wrench::BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "2048"}});
 
   /* Add the batch service to the simulation, catching a possible exception */
@@ -95,19 +95,30 @@ int main(int argc, char **argv) {
     std::exit(1);
   }
 
+  /* Create a list of compute services that will be used by the WMS */
+  std::set<wrench::ComputeService *> compute_services;
+  compute_services.insert(batch_service);
+
+  /* Create a list of storage services that will be used by the WMS */
+  std::set<wrench::StorageService *> storage_services;
+  storage_services.insert(storage_service);
+
   /* Instantiate a WMS, to be stated on some host (wms_host), which is responsible
-   * for executing the workflow, and uses a scheduler (BatchScheduler). That scheduler
+   * for executing the workflow, and uses a scheduler (BatchStandardJobScheduler). That scheduler
    * is instantiated with the batch service, the list of hosts available for running
    * tasks, and also provided a pointer to the simulation object.
    *
    * The WMS implementation is in SimpleWMS.[cpp|h].
    */
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
-  wrench::WMS *wms = simulation.setWMS(
+  wrench::WMS *wms = simulation.add(
           std::unique_ptr<wrench::WMS>(
-                  new wrench::SimpleWMS(&workflow,
-                                        std::unique_ptr<wrench::Scheduler>(
-                                                new wrench::BatchScheduler(batch_service, &simulation)), wms_host)));
+                  new wrench::SimpleWMS(std::unique_ptr<wrench::BatchStandardJobScheduler>(
+                                                new wrench::BatchStandardJobScheduler()),
+                                        nullptr,
+                                        compute_services, storage_services, wms_host)));
+
+  wms->addWorkflow(&workflow);
 
   /* Instantiate a file registry service to be started on some host. This service is
    * essentially a replica catalog that stores <file , storage service> pairs so that
@@ -125,7 +136,7 @@ int main(int argc, char **argv) {
    * These files are then staged on the storage service.
    */
   std::cerr << "Staging input files..." << std::endl;
-  std::set<wrench::WorkflowFile *> input_files = workflow.getInputFiles();
+  std::map<std::string, wrench::WorkflowFile *> input_files = workflow.getInputFiles();
   try {
     simulation.stageFiles(input_files, storage_service);
   } catch (std::runtime_error &e) {

@@ -47,14 +47,14 @@ namespace wrench {
                 std::string callback_mailbox,
                 std::string hostname,
                 StandardJob *job,
-                std::set<std::pair<std::string, unsigned long>> compute_resources,
+                std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                 StorageService *default_storage_service,
                 std::map<std::string, std::string> plist = {});
 
         void kill();
 
         StandardJob *getJob();
-        std::set<std::pair<std::string, unsigned long>> getComputeResources();
+        std::set<std::tuple<std::string, unsigned long, double>> getComputeResources();
 
     private:
 
@@ -63,16 +63,20 @@ namespace wrench {
         Simulation *simulation;
         std::string callback_mailbox;
         StandardJob *job;
-        std::set<std::pair<std::string, unsigned long>> compute_resources;
+        std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
         int total_num_cores;
+        double total_ram;
         StorageService *default_storage_service;
 
         // Core availabilities (for each hosts, how many cores are currently available on it)
         std::map<std::string, unsigned long> core_availabilities;
+        // RAM availabilities (for each host, host many bytes of RAM are currently available on it)
+        std::map<std::string, double> ram_availabilities;
 
         // Sets of workunit executors
         std::set<std::unique_ptr<WorkunitMulticoreExecutor>> running_workunit_executors;
         std::set<std::unique_ptr<WorkunitMulticoreExecutor>> finished_workunit_executors;
+        std::set<std::unique_ptr<WorkunitMulticoreExecutor>> failed_workunit_executors;
 
         // Work units
         std::set<std::unique_ptr<Workunit>> non_ready_workunits;
@@ -107,7 +111,11 @@ namespace wrench {
 
         bool processNextMessage();
 
-        void dispatchReadyWorkunits();
+        unsigned long computeWorkUnitMinNumCores(Workunit *wu);
+        unsigned long computeWorkUnitDesiredNumCores(Workunit *wu);
+        double computeWorkUnitMinMemory(Workunit *wu);
+
+          void dispatchReadyWorkunits();
 
         void createWorkunits();
 

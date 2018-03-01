@@ -65,8 +65,10 @@ WRENCH is intended for three different classes of users:
 
 The WRENCH library provides three _incremental_ levels of documentation:
 
-**User:** targets users who who want to use WRENCH for simulation the execution of scientific workflows in different simulation scenarios. _Users_ are NOT expected to develop new simulation abstractions or algorithms for WRENCH. Instead, they use available 
-simulation components a high-level building blocks to build a simulator.
+**User:** targets users who who want to use WRENCH for simulation the execution of 
+scientific workflows in different simulation scenarios. _Users_ are NOT expected 
+to develop new simulation abstractions or algorithms for WRENCH. Instead, they use available 
+simulation components as high-level building blocks to build a simulator.
 @WRENCHNotUserDoc ([See User Documentation](../user/index.html)) @endWRENCHDoc
 
 
