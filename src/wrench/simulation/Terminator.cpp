@@ -133,16 +133,25 @@ namespace wrench {
         WRENCH_INFO("Terminator shut down file registry service: %s", file_registry_service->getName().c_str());
       }
     }
+    /**
+      * @brief Register a reference to a NetworkProximityService
+      *
+      * @param network_proximity_service: a pointer to a NetworkProximityService
+      */
+    void Terminator::registerNetworkProximityService(std::set<NetworkProximityService *> network_proximity_services) {
+      for (auto nps : network_proximity_services) {
+        this->registerService(this->network_proximity_services, nps);
+      }
+    }
+
 
     /**
      * @brief Register a reference to a NetworkProximityService
      *
      * @param network_proximity_service: a pointer to a NetworkProximityService
      */
-    void Terminator::registerNetworkProximityService(std::set<NetworkProximityService *> network_proximity_services) {
-      for (auto nps : network_proximity_services) {
-        this->registerService(this->network_proximity_services, nps);
-      }
+    void Terminator::registerNetworkProximityService(NetworkProximityService *network_proximity_service) {
+      this->registerService(this->network_proximity_services, network_proximity_service);
     }
 
     /**

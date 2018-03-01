@@ -149,7 +149,7 @@ namespace wrench {
       WRENCH_INFO("WMS %s Daemon is shutting down the File Registry Service", this->getName().c_str());
       this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
 
-      WRENCH_INFO("WMS %s Daemon is shutting down the Network Proximity Service", this->getName().c_str());
+      WRENCH_INFO("WMS %s Daemon is shutting down all Network Proximity Services", this->getName().c_str());
       this->simulation->getTerminator()->shutdownNetworkProximityService(
               this->simulation->getRunningNetworkProximityServices());
     }

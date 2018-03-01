@@ -356,6 +356,7 @@ namespace wrench {
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
+      this->terminator->registerNetworkProximityService(service.get());
       this->network_proximity_services.insert(std::move(service));
       return raw_ptr;
     }
@@ -460,6 +461,7 @@ namespace wrench {
     */
     void Simulation::shutdownAllNetworkProximityServices() {
 
+      std::cerr << "Shutting fown all network proximity services\n";
       for (auto it = this->network_proximity_services.begin(); it != this->network_proximity_services.end(); it++) {
         if ((*it)->state == Service::UP) {
           (*it)->stop();
