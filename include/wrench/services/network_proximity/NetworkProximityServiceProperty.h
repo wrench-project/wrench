@@ -52,6 +52,9 @@ namespace wrench {
 
         /** @brief The percentage of other network daemons that each network daemon will communicate with **/
         DECLARE_PROPERTY_NAME(NETWORK_DAEMON_COMMUNICATION_COVERAGE);
+
+        /** @brief The random number generator seed (int) used by the service to decide a sequence of communication peers **/
+        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_PEER_LOOKUP_SEED);
     };
 }
 
