@@ -53,7 +53,7 @@ namespace wrench {
         std::string id;
         double size; // in bytes
 
-        void setOutputOf(WorkflowTask *task);
+        void setOutputOf(WorkflowTask * task);
 
         WorkflowTask *getOutputOf();
 

@@ -151,7 +151,7 @@ namespace wrench {
 
       WRENCH_INFO("WMS %s Daemon is shutting down the Network Proximity Service", this->getName().c_str());
       this->simulation->getTerminator()->shutdownNetworkProximityService(
-              this->simulation->getNetworkProximityService());
+              this->simulation->getRunningNetworkProximityServices());
     }
 
     /**
@@ -277,7 +277,7 @@ namespace wrench {
       this->simulation->getTerminator()->registerStorageService(this->storage_services);
       this->simulation->getTerminator()->registerFileRegistryService(this->simulation->getFileRegistryService());
       this->simulation->getTerminator()->registerNetworkProximityService(
-              this->simulation->getNetworkProximityService());
+              this->simulation->getRunningNetworkProximityServices());
     }
 
     /**

@@ -10,6 +10,7 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
+#include <boost/algorithm/string.hpp>
 
 #include "TestWithFork.h"
 
@@ -25,6 +26,8 @@ public:
     void do_NetworkProximity_Test();
 
     void do_CompareNetworkProximity_Test();
+
+    void do_VivaldiConverge_Test();
 
 protected:
     NetworkProximityTest() {
@@ -58,8 +61,6 @@ protected:
               "       <link id=\"6\" bandwidth=\"2900GBps\" latency=\"0us\"/>"
               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
               "/> </route>"
-              "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\""
-              "/> </route>"
               "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"3\""
               "/> </route>"
               "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"4\""
@@ -67,6 +68,8 @@ protected:
               "       <route src=\"Host2\" dst=\"Host4\"> <link_ctn id=\"5\""
               "/> </route>"
               "       <route src=\"Host2\" dst=\"Host3\"> <link_ctn id=\"6\""
+              "/> </route>"
+              "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\""
               "/> </route>"
               "   </zone> "
               "</platform>";
@@ -83,7 +86,7 @@ protected:
 };
 
 /**********************************************************************/
-/**  SIMPLE PROXIMITY TEST                                            **/
+/**  SIMPLE PROXIMITY TEST                                           **/
 /**********************************************************************/
 
 class ProxTestWMS : public wrench::WMS {
@@ -105,32 +108,36 @@ private:
       // Create a job manager
       std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+        // Create a data movement manager
+        std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
-      std::pair<std::string, std::string> hosts_to_compute_proximity;
-      hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
-                                                  this->simulation->getHostnameList()[1]);
-      int count = 0, max_count = 100;
-      double proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
+        std::pair<std::string, std::string> hosts_to_compute_proximity;
+        hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
+                                                    this->simulation->getHostnameList()[1]);
+        int count = 0, max_count = 100;
+        std::set<wrench::NetworkProximityService *> network_proximity_services = this->simulation->getRunningNetworkProximityServices();
+        auto network_proximity_service = network_proximity_services.begin();
+        double proximity = (*network_proximity_service)->query(hosts_to_compute_proximity);
 
-      while (proximity < 0 && count < max_count) {
-        count++;
-        wrench::Simulation::sleep(10.0);
-        proximity = this->simulation->getNetworkProximityService()->query(hosts_to_compute_proximity);
-      }
+        while (proximity < 0 && count < max_count) {
+            count++;
+            wrench::S4U_Simulation::sleep(10.0);
+            proximity = (*network_proximity_service)->query(hosts_to_compute_proximity);
+        }
 
-      if (count == max_count) {
-        throw std::runtime_error("Never got an answer to proximity query");
-      }
+        if (count == max_count) {
+            throw std::runtime_error("Never got an answer to proximity query");
+        }
 
-      if (proximity < 0.0) {
-        throw std::runtime_error("Got a negative proximity value");
-      }
+        if (proximity < 0.0) {
+            throw std::runtime_error("Got a negative proximity value");
+        }
 
-      // Terminate
-      this->shutdownAllServices();
-      return 0;
+        // Terminate
+        this->shutdownAllServices();
+//        this->simulation->getFileRegistryService()->stop();
+//        this->simulation->shutdownAllNetworkProximityServices();
+        return 0;
     }
 };
 
@@ -194,12 +201,31 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   std::string network_daemon4 = simulation->getHostnameList()[3];
   std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
-  // Create a network proximity service
-  std::unique_ptr<wrench::NetworkProximityService> network_proximity_service(
-          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, 1, 2, 1)
-  );
+  std::unique_ptr<wrench::NetworkProximityService> network_proximity_service = nullptr;
 
-  EXPECT_NO_THROW(simulation->setNetworkProximityService(std::move(network_proximity_service)));
+  // Create a network proximity service
+  EXPECT_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "BOGUS"}})),
+               std::invalid_argument);
+
+    EXPECT_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
+            new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                                 {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.5"}})),
+                 std::invalid_argument);
+
+    std::vector<std::string> too_few_hosts = {network_daemon1};
+    EXPECT_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
+            new wrench::NetworkProximityService(network_proximity_db_hostname, too_few_hosts,
+                                                {})),
+            std::invalid_argument);
+
+  EXPECT_NO_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
+
+  EXPECT_NO_THROW(simulation->add(std::move(network_proximity_service)));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -210,17 +236,16 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   free(argv);
 }
 
-
 /**********************************************************************/
-/**  COMPARE PROXIMITY TEST                                           **/
+/**  COMPARE PROXIMITY TEST                                          **/
 /**********************************************************************/
 
 class CompareProxTestWMS : public wrench::WMS {
 
 public:
     CompareProxTestWMS(NetworkProximityTest *test,
-                       const std::set<wrench::ComputeService *> &compute_services,
-                       const std::set<wrench::StorageService *> &storage_services,
+                       std::set<wrench::ComputeService *> compute_services,
+                       std::set<wrench::StorageService *> storage_services,
                        std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
@@ -237,17 +262,18 @@ private:
       // Create a data movement manager
       std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
+
       std::pair<std::string, std::string> first_pair_to_compute_proximity;
       first_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[0],
                                                        this->simulation->getHostnameList()[1]);
       int count = 0, max_count = 100;
-      double first_pair_proximity = this->simulation->getNetworkProximityService()->query(
+      double first_pair_proximity = (*(this->simulation->getRunningNetworkProximityServices().begin()))->query(
               first_pair_to_compute_proximity);
 
       while (first_pair_proximity < 0 && count < max_count) {
         count++;
         wrench::Simulation::sleep(10.0);
-        first_pair_proximity = this->simulation->getNetworkProximityService()->query(first_pair_to_compute_proximity);
+        first_pair_proximity = (*(this->simulation->getRunningNetworkProximityServices().begin()))->query(first_pair_to_compute_proximity);
       }
 
       if (count == max_count) {
@@ -263,13 +289,13 @@ private:
       second_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
                                                         this->simulation->getHostnameList()[3]);
       count = 0, max_count = 100;
-      double second_pair_proximity = this->simulation->getNetworkProximityService()->query(
+      double second_pair_proximity = (*(this->simulation->getRunningNetworkProximityServices().begin()))->query(
               second_pair_to_compute_proximity);
 
         while (second_pair_proximity < 0 && count < max_count) {
             count++;
             wrench::Simulation::sleep(10.0);
-            second_pair_proximity = this->simulation->getNetworkProximityService()->query(second_pair_to_compute_proximity);
+            second_pair_proximity = (*(this->simulation->getRunningNetworkProximityServices().begin()))->query(second_pair_to_compute_proximity);
         }
 
       if (count == max_count) {
@@ -299,9 +325,9 @@ TEST_F(NetworkProximityTest, CompareNetworkProximity) {
 void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
   // Create and initialize a simulation
-  auto *simulation = new wrench::Simulation();
+  wrench::Simulation *simulation = new wrench::Simulation();
   int argc = 1;
-  auto **argv = (char **) calloc(1, sizeof(char *));
+  char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("one_task_test");
 
   simulation->init(&argc, argv);
@@ -311,6 +337,180 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
+
+
+
+  // Create a Compute Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                               nullptr,
+                                                               {}))));
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new CompareProxTestWMS(this, (std::set<wrench::ComputeService *>){compute_service},
+                                                              (std::set<wrench::StorageService *>){storage_service1},
+                                                              hostname))));
+
+  wms->addWorkflow(this->workflow, 0.0);
+
+
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(hostname));
+
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFiles({std::make_pair(input_file->getId(), input_file)}, storage_service1));
+
+  // Get a host for network proximity host
+  std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+
+  //Get two hosts to communicate with each other for proximity value
+  std::string network_daemon1 = simulation->getHostnameList()[0];
+  std::string network_daemon2 = simulation->getHostnameList()[1];
+  std::string network_daemon3 = simulation->getHostnameList()[2];
+  std::string network_daemon4 = simulation->getHostnameList()[3];
+  std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
+
+  std::unique_ptr<wrench::NetworkProximityService> network_proximity_service(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, {})
+  );
+
+  EXPECT_NO_THROW(simulation->add(std::move(network_proximity_service)));
+
+  // Running a "run a single task" simulation
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+/**********************************************************************/
+/**  VIVALDI CONVERGE TEST                                           **/
+/**********************************************************************/
+
+class VivaldiConvergeWMS : public wrench::WMS {
+public:
+    VivaldiConvergeWMS(NetworkProximityTest *test,
+        std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, {}, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    NetworkProximityTest *test;
+
+    int main() {
+        // Create a job manager
+        std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+        // Create a data movement manager
+        std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+        std::pair<std::string, std::string> hosts_to_compute_proximity;
+        hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
+                                                    this->simulation->getHostnameList()[3]);
+        int count = 0, max_count = 100;
+        std::set<wrench::NetworkProximityService *> network_proximity_services = this->simulation->getRunningNetworkProximityServices();
+
+        wrench::NetworkProximityService* alltoall_service;
+        wrench::NetworkProximityService* vivaldi_service;
+
+        // TODO: discuss using map so that users can access a desired service easier. since the key in set will be a raw pointer
+        for (auto  nps : network_proximity_services) {
+            std::string type = nps->getPropertyValueAsString(wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
+
+            if (boost::iequals(type, "alltoall")) {
+                alltoall_service = nps;
+            }
+
+            if (boost::iequals(type, "vivaldi")) {
+                vivaldi_service = nps;
+            }
+        }
+
+        double alltoall_proximity = alltoall_service->query(hosts_to_compute_proximity);
+
+        while (alltoall_proximity < 0 && count < max_count) {
+            count++;
+            wrench::S4U_Simulation::sleep(10.0);
+            alltoall_proximity = alltoall_service->query(hosts_to_compute_proximity);
+        }
+
+        if (count == max_count) {
+            throw std::runtime_error("Never got an answer to proximity query");
+        }
+
+        if (alltoall_proximity < 0.0) {
+            throw std::runtime_error("Got a negative proximity value");
+        }
+
+        wrench::S4U_Simulation::sleep(100);
+        double vivaldi_proximity = vivaldi_service->query(hosts_to_compute_proximity);
+
+        if (vivaldi_proximity > 1000) {
+            throw std::runtime_error("Vivaldi proximity is larger than it should be");
+        }
+
+
+        // Check values
+        double epsilon = 0.1 * 1000;
+
+      if (fabs(1000 - alltoall_proximity) > epsilon) {
+        throw std::runtime_error("All-to-all algorithm goe a strange value: " + std::to_string(alltoall_proximity));
+      }
+
+      if (fabs(vivaldi_proximity - alltoall_proximity) > epsilon) {
+            throw std::runtime_error("Vivaldi algorithm did not converge");
+        }
+
+        hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[1],
+                                                    this->simulation->getHostnameList()[2]);
+
+        vivaldi_proximity = vivaldi_service->query(hosts_to_compute_proximity);
+
+        if (vivaldi_proximity < 0 || vivaldi_proximity > 0.000001) {
+            throw std::runtime_error("Vivaldi algorithm computed the wrong proximity between hosts connected by a 0 latency link");
+        }
+
+        // Terminate
+        this->shutdownAllServices();
+        return 0;
+    }
+};
+
+TEST_F(NetworkProximityTest, VivaldiConvergeTest) {
+    DO_TEST_WITH_FORK(do_VivaldiConverge_Test);
+}
+
+void NetworkProximityTest::do_VivaldiConverge_Test() {
+    // Create and initialize a simulation
+    wrench::Simulation *simulation = new wrench::Simulation();
+    int argc = 1;
+    char **argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+
+
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -329,12 +529,15 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new CompareProxTestWMS(
                   this,
-                  {compute_service}, {storage_service1}, hostname))));
+                  (std::set<wrench::ComputeService *>){compute_service},
+                  (std::set<wrench::StorageService *>){storage_service1},
+                  hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
+    // Create a file registry service
+    std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+            new wrench::FileRegistryService(hostname));
 
   simulation->setFileRegistryService(std::move(file_registry_service));
 
@@ -351,11 +554,21 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   std::string network_daemon4 = simulation->getHostnameList()[3];
   std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
 
-  std::unique_ptr<wrench::NetworkProximityService> network_proximity_service(
-          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network, 1, 2, 1)
-  );
+    std::unique_ptr<wrench::NetworkProximityService> alltoall_network_service = nullptr;
+    std::unique_ptr<wrench::NetworkProximityService> vivaldi_network_service = nullptr;
 
-  EXPECT_NO_THROW(simulation->setNetworkProximityService(std::move(network_proximity_service)));
+    // Add vivaldi and alltoall network proximity services
+    EXPECT_NO_THROW(alltoall_network_service = std::unique_ptr<wrench::NetworkProximityService>(
+            new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
+
+    EXPECT_NO_THROW(vivaldi_network_service = std::unique_ptr<wrench::NetworkProximityService>(
+            new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
+                                                 {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"}})));
+
+    EXPECT_NO_THROW(simulation->add(std::move(alltoall_network_service)));
+    EXPECT_NO_THROW(simulation->add(std::move(vivaldi_network_service)));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());

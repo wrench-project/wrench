@@ -350,7 +350,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     ComputeServiceInformationMessage::ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload)
-            : ComputeServiceMessage("INFORMATION_REPLY", payload), job(job), information(information) {}
+            : ComputeServiceMessage("INFORMATION_REPLY", payload), job(job), information(std::move(information)) {}
 
 
     /**
@@ -370,6 +370,18 @@ namespace wrench {
       this->answer_mailbox = answer_mailbox;
     }
 
+
+//    /**
+//     * @brief Constructor
+//     * @param num: information to reply back
+//     * @param payload: the message size in bytes
+//     *
+//     * @throw std::invalid_argument
+//     */
+//    ComputeServiceInformationMessage::ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload)
+//            : ComputeServiceMessage("INFORMATION_REPLY", payload), job(job), information(std::move(information)) {}
+
+
     /**
      * @brief Constructor
      * @param info: resource description
@@ -379,7 +391,4 @@ namespace wrench {
      */
     ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(std::map<std::string, std::vector<double>> info, double payload)
             : ComputeServiceMessage("RESOURCE_DESCRIPTION_ANSWER", payload), info(info) {}
-    
-    
-    
 };

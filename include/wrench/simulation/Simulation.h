@@ -51,11 +51,12 @@ namespace wrench {
 
         StorageService *add(std::unique_ptr<StorageService> executor);
 
+        NetworkProximityService *add(std::unique_ptr<NetworkProximityService> executor);
         WMS *add(std::unique_ptr<WMS>);
 
         void setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service);
 
-        void setNetworkProximityService(std::unique_ptr<NetworkProximityService> network_proximity_service);
+//        void setNetworkProximityService(std::unique_ptr<NetworkProximityService> network_proximity_service);
 
         void stageFile(WorkflowFile *file, StorageService *storage_service);
 
@@ -73,13 +74,16 @@ namespace wrench {
 
         FileRegistryService *getFileRegistryService();
 
-        NetworkProximityService *getNetworkProximityService();
+        void shutdownAllNetworkProximityServices();
 
+        std::set<ComputeService *> getRunningComputeServices();
         double getCurrentSimulatedDate();
 
         static double getHostMemoryCapacity(std::string hostname);
 
         static unsigned long getHostNumCores(std::string hostname);
+
+        std::set<NetworkProximityService *> getRunningNetworkProximityServices();
 
         static double getHostFlopRate(std::string hostname);
 
@@ -112,7 +116,7 @@ namespace wrench {
 
         std::unique_ptr<FileRegistryService> file_registry_service = nullptr;
 
-        std::unique_ptr<NetworkProximityService> network_proximity_service = nullptr;
+        std::set<std::unique_ptr<NetworkProximityService>> network_proximity_services;
 
         std::set<std::unique_ptr<ComputeService>> compute_services;
 

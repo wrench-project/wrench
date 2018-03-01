@@ -27,8 +27,8 @@ namespace wrench {
 
         NetworkProximityDaemon(std::string hostname,
                        std::string network_proximity_service_mailbox,
-        int message_size,double measurement_period,
-        int noise);
+        double message_size,double measurement_period,
+        double noise);
 
     private:
         std::map<std::string, std::string> default_property_values =
@@ -49,13 +49,13 @@ namespace wrench {
 
         NetworkProximityDaemon(std::string hostname,
                        std::string network_proximity_service_mailbox,
-                       int message_size,double measurement_period,
-                       int noise, std::string suffix);
+                       double message_size,double measurement_period,
+                       double noise, std::string suffix);
 
 
-        int message_size;
+        double message_size;
         double measurement_period;
-        int noise;
+        double max_noise;
         std::string suffix;
         std::string next_mailbox_to_send;
         std::string next_host_to_send;
@@ -63,8 +63,9 @@ namespace wrench {
 
         int main();
 
+        double getTimeUntilNextMeasurement();
 
-        bool processNextMessage(double timeout);
+          bool processNextMessage(double timeout);
     };
 
     /***********************/

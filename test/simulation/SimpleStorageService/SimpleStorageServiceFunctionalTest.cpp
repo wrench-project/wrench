@@ -927,7 +927,7 @@ private:
       this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_100);
       this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
       this->simulation->getTerminator()->shutdownNetworkProximityService(
-              this->simulation->getNetworkProximityService());
+              this->simulation->getRunningNetworkProximityServices());
       return 0;
     }
 };
@@ -1171,7 +1171,7 @@ private:
       this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_100);
       this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
       this->simulation->getTerminator()->shutdownNetworkProximityService(
-              this->simulation->getNetworkProximityService());
+              this->simulation->getRunningNetworkProximityServices());
       return 0;
     }
 };
