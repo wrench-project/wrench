@@ -33,4 +33,6 @@ namespace wrench {
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE);
 
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_DAEMON_COMMUNICATION_COVERAGE);
+    
+    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_PEER_LOOKUP_SEED);
 };
