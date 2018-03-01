@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,13 +8,14 @@
  *
  */
 
+#include <cfloat>
+#include <numeric>
+#include "CloudServiceMessage.h"
 #include "wrench/services/compute/cloud/CloudService.h"
 #include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "services/ServiceMessage.h"
-#include "CloudServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
 
@@ -37,7 +38,7 @@ namespace wrench {
     CloudService::CloudService(const std::string &hostname,
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
-                               std::vector<std::string> execution_hosts,
+                               std::vector<std::string> &execution_hosts,
                                StorageService *default_storage_service,
                                std::map<std::string, std::string> plist) :
             ComputeService(hostname, "cloud_service", "cloud_service", supports_standard_jobs, supports_pilot_jobs,
@@ -50,13 +51,6 @@ namespace wrench {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
-
-      // Start the daemon on the same host
-//      try {
-//        this->start_daemon(hostname);
-//      } catch (std::invalid_argument &e) {
-//        throw e;
-//      }
     }
 
     /**
@@ -75,11 +69,9 @@ namespace wrench {
      */
     std::vector<std::string> CloudService::getExecutionHosts() {
 
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
+      serviceSanityCheck();
 
-      // send a "get execution hosts" message to the daemon's mailbox
+      // send a "get execution hosts" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("get_execution_hosts");
 
       try {
@@ -114,6 +106,7 @@ namespace wrench {
      * @param pm_hostname: the name of the physical machine host
      * @param vm_hostname: the name of the new VM host
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
+     * @param ram_memory: the VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue)
      * @param plist: a property list ({} means "use all defaults")
      *
      * @return Whether the VM creation succeeded
@@ -123,20 +116,19 @@ namespace wrench {
     bool CloudService::createVM(const std::string &pm_hostname,
                                 const std::string &vm_hostname,
                                 unsigned long num_cores,
+                                double ram_memory,
                                 std::map<std::string, std::string> plist) {
 
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
+      serviceSanityCheck();
 
-      // send a "create vm" message to the daemon's mailbox
+      // send a "create vm" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new CloudServiceCreateVMRequestMessage(
-                                        answer_mailbox, pm_hostname, vm_hostname, num_cores, supports_standard_jobs,
-                                        supports_pilot_jobs, plist,
+                                        answer_mailbox, pm_hostname, vm_hostname, supports_standard_jobs,
+                                        supports_pilot_jobs, num_cores, ram_memory, plist,
                                         this->getPropertyValueAsDouble(
                                                 CloudServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -170,13 +162,11 @@ namespace wrench {
      */
     void CloudService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) {
 
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
+      serviceSanityCheck();
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
 
-      //  send a "run a standard job" message to the daemon's mailbox
+      //  send a "run a standard job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceSubmitStandardJobRequestMessage(
@@ -217,13 +207,11 @@ namespace wrench {
      */
     void CloudService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) {
 
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
-      }
+      serviceSanityCheck();
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_pilot_job");
 
-      // Send a "run a pilot job" message to the daemon's mailbox
+      // Send a "run a pilot job" message to the daemon's mailbox_name
       try {
         S4U_Mailbox::putMessage(
                 this->mailbox_name,
@@ -257,6 +245,28 @@ namespace wrench {
       }
     }
 
+
+    /**
+     * @brief Terminate a standard job to the compute service (virtual)
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
+    void CloudService::terminateStandardJob(StandardJob *job) {
+      throw std::runtime_error("CloudService::terminateStandardJob(): Not implemented yet!");
+    }
+
+    /**
+     * @brief Terminate a pilot job to the compute service (virtual)
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
+    void CloudService::terminatePilotJob(PilotJob *job) {
+      throw std::runtime_error("CloudService::terminatePilotJob(): Not implemented yet!");
+    }
+
+
     /**
     * @brief Main method of the daemon
     *
@@ -265,7 +275,7 @@ namespace wrench {
     int CloudService::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
-      WRENCH_INFO("Cloud Service starting on host %s listening on mailbox %s", this->hostname.c_str(),
+      WRENCH_INFO("Cloud Service starting on host %s listening on mailbox_name %s", this->hostname.c_str(),
                   this->mailbox_name.c_str());
 
       /** Main loop **/
@@ -290,7 +300,6 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
-
       } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
@@ -314,12 +323,8 @@ namespace wrench {
         }
         return false;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceNumCoresRequestMessage *>(message.get())) {
-        processGetNumCores(msg->answer_mailbox);
-        return true;
-
-      } else if (auto *msg = dynamic_cast<ComputeServiceNumIdleCoresRequestMessage *>(message.get())) {
-        processGetNumIdleCores(msg->answer_mailbox);
+      } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+        processGetResourceInformation(msg->answer_mailbox);
         return true;
 
       } else if (auto *msg = dynamic_cast<CloudServiceGetExecutionHostsRequestMessage *>(message.get())) {
@@ -327,8 +332,8 @@ namespace wrench {
         return true;
 
       } else if (auto *msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
-        processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->num_cores,
-                        msg->supports_standard_jobs, msg->supports_pilot_jobs, msg->plist);
+        processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->supports_standard_jobs,
+                        msg->supports_pilot_jobs, msg->num_cores, msg->ram_memory, msg->plist);
         return true;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
@@ -338,18 +343,6 @@ namespace wrench {
       } else if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
         processSubmitPilotJob(msg->answer_mailbox, msg->job);
         return true;
-
-      } else if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-        this->terminate();
-        // This is Synchronous
-        try {
-          S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                  new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                          CloudServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return false;
-        }
-        return false;
 
       } else {
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -381,9 +374,10 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param pm_hostname: the name of the physical machine host
      * @param vm_hostname: the name of the VM host
-     * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
+     * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
+     * @param ram_memory: the VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue)
      * @param plist: a property list ({} means "use all defaults")
      *
      * @throw std::runtime_error
@@ -391,12 +385,13 @@ namespace wrench {
     void CloudService::processCreateVM(const std::string &answer_mailbox,
                                        const std::string &pm_hostname,
                                        const std::string &vm_hostname,
-                                       int num_cores,
                                        bool supports_standard_jobs,
                                        bool supports_pilot_jobs,
+                                       unsigned long num_cores,
+                                       double ram_memory,
                                        std::map<std::string, std::string> plist) {
 
-      WRENCH_INFO("Asked to create a VM on %s with %d cores", pm_hostname.c_str(), num_cores);
+      WRENCH_INFO("Asked to create a VM on %s with %d cores", pm_hostname.c_str(), (int) num_cores);
 
       try {
 
@@ -405,15 +400,33 @@ namespace wrench {
             num_cores = S4U_Simulation::getNumCores(pm_hostname);
           }
 
-          simgrid::s4u::VirtualMachine *vm = new simgrid::s4u::VirtualMachine(vm_hostname.c_str(),
-                                                                              simgrid::s4u::Host::by_name(
-                                                                                      pm_hostname), num_cores);
+          // RAM memory management
+          if (this->cs_available_ram.find(pm_hostname) == this->cs_available_ram.end()) {
+            this->cs_available_ram[pm_hostname] = S4U_Simulation::getHostMemoryCapacity(pm_hostname);
+          }
+          if (ram_memory <= 0 || ram_memory == ComputeService::ALL_RAM) {
+            ram_memory = this->cs_available_ram[pm_hostname];
+          }
+          if (this->cs_available_ram[pm_hostname] == 0 || this->cs_available_ram[pm_hostname] < ram_memory) {
+            throw std::runtime_error("Requested memory is below available memory");
+          }
+
+          // create a VM on the provided physical machine
+          simgrid::s4u::VirtualMachine *vm = new simgrid::s4u::VirtualMachine(
+                  vm_hostname.c_str(), simgrid::s4u::Host::by_name(pm_hostname), num_cores);
 
           // create a multihost multicore computer service for the VM
+          std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
+                  std::make_tuple(vm_hostname, num_cores, ram_memory)};
+
           std::unique_ptr<ComputeService> cs(
-                  new MultihostMulticoreComputeService(vm_hostname, supports_standard_jobs, supports_pilot_jobs,
-                                                       {std::make_pair(vm_hostname, num_cores)},
+                  new MultihostMulticoreComputeService(vm_hostname,
+                                                       supports_standard_jobs,
+                                                       supports_pilot_jobs,
+                                                       compute_resources,
                                                        default_storage_service, plist));
+
+          this->cs_available_ram[pm_hostname] -= ram_memory;
 
           cs->setSimulation(this->simulation);
 
@@ -423,7 +436,6 @@ namespace wrench {
           } catch (std::runtime_error &e) {
             throw;
           }
-
 
           this->vm_list[vm_hostname] = std::make_tuple(vm, std::move(cs), num_cores);
 
@@ -439,56 +451,6 @@ namespace wrench {
                           false,
                           this->getPropertyValueAsDouble(CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
         }
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
-
-    /**
-     * @brief Process a get number of cores request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     *
-     * @throw std::runtime_error
-     */
-    void CloudService::processGetNumCores(const std::string &answer_mailbox) {
-
-      unsigned int total_num_cores = 0;
-      for (auto &vm : this->vm_list) {
-        total_num_cores += std::get<2>(vm.second);
-      }
-
-      ComputeServiceNumCoresAnswerMessage *answer_message = new ComputeServiceNumCoresAnswerMessage(
-              total_num_cores,
-              this->getPropertyValueAsDouble(
-                      ComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
-      try {
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
-
-    /**
-     * @brief Process a get number of idle cores request
-     *
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     *
-     * @throw std::runtime_error
-     */
-    void CloudService::processGetNumIdleCores(const std::string &answer_mailbox) {
-
-      unsigned int total_num_available_cores = 0;
-      for (auto &vm : this->vm_list) {
-        total_num_available_cores += std::get<1>(vm.second)->getNumIdleCores();
-      }
-
-      ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
-              total_num_available_cores,
-              this->getPropertyValueAsDouble(
-                      MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
-      try {
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -523,8 +485,11 @@ namespace wrench {
 
       for (auto &vm : vm_list) {
         ComputeService *cs = std::get<1>(vm.second).get();
+        unsigned long sum_num_idle_cores;
+        std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
+        sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
         if (std::get<2>(vm.second) >= job->getMinimumRequiredNumCores() &&
-            cs->getNumIdleCores() >= job->getMinimumRequiredNumCores()) {
+            sum_num_idle_cores >= job->getMinimumRequiredNumCores()) {
           cs->submitStandardJob(job, service_specific_args);
           try {
             S4U_Mailbox::dputMessage(
@@ -619,6 +584,78 @@ namespace wrench {
     }
 
     /**
+     * @brief Process a "get resource information message"
+     * @param answer_mailbox: the mailbox to which the description message should be sent
+     */
+    void CloudService::processGetResourceInformation(const std::string &answer_mailbox) {
+      // Build a dictionary
+      std::map<std::string, std::vector<double>> dict;
+
+      // Num hosts
+      std::vector<double> num_hosts;
+      num_hosts.push_back((double)(this->vm_list.size()));
+      dict.insert(std::make_pair("num_hosts", num_hosts));
+
+      // Num cores per vm
+      std::vector<double> num_cores;
+      for (auto &vm : this->vm_list) {
+        num_cores.push_back(std::get<2>(vm.second));
+      }
+
+      dict.insert(std::make_pair("num_cores", num_cores));
+
+      // Num idle cores per vm
+      std::vector<double> num_idle_cores;
+      for (auto &vm : this->vm_list) {
+        std::vector<unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
+        num_idle_cores.push_back(std::accumulate(idle_core_counts.begin(), idle_core_counts.end(), 0));
+      }
+
+      dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
+
+      // Flop rate per vm
+      std::vector<double> flop_rates;
+      for (auto &vm : this->vm_list) {
+        // TODO: This is calling a S4U thing directly, without going though our
+        // TODO: S4U_Simulation class (perhaps change later, but then the CloudService
+        // TODO: implementation will have to change since it uses the simgrid::s4u stuff
+        // TODO: directly
+        flop_rates.push_back((std::get<0>(vm.second))->getPstateSpeed(0));
+      }
+      dict.insert(std::make_pair("flop_rates", flop_rates));
+
+      // RAM capacity per host
+      std::vector<double> ram_capacities;
+      for (auto &vm : this->vm_list) {
+        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(std::get<0>(vm)));
+      }
+      dict.insert(std::make_pair("ram_capacities", ram_capacities));
+
+      // RAM availability per host
+      std::vector<double> ram_availabilities;
+      for (auto &vm : this->vm_list) {
+        ram_availabilities.push_back(
+                ComputeService::ALL_RAM);  // TODO FOR RAFAEL : What about VM memory availabilities???
+      }
+      dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
+
+      std::vector<double> ttl;
+      ttl.push_back(ComputeService::ALL_RAM);
+      dict.insert(std::make_pair("ttl", ttl));
+
+      // Send the reply
+      ComputeServiceResourceInformationAnswerMessage *answer_message = new ComputeServiceResourceInformationAnswerMessage(
+              dict,
+              this->getPropertyValueAsDouble(
+                      ComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
+      try {
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
+
+    /**
     * @brief Terminate the daemon.
     */
     void CloudService::terminate() {
@@ -626,7 +663,11 @@ namespace wrench {
 
       WRENCH_INFO("Stopping VMs Compute Service");
       for (auto &vm : this->vm_list) {
+        this->cs_available_ram[(std::get<0>(vm.second))->getPm()->getName()] += S4U_Simulation::getHostMemoryCapacity(
+                std::get<0>(vm));
         std::get<1>(vm.second)->stop();
       }
     }
+
+
 }

@@ -11,7 +11,7 @@
 
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
 
-#include "simulation/SimulationMessage.h"
+#include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "services/storage/StorageServiceMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
@@ -34,16 +34,17 @@ namespace wrench {
      */
     std::unique_ptr<WorkflowExecutionEvent> WorkflowExecutionEvent::waitForNextExecutionEvent(std::string mailbox) {
 
-      // Get the message from the mailbox
+      // Get the message from the mailbox_name
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
       std::unique_ptr<WorkflowExecutionEvent> event =
               std::unique_ptr<WorkflowExecutionEvent>(new WorkflowExecutionEvent());
+
 
       if (ComputeServiceStandardJobDoneMessage *m = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
         event->type = WorkflowExecutionEvent::STANDARD_JOB_COMPLETION;

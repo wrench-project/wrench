@@ -11,10 +11,11 @@
 #define WRENCH_SIMPLESTORAGESERVICE_H
 
 
+#include <wrench/services/storage/simple/NetworkConnection.h>
+#include <wrench/services/storage/simple/NetworkConnectionManager.h>
 #include "wrench/services/storage/StorageService.h"
 #include "SimpleStorageServiceProperty.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
-#include "IncomingFile.h"
 
 namespace wrench {
 
@@ -45,6 +46,7 @@ namespace wrench {
                  {SimpleStorageServiceProperty::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                  {SimpleStorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD,   "1024"},
                  {SimpleStorageServiceProperty::FILE_READ_ANSWER_MESSAGE_PAYLOAD,    "1024"},
+                 {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS,  "infinity"},
                 };
 
     public:
@@ -76,11 +78,13 @@ namespace wrench {
                              std::map<std::string, std::string>,
                              std::string suffix);
 
-        int main();
+        int main() override;
 
-        bool processControlMessage(std::unique_ptr<S4U_PendingCommunication> comm);
+        bool processControlMessage(std::unique_ptr<NetworkConnection> connection);
 
-        bool processDataMessage(std::unique_ptr<S4U_PendingCommunication> comm);
+        bool processDataConnection(std::unique_ptr<NetworkConnection> connection);
+        bool processIncomingDataConnection(std::unique_ptr<NetworkConnection> connection);
+        bool processOutgoingDataConnection(std::unique_ptr<NetworkConnection> connection);
 
         unsigned long getNewUniqueNumber();
 
@@ -91,10 +95,10 @@ namespace wrench {
 
         bool processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox);
 
-//        std::vector<S4U_PendingCommunication *> pending_communications;
-        std::vector<std::unique_ptr<S4U_PendingCommunication>> pending_communications;
+        unsigned long num_concurrent_connections;
 
-        std::map<S4U_PendingCommunication *, std::unique_ptr<IncomingFile>> incoming_files;
+        std::unique_ptr<NetworkConnectionManager> network_connection_manager;
+
 
     };
 

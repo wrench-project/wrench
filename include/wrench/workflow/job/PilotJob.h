@@ -53,6 +53,8 @@ namespace wrench {
 
         unsigned long getNumCoresPerHost() const;
 
+        double getMemoryPerHost() const;
+
         double getDuration() const;
 
 
@@ -72,10 +74,11 @@ namespace wrench {
 
         friend class JobManager;
 
-        PilotJob(Workflow *workflow, unsigned long num_hosts, unsigned long num_cores_per_host, double duration);
+        PilotJob(Workflow *workflow, unsigned long num_hosts, unsigned long num_cores_per_host, double ram_per_host, double duration);
 
         unsigned long num_hosts;
         unsigned long num_cores_per_host;
+        double ram_per_host;
         double duration;
 
 

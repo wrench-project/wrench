@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,16 +11,18 @@
 #define WRENCH_WMS_H
 
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
-#include "wrench/wms/scheduler/Scheduler.h"
-#include "DynamicOptimization.h"
-#include "StaticOptimization.h"
+#include "wrench/wms/DynamicOptimization.h"
+#include "wrench/wms/StaticOptimization.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
+#include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/workflow/Workflow.h"
 #include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
 
 namespace wrench {
 
     class Simulation;
+    class JobManager;
+    class DataMovementManager;
 
     /**
      * @brief A top-level class that defines a workflow management system (WMS)
@@ -28,11 +30,13 @@ namespace wrench {
     class WMS : public S4U_Daemon {
 
     public:
+        void addWorkflow(Workflow *workflow, double start_time = 0);
+        Workflow *getWorkflow();
+
+
         void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
         void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
-
-        void setPilotJobScheduler(std::unique_ptr<PilotJobScheduler>);
 
         /***********************/
         /** \cond DEVELOPER */
@@ -50,16 +54,28 @@ namespace wrench {
         /** \cond DEVELOPER */
         /***********************/
 
-        WMS(Workflow *workflow,
-            std::unique_ptr<Scheduler> scheduler,
-            std::string &hostname,
-            std::string suffix);
+        WMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
+            std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
+            const std::set<ComputeService *> &compute_services,
+            const std::set<StorageService *> &storage_services,
+            const std::string &hostname,
+            const std::string suffix);
 
         void start();
+
+        void checkDeferredStart();
+
+        std::unique_ptr<JobManager> createJobManager();
+
+        std::unique_ptr<DataMovementManager> createDataMovementManager();
 
         void runDynamicOptimizations();
 
         void runStaticOptimizations();
+
+        std::set<ComputeService *> getRunningComputeServices();
+
+        void shutdownAllServices();
 
         void waitForAndProcessNextEvent();
 
@@ -85,16 +101,25 @@ namespace wrench {
         /***********************/
 
         friend class Simulation;
+        friend class DataMovementManager;
+        friend class JobManager;
 
         /** @brief The current simulation */
         Simulation *simulation;
         /** @brief The workflow to execute */
         Workflow *workflow;
+        /** @brief the WMS simulated start time */
+        double start_time;
+        /** @brief List of available compute services */
+        std::set<ComputeService *> compute_services;
+        /** @brief List of available storage services */
+        std::set<StorageService *> storage_services;
 
-        /** @brief The selected scheduler */
-        std::unique_ptr<Scheduler> scheduler;
-        /** @brief The pilot job scheduler */
+        /** @brief The standard job scheduler */
+        std::unique_ptr<StandardJobScheduler> standard_job_scheduler = nullptr;
+        /** @brief The standard job scheduler */
         std::unique_ptr<PilotJobScheduler> pilot_job_scheduler = nullptr;
+
         /** @brief The enabled dynamic optimizations */
         std::vector<std::unique_ptr<DynamicOptimization>> dynamic_optimizations;
         /** @brief The enabled static optimizations */

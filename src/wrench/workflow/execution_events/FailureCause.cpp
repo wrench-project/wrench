@@ -193,7 +193,7 @@ namespace wrench {
      * @param compute_service: the compute service that didn't have enough cores
      */
     NotEnoughComputeResources::NotEnoughComputeResources(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
-            NOT_ENOUGH_CORES) {
+            NOT_ENOUGH_COMPUTE_RESOURCES) {
       this->job = job;
       this->compute_service = compute_service;
     }
@@ -266,7 +266,7 @@ namespace wrench {
       } else {
         operation = "receiving from";
       }
-      return "Network error (link failure, or communication peer died) while " + operation + " mailbox " + this->mailbox;
+      return "Network error (link failure, or communication peer died) while " + operation + " mailbox_name " + this->mailbox;
     };
 
     /**
@@ -312,7 +312,7 @@ namespace wrench {
       } else {
         operation = "receiving from";
       }
-      return "Network timeout while " + operation + " mailbox " + this->mailbox;
+      return "Network timeout while " + operation + " mailbox_name " + this->mailbox;
     };
 
     /**

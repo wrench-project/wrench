@@ -10,7 +10,7 @@
 
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <services/ServiceMessage.h>
+#include <wrench/services/ServiceMessage.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
@@ -33,7 +33,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Mult
 namespace wrench {
 
     WorkunitMulticoreExecutor::~WorkunitMulticoreExecutor() {
-//      WRENCH_INFO("In WORKUNIT_MULTICORE_EXECUTOR DESTRUCTOR");
     }
 
     /**
@@ -42,6 +41,7 @@ namespace wrench {
      * @param simulation: the simulation
      * @param hostname: the name of the host
      * @param num_cores: the number of cores available to the executor
+     * @param ram_utilization: the number of bytes of RAM used by the executor
      * @param callback_mailbox: the callback mailbox to which the worker
      *        thread can send "work done" messages
      * @param workunit: the workunit to perform
@@ -52,6 +52,7 @@ namespace wrench {
             Simulation *simulation,
             std::string hostname,
             unsigned long num_cores,
+            double ram_utilization,
             std::string callback_mailbox,
             Workunit *workunit,
             StorageService *default_storage_service,
@@ -71,6 +72,7 @@ namespace wrench {
       this->workunit = workunit;
       this->thread_startup_overhead = thread_startup_overhead;
       this->num_cores = num_cores;
+      this->ram_utilization = ram_utilization;
       this->default_storage_service = default_storage_service;
 
       // Start my daemon on the host
@@ -151,28 +153,27 @@ namespace wrench {
 
       // Send the callback
       if (success) {
-        WRENCH_INFO("Notifying mailbox %s that work has completed",
+        WRENCH_INFO("Notifying mailbox_name %s that work has completed",
                     this->callback_mailbox.c_str());
       } else {
-        WRENCH_INFO("Notifying mailbox %s that work has failed",
+        WRENCH_INFO("Notifying mailbox_name %s that work has failed",
                     this->callback_mailbox.c_str());
       }
 
 
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox, msg_to_send_back);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         WRENCH_INFO("Work unit executor on can't report back due to network error.. aborting!");
         this->workunit = nullptr; // To decrease the ref count
         return 0;
-      } catch (std::shared_ptr<FatalFailure> cause) {
+      } catch (std::shared_ptr<FatalFailure> &cause) {
         WRENCH_INFO("Work unit executor got a fatal failure... aborting!");
         this->workunit = nullptr; // To decrease the ref count
         return 0;
       }
 
       WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
-      this->workunit = nullptr; // To decrease the ref count
       return 0;
     }
 
@@ -389,6 +390,14 @@ namespace wrench {
      */
     unsigned long WorkunitMulticoreExecutor::getNumCores() {
       return this->num_cores;
+    }
+
+    /**
+     * @brief Returns the RAM the executor is utilizing
+     * @return number of bytes
+     */
+    double WorkunitMulticoreExecutor::getMemoryUtilization() {
+      return this->ram_utilization;
     }
 
 };

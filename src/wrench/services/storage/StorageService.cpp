@@ -227,6 +227,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
+
       // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
 
@@ -241,8 +242,7 @@ namespace wrench {
       if (StorageServiceFileReadAnswerMessage *msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
         // If it's not a success, throw an exception
         if (not msg->success) {
-          std::shared_ptr<FailureCause> cause = msg->failure_cause;
-          msg->failure_cause = nullptr; // TODO: Why this is needed to avoid a memory leak?
+          std::shared_ptr<FailureCause> &cause = msg->failure_cause;
           throw WorkflowExecutionException(cause);
         }
 
@@ -306,7 +306,6 @@ namespace wrench {
       }
 
       // Wait for a reply
-      WRENCH_INFO("GETTING A REPLY");
       std::unique_ptr<SimulationMessage> message;
 
       try {
@@ -315,7 +314,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (StorageServiceFileWriteAnswerMessage *msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
         // If not a success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -388,7 +387,6 @@ namespace wrench {
      * @param files: the set of files to read/write
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
-     * @return nullptr on success, or a workflow execution failure cause on failure
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -398,6 +396,16 @@ namespace wrench {
                                           std::map<WorkflowFile *, StorageService *> file_locations,
                                           StorageService *default_storage_service) {
 
+      for (auto f : files) {
+        if (f == nullptr) {
+          throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid files argument");
+        }
+      }
+      for (auto l : file_locations) {
+        if ((l.first == nullptr) || (l.second == nullptr)) {
+          throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid file location argument");
+        }
+      }
       for (auto f : files) {
 
         // Identify the Storage Service
@@ -684,7 +692,7 @@ namespace wrench {
                                  message->getName() + "] message!");
       }
 
-      WRENCH_INFO("File read request accepted (will receive file content on mailbox %s)",
+      WRENCH_INFO("File read request accepted (will receive file content on mailbox_name %s)",
                   mailbox_that_should_receive_file_content.c_str());
       // At this point, the file should show up at some point on the mailbox_that_should_receive_file_content
       return;

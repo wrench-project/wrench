@@ -13,6 +13,8 @@
 #include <map>
 
 #include <iostream>
+#include <cfloat>
+#include <climits>
 
 #include "wrench/services/Service.h"
 #include "wrench/workflow/job/WorkflowJob.h"
@@ -34,18 +36,18 @@ namespace wrench {
 
     public:
 
+        static constexpr unsigned long ALL_CORES = ULONG_MAX;
+        static constexpr double ALL_RAM = DBL_MAX;
+
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-
 
         virtual ~ComputeService(){}
 
         void stop() override;
 
-//        void runJob(WorkflowJob *job);
-
-        void runJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args = {});
+        void submitJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args = {});
 
         void terminateJob(WorkflowJob *job);
 
@@ -53,30 +55,34 @@ namespace wrench {
 
         bool supportsPilotJobs();
 
-        unsigned long getNumCores();
+        unsigned long getNumHosts();
 
-        unsigned long getNumIdleCores();
+        std::vector<unsigned long> getNumCores();
 
-        virtual double getCoreFlopRate();
+        std::vector<unsigned long> getNumIdleCores();
 
-        virtual double getTTL();
+        std::vector<double> getMemoryCapacity();
+
+        std::vector<double> getCoreFlopRate();
+
+        double getTTL();
 
         void setDefaultStorageService(StorageService *storage_service);
 
         StorageService *getDefaultStorageService();
 
         virtual void
-        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments);
+        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
-        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments);
+        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual void terminateStandardJob(StandardJob *job);
+        virtual void terminateStandardJob(StandardJob *job) = 0;
 
-        virtual void terminatePilotJob(PilotJob *job);
+        virtual void terminatePilotJob(PilotJob *job) = 0;
 
         ComputeService(std::string hostname,
                        std::string service_name,
@@ -87,14 +93,12 @@ namespace wrench {
 
     protected:
 
-        virtual void processGetNumCores(const std::string &answer_mailbox);
+//        virtual void processGetResourceInformation(const std::string &answer_mailbox) = 0;
 
-        virtual void processGetNumIdleCores(const std::string &answer_mailbox);
-
-        virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-                                              std::map<std::string, std::string> &service_specific_args);
-
-        virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
+//        virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+//                                              std::map<std::string, std::string> &service_specific_args) = 0;
+//
+//        virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) = 0;
 
         /** @brief Whether the compute service supports pilot jobs */
         bool supports_pilot_jobs;
@@ -102,6 +106,10 @@ namespace wrench {
         bool supports_standard_jobs;
         /** @brief The default storage service associated to the compute service (nullptr if none) */
         StorageService *default_storage_service;
+
+    private:
+
+        std::map<std::string, std::vector<double>> getServiceResourceInformation();
 
         /***********************/
         /** \endcond          **/

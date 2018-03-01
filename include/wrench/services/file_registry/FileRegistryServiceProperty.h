@@ -36,7 +36,7 @@ namespace wrench {
         /** @brief The number of bytes in the control message sent by the daemon to answer an entry removal request **/
         DECLARE_PROPERTY_NAME(REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD);
 
-        /** @brief The overhead, in seconds, of looking up entries for a file **/
+        /** @brief The computational cost, in flops, of looking up entries for a file **/
         DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
         
     };

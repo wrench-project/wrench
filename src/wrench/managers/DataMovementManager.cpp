@@ -10,12 +10,13 @@
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <simulation/SimulationMessage.h>
-#include <services/ServiceMessage.h>
+#include <wrench/simulation/SimulationMessage.h>
+#include <wrench/services/ServiceMessage.h>
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <services/storage/StorageServiceMessage.h>
 #include <wrench/workflow/WorkflowFile.h>
+#include <wrench/wms/WMS.h>
 #include "wrench/workflow/Workflow.h"
 #include "wrench/managers/DataMovementManager.h"
 
@@ -28,10 +29,18 @@ namespace wrench {
      *
      * @param workflow: the workflow whose data (files) are to be managed
      */
-    DataMovementManager::DataMovementManager(Workflow *workflow) :
+    DataMovementManager::DataMovementManager(WMS *wms) :
             S4U_Daemon("data_movement_manager", "data_movement_manager") {
 
-      this->workflow = workflow;
+      this->wms = wms;
+
+      // Get myself known to schedulers
+      if (this->wms->standard_job_scheduler) {
+        this->wms->standard_job_scheduler->setDataMovementManager(this);
+      }
+      if (this->wms->pilot_job_scheduler) {
+        this->wms->pilot_job_scheduler->setDataMovementManager(this);
+      }
 
       // Start the daemon
       std::string localhost = S4U_Simulation::getHostName();
@@ -61,7 +70,7 @@ namespace wrench {
     void DataMovementManager::stop() {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new ServiceStopDaemonMessage("", 0.0));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
     }
@@ -145,9 +154,9 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
-      }  catch (std::shared_ptr<FatalFailure> cause) {
+      }  catch (std::shared_ptr<FatalFailure> &cause) {
         return true;
       }
 
@@ -158,11 +167,11 @@ namespace wrench {
 
       WRENCH_INFO("Data Movement Manager got a %s message", message->getName().c_str());
 
-      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         // There shouldn't be any need to clean any state up
         return false;
 
-      } else if (StorageServiceFileCopyAnswerMessage *msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
         // Forward it back
         try {
@@ -170,7 +179,7 @@ namespace wrench {
                                    new StorageServiceFileCopyAnswerMessage(msg->file,
                                                                            msg->storage_service, msg->success,
                                                                            std::move(msg->failure_cause), 0));
-        } catch  (std::shared_ptr<NetworkError> cause) {
+        } catch  (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
         return true;

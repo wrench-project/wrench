@@ -12,8 +12,9 @@
 #define WRENCH_COMPUTESERVICEMESSAGE_H
 
 #include <memory>
+#include <vector>
 #include "wrench/workflow/execution_events/FailureCause.h"
-#include "services/ServiceMessage.h"
+#include "wrench/services/ServiceMessage.h"
 
 namespace wrench {
 
@@ -233,50 +234,6 @@ namespace wrench {
     };
 
     /**
-     * @brief ComputeServiceNumCoresRequestMessage class
-     */
-    class ComputeServiceNumCoresRequestMessage : public ComputeServiceMessage {
-    public:
-        ComputeServiceNumCoresRequestMessage(std::string answer_mailbox, double payload);
-
-        /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
-    };
-
-    /**
-     * @brief ComputeServiceNumCoresAnswerMessage class
-     */
-    class ComputeServiceNumCoresAnswerMessage : public ComputeServiceMessage {
-    public:
-        ComputeServiceNumCoresAnswerMessage(unsigned long num, double payload);
-
-        /** @brief The number of cores */
-        unsigned long num_cores;
-    };
-
-    /**
-  * @brief ComputeServiceNumIdleCoresRequestMessage class
-  */
-    class ComputeServiceNumIdleCoresRequestMessage : public ComputeServiceMessage {
-    public:
-        ComputeServiceNumIdleCoresRequestMessage(std::string answer_mailbox, double payload);
-
-        /** @brief The mailbox to which the answer message should be sent */
-        std::string answer_mailbox;
-    };
-
-    /**
-     * @brief ComputeServiceNumIdleCoresAnswerMessage class
-     */
-    class ComputeServiceNumIdleCoresAnswerMessage : public ComputeServiceMessage {
-    public:
-        ComputeServiceNumIdleCoresAnswerMessage(unsigned long num, double payload);
-
-        /** @brief The number of idle cores */
-        unsigned long num_idle_cores;
-    };
-
-    /**
      * @brief ComputeServiceInformationMessage class
      */
     class ComputeServiceInformationMessage : public ComputeServiceMessage {
@@ -288,6 +245,28 @@ namespace wrench {
 
         /** @brief The information to reply back */
         std::string information;
+    };
+
+
+    /**
+     * @brief ComputeServiceResourceDescriptionRequestMessage class
+    */
+    class ComputeServiceResourceInformationRequestMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceResourceInformationRequestMessage(std::string answer_mailbox, double payload);
+
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+    };
+
+    /**
+     * @brief ComputeServiceNumIdleCoresAnswerMessage class
+     */
+    class ComputeServiceResourceInformationAnswerMessage : public ComputeServiceMessage {
+    public:
+        ComputeServiceResourceInformationAnswerMessage(std::map<std::string, std::vector<double>> info, double payload);
+
+        std::map<std::string, std::vector<double>> info;
     };
 
 

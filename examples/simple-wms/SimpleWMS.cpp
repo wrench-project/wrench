@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,25 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_wms, "Log category for Simple WMS");
 namespace wrench {
 
     /**
-     * @brief Create a Simple WMS with a workflow instance and a scheduler implementation
+     * @brief Create a Simple WMS with a workflow instance, a scheduler implementation, and a list of compute services
      *
-     * @param workflow: a workflow to execute
-     * @param scheduler: a scheduler implementation
+     * @param standard_job_scheduler: a standard job scheduler implementation (if nullptr none is used)
+     * @param pilot_job_scheduler: a pilot job scheduler implementation if nullptr none is used)
+     * @param compute_services: a set of compute services available to run jobs
+     * @param storage_services: a set of storage services available to the WMS
      * @param hostname: the name of the host on which to start the WMS
      */
-    SimpleWMS::SimpleWMS(Workflow *workflow,
-                         std::unique_ptr<Scheduler> scheduler,
-                         std::string hostname) : WMS(workflow,
-                                                     std::move(scheduler),
-                                                     hostname,
-                                                     "simple") {}
+    SimpleWMS::SimpleWMS(std::unique_ptr<StandardJobScheduler> standard_job_scheduler,
+                         std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
+                         const std::set<ComputeService *> &compute_services,
+                         const std::set<StorageService *> &storage_services,
+                         const std::string &hostname) : WMS(
+            std::move(standard_job_scheduler),
+            std::move(pilot_job_scheduler),
+            compute_services,
+            storage_services,
+            hostname,
+            "simple") {}
 
     /**
      * @brief main method of the SimpleWMS daemon
@@ -40,17 +47,20 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
 
-      WRENCH_INFO("Starting on host %s listening on mailbox %s",
+      // Check whether the WMS has a deferred start time
+      checkDeferredStart();
+
+      WRENCH_INFO("Starting on host %s listening on mailbox_name %s",
                   S4U_Simulation::getHostName().c_str(),
                   this->mailbox_name.c_str());
       WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
 
       // Create a job manager
-      this->job_manager = std::unique_ptr<JobManager>(new JobManager(this->workflow));
+
+      this->job_manager = this->createJobManager();
 
       // Create a data movement manager
-      std::unique_ptr<DataMovementManager> data_movement_manager = std::unique_ptr<DataMovementManager>(
-              new DataMovementManager(this->workflow));
+      std::unique_ptr<DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Perform static optimizations
       runStaticOptimizations();
@@ -61,9 +71,9 @@ namespace wrench {
         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks = this->workflow->getReadyTasks();
 
         // Get the available compute services
-        std::set<ComputeService *> compute_services = this->simulation->getRunningComputeServices();
+        std::set<ComputeService *> compute_services = this->getRunningComputeServices();
 
-        if (compute_services.size() == 0) {
+        if (compute_services.empty()) {
           WRENCH_INFO("Aborting - No compute services available!");
           break;
         }
@@ -71,8 +81,8 @@ namespace wrench {
         // Submit pilot jobs
         if (this->pilot_job_scheduler) {
           WRENCH_INFO("Scheduling pilot jobs...");
-          this->pilot_job_scheduler.get()->schedule(this->scheduler.get(), this->workflow, this->job_manager.get(),
-                                                    this->simulation->getRunningComputeServices());
+          this->pilot_job_scheduler->schedulePilotJobs(
+                                                    this->getRunningComputeServices());
         }
 
         // Perform dynamic optimizations
@@ -80,9 +90,9 @@ namespace wrench {
 
         // Run ready tasks with defined scheduler implementation
         WRENCH_INFO("Scheduling tasks...");
-        this->scheduler->scheduleTasks(this->job_manager.get(),
-                                       ready_tasks,
-                                       this->simulation->getRunningComputeServices());
+        this->standard_job_scheduler->scheduleTasks(
+                                       this->getRunningComputeServices(),
+                                       ready_tasks);
 
         // Wait for a workflow execution event, and process it
         try {
@@ -111,14 +121,8 @@ namespace wrench {
 //      simgrid::s4u::Actor::killAll();
 //      return 0;
 
-      WRENCH_INFO("Simple WMS Daemon is shutting down all Compute Services");
-      this->simulation->shutdownAllComputeServices();
-
-      WRENCH_INFO("Simple WMS Daemon is shutting down all Data Services");
-      this->simulation->shutdownAllStorageServices();
-
-      WRENCH_INFO("Simple WMS Daemon is shutting down the File Registry Service");
-      this->simulation->getFileRegistryService()->stop();
+      WRENCH_INFO("Simple WMS Daemon is shutting all services");
+      this->shutdownAllServices();
 
       WRENCH_INFO("Simple WMS Daemon is shutting down the Network Proximity Service");
       this->simulation->shutdownAllNetworkProximityServices();
@@ -141,7 +145,7 @@ namespace wrench {
      * @param event: a workflow execution event
      */
     void SimpleWMS::processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent> event) {
-      StandardJob *job = (StandardJob *) (event->job);
+      auto job = (StandardJob *) (event->job);
       WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
       WRENCH_INFO("CauseType: %s", event->failure_cause->toString().c_str());
       this->job_manager->forgetJob(job);

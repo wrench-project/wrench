@@ -12,7 +12,7 @@
 #define WRENCH_FILEREGISTRYMESSAGE_H
 
 
-#include <services/ServiceMessage.h>
+#include <wrench/services/ServiceMessage.h>
 #include <iostream>
 
 namespace wrench {

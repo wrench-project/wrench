@@ -7,32 +7,41 @@
  * (at your option) any later version.
  */
 
+
 #ifndef WRENCH_PILOTJOBSCHEDULER_H
 #define WRENCH_PILOTJOBSCHEDULER_H
 
-#include <set>
 
-#include "wrench/managers/JobManager.h"
-#include "wrench/wms/scheduler/Scheduler.h"
-#include "wrench/workflow/Workflow.h"
+#include <set>
 
 namespace wrench {
 
-    /**
-     * @brief A pilot job scheduler
-     */
+    class ComputeService;
+    class DataMovementManager;
+    class JobManager;
+
     class PilotJobScheduler {
 
-    public:
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
-        virtual void schedule(Scheduler *, Workflow *, JobManager *, const std::set<ComputeService *> &) = 0;
 
-        /***********************/
-        /** \endcond           */
-        /***********************/
+    public:
+        virtual void schedulePilotJobs(const std::set<ComputeService *> &compute_services) = 0;
+
+        void setDataMovementManager(DataMovementManager *data_movement_manager) {
+          this->data_movement_manager = data_movement_manager;
+        }
+
+        void setJobManager(JobManager *job_manager) {
+          this->job_manager = job_manager;
+        }
+
+    protected:
+
+        DataMovementManager *data_movement_manager;
+        JobManager *job_manager;
+
+
     };
-}
+};
+
 
 #endif //WRENCH_PILOTJOBSCHEDULER_H

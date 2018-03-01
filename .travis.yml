@@ -2,240 +2,63 @@ language: cpp
 
 sudo: required
 
-matrix:
-  include:
-    - os: osx
-      compiler: clang
-    - os: linux
-      compiler: gcc
-      dist: trusty
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports
-            - boost-latest
-          packages:
-            - g++-5
-            - gcc-5
-            - cmake
-            - cmake-data
-            - doxygen
-            - doxygen-doc
-            - doxygen-latex
-            - doxygen-gui
-            - graphviz
-            - libboost-all-dev
-        sonarcloud:
-          organization: "wrench"
-          token:
-            secure: "a3gk/Phr7yPccMhzBp6LRwEkIXWwSMbeC20sm0N5O/eZ63gN+4sp371pQcUugoPIXBa1jLMeJLL0we950EY9/kFPMVTdscHJ1OOwrM98R65dTtayxLOhDf1D8GTnrOIdpuH9vMatIulRoW0TYUhD1Ay2wIJWToXAJRM4W3bgzAOfsaM45PYeR21tlIuplazZtNys7XFVBO/4F4dHvG1tC5DqiaAM6GBHWqFivdr6vOVzZRZ1+ZvNWv0qk0zy4uxF6W4C+kdBEqhX6Ad2/AuFxIEe5zwdgqMGIu3pSySLVmcrIAGUjBqkR84iQQjlbniSEUyv89jpTvyJ9D95UVlbJ9PB38SYLtfyboDgXb2Sm/M3v0gqPcF6ZX8RP9MaIBEN6HfB4XpPYN4CI6Pwkzkz+7gdFPIl6o5lqbjrvXkeccBH2pWIHrL33pBkIB/wQEKA552jZbB9DbU+A2lobJcFREO5PO5EPWh2WUFB9/C0cOTHPY2k8W92mvsjXlWNqmUTqKwQsldOLrX45sPTkFFCAMU0hOVrjL4qtVO8l/jJitRvtKqXe3ZK1dbZmJU1Rh2G7KDS6+m4t2kIgoxtYDOPdHft38s6NTo/639TPEisn2kLO4sjx/sk2KXh7ja6vKa/eNKMxUBLTbv0x28xMiKN/WEtSTzQKsLWpYLlMUNGUTM="
-      env: GCC_VERSION=5
-    - os: linux
-      compiler: gcc
-      dist: trusty
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - george-edison55-precise-backports
-            - boost-latest
-          packages:
-            - g++-6
-            - gcc-6
-            - cmake
-            - cmake-data
-            - doxygen
-            - doxygen-doc
-            - doxygen-latex
-            - doxygen-gui
-            - graphviz
-            - libboost-all-dev
-        sonarcloud:
-          organization: "wrench"
-          token:
-            secure: "a3gk/Phr7yPccMhzBp6LRwEkIXWwSMbeC20sm0N5O/eZ63gN+4sp371pQcUugoPIXBa1jLMeJLL0we950EY9/kFPMVTdscHJ1OOwrM98R65dTtayxLOhDf1D8GTnrOIdpuH9vMatIulRoW0TYUhD1Ay2wIJWToXAJRM4W3bgzAOfsaM45PYeR21tlIuplazZtNys7XFVBO/4F4dHvG1tC5DqiaAM6GBHWqFivdr6vOVzZRZ1+ZvNWv0qk0zy4uxF6W4C+kdBEqhX6Ad2/AuFxIEe5zwdgqMGIu3pSySLVmcrIAGUjBqkR84iQQjlbniSEUyv89jpTvyJ9D95UVlbJ9PB38SYLtfyboDgXb2Sm/M3v0gqPcF6ZX8RP9MaIBEN6HfB4XpPYN4CI6Pwkzkz+7gdFPIl6o5lqbjrvXkeccBH2pWIHrL33pBkIB/wQEKA552jZbB9DbU+A2lobJcFREO5PO5EPWh2WUFB9/C0cOTHPY2k8W92mvsjXlWNqmUTqKwQsldOLrX45sPTkFFCAMU0hOVrjL4qtVO8l/jJitRvtKqXe3ZK1dbZmJU1Rh2G7KDS6+m4t2kIgoxtYDOPdHft38s6NTo/639TPEisn2kLO4sjx/sk2KXh7ja6vKa/eNKMxUBLTbv0x28xMiKN/WEtSTzQKsLWpYLlMUNGUTM="
-      env: GCC_VERSION=6
-    - os: linux
-      compiler: clang
-      dist: trusty
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.6
-            - george-edison55-precise-backports
-            - boost-latest
-          packages:
-            - clang-3.6
-            - cmake
-            - cmake-data
-            - doxygen
-            - doxygen-doc
-            - doxygen-latex
-            - doxygen-gui
-            - graphviz
-            - libboost-all-dev
-        sonarcloud:
-          organization: "wrench"
-          token:
-            secure: "a3gk/Phr7yPccMhzBp6LRwEkIXWwSMbeC20sm0N5O/eZ63gN+4sp371pQcUugoPIXBa1jLMeJLL0we950EY9/kFPMVTdscHJ1OOwrM98R65dTtayxLOhDf1D8GTnrOIdpuH9vMatIulRoW0TYUhD1Ay2wIJWToXAJRM4W3bgzAOfsaM45PYeR21tlIuplazZtNys7XFVBO/4F4dHvG1tC5DqiaAM6GBHWqFivdr6vOVzZRZ1+ZvNWv0qk0zy4uxF6W4C+kdBEqhX6Ad2/AuFxIEe5zwdgqMGIu3pSySLVmcrIAGUjBqkR84iQQjlbniSEUyv89jpTvyJ9D95UVlbJ9PB38SYLtfyboDgXb2Sm/M3v0gqPcF6ZX8RP9MaIBEN6HfB4XpPYN4CI6Pwkzkz+7gdFPIl6o5lqbjrvXkeccBH2pWIHrL33pBkIB/wQEKA552jZbB9DbU+A2lobJcFREO5PO5EPWh2WUFB9/C0cOTHPY2k8W92mvsjXlWNqmUTqKwQsldOLrX45sPTkFFCAMU0hOVrjL4qtVO8l/jJitRvtKqXe3ZK1dbZmJU1Rh2G7KDS6+m4t2kIgoxtYDOPdHft38s6NTo/639TPEisn2kLO4sjx/sk2KXh7ja6vKa/eNKMxUBLTbv0x28xMiKN/WEtSTzQKsLWpYLlMUNGUTM="
-      env: CLANG_VERSION=3.6
-    - os: linux
-      compiler: clang
-      dist: trusty
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-precise-3.7
-            - george-edison55-precise-backports
-            - boost-latest
-          packages:
-            - clang-3.7
-            - cmake
-            - cmake-data
-            - doxygen
-            - doxygen-doc
-            - doxygen-latex
-            - doxygen-gui
-            - graphviz
-            - libboost-all-dev
-        sonarcloud:
-          organization: "wrench"
-          token:
-            secure: "a3gk/Phr7yPccMhzBp6LRwEkIXWwSMbeC20sm0N5O/eZ63gN+4sp371pQcUugoPIXBa1jLMeJLL0we950EY9/kFPMVTdscHJ1OOwrM98R65dTtayxLOhDf1D8GTnrOIdpuH9vMatIulRoW0TYUhD1Ay2wIJWToXAJRM4W3bgzAOfsaM45PYeR21tlIuplazZtNys7XFVBO/4F4dHvG1tC5DqiaAM6GBHWqFivdr6vOVzZRZ1+ZvNWv0qk0zy4uxF6W4C+kdBEqhX6Ad2/AuFxIEe5zwdgqMGIu3pSySLVmcrIAGUjBqkR84iQQjlbniSEUyv89jpTvyJ9D95UVlbJ9PB38SYLtfyboDgXb2Sm/M3v0gqPcF6ZX8RP9MaIBEN6HfB4XpPYN4CI6Pwkzkz+7gdFPIl6o5lqbjrvXkeccBH2pWIHrL33pBkIB/wQEKA552jZbB9DbU+A2lobJcFREO5PO5EPWh2WUFB9/C0cOTHPY2k8W92mvsjXlWNqmUTqKwQsldOLrX45sPTkFFCAMU0hOVrjL4qtVO8l/jJitRvtKqXe3ZK1dbZmJU1Rh2G7KDS6+m4t2kIgoxtYDOPdHft38s6NTo/639TPEisn2kLO4sjx/sk2KXh7ja6vKa/eNKMxUBLTbv0x28xMiKN/WEtSTzQKsLWpYLlMUNGUTM="
-      env: CLANG_VERSION=3.7
+addons:
+  apt:
+    packages:
+      - docker-ce
+  sonarcloud:
+    organization: "wrench"
+    token:
+      secure: "a3gk/Phr7yPccMhzBp6LRwEkIXWwSMbeC20sm0N5O/eZ63gN+4sp371pQcUugoPIXBa1jLMeJLL0we950EY9/kFPMVTdscHJ1OOwrM98R65dTtayxLOhDf1D8GTnrOIdpuH9vMatIulRoW0TYUhD1Ay2wIJWToXAJRM4W3bgzAOfsaM45PYeR21tlIuplazZtNys7XFVBO/4F4dHvG1tC5DqiaAM6GBHWqFivdr6vOVzZRZ1+ZvNWv0qk0zy4uxF6W4C+kdBEqhX6Ad2/AuFxIEe5zwdgqMGIu3pSySLVmcrIAGUjBqkR84iQQjlbniSEUyv89jpTvyJ9D95UVlbJ9PB38SYLtfyboDgXb2Sm/M3v0gqPcF6ZX8RP9MaIBEN6HfB4XpPYN4CI6Pwkzkz+7gdFPIl6o5lqbjrvXkeccBH2pWIHrL33pBkIB/wQEKA552jZbB9DbU+A2lobJcFREO5PO5EPWh2WUFB9/C0cOTHPY2k8W92mvsjXlWNqmUTqKwQsldOLrX45sPTkFFCAMU0hOVrjL4qtVO8l/jJitRvtKqXe3ZK1dbZmJU1Rh2G7KDS6+m4t2kIgoxtYDOPdHft38s6NTo/639TPEisn2kLO4sjx/sk2KXh7ja6vKa/eNKMxUBLTbv0x28xMiKN/WEtSTzQKsLWpYLlMUNGUTM="
+
+env:
+  - DIST=ubuntu-trusty COMPILER=gcc5-batsched BATSCHED=on
+  - DIST=ubuntu-trusty COMPILER=gcc5 BATSCHED=off
+  - DIST=ubuntu-trusty COMPILER=gcc6 BATSCHED=off
+  - DIST=ubuntu-trusty COMPILER=clang3-6 BATSCHED=off
+  - DIST=ubuntu-trusty COMPILER=clang3-7 BATSCHED=off
+  - DIST=ubuntu-xenial COMPILER=gcc5 BATSCHED=off
+  - DIST=debian-stretch COMPILER=gcc6 BATSCHED=off
+
+services:
+  - docker
 
 before_install:
-  - if [ -n "$GCC_VERSION" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
-  - if [ -n "$CLANG_VERSION" ]; then export CXX="clang++-${CLANG_VERSION}" CC="clang-${CLANG_VERSION}"; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-      brew update;
-      brew install python3 doxygen;
-      virtualenv venv -p python3;
-      source venv/bin/activate;
-    fi
-  # configure coveralls
+  # install container
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      sudo apt-get install lcov;
-      sudo gem install coveralls-lcov;
+      docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
+      docker run -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
+      export BRANCH=`git rev-parse --abbrev-ref HEAD`;
+      docker exec -it wrench git clone https://github.com/wrench-project/wrench;
     fi
-
-install:
-  # install SimGrid
-  # cloning SimGrid from specific commit (temporary while using unstable SimGrid version)
-#  - git clone https://github.com/simgrid/simgrid.git
-#  - cd simgrid && git reset --hard a3bd734d0a2fdda1ef73434c529c938b773bb127 # Oct 5, 2017, 2:02 PM PDT
-  - wget https://gforge.inria.fr/frs/download.php/file/37148/SimGrid-3.17.tar.gz
-  - tar -xf SimGrid-3.17.tar.gz
-  - cd SimGrid-3.17 && cmake . && make && sudo make install && cd ..
-  # install Lemon
-  - wget http://lemon.cs.elte.hu/pub/sources/lemon-1.3.1.tar.gz
-  - tar -xf lemon-1.3.1.tar.gz
-  - cd lemon-1.3.1 && cmake . && make && sudo make install && cd ..
-  # install pugixml
-  - wget https://github.com/zeux/pugixml/releases/download/v1.8.1/pugixml-1.8.1.tar.gz
-  - tar -xf pugixml-1.8.1.tar.gz
-  - cd pugixml-1.8 && cmake . && make && sudo make install && cd ..
-  # install json for modern c++
-  - wget https://github.com/nlohmann/json/archive/v2.1.1.tar.gz
-  - tar -xf v2.1.1.tar.gz
-  - cd json-2.1.1 && cmake . && make && sudo make install && cd ..
-  # install googletest
-  - wget https://github.com/google/googletest/archive/release-1.8.0.tar.gz
-  - tar xf release-1.8.0.tar.gz
-  - cd googletest-release-1.8.0/googletest && cmake . && make && sudo make install && cd ../..
-
-  #install necessary dependencies for Batsched
-  #install ASCIIDOC
-  - wget https://newcontinuum.dl.sourceforge.net/project/asciidoc/asciidoc/8.6.9/asciidoc-8.6.9.tar.gz
-  - tar -xzf asciidoc-8.6.9.tar.gz
-  - cd asciidoc-8.6.9 && ./configure && sudo make install && cd ..
-
-  #install AUTOCONF
-  - wget http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
-  - tar xf autoconf*
-  - cd autoconf-2.69 && sh configure --prefix /usr/local && sudo make install && cd ..
-
-  #install AUTOMAKE
-  - wget http://ftp.gnu.org/gnu/automake/automake-1.15.tar.gz
-  - tar xf automake*
-  - cd automake-1.15 && sh configure --prefix /usr/local && sudo make install && cd ..
-
-  #install LIBTOOL
-  - wget http://mirror.jre655.com/GNU/libtool/libtool-2.4.6.tar.gz
-  - tar xf libtool*
-  - cd libtool-2.4.6 && sh configure --prefix /usr/local && sudo make install && cd ..
-
-  #install LIBSODIUM
-  - wget https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz
-  - tar xf libsodium-1.0.16.tar.gz
-  - cd libsodium-1.0.16 && ./configure && make check && sudo make install
-  - cd ..
-
-  #install ZMQ
-  - wget http://download.zeromq.org/zeromq-4.0.5.tar.gz
-  - tar xvzf zeromq-4.0.5.tar.gz
-  - cd zeromq-4.0.5 && ./configure && sudo make install && cd ..
-
-  #install CPPZMQ
-  - wget https://github.com/zeromq/cppzmq/archive/v4.2.3.tar.gz
-  - tar xf v4.2.3.tar.gz
-  - cd cppzmq-4.2.3/ && mkdir build && cd build/ && cmake .. && sudo make -j4 install && cd ../../
-
-  #install GMPLIB
-  - wget https://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.xz
-  - tar -xf gmp-6.1.2.tar.xz
-  - cd gmp-6.1.2/ && ./configure && make && sudo make install && cd ..
-
-  #install RAPIDJSON
-  - wget https://github.com/Tencent/rapidjson/archive/v1.1.0.tar.gz
-  - gunzip v1.1.0.tar.gz && tar -xf v1.1.0.tar
-  - cd rapidjson-1*
-  - mkdir build
-  - cd build && cmake .. && make && sudo make install && cd ../../
-
-  #install HIREDIS
-  - git clone https://github.com/redis/hiredis.git
-  - cd hiredis && make && sudo make install && cd ..
-
-  #install LIBEV
-  - wget https://launchpad.net/ubuntu/+archive/primary/+files/libev_4.22.orig.tar.gz
-  - tar -xf libev_4.22.orig.tar.gz
-  - cd libev-4.22/ && ./configure && make && sudo make install && cd ..
-
-  #install REDOX
-  - git clone https://github.com/hmartiro/redox.git
-  - cd redox && mkdir build && cd build && cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local/ && make && sudo make install && cd ../../
-
-  # Ainstall BOOST
-  - wget https://dl.bintray.com/boostorg/release/1.65.1/source/boost_1_65_1.tar.gz
-  - tar -xf boost_1_65_1.tar.gz && cd boost_1_65_1/ && ./bootstrap.sh && sudo ./b2 install --prefix=/usr/local && cd ..
-
-  #install BATSCHED
-  - wget https://gitlab.inria.fr/batsim/batsched/repository/master/archive.tar.gz
-  - tar -xf archive.tar.gz
-  - cd batsched-master* && mkdir build && cd build
-  - cmake .. -DREDOX_LIBRARY:FILEPATH=/usr/local/lib64/libredox.so
-  - make && sudo make install && cd ../../
-
-
+  - if [[ "$BRANCH" != "HEAD" ]]; then
+      docker exec -w /home/wrench/wrench -it wrench git checkout ${BRANCH};
+    fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      docker exec -it wrench mkdir wrench/build;
+    fi
 
 script:
-  - cmake -DCMAKE_VERBOSE_MAKEFILE=ON .
-  - make all unit_tests doc-gh
-  - ./unit_tests
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${BATSCHED} -DCMAKE_VERBOSE_MAKEFILE=ON ..;
+      docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests doc-gh;
+      docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
+    fi
 
 after_success:
-  # coverage analysis
+  # coverage analysis and sonarcloud
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      lcov --directory . --capture --output-file coverage.info;
-      lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
-      coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
-    fi
-  # sonarcloud
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      docker exec -w /home/wrench/wrench/build -it wrench lcov --directory . --capture --output-file coverage.info;
+      docker exec -w /home/wrench/wrench/build -it wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
+      docker exec -w /home/wrench/wrench/build -it wrench coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
+
+      docker cp wrench:/home/wrench/wrench/build .;
+      docker cp wrench:/home/wrench/wrench/docs .;
+
+      docker stop wrench;
+      docker rm wrench;
+      docker rmi wrenchproject/wrench-build:${DIST}-${COMPILER};
+
       build-wrapper-linux-x86-64 --out-dir bw-output make all;
       sonar-scanner -Dsonar.host.url=https://sonarqube.com -Dsonar.login=$SONAR_TOKEN;
     fi

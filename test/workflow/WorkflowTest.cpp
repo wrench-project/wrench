@@ -40,9 +40,9 @@ protected:
       t2->addInputFile(f2);
       t2->addOutputFile(f3);
       t3->addInputFile(f2);
-      t3->addOutputFile(f4);
       t4->addInputFile(f3);
       t4->addInputFile(f4);
+      t3->addOutputFile(f4);
     }
 
     // data members
@@ -141,4 +141,12 @@ TEST_F(WorkflowTest, IsDone) {
   }
 
   EXPECT_TRUE(workflow->isDone());
+}
+
+TEST_F(WorkflowTest, SumFlops) {
+
+  double sum_flops = 0;
+
+  EXPECT_NO_THROW(sum_flops = wrench::Workflow::getSumFlops(workflow->getTasks()));
+  ASSERT_EQ(sum_flops, 4.0);
 }

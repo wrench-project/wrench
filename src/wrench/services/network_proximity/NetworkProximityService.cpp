@@ -10,9 +10,9 @@
 #include <wrench/logging/TerminalOutput.h>
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include <simulation/SimulationMessage.h>
+#include <wrench/simulation/SimulationMessage.h>
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <services/ServiceMessage.h>
+#include <wrench/services/ServiceMessage.h>
 #include "NetworkProximityMessage.h"
 
 #include <wrench/exceptions/WorkflowExecutionException.h>
@@ -232,7 +232,7 @@ namespace wrench {
 
         try {
             message = S4U_Mailbox::getMessage(this->mailbox_name);
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
         }
 
@@ -260,7 +260,7 @@ namespace wrench {
                                         new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                                 NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
 
-            } catch (std::shared_ptr<NetworkError> cause) {
+            } catch (std::shared_ptr<NetworkError> &cause) {
                 return false;
             }
             return false;
@@ -292,7 +292,7 @@ namespace wrench {
                                                                                  this->getPropertyValueAsDouble(
                                                                                          NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
             }
-            catch (std::shared_ptr<NetworkError> cause) {
+            catch (std::shared_ptr<NetworkError> &cause) {
                 return true;
             }
             return true;
