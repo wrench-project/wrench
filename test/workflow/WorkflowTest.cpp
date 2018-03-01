@@ -40,9 +40,9 @@ protected:
       t2->addInputFile(f2);
       t2->addOutputFile(f3);
       t3->addInputFile(f2);
-      t3->addOutputFile(f4);
       t4->addInputFile(f3);
       t4->addInputFile(f4);
+      t3->addOutputFile(f4);
     }
 
     // data members
