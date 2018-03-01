@@ -222,6 +222,45 @@ private:
       }
 
 
+
+      // Do a bogus asynchronous file copy (file = nullptr);
+      success = true;
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(nullptr,
+                                                            this->test->storage_service_1000,
+                                                            this->test->storage_service_100);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr file");
+      }
+      // Do a bogus asynchronous file copy (src = nullptr);
+      success = true;
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
+                                                            nullptr,
+                                                            this->test->storage_service_100);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr src");
+      }
+      // Do a bogus asynchronous file copy (dst = nullptr);
+      success = true;
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
+                                                            this->test->storage_service_1000,
+                                                            nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr dst");
+      }
+
+
       // Do a valid asynchronous file copy
       try {
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_1,
@@ -387,10 +426,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
           std::unique_ptr<wrench::WMS>(
                   new SimpleStorageServiceBasicFunctionalityTestWMS(this,
                                                                     {compute_service},
-                          {
-                            storage_service_100, storage_service_500,
-                                    storage_service_1000
-                          }, hostname))));
+                                                                    {
+                                                                            storage_service_100, storage_service_500,
+                                                                            storage_service_1000
+                                                                    }, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -447,6 +486,43 @@ private:
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
+      bool success;
+      // Do a bogus file copy (file = nullptr)
+      success = true;
+      try {
+        data_movement_manager->doSynchronousFileCopy(nullptr, this->test->storage_service_1000,
+                                                     this->test->storage_service_500);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr file");
+      }
+
+      // Do a bogus file copy (src = nullptr)
+      success = true;
+      try {
+        data_movement_manager->doSynchronousFileCopy(this->test->file_500, nullptr,
+                                                     this->test->storage_service_500);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr src");
+      }
+
+      // Do a bogus file copy (dst = nullptr)
+      success = true;
+      try {
+        data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
+                                                     nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to do a synchronous file copy with a nullptr src");
+      }
+
       // Do the file copy
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
@@ -456,7 +532,7 @@ private:
       }
 
       // Do the file copy again, which should fail
-      bool success = true;
+      success = true;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                      this->test->storage_service_500);
@@ -514,7 +590,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceSynchronousFileCopyTestWMS(
                   this,
                   {compute_service},
-                          { storage_service_1000, storage_service_500 }, hostname))));
+                  { storage_service_1000, storage_service_500 }, hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -673,7 +749,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   EXPECT_NO_THROW(wms = simulation->add(
           std::unique_ptr<wrench::WMS>(new SimpleStorageServiceAsynchronousFileCopyTestWMS(
                   this,  {compute_service}, {storage_service_1000, storage_service_500},
-                          hostname))));
+                  hostname))));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
