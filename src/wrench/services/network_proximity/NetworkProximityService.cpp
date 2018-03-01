@@ -54,7 +54,7 @@ namespace wrench {
         validateProperties();
 
         // Seed the master_rng
-        this->master_rng.seed(0);  // TODO: Make this a property some day?
+        this->master_rng.seed(this->getPropertyValueAsDouble(wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED));
 
         // Create the network daemons
         std::vector<std::string>::iterator it;
@@ -405,8 +405,6 @@ namespace wrench {
     void NetworkProximityService::vivaldiUpdate(double proximity_value, std::string sender_hostname,
                                                 std::string peer_hostname) {
 
-        // TODO: possibly make this a property
-        // TODO: sensitivity is constant, maybe we need to use Vivaldi with dynamic sensitivity (hosts don't get added in dynamically so maybe not)
         const std::complex<double> sensitivity(0.25, 0.25);
 
         std::complex<double> sender_coordinates, peer_coordinates;
@@ -451,20 +449,20 @@ namespace wrench {
             search->second = updated_sender_coordinates;
         }
 
-        WRENCH_INFO("Vivaldi updated coordinates of %s from (%f,%f) to (%f,%f)", sender_hostname.c_str(),
+        WRENCH_DEBUG("Vivaldi updated coordinates of %s from (%f,%f) to (%f,%f)", sender_hostname.c_str(),
                     sender_coordinates.real(), sender_coordinates.imag(), updated_sender_coordinates.real(),
                     updated_sender_coordinates.imag());
 
         // WRITING VIVALDI RESULTS FOR DEBUGGING
-        std::ofstream output("/home/ryan/Dropbox/Spring18/GRAD_PROJECT/vivaldi_visual/coordinate_table.txt", std::ofstream::app);
-
-        std::map<std::string, std::complex<double>>::iterator it;
-        output.precision(std::numeric_limits<double>::max_digits10);
-        for (it = this->coordinate_lookup_table.begin(); it != this->coordinate_lookup_table.end(); ++it) {
-            output << std::setw(15) << it->first + " | " << std::fixed << it->second.real() << " | " << std::fixed << it->second.imag() << std::endl;
-        }
-        output << "*" << std::endl;
-        output.close();
+//        std::ofstream output("/home/ryan/Dropbox/Spring18/GRAD_PROJECT/vivaldi_visual/coordinate_table.txt", std::ofstream::app);
+//
+//        std::map<std::string, std::complex<double>>::iterator it;
+//        output.precision(std::numeric_limits<double>::max_digits10);
+//        for (it = this->coordinate_lookup_table.begin(); it != this->coordinate_lookup_table.end(); ++it) {
+//            output << std::setw(15) << it->first + " | " << std::fixed << it->second.real() << " | " << std::fixed << it->second.imag() << std::endl;
+//        }
+//        output << "*" << std::endl;
+//        output.close();
         // END WRITING VIVALDI RESULTS
 
     }
