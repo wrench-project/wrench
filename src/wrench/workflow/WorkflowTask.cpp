@@ -48,7 +48,7 @@ namespace wrench {
 
       WRENCH_DEBUG("Adding file '%s' as input to task %s",
                    file->getId().c_str(), this->getId().c_str());
-      // Perhaps add a control dependency?
+
       if (file->getOutputOf()) {
         workflow->addControlDependency(file->getOutputOf(), this);
       }
@@ -65,7 +65,7 @@ namespace wrench {
 
       addFileToMap(output_files, input_files, file);
       file->setOutputOf(this);
-      // Perhaps add control dependencies?
+
       for (auto const &x : file->getInputOf()) {
         workflow->addControlDependency(this, x.second);
       }
