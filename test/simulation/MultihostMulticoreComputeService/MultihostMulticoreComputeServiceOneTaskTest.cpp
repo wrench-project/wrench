@@ -219,6 +219,9 @@ private:
       // Stop the Job Manager manually, just for kicks
       job_manager->stop();
 
+      // Stop the Data Movement Manager manually, just for kicks
+      data_movement_manager->stop();
+
       // Terminate
       this->shutdownAllServices();
       return 0;
