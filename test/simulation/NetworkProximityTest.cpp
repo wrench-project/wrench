@@ -219,6 +219,12 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
                                                  {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.5"}})),
                  std::invalid_argument);
 
+    std::vector<std::string> too_few_hosts = {network_daemon1};
+    EXPECT_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
+            new wrench::NetworkProximityService(network_proximity_db_hostname, too_few_hosts,
+                                                {})),
+            std::invalid_argument);
+
   EXPECT_NO_THROW(network_proximity_service = std::unique_ptr<wrench::NetworkProximityService>(
           new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
                                               {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
