@@ -473,9 +473,15 @@ private:
             throw std::runtime_error("Vivaldi proximity is larger than it should be");
         }
 
+
+        // Check values
         double epsilon = 0.1 * 1000;
 
-        if (vivaldi_proximity < (alltoall_proximity - epsilon) || vivaldi_proximity > (alltoall_proximity + epsilon)) {
+      if (fabs(1000 - alltoall_proximity) > epsilon) {
+        throw std::runtime_error("All-to-all algorithm goe a strange value: " + std::to_string(alltoall_proximity));
+      }
+
+      if (fabs(vivaldi_proximity - alltoall_proximity) > epsilon) {
             throw std::runtime_error("Vivaldi algorithm did not converge");
         }
 
