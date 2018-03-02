@@ -46,12 +46,12 @@ void PointerUtilTest::do_moveUniqueFromSetToSet_test() {
 
 
   int sum_src = 0;
-  for (auto it = src_set.begin(); it != src_set.end(); it++) {
-    sum_src += (*it)->x + (*it)->y;
+  for (const auto &e : src_set) {
+    sum_src += e->x + e->y;
   }
   int sum_dst = 0;
-  for (auto it = dst_set.begin(); it != dst_set.end(); it++) {
-    sum_dst += (*it)->x + (*it)->y;
+  for (const auto &e : dst_set) {
+    sum_dst += e->x + e->y;
   }
 
   ASSERT_EQ(sum_src, 4);
