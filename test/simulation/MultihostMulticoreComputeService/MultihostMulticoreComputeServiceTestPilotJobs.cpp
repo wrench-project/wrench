@@ -13,7 +13,7 @@
 #include <wrench-dev.h>
 
 #include "wrench/workflow/job/PilotJob.h"
-#include "../TestWithFork.h"
+#include "../../include/TestWithFork.h"
 
 
 class MultihostMulticoreComputeServiceTestPilotJobs : public ::testing::Test {

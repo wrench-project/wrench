@@ -11,7 +11,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "TestWithFork.h"
+#include "../include/TestWithFork.h"
 
 class FileRegistryTest : public ::testing::Test {
 

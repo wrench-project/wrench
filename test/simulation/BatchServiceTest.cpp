@@ -17,7 +17,7 @@
 #include <wrench/util/TraceFileLoader.h>
 #include "wrench/workflow/job/PilotJob.h"
 
-#include "TestWithFork.h"
+#include "../include/TestWithFork.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_test, "Log category for BatchServiceTest");
 
