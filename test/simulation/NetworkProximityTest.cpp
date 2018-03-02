@@ -133,10 +133,6 @@ private:
             throw std::runtime_error("Got a negative proximity value");
         }
 
-        // Terminate
-        this->shutdownAllServices();
-//        this->simulation->getFileRegistryService()->stop();
-//        this->simulation->shutdownAllNetworkProximityServices();
         return 0;
     }
 };
@@ -312,8 +308,6 @@ private:
         );
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -484,8 +478,6 @@ private:
             throw std::runtime_error("Vivaldi algorithm computed the wrong proximity between hosts connected by a 0 latency link");
         }
 
-        // Terminate
-        this->shutdownAllServices();
         return 0;
     }
 };

@@ -173,8 +173,6 @@ private:
       }
 
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };

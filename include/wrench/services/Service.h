@@ -38,7 +38,7 @@ namespace wrench {
             DOWN,
         };
 
-        virtual void start();
+        virtual void start(bool daemonize = false);
 
         virtual void stop();
 

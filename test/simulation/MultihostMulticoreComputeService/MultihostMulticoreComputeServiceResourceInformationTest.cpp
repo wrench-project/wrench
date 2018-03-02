@@ -177,8 +177,6 @@ private:
       workflow->removeTask(t1);
       workflow->removeTask(t2);
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };

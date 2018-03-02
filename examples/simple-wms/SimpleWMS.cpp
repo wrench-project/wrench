@@ -116,22 +116,6 @@ namespace wrench {
         WRENCH_INFO("Workflow execution is incomplete!");
       }
 
-//      // kill all processes
-//      // TODO: This could work, but there is a problem with killAll() in S4U
-//      simgrid::s4u::Actor::killAll();
-//      return 0;
-
-      WRENCH_INFO("Simple WMS Daemon is shutting all services");
-      this->shutdownAllServices();
-
-      WRENCH_INFO("Simple WMS Daemon is shutting down the Network Proximity Service");
-      this->simulation->shutdownAllNetworkProximityServices();
-
-      /***
-       *** NO NEED TO stop/kill the Managers (will soon be out of scope, and
-       *** destructor simply called kill() on their actors.
-       ***/
-
       WRENCH_INFO("Simple WMS Daemon started on host %s terminating", S4U_Simulation::getHostName().c_str());
 
       this->job_manager.reset();

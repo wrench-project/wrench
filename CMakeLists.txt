@@ -83,7 +83,6 @@ set(HEADER_FILES
         include/wrench/simulation/SimulationOutput.h
         include/wrench/simulation/SimulationTimestamp.h
         include/wrench/simulation/SimulationTrace.h
-        include/wrench/simulation/Terminator.h
         include/wrench.h
         include/wrench-dev.h
         include/wrench/services/compute/batch/BatchJob.h
@@ -131,7 +130,6 @@ set(SOURCE_FILES
         src/wrench/simulation/SimulationTimestamp.cpp
         src/wrench/simulation/SimulationTrace.cpp
         src/wrench/simulation/SimulationOutput.cpp
-        src/wrench/simulation/Terminator.cpp
         src/wrench/services/file_registry/FileRegistryService.cpp
         src/wrench/services/storage/StorageService.cpp
         src/wrench/services/storage/simple/SimpleStorageService.cpp

@@ -171,8 +171,6 @@ private:
                 "Should not be able to submit a pilot job to a compute service that does not support them");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -302,8 +300,6 @@ private:
                                  std::to_string(delta) + " apart.");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -433,8 +429,6 @@ private:
                                  std::to_string(task4_end_date) + ".");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -570,8 +564,6 @@ private:
         throw std::runtime_error("Unexpected task6 end date " + std::to_string(task6_end_date) + " (should be 12.0)");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -690,8 +682,6 @@ private:
         throw std::runtime_error("Tasks in a FAILED job should be in the READY state");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -826,8 +816,6 @@ private:
         throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -972,8 +960,6 @@ private:
         throw std::runtime_error("Trying to terminate a non-submitted job should have raised an exception!");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1091,8 +1077,8 @@ private:
       // Submit the 2-task job for execution
       job_manager->submitJob(two_task_job, this->test->compute_service);
 
-      // Shutdown all compute services
-      this->shutdownAllServices();
+      // Shutdown the compute service
+      this->test->compute_service->stop();
 
       // Wait for the job failure notification
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -1234,8 +1220,8 @@ private:
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
                                                                          {}, {});
 
-      // Shutdown all storage services
-      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service);
+      // Shutdown the storage service
+      this->test->storage_service->stop();
 
       // Submit the 2-task job for execution
       job_manager->submitJob(two_task_job, this->test->compute_service);
@@ -1264,12 +1250,6 @@ private:
         }
       }
 
-      // Terminate
-      // since storage services have been manually stopped, we manually stop all other services
-      this->simulation->getTerminator()->shutdownComputeService(this->compute_services);
-      this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
-      this->simulation->getTerminator()->shutdownNetworkProximityService(
-              this->simulation->getRunningNetworkProximityServices());
       return 0;
     }
 };

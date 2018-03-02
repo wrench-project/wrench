@@ -705,7 +705,7 @@ namespace wrench {
 
       // Start the compute service
       try {
-        cs->start();
+        cs->start(true); // Demonize
       } catch (std::runtime_error &e) {
         throw;
       }

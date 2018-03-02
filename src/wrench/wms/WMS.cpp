@@ -15,6 +15,7 @@
 #include "wms/WMSMessage.h"
 #include "wrench/managers/JobManager.h"
 #include "wrench/managers/DataMovementManager.h"
+#include "wrench/services/compute/ComputeService.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(wms, "Log category for WMS");
 
@@ -137,24 +138,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Shutdown all services
-     */
-    void WMS::shutdownAllServices() {
-      WRENCH_INFO("WMS %s Daemon is shutting down all Compute Services", this->getName().c_str());
-      this->simulation->getTerminator()->shutdownComputeService(this->compute_services);
-
-      WRENCH_INFO("WMS %s Daemon is shutting down all Storage Services", this->getName().c_str());
-      this->simulation->getTerminator()->shutdownStorageService(this->storage_services);
-
-      WRENCH_INFO("WMS %s Daemon is shutting down the File Registry Service", this->getName().c_str());
-      this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
-
-      WRENCH_INFO("WMS %s Daemon is shutting down all Network Proximity Services", this->getName().c_str());
-      this->simulation->getTerminator()->shutdownNetworkProximityService(
-              this->simulation->getRunningNetworkProximityServices());
-    }
-
-    /**
      * @brief Wait for a workflow execution event and then call the associated function to process
      *
      * @throw wrench::WorkflowExecutionException
@@ -272,12 +255,6 @@ namespace wrench {
       } catch (std::invalid_argument &e) {
         throw std::runtime_error("WMS:start(): " + std::string(e.what()));
       }
-      // register services into terminator (the storage service is obtained from the compute service)
-      this->simulation->getTerminator()->registerComputeService(this->compute_services);
-      this->simulation->getTerminator()->registerStorageService(this->storage_services);
-      this->simulation->getTerminator()->registerFileRegistryService(this->simulation->getFileRegistryService());
-      this->simulation->getTerminator()->registerNetworkProximityService(
-              this->simulation->getRunningNetworkProximityServices());
     }
 
     /**

@@ -192,8 +192,6 @@ private:
         throw std::runtime_error("Got the wrong locations for file 1");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };

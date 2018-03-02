@@ -48,7 +48,7 @@ namespace wrench {
 
       // Start the daemon
       std::string localhost = S4U_Simulation::getHostName();
-      this->start_daemon(localhost);
+      this->start_daemon(localhost, true); // Always daemonize
     }
 
     /**
