@@ -82,16 +82,17 @@ namespace wrench {
     /**
      * @brief Starts the network proximity service sets of daemons and the
      *        proximity service itself
+     * @param daemonize: whether the daemon is supposed to be daemonized or not
      *
      * @throw std::runtime_error
      */
-    void NetworkProximityService::start() {
+    void NetworkProximityService::start(bool daemonize) {
         try {
             // Start the network daemons
             for (auto it = this->network_daemons.begin(); it != this->network_daemons.end(); it++) {
-                (*it)->start();
+                (*it)->start(true); // daemonized
             }
-            this->start_daemon(this->hostname, false);
+            this->start_daemon(this->hostname, daemonize);
             this->state = Service::UP;
         } catch (std::runtime_error &e) {
             throw;

@@ -18,7 +18,6 @@
 #include "wrench/services/network_proximity/NetworkProximityService.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include "wrench/simulation/SimulationOutput.h"
-#include "wrench/simulation/Terminator.h"
 #include "wrench/wms/WMS.h"
 #include "wrench/workflow/job/StandardJob.h"
 
@@ -91,8 +90,6 @@ namespace wrench {
 
         static void sleep(double duration);
 
-        Terminator* getTerminator();
-
         /***********************/
         /** \endcond            */
         /***********************/
@@ -109,8 +106,6 @@ namespace wrench {
     private:
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
-
-        std::unique_ptr<Terminator> terminator;
 
         std::set<std::unique_ptr<WMS>> wmses;
 

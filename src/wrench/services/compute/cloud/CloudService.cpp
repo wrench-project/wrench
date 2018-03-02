@@ -432,7 +432,7 @@ namespace wrench {
 
           // start the service
           try {
-            cs->start();
+            cs->start(true); // Daemonize!
           } catch (std::runtime_error &e) {
             throw;
           }

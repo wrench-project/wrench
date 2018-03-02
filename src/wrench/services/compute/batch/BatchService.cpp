@@ -468,7 +468,7 @@ namespace wrench {
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-      network_listener->start();
+      network_listener->start(true);
       network_listeners.push_back(std::move(network_listener));
 #endif
 
@@ -808,7 +808,7 @@ namespace wrench {
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-      network_listener->start();
+      network_listener->start(true);
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;
 #else
@@ -989,7 +989,7 @@ namespace wrench {
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
 
-      network_listener->start();
+      network_listener->start(true);
       network_listeners.push_back(std::move(network_listener));
 
 #endif
@@ -1671,7 +1671,7 @@ namespace wrench {
 
 
           try {
-            cs->start();
+            cs->start(true);
           } catch (std::runtime_error &e) {
             throw;
           }
@@ -1941,7 +1941,7 @@ namespace wrench {
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
 
-      network_listener->start();
+      network_listener->start(true);
       network_listeners.push_back(std::move(network_listener));
 
     }

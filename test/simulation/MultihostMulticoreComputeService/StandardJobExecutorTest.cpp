@@ -434,8 +434,6 @@ private:
 
 
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -630,8 +628,6 @@ private:
         workflow->removeTask(task);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -817,8 +813,6 @@ private:
 
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1003,8 +997,6 @@ private:
 
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1303,8 +1295,6 @@ private:
         this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1661,8 +1651,6 @@ private:
 
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1941,8 +1929,6 @@ public:
         workflow->removeTask(task4);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -2105,8 +2091,6 @@ private:
 
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -2264,8 +2248,6 @@ private:
         workflow->removeTask(task4);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -2442,8 +2424,6 @@ private:
         }
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };

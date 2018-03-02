@@ -175,8 +175,6 @@ private:
         this->workflow->removeTask(task);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -325,8 +323,6 @@ private:
         }
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -527,8 +523,6 @@ private:
         }
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -671,8 +665,6 @@ private:
         workflow->removeTask(task);
       }
 
-// Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -807,8 +799,6 @@ private:
         workflow->removeTask(task);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -960,8 +950,6 @@ private:
         workflow->removeTask(task);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1111,8 +1099,6 @@ private:
         }
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1328,8 +1314,6 @@ private:
         workflow->removeTask(task2);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1527,8 +1511,6 @@ private:
         workflow->removeTask(task);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1719,9 +1701,6 @@ private:
         workflow->removeTask(task);
       }
 
-      //we let the standard job complete but now let's just kill the pilot job before it expires
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1895,9 +1874,6 @@ private:
         workflow->removeTask(task);
       }
 
-      //we let the standard job complete but now let's just kill the pilot job before it expires
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -2052,8 +2028,6 @@ private:
         }
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -2206,8 +2180,6 @@ private:
         this->workflow->removeTask(task);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -2374,8 +2346,6 @@ private:
         this->workflow->removeTask(task);
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -2556,8 +2526,6 @@ private:
         }
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };

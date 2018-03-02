@@ -51,10 +51,10 @@ namespace wrench{
                                                                              sched_port,BatchNetworkListener::NETWORK_LISTENER_TYPE::LISTENER,
                                                                              ""));
       // TODO: Do the starting in a separate start() method
-      network_listener->start();
+      network_listener->start(true);
 
       try {
-        this->start_daemon(this->hostname);
+        this->start_daemon(this->hostname, true);
       } catch (std::invalid_argument e) {
         throw e;
       }
@@ -114,7 +114,7 @@ namespace wrench{
       }else if (BatchSimulationBeginsToSchedulerMessage *msg = dynamic_cast<BatchSimulationBeginsToSchedulerMessage *>(message.get())) {
         std::unique_ptr<BatchNetworkListener> network_sender = std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(
                 this->hostname, this->mailbox_name, this->self_port, this->sched_port,BatchNetworkListener::NETWORK_LISTENER_TYPE::LISTENER, msg->job_args_to_scheduler));
-        network_sender->start();
+        network_sender->start(true);
         return true;
 
       }else{

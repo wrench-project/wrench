@@ -224,8 +224,6 @@ private:
       // Stop the Data Movement Manager manually, just for kicks
       data_movement_manager->stop();
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -555,8 +553,6 @@ private:
       // Stop the Job Manager manually, just for kicks
       job_manager->stop();
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -667,8 +663,6 @@ private:
       }
 
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -821,8 +815,6 @@ private:
         throw std::runtime_error("Shouldn't be able to remove nullptr entry in the File Registry Service");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -947,8 +939,6 @@ private:
         throw std::runtime_error("Output file not written to storage service");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1095,8 +1085,6 @@ private:
         throw std::runtime_error("Output file should not be on Storage Service #2");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1245,8 +1233,6 @@ private:
         }
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1379,8 +1365,6 @@ private:
         throw std::runtime_error("Should not be able to submit a job to a service without enough cores");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1513,8 +1497,6 @@ private:
         throw std::runtime_error("Should not be able to submit a job to a service without enough cores");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -1648,10 +1630,6 @@ private:
         throw std::runtime_error("Should not be able to submit a job to a service that is down");
       }
 
-      test->compute_service->start();  // Otherwise the shutdown will fail
-
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };

@@ -361,8 +361,6 @@ private:
       }
 
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -619,8 +617,6 @@ private:
         workflow->removeTask(t2_2);
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };

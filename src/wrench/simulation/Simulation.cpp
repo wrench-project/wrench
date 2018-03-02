@@ -53,8 +53,6 @@ namespace wrench {
       // Create the S4U simulation wrapper
       this->s4u_simulation = std::unique_ptr<S4U_Simulation>(new S4U_Simulation());
 
-      // create the simulation terminator daemon
-      this->terminator = std::unique_ptr<Terminator>(new Terminator());
     }
 
     /**
@@ -286,22 +284,22 @@ namespace wrench {
 
         // Start the compute services
         for (const auto &compute_service : this->compute_services) {
-          compute_service->start();
+          compute_service->start(true);
         }
 
         // Start the storage services
         for (const auto &storage_service : this->storage_services) {
-          storage_service->start();
+          storage_service->start(true);
         }
 
         // Start the network proximity services
         for (const auto &network_proximity_service : this->network_proximity_services) {
-          network_proximity_service->start();
+          network_proximity_service->start(true);
         }
 
         // Start the file registry service
         if (this->file_registry_service) {
-          this->file_registry_service->start();
+          this->file_registry_service->start(true);
         }
 
       } catch (std::runtime_error &e) {
@@ -330,7 +328,8 @@ namespace wrench {
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
-      this->terminator->registerComputeService(service.get());
+//      this->
+// gisterComputeService(service.get());
       this->compute_services.insert(std::move(service));
       return raw_ptr;
     }
@@ -356,7 +355,7 @@ namespace wrench {
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
-      this->terminator->registerNetworkProximityService(service.get());
+//      this->terminator->registerNetworkProximityService(service.get());
       this->network_proximity_services.insert(std::move(service));
       return raw_ptr;
     }
@@ -382,7 +381,7 @@ namespace wrench {
 
       service->setSimulation(this);
       // Add a unique ptr to the list of Compute Services
-      this->terminator->registerStorageService(service.get());
+//      this->terminator->registerStorageService(service.get());
       this->storage_services.insert(std::move(service));
       return raw_ptr;
     }
@@ -422,7 +421,7 @@ namespace wrench {
       if (file_registry_service == nullptr) {
         throw std::invalid_argument("Simulation::setFileRegistryService(): invalid arguments");
       }
-      this->terminator->registerFileRegistryService(file_registry_service.get());
+//      this->terminator->registerFileRegistryService(file_registry_service.get());
       this->file_registry_service = std::move(file_registry_service);
     }
 
@@ -600,11 +599,4 @@ namespace wrench {
       S4U_Simulation::sleep(duration);
     }
 
-    /**
-     * @brief Get a pointer to the Terminator object
-     * @return a pointer to the Terminator object
-     */
-    Terminator *Simulation::getTerminator() {
-      return this->terminator.get();
-    }
 };

@@ -372,8 +372,6 @@ private:
         throw std::runtime_error("Should not be able to delete a nullptr file from a storage service");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -543,7 +541,6 @@ private:
         throw std::runtime_error("Should be able fo write a file that's already there");
       }
 
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -703,7 +700,6 @@ private:
         }
       }
 
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -872,7 +868,7 @@ private:
 
 
       // Do the file copy from a dst storage service that's down
-      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_1000);
+      this->test->storage_service_1000->stop();
 
       success = true;
       try {
@@ -898,7 +894,7 @@ private:
 
 
       // Do the file copy from a src storage service that's down
-      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_500);
+      this->test->storage_service_500->stop();
 
       success = true;
       try {
@@ -922,12 +918,6 @@ private:
         throw std::runtime_error("Should have gotten a 'service is down' exception");
       }
 
-      // since storage services have been manually stopped, we manually stop all other services
-      this->simulation->getTerminator()->shutdownComputeService(this->compute_services);
-      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_100);
-      this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
-      this->simulation->getTerminator()->shutdownNetworkProximityService(
-              this->simulation->getRunningNetworkProximityServices());
       return 0;
     }
 };
@@ -1107,7 +1097,7 @@ private:
       }
 
       // Do the file copy for a src storage service that's down
-      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_1000);
+      this->test->storage_service_1000->stop();
 
       try {
         data_movement_manager->initiateAsynchronousFileCopy(this->test->file_100, this->test->storage_service_1000,
@@ -1142,7 +1132,7 @@ private:
       }
 
       // Do the file copy from a dst storage service that's down
-      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_500);
+      this->test->storage_service_500->stop();
 
       bool success = true;
       try {
@@ -1166,12 +1156,6 @@ private:
         throw std::runtime_error("Should have gotten a 'service is down' exception");
       }
 
-      // since storage services have been manually stopped, we manually stop all other services
-      this->simulation->getTerminator()->shutdownComputeService(this->compute_services);
-      this->simulation->getTerminator()->shutdownStorageService(this->test->storage_service_100);
-      this->simulation->getTerminator()->shutdownFileRegistryService(this->simulation->getFileRegistryService());
-      this->simulation->getTerminator()->shutdownNetworkProximityService(
-              this->simulation->getRunningNetworkProximityServices());
       return 0;
     }
 };

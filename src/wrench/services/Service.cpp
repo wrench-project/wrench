@@ -81,13 +81,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Start the service 
+     * @brief Start the service
+     * @param daemonize: true if the daemon is to be truly daemonized, false otherwise
      * 
      * @throw std::runtime_error
      */
-    void Service::start() {
+    void Service::start(bool daemonize) {
       try {
-        this->start_daemon(this->hostname);
+        this->start_daemon(this->hostname, daemonize);
         this->state = Service::UP;
       } catch (std::invalid_argument &e) {
         XBT_INFO("THROWING!! %s", e.what());

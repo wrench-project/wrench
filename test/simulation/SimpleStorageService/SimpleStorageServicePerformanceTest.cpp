@@ -147,8 +147,6 @@ private:
         throw std::runtime_error("Time between two asynchronous operation completions is too big");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };

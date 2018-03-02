@@ -55,7 +55,7 @@ void PointerUtilTest::do_moveUniqueFromSetToSet_test() {
   }
 
   ASSERT_EQ(sum_src, 4);
-  ASSERT_EQ(sum_dst, 8);
+  ASSERT_EQ(sum_dst, 10);
 
 }
 

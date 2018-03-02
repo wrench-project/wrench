@@ -75,8 +75,6 @@ namespace wrench {
 
         std::set<ComputeService *> getRunningComputeServices();
 
-        void shutdownAllServices();
-
         void waitForAndProcessNextEvent();
 
         // workflow execution event processors

@@ -153,8 +153,6 @@ private:
         }
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -279,8 +277,6 @@ private:
         }
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -400,8 +396,6 @@ private:
         throw std::runtime_error(e.what());
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };

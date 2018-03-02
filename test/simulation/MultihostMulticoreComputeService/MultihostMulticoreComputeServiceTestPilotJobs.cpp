@@ -132,8 +132,6 @@ private:
                 "Should not be able to submit a pilot job to a compute service that does not support them");
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -313,8 +311,6 @@ private:
         }
       }
 
-      // Terminate
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -471,8 +467,6 @@ private:
         throw std::runtime_error("Unexpected task state");
       }
 
-      // Terminate while the pilot job is still running
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -589,8 +583,6 @@ private:
         }
       }
 
-      // Terminate everything
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -755,8 +747,6 @@ private:
         throw std::runtime_error("Unexpected exception while terminating pilot job: " + std::string(e.what()));
       }
 
-      // Terminate while the pilot job is still running
-      this->shutdownAllServices();
       return 0;
     }
 };
@@ -924,8 +914,6 @@ private:
         throw std::runtime_error("Unexpected task state");
       }
 
-      // Terminate while the pilot job is still running
-      this->shutdownAllServices();
       return 0;
     }
 };
