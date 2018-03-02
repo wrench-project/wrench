@@ -34,7 +34,7 @@ void PointerUtilTest::do_moveUniqueFromSetToSet_test() {
   std::set<std::unique_ptr<TwoInts>> src_set;
   std::set<std::unique_ptr<TwoInts>> dst_set;
 
-  src_set.insert(std::unique_ptr<TwoInts>(new TwoInts(1,1)));
+  src_set.insert(std::unique_ptr<TwoInts>(new TwoInts(2,2)));
   src_set.insert(std::unique_ptr<TwoInts>(new TwoInts(2,2)));
 
   dst_set.insert(std::unique_ptr<TwoInts>(new TwoInts(3,3)));
