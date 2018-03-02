@@ -33,7 +33,7 @@ namespace wrench {
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      *
-     * @throw std::invalid_argument
+     * @throw std::runtime_error
      */
     CloudService::CloudService(const std::string &hostname,
                                bool supports_standard_jobs,
@@ -244,7 +244,6 @@ namespace wrench {
                 "CloudService::submitPilotJob(): Received an unexpected [" + message->getName() + "] message!");
       }
     }
-
 
     /**
      * @brief Terminate a standard job to the compute service (virtual)
@@ -593,50 +592,38 @@ namespace wrench {
 
       // Num hosts
       std::vector<double> num_hosts;
-      num_hosts.push_back((double)(this->vm_list.size()));
+      num_hosts.push_back((double) (this->vm_list.size()));
       dict.insert(std::make_pair("num_hosts", num_hosts));
 
-      // Num cores per vm
       std::vector<double> num_cores;
-      for (auto &vm : this->vm_list) {
-        num_cores.push_back(std::get<2>(vm.second));
-      }
-
-      dict.insert(std::make_pair("num_cores", num_cores));
-
-      // Num idle cores per vm
       std::vector<double> num_idle_cores;
+      std::vector<double> flop_rates;
+      std::vector<double> ram_capacities;
+      std::vector<double> ram_availabilities;
+
       for (auto &vm : this->vm_list) {
+        // Num cores per vm
+        num_cores.push_back(std::get<2>(vm.second));
+
+        // Num idle cores per vm
         std::vector<unsigned long> idle_core_counts = std::get<1>(vm.second)->getNumIdleCores();
         num_idle_cores.push_back(std::accumulate(idle_core_counts.begin(), idle_core_counts.end(), 0));
-      }
 
-      dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
+        // Flop rate per vm
+        flop_rates.push_back(S4U_Simulation::getFlopRate(std::get<0>(vm)));
 
-      // Flop rate per vm
-      std::vector<double> flop_rates;
-      for (auto &vm : this->vm_list) {
-        // TODO: This is calling a S4U thing directly, without going though our
-        // TODO: S4U_Simulation class (perhaps change later, but then the CloudService
-        // TODO: implementation will have to change since it uses the simgrid::s4u stuff
-        // TODO: directly
-        flop_rates.push_back((std::get<0>(vm.second))->getPstateSpeed(0));
-      }
-      dict.insert(std::make_pair("flop_rates", flop_rates));
-
-      // RAM capacity per host
-      std::vector<double> ram_capacities;
-      for (auto &vm : this->vm_list) {
+        // RAM capacity per host
         ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(std::get<0>(vm)));
-      }
-      dict.insert(std::make_pair("ram_capacities", ram_capacities));
 
-      // RAM availability per host
-      std::vector<double> ram_availabilities;
-      for (auto &vm : this->vm_list) {
+        // RAM availability per
         ram_availabilities.push_back(
                 ComputeService::ALL_RAM);  // TODO FOR RAFAEL : What about VM memory availabilities???
       }
+
+      dict.insert(std::make_pair("num_cores", num_cores));
+      dict.insert(std::make_pair("num_idle_cores", num_idle_cores));
+      dict.insert(std::make_pair("flop_rates", flop_rates));
+      dict.insert(std::make_pair("ram_capacities", ram_capacities));
       dict.insert(std::make_pair("ram_availabilities", ram_availabilities));
 
       std::vector<double> ttl;
@@ -668,6 +655,4 @@ namespace wrench {
         std::get<1>(vm.second)->stop();
       }
     }
-
-
 }
