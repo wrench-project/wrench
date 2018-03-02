@@ -12,7 +12,7 @@
 #include <wrench-dev.h>
 #include <boost/algorithm/string.hpp>
 
-#include "TestWithFork.h"
+#include "../include/TestWithFork.h"
 
 class NetworkProximityTest : public ::testing::Test {
 

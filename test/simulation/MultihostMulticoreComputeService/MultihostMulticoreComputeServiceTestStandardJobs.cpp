@@ -12,7 +12,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "../TestWithFork.h"
+#include "../../include/TestWithFork.h"
 
 #define EPSILON 0.05
 

@@ -197,7 +197,7 @@ set(TEST_FILES
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceSchedulingTest.cpp
-        test/simulation/TestWithFork.h
+        test/include/TestWithFork.h
         test/simulation/MultihostMulticoreComputeService/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
         test/simulation/FileRegistryTest.cpp
@@ -206,6 +206,7 @@ set(TEST_FILES
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/MultipleWMSTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
+        test/misc/PointerUtilTest.cpp
         examples/simple-wms/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
         )
 
