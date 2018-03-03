@@ -41,7 +41,7 @@ namespace wrench {
       // Start the daemon on the same host
       try {
         WRENCH_INFO("Alarm Service starting...");
-        this->start_daemon(hostname, true);
+        this->start_daemon(hostname, true); // Daemonize
         this->state = UP;
       } catch (std::invalid_argument &e) {
         throw e;
