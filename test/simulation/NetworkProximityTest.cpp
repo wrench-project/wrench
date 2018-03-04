@@ -421,9 +421,8 @@ private:
         wrench::NetworkProximityService* alltoall_service;
         wrench::NetworkProximityService* vivaldi_service;
 
-        // TODO: discuss using map so that users can access a desired service easier. since the key in set will be a raw pointer
         for (auto  nps : network_proximity_services) {
-            std::string type = nps->getPropertyValueAsString(wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
+            std::string type = nps->getNetworkProximityServiceType();
 
             if (boost::iequals(type, "alltoall")) {
                 alltoall_service = nps;
