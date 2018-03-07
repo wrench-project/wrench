@@ -19,6 +19,8 @@
 #include <wrench/services/storage/StorageService.h>
 #include <wrench/workflow/WorkflowFile.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
+#include <wrench/services/network_proximity/NetworkProximityService.h>
+#include <algorithm>
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
 
@@ -115,6 +117,44 @@ namespace wrench {
 
     }
 
+    // DOCUMENT THIS
+    std::map<double, StorageService *> FileRegistryService::lookupEntryByProximity(WorkflowFile *file,
+                                                                                   std::string host_to_measure_from,
+    NetworkProximityService *network_proximity_service) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
+      }
+
+      // check to see if the 'host_to_measure_from' is valid
+      if(std::find(network_proximity_service->hosts_in_network.cbegin(), network_proximity_service->hosts_in_network.cend(), host_to_measure_from) == network_proximity_service->hosts_in_network.cend()) {
+        throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, host " + host_to_measure_from + " does not exist");
+      }
+
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry_by_proximity");
+
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file, host_to_measure_from, network_proximity_service,
+                                                                                             this->getPropertyValueAsDouble(
+                                                                                                     FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (FileRegistryFileLookupByProximityAnswerMessage *msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage *> (message.get())) {
+        return msg->locations;
+      } else {
+        throw std::runtime_error("FileRegistryService::lookupEntry(): Unexpected [" + message->getName() + "] message");
+      }
+    }
 
     /**
      * @brief Add an entry
@@ -268,6 +308,34 @@ namespace wrench {
                                    new FileRegistryFileLookupAnswerMessage(msg->file, locations,
                                                                            this->getPropertyValueAsDouble(
                                                                                    FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          return true;
+        }
+        return true;
+
+      } else if (FileRegistryFileLookupByProximityRequestMessage *msg = dynamic_cast<FileRegistryFileLookupByProximityRequestMessage *> (message.get())) {
+
+        std::string host_to_measure_from = msg->host_to_measure_from;
+
+        std::map<double, StorageService *> locations;
+        std::set<StorageService *> storage_services_with_file;
+        if (this->entries.find(msg->file) != this->entries.end()) {
+          storage_services_with_file = this->entries[msg->file];
+        }
+
+        double proximity;
+        auto locations_itr = locations.cbegin();
+
+        for (auto &storage_service: storage_services_with_file) {
+          proximity = msg->network_proximity_service->query(std::make_pair(host_to_measure_from, storage_service->hostname));
+          locations_itr = locations.insert(locations_itr, std::make_pair(proximity, storage_service));
+        }
+
+        // TODO: make this lookup greater since we are using the network proximity service??
+        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_OVERHEAD));
+        try {
+          S4U_Mailbox::dputMessage(msg->answer_mailbox, new FileRegistryFileLookupByProximityAnswerMessage(msg->file,
+          msg->host_to_measure_from, locations, this->getPropertyValueAsDouble(FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
