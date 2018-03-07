@@ -27,6 +27,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(network_proximity_service, "Log category for Networ
 
 namespace wrench {
 
+    constexpr double NetworkProximityService::NOT_AVAILABLE;
+
     /**
      * @brief Destructor
      */
@@ -267,7 +269,7 @@ namespace wrench {
             return false;
 
         } else if (NetworkProximityLookupRequestMessage *msg = dynamic_cast<NetworkProximityLookupRequestMessage *>(message.get())) {
-            double proximityValue = -1.0;
+            double proximityValue = NetworkProximityService::NOT_AVAILABLE;
 
             std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
 
@@ -277,7 +279,6 @@ namespace wrench {
 
                 if (host1 != this->coordinate_lookup_table.end() && host2 != this->coordinate_lookup_table.end()) {
                     proximityValue = std::sqrt(norm(host2->second - host1->second));
-
                 }
             } else {
                 if (this->entries.find(msg->hosts) != this->entries.end()) {
@@ -557,5 +558,13 @@ namespace wrench {
                                         this->getPropertyValueAsString(
                                                 NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE));
         }
+    }
+
+    /**
+     * @brief Gets the list of hosts monitored by this service (does not involve simulated network communications with the service)
+     * @return a list of hostnames
+     */
+    std::vector<std::string> NetworkProximityService::getHostnameList() {
+        return this->hosts_in_network;
     }
 }

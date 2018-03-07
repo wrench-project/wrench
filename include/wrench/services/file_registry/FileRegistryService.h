@@ -58,8 +58,8 @@ namespace wrench {
 
         std::set<StorageService *> lookupEntry(WorkflowFile *file);
 
-        std::map<double, StorageService *> lookupEntryByProximity(WorkflowFile *file, std::string host_to_measure_from,
-                                                                  NetworkProximityService *);
+        std::map<double, StorageService *> lookupEntry(WorkflowFile *file, std::string reference_host,
+                                                       NetworkProximityService *);
 
         void addEntry(WorkflowFile *file, StorageService *storage_service);
 
@@ -73,6 +73,7 @@ namespace wrench {
         /****************************/
         /** \cond INTERNAL          */
         /****************************/
+
         ~FileRegistryService();
         /****************************/
         /** \endcond                */
