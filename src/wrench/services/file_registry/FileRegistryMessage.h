@@ -14,6 +14,7 @@
 
 #include <wrench/services/ServiceMessage.h>
 #include <iostream>
+#include <wrench/services/network_proximity/NetworkProximityService.h>
 
 namespace wrench {
 
@@ -33,7 +34,7 @@ namespace wrench {
     /**
      * @brief FileRegistryFileLookupRequestMessage class
      */
-    class FileRegistryFileLookupRequestMessage: public FileRegistryMessage {
+    class FileRegistryFileLookupRequestMessage : public FileRegistryMessage {
     public:
         FileRegistryFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
 
@@ -46,22 +47,75 @@ namespace wrench {
     /**
      * @brief FileRegistryFileLookupAnswerMessage class
      */
-    class FileRegistryFileLookupAnswerMessage: public FileRegistryMessage {
+    class FileRegistryFileLookupAnswerMessage : public FileRegistryMessage {
     public:
-        FileRegistryFileLookupAnswerMessage(WorkflowFile *file, std::set<StorageService*> locations, double payload);
+        FileRegistryFileLookupAnswerMessage(WorkflowFile *file, std::set<StorageService *> locations, double payload);
 
         /** @brief The file that was looked up */
         WorkflowFile *file;
         /** @brief The (possibly empty) set of storage services where the file was found */
-        std::set<StorageService*> locations;
+        std::set<StorageService *> locations;
+    };
+
+    /**
+     * @brief FileRegistryFileLookupByProximityRequestMessage class
+     */
+    class FileRegistryFileLookupByProximityRequestMessage : public FileRegistryMessage {
+    public:
+        FileRegistryFileLookupByProximityRequestMessage(std::string answer_mailbox, WorkflowFile *file,
+                                                        std::string host_to_measure_from,
+                NetworkProximityService *network_proximity_service, double payload);
+
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The file to lookup */
+        WorkflowFile *file;
+        /**
+         * @brief The host from which network proximity will be measured from.
+         * If 'host_to_measure_from' is host 'A', and the workflow file resides at hosts 'B'
+         * and 'C', then the proximity will be computed between hosts 'A' and 'B', and hosts
+         * 'A' and 'C' so that the locations of the workflow file may be sorted with respect to
+         * their current network proximity value
+         */
+        std::string host_to_measure_from;
+
+        NetworkProximityService *network_proximity_service;
+    };
+
+    /**
+     * @brief FileRegistryFileLookupByProximityAnswerMessage class
+     */
+    class FileRegistryFileLookupByProximityAnswerMessage : public FileRegistryMessage {
+    public:
+        FileRegistryFileLookupByProximityAnswerMessage(WorkflowFile *file,
+                                                       std::string host_to_measure_from,
+                                                       std::map<double, StorageService *> locations,
+                                                       double payload);
+
+        /** @brief The file to lookup */
+        WorkflowFile *file;
+        /**
+         * @brief The host from which network proximity will be measured from.
+         * If 'host_to_measure_from' is host 'A', and the workflow file resides at hosts 'B'
+         * and 'C', then the proximity will be computed between hosts 'A' and 'B', and hosts
+         * 'A' and 'C' so that the locations of the workflow file may be sorted with respect to
+         * their current network proximity value
+         */
+        std::string host_to_measure_from;
+        /**
+         * @brief A map of all locations where the file resides sorted with respect to their distance from
+         * the host 'host_to_measure_from'
+         */
+        std::map<double, StorageService *> locations;
     };
 
     /**
      * @brief FileRegistryRemoveEntryRequestMessage class
      */
-    class FileRegistryRemoveEntryRequestMessage: public FileRegistryMessage {
+    class FileRegistryRemoveEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *storage_service, double payload);
+        FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file,
+                                              StorageService *storage_service, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
@@ -74,7 +128,7 @@ namespace wrench {
     /**
      * @brief FileRegistryRemoveEntryAnswerMessage
      */
-    class FileRegistryRemoveEntryAnswerMessage: public FileRegistryMessage {
+    class FileRegistryRemoveEntryAnswerMessage : public FileRegistryMessage {
     public:
         FileRegistryRemoveEntryAnswerMessage(bool success, double payload);
 
@@ -85,9 +139,10 @@ namespace wrench {
     /**
      * @brief FileRegistryAddEntryRequestMessage class
      */
-    class FileRegistryAddEntryRequestMessage: public FileRegistryMessage {
+    class FileRegistryAddEntryRequestMessage : public FileRegistryMessage {
     public:
-        FileRegistryAddEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *storage_service, double payload);
+        FileRegistryAddEntryRequestMessage(std::string answer_mailbox, WorkflowFile *file,
+                                           StorageService *storage_service, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
@@ -100,7 +155,7 @@ namespace wrench {
     /**
      * @brief FileRegistryAddEntryAnswerMessage class
      */
-    class FileRegistryAddEntryAnswerMessage: public FileRegistryMessage {
+    class FileRegistryAddEntryAnswerMessage : public FileRegistryMessage {
     public:
         FileRegistryAddEntryAnswerMessage(double payload);
     };
