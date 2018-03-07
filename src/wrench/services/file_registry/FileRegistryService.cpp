@@ -95,7 +95,7 @@ namespace wrench {
                                                                                              this->getPropertyValueAsDouble(
                                                                                                      FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
-          throw WorkflowExecutionException(cause);
+        throw WorkflowExecutionException(cause);
       }
 
       std::unique_ptr<SimulationMessage> message = nullptr;
@@ -117,26 +117,34 @@ namespace wrench {
 
     }
 
-    // DOCUMENT THIS
-    std::map<double, StorageService *> FileRegistryService::lookupEntryByProximity(WorkflowFile *file,
-                                                                                   std::string host_to_measure_from,
-    NetworkProximityService *network_proximity_service) {
+    /**
+     * @brief Retrieve a list of storage services that hold a file, sorted by increasing network distance from a reference host, according to a network proximity service
+     * @param file: the file of interest
+     * @param reference_host: reference host
+     * @param network_proximity_service: the network proximity service
+     *
+     * @return a map of <distance , storage service> pairs
+     */
+    std::map<double, StorageService *> FileRegistryService::lookupEntry(WorkflowFile *file,
+                                                                        std::string reference_host,
+                                                                        NetworkProximityService *network_proximity_service) {
 
       if (file == nullptr) {
         throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
       }
 
-      // check to see if the 'host_to_measure_from' is valid
-      if(std::find(network_proximity_service->hosts_in_network.cbegin(), network_proximity_service->hosts_in_network.cend(), host_to_measure_from) == network_proximity_service->hosts_in_network.cend()) {
-        throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, host " + host_to_measure_from + " does not exist");
+      // check to see if the 'reference_host' is valid
+      std::vector<std::string> monitored_hosts = network_proximity_service->getHostnameList();
+      if(std::find(monitored_hosts.cbegin(), monitored_hosts.cend(), reference_host) == monitored_hosts.cend()) {
+        throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, host " + reference_host + " does not exist");
       }
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry_by_proximity");
 
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file, host_to_measure_from, network_proximity_service,
-                                                                                             this->getPropertyValueAsDouble(
-                                                                                                     FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file, reference_host, network_proximity_service,
+                                                                                                        this->getPropertyValueAsDouble(
+                                                                                                                FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -179,7 +187,7 @@ namespace wrench {
                                                                        this->getPropertyValueAsDouble(
                                                                                FileRegistryServiceProperty::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
-          throw WorkflowExecutionException(cause);
+        throw WorkflowExecutionException(cause);
       }
 
       std::unique_ptr<SimulationMessage> message = nullptr;
@@ -335,7 +343,7 @@ namespace wrench {
         S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_OVERHEAD));
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox, new FileRegistryFileLookupByProximityAnswerMessage(msg->file,
-          msg->host_to_measure_from, locations, this->getPropertyValueAsDouble(FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                                                                                                           msg->host_to_measure_from, locations, this->getPropertyValueAsDouble(FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }

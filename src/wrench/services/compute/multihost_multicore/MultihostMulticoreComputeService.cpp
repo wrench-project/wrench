@@ -788,17 +788,14 @@ namespace wrench {
         return true;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
-
         processGetResourceInformation(msg->answer_mailbox);
         return true;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage *>(message.get())) {
-
         processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
         return true;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
-
         processPilotJobTerminationRequest(msg->job, msg->answer_mailbox);
         return true;
 

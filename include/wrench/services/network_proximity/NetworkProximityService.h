@@ -12,6 +12,7 @@
 
 #include <complex>
 #include <random>
+#include <cfloat>
 #include "wrench/services/Service.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
 #include "wrench/services/network_proximity/NetworkProximityDaemon.h"
@@ -40,6 +41,9 @@ namespace wrench{
 
     public:
 
+        static constexpr double NOT_AVAILABLE = DBL_MAX;
+
+
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -58,13 +62,14 @@ namespace wrench{
 
         double query(std::pair<std::string, std::string> hosts);
 
+        std::vector<std::string> getHostnameList();
+
         // TODO: add function to return coordinate of desired network daemon
         std::pair<double, double> getCoordinate(std::string);
 
     private:
 
         friend class Simulation;
-        friend class FileRegistryService;
 
         std::vector<std::shared_ptr<NetworkProximityDaemon>> network_daemons;
         std::vector<std::string> hosts_in_network;
