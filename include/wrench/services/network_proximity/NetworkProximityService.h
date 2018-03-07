@@ -64,6 +64,7 @@ namespace wrench{
     private:
 
         friend class Simulation;
+        friend class FileRegistryService;
 
         std::vector<std::shared_ptr<NetworkProximityDaemon>> network_daemons;
         std::vector<std::string> hosts_in_network;
