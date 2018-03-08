@@ -134,7 +134,6 @@ namespace wrench {
       zmq::socket_t socket(context, ZMQ_REQ);
       socket.connect("tcp://localhost:" + this->sched_port);
 
-      std::cout << "Sending a terminate message to batsched " << data_to_send.c_str() << "\n";
       zmq::message_t request(strlen(this->data_to_send.c_str()));
       memcpy(request.data(), this->data_to_send.c_str(), strlen(this->data_to_send.c_str()));
       socket.send(request);
