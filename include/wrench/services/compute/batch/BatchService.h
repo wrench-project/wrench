@@ -196,7 +196,7 @@ namespace wrench {
         BatchJob *scheduleJob(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
-        void terminate();
+        void cleanup() override;
 
         //Fail the standard jobs inside the pilot jobs
         void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);

@@ -25,6 +25,11 @@
 #include <boost/algorithm/string.hpp>
 #include <wrench/util/MessageManager.h>
 
+#ifdef ENABLE_BATSCHED
+#include <zmq.hpp>
+#include <zmq.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -952,7 +957,8 @@ namespace wrench {
 /**
  * @brief Terminate the daemon, dealing with pending/running jobs
  */
-    void BatchService::terminate() {
+    void BatchService::cleanup() {
+
       this->setStateToDown();
 
       if (this->getPropertyValueAsString(BatchServiceProperty::BATCH_FAKE_SUBMISSION) == "false") {
@@ -960,37 +966,62 @@ namespace wrench {
         this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
-      //remove standard job alarms
-      std::vector<std::unique_ptr<Alarm>>::iterator it;
-      for (it = this->standard_job_alarms.begin(); it != this->standard_job_alarms.end(); it++) {
-        if ((*it)->isUp()) {
-          it->reset();
-        }
-      }
-
-      //remove pilot job alarms
-      for (it = this->pilot_job_alarms.begin(); it != this->pilot_job_alarms.end(); it++) {
-        if ((*it)->isUp()) {
-          it->reset();
-        }
-      }
+//      //remove standard job alarms
+//      std::vector<std::unique_ptr<Alarm>>::iterator it;
+//      for (it = this->standard_job_alarms.begin(); it != this->standard_job_alarms.end(); it++) {
+//        if ((*it)->isUp()) {
+//          it->reset();
+//        }
+//      }
+//
+//      //remove pilot job alarms
+//      for (it = this->pilot_job_alarms.begin(); it != this->pilot_job_alarms.end(); it++) {
+//        if ((*it)->isUp()) {
+//          it->reset();
+//        }
+//      }
 
 #ifdef ENABLE_BATSCHED
+//      nlohmann::json simulation_ends_msg;
+//      simulation_ends_msg["now"] = S4U_Simulation::getClock();
+//      simulation_ends_msg["events"][0]["timestamp"] = S4U_Simulation::getClock();
+//      simulation_ends_msg["events"][0]["type"] = "SIMULATION_ENDS";
+//      simulation_ends_msg["events"][0]["data"] = {};
+//      std::string data = simulation_ends_msg.dump();
+//
+//
+//      std::unique_ptr<BatchNetworkListener> network_listener =
+//              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
+//                                                                             "14000", "28000",
+//                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+//                                                                             data));
+//
+//      network_listener->start(true);
+//      network_listeners.push_back(std::move(network_listener));
+
+
+      zmq::context_t context(1);
+      zmq::socket_t socket(context, ZMQ_REQ);
+      socket.connect("tcp://localhost:28000");
+
+
       nlohmann::json simulation_ends_msg;
       simulation_ends_msg["now"] = S4U_Simulation::getClock();
       simulation_ends_msg["events"][0]["timestamp"] = S4U_Simulation::getClock();
       simulation_ends_msg["events"][0]["type"] = "SIMULATION_ENDS";
       simulation_ends_msg["events"][0]["data"] = {};
-      std::string data = simulation_ends_msg.dump();
+      std::string data_to_send = simulation_ends_msg.dump();
 
-      std::unique_ptr<BatchNetworkListener> network_listener =
-              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                             "14000", "28000",
-                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
-                                                                             data));
+      zmq::message_t request(strlen(data_to_send.c_str()));
+      memcpy(request.data(), data_to_send.c_str(), strlen(data_to_send.c_str()));
+      socket.send(request);
 
-      network_listener->start(true);
-      network_listeners.push_back(std::move(network_listener));
+      //  Get the reply.
+      zmq::message_t reply;
+      socket.recv(&reply);
+
+      std::string reply_data;
+      reply_data = std::string(static_cast<char *>(reply.data()), reply.size());
 
 #endif
 
@@ -1038,7 +1069,7 @@ namespace wrench {
 
 
       if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-        this->terminate();
+        this->cleanup();
         // This is Synchronous;
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
