@@ -58,10 +58,12 @@ namespace wrench {
     /**
      * \cond
      */
-    static int daemon_goodbye(void *x, void* y) {
-      WRENCH_INFO("Terminating");
-      auto *service = reinterpret_cast<S4U_Daemon *>(y);
-      service->cleanup();
+    static int daemon_goodbye(void *x, void* service_instance) {
+      WRENCH_INFO("Terminating (but by now the object may have been freed :(");
+      if (service_instance) {
+        auto *service = reinterpret_cast<S4U_Daemon *>(service_instance);
+        service->cleanup();
+      }
       return 0;
     }
 
