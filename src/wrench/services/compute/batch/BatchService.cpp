@@ -32,6 +32,7 @@
 
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
@@ -1564,17 +1565,16 @@ namespace wrench {
 *           - exit code 3: execvp error
 */
     void BatchService::run_batsched() {
-      this->pid = fork();
 
-      if (this->pid == 0) { // Child process that will exec batsched
+      this->pid = getpid();
+
+      int top_pid = fork();
+      if (top_pid == 0) { // Child process that will exec batsched
 
         std::string algorithm = this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM);
         bool is_supported = this->scheduling_algorithms.find(algorithm) != this->scheduling_algorithms.end();
         if (not is_supported) {
           exit(1);
-//          throw std::runtime_error(
-//                  "The algorithm " + algorithm + " is not supported by the batch service"
-//          );
         }
 
         std::string queue_ordering = this->getPropertyValueAsString(
@@ -1584,24 +1584,40 @@ namespace wrench {
         if (not is_queue_ordering_available) {
           std::cerr << "The queue ordering option " + queue_ordering + " is not supported by the batch service" << "\n";
           exit(2);
-//          throw std::runtime_error(
-//                  "The queue ordering option " + queue_ordering + " is not supported by the batch service"
-//          );
         }
 
         const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), NULL};
-        // Now execute it
         if (execvp(args[0], (char **) args) == -1) {
           exit(3);
-//          throw std::runtime_error("Cannot exec batsched process");
         }
 
-      } else if (this->pid > 0) {
+
+      } else if (top_pid > 0) {
         // parent process
         sleep(1); // Wait one second to let batsched the time to start (this is pretty ugly)
-        int exit_code = waitpid(this->pid, NULL, WNOHANG);
+        int exit_code = waitpid(top_pid, NULL, WNOHANG);
         switch (exit_code) {
           case 0:
+          {
+            //now fork a process that sleeps until its parent is dead
+            int nested_pid = fork();
+
+            if(nested_pid > 0) {
+              //I am the parent, whose child fork exec'd batsched
+            } else if (nested_pid == 0) {
+              int ppid = getppid();
+              while (ppid != 1) {
+                ppid = getppid();
+              }
+              //check if the child that forked batsched is still running
+              int is_sent = 0;
+              if (getpgid(top_pid)) {
+                is_sent = kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched
+              }
+              exit(is_sent); //exit myself
+
+            }
+          }
             return;
           case 1:
             throw std::runtime_error(
@@ -1620,6 +1636,7 @@ namespace wrench {
             throw std::runtime_error(
                     "run_batsched(): Unknown fatal error");
         }
+
       } else {
         // fork failed
         throw std::runtime_error(
