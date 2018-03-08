@@ -50,14 +50,21 @@ namespace wrench {
 //        WRENCH_INFO("In the Daemon Destructor");
     }
 
+    void S4U_Daemon::cleanup(){
+      WRENCH_INFO("Cleaning Up");
+    }
+
 
     /**
      * \cond
      */
-    static int daemon_goodbye(void *x, void *y) {
+    static int daemon_goodbye(void *x, void* y) {
       WRENCH_INFO("Terminating");
+      auto *service = reinterpret_cast<S4U_Daemon *>(y);
+      service->cleanup();
       return 0;
     }
+
 
     /**
      * \endcond
@@ -90,8 +97,7 @@ namespace wrench {
       // TODO: This wasn't working right last time Henri checked... but it's likely no big deal
       if (daemonized)
         this->s4u_actor->daemonize();
-
-      this->s4u_actor->onExit(daemon_goodbye, (void *) (this->process_name.c_str()));
+      this->s4u_actor->onExit(daemon_goodbye, (void *) (this));
 
 
       // Set the mailbox_name receiver

@@ -13,6 +13,7 @@
 #include <string>
 
 #include <simgrid/s4u.hpp>
+#include <iostream>
 
 namespace wrench {
 
@@ -39,6 +40,8 @@ namespace wrench {
 				virtual ~S4U_Daemon();
 
 				void start_daemon(std::string hostname, bool daemonized = false);
+
+				virtual void cleanup();
 
 				virtual int main() = 0;
         void setTerminated();
