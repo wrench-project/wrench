@@ -279,7 +279,7 @@ namespace wrench {
       try {
         // Start the WMSes
         for (const auto &wms : this->wmses) {
-          wms->start(wms);
+          wms->start(wms, false);
         }
 
         // Start the compute services

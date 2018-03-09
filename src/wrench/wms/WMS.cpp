@@ -40,14 +40,13 @@ namespace wrench {
              const std::set<StorageService *> &storage_services,
              const std::string &hostname,
              const std::string suffix) :
-            S4U_Daemon("wms_" + suffix, "wms_" + suffix),
+            Service(hostname, "wms_" + suffix, "wms_" + suffix),
             compute_services(std::move(compute_services)),
             storage_services(std::move(storage_services)),
             standard_job_scheduler(std::move(standard_job_scheduler)),
             pilot_job_scheduler(std::move(pilot_job_scheduler))
              {
 
-      this->hostname = hostname;
       this->workflow = nullptr;
     }
 
@@ -245,21 +244,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Start the WMS daemon
-     *
-     * @throw std::runtime_error
-     */
-    void WMS::start(std::shared_ptr<WMS> this_service) {
-      // Start the daemon
-      try {
-        this->createLifeSaver(this_service);
-        this->startDaemon(this->hostname, false);
-      } catch (std::invalid_argument &e) {
-        throw std::runtime_error("WMS:start(): " + std::string(e.what()));
-      }
-    }
-
-    /**
      * @brief Get the name of the host on which the WMS is running
      *
      * @return the hostname
@@ -306,8 +290,7 @@ namespace wrench {
     std::shared_ptr<JobManager> WMS::createJobManager() {
       auto job_manager_raw_ptr = new JobManager(this);
       std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
-      job_manager->createLifeSaver(job_manager); // Start the daemon
-      job_manager->startDaemon(S4U_Simulation::getHostName(), true); // Always daemonize
+      job_manager->start(job_manager, true); // Always daemonize
       return job_manager;
     }
 
@@ -319,8 +302,7 @@ namespace wrench {
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
       auto data_movement_manager_raw_ptr = new DataMovementManager(this);
       std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
-      data_movement_manager->createLifeSaver(data_movement_manager);
-      data_movement_manager->startDaemon(S4U_Simulation::getHostName(), true);
+      data_movement_manager->start(data_movement_manager, true);
       return data_movement_manager;
     }
 

@@ -12,7 +12,7 @@
 #define WRENCH_WORKUNITMULTICOREEXECUTOR_H
 
 
-#include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/services/Service.h"
 
 namespace wrench {
 
@@ -33,11 +33,9 @@ namespace wrench {
     /**
      * @brief An actor that knows how to perform a work unit
      */
-    class WorkunitMulticoreExecutor : public S4U_Daemon {
+    class WorkunitMulticoreExecutor : public Service {
 
     public:
-
-        ~WorkunitMulticoreExecutor();
 
         WorkunitMulticoreExecutor(
                      Simulation *simulation,
@@ -68,7 +66,6 @@ namespace wrench {
 
         Simulation *simulation;
         std::string callback_mailbox;
-        std::string hostname;
         unsigned long num_cores;
         double ram_utilization;
         double thread_startup_overhead;

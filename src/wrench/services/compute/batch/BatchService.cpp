@@ -1652,8 +1652,7 @@ namespace wrench {
                           {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                                    this->getPropertyValueAsString(
                                            BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}}));
-          executor->createLifeSaver(executor);
-          executor->startDaemon(std::get<0>(*resources.begin()), true);
+          executor->start(executor, true);
 
           this->running_standard_job_executors.insert(executor);
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);

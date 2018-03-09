@@ -34,7 +34,7 @@ namespace wrench {
      * @param wms: the wms for which this manager is working
      */
     JobManager::JobManager(WMS *wms) :
-            S4U_Daemon("job_manager", "job_manager") {
+            Service(wms->hostname, "job_manager", "job_manager") {
 
       this->wms = wms;
 

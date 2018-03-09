@@ -642,8 +642,7 @@ namespace wrench {
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM)},
                {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}}));
-      executor->createLifeSaver(executor);
-      executor->startDaemon(this->hostname, true);
+      executor->start(executor, true);
 
       this->standard_job_executors.insert(executor);
       this->running_jobs.insert(job);
