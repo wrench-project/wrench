@@ -72,35 +72,12 @@ namespace wrench {
                                            this->getPropertyValueAsDouble(
                                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE)));
 
-        np_daemon->createLifeSaver(np_daemon);
         this->network_daemons.push_back(np_daemon);
 
         // if this network service type is 'vivaldi', setup the coordinate lookup table
         if (boost::iequals(this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE), "vivaldi")) {
           this->coordinate_lookup_table.insert(std::pair<std::string, std::complex<double>>(*it, (0.0)));
         }
-      }
-    }
-
-
-    /**
-     * @brief Starts the network proximity service sets of daemons and the
-     *        proximity service itself
-     * @param daemonize: whether the daemon is supposed to be daemonized or not
-     *
-     * @throw std::runtime_error
-     */
-    void NetworkProximityService::start(bool daemonize) {
-      try {
-        // Start the network daemons
-        for (auto it = this->network_daemons.begin(); it != this->network_daemons.end(); it++) {
-          (*it)->start(true); // daemonized
-
-        }
-        this->startDaemon(this->hostname, daemonize);
-        this->state = Service::UP;
-      } catch (std::runtime_error &e) {
-        throw;
       }
     }
 
@@ -221,6 +198,15 @@ namespace wrench {
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
 
       WRENCH_INFO("Network Proximity Service starting on host %s!", S4U_Simulation::getHostName().c_str());
+
+      // Start all network daemons
+      try {
+        for (auto it = this->network_daemons.begin(); it != this->network_daemons.end(); it++) {
+          (*it)->start((*it), true); // daemonized
+        }
+      } catch (std::runtime_error &e) {
+        throw;
+      }
 
       /** Main loop **/
       while (this->processNextMessage()) {

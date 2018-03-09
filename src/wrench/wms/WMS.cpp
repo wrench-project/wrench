@@ -249,9 +249,10 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void WMS::start() {
+    void WMS::start(std::shared_ptr<WMS> this_service) {
       // Start the daemon
       try {
+        this->createLifeSaver(this_service);
         this->startDaemon(this->hostname, false);
       } catch (std::invalid_argument &e) {
         throw std::runtime_error("WMS:start(): " + std::string(e.what()));

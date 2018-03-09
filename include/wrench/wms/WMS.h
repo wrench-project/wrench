@@ -61,7 +61,7 @@ namespace wrench {
             const std::string &hostname,
             const std::string suffix);
 
-        void start();
+        void start(std::shared_ptr<WMS> this_service);
 
         void checkDeferredStart();
 

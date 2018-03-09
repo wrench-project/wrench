@@ -83,9 +83,8 @@ namespace wrench {
                                SimulationMessage *msg, std::string suffix) {
       std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
               new Alarm(date, hostname, reply_mailbox_name, msg, suffix));
-      alarm_ptr->createLifeSaver(alarm_ptr);
       try {
-        alarm_ptr->start(true); // daemonize
+        alarm_ptr->start(alarm_ptr, true); // daemonize
       } catch (std::invalid_argument &e) {
         throw;
       }

@@ -424,14 +424,13 @@ namespace wrench {
                                                        supports_pilot_jobs,
                                                        compute_resources,
                                                        default_storage_service, plist));
-          cs->createLifeSaver(cs);
           cs->setSimulation(this->simulation);
 
           this->cs_available_ram[pm_hostname] -= ram_memory;
 
           // start the service
           try {
-            cs->start(true); // Daemonize!
+            cs->start(cs, true); // Daemonize!
           } catch (std::runtime_error &e) {
             throw;
           }

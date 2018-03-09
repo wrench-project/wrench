@@ -82,12 +82,14 @@ namespace wrench {
 
     /**
      * @brief Start the service
+     * @param this_service: a shared pointer to this service object
      * @param daemonize: true if the daemon is to be truly daemonized, false otherwise
      * 
      * @throw std::runtime_error
      */
-    void Service::start(bool daemonize) {
+    void Service::start(std::shared_ptr<Service> this_service, bool daemonize) {
       try {
+        this->createLifeSaver(this_service);
         this->startDaemon(this->hostname, daemonize);
         this->state = Service::UP;
       } catch (std::invalid_argument &e) {

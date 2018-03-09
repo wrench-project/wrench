@@ -1701,8 +1701,7 @@ namespace wrench {
           job->setComputeService(cs);
 
           try {
-            cs->createLifeSaver(cs);
-            cs->start(true);
+            cs->start(cs, true);
           } catch (std::runtime_error &e) {
             throw;
           }
@@ -1967,8 +1966,7 @@ namespace wrench {
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-      network_listener->createLifeSaver(network_listener);
-      network_listener->start(true);
+      network_listener->start(network_listener, true);
       network_listeners.push_back(network_listener);
 
     }
