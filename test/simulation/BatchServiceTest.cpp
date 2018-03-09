@@ -119,7 +119,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -203,29 +203,24 @@ void BatchServiceTest::do_StandardJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                           storage_service1, {}))));
+                                           storage_service1, {})));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new OneStandardJobSubmissionTestWMS(
-                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new OneStandardJobSubmissionTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
@@ -269,7 +264,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM and 30 seconds
@@ -349,33 +344,27 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                           storage_service1, {}))));
+                                           storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new OnePilotJobSubmissionTestWMS(
+          new OnePilotJobSubmissionTestWMS(
                   this,
-                          {compute_service}, {storage_service1, storage_service2}, hostname))));
+                          {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -419,7 +408,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -549,34 +538,28 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
-                                           storage_service1, {}))));
+                                           storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new StandardPlusPilotJobSubmissionTestWMS(
+          new StandardPlusPilotJobSubmissionTestWMS(
                   this,
-                          {compute_service}, {storage_service1, storage_service2}, hostname))));
+                          {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -619,7 +602,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -691,33 +674,27 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
-                                           storage_service1,  {}))));
+                                           storage_service1,  {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new InsufficientCoresJobSubmissionTestWMS(
-                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new InsufficientCoresJobSubmissionTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -761,7 +738,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -825,33 +802,27 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
-                                           storage_service1, {}))));
+                                           storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new NoArgumentsJobSubmissionTestWMS(
-                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new NoArgumentsJobSubmissionTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -895,7 +866,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -976,33 +947,27 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
-                                           storage_service1, {}))));
+                                           storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new StandardJobTimeoutSubmissionTestWMS(
-                  this, {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new StandardJobTimeoutSubmissionTestWMS(
+                  this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1046,7 +1011,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
@@ -1125,33 +1090,27 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
-                                           storage_service1, {}))));
+                                           storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new PilotJobTimeoutSubmissionTestWMS(
-                  this, {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new PilotJobTimeoutSubmissionTestWMS(
+                  this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1194,7 +1153,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 8 cores
@@ -1340,34 +1299,28 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
                                            storage_service1,
-                                           {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}}))));
+                                           {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new BestFitStandardJobSubmissionTestWMS(
-                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new BestFitStandardJobSubmissionTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1417,7 +1370,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
@@ -1537,33 +1490,27 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
-                                           storage_service1, {}))));
+                                           storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new StandardJobInsidePilotJobTimeoutSubmissionTestWMS(
-                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new StandardJobInsidePilotJobTimeoutSubmissionTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1606,7 +1553,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a pilot job tbat needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
@@ -1727,33 +1674,27 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
-                                           storage_service1, {}))));
+                                           storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new StandardJobInsidePilotJobSucessSubmissionTestWMS(
-                  this, {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new StandardJobInsidePilotJobSucessSubmissionTestWMS(
+                  this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1797,7 +1738,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
@@ -1900,33 +1841,27 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
-                                           storage_service1,  {}))));
+                                           storage_service1,  {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new InsufficientCoresInsidePilotJobSubmissionTestWMS(
-                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new InsufficientCoresInsidePilotJobSubmissionTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1970,7 +1905,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
 
@@ -2055,33 +1990,27 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(),
-                                           storage_service1, {}))));
+                                           storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MultipleStandardJobSubmissionTestWMS(
-                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new MultipleStandardJobSubmissionTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2124,7 +2053,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -2218,36 +2147,30 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname,
                                            true, true,
                                            simulation->getHostnameList(), storage_service1,  {
                                                    {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "filler"},
                                                    {wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"}
-                                           }))));
+                                           })));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new DifferentBatchAlgorithmsSubmissionTestWMS(
-                  this,  {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new DifferentBatchAlgorithmsSubmissionTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow).get()));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2291,7 +2214,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
@@ -2384,34 +2307,28 @@ void BatchServiceTest::do_BatchFakeJobSubmissionTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(), storage_service1,  {
                                                    {wrench::BatchServiceProperty::BATCH_FAKE_SUBMISSION, "true"}
-                                           }))));
+                                           })));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new BatchFakeJobSubmissionTestWMS(
-                  this,   {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new BatchFakeJobSubmissionTestWMS(
+                  this,   {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2456,7 +2373,7 @@ private:
 
     int main() {
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
         //Let's load the trace file
@@ -2563,34 +2480,28 @@ void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::BatchService>(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(), storage_service1, {
                                                    {wrench::BatchServiceProperty::BATCH_FAKE_SUBMISSION, "true"}
-                                           }))));
+                                           })));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new BatchTraceFileJobSubmissionTestWMS(
-                  this, {compute_service}, {storage_service1, storage_service2}, hostname))));
+          new BatchTraceFileJobSubmissionTestWMS(
+                  this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);

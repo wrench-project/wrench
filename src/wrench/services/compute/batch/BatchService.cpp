@@ -608,13 +608,13 @@ namespace wrench {
     }
 
     void BatchService::processStandardJobTimeout(StandardJob *job) {
-      std::set<std::unique_ptr<StandardJobExecutor>>::iterator it;
+      std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
 
       bool terminated = false;
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if (((*it).get())->getJob() == job) {
           ((*it).get())->kill();
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_standard_job_executors),
+          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));
           terminated = true;
           break;
@@ -657,10 +657,10 @@ namespace wrench {
     void BatchService::terminateRunningStandardJob(StandardJob *job) {
 
       StandardJobExecutor *executor = nullptr;
-      std::set<std::unique_ptr<StandardJobExecutor>>::iterator it;
+      std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
       for (it = this->running_standard_job_executors.begin();
            it != this->running_standard_job_executors.end(); it++) {
-        if (((*it).get())->getJob() == job) {
+        if (((*it))->getJob() == job) {
           executor = (it->get());
         }
       }
@@ -982,7 +982,7 @@ namespace wrench {
 //      }
 
 #ifdef ENABLE_BATSCHED
-//      nlohmann::json simulation_ends_msg;
+      //      nlohmann::json simulation_ends_msg;
 //      simulation_ends_msg["now"] = S4U_Simulation::getClock();
 //      simulation_ends_msg["events"][0]["timestamp"] = S4U_Simulation::getClock();
 //      simulation_ends_msg["events"][0]["type"] = "SIMULATION_ENDS";
@@ -1443,10 +1443,10 @@ namespace wrench {
  */
     void BatchService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
       bool executor_on_the_list = false;
-      std::set<std::unique_ptr<StandardJobExecutor>>::iterator it;
+      std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if ((*it).get() == executor) {
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_standard_job_executors),
+          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));
           executor_on_the_list = true;
           break;
@@ -1497,10 +1497,10 @@ namespace wrench {
                                                  std::shared_ptr<FailureCause> cause) {
 
       bool executor_on_the_list = false;
-      std::set<std::unique_ptr<StandardJobExecutor>>::iterator it;
+      std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if ((*it).get() == executor) {
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_standard_job_executors),
+          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));
           executor_on_the_list = true;
           break;
@@ -1641,17 +1641,21 @@ namespace wrench {
           WRENCH_INFO("Creating a StandardJobExecutor on %ld cores for a standard job on %ld nodes",
                       cores_per_node_asked_for, num_nodes_allocated);
           // Create a standard job executor
-          StandardJobExecutor *executor = new StandardJobExecutor(
-                  this->simulation,
-                  this->mailbox_name,
-                  std::get<0>(*resources.begin()),
-                  (StandardJob *) workflow_job,
-                  resources,
-                  this->default_storage_service,
-                  {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
-                           this->getPropertyValueAsString(
-                                   BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}});
-          this->running_standard_job_executors.insert(std::unique_ptr<StandardJobExecutor>(executor));
+          std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(
+                  new StandardJobExecutor(
+                          this->simulation,
+                          this->mailbox_name,
+                          std::get<0>(*resources.begin()),
+                          (StandardJob *) workflow_job,
+                          resources,
+                          this->default_storage_service,
+                          {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
+                                   this->getPropertyValueAsString(
+                                           BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}}));
+          executor->createLifeSaver(executor);
+          executor->startDaemon(std::get<0>(*resources.begin()), true);
+
+          this->running_standard_job_executors.insert(executor);
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
 //          this->running_jobs.insert(std::move(batch_job_ptr));
           this->timeslots.push_back(batch_job->getEndingTimeStamp());
@@ -1661,12 +1665,9 @@ namespace wrench {
           SimulationMessage *msg =
                   new AlarmJobTimeOutMessage(job, 0);
 
-          std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(
-                  new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
-                            "batch_standard"));
-
-          standard_job_alarms.push_back(
-                  std::move(alarm_ptr));
+          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+                                                                        "batch_standard");
+          standard_job_alarms.push_back(alarm_ptr);
 
 
           return;
@@ -1689,19 +1690,18 @@ namespace wrench {
           double timeout_timestamp = std::min(job->getDuration(), time_in_minutes * 60 * 1.0);
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
 
-          ComputeService *cs =
+          // Create and launch a compute service for the pilot job
+          std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(host_to_run_on,
                                                        true, false,
                                                        resources,
                                                        this->default_storage_service
-                  );
+                  ));
           cs->setSimulation(this->simulation);
-
-          // Create and launch a compute service for the pilot job
           job->setComputeService(cs);
 
-
           try {
+            cs->createLifeSaver(cs);
             cs->start(true);
           } catch (std::runtime_error &e) {
             throw;
@@ -1729,12 +1729,10 @@ namespace wrench {
 
           SimulationMessage *msg =
                   new AlarmJobTimeOutMessage(job, 0);
-          std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(
-                  new Alarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
-                            "batch_pilot"));
+          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
+                            "batch_pilot");
 
-          this->pilot_job_alarms.push_back(
-                  std::move(alarm_ptr));
+          this->pilot_job_alarms.push_back(alarm_ptr);
 
           // Push my own mailbox_name onto the pilot job!
 //          job->pushCallbackMailbox(this->mailbox_name);
@@ -1814,11 +1812,9 @@ namespace wrench {
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
           SimulationMessage *msg =
                   new AlarmNotifyBatschedMessage(std::to_string(batch_job->getJobID()), 0);
-          std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(
-                  new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
-                            "batch_alarm_notify_batsched"));
-          standard_job_alarms.push_back(
-                  std::move(alarm_ptr));
+          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+                            "batch_alarm_notify_batsched");
+          standard_job_alarms.push_back(alarm_ptr);
         } else {
 #ifdef ENABLE_BATSCHED
           this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY",
@@ -1966,14 +1962,14 @@ namespace wrench {
       batch_submission_data["events"][0]["data"]["kill_reason"] = kill_reason;
 
       std::string data = batch_submission_data.dump();
-      std::unique_ptr<BatchNetworkListener> network_listener =
-              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
+      std::shared_ptr<BatchNetworkListener> network_listener =
+              std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-
+      network_listener->createLifeSaver(network_listener);
       network_listener->start(true);
-      network_listeners.push_back(std::move(network_listener));
+      network_listeners.push_back(network_listener);
 
     }
 

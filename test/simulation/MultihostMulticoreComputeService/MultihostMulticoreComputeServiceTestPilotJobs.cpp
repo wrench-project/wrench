@@ -105,11 +105,11 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager =
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager =
               this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -158,33 +158,28 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0))));
+                  new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, true, false,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {}))));
+                                                               storage_service, {})));
 
   // Create a WMS
   wrench::WMS *wms;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS(
+          new MultihostMulticoreComputeServiceUnsupportedPilotJobsTestWMS(
                   this,  {
                           compute_service
                   }, {
                           storage_service
-                  }, hostname))));
+                  }, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
 
 
@@ -221,10 +216,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -243,7 +238,7 @@ private:
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
 
-      // Wait for the pilot job start_daemon
+      // Wait for the pilot job start
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
         event = workflow->waitForNextExecutionEvent();
@@ -337,34 +332,28 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0))));
+                  new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {}))));
+                                                               storage_service, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(
                           this,  {
                           compute_service
                   }, {
                           storage_service
-                  }, hostname))));
+                  }, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Staging the input file on the storage service
   EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
@@ -399,10 +388,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -416,7 +405,7 @@ private:
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
 
-      // Wait for the pilot job start_daemon
+      // Wait for the pilot job startDaemon
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
         event = workflow->waitForNextExecutionEvent();
@@ -493,34 +482,28 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0))));
+                  new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {}))));
+                                                               storage_service, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(
                           this,  {
                           compute_service
                   }, {
                           storage_service
-                  }, hostname))));
+                  }, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -556,10 +539,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -609,34 +592,28 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0))));
+                  new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {}))));
+                                                               storage_service, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(
                           this,  {
                           compute_service
                   }, {
                           storage_service
-                  }, hostname))));
+                  }, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -672,10 +649,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -689,7 +666,7 @@ private:
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
 
-      // Wait for the pilot job start_daemon
+      // Wait for the pilot job startDaemon
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
         event = workflow->waitForNextExecutionEvent();
@@ -773,30 +750,24 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0))));
+                  new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {}))));
+                                                               storage_service, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS(
-                          this,  {compute_service}, {storage_service}, hostname))));
+                          this,  {compute_service}, {storage_service}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -832,10 +803,10 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Create a job  manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
 
@@ -849,7 +820,7 @@ private:
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
 
-      // Wait for the pilot job start_daemon
+      // Wait for the pilot job startDaemon
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
         event = workflow->waitForNextExecutionEvent();
@@ -940,30 +911,24 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
 
   // Create A Storage Services
   EXPECT_NO_THROW(storage_service = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 100.0))));
+                  new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {}))));
+                                                               storage_service, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(
                   new MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(
-                          this,  {compute_service}, {storage_service}, hostname))));
+                          this,  {compute_service}, {storage_service}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service

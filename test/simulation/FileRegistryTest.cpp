@@ -77,9 +77,9 @@ class FileRegistryTestWMS : public wrench::WMS {
 
 public:
     FileRegistryTestWMS(FileRegistryTest *test,
-                const std::set<wrench::ComputeService *> &compute_services,
-                const std::set<wrench::StorageService *> &storage_services,
-                std::string hostname) :
+                        const std::set<wrench::ComputeService *> &compute_services,
+                        const std::set<wrench::StorageService *> &storage_services,
+                        std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
       this->test = test;
     }
@@ -218,36 +218,30 @@ void FileRegistryTest::do_FileRegistry_Test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {}))));
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new FileRegistryTestWMS(
+          new FileRegistryTestWMS(
                   this,
-                  {compute_service}, {storage_service1, storage_service2}, hostname))));
+                  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry service
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
   EXPECT_THROW(simulation->setFileRegistryService(nullptr), std::invalid_argument);
-  EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
+  EXPECT_NO_THROW(simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
 
 
   // Running a "run a single task" simulation

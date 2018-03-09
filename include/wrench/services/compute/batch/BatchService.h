@@ -90,14 +90,14 @@ namespace wrench {
         //Configuration to create randomness in measurement period initially
         unsigned long random_interval = 10;
 
-        //create alarms for standardjobs
-        std::vector<std::unique_ptr<Alarm>> standard_job_alarms;
+        //create alarms for standard jobs
+        std::vector<std::shared_ptr<Alarm>> standard_job_alarms;
 
         //alarms for pilot jobs (only one pilot job alarm)
-        std::vector<std::unique_ptr<Alarm>> pilot_job_alarms;
+        std::vector<std::shared_ptr<Alarm>> pilot_job_alarms;
 
         //vector of network listeners
-        std::vector<std::unique_ptr<BatchNetworkListener>> network_listeners;
+        std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
 
         /* Resources information in Batchservice */
         unsigned long total_num_of_nodes;
@@ -108,10 +108,10 @@ namespace wrench {
         /*End Resources information in Batchservice */
 
         // Vector of standard job executors
-        std::set<std::unique_ptr<StandardJobExecutor>> running_standard_job_executors;
+        std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
 
         // Vector of standard job executors
-        std::set<std::unique_ptr<StandardJobExecutor>> finished_standard_job_executors;
+        std::set<std::shared_ptr<StandardJobExecutor>> finished_standard_job_executors;
 
         //Queue of pending batch jobs
         std::deque<std::unique_ptr<BatchJob>> pending_jobs;

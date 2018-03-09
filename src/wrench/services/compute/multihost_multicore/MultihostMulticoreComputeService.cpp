@@ -345,7 +345,7 @@ namespace wrench {
 
 //      // Start the daemon on the same host
 //      try {
-//        this->start_daemon(hostname);
+//        this->startDaemon(hostname);
 //      } catch (std::invalid_argument &e) {
 //        throw;
 //      }
@@ -369,7 +369,7 @@ namespace wrench {
         WRENCH_INFO("Will be terminating at date %lf", this->death_date);
 //        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
         SimulationMessage *msg = new ServiceTTLExpiredMessage(0);
-        this->death_alarm = new Alarm(death_date, this->hostname, this->mailbox_name, msg, "service_string");
+        this->death_alarm = Alarm::createAndStartAlarm(death_date, this->hostname, this->mailbox_name, msg, "service_string");
       } else {
         this->death_date = -1.0;
         this->death_alarm = nullptr;
@@ -626,8 +626,8 @@ namespace wrench {
       WRENCH_INFO(
               "Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2lf bytes of RAM) for a standard job",
               compute_resources.size(), total_cores, total_ram);
-      // Create a standard job executor
-      StandardJobExecutor *executor = new StandardJobExecutor(
+      // Create and start a standard job executor
+      std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(new StandardJobExecutor(
               this->simulation,
               this->mailbox_name,
               this->hostname,
@@ -641,9 +641,11 @@ namespace wrench {
                {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM)},
                {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
-                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}});
+                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}}));
+      executor->createLifeSaver(executor);
+      executor->startDaemon(this->hostname, true);
 
-      this->standard_job_executors.insert(std::unique_ptr<StandardJobExecutor>(executor));
+      this->standard_job_executors.insert(executor);
       this->running_jobs.insert(job);
 
       // Tell the caller that a job was dispatched!
@@ -691,24 +693,26 @@ namespace wrench {
         compute_resources.insert(std::make_tuple(h, job->getNumCoresPerHost(), job->getMemoryPerHost()));
       }
 
-      ComputeService *cs = new MultihostMulticoreComputeService(this->hostname,
+      std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(new MultihostMulticoreComputeService(this->hostname,
                                                                 true, false,
                                                                 compute_resources,
                                                                 this->property_list,
                                                                 job->getDuration(),
                                                                 job,
                                                                 "_pilot_job",
-                                                                this->default_storage_service);
-
+                                                                this->default_storage_service));
+      cs->createLifeSaver(cs);
       cs->setSimulation(this->simulation);
       job->setComputeService(cs);
 
       // Start the compute service
       try {
-        cs->start(true); // Demonize
+        cs->start(true);
       } catch (std::runtime_error &e) {
         throw;
       }
+
+
 
       // Put the job in the running queue
       this->running_jobs.insert((WorkflowJob *) job);
@@ -725,10 +729,10 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
+
       // Push my own mailbox_name onto the pilot job!
       job->pushCallbackMailbox(this->mailbox_name);
 
-      // Tell the caller that a job was dispatched!
       return true;
     }
 
@@ -1024,8 +1028,7 @@ namespace wrench {
            it != this->standard_job_executors.end(); it++) {
         if ((*it).get() == executor) {
 
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
-
+          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
           found_it = true;
           break;
         }
@@ -1084,7 +1087,7 @@ namespace wrench {
       for (auto it = this->standard_job_executors.begin();
            it != this->standard_job_executors.end(); it++) {
         if ((*it).get() == executor) {
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
+          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
           found_it = true;
           break;
         }

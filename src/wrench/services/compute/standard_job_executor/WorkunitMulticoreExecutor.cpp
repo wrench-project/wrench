@@ -75,9 +75,6 @@ namespace wrench {
       this->ram_utilization = ram_utilization;
       this->default_storage_service = default_storage_service;
 
-      // Start my daemon on the host
-      this->start_daemon(this->hostname);
-
     }
 
     /**
@@ -92,7 +89,7 @@ namespace wrench {
       // First kill the executor's main actor
       WRENCH_INFO("Killing WorkunitExecutor [%s]", this->getName().c_str());
 
-      this->kill_actor();
+      this->killActor();
 
 
       // Then kill all compute threads, if any
@@ -311,10 +308,11 @@ namespace wrench {
           WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
           throw WorkflowExecutionException(new FatalFailure());
         }
-        ComputeThread *compute_thread;
+        std::shared_ptr<ComputeThread> compute_thread;
         try {
-          compute_thread = new ComputeThread(effective_flops, tmp_mailbox);
-
+          compute_thread = std::shared_ptr<ComputeThread>(new ComputeThread(effective_flops, tmp_mailbox));
+          compute_thread->createLifeSaver(compute_thread);
+          compute_thread->startDaemon(S4U_Simulation::getHostName(), true);
         } catch (std::exception &e) {
           // Some internal SimGrid exceptions...????
           WRENCH_INFO("Could not create compute thread... perhaps I am being killed?");
@@ -322,7 +320,7 @@ namespace wrench {
           break;
         }
         WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
-        this->compute_threads.push_back(std::unique_ptr<ComputeThread>(compute_thread));
+        this->compute_threads.push_back(compute_thread);
       }
 
       if (!success) {

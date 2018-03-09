@@ -278,27 +278,32 @@ namespace wrench {
 
       try {
         // Start the WMSes
-        for (auto it = this->wmses.begin(); it != this->wmses.end(); ++it) {
-          it->get()->start();
+        for (const auto &wms : this->wmses) {
+          wms->createLifeSaver(wms);
+          wms->start();
         }
 
         // Start the compute services
         for (const auto &compute_service : this->compute_services) {
+          compute_service->createLifeSaver(compute_service);
           compute_service->start(true);
         }
 
         // Start the storage services
         for (const auto &storage_service : this->storage_services) {
+          storage_service->createLifeSaver(storage_service);
           storage_service->start(true);
         }
 
         // Start the network proximity services
         for (const auto &network_proximity_service : this->network_proximity_services) {
+          network_proximity_service->createLifeSaver(network_proximity_service);
           network_proximity_service->start(true);
         }
 
         // Start the file registry service
         if (this->file_registry_service) {
+          this->file_registry_service->createLifeSaver(this->file_registry_service);
           this->file_registry_service->start(true);
         }
 
@@ -312,26 +317,19 @@ namespace wrench {
      *
      * @param service: a compute service
      *
-     * @return the compute service
-     *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    ComputeService *Simulation::add(std::unique_ptr<ComputeService> service) {
+    ComputeService * Simulation::add(ComputeService *service) {
       if (service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid arguments");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
-      ComputeService *raw_ptr = service.get();
-
       service->setSimulation(this);
-      // Add a unique ptr to the list of Compute Services
-//      this->
-// gisterComputeService(service.get());
-      this->compute_services.insert(std::move(service));
-      return raw_ptr;
+      this->compute_services.insert(std::shared_ptr<ComputeService>(service));
+      return service;
     }
 
     /**
@@ -339,25 +337,19 @@ namespace wrench {
      *
      * @param service: a network proximity service
      *
-     * @return the network proximity service
-     *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    NetworkProximityService *Simulation::add(std::unique_ptr<NetworkProximityService> service) {
+    NetworkProximityService * Simulation::add(NetworkProximityService *service) {
       if (service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid arguments");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
-      NetworkProximityService *raw_ptr = service.get();
-
       service->setSimulation(this);
-      // Add a unique ptr to the list of Compute Services
-//      this->terminator->registerNetworkProximityService(service.get());
-      this->network_proximity_services.insert(std::move(service));
-      return raw_ptr;
+      this->network_proximity_services.insert(std::shared_ptr<NetworkProximityService>(service));
+      return service;
     }
 
 
@@ -365,49 +357,40 @@ namespace wrench {
     * @brief Add a StorageService to the simulation
     *
     * @param service: a storage service
-    * @return the storage service
      *
     * @throw std::invalid_argument
     * @throw std::runtime_error
     */
-    StorageService *Simulation::add(std::unique_ptr<StorageService> service) {
+    StorageService * Simulation::add(StorageService *service) {
       if (service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid arguments");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
-      StorageService *raw_ptr = service.get();
-
       service->setSimulation(this);
-      // Add a unique ptr to the list of Compute Services
-//      this->terminator->registerStorageService(service.get());
-      this->storage_services.insert(std::move(service));
-      return raw_ptr;
+      this->storage_services.insert(std::shared_ptr<StorageService>(service));
+      return service;
     }
 
     /**
      * @brief Add a WMS for the simulation
      *
      * @param wms: a WMS
-     * @return a pointer to the WMS
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    WMS *Simulation::add(std::unique_ptr<WMS> wms) {
+    WMS * Simulation::add(WMS *wms) {
       if (wms == nullptr) {
         throw std::invalid_argument("Simulation::addWMS(): invalid arguments");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::setWMS(): Simulation is not initialized");
       }
-      WMS *raw_ptr = wms.get();
-
       wms->setSimulation(this);
-      // Add a unique ptr to the list of WMSes
-      this->wmses.insert(std::move(wms));
-      return raw_ptr;
+      this->wmses.insert(std::shared_ptr<WMS>(wms));
+      return wms;
     }
 
     /**
@@ -417,28 +400,13 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    void Simulation::setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service) {
+    FileRegistryService * Simulation::setFileRegistryService(FileRegistryService *file_registry_service) {
       if (file_registry_service == nullptr) {
         throw std::invalid_argument("Simulation::setFileRegistryService(): invalid arguments");
       }
-//      this->terminator->registerFileRegistryService(file_registry_service.get());
-      this->file_registry_service = std::move(file_registry_service);
+      this->file_registry_service = std::shared_ptr<FileRegistryService>(file_registry_service);
+      return file_registry_service;
     }
-
-//    /**
-//     * @brief Set a NetworkProximityService for the simulation
-//     *
-//     * @param network_proximity_service: a network proximity service
-//     *
-//     * @throw std::invalid_argument
-//     */
-//    void Simulation::setNetworkProximityService(std::unique_ptr<NetworkProximityService> network_proximity_service) {
-//      if (network_proximity_service == nullptr) {
-//        throw std::invalid_argument("Simulation::setNetworkProximityService(): invalid arguments");
-//      }
-//      this->terminator->registerNetworkProximityService(network_proximity_service.get());
-//      this->network_proximity_service = std::move(network_proximity_service);
-//    }
 
     /**
      * @brief Retrieves all running network proximity services on the platform

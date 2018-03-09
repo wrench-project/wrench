@@ -50,6 +50,21 @@ namespace wrench {
         };
 
         template<class T>
+        static void moveSharedPtrFromSetToSet(
+                typename std::set<std::shared_ptr<T>>::iterator it,
+                std::set<std::shared_ptr<T>> *from,
+                std::set<std::shared_ptr<T>> *to)
+        {
+
+            auto tmp = const_cast<std::shared_ptr<T>&&>(*it);
+            (*from).erase(it);
+            (*to).insert(tmp);
+
+        };
+
+
+
+        template<class T>
         static void moveUniquePtrFromDequeToSet(
                 typename std::deque<std::unique_ptr<T>>::iterator it,
                 std::deque<std::unique_ptr<T>> *from,

@@ -19,6 +19,7 @@ namespace wrench {
     class Workflow;
     class WorkflowFile;
     class StorageService;
+    class WMS;
 
     /***********************/
     /** \cond DEVELOPER    */

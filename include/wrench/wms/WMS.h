@@ -17,12 +17,12 @@
 #include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/workflow/Workflow.h"
 #include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
+//#include "wrench/managers/DataMovementManager.h"
+//#include "wrench/managers/JobManager.h"
 
 namespace wrench {
 
     class Simulation;
-    class JobManager;
-    class DataMovementManager;
 
     /**
      * @brief A top-level class that defines a workflow management system (WMS)
@@ -65,9 +65,9 @@ namespace wrench {
 
         void checkDeferredStart();
 
-        std::unique_ptr<JobManager> createJobManager();
+        std::shared_ptr<JobManager> createJobManager();
 
-        std::unique_ptr<DataMovementManager> createDataMovementManager();
+        std::shared_ptr<DataMovementManager> createDataMovementManager();
 
         void runDynamicOptimizations();
 

@@ -155,7 +155,6 @@ namespace wrench {
       this->simulation = simulation;
       this->callback_mailbox = callback_mailbox;
       this->job = job;
-      this->compute_resources = compute_resources;
       this->default_storage_service = default_storage_service;
 
 
@@ -194,12 +193,20 @@ namespace wrench {
         this->ram_availabilities.insert(std::make_pair(std::get<0>(host),  ram));
       }
 
-      // Start the daemon
-      try {
-        this->start_daemon(hostname);
-      } catch (std::invalid_argument &e) {
-        throw;
+      // Create my compute resources record
+      this->total_num_cores = 0;
+      for (auto host : compute_resources) {
+        unsigned long num_cores = std::get<1>(host);
+        if (num_cores == ComputeService::ALL_CORES) {
+          num_cores = simulation->getHostNumCores(std::get<0>(host));
+        }
+        double ram = std::get<2>(host);
+        if (ram == ComputeService::ALL_RAM) {
+          ram = simulation->getHostMemoryCapacity(std::get<0>(host));
+        }
+        this->compute_resources.insert(std::make_tuple(std::get<0>(host), num_cores, ram));
       }
+
     }
 
 
@@ -213,13 +220,13 @@ namespace wrench {
       // TODO: INVESTIGATE?
 
       // Kill all Workunit executors
-      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
+      std::set<std::shared_ptr<WorkunitMulticoreExecutor>>::iterator it;
       for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
         (*it)->kill();
       }
 
       // Kill the StandardJobExecutor
-      this->kill_actor();
+      this->killActor();
 
     }
 
@@ -232,8 +239,8 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
       WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores and %.2lf bytes of RAM over %ld hosts: ",
-                  this->mailbox_name.c_str(), this->total_num_cores, this->total_ram, this->compute_resources.size());
-      for (auto h : this->compute_resources) {
+                  this->mailbox_name.c_str(), this->total_num_cores, this->total_ram, this->core_availabilities.size());
+      for (auto h : this->core_availabilities) {
         WRENCH_INFO("  %s: %ld cores", std::get<0>(h).c_str(), std::get<1>(h));
       }
 
@@ -432,7 +439,7 @@ namespace wrench {
         if (host_selection_algorithm == "best_fit") {
           unsigned long target_slack = 0;
 
-          for (auto h : this->compute_resources) {
+          for (auto h : this->core_availabilities) {
             std::string hostname = std::get<0>(h);
 //              WRENCH_INFO("Looking at host %s", hostname.c_str());
 
@@ -485,7 +492,7 @@ namespace wrench {
 
 //        std::cerr << "CREATING A WORKUNIT EXECUTOR\n";
 
-        std::unique_ptr<WorkunitMulticoreExecutor> workunit_executor = std::unique_ptr<WorkunitMulticoreExecutor>(
+        std::shared_ptr<WorkunitMulticoreExecutor> workunit_executor = std::shared_ptr<WorkunitMulticoreExecutor>(
                 new WorkunitMulticoreExecutor(this->simulation,
                                               target_host,
                                               target_num_cores,
@@ -495,6 +502,9 @@ namespace wrench {
                                               this->default_storage_service,
                                               this->getPropertyValueAsDouble(
                                                       StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD)));
+
+        workunit_executor->createLifeSaver(workunit_executor);
+        workunit_executor->startDaemon(target_host, true);
 
         // Update core availabilities
         this->core_availabilities[target_host] -= target_num_cores;
@@ -586,7 +596,7 @@ namespace wrench {
 //      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
       for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
         if ((*it).get() == workunit_executor) {
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunit_executors), &(this->finished_workunit_executors));
+          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors), &(this->finished_workunit_executors));
           break;
         }
       }
@@ -691,7 +701,7 @@ namespace wrench {
       for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
 //      for (auto wt : this->running_workunit_executors) {
         if ((*it).get() == workunit_executor) {
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->running_workunit_executors), &(this->failed_workunit_executors));
+          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors), &(this->failed_workunit_executors));
           break;
         }
       }
@@ -938,7 +948,7 @@ namespace wrench {
 
     /**
      * @brief Retrieve the executor's compute resources
-     * @return a a set of compute resources
+     * @return a set of compute resources
      */
     std::set<std::tuple<std::string, unsigned long, double>>  StandardJobExecutor::getComputeResources() {
       return this->compute_resources;
