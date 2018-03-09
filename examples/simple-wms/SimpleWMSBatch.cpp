@@ -65,8 +65,8 @@ int main(int argc, char **argv) {
    */
   std::string storage_host = hostname_list[(hostname_list.size() > 2) ? 2 : 1];
   std::cerr << "Instantiating a SimpleStorageService on " << storage_host << "..." << std::endl;
-  wrench::StorageService *storage_service = simulation.add(std::unique_ptr<wrench::SimpleStorageService>(
-          new wrench::SimpleStorageService(storage_host, 10000000000000.0)));
+  wrench::StorageService *storage_service = simulation.add(
+          new wrench::SimpleStorageService(storage_host, 10000000000000.0));
 
   std::string wms_host = hostname_list[0];
 
@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 
   /* Add the batch service to the simulation, catching a possible exception */
   try {
-    simulation.add(std::unique_ptr<wrench::ComputeService>(batch_service));
+    simulation.add(batch_service);
 
   } catch (std::invalid_argument &e) {
     std::cerr << "Error: " << e.what() << std::endl;
@@ -112,11 +112,10 @@ int main(int argc, char **argv) {
    */
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
   wrench::WMS *wms = simulation.add(
-          std::unique_ptr<wrench::WMS>(
-                  new wrench::SimpleWMS(std::unique_ptr<wrench::BatchStandardJobScheduler>(
-                                                new wrench::BatchStandardJobScheduler()),
-                                        nullptr,
-                                        compute_services, storage_services, wms_host)));
+          new wrench::SimpleWMS(std::unique_ptr<wrench::BatchStandardJobScheduler>(
+                  new wrench::BatchStandardJobScheduler()),
+                                nullptr,
+                                compute_services, storage_services, wms_host));
 
   wms->addWorkflow(&workflow);
 
@@ -126,9 +125,8 @@ int main(int argc, char **argv) {
    */
   std::string file_registry_service_host = hostname_list[(hostname_list.size() > 2) ? 1 : 0];
   std::cerr << "Instantiating a FileRegistryService on " << file_registry_service_host << "..." << std::endl;
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(file_registry_service_host));
-  simulation.setFileRegistryService(std::move(file_registry_service));
+  wrench::FileRegistryService *file_registry_service =
+          simulation.setFileRegistryService(new wrench::FileRegistryService(file_registry_service_host));
 
   /* It is necessary to store, or "stage", input files for the first task(s) of the workflow on some storage
    * service, so that workflow execution can be initiated. The getInputFiles() method of the Workflow class

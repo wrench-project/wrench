@@ -60,7 +60,7 @@ namespace wrench {
       this->job_manager = this->createJobManager();
 
       // Create a data movement manager
-      std::unique_ptr<DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      std::shared_ptr<DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Perform static optimizations
       runStaticOptimizations();
