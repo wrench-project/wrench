@@ -89,7 +89,7 @@ private:
     int main() {
 
       // Create a job manager
-      std::unique_ptr<wrench::JobManager> job_manager = this->createJobManager();
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Ask questions about resources
 
@@ -201,21 +201,19 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
 
   // Create 1 Compute Service that manages Host1 and Host2
   EXPECT_NO_THROW(compute_service1 = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host1", true, true,
                                                                {{std::make_tuple("Host1", 4, wrench::ComputeService::ALL_RAM)},
                                                                 {std::make_tuple("Host2", 4, wrench::ComputeService::ALL_RAM)}},
                                                                nullptr
-                  ))));
+                  )));
 
   // Create 1 Compute Service that manages Host3 and Host4
   EXPECT_NO_THROW(compute_service2 = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("Host1", true, true,
                                                                {{std::make_tuple("Host3", 8, wrench::ComputeService::ALL_RAM)},
                                                                 {std::make_tuple("Host4", 8, wrench::ComputeService::ALL_RAM)}},
                                                                nullptr
-                  ))));
+                  )));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service1);
   compute_services.insert(compute_service2);
@@ -223,8 +221,8 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   // Create the WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new ResourceInformationTestWMS(
-                  this,  compute_services, {}, "Host1"))));
+          new ResourceInformationTestWMS(
+                  this,  compute_services, {}, "Host1")));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 

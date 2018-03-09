@@ -74,9 +74,9 @@ namespace wrench {
         std::map<std::string, double> ram_availabilities;
 
         // Sets of workunit executors
-        std::set<std::unique_ptr<WorkunitMulticoreExecutor>> running_workunit_executors;
-        std::set<std::unique_ptr<WorkunitMulticoreExecutor>> finished_workunit_executors;
-        std::set<std::unique_ptr<WorkunitMulticoreExecutor>> failed_workunit_executors;
+        std::set<std::shared_ptr<WorkunitMulticoreExecutor>> running_workunit_executors;
+        std::set<std::shared_ptr<WorkunitMulticoreExecutor>> finished_workunit_executors;
+        std::set<std::shared_ptr<WorkunitMulticoreExecutor>> failed_workunit_executors;
 
         // Work units
         std::set<std::unique_ptr<Workunit>> non_ready_workunits;

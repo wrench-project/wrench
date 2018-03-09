@@ -60,7 +60,7 @@ namespace wrench {
 
 //      // Start the daemon on the same host
 //      try {
-//        this->start_daemon(hostname);
+//        this->startDaemon(hostname);
 //      } catch (std::invalid_argument e) {
 //        throw e;
 //      }

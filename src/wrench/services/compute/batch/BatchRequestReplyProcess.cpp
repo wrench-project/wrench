@@ -54,7 +54,7 @@ namespace wrench{
       network_listener->start(true);
 
       try {
-        this->start_daemon(this->hostname, true);
+        this->startDaemon(this->hostname, true);
       } catch (std::invalid_argument e) {
         throw e;
       }

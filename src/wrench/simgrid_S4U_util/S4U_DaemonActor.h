@@ -20,11 +20,12 @@
 #include <wrench-dev.h>
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 
-namespace wrench {
 
     /***********************/
     /** \cond INTERNAL     */
     /***********************/
+
+namespace wrench {
 
     class S4U_Daemon;
 
@@ -47,24 +48,14 @@ namespace wrench {
          * @brief The S4U way of doing things
          */
         void operator()() {
+//          std::cerr << "ACTOR: RUNNING MAIN: " << this->daemon->getName() << "\n";
           try {
             this->daemon->main();
-//            WRENCH_INFO("Daemon's main() function has returned");
           } catch (std::exception &e) {
             throw;
           }
           this->daemon->setTerminated();
         }
-
-//        static bool destruct(S4U_Daemon *daemon) {
-//          if (daemon->getTerminated()) {
-//            delete daemon;
-//            return true;
-//          } else {
-//            // print "Can't destroy object yet"
-//            return false;
-//          }
-//        }
 
     private:
         S4U_Daemon *daemon;

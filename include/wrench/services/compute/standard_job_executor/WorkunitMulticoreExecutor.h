@@ -75,7 +75,7 @@ namespace wrench {
 
         StorageService *default_storage_service;
 
-        std::vector<std::unique_ptr<ComputeThread>> compute_threads;
+        std::vector<std::shared_ptr<ComputeThread>> compute_threads;
 
     };
 

@@ -42,23 +42,19 @@ namespace wrench {
         this->wms->pilot_job_scheduler->setDataMovementManager(this);
       }
 
-      // Start the daemon
-      std::string localhost = S4U_Simulation::getHostName();
-      this->start_daemon(localhost, true); // Always daemonize
     }
 
     /**
-     * @brief Destructor, which kills the daemon
+     * @brief Destructor
      */
     DataMovementManager::~DataMovementManager() {
-      this->kill();
     }
 
     /**
      * @brief Kill the manager (brutally terminate the daemon)
      */
     void DataMovementManager::kill() {
-      this->kill_actor();
+      this->killActor();
     }
 
     /**

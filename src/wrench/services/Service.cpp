@@ -88,10 +88,9 @@ namespace wrench {
      */
     void Service::start(bool daemonize) {
       try {
-        this->start_daemon(this->hostname, daemonize);
+        this->startDaemon(this->hostname, daemonize);
         this->state = Service::UP;
       } catch (std::invalid_argument &e) {
-        XBT_INFO("THROWING!! %s", e.what());
         throw std::runtime_error("Service::start(): " + std::string(e.what()));
       }
     }

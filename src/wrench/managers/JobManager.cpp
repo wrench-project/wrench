@@ -45,17 +45,12 @@ namespace wrench {
       if (this->wms->pilot_job_scheduler) {
         this->wms->pilot_job_scheduler->setJobManager(this);
       }
-
-      // Start the daemon
-      std::string localhost = S4U_Simulation::getHostName();
-      this->start_daemon(localhost, true); // Always daemonize
     }
 
     /**
      * @brief Destructor, which kills the daemon (and clears all the jobs)
      */
     JobManager::~JobManager() {
-      this->kill();
       this->jobs.clear();
     }
 
@@ -63,7 +58,7 @@ namespace wrench {
      * @brief Kill the job manager (brutally terminate the daemon, clears all jobs)
      */
     void JobManager::kill() {
-      this->kill_actor();
+      this->killActor();
       this->jobs.clear();
     }
 
@@ -295,6 +290,7 @@ namespace wrench {
                                std::map<std::string, std::string> service_specific_args) {
 
       if ((job == nullptr) || (compute_service == nullptr)) {
+        std::cerr << "COMPUTE_SERVICE = " << compute_service << "\n";
         throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
       }
 
@@ -545,6 +541,7 @@ namespace wrench {
           // move the job from the "pending" list to the "running" list
           this->pending_pilot_jobs.erase(job);
           this->running_pilot_jobs.insert(job);
+
 
           // Forward the notification to the source
           WRENCH_INFO("Forwarding to %s", job->getOriginCallbackMailbox().c_str());

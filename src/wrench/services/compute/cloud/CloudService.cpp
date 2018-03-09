@@ -418,16 +418,16 @@ namespace wrench {
           std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
                   std::make_tuple(vm_hostname, num_cores, ram_memory)};
 
-          std::unique_ptr<ComputeService> cs(
+          std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(vm_hostname,
                                                        supports_standard_jobs,
                                                        supports_pilot_jobs,
                                                        compute_resources,
                                                        default_storage_service, plist));
+          cs->createLifeSaver(cs);
+          cs->setSimulation(this->simulation);
 
           this->cs_available_ram[pm_hostname] -= ram_memory;
-
-          cs->setSimulation(this->simulation);
 
           // start the service
           try {
@@ -436,7 +436,7 @@ namespace wrench {
             throw;
           }
 
-          this->vm_list[vm_hostname] = std::make_tuple(vm, std::move(cs), num_cores);
+          this->vm_list[vm_hostname] = std::make_tuple(vm, cs, num_cores);
 
           S4U_Mailbox::dputMessage(
                   answer_mailbox,

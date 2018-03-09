@@ -47,7 +47,7 @@ namespace wrench {
     }
 
     S4U_Daemon::~S4U_Daemon() {
-//        WRENCH_INFO("In the Daemon Destructor");
+//      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
     }
 
     void S4U_Daemon::cleanup(){
@@ -59,10 +59,11 @@ namespace wrench {
      * \cond
      */
     static int daemon_goodbye(void *x, void* service_instance) {
-      WRENCH_INFO("Terminating (but by now the object may have been freed :(");
+      WRENCH_INFO("Terminating");
       if (service_instance) {
         auto *service = reinterpret_cast<S4U_Daemon *>(service_instance);
         service->cleanup();
+        delete service->life_saver;
       }
       return 0;
     }
@@ -78,14 +79,21 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the daemon
      * @param daemonized: whether the S4U actor should be daemonized (untstart_ested)
      */
-    void S4U_Daemon::start_daemon(std::string hostname, bool daemonized) {
+    void S4U_Daemon::startDaemon(std::string hostname, bool daemonized) {
 
+//      std::cerr << "IN START DAEMON: " << this->process_name << "\n";
       // Check that the host exists, and if not throw an exceptions
       if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
-        WRENCH_INFO("THROWING IN S$UDAEMON: '%s'", hostname.c_str());
-        throw std::invalid_argument("S4U_DaemonWithMailbox::start_daemon(): Unknown host name '" + hostname + "'");
+//        std::cerr << "UNKNOWN HOST \n";
+        throw std::invalid_argument("S4U_Daemon::startDaemon(): Unknown host name '" + hostname + "'");
       }
 
+      // Check that there is a lifesaver
+      if (not this->life_saver) {
+        throw std::runtime_error("S4U_Daemon::startDaemon(): You must call createLifeSaver() before calling startDaemon()");
+      }
+
+//      std::cerr << "IN START DAEMON: CREATING ACTOR " << this->process_name << "\n";
       // Create the s4u_actor
       try {
         this->s4u_actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
@@ -96,9 +104,10 @@ namespace wrench {
         std::abort();
       }
 
-      // TODO: This wasn't working right last time Henri checked... but it's likely no big deal
-      if (daemonized)
+      if (daemonized) {
+//        std::cerr << "IN START DAEMON: DAEMONIZE ACTOR " << this->process_name << "\n";
         this->s4u_actor->daemonize();
+      }
       this->s4u_actor->onExit(daemon_goodbye, (void *) (this));
 
 
@@ -107,12 +116,13 @@ namespace wrench {
       mailbox->setReceiver(this->s4u_actor);
 
       this->hostname = hostname;
+//      std::cerr << "IN START DAEMON: RETURNING " << this->process_name << "\n";
     }
 
     /**
      * @brief Kill the daemon/actor.
      */
-    void S4U_Daemon::kill_actor() {
+    void S4U_Daemon::killActor() {
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         try {
           // Sleeping a tiny bit to avoid the following behavior:
@@ -165,6 +175,18 @@ namespace wrench {
      */
     std::string S4U_Daemon::getName() {
       return this->process_name;
+    }
+
+    /**
+     * @brief creates a life saver for the daemon
+     * @param reference
+     */
+    void S4U_Daemon::createLifeSaver(std::shared_ptr<S4U_Daemon> reference) {
+      if (this->life_saver) {
+        throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");
+      }
+      this->life_saver = new S4U_Daemon::LifeSaver(reference);
+
     }
 
 };

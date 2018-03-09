@@ -46,16 +46,11 @@ namespace wrench {
 
         void launch();
 
-        ComputeService *add(std::unique_ptr<ComputeService> executor);
-
-        StorageService *add(std::unique_ptr<StorageService> executor);
-
-        NetworkProximityService *add(std::unique_ptr<NetworkProximityService> executor);
-        WMS *add(std::unique_ptr<WMS>);
-
-        void setFileRegistryService(std::unique_ptr<FileRegistryService> file_registry_service);
-
-//        void setNetworkProximityService(std::unique_ptr<NetworkProximityService> network_proximity_service);
+        ComputeService * add(ComputeService *);
+        StorageService * add(StorageService *);
+        NetworkProximityService * add(NetworkProximityService *);
+        WMS * add(WMS *);
+        FileRegistryService * setFileRegistryService(FileRegistryService *);
 
         void stageFile(WorkflowFile *file, StorageService *storage_service);
 
@@ -107,15 +102,15 @@ namespace wrench {
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 
-        std::set<std::unique_ptr<WMS>> wmses;
+        std::set<std::shared_ptr<WMS>> wmses;
 
-        std::unique_ptr<FileRegistryService> file_registry_service = nullptr;
+        std::shared_ptr<FileRegistryService> file_registry_service = nullptr;
 
-        std::set<std::unique_ptr<NetworkProximityService>> network_proximity_services;
+        std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
 
-        std::set<std::unique_ptr<ComputeService>> compute_services;
+        std::set<std::shared_ptr<ComputeService>> compute_services;
 
-        std::set<std::unique_ptr<StorageService>> storage_services;
+        std::set<std::shared_ptr<StorageService>> storage_services;
 
         void check_simulation_setup();
 
