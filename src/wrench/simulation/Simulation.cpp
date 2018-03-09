@@ -91,9 +91,6 @@ namespace wrench {
       }
       *argc = i - skip;
 
-      // DEBUG
-      TerminalOutput::disableColor();
-
       this->s4u_simulation->initialize(argc, argv);
     }
 
