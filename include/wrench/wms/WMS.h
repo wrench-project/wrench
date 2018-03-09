@@ -27,7 +27,7 @@ namespace wrench {
     /**
      * @brief A top-level class that defines a workflow management system (WMS)
      */
-    class WMS : public S4U_Daemon {
+    class WMS : public Service {
 
     public:
         void addWorkflow(Workflow *workflow, double start_time = 0);
@@ -61,7 +61,7 @@ namespace wrench {
             const std::string &hostname,
             const std::string suffix);
 
-        void start(std::shared_ptr<WMS> this_service);
+//        void start(std::shared_ptr<WMS> this_service);
 
         void checkDeferredStart();
 
@@ -132,7 +132,6 @@ namespace wrench {
     private:
         virtual int main() = 0;
 
-        std::string hostname;
     };
 };
 

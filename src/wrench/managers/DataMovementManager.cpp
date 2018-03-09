@@ -30,7 +30,7 @@ namespace wrench {
      * @param workflow: the workflow whose data (files) are to be managed
      */
     DataMovementManager::DataMovementManager(WMS *wms) :
-            S4U_Daemon("data_movement_manager", "data_movement_manager") {
+            Service(wms->hostname, "data_movement_manager", "data_movement_manager") {
 
       this->wms = wms;
 

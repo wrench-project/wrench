@@ -59,7 +59,7 @@ namespace wrench {
                                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                              StorageService *default_storage_service,
                                              std::map<std::string, std::string> plist) :
-            S4U_Daemon("standard_job_executor", "standard_job_executor") {
+            Service(hostname, "standard_job_executor", "standard_job_executor") {
 
       if ((job == nullptr) || (compute_resources.empty())) {
         throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): invalid arguments");
@@ -503,8 +503,7 @@ namespace wrench {
                                               this->getPropertyValueAsDouble(
                                                       StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD)));
 
-        workunit_executor->createLifeSaver(workunit_executor);
-        workunit_executor->startDaemon(target_host, true);
+        workunit_executor->start(workunit_executor, true);
 
         // Update core availabilities
         this->core_availabilities[target_host] -= target_num_cores;
@@ -513,7 +512,7 @@ namespace wrench {
 
 
         // Update data structures
-        this->running_workunit_executors.insert(std::move(workunit_executor));
+        this->running_workunit_executors.insert(workunit_executor);
 
         for (auto it = this->ready_workunits.begin();
                 it != this->ready_workunits.end(); it++) {

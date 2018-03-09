@@ -35,7 +35,7 @@ namespace wrench {
     /**  @brief A base abstraction that knows how to execute a standard job
      *   on a multi-node multi-core platform.
      */
-    class StandardJobExecutor : public S4U_Daemon {
+    class StandardJobExecutor : public Service {
 
     public:
 

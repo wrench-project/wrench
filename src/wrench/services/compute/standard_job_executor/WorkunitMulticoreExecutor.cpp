@@ -32,9 +32,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Mult
 
 namespace wrench {
 
-    WorkunitMulticoreExecutor::~WorkunitMulticoreExecutor() {
-    }
-
     /**
      * @brief Constructor, which starts the workunit executor on the host
      *
@@ -57,7 +54,7 @@ namespace wrench {
             Workunit *workunit,
             StorageService *default_storage_service,
             double thread_startup_overhead) :
-            S4U_Daemon("workunit_multicore_executor_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber())) {
+            Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
 
       if (thread_startup_overhead < 0) {
         throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): thread_startup_overhead must be >= 0");
@@ -67,7 +64,6 @@ namespace wrench {
       }
 
       this->simulation = simulation;
-      this->hostname = hostname;
       this->callback_mailbox = callback_mailbox;
       this->workunit = workunit;
       this->thread_startup_overhead = thread_startup_overhead;
@@ -310,9 +306,8 @@ namespace wrench {
         }
         std::shared_ptr<ComputeThread> compute_thread;
         try {
-          compute_thread = std::shared_ptr<ComputeThread>(new ComputeThread(effective_flops, tmp_mailbox));
-          compute_thread->createLifeSaver(compute_thread);
-          compute_thread->startDaemon(S4U_Simulation::getHostName(), true);
+          compute_thread = std::shared_ptr<ComputeThread>(new ComputeThread(S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
+          compute_thread->start(compute_thread, true);
         } catch (std::exception &e) {
           // Some internal SimGrid exceptions...????
           WRENCH_INFO("Could not create compute thread... perhaps I am being killed?");
