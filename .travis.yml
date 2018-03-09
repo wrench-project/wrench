@@ -27,7 +27,7 @@ before_install:
   # install container
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       docker pull wrenchproject/wrench-build:${DIST}-${COMPILER};
-      docker run -m 512m -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
+      docker run -m 1g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
       export BRANCH=`git rev-parse --abbrev-ref HEAD`;
       docker exec -it wrench git clone https://github.com/wrench-project/wrench;
     fi
