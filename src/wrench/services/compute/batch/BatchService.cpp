@@ -468,12 +468,12 @@ namespace wrench {
       std::string data = compute_resources_map.dump();
 
 
-      std::unique_ptr<BatchNetworkListener> network_listener =
-              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
+      std::shared_ptr<BatchNetworkListener> network_listener =
+              std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-      network_listener->start(true);
+      network_listener->start(network_listener,true);
       network_listeners.push_back(std::move(network_listener));
 #endif
 
@@ -808,12 +808,12 @@ namespace wrench {
 
       }
       std::string data = batch_submission_data.dump();
-      std::unique_ptr<BatchNetworkListener> network_listener =
+      std::shared_ptr<BatchNetworkListener> network_listener =
               std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-      network_listener->start(true);
+      network_listener->start(network_listener,true);
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;
 #else
