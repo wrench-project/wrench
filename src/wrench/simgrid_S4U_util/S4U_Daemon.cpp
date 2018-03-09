@@ -186,7 +186,6 @@ namespace wrench {
         throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");
       }
       this->life_saver = new S4U_Daemon::LifeSaver(reference);
-
     }
 
 };

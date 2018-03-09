@@ -701,13 +701,12 @@ namespace wrench {
                                                                 job,
                                                                 "_pilot_job",
                                                                 this->default_storage_service));
-      cs->createLifeSaver(cs);
       cs->setSimulation(this->simulation);
       job->setComputeService(cs);
 
       // Start the compute service
       try {
-        cs->start(true);
+        cs->start(cs, true);
       } catch (std::runtime_error &e) {
         throw;
       }

@@ -279,32 +279,27 @@ namespace wrench {
       try {
         // Start the WMSes
         for (const auto &wms : this->wmses) {
-          wms->createLifeSaver(wms);
-          wms->start();
+          wms->start(wms);
         }
 
         // Start the compute services
         for (const auto &compute_service : this->compute_services) {
-          compute_service->createLifeSaver(compute_service);
-          compute_service->start(true);
+          compute_service->start(compute_service, true);
         }
 
         // Start the storage services
         for (const auto &storage_service : this->storage_services) {
-          storage_service->createLifeSaver(storage_service);
-          storage_service->start(true);
+          storage_service->start(storage_service, true);
         }
 
         // Start the network proximity services
         for (const auto &network_proximity_service : this->network_proximity_services) {
-          network_proximity_service->createLifeSaver(network_proximity_service);
-          network_proximity_service->start(true);
+          network_proximity_service->start(network_proximity_service, true);
         }
 
         // Start the file registry service
         if (this->file_registry_service) {
-          this->file_registry_service->createLifeSaver(this->file_registry_service);
-          this->file_registry_service->start(true);
+          this->file_registry_service->start(this->file_registry_service, true);
         }
 
       } catch (std::runtime_error &e) {

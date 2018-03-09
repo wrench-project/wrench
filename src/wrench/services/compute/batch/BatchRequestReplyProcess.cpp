@@ -42,21 +42,17 @@ namespace wrench{
             std::string hostname,std::string self_port, std::string sched_port, std::string suffix="") :
             Service(hostname, "batch_request_reply" + suffix, "batch_request_reply" + suffix) {
 
-      // Start the daemon on the same host
-//      std::cout<<"Not thrown until here\n";
-
       //create a network listener here, because there will be only one network listener but many network senders
-      std::unique_ptr<BatchNetworkListener> network_listener =
-              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name, self_port,
+      std::shared_ptr<BatchNetworkListener> network_listener =
+              std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name, self_port,
                                                                              sched_port,BatchNetworkListener::NETWORK_LISTENER_TYPE::LISTENER,
                                                                              ""));
-      // TODO: Do the starting in a separate start() method
-      network_listener->start(true);
+      network_listener->start(network_listener, true);
 
       try {
         this->startDaemon(this->hostname, true);
-      } catch (std::invalid_argument e) {
-        throw e;
+      } catch (std::invalid_argument &e) {
+        throw;
       }
     }
 
@@ -111,13 +107,13 @@ namespace wrench{
         }
         return false;
 
-      }else if (BatchSimulationBeginsToSchedulerMessage *msg = dynamic_cast<BatchSimulationBeginsToSchedulerMessage *>(message.get())) {
-        std::unique_ptr<BatchNetworkListener> network_sender = std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(
+      } else if (auto msg = dynamic_cast<BatchSimulationBeginsToSchedulerMessage *>(message.get())) {
+        std::shared_ptr<BatchNetworkListener> network_sender = std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(
                 this->hostname, this->mailbox_name, this->self_port, this->sched_port,BatchNetworkListener::NETWORK_LISTENER_TYPE::LISTENER, msg->job_args_to_scheduler));
-        network_sender->start(true);
+        network_sender->start(network_sender, true);
         return true;
 
-      }else{
+      } else {
         throw std::runtime_error(
                 "BatchRequestReplyProcess::BatchRequestReplyProcess():Unknown message type received"
         );
