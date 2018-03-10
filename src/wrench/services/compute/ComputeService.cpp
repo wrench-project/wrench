@@ -27,10 +27,8 @@ namespace wrench {
      *        method of derived classes
      */
     void ComputeService::stop() {
-
       // Call the super class's method
       Service::stop();
-
     }
 
 

@@ -62,11 +62,9 @@ namespace wrench {
       this->next_host_to_send = "";
       this->network_proximity_service_mailbox = std::move(network_proximity_service_mailbox);
 
-      // Set default properties
-      for (auto p : this->default_property_values) {
-        this->setProperty(p.first, p.second);
-      }
-      this->setProperty("NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD", std::to_string(message_size));
+      // Set properties
+      this->setProperties(this->default_property_values,
+                          {std::make_pair("NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD", std::to_string(message_size))});
 
     }
 
