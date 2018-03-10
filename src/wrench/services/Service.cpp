@@ -181,12 +181,12 @@ namespace wrench {
     void Service::setProperties(std::map<std::string, std::string> default_property_values,
                                 std::map<std::string, std::string> plist) {
       // Set default properties
-      for (auto p : default_property_values) {
+      for (auto const &p : default_property_values) {
         this->setProperty(p.first, p.second);
       }
 
       // Set specified properties (possible overwriting default ones)
-      for (auto p : plist) {
+      for (auto const &p : plist) {
         this->setProperty(p.first, p.second);
       }
     }

@@ -530,7 +530,6 @@ namespace wrench {
           }
         }
 
-
         return true;
       } else {
         throw std::runtime_error(
