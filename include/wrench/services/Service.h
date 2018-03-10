@@ -93,9 +93,6 @@ namespace wrench {
         /** @brief The service's name */
         std::string name;
 
-        /** @brief The name of the host that runs the service */
-        std::string hostname;
-
         /** @brief The simulation */
         Simulation *simulation;
 

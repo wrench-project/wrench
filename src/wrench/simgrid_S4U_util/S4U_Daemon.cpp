@@ -25,10 +25,16 @@ namespace wrench {
     /**
      * @brief Constructor (daemon with a mailbox)
      *
+     * @param hostname: the name of the host on which the daemon will run
      * @param process_name_prefix: the prefix of the name of the simulated process/actor
      * @param mailbox_prefix: the prefix of the mailbox (to which a unique integer is appended)
      */
-    S4U_Daemon::S4U_Daemon(std::string process_name_prefix, std::string mailbox_prefix) {
+    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix) {
+      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
+        throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
+      }
+
+      this->hostname = hostname;
       unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
       this->mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
       this->process_name = process_name_prefix + "_" + std::to_string(seq);
@@ -40,7 +46,12 @@ namespace wrench {
      *
      * @param process_name: the prefix of the name of the simulated process/actor
      */
-    S4U_Daemon::S4U_Daemon(std::string process_name_prefix) {
+    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
+      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
+        throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
+      }
+
+      this->hostname = hostname;
       this->process_name = process_name_prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
       this->mailbox_name="";
       this->terminated = false;
@@ -79,21 +90,13 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the daemon
      * @param daemonized: whether the S4U actor should be daemonized (untstart_ested)
      */
-    void S4U_Daemon::startDaemon(std::string hostname, bool daemonized) {
-
-//      std::cerr << "IN START DAEMON: " << this->process_name << "\n";
-      // Check that the host exists, and if not throw an exceptions
-      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
-//        std::cerr << "UNKNOWN HOST \n";
-        throw std::invalid_argument("S4U_Daemon::startDaemon(): Unknown host name '" + hostname + "'");
-      }
+    void S4U_Daemon::startDaemon(bool daemonized) {
 
       // Check that there is a lifesaver
       if (not this->life_saver) {
         throw std::runtime_error("S4U_Daemon::startDaemon(): You must call createLifeSaver() before calling startDaemon()");
       }
 
-//      std::cerr << "IN START DAEMON: CREATING ACTOR " << this->process_name << "\n";
       // Create the s4u_actor
       try {
         this->s4u_actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
@@ -105,18 +108,13 @@ namespace wrench {
       }
 
       if (daemonized) {
-//        std::cerr << "IN START DAEMON: DAEMONIZE ACTOR " << this->process_name << "\n";
         this->s4u_actor->daemonize();
       }
       this->s4u_actor->onExit(daemon_goodbye, (void *) (this));
 
-
       // Set the mailbox_name receiver
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
       mailbox->setReceiver(this->s4u_actor);
-
-      this->hostname = hostname;
-//      std::cerr << "IN START DAEMON: RETURNING " << this->process_name << "\n";
     }
 
     /**
