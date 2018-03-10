@@ -158,16 +158,8 @@ namespace wrench {
       this->default_storage_service = default_storage_service;
 
 
-      // Set default properties
-      for (auto p : this->default_property_values) {
-        this->setProperty(p.first, p.second);
-      }
-
-      // Set specified properties
-      for (auto p : plist) {
-        this->setProperty(p.first, p.second);
-      }
-
+      // set properties
+      this->setProperties(this->default_property_values, plist);
 
       // Compute the total number of cores and set initial core availabilities
       this->total_num_cores = 0;
@@ -846,45 +838,45 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Set a property of the executor
-     * @param property: the property
-     * @param value: the property value
-     */
-    void StandardJobExecutor::setProperty(std::string property, std::string value) {
-      this->property_list[property] = value;
-    }
-
-    /**
-     * @brief Get a property of the executor a string
-     * @param property: the property
-     * @return the property value as a string
-     *
-     * @throw std::runtime_error
-     */
-    std::string StandardJobExecutor::getPropertyValueAsString(std::string property) {
-      if (this->property_list.find(property) == this->property_list.end()) {
-        throw std::runtime_error("Service::getPropertyValueAsString(): Cannot find value for property " + property +
-                                 " (perhaps a derived service class does not provide a default value?)");
-      }
-      return this->property_list[property];
-    }
-
-    /**
-     * @brief Get a property of the executor as a double
-     * @param property: the property
-     * @return the property value as a double
-     *
-     * @throw std::runtime_error
-     */
-    double StandardJobExecutor::getPropertyValueAsDouble(std::string property) {
-      double value;
-      if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
-        throw std::runtime_error("Service::getPropertyValueAsDouble(): Invalid double property value " + property + " " +
-                                 this->getPropertyValueAsString(property));
-      }
-      return value;
-    }
+//    /**
+//     * @brief Set a property of the executor
+//     * @param property: the property
+//     * @param value: the property value
+//     */
+//    void StandardJobExecutor::setProperty(std::string property, std::string value) {
+//      this->property_list[property] = value;
+//    }
+//
+//    /**
+//     * @brief Get a property of the executor a string
+//     * @param property: the property
+//     * @return the property value as a string
+//     *
+//     * @throw std::runtime_error
+//     */
+//    std::string StandardJobExecutor::getPropertyValueAsString(std::string property) {
+//      if (this->property_list.find(property) == this->property_list.end()) {
+//        throw std::runtime_error("Service::getPropertyValueAsString(): Cannot find value for property " + property +
+//                                 " (perhaps a derived service class does not provide a default value?)");
+//      }
+//      return this->property_list[property];
+//    }
+//
+//    /**
+//     * @brief Get a property of the executor as a double
+//     * @param property: the property
+//     * @return the property value as a double
+//     *
+//     * @throw std::runtime_error
+//     */
+//    double StandardJobExecutor::getPropertyValueAsDouble(std::string property) {
+//      double value;
+//      if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
+//        throw std::runtime_error("Service::getPropertyValueAsDouble(): Invalid double property value " + property + " " +
+//                                 this->getPropertyValueAsString(property));
+//      }
+//      return value;
+//    }
 
 
     /**

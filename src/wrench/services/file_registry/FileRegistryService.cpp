@@ -48,22 +48,7 @@ namespace wrench {
             std::string suffix) :
             Service(hostname, "file_registry" + suffix, "file_registry" + suffix) {
 
-      // Set default properties
-      for (auto p : this->default_property_values) {
-        this->setProperty(p.first, p.second);
-      }
-
-      // Set specified properties
-      for (auto p : plist) {
-        this->setProperty(p.first, p.second);
-      }
-
-//      // Start the daemon on the same host
-//      try {
-//        this->startDaemon(hostname);
-//      } catch (std::invalid_argument e) {
-//        throw e;
-//      }
+      this->setProperties(this->default_property_values, plist);
     }
 
 

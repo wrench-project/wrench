@@ -98,9 +98,9 @@ namespace wrench {
 
         int main();
 
-        void setProperty(std::string property, std::string value);
-        std::string getPropertyValueAsString(std::string property);
-        double getPropertyValueAsDouble(std::string property);
+//        void setProperty(std::string property, std::string value);
+//        std::string getPropertyValueAsString(std::string property);
+//        double getPropertyValueAsDouble(std::string property);
 
         void processWorkunitExecutorCompletion(WorkunitMulticoreExecutor *workunit_executor,
                                                Workunit *workunit);

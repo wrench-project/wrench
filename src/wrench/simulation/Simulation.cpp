@@ -222,8 +222,7 @@ namespace wrench {
                 "At least one ComputeService should have been instantiated add passed to Simulation.add()");
       }
 
-      for (auto it = this->wmses.begin(); it != this->wmses.end(); ++it) {
-        auto wms = it->get();
+      for (auto wms : this->wmses) {
 
         // Check that at least one StorageService is running (only needed if there are files in the workflow),
         // and that each StorageService is on a valid host
@@ -308,9 +307,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a ComputeService to the simulation
+     * @brief Add a ComputeService to the simulation. The simulation takes ownership of
+     *        the reference and will call the destructor.
      *
      * @param service: a compute service
+     *
+     * @return the ComputeService
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
@@ -328,9 +330,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a NetworkProximityService to the simulation
+     * @brief Add a NetworkProximityService to the simulation. The simulation takes ownership of
+     *        the reference and will call the destructor.
      *
      * @param service: a network proximity service
+     *
+     * @return the NetworkProximityService
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
@@ -349,9 +354,12 @@ namespace wrench {
 
 
     /**
-    * @brief Add a StorageService to the simulation
+    * @brief Add a StorageService to the simulation. The simulation takes ownership of
+     *        the reference and will call the destructor.
     *
     * @param service: a storage service
+     *
+     * @return the StorageService
      *
     * @throw std::invalid_argument
     * @throw std::runtime_error
@@ -369,9 +377,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a WMS for the simulation
+     * @brief Add a WMS for the simulation. The simulation takes ownership of
+     *        the reference and will call the destructor.
      *
      * @param wms: a WMS
+     *
+     * @return the WMS
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
@@ -389,9 +400,12 @@ namespace wrench {
     }
 
     /**
-     * @brief Set a FileRegistryService for the simulation
+     * @brief Set a FileRegistryService for the simulation. The simulation takes ownership of
+     *        the reference and will call the destructor.
      *
      * @param file_registry_service: a file registry service
+     *
+     * @return the FileRegistryService
      *
      * @throw std::invalid_argument
      */
@@ -410,9 +424,9 @@ namespace wrench {
      */
     std::set<NetworkProximityService *> Simulation::getRunningNetworkProximityServices() {
       std::set<NetworkProximityService *> set = {};
-      for (auto it = this->network_proximity_services.begin(); it != this->network_proximity_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          set.insert((*it).get());
+      for (auto const &nps : this->network_proximity_services) {
+        if (nps->state == Service::UP) {
+          set.insert(nps.get());
         }
       }
       return set;

@@ -343,12 +343,6 @@ namespace wrench {
       this->has_ttl = (ttl >= 0);
       this->containing_pilot_job = pj;
 
-//      // Start the daemon on the same host
-//      try {
-//        this->startDaemon(hostname);
-//      } catch (std::invalid_argument &e) {
-//        throw;
-//      }
     }
 
 /**

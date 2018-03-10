@@ -185,7 +185,7 @@ namespace wrench {
         this->setProperty(p.first, p.second);
       }
 
-      // Set specified properties
+      // Set specified properties (possible overwriting default ones)
       for (auto p : plist) {
         this->setProperty(p.first, p.second);
       }

@@ -80,16 +80,7 @@ namespace wrench {
             std::string suffix) :
             StorageService(std::move(hostname), "simple" + suffix, "simple" + suffix, capacity) {
 
-      // Set default properties
-      for (auto p : this->default_property_values) {
-        this->setProperty(p.first, p.second);
-      }
-
-      // Set specified properties
-      for (auto p : plist) {
-        this->setProperty(p.first, p.second);
-      }
-
+      this->setProperties(this->default_property_values, plist);
     }
 
     /**
