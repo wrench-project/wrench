@@ -33,6 +33,7 @@ namespace wrench {
             std::move(pilot_job_scheduler),
             compute_services,
             storage_services,
+            {}, nullptr,
             hostname,
             "simple") {}
 
@@ -71,7 +72,7 @@ namespace wrench {
         std::map<std::string, std::vector<WorkflowTask *>> ready_tasks = this->workflow->getReadyTasks();
 
         // Get the available compute services
-        std::set<ComputeService *> compute_services = this->getRunningComputeServices();
+        std::set<ComputeService *> compute_services = this->getAvailableComputeServices();
 
         if (compute_services.empty()) {
           WRENCH_INFO("Aborting - No compute services available!");
@@ -82,7 +83,7 @@ namespace wrench {
         if (this->pilot_job_scheduler) {
           WRENCH_INFO("Scheduling pilot jobs...");
           this->pilot_job_scheduler->schedulePilotJobs(
-                                                    this->getRunningComputeServices());
+                                                    this->getAvailableComputeServices());
         }
 
         // Perform dynamic optimizations
@@ -91,7 +92,7 @@ namespace wrench {
         // Run ready tasks with defined scheduler implementation
         WRENCH_INFO("Scheduling tasks...");
         this->standard_job_scheduler->scheduleTasks(
-                                       this->getRunningComputeServices(),
+                                       this->getAvailableComputeServices(),
                                        ready_tasks);
 
         // Wait for a workflow execution event, and process it

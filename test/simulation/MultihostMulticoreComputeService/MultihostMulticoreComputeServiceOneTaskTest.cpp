@@ -102,7 +102,7 @@ public:
                     const std::set<wrench::ComputeService *> &compute_services,
                     const std::set<wrench::StorageService *> &storage_services,
                     std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -197,7 +197,7 @@ public:
                 const std::set<wrench::ComputeService *> &compute_services,
                 const std::set<wrench::StorageService *> &storage_services,
                 std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -314,7 +314,7 @@ public:
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -619,7 +619,7 @@ public:
                       const std::set<wrench::StorageService *> &storage_services,
                       std::string &hostname1,
                       std::string &hostname2) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname1, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname1, "test") {
       this->test = test;
     }
 
@@ -724,7 +724,7 @@ public:
                                     const std::set<wrench::ComputeService *> &compute_services,
                                     const std::set<wrench::StorageService *> &storage_services,
                                     std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -771,7 +771,7 @@ private:
       /* Do a bogus lookup of the file registry service */
       success = true;
       try {
-        this->simulation->getFileRegistryService()->lookupEntry(nullptr);
+        this->getAvailableFileRegistryService()->lookupEntry(nullptr);
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -782,7 +782,7 @@ private:
       /* Do a bogus add entry of the file registry service */
       success = true;
       try {
-        this->simulation->getFileRegistryService()->addEntry(nullptr, nullptr);
+        this->getAvailableFileRegistryService()->addEntry(nullptr, nullptr);
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -793,7 +793,7 @@ private:
       /* Do a bogus remove entry of the file registry service */
       success = true;
       try {
-        this->simulation->getFileRegistryService()->removeEntry(nullptr, nullptr);
+        this->getAvailableFileRegistryService()->removeEntry(nullptr, nullptr);
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -889,7 +889,7 @@ public:
                                               const std::set<wrench::ComputeService *> &compute_services,
                                               const std::set<wrench::StorageService *> &storage_services,
                                               std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -1010,7 +1010,7 @@ public:
                                                 const std::set<wrench::ComputeService *> &compute_services,
                                                 const std::set<wrench::StorageService *> &storage_services,
                                                 std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -1157,7 +1157,7 @@ public:
                                     const std::set<wrench::ComputeService *> &compute_services,
                                     const std::set<wrench::StorageService *> &storage_services,
                                     std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -1286,7 +1286,7 @@ public:
                                        const std::set<wrench::ComputeService *> &compute_services,
                                        const std::set<wrench::StorageService *> &storage_services,
                                        std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -1413,7 +1413,7 @@ public:
                                      const std::set<wrench::ComputeService *> &compute_services,
                                      const std::set<wrench::StorageService *> &storage_services,
                                      std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -1540,7 +1540,7 @@ public:
                                     const std::set<wrench::ComputeService *> &compute_services,
                                     const std::set<wrench::StorageService *> &storage_services,
                                     std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 

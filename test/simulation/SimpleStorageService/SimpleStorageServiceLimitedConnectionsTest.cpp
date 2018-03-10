@@ -83,7 +83,7 @@ public:
                                                                        const std::set<wrench::ComputeService *> &compute_services,
                                                                        const std::set<wrench::StorageService *> &storage_services,
                                                                        const std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -98,7 +98,7 @@ private:
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Get a file registry
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Reading
       for (auto dst_storage_service : {this->test->storage_service_1, this->test->storage_service_2}) {

@@ -17,12 +17,14 @@
 #include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/workflow/Workflow.h"
 #include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
-//#include "wrench/managers/DataMovementManager.h"
-//#include "wrench/managers/JobManager.h"
 
 namespace wrench {
 
     class Simulation;
+    class ComputeService;
+    class StorageService;
+    class NetworkProximityService;
+    class FileRegistryService;
 
     /**
      * @brief A top-level class that defines a workflow management system (WMS)
@@ -56,6 +58,8 @@ namespace wrench {
             std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
             const std::set<ComputeService *> &compute_services,
             const std::set<StorageService *> &storage_services,
+            const std::set<NetworkProximityService *> &network_proximity_services,
+            FileRegistryService *file_registry_service,
             const std::string &hostname,
             const std::string suffix);
 
@@ -69,7 +73,10 @@ namespace wrench {
 
         void runStaticOptimizations();
 
-        std::set<ComputeService *> getRunningComputeServices();
+        std::set<ComputeService *> getAvailableComputeServices();
+        std::set<StorageService *> getAvailableStorageServices();
+        std::set<NetworkProximityService *> getAvailableNetworkProximityServices();
+        FileRegistryService * getAvailableFileRegistryService();
 
         void waitForAndProcessNextEvent();
 
@@ -105,6 +112,10 @@ namespace wrench {
         std::set<ComputeService *> compute_services;
         /** @brief List of available storage services */
         std::set<StorageService *> storage_services;
+        /** @brief List of available network proximity services */
+        std::set<NetworkProximityService *> network_proximity_services;
+        /** @brief The file registry service */
+        FileRegistryService * file_registry_service;
 
         /** @brief The standard job scheduler */
         std::unique_ptr<StandardJobScheduler> standard_job_scheduler = nullptr;

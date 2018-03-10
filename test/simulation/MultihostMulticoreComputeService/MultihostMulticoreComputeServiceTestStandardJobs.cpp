@@ -123,7 +123,7 @@ public:
                                                      const std::set<wrench::ComputeService *> compute_services,
                                                      const std::set<wrench::StorageService *> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -139,7 +139,7 @@ private:
       // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
@@ -239,7 +239,7 @@ public:
                                                      const std::set<wrench::ComputeService *> &compute_services,
                                                      const std::set<wrench::StorageService *> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -255,7 +255,7 @@ private:
       // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
@@ -363,7 +363,7 @@ public:
                                                         const std::set<wrench::ComputeService *> compute_services,
                                                         const std::set<wrench::StorageService *> &storage_services,
                                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -379,7 +379,7 @@ private:
       // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task3, this->test->task4}, {}, {},
@@ -488,7 +488,7 @@ public:
                                                         const std::set<wrench::ComputeService *> compute_services,
                                                         const std::set<wrench::StorageService *> &storage_services,
                                                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -504,7 +504,7 @@ private:
       // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6}, {}, {},
@@ -618,7 +618,7 @@ public:
                                                  const std::set<wrench::ComputeService *> &compute_services,
                                                  const std::set<wrench::StorageService *> &storage_services,
                                                  std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -634,7 +634,7 @@ private:
       // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
@@ -748,7 +748,7 @@ public:
                                                              const std::set<wrench::ComputeService *> compute_services,
                                                              const std::set<wrench::StorageService *> &storage_services,
                                                              std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -764,7 +764,7 @@ private:
       // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
@@ -876,7 +876,7 @@ public:
                                                           const std::set<wrench::ComputeService *> &compute_services,
                                                           const std::set<wrench::StorageService *> &storage_services,
                                                           std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -892,7 +892,7 @@ private:
       // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
@@ -1016,7 +1016,7 @@ public:
             const std::set<wrench::ComputeService *> compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -1032,7 +1032,7 @@ private:
       // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
@@ -1156,7 +1156,7 @@ public:
             const std::set<wrench::ComputeService *> &compute_services,
             const std::set<wrench::StorageService *> &storage_services,
             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -1172,7 +1172,7 @@ private:
       // Create a job  manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},

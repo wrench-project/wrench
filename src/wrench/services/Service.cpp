@@ -88,9 +88,9 @@ namespace wrench {
      */
     void Service::start(std::shared_ptr<Service> this_service, bool daemonize) {
       try {
+        this->state = Service::UP;
         this->createLifeSaver(this_service);
         this->startDaemon(daemonize);
-        this->state = Service::UP;
       } catch (std::invalid_argument &e) {
         throw std::runtime_error("Service::start(): " + std::string(e.what()));
       }
@@ -123,7 +123,6 @@ namespace wrench {
       }
 
       // Wait for the ack
-//      WRENCH_INFO("Waiting for the 'I am dead' ack from the daemon");
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {

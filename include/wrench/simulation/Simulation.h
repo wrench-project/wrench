@@ -66,18 +66,11 @@ namespace wrench {
         template<class T>
         void newTimestamp(SimulationTimestamp<T> *event);
 
-        FileRegistryService *getFileRegistryService();
-
-        void shutdownAllNetworkProximityServices();
-
-        std::set<ComputeService *> getRunningComputeServices();
         double getCurrentSimulatedDate();
 
         static double getHostMemoryCapacity(std::string hostname);
 
         static unsigned long getHostNumCores(std::string hostname);
-
-        std::set<NetworkProximityService *> getRunningNetworkProximityServices();
 
         static double getHostFlopRate(std::string hostname);
 
