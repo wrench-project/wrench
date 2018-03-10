@@ -187,14 +187,14 @@ namespace wrench {
         }
         return false;
 
-      } else if (NextContactDaemonAnswerMessage *msg = dynamic_cast<NextContactDaemonAnswerMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<NextContactDaemonAnswerMessage *>(message.get())) {
 
         this->next_host_to_send = msg->next_host_to_send;
         this->next_mailbox_to_send = msg->next_mailbox_to_send;
 
         return true;
 
-      } else if (NetworkProximityTransferMessage *msg = dynamic_cast<NetworkProximityTransferMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<NetworkProximityTransferMessage *>(message.get())) {
 
         WRENCH_INFO("NetworkProximityTransferMessage: Got a [%s] message", message->getName().c_str());
         return true;
@@ -205,9 +205,5 @@ namespace wrench {
                 std::to_string(message->payload));
       }
     }
-
-//    std::string NetworkProximityDaemon::getHostname() {
-//        return this->hostname;
-//    }
 
 }

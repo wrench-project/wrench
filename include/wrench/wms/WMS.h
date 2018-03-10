@@ -42,8 +42,6 @@ namespace wrench {
         /** \cond DEVELOPER */
         /***********************/
 
-        std::string getHostname();
-
         /***********************/
         /** \endcond           */
         /***********************/
@@ -61,8 +59,6 @@ namespace wrench {
             const std::string &hostname,
             const std::string suffix);
 
-//        void start(std::shared_ptr<WMS> this_service);
-
         void checkDeferredStart();
 
         std::shared_ptr<JobManager> createJobManager();
@@ -77,7 +73,6 @@ namespace wrench {
 
         void waitForAndProcessNextEvent();
 
-        // workflow execution event processors
         virtual void processEventStandardJobCompletion(std::unique_ptr<WorkflowExecutionEvent>);
 
         virtual void processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent>);
@@ -102,8 +97,6 @@ namespace wrench {
         friend class DataMovementManager;
         friend class JobManager;
 
-        /** @brief The current simulation */
-        Simulation *simulation;
         /** @brief The workflow to execute */
         Workflow *workflow;
         /** @brief the WMS simulated start time */
@@ -122,8 +115,6 @@ namespace wrench {
         std::vector<std::unique_ptr<DynamicOptimization>> dynamic_optimizations;
         /** @brief The enabled static optimizations */
         std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
-
-        void setSimulation(Simulation *simulation);
 
         /***********************/
         /** \endcond           */
