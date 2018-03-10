@@ -15,7 +15,6 @@
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "wrench/services/compute/batch/BatchJob.h"
 #include "wrench/services/compute/batch/BatchNetworkListener.h"
-#include "wrench/services/compute/batch/BatchRequestReplyProcess.h"
 #include "wrench/services/compute/batch/BatchServiceProperty.h"
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"

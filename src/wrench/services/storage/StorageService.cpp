@@ -28,7 +28,8 @@ namespace wrench {
      * @param mailbox_name_prefix:
      * @param capacity:
      */
-    StorageService::StorageService(std::string hostname, std::string service_name, std::string mailbox_name_prefix, double capacity) :
+    StorageService::StorageService(std::string hostname, std::string service_name, std::string mailbox_name_prefix,
+                                   double capacity) :
             Service(hostname, service_name, mailbox_name_prefix) {
 
       if (capacity < 0) {

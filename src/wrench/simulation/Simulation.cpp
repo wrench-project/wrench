@@ -112,10 +112,11 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void Simulation::instantiatePlatform(std::string filename) {
+      static bool already_setup = false;
+
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::instantiatePlatform(): Simulation is not initialized");
       }
-      static bool already_setup = false;
       if (already_setup) {
         throw std::runtime_error("Simulation::instantiatePlatform(): Platform already setup");
       }
@@ -139,7 +140,7 @@ namespace wrench {
      * @return true or false
      */
     bool Simulation::hostExists(std::string hostname) {
-      return this->s4u_simulation->hostExists(hostname);
+      return this->s4u_simulation->hostExists(std::move(hostname));
     }
 
     /**
