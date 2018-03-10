@@ -16,7 +16,6 @@
 #include <xbt/ex.hpp>
 
 
-
 XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon, "Log category for S4U_Daemon");
 
 
@@ -157,7 +156,6 @@ namespace wrench {
         }
       }
     }
-
 
     /**
      * @brief Set the terminated status of the daemon/actor

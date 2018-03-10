@@ -79,8 +79,10 @@ public:
     SimpleStorageServiceBasicFunctionalityTestWMS(SimpleStorageServiceFunctionalTest *test,
                                                   const std::set<wrench::ComputeService *> &compute_services,
                                                   const std::set<wrench::StorageService *> &storage_services,
+                                                  wrench::FileRegistryService *file_registry_service,
                                                   std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname,
+                        "test") {
       this->test = test;
     }
 
@@ -104,7 +106,7 @@ private:
       // Create a data movement manager
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Do a few lookups from the file registry service
       for (auto f : {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
@@ -399,7 +401,8 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM)},
                                                        nullptr, {})));
   // Create a bad Storage Service
   EXPECT_THROW(storage_service_100 = simulation->add(
@@ -413,6 +416,11 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
           new wrench::SimpleStorageService(hostname, 1000.0)));
 
+
+  // Create a file registry
+  wrench::FileRegistryService *file_registry_service =
+          simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
@@ -421,12 +429,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                                                             {
                                                                     storage_service_100, storage_service_500,
                                                                     storage_service_1000
-                                                            }, hostname)));
+                                                            },
+                                                            file_registry_service, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
-
-  // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // A bogus staging
   EXPECT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
@@ -435,8 +441,8 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   EXPECT_THROW(simulation->stageFile(file_500, storage_service_100), std::runtime_error);
 
   // Staging all files on the 1000 storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(), file_1},
-                                          {file_10->getId(), file_10},
+  EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(),   file_1},
+                                          {file_10->getId(),  file_10},
                                           {file_100->getId(), file_100},
                                           {file_500->getId(), file_500}}, storage_service_1000));
 
@@ -460,7 +466,7 @@ public:
                                                    const std::set<wrench::ComputeService *> &compute_services,
                                                    const std::set<wrench::StorageService *> &storage_services,
                                                    std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -473,7 +479,7 @@ private:
       // Create a data movement manager
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       bool success;
       // Do a bogus file copy (file = nullptr)
@@ -575,7 +581,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
           new SimpleStorageServiceSynchronousFileCopyTestWMS(
                   this,
                   {compute_service},
-                  { storage_service_1000, storage_service_500 }, hostname)));
+                  {storage_service_1000, storage_service_500}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -605,7 +611,7 @@ public:
                                                     const std::set<wrench::ComputeService *> &compute_services,
                                                     const std::set<wrench::StorageService *> &storage_services,
                                                     std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -618,7 +624,7 @@ private:
       // Create a data movement manager
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Initiate a file copy
       try {
@@ -712,7 +718,8 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM)},
                                                        nullptr, {})));
 
   // Create 2 Storage Services
@@ -726,7 +733,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceAsynchronousFileCopyTestWMS(
-                  this,  {compute_service}, {storage_service_1000, storage_service_500},
+                  this, {compute_service}, {storage_service_1000, storage_service_500},
                   hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
@@ -757,7 +764,7 @@ public:
                                                            const std::set<wrench::ComputeService *> compute_services,
                                                            const std::set<wrench::StorageService *> &storage_services,
                                                            std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -770,7 +777,7 @@ private:
       // Create a data movement manager
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Do the file copy while space doesn't fit
       bool success = true;
@@ -924,7 +931,8 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM)},
                                                        nullptr, {})));
 
   // Create 3 Storage Services
@@ -941,7 +949,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(
-                  this,  {
+                  this, {
                           compute_service
                   }, {
                           storage_service_100, storage_service_500,
@@ -977,7 +985,7 @@ public:
                                                             const std::set<wrench::ComputeService *> compute_services,
                                                             const std::set<wrench::StorageService *> &storage_services,
                                                             std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -990,7 +998,7 @@ private:
       // Create a data movement manager
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Do the file copy while space doesn't fit
       try {
@@ -1155,7 +1163,8 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM)},
                                                        nullptr, {})));
 
   // Create 3 Storage Services
@@ -1172,7 +1181,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(
-                  this,  {
+                  this, {
                           compute_service
                   }, {
                           storage_service_100, storage_service_500,

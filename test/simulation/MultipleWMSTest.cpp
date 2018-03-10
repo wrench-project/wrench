@@ -85,7 +85,7 @@ public:
                             const std::set<wrench::ComputeService *> &compute_services,
                             const std::set<wrench::StorageService *> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test"
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
                         ) {
       this->test = test;
     }
@@ -106,7 +106,7 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       // Get the file registry service
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob(this->workflow->getTasks(), {}, {},
@@ -114,7 +114,7 @@ private:
 
       // Submit the 2-task job for execution
       try {
-        auto cs = (wrench::CloudService *) *this->getRunningComputeServices().begin();
+        auto cs = (wrench::CloudService *) *this->getAvailableComputeServices().begin();
         std::string execution_host = cs->getExecutionHosts()[0];
         cs->createVM(execution_host, "vm_" + execution_host, 2);
         job_manager->submitJob(two_task_job, this->test->compute_service);

@@ -233,7 +233,6 @@ namespace wrench {
         return false;
       }
 
-
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
       if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {

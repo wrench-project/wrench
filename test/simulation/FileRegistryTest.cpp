@@ -79,8 +79,9 @@ public:
     FileRegistryTestWMS(FileRegistryTest *test,
                         const std::set<wrench::ComputeService *> &compute_services,
                         const std::set<wrench::StorageService *> &storage_services,
+                        wrench::FileRegistryService *file_registry_service,
                         std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, file_registry_service, hostname, "test") {
       this->test = test;
     }
 
@@ -93,7 +94,7 @@ private:
 
       wrench::WorkflowFile *file1 = workflow->addFile("file1", 100.0);
       wrench::WorkflowFile *file2 = workflow->addFile("file2", 100.0);
-      wrench::FileRegistryService *frs = simulation->getFileRegistryService();
+      wrench::FileRegistryService *frs = this->getAvailableFileRegistryService();
 
       bool success;
       std::set<wrench::StorageService *> locations;
@@ -230,19 +231,21 @@ void FileRegistryTest::do_FileRegistry_Test() {
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
+  // Create a file registry service
+  wrench::FileRegistryService *file_registry_service = nullptr;
+  EXPECT_THROW(simulation->setFileRegistryService(nullptr), std::invalid_argument);
+  EXPECT_NO_THROW(file_registry_service = simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
+
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           new FileRegistryTestWMS(
                   this,
-                  {compute_service}, {storage_service1, storage_service2}, hostname)));
+                  {compute_service}, {storage_service1, storage_service2}, file_registry_service, hostname)));
+
+
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
-
-  // Create a file registry service
-  EXPECT_THROW(simulation->setFileRegistryService(nullptr), std::invalid_argument);
-  EXPECT_NO_THROW(simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
-
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());

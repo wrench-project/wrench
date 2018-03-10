@@ -66,7 +66,6 @@ namespace wrench {
       }
     }
 
-
     /**
     * join()
     */
@@ -77,6 +76,5 @@ namespace wrench {
         throw;
       }
     }
-
 
 };

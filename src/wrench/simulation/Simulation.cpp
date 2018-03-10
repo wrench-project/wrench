@@ -195,7 +195,6 @@ namespace wrench {
                 "A WMS should have been instantiated and passed to Simulation.setWMS()");
       }
 
-
       for (const auto &wmse : this->wmses) {
         auto wms = wmse.get();
         if (not this->hostExists(wms->getHostname())) {
@@ -418,43 +417,6 @@ namespace wrench {
       return file_registry_service;
     }
 
-    /**
-     * @brief Retrieves all running network proximity services on the platform
-     *
-     * @return a vector of network proximity services
-     */
-    std::set<NetworkProximityService *> Simulation::getRunningNetworkProximityServices() {
-      std::set<NetworkProximityService *> set = {};
-      for (auto const &nps : this->network_proximity_services) {
-        if (nps->state == Service::UP) {
-          set.insert(nps.get());
-        }
-      }
-      return set;
-    }
-
-    /**
-    * @brief Shutdown all running network proximity services on the platform
-    */
-    void Simulation::shutdownAllNetworkProximityServices() {
-
-      std::cerr << "Shutting fown all network proximity services\n";
-      for (auto it = this->network_proximity_services.begin(); it != this->network_proximity_services.end(); it++) {
-        if ((*it)->state == Service::UP) {
-          (*it)->stop();
-        }
-      }
-    }
-
-    /**
-     * @brief Retrieves the FileRegistryService
-     *
-     * @return a file registry service, or nullptr
-     */
-    FileRegistryService *Simulation::getFileRegistryService() {
-      return this->file_registry_service.get();
-    }
-
 
     /**
      * @brief Stage a copy of a file on a storage service
@@ -516,7 +478,7 @@ namespace wrench {
       }
 
       try {
-        for (auto f : files) {
+        for (auto const &f : files) {
           this->stageFile(f.second, storage_service);
         }
       } catch (std::runtime_error &e) {
