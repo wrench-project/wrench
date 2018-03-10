@@ -282,7 +282,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -415,7 +415,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -939,7 +939,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceTerminatePilotJobAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -1068,7 +1068,7 @@ namespace wrench {
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
 
-      if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         this->cleanup();
         // This is Synchronous;
         try {
@@ -1081,38 +1081,38 @@ namespace wrench {
         }
         return false;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
         processGetResourceInformation(msg->answer_mailbox);
         return true;
 
-      } else if (auto *msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
         is_bat_sched_ready = true;
         return true;
 
-      } else if (auto *msg = dynamic_cast<BatchExecuteJobFromBatSchedMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<BatchExecuteJobFromBatSchedMessage *>(message.get())) {
         processExecuteJobFromBatSched(msg->batsched_decision_reply);
         return true;
 
-      } else if (auto *msg = dynamic_cast<BatchServiceJobRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<BatchServiceJobRequestMessage *>(message.get())) {
         processJobSubmission(msg->job, msg->answer_mailbox);
         return true;
 
-      } else if (auto *msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
         processStandardJobCompletion(msg->executor, msg->job);
         return true;
 
-      } else if (auto *msg = dynamic_cast<StandardJobExecutorFailedMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StandardJobExecutorFailedMessage *>(message.get())) {
         processStandardJobFailure(msg->executor, msg->job, msg->cause);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
         processPilotJobCompletion(msg->job);
         return true;
-      } else if (auto *msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
         processPilotJobTerminationRequest(msg->job, msg->answer_mailbox);
         return true;
 
-      } else if (auto *msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
         if (msg->job->getType() == WorkflowJob::STANDARD) {
           this->processStandardJobTimeout((StandardJob *) (msg->job));
           this->updateResources((StandardJob *) msg->job);
@@ -1135,7 +1135,7 @@ namespace wrench {
                   "BatchService::processNextMessage(): Alarm about unknown job type"
           );
         }
-      } else if (auto *msg = dynamic_cast<AlarmNotifyBatschedMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<AlarmNotifyBatschedMessage *>(message.get())) {
         //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(msg->job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "");

@@ -56,7 +56,7 @@ namespace wrench {
       if (this->getPropertyValueAsString("MAX_NUM_CONCURRENT_DATA_CONNECTIONS") == "infinity") {
         this->num_concurrent_connections = ULONG_MAX;
       } else {
-      this->num_concurrent_connections = (unsigned long) (this->getPropertyValueAsDouble("MAX_NUM_CONCURRENT_DATA_CONNECTIONS"));
+        this->num_concurrent_connections = (unsigned long) (this->getPropertyValueAsDouble("MAX_NUM_CONCURRENT_DATA_CONNECTIONS"));
       }
       this->network_connection_manager =  std::unique_ptr<NetworkConnectionManager>(
               new NetworkConnectionManager(this->num_concurrent_connections));
@@ -90,7 +90,6 @@ namespace wrench {
      */
     int SimpleStorageService::main() {
 
-
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
 
       WRENCH_INFO("Simple Storage Service %s starting on host %s (capacity: %lf, holding %ld files, listening on %s)",
@@ -103,7 +102,6 @@ namespace wrench {
       /** Main loop **/
       bool should_add_incoming_control_connection = true;
       bool should_continue = true;
-
 
       while (should_continue) {
 
@@ -365,9 +363,9 @@ namespace wrench {
 
       // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
       if (success) {
-          this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
-             new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, mailbox_to_receive_the_file_content, "")
-          ));
+        this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
+                new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, mailbox_to_receive_the_file_content, "")
+        ));
       }
 
       return true;

@@ -53,7 +53,7 @@ namespace wrench {
             std::string network_proximity_service_mailbox,
             double message_size = 1, double measurement_period = 1000,
             double noise = 100, std::string suffix = "") :
-            Service(hostname, "network_daemons" + suffix, "network_daemons" + suffix) {
+            Service(std::move(hostname), "network_daemons" + suffix, "network_daemons" + suffix) {
 
       this->message_size = message_size;
       this->measurement_period = measurement_period;
