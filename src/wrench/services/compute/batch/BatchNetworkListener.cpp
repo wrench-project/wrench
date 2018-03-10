@@ -9,7 +9,6 @@
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/compute/batch/BatchRequestReplyProcess.h"
 #include "wrench/services/compute/batch/BatchServiceMessage.h"
 #include "wrench/services/compute/batch/BatchServiceProperty.h"
 #include "wrench/services/compute/batch/BatchNetworkListener.h"
