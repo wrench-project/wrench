@@ -98,7 +98,7 @@ namespace wrench {
 
         WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-        if (auto *msg = dynamic_cast<AlarmWMSDeferredStartMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<AlarmWMSDeferredStartMessage *>(message.get())) {
           // The WMS can be started
         }
       }

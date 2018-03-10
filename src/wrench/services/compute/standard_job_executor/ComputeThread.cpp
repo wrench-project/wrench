@@ -72,7 +72,7 @@ namespace wrench {
     */
     void ComputeThread::join() {
       try {
-        this->join_actor();
+        this->joinActor();
       } catch (std::shared_ptr<FatalFailure> &e) {
         throw;
       }
