@@ -30,6 +30,7 @@ namespace wrench {
      * @param mailbox_prefix: the prefix of the mailbox (to which a unique integer is appended)
      */
     S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix) {
+
       if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
         throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
       }
@@ -72,7 +73,7 @@ namespace wrench {
     static int daemon_goodbye(void *x, void* service_instance) {
       WRENCH_INFO("Terminating");
       if (service_instance) {
-        auto *service = reinterpret_cast<S4U_Daemon *>(service_instance);
+        auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
         service->cleanup();
         delete service->life_saver;
       }
@@ -151,8 +152,7 @@ namespace wrench {
           this->s4u_actor->join();
         } catch (xbt_ex &e) {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
-        } catch (std::exception &e)
-        {
+        } catch (std::exception &e) {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
         }
       }

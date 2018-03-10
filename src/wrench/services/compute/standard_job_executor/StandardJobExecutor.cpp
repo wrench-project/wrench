@@ -172,8 +172,6 @@ namespace wrench {
         this->core_availabilities.insert(std::make_pair(std::get<0>(host), num_cores));
       }
 
-
-
       // Compute the total ram and set initial ram availabilities
       this->total_ram = 0.0;
       for (auto host : compute_resources) {
@@ -212,9 +210,8 @@ namespace wrench {
       // TODO: INVESTIGATE?
 
       // Kill all Workunit executors
-      std::set<std::shared_ptr<WorkunitMulticoreExecutor>>::iterator it;
-      for (it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
-        (*it)->kill();
+      for (auto const &wue : this->running_workunit_executors) {
+        wue->kill();
       }
 
       // Kill the StandardJobExecutor
@@ -251,7 +248,7 @@ namespace wrench {
         }
 
         /** Detect Termination **/
-        if (this->non_ready_workunits.size() + this->ready_workunits.size() +  this->running_workunits.size() == 0) {
+        if (this->non_ready_workunits.empty() and  this->ready_workunits.empty() and  this->running_workunits.empty()) {
 //          std::cerr << "CANARY 1: " << (*(this->completed_workunits. begin())).use_count() << "\n";
 //          std::shared_ptr<Workunit> canary = std::move(*(this->completed_workunits.begin()));
 //          std::cerr << "CANARY 2: " << canary.use_count() << "\n";
@@ -279,7 +276,7 @@ namespace wrench {
      */
     unsigned long StandardJobExecutor::computeWorkUnitMinNumCores(Workunit *wu) {
       unsigned long minimum_num_cores;
-      if (wu->tasks.size() == 0) {
+      if (wu->tasks.empty()) {
         minimum_num_cores = 1;
       } else if (wu->tasks.size() == 1) {
         minimum_num_cores = wu->tasks[0]->getMinNumCores();
@@ -299,7 +296,7 @@ namespace wrench {
      */
     unsigned long StandardJobExecutor::computeWorkUnitDesiredNumCores(Workunit *wu) {
       unsigned long desired_num_cores;
-      if (wu->tasks.size() == 0) {
+      if (wu->tasks.empty()) {
         desired_num_cores = 1;
 
       } else if (wu->tasks.size() == 1) {
@@ -330,7 +327,7 @@ namespace wrench {
     */
     double StandardJobExecutor::computeWorkUnitMinMemory(Workunit *wu) {
       double  min_ram;
-      if (wu->tasks.size() == 0) {
+      if (wu->tasks.empty()) {
         min_ram  = 0.0;
 
       } else if (wu->tasks.size() == 1) {
@@ -356,7 +353,7 @@ namespace wrench {
 //      }
 
       // If there is no ready work unit, there is nothing to dispatch
-      if (this->ready_workunits.size() == 0) {
+      if (this->ready_workunits.empty()) {
         return;
       }
 
@@ -431,8 +428,8 @@ namespace wrench {
         if (host_selection_algorithm == "best_fit") {
           unsigned long target_slack = 0;
 
-          for (auto h : this->core_availabilities) {
-            std::string hostname = std::get<0>(h);
+          for (auto const &h : this->core_availabilities) {
+            std::string const &hostname = std::get<0>(h);
 //              WRENCH_INFO("Looking at host %s", hostname.c_str());
 
             // Does the host have enough cores?
@@ -518,7 +515,6 @@ namespace wrench {
 
       sorted_ready_workunits.clear();
 
-      return;
     }
 
     /**
@@ -584,7 +580,6 @@ namespace wrench {
       this->ram_availabilities[workunit_executor->getHostname()] += workunit_executor->getMemoryUtilization();
 
       // Remove the workunit executor from the workunit executor list
-//      std::set<std::unique_ptr<WorkunitMulticoreExecutor>>::iterator it;
       for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
         if ((*it).get() == workunit_executor) {
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors), &(this->finished_workunit_executors));
@@ -616,9 +611,9 @@ namespace wrench {
       }
 
       // Send the callback to the originator if the job has completed
-      if ((this->non_ready_workunits.size() == 0) &&
-          (this->ready_workunits.size() == 0) &&
-          (this->running_workunits.size() == 0)) {
+      if ((this->non_ready_workunits.empty()) &&
+          (this->ready_workunits.empty()) &&
+          (this->running_workunits.empty())) {
 
         // Erase all completed works for the job
         this->completed_workunits.clear();
@@ -664,7 +659,6 @@ namespace wrench {
         }
       }
 
-      return;
     }
 
 
@@ -690,7 +684,6 @@ namespace wrench {
 
       // Remove the workunit executor from the workunit executor list and put it in the failed list
       for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
-//      for (auto wt : this->running_workunit_executors) {
         if ((*it).get() == workunit_executor) {
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_workunit_executors), &(this->failed_workunit_executors));
           break;
@@ -718,17 +711,15 @@ namespace wrench {
       this->ready_workunits.clear();
 
       // Deal with running workunits!
-      for (auto it = this->running_workunits.begin(); it != this->running_workunits.end(); it++) {
-        if (((*it)->post_file_copies.size() != 0) || ((*it)->pre_file_copies.size() != 0)) {
+      for (auto const &wu : this->running_workunits) {
+        if ((not wu->post_file_copies.empty()) || (not wu->pre_file_copies.empty())) {
           throw std::runtime_error(
                   "StandardJobExecutor::processWorkunitExecutorFailure(): trying to cancel a running workunit that's doing some file copy operations - not supported (for now)");
         }
         // find the workunit executor  that's doing the work (lame iteration)
-        for (auto it_e = this->running_workunit_executors.begin();
-             it_e != this->running_workunit_executors.end(); it_e++) {
-//        for (auto wt :  this->running_workunit_executors) {
-          if ((*it_e)->workunit == (*it).get()) {
-            (*it_e)->kill();
+        for (auto const &wue : this->running_workunit_executors) {
+          if (wue->workunit == wu.get()) {
+            wue->kill();
             break;
           }
         }
@@ -748,7 +739,6 @@ namespace wrench {
         return;
       }
 
-
     }
 
 
@@ -765,29 +755,29 @@ namespace wrench {
       Workunit *cleanup_workunit = nullptr;
 
       // Create the cleanup workunit, if any
-      if (job->cleanup_file_deletions.size() > 0) {
+      if (not job->cleanup_file_deletions.empty()) {
         cleanup_workunit = new Workunit({}, {}, {}, {}, job->cleanup_file_deletions);
       }
 
       // Create the pre_file_copies work unit, if any
-      if (job->pre_file_copies.size() > 0) {
+      if (not job->pre_file_copies.empty()) {
         pre_file_copies_work_unit = new Workunit(job->pre_file_copies, {}, {}, {}, {});
       }
 
       // Create the post_file_copies work unit, if any
-      if (job->post_file_copies.size() > 0) {
+      if (not job->post_file_copies.empty()) {
         post_file_copies_work_unit = new Workunit({}, {}, {}, job->post_file_copies, {});
       }
 
       // Create the task work units, if any
-      for (auto task : job->tasks) {
+      for (auto const &task : job->tasks) {
         task_work_units.push_back(new Workunit({}, {task}, job->file_locations, {}, {}));
       }
 
       // Add dependencies from pre copies to possible successors
       if (pre_file_copies_work_unit != nullptr) {
-        if (task_work_units.size() > 0) {
-          for (auto twu: task_work_units) {
+        if (not task_work_units.empty()) {
+          for (auto const &twu: task_work_units) {
             Workunit::addDependency(pre_file_copies_work_unit, twu);
           }
         } else if (post_file_copies_work_unit != nullptr) {
@@ -798,7 +788,7 @@ namespace wrench {
       }
 
       // Add dependencies from tasks to possible successors
-      for (auto twu: task_work_units) {
+      for (auto const &twu: task_work_units) {
         if (post_file_copies_work_unit != nullptr) {
           Workunit::addDependency(twu, post_file_copies_work_unit);
         } else if (cleanup_workunit != nullptr) {
@@ -816,7 +806,7 @@ namespace wrench {
       // Create a list of all work units
       std::vector<Workunit*> all_work_units;
       if (pre_file_copies_work_unit) all_work_units.push_back(pre_file_copies_work_unit);
-      for (auto twu : task_work_units) {
+      for (auto const &twu : task_work_units) {
         all_work_units.push_back(twu);
       }
       if (post_file_copies_work_unit) all_work_units.push_back(post_file_copies_work_unit);
@@ -825,7 +815,7 @@ namespace wrench {
       task_work_units.clear();
 
       // Insert work units in the ready or non-ready queues
-      for (auto wu : all_work_units) {
+      for (auto const &wu : all_work_units) {
         if (wu->num_pending_parents == 0) {
           this->ready_workunits.insert(std::unique_ptr<Workunit>(wu));
         } else {
@@ -834,49 +824,7 @@ namespace wrench {
       }
 
       all_work_units.clear();
-      return;
     }
-
-
-//    /**
-//     * @brief Set a property of the executor
-//     * @param property: the property
-//     * @param value: the property value
-//     */
-//    void StandardJobExecutor::setProperty(std::string property, std::string value) {
-//      this->property_list[property] = value;
-//    }
-//
-//    /**
-//     * @brief Get a property of the executor a string
-//     * @param property: the property
-//     * @return the property value as a string
-//     *
-//     * @throw std::runtime_error
-//     */
-//    std::string StandardJobExecutor::getPropertyValueAsString(std::string property) {
-//      if (this->property_list.find(property) == this->property_list.end()) {
-//        throw std::runtime_error("Service::getPropertyValueAsString(): Cannot find value for property " + property +
-//                                 " (perhaps a derived service class does not provide a default value?)");
-//      }
-//      return this->property_list[property];
-//    }
-//
-//    /**
-//     * @brief Get a property of the executor as a double
-//     * @param property: the property
-//     * @return the property value as a double
-//     *
-//     * @throw std::runtime_error
-//     */
-//    double StandardJobExecutor::getPropertyValueAsDouble(std::string property) {
-//      double value;
-//      if (sscanf(this->getPropertyValueAsString(property).c_str(), "%lf", &value) != 1) {
-//        throw std::runtime_error("Service::getPropertyValueAsDouble(): Invalid double property value " + property + " " +
-//                                 this->getPropertyValueAsString(property));
-//      }
-//      return value;
-//    }
 
 
     /**
@@ -890,8 +838,8 @@ namespace wrench {
 
       std::vector<Workunit *> sorted_workunits;
 
-      for (auto it = this->ready_workunits.begin(); it != this->ready_workunits.end(); it++) {
-        sorted_workunits.push_back((*it).get());
+      for (auto const &wu : this->ready_workunits) {
+        sorted_workunits.push_back(wu.get());
       }
 
 //      std::cerr << "SORTED LENGTH = " << sorted_workunits.size() << "\n";

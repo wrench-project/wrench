@@ -415,7 +415,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage *>(message.get())) {
         return msg->info;
 
       } else {
