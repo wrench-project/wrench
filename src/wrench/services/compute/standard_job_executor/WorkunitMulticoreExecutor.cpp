@@ -370,14 +370,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the name of the host the executor is running on
-     * @return a hostname
-     */
-    std::string WorkunitMulticoreExecutor::getHostname() {
-      return this->hostname;
-    }
-
-    /**
      * @brief Returns the number of cores the executor is running on
      * @return number of cores
      */

@@ -49,7 +49,6 @@ namespace wrench {
 
         void kill();
 
-        std::string getHostname();
         unsigned long getNumCores();
         double getMemoryUtilization();
 

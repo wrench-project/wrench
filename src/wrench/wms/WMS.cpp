@@ -233,26 +233,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the simulation
-     *
-     * @param simulation: the current simulation
-     *
-     * @throw std::invalid_argument
-     */
-    void WMS::setSimulation(Simulation *simulation) {
-      this->simulation = simulation;
-    }
-
-    /**
-     * @brief Get the name of the host on which the WMS is running
-     *
-     * @return the hostname
-     */
-    std::string WMS::getHostname() {
-      return this->hostname;
-    }
-
-    /**
      * @brief Set the workflow to be executed by the WMS
      * @param workflow: a workflow to execute
      * @param start_time: the simulated time when the WMS should start executed the workflow (0 if not specified)
@@ -302,7 +282,7 @@ namespace wrench {
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
       auto data_movement_manager_raw_ptr = new DataMovementManager(this);
       std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
-      data_movement_manager->start(data_movement_manager, true);
+      data_movement_manager->start(data_movement_manager, true); // Always daemonize
       return data_movement_manager;
     }
 
