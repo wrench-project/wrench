@@ -196,8 +196,8 @@ namespace wrench {
       }
 
 
-      for (auto it = this->wmses.begin(); it != this->wmses.end(); ++it) {
-        auto wms = it->get();
+      for (const auto &wmse : this->wmses) {
+        auto wms = wmse.get();
         if (not this->hostExists(wms->getHostname())) {
           throw std::runtime_error("A WMS cannot be started on host '" + wms->getHostname() + "'");
         }

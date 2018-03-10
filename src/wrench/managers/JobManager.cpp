@@ -459,10 +459,10 @@ namespace wrench {
 
         WRENCH_INFO("Job Manager got a %s message", message->getName().c_str());
 
-        if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
           // There shouldn't be any need to clean any state up
           keep_going = false;
-//        } else if (ComputeServiceJobTypeNotSupportedMessage *msg = dynamic_cast<ComputeServiceJobTypeNotSupportedMessage *>(message.get())) {
+//        } else if (auto msg = dynamic_cast<ComputeServiceJobTypeNotSupportedMessage *>(message.get())) {
 //
 //          // update job state and remove from list
 //          if (msg->job->getType() == WorkflowJob::STANDARD) {
@@ -490,7 +490,7 @@ namespace wrench {
 //            keep_going = true;
 //          }
 
-        } else if (ComputeServiceStandardJobDoneMessage *msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
           // update job state
           StandardJob *job = msg->job;
           job->state = StandardJob::State::COMPLETED;
@@ -506,7 +506,7 @@ namespace wrench {
           } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;
           }
-        } else if (ComputeServiceStandardJobFailedMessage *msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
 
           // update job state
           StandardJob *job = msg->job;
@@ -532,7 +532,7 @@ namespace wrench {
             keep_going = true;
           }
 
-        } else if (ComputeServicePilotJobStartedMessage *msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
 
           // update job state
           PilotJob *job = msg->job;
@@ -552,7 +552,7 @@ namespace wrench {
             keep_going = true;
           }
 
-        } else if (ComputeServicePilotJobExpiredMessage *msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
 
           // update job state
           PilotJob *job = msg->job;
@@ -570,7 +570,7 @@ namespace wrench {
             keep_going = true;
           }
 
-        } else if (ComputeServiceInformationMessage *msg = dynamic_cast<ComputeServiceInformationMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<ComputeServiceInformationMessage *>(message.get())) {
 
           // update job state
           WorkflowJob *job = msg->job;

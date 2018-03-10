@@ -132,7 +132,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (ServiceDaemonStoppedMessage *msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
         this->state = Service::DOWN;
       } else {
         throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
@@ -176,17 +176,17 @@ namespace wrench {
     /**
      * @brief Set default and user defined properties
      * @param default_property_values: list of default properties
-     * @param plist: user defined list of properties
+     * @param overridden_poperty_values: list of overridden properties (override the default)
      */
     void Service::setProperties(std::map<std::string, std::string> default_property_values,
-                                std::map<std::string, std::string> plist) {
+                                std::map<std::string, std::string> overridden_poperty_values) {
       // Set default properties
       for (auto const &p : default_property_values) {
         this->setProperty(p.first, p.second);
       }
 
       // Set specified properties (possible overwriting default ones)
-      for (auto const &p : plist) {
+      for (auto const &p : overridden_poperty_values) {
         this->setProperty(p.first, p.second);
       }
     }

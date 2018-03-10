@@ -33,7 +33,7 @@ namespace wrench {
                                                    std::string network_proximity_service_mailbox,
                                                    double message_size = 1, double measurement_period = 1000,
                                                    double noise = 100) :
-            NetworkProximityDaemon(hostname, network_proximity_service_mailbox,
+            NetworkProximityDaemon(std::move(hostname), std::move(network_proximity_service_mailbox),
                                    message_size, measurement_period, noise, "") {
     }
 
@@ -163,9 +163,9 @@ namespace wrench {
 //                std::cout<<"Timeout very less "<<this->mailbox_name<<"\n";
 //            }
         message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
-      } catch (std::shared_ptr<NetworkTimeout> cause) {
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         return true;
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
 
@@ -176,13 +176,13 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
                                   new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
                                           NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> cause) {
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
         return false;

@@ -80,7 +80,7 @@ namespace wrench {
         void setProperty(std::string, std::string);
 
         void setProperties(std::map<std::string, std::string> default_property_values,
-                           std::map<std::string, std::string> plist);
+                           std::map<std::string, std::string> overriden_poperty_values);
 
         void serviceSanityCheck();
 

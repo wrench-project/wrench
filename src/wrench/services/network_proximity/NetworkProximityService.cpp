@@ -118,7 +118,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (CoordinateLookupAnswerMessage *msg = dynamic_cast<CoordinateLookupAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<CoordinateLookupAnswerMessage *>(message.get())) {
         return msg->xy_coordinate;
       } else {
         throw std::runtime_error(
@@ -236,7 +236,7 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         // This is Synchronous
         try {
           //Stop the network daemons
@@ -257,7 +257,7 @@ namespace wrench {
         }
         return false;
 
-      } else if (NetworkProximityLookupRequestMessage *msg = dynamic_cast<NetworkProximityLookupRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<NetworkProximityLookupRequestMessage *>(message.get())) {
         double proximityValue = -1.0;
 
         std::string network_service_type = this->getPropertyValueAsString("NETWORK_PROXIMITY_SERVICE_TYPE");
@@ -278,7 +278,7 @@ namespace wrench {
         }
 
         try {
-          //NetworkProximityComputeAnswerMessage *proximity_msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get());
+          //auto proximity_msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get());
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new NetworkProximityLookupAnswerMessage(msg->hosts, proximityValue,
                                                                            this->getPropertyValueAsDouble(
@@ -289,7 +289,7 @@ namespace wrench {
         }
         return true;
 
-      } else if (NetworkProximityComputeAnswerMessage *msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get())) {
         try {
           WRENCH_INFO(
                   "NetworkProximityService::processNextMessage()::Adding proximity value between %s and %s into the database",

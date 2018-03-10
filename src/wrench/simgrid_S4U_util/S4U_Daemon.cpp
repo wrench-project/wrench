@@ -146,7 +146,7 @@ namespace wrench {
     /**
      * @brief Kill the daemon/actor.
      */
-    void S4U_Daemon::join_actor() {
+    void S4U_Daemon::joinActor() {
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         try {
           this->s4u_actor->join();

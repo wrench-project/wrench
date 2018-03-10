@@ -90,9 +90,9 @@ namespace wrench {
 
       // Then kill all compute threads, if any
       WRENCH_INFO("Killing %ld compute threads", this->compute_threads.size());
-      for (unsigned long i=0; i < this->compute_threads.size(); i++) {
-        WRENCH_INFO("Killing compute thread [%s]", this->compute_threads[i]->getName().c_str());
-        this->compute_threads[i]->kill();
+      for (auto const &compute_thread : this->compute_threads) {
+        WRENCH_INFO("Killing compute thread [%s]", compute_thread->getName().c_str());
+        compute_thread->kill();
       }
 //      WRENCH_INFO("Clearing before everything got killed\n");
 //      this->compute_threads.clear();
@@ -366,7 +366,6 @@ namespace wrench {
       if (!success) {
         throw WorkflowExecutionException(new ComputeThreadHasDied());
       }
-      return;
     }
 
     /**
