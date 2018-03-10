@@ -416,8 +416,7 @@ private:
         throw std::runtime_error("Should  be able to create a valid standard job executor!");
       }
 
-      executor->createLifeSaver(executor);
-      executor->startDaemon(test->simulation->getHostnameList()[0], true);
+      executor->start(executor, true);
 
       // Wait for a message on my mailbox_name
       std::unique_ptr<wrench::SimulationMessage> message;
@@ -569,8 +568,7 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[0], true);
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -602,7 +600,7 @@ private:
         // Doe the task-stored time information look good
         if (!StandardJobExecutorTest::isJustABitGreater(before, task->getStartDate())) {
           throw std::runtime_error(
-                  "Case 1: Unexpected task startDaemon date: " + std::to_string(task->getStartDate()));
+                  "Case 1: Unexpected task start date: " + std::to_string(task->getStartDate()));
         }
 
         // Note that we have to subtract the last thread startup overhead (for file deletions)
@@ -768,9 +766,7 @@ private:
         } catch (std::runtime_error &e) {
           throw std::runtime_error("Should have been able to create standard job executor!");
         }
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[0], true);
-
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -949,8 +945,7 @@ private:
         } catch (std::runtime_error &e) {
           throw std::runtime_error("Should have been able to create standard job executor!");
         }
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[1], true);
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1112,9 +1107,7 @@ private:
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[1], true);
-
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1177,8 +1170,7 @@ private:
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[1], true);
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1246,9 +1238,7 @@ private:
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[1], true);
-
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1416,9 +1406,7 @@ private:
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[0], true);
-
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1503,9 +1491,7 @@ private:
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[0], true);
-
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1591,8 +1577,7 @@ private:
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[0], true);
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1781,8 +1766,7 @@ public:
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[0], true);
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -1868,8 +1852,7 @@ public:
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon(test->simulation->getHostnameList()[0], true);
+        executor->start(executor, true);
 
         // Wait for a message on my mailbox_name
         std::unique_ptr<wrench::SimulationMessage> message;
@@ -2059,8 +2042,7 @@ private:
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon("Host3", true);
+        executor->start(executor, true);
 
         // Sleep 1 second
         wrench::Simulation::sleep(80);
@@ -2212,9 +2194,7 @@ private:
                         nullptr,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
-        executor->createLifeSaver(executor);
-        executor->startDaemon("Host3", true);
-
+        executor->start(executor, true);
 
         // Sleep 48.20 second
         wrench::Simulation::sleep(48.20);
@@ -2381,9 +2361,7 @@ private:
                           nullptr,
                           {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                   ));
-          executor->createLifeSaver(executor);
-          executor->startDaemon("Host3", true);
-
+          executor->start(executor, true);
 
           // Sleep some random number of seconds
           double sleep_time = dist(rng);

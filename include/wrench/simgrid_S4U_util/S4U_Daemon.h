@@ -28,7 +28,7 @@ namespace wrench {
 
         class LifeSaver {
         public:
-            explicit LifeSaver(std::shared_ptr<S4U_Daemon> reference) : reference(reference) {}
+            explicit LifeSaver(std::shared_ptr<S4U_Daemon> &reference) : reference(reference) {}
             std::shared_ptr<S4U_Daemon> reference;
         };
 
@@ -40,15 +40,14 @@ namespace wrench {
 				/** @brief The name of the host on which the daemon is running */
 				std::string hostname;
 
-				S4U_Daemon(std::string process_name_prefix, std::string mailbox_prefix);
-				S4U_Daemon(std::string process_name_prefix);
+				S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix);
+				S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
 				virtual ~S4U_Daemon();
 
-				void startDaemon(std::string hostname, bool daemonized);
+				void startDaemon(bool daemonized);
 
         void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
-        void removeLifeSaver();
 
 				virtual void cleanup();
 
@@ -65,8 +64,6 @@ namespace wrench {
 		private:
 				bool terminated;
 				simgrid::s4u::ActorPtr s4u_actor;
-
-
 
 		};
 

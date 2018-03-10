@@ -30,8 +30,7 @@ namespace wrench {
      * @param mailbox_name_prefix: the prefix for the mailbox name
      */
     Service::Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix) :
-            S4U_Daemon(process_name_prefix, mailbox_name_prefix) {
-      this->hostname = hostname;
+            S4U_Daemon(hostname, process_name_prefix, mailbox_name_prefix) {
       this->name = process_name_prefix;
     }
 
@@ -90,7 +89,7 @@ namespace wrench {
     void Service::start(std::shared_ptr<Service> this_service, bool daemonize) {
       try {
         this->createLifeSaver(this_service);
-        this->startDaemon(this->hostname, daemonize);
+        this->startDaemon(daemonize);
         this->state = Service::UP;
       } catch (std::invalid_argument &e) {
         throw std::runtime_error("Service::start(): " + std::string(e.what()));

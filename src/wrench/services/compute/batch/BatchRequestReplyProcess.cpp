@@ -49,8 +49,10 @@ namespace wrench{
                                                                              ""));
       network_listener->start(network_listener, true);
 
+      // TODO: This should not be here
+      // TODO: No starting within Constructor
       try {
-        this->startDaemon(this->hostname, true);
+        this->startDaemon(true);
       } catch (std::invalid_argument &e) {
         throw;
       }
