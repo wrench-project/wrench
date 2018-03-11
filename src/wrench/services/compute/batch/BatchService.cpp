@@ -1614,7 +1614,9 @@ namespace wrench {
               if (getpgid(top_pid)) {
                 is_sent = kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched
               }
-              exit(is_sent); //exit myself
+              //my parent has died so, I will kill myself instead of exiting and becoming a zombie
+              kill(getpid(),SIGKILL);
+              //exit(is_sent); //if exit myself and become a zombie :D
 
             }
           }
