@@ -73,29 +73,7 @@ namespace wrench {
       WRENCH_INFO("Batch Network Listener Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
       /** Main loop **/
-      if (MY_LISTENER_TYPE == NETWORK_LISTENER_TYPE::LISTENER) {
-        while (true) {
-          this->read();
-          try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new BatchJobReplyFromSchedulerMessage(this->reply_received,
-                                                                          this->getPropertyValueAsDouble(
-                                                                                  BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD)));
-
-            //TODO::check if this message is simulation_ends message
-            //TODO::if this message is simulation_ends message, then I have to terminate
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
-          }
-        }
-      } else if (MY_LISTENER_TYPE == NETWORK_LISTENER_TYPE::SENDER) {
-        if (this->data_to_send.empty()) {
-          throw std::runtime_error(
-                  "BatchNetworkListener::BatchNetworkListener():Network sending process has no data to send"
-          );
-        }
-//        this->send();
-      } else if (MY_LISTENER_TYPE == NETWORK_LISTENER_TYPE::SENDER_RECEIVER) {
+      if (MY_LISTENER_TYPE == NETWORK_LISTENER_TYPE::SENDER_RECEIVER) {
         if (this->data_to_send.empty()) {
           throw std::runtime_error(
                   "BatchNetworkListener::BatchNetworkListener():Network sending process has no data to send"
@@ -112,20 +90,6 @@ namespace wrench {
 
       WRENCH_INFO("Batch Network Listener Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
-    }
-
-    void BatchNetworkListener::read() {
-#ifdef ENABLE_BATSCHED
-      zmq::context_t context(1);
-      zmq::socket_t socket(context, ZMQ_REP);
-
-      socket.bind("tcp://*:" + this->self_port);
-
-      //  Get the reply.
-      zmq::message_t reply;
-      socket.recv(&reply);
-      this->reply_received = std::string(static_cast<char *>(reply.data()), reply.size());
-#endif
     }
 
     void BatchNetworkListener::send_receive() {
@@ -188,19 +152,6 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
-#endif
-    }
-
-    void BatchNetworkListener::send() {
-#ifdef ENABLE_BATSCHED
-      zmq::context_t context(1);
-      zmq::socket_t socket(context, ZMQ_REQ);
-
-      socket.connect("tcp://localhost:" + this->sched_port);
-      std::string data = this->data_to_send;
-      zmq::message_t request(strlen(data.c_str()));
-      memcpy(request.data(), data.c_str(), strlen(data.c_str()));
-      socket.send(request);
 #endif
     }
 

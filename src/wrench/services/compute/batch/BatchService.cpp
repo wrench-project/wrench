@@ -1610,9 +1610,8 @@ namespace wrench {
                 ppid = getppid();
               }
               //check if the child that forked batsched is still running
-              int is_sent = 0;
               if (getpgid(top_pid)) {
-                is_sent = kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched
+                kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched
               }
               //my parent has died so, I will kill myself instead of exiting and becoming a zombie
               kill(getpid(),SIGKILL);

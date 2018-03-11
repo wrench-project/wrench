@@ -38,14 +38,10 @@ namespace wrench {
         std::string data_to_send;
         std::string reply_received;
         std::string batch_service_mailbox;
-
-
-
+        
         NETWORK_LISTENER_TYPE MY_LISTENER_TYPE;
 
 
-        void read();
-        void send();
         void send_receive();
     };
 }
