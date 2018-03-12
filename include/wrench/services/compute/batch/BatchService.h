@@ -73,6 +73,8 @@ namespace wrench {
         //returns jobid,started time, running time
         std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
 
+        double getQueueWaitingTimeEstimate(std::string job_id,unsigned int num_nodes, double walltime_seconds);
+
         ~BatchService();
 
 
@@ -129,7 +131,7 @@ namespace wrench {
                                                        "energy_bf_monitoring",
                                                        "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
                                                        "filler", "killer", "killer2", "rejecter", "sleeper",
-                                                       "submitter"
+                                                       "submitter","waiting_time_estimator"
         };
 
         //Batch queue ordering options
