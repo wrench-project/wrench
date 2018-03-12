@@ -93,7 +93,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<CloudServiceGetExecutionHostsAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<CloudServiceGetExecutionHostsAnswerMessage *>(message.get())) {
         return msg->execution_hosts;
       } else {
         throw std::runtime_error("CloudService::createVM(): Unexpected [" + msg->getName() + "] message");
@@ -144,7 +144,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(message.get())) {
         return msg->success;
       } else {
         throw std::runtime_error("CloudService::createVM(): Unexpected [" + msg->getName() + "] message");
@@ -185,7 +185,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -231,7 +231,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -310,7 +310,7 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         this->terminate();
         // This is Synchronous
         try {
@@ -322,24 +322,24 @@ namespace wrench {
         }
         return false;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
         processGetResourceInformation(msg->answer_mailbox);
         return true;
 
-      } else if (auto *msg = dynamic_cast<CloudServiceGetExecutionHostsRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<CloudServiceGetExecutionHostsRequestMessage *>(message.get())) {
         processGetExecutionHosts(msg->answer_mailbox);
         return true;
 
-      } else if (auto *msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<CloudServiceCreateVMRequestMessage *>(message.get())) {
         processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->supports_standard_jobs,
                         msg->supports_pilot_jobs, msg->num_cores, msg->ram_memory, msg->plist);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
         processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
         processSubmitPilotJob(msg->answer_mailbox, msg->job);
         return true;
 
@@ -418,25 +418,24 @@ namespace wrench {
           std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
                   std::make_tuple(vm_hostname, num_cores, ram_memory)};
 
-          std::unique_ptr<ComputeService> cs(
+          std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(vm_hostname,
                                                        supports_standard_jobs,
                                                        supports_pilot_jobs,
                                                        compute_resources,
                                                        default_storage_service, plist));
+          cs->setSimulation(this->simulation);
 
           this->cs_available_ram[pm_hostname] -= ram_memory;
 
-          cs->setSimulation(this->simulation);
-
           // start the service
           try {
-            cs->start(true); // Daemonize!
+            cs->start(cs, true); // Daemonize!
           } catch (std::runtime_error &e) {
             throw;
           }
 
-          this->vm_list[vm_hostname] = std::make_tuple(vm, std::move(cs), num_cores);
+          this->vm_list[vm_hostname] = std::make_tuple(vm, cs, num_cores);
 
           S4U_Mailbox::dputMessage(
                   answer_mailbox,

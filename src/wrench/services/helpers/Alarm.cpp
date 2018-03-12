@@ -37,15 +37,6 @@ namespace wrench {
       }
       this->reply_mailbox_name = reply_mailbox_name;
       this->msg = std::unique_ptr<SimulationMessage>(msg);
-
-      // Start the daemon on the same host
-      try {
-        WRENCH_INFO("Alarm Service starting...");
-        this->start_daemon(hostname, true); // Daemonize
-        this->state = UP;
-      } catch (std::invalid_argument &e) {
-        throw e;
-      }
     }
 
     /**
@@ -75,12 +66,29 @@ namespace wrench {
       return 0;
     }
 
+
     /**
-     * @brief Brutally kill the daemon
+     * @brief Creates and start an alarm service
+     * @param date: the date at this the message should be sent
+     * @param hostname: the name of the host on which the Alarm daemon should run
+     * @param reply_mailbox_name: the mailbox to which the message should be sent
+     * @param msg: the message to send
+     * @param suffix: a (possibly empty) suffix to append to the daemon name
+     * @return a reference to the alarm service
+     *
+     * @throw std::invalid_argument
      */
-    void Alarm::kill() {
-      //kill itself
-      this->kill_actor();
+    std::shared_ptr<Alarm>
+    Alarm::createAndStartAlarm(double date, std::string hostname, std::string &reply_mailbox_name,
+                               SimulationMessage *msg, std::string suffix) {
+      std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
+              new Alarm(date, hostname, reply_mailbox_name, msg, suffix));
+      try {
+        alarm_ptr->start(alarm_ptr, true); // daemonize
+      } catch (std::invalid_argument &e) {
+        throw;
+      }
+      return alarm_ptr;
     }
 
 };

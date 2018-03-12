@@ -46,24 +46,24 @@ namespace wrench {
               std::unique_ptr<WorkflowExecutionEvent>(new WorkflowExecutionEvent());
 
 
-      if (ComputeServiceStandardJobDoneMessage *m = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
+      if (auto m = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
         event->type = WorkflowExecutionEvent::STANDARD_JOB_COMPLETION;
         event->job = (WorkflowJob *) m->job;
         event->compute_service = m->compute_service;
-      } else if (ComputeServiceStandardJobFailedMessage *m = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
+      } else if (auto m = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
         event->type = WorkflowExecutionEvent::STANDARD_JOB_FAILURE;
         event->job = (WorkflowJob *) m->job;
         event->compute_service = m->compute_service;
         event->failure_cause = m->cause;
-      } else if (ComputeServicePilotJobStartedMessage *m = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
+      } else if (auto m = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
         event->type = WorkflowExecutionEvent::PILOT_JOB_START;
         event->job = (WorkflowJob *) m->job;
         event->compute_service = m->compute_service;
-      } else if (ComputeServicePilotJobExpiredMessage *m = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+      } else if (auto m = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
         event->type = WorkflowExecutionEvent::PILOT_JOB_EXPIRATION;
         event->job = (WorkflowJob *) m->job;
         event->compute_service = m->compute_service;
-      } else if (StorageServiceFileCopyAnswerMessage *m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
+      } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (m->success) {
           event->type = WorkflowExecutionEvent::FILE_COPY_COMPLETION;
           event->file = m->file;

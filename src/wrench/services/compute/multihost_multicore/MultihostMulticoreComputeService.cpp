@@ -62,7 +62,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -121,7 +121,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -343,12 +343,6 @@ namespace wrench {
       this->has_ttl = (ttl >= 0);
       this->containing_pilot_job = pj;
 
-//      // Start the daemon on the same host
-//      try {
-//        this->start_daemon(hostname);
-//      } catch (std::invalid_argument &e) {
-//        throw;
-//      }
     }
 
 /**
@@ -369,7 +363,7 @@ namespace wrench {
         WRENCH_INFO("Will be terminating at date %lf", this->death_date);
 //        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
         SimulationMessage *msg = new ServiceTTLExpiredMessage(0);
-        this->death_alarm = new Alarm(death_date, this->hostname, this->mailbox_name, msg, "service_string");
+        this->death_alarm = Alarm::createAndStartAlarm(death_date, this->hostname, this->mailbox_name, msg, "service_string");
       } else {
         this->death_date = -1.0;
         this->death_alarm = nullptr;
@@ -626,8 +620,8 @@ namespace wrench {
       WRENCH_INFO(
               "Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2lf bytes of RAM) for a standard job",
               compute_resources.size(), total_cores, total_ram);
-      // Create a standard job executor
-      StandardJobExecutor *executor = new StandardJobExecutor(
+      // Create and start a standard job executor
+      std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(new StandardJobExecutor(
               this->simulation,
               this->mailbox_name,
               this->hostname,
@@ -641,9 +635,10 @@ namespace wrench {
                {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM)},
                {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
-                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}});
+                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}}));
+      executor->start(executor, true);
 
-      this->standard_job_executors.insert(std::unique_ptr<StandardJobExecutor>(executor));
+      this->standard_job_executors.insert(executor);
       this->running_jobs.insert(job);
 
       // Tell the caller that a job was dispatched!
@@ -680,32 +675,31 @@ namespace wrench {
       WRENCH_INFO("Allocating %ld/%ld hosts/cores to a pilot job", job->getNumHosts(), job->getNumCoresPerHost());
 
       // Update core and ram availabilities
-      for (auto h : chosen_hosts) {
+      for (auto const &h : chosen_hosts) {
         std::get<0>(this->core_and_ram_availabilities[h]) -= job->getNumCoresPerHost();
         std::get<1>(this->core_and_ram_availabilities[h]) -= job->getMemoryPerHost();
       }
 
       // Creates a compute service (that does not support pilot jobs!!)
       std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
-      for (auto h : chosen_hosts) {
+      for (auto const &h : chosen_hosts) {
         compute_resources.insert(std::make_tuple(h, job->getNumCoresPerHost(), job->getMemoryPerHost()));
       }
 
-      ComputeService *cs = new MultihostMulticoreComputeService(this->hostname,
+      std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(new MultihostMulticoreComputeService(this->hostname,
                                                                 true, false,
                                                                 compute_resources,
                                                                 this->property_list,
                                                                 job->getDuration(),
                                                                 job,
                                                                 "_pilot_job",
-                                                                this->default_storage_service);
-
+                                                                this->default_storage_service));
       cs->setSimulation(this->simulation);
       job->setComputeService(cs);
 
       // Start the compute service
       try {
-        cs->start(true); // Demonize
+        cs->start(cs, true);
       } catch (std::runtime_error &e) {
         throw;
       }
@@ -725,10 +719,10 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
+
       // Push my own mailbox_name onto the pilot job!
       job->pushCallbackMailbox(this->mailbox_name);
 
-      // Tell the caller that a job was dispatched!
       return true;
     }
 
@@ -758,12 +752,12 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      if (auto *msg = dynamic_cast<ServiceTTLExpiredMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceTTLExpiredMessage *>(message.get())) {
         WRENCH_INFO("My TTL has expired, terminating and perhaps notify a pilot job submitted");
         this->terminate(true);
         return false;
 
-      } else if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         this->terminate(false);
         // This is Synchronous
         try {
@@ -775,38 +769,38 @@ namespace wrench {
         }
         return false;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
         processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
         processSubmitPilotJob(msg->answer_mailbox, msg->job);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
         processPilotJobCompletion(msg->job);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
 
         processGetResourceInformation(msg->answer_mailbox);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage *>(message.get())) {
 
         processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
         return true;
 
-      } else if (auto *msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
 
         processPilotJobTerminationRequest(msg->job, msg->answer_mailbox);
         return true;
 
-      } else if (auto *msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
         processStandardJobCompletion(msg->executor, msg->job);
         return true;
 
-      } else if (auto *msg = dynamic_cast<StandardJobExecutorFailedMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<StandardJobExecutorFailedMessage *>(message.get())) {
         processStandardJobFailure(msg->executor, msg->job, msg->cause);
         return true;
 
@@ -892,10 +886,9 @@ namespace wrench {
     void MultihostMulticoreComputeService::terminateRunningStandardJob(StandardJob *job) {
 
       StandardJobExecutor *executor = nullptr;
-      for (auto it = this->standard_job_executors.begin();
-           it != this->standard_job_executors.end(); it++) {
-        if ((*it)->getJob() == job) {
-          executor = (*it).get();
+      for (const auto &standard_job_executor : this->standard_job_executors) {
+        if (standard_job_executor->getJob() == job) {
+          executor = standard_job_executor.get();
         }
       }
 
@@ -953,7 +946,7 @@ namespace wrench {
     void MultihostMulticoreComputeService::terminateRunningPilotJob(PilotJob *job) {
 
       // Get the associated compute service
-      auto *compute_service = (MultihostMulticoreComputeService *) (job->getComputeService());
+      auto compute_service = (MultihostMulticoreComputeService *) (job->getComputeService());
 
       if (compute_service == nullptr) {
         throw std::runtime_error(
@@ -967,7 +960,7 @@ namespace wrench {
       this->running_jobs.erase(job);
 
       // Update the number of available cores
-      for (auto r : compute_service->compute_resources) {
+      for (auto const &r : compute_service->compute_resources) {
         std::string hostname = std::get<0>(r);
         unsigned long num_cores = std::get<1>(r);
 
@@ -983,7 +976,7 @@ namespace wrench {
 
       for (auto workflow_job : this->running_jobs) {
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
-          StandardJob *job = (StandardJob *) workflow_job;
+          auto job = (StandardJob *) workflow_job;
           this->failRunningStandardJob(job, std::move(cause));
         }
       }
@@ -1024,8 +1017,7 @@ namespace wrench {
            it != this->standard_job_executors.end(); it++) {
         if ((*it).get() == executor) {
 
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
-
+          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
           found_it = true;
           break;
         }
@@ -1084,7 +1076,7 @@ namespace wrench {
       for (auto it = this->standard_job_executors.begin();
            it != this->standard_job_executors.end(); it++) {
         if ((*it).get() == executor) {
-          PointerUtil::moveUniquePtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
+          PointerUtil::moveSharedPtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
           found_it = true;
           break;
         }
@@ -1106,7 +1098,7 @@ namespace wrench {
       WRENCH_INFO("A standard job executor has failed to perform job %s", job->getName().c_str());
 
       // Fail the job
-      this->failPendingStandardJob(job, cause);
+      this->failPendingStandardJob(job, std::move(cause));
 
     }
 
@@ -1156,7 +1148,7 @@ namespace wrench {
       auto *cs = (MultihostMulticoreComputeService *) job->getComputeService();
 
       // Update core and ram availabilities
-      for (auto r : cs->compute_resources) {
+      for (auto const &r : cs->compute_resources) {
         std::string hostname = std::get<0>(r);
         unsigned long num_cores = job->getNumCoresPerHost();
         double ram = job->getMemoryPerHost();
@@ -1209,7 +1201,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceTerminateStandardJobAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);
@@ -1256,7 +1248,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceTerminatePilotJobAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobAnswerMessage *>(message.get())) {
         // If no success, throw an exception
         if (not msg->success) {
           throw WorkflowExecutionException(msg->failure_cause);

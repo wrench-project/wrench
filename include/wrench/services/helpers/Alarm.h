@@ -31,6 +31,10 @@ namespace wrench {
 
     public:
 
+        static std::shared_ptr<Alarm> createAndStartAlarm(double date, std::string hostname, std::string &reply_mailbox_name,
+                                                          SimulationMessage *msg, std::string suffix);
+
+    private:
         Alarm(double date, std::string hostname, std::string &reply_mailbox_name,
               SimulationMessage *msg, std::string suffix);
 
@@ -39,8 +43,6 @@ namespace wrench {
         std::unique_ptr<SimulationMessage> msg;
 
         int main() override;
-
-        void kill();
 
     };
 

@@ -19,6 +19,7 @@ namespace wrench {
     class Workflow;
     class WorkflowFile;
     class StorageService;
+    class WMS;
 
     /***********************/
     /** \cond DEVELOPER    */
@@ -27,7 +28,7 @@ namespace wrench {
     /**
      * @brief A helper daemon (co-located with a WMS) that handles data movement operations
      */
-    class DataMovementManager : public S4U_Daemon {
+    class DataMovementManager : public Service {
 
     public:
 

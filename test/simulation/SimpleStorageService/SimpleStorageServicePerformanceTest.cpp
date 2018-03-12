@@ -87,7 +87,7 @@ public:
                                                      const std::set<wrench::ComputeService *> compute_services,
                                                      const std::set<wrench::StorageService *> &storage_services,
                                                      std::string hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -98,9 +98,9 @@ private:
     int main() {
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
 
       // Time the time it takes to transfer a file from Src to Dst
@@ -170,33 +170,27 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
 
   // Create a (unused) Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("WMSHost", true, true,
                                                                {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr, {}))));
+                                                               nullptr, {})));
 
   // Create Two Storage Services
   EXPECT_NO_THROW(storage_service_1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE))));
+                  new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE)));
   EXPECT_NO_THROW(storage_service_2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("DstHost", STORAGE_SIZE))));
+                  new wrench::SimpleStorageService("DstHost", STORAGE_SIZE)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesTestWMS(
+          new SimpleStorageServiceConcurrencyFileCopiesTestWMS(
                   this, {compute_service}, {storage_service_1, storage_service_2},
-                          "WMSHost"))));
+                          "WMSHost")));
 
   wms->addWorkflow(this->workflow);
 
   // Create a file registry
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService("WMSHost"));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService("WMSHost"));
 
   // Staging all files on the Src storage service
   EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(), file_1}, {file_2->getId(), file_2}, {file_3->getId(), file_3}}, storage_service_1));

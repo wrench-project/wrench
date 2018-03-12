@@ -63,7 +63,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void setComputeService(ComputeService *cs);
+        void setComputeService(std::shared_ptr<ComputeService> cs);
 
 
         /***********************/
@@ -83,7 +83,7 @@ namespace wrench {
 
 
         State state;
-        std::unique_ptr<ComputeService> compute_service; // Associated compute service, i.e., the running pilot job
+        std::shared_ptr<ComputeService> compute_service; // Associated compute service, i.e., the running pilot job
     };
 
     /***********************/
