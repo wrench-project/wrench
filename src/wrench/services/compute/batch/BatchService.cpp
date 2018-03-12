@@ -1696,7 +1696,6 @@ namespace wrench {
                                                        resources,
                                                        this->default_storage_service
                   ));
-          cs->setSimulation(this->simulation);
           job->setComputeService(cs);
 
           try {
