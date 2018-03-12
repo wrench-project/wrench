@@ -83,7 +83,7 @@ public:
                                                                        const std::set<wrench::ComputeService *> &compute_services,
                                                                        const std::set<wrench::StorageService *> &storage_services,
                                                                        const std::string &hostname) :
-            wrench::WMS(nullptr, nullptr, compute_services, storage_services, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
@@ -95,10 +95,10 @@ private:
 
 
       // Create a data movement manager
-      std::unique_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       // Get a file registry
-      wrench::FileRegistryService *file_registry_service = this->simulation->getFileRegistryService();
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Reading
       for (auto dst_storage_service : {this->test->storage_service_1, this->test->storage_service_2}) {
@@ -196,40 +196,33 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
 
   // Create a (unused) Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
                   new wrench::MultihostMulticoreComputeService("WMSHost", true, true,
                                                                {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr, {}))));
+                                                               nullptr, {})));
 
   // Create a Local storage service with unlimited connections
   EXPECT_NO_THROW(storage_service_wms = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE))));
+                  new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE)));
 
   // Create a Storage service with unlimited connections
   EXPECT_NO_THROW(storage_service_1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("Host1", STORAGE_SIZE))));
+                  new wrench::SimpleStorageService("Host1", STORAGE_SIZE)));
 
   // Create a Storage Service limited to 3 connections
   EXPECT_NO_THROW(storage_service_2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService("Host2", STORAGE_SIZE, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}}))));
+                  new wrench::SimpleStorageService("Host2", STORAGE_SIZE, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
+          new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
                   this, {compute_service}, {storage_service_wms, storage_service_1, storage_service_2},
-                  "WMSHost"))));
+                  "WMSHost")));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService("WMSHost"));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
+  simulation->setFileRegistryService(new wrench::FileRegistryService("WMSHost"));
 
   // Staging all files on the WMS storage service
   for (int i=0; i < 10; i++) {

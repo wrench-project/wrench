@@ -56,7 +56,7 @@ namespace wrench {
       if (this->getPropertyValueAsString("MAX_NUM_CONCURRENT_DATA_CONNECTIONS") == "infinity") {
         this->num_concurrent_connections = ULONG_MAX;
       } else {
-      this->num_concurrent_connections = (unsigned long) (this->getPropertyValueAsDouble("MAX_NUM_CONCURRENT_DATA_CONNECTIONS"));
+        this->num_concurrent_connections = (unsigned long) (this->getPropertyValueAsDouble("MAX_NUM_CONCURRENT_DATA_CONNECTIONS"));
       }
       this->network_connection_manager =  std::unique_ptr<NetworkConnectionManager>(
               new NetworkConnectionManager(this->num_concurrent_connections));
@@ -80,16 +80,7 @@ namespace wrench {
             std::string suffix) :
             StorageService(std::move(hostname), "simple" + suffix, "simple" + suffix, capacity) {
 
-      // Set default properties
-      for (auto p : this->default_property_values) {
-        this->setProperty(p.first, p.second);
-      }
-
-      // Set specified properties
-      for (auto p : plist) {
-        this->setProperty(p.first, p.second);
-      }
-
+      this->setProperties(this->default_property_values, plist);
     }
 
     /**
@@ -98,7 +89,6 @@ namespace wrench {
      * @return 0 on termination
      */
     int SimpleStorageService::main() {
-
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
 
@@ -112,7 +102,6 @@ namespace wrench {
       /** Main loop **/
       bool should_add_incoming_control_connection = true;
       bool should_continue = true;
-
 
       while (should_continue) {
 
@@ -374,9 +363,9 @@ namespace wrench {
 
       // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
       if (success) {
-          this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
-             new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, mailbox_to_receive_the_file_content, "")
-          ));
+        this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
+                new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, mailbox_to_receive_the_file_content, "")
+        ));
       }
 
       return true;
@@ -540,7 +529,6 @@ namespace wrench {
             return true;
           }
         }
-
 
         return true;
       } else {

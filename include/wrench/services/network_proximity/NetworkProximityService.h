@@ -54,7 +54,7 @@ namespace wrench{
                                 std::vector<std::string> hosts_in_network,
                                 std::map<std::string, std::string> = {});
 
-        void start(bool daemonize = true);
+//        void start(std::shared_ptr<NetworkProximityService> this_service, bool daemonize = true);
 
         double query(std::pair<std::string, std::string> hosts);
 

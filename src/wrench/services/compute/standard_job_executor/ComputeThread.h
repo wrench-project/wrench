@@ -26,13 +26,13 @@ namespace wrench {
     /**
      * @brief A compute thread
      */
-    class ComputeThread : public S4U_Daemon {
+    class ComputeThread : public Service {
 
     public:
 
         ~ComputeThread();
 
-        ComputeThread(double flops, std::string reply_mailbox);
+        ComputeThread(std::string hostname, double flops, std::string reply_mailbox);
 
         int main();
 

@@ -35,7 +35,7 @@ namespace wrench {
     /**  @brief A base abstraction that knows how to execute a standard job
      *   on a multi-node multi-core platform.
      */
-    class StandardJobExecutor : public S4U_Daemon {
+    class StandardJobExecutor : public Service {
 
     public:
 
@@ -74,9 +74,9 @@ namespace wrench {
         std::map<std::string, double> ram_availabilities;
 
         // Sets of workunit executors
-        std::set<std::unique_ptr<WorkunitMulticoreExecutor>> running_workunit_executors;
-        std::set<std::unique_ptr<WorkunitMulticoreExecutor>> finished_workunit_executors;
-        std::set<std::unique_ptr<WorkunitMulticoreExecutor>> failed_workunit_executors;
+        std::set<std::shared_ptr<WorkunitMulticoreExecutor>> running_workunit_executors;
+        std::set<std::shared_ptr<WorkunitMulticoreExecutor>> finished_workunit_executors;
+        std::set<std::shared_ptr<WorkunitMulticoreExecutor>> failed_workunit_executors;
 
         // Work units
         std::set<std::unique_ptr<Workunit>> non_ready_workunits;
@@ -98,9 +98,9 @@ namespace wrench {
 
         int main();
 
-        void setProperty(std::string property, std::string value);
-        std::string getPropertyValueAsString(std::string property);
-        double getPropertyValueAsDouble(std::string property);
+//        void setProperty(std::string property, std::string value);
+//        std::string getPropertyValueAsString(std::string property);
+//        double getPropertyValueAsDouble(std::string property);
 
         void processWorkunitExecutorCompletion(WorkunitMulticoreExecutor *workunit_executor,
                                                Workunit *workunit);

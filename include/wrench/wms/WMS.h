@@ -21,13 +21,15 @@
 namespace wrench {
 
     class Simulation;
-    class JobManager;
-    class DataMovementManager;
+    class ComputeService;
+    class StorageService;
+    class NetworkProximityService;
+    class FileRegistryService;
 
     /**
      * @brief A top-level class that defines a workflow management system (WMS)
      */
-    class WMS : public S4U_Daemon {
+    class WMS : public Service {
 
     public:
         void addWorkflow(Workflow *workflow, double start_time = 0);
@@ -41,8 +43,6 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER */
         /***********************/
-
-        std::string getHostname();
 
         /***********************/
         /** \endcond           */
@@ -58,26 +58,28 @@ namespace wrench {
             std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
             const std::set<ComputeService *> &compute_services,
             const std::set<StorageService *> &storage_services,
+            const std::set<NetworkProximityService *> &network_proximity_services,
+            FileRegistryService *file_registry_service,
             const std::string &hostname,
             const std::string suffix);
 
-        void start();
-
         void checkDeferredStart();
 
-        std::unique_ptr<JobManager> createJobManager();
+        std::shared_ptr<JobManager> createJobManager();
 
-        std::unique_ptr<DataMovementManager> createDataMovementManager();
+        std::shared_ptr<DataMovementManager> createDataMovementManager();
 
         void runDynamicOptimizations();
 
         void runStaticOptimizations();
 
-        std::set<ComputeService *> getRunningComputeServices();
+        std::set<ComputeService *> getAvailableComputeServices();
+        std::set<StorageService *> getAvailableStorageServices();
+        std::set<NetworkProximityService *> getAvailableNetworkProximityServices();
+        FileRegistryService * getAvailableFileRegistryService();
 
         void waitForAndProcessNextEvent();
 
-        // workflow execution event processors
         virtual void processEventStandardJobCompletion(std::unique_ptr<WorkflowExecutionEvent>);
 
         virtual void processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent>);
@@ -102,8 +104,6 @@ namespace wrench {
         friend class DataMovementManager;
         friend class JobManager;
 
-        /** @brief The current simulation */
-        Simulation *simulation;
         /** @brief The workflow to execute */
         Workflow *workflow;
         /** @brief the WMS simulated start time */
@@ -112,6 +112,10 @@ namespace wrench {
         std::set<ComputeService *> compute_services;
         /** @brief List of available storage services */
         std::set<StorageService *> storage_services;
+        /** @brief List of available network proximity services */
+        std::set<NetworkProximityService *> network_proximity_services;
+        /** @brief The file registry service */
+        FileRegistryService * file_registry_service;
 
         /** @brief The standard job scheduler */
         std::unique_ptr<StandardJobScheduler> standard_job_scheduler = nullptr;
@@ -123,8 +127,6 @@ namespace wrench {
         /** @brief The enabled static optimizations */
         std::vector<std::unique_ptr<StaticOptimization>> static_optimizations;
 
-        void setSimulation(Simulation *simulation);
-
         /***********************/
         /** \endcond           */
         /***********************/
@@ -132,7 +134,6 @@ namespace wrench {
     private:
         virtual int main() = 0;
 
-        std::string hostname;
     };
 };
 
