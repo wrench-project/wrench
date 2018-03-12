@@ -290,7 +290,6 @@ namespace wrench {
                                std::map<std::string, std::string> service_specific_args) {
 
       if ((job == nullptr) || (compute_service == nullptr)) {
-        std::cerr << "COMPUTE_SERVICE = " << compute_service << "\n";
         throw std::invalid_argument("JobManager::submitJob(): Invalid arguments");
       }
 
