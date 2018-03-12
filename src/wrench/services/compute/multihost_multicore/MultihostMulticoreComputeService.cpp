@@ -559,6 +559,7 @@ namespace wrench {
  */
     bool MultihostMulticoreComputeService::dispatchStandardJob(StandardJob *job) {
 
+
       // Compute the required minimum number of cores
       unsigned long max_min_required_num_cores = 1;
       for (auto t : (job)->getTasks()) {
@@ -617,6 +618,7 @@ namespace wrench {
         total_ram += std::get<2>(r);
       }
 
+
       WRENCH_INFO(
               "Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2lf bytes of RAM) for a standard job",
               compute_resources.size(), total_cores, total_ram);
@@ -636,6 +638,8 @@ namespace wrench {
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM)},
                {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}}));
+
+
       executor->start(executor, true);
 
       this->standard_job_executors.insert(executor);
@@ -1443,6 +1447,7 @@ namespace wrench {
         return;
       }
 
+
       // Can we run this job assuming the whole set of resources is available?
       // Let's check for each task
       bool enough_resources = false;
@@ -1472,6 +1477,7 @@ namespace wrench {
         }
         return;
       }
+
 
       // Since we can run, add the job to the list of pending jobs
       this->pending_jobs.push_front((WorkflowJob *) job);
