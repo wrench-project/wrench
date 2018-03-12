@@ -43,6 +43,53 @@ namespace wrench {
       MessageManager::cleanUpMessages(this->mailbox_name);
     }
 
+
+    double BatchService::getQueueWaitingTimeEstimate(std::string job_id,unsigned int num_nodes, double walltime_seconds) {
+#ifdef ENABLE_BATSCHED
+      nlohmann::json batch_submission_data;
+      batch_submission_data["now"] = S4U_Simulation::getClock();
+
+      batch_submission_data["events"] = nlohmann::json::array();
+      batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
+      batch_submission_data["events"][0]["type"] = "QUERY";
+      batch_submission_data["events"][0]["data"]["requests"]["estimate_waiting_time"]["job_id"] = "unique_"+job_id;
+      batch_submission_data["events"][0]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = "unique_"+job_id;
+      batch_submission_data["events"][0]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = num_nodes;
+      batch_submission_data["events"][0]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = walltime_seconds;
+
+
+      std::string batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailboxName("batchsched_query_mailbox");
+      std::string data = batch_submission_data.dump();
+      std::unique_ptr<BatchNetworkListener> network_listener =
+              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, batchsched_query_mailbox,
+                                                                             "14000", "28000",
+                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                                             data));
+      network_listener->start(true);
+      network_listeners.push_back(std::move(network_listener));
+      this->is_bat_sched_ready = false;
+
+
+      // Get the answer
+      std::unique_ptr<SimulationMessage> message = nullptr;
+      try {
+        message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto *msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
+          return msg->estimated_waiting_time;
+      } else {
+        throw std::runtime_error(
+                "BatchService::getQueueWaitingTimeEstimate(): Received an unexpected [" + message->getName() +
+                "] message!");
+      }
+      //By default return -1
+      return -1;
+#endif
+    }
+
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
@@ -1761,7 +1808,7 @@ namespace wrench {
         }
           break;
       }
-    };
+    }
 
 
     void BatchService::processExecuteJobFromBatSched(std::string bat_sched_reply) {
