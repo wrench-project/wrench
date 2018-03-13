@@ -72,6 +72,8 @@ namespace wrench {
         //returns jobid,started time, running time
         std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
 
+        double getQueueWaitingTimeEstimate(std::string job_id,unsigned int num_nodes, double walltime_seconds);
+
         ~BatchService();
 
 
