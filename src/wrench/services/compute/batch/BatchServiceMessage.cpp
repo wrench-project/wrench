@@ -71,6 +71,18 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param batsched_job_estimated_time: the estimated time to run the job done by batsched
+     * @param payload: message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_waiting_time, double payload)
+            : BatchServiceMessage("BATCH_QUERY_ANSWER", payload) {
+      this->estimated_waiting_time = estimated_waiting_time;
+    }
+
+    /**
+     * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
      * @param job: the batch job
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim

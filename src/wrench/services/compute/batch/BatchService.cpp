@@ -42,49 +42,56 @@ namespace wrench {
     }
 
 
-    double BatchService::getQueueWaitingTimeEstimate(std::string job_id,unsigned int num_nodes, double walltime_seconds) {
+    std::map<std::string,double> BatchService::getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs) {
+//      std::string job_id,unsigned int num_nodes, double walltime_seconds
 #ifdef ENABLE_BATSCHED
       nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
 
-      batch_submission_data["events"] = nlohmann::json::array();
-      batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
-      batch_submission_data["events"][0]["type"] = "QUERY";
-      batch_submission_data["events"][0]["data"]["requests"]["estimate_waiting_time"]["job_id"] = "unique_"+job_id;
-      batch_submission_data["events"][0]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = "unique_"+job_id;
-      batch_submission_data["events"][0]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = num_nodes;
-      batch_submission_data["events"][0]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = walltime_seconds;
+      int idx = 0;
+      for (auto job : set_of_jobs) {
+        batch_submission_data["events"] = nlohmann::json::array();
+        batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
+        batch_submission_data["events"][idx]["type"] = "QUERY";
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = "unique_"+std::get<0>(job);
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = "unique_"+std::get<0>(job);
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(job);
+        batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<2>(job);
+      }
 
 
       std::string batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailboxName("batchsched_query_mailbox");
       std::string data = batch_submission_data.dump();
-      std::unique_ptr<BatchNetworkListener> network_listener =
+      std::shared_ptr<BatchNetworkListener> network_listener =
               std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, batchsched_query_mailbox,
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-      network_listener->start(true);
+      network_listener->setSimulation(this->simulation);
+      network_listener->start(network_listener,true);
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;
 
 
-      // Get the answer
-      std::unique_ptr<SimulationMessage> message = nullptr;
-      try {
-        message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+      std::map<std::string,double> jobs_estimated_waiting_time = {};
+      for (auto job : set_of_jobs) {
+        // Get the answer
+        std::unique_ptr<SimulationMessage> message = nullptr;
+        try {
+          message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          throw WorkflowExecutionException(cause);
+        }
 
-      if (auto *msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
-          return msg->estimated_waiting_time;
-      } else {
-        throw std::runtime_error(
-                "BatchService::getQueueWaitingTimeEstimate(): Received an unexpected [" + message->getName() +
-                "] message!");
+        if (auto *msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
+            jobs_estimated_waiting_time[std::get<0>(job)] = msg->estimated_waiting_time;
+        } else {
+          throw std::runtime_error(
+                  "BatchService::getQueueWaitingTimeEstimate(): Received an unexpected [" + message->getName() +
+                  "] message!");
+        }
       }
-      //By default return -1
-      return -1;
+      return jobs_estimated_waiting_time;
 #endif
     }
 
@@ -844,6 +851,7 @@ namespace wrench {
         unsigned long time_in_minutes = batch_job->getAllocatedTime();
 
         batch_submission_data["events"][i]["timestamp"] = batch_job->getAppearedTimeStamp();
+        std::cerr << "The diff between the timestamp and now is "<< S4U_Simulation::getClock() - batch_job->getAppearedTimeStamp() << "\n";
         batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
         batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
         batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
