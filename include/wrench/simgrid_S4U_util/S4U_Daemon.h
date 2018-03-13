@@ -21,6 +21,8 @@ namespace wrench {
 		/** \cond INTERNAL     */
 		/***********************/
 
+    class Simulation;
+
 		/**
 		 * @brief A generic "running daemon that listens on a mailbox" abstraction
 		 */
@@ -56,10 +58,14 @@ namespace wrench {
 				std::string getName();
 
         LifeSaver *life_saver = nullptr;
+
+        void setSimulation(Simulation *simulation);
+
     protected:
 
         void killActor();
         void joinActor();
+        Simulation *simulation;
 
 		private:
 				bool terminated;

@@ -62,8 +62,6 @@ namespace wrench {
 
         void runMulticoreComputation(double flops, double parallel_efficiency);
 
-
-        Simulation *simulation;
         std::string callback_mailbox;
         unsigned long num_cores;
         double ram_utilization;

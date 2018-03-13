@@ -84,7 +84,7 @@ namespace wrench {
     void WMS::checkDeferredStart() {
       if (S4U_Simulation::getClock() < this->start_time) {
 
-        Alarm::createAndStartAlarm(this->start_time, this->hostname, this->mailbox_name,
+        Alarm::createAndStartAlarm(this->simulation, this->start_time, this->hostname, this->mailbox_name,
                                    new AlarmWMSDeferredStartMessage(this->mailbox_name, this->start_time, 0), "wms_start");
 
         // Wait for a message
@@ -296,6 +296,7 @@ namespace wrench {
     std::shared_ptr<JobManager> WMS::createJobManager() {
       auto job_manager_raw_ptr = new JobManager(this);
       std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
+      job_manager->setSimulation(this->simulation);
       job_manager->start(job_manager, true); // Always daemonize
       return job_manager;
     }
@@ -307,6 +308,7 @@ namespace wrench {
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
       auto data_movement_manager_raw_ptr = new DataMovementManager(this);
       std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
+      data_movement_manager->setSimulation(this->simulation);
       data_movement_manager->start(data_movement_manager, true); // Always daemonize
       return data_movement_manager;
     }

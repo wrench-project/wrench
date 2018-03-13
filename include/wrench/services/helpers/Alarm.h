@@ -25,13 +25,15 @@ namespace wrench {
      * @brief A daemon that sends a message to a mailbox after some specified amount of time and then terminates
      */
 
+    class Simulation;
+
     class Alarm : public Service {
 
         friend class S4U_Daemon;
 
     public:
 
-        static std::shared_ptr<Alarm> createAndStartAlarm(double date, std::string hostname, std::string &reply_mailbox_name,
+        static std::shared_ptr<Alarm> createAndStartAlarm(Simulation *simulation, double date, std::string hostname, std::string &reply_mailbox_name,
                                                           SimulationMessage *msg, std::string suffix);
 
     private:

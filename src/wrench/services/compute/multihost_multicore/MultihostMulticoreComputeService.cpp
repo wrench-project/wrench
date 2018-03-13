@@ -363,7 +363,7 @@ namespace wrench {
         WRENCH_INFO("Will be terminating at date %lf", this->death_date);
 //        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
         SimulationMessage *msg = new ServiceTTLExpiredMessage(0);
-        this->death_alarm = Alarm::createAndStartAlarm(death_date, this->hostname, this->mailbox_name, msg, "service_string");
+        this->death_alarm = Alarm::createAndStartAlarm(this->simulation, death_date, this->hostname, this->mailbox_name, msg, "service_string");
       } else {
         this->death_date = -1.0;
         this->death_alarm = nullptr;

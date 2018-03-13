@@ -35,6 +35,7 @@ namespace wrench {
       }
 
       this->hostname = hostname;
+      this->simulation = nullptr;
       unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
       this->mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
       this->process_name = process_name_prefix + "_" + std::to_string(seq);
@@ -95,6 +96,12 @@ namespace wrench {
       // Check that there is a lifesaver
       if (not this->life_saver) {
         throw std::runtime_error("S4U_Daemon::startDaemon(): You must call createLifeSaver() before calling startDaemon()");
+      }
+
+      // Check that the simulation pointer is set
+      if (not this->simulation) {
+        std::cerr << "S4U_Daemon::startDaemon(): You must call setSimulation() before calling startDaemon() (" + this->getName() + ")\n";
+        throw std::runtime_error("S4U_Daemon::startDaemon(): You must call setSimulation() before calling startDaemon() (" + this->getName() + ")");
       }
 
       // Create the s4u_actor
@@ -182,6 +189,13 @@ namespace wrench {
         throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");
       }
       this->life_saver = new S4U_Daemon::LifeSaver(reference);
+    }
+
+    /**
+     * @brief Sets the reference to the simulation object
+     */
+    void S4U_Daemon::setSimulation(Simulation  *simulation) {
+      this->simulation = simulation;
     }
 
 };

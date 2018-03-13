@@ -30,8 +30,6 @@
 #include <zmq.h>
 #endif
 
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <signal.h>
 
 
@@ -1681,7 +1679,7 @@ namespace wrench {
           SimulationMessage *msg =
                   new AlarmJobTimeOutMessage(job, 0);
 
-          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation, batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
                                                                         "batch_standard");
           standard_job_alarms.push_back(alarm_ptr);
 
@@ -1744,7 +1742,7 @@ namespace wrench {
 
           SimulationMessage *msg =
                   new AlarmJobTimeOutMessage(job, 0);
-          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
+          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation, batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
                             "batch_pilot");
 
           this->pilot_job_alarms.push_back(alarm_ptr);
@@ -1827,7 +1825,7 @@ namespace wrench {
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
           SimulationMessage *msg =
                   new AlarmNotifyBatschedMessage(std::to_string(batch_job->getJobID()), 0);
-          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation, batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
                             "batch_alarm_notify_batsched");
           standard_job_alarms.push_back(alarm_ptr);
         } else {

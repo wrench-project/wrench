@@ -23,6 +23,8 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    class Simulation;
+
     /**
      * @brief A compute thread
      */
@@ -32,7 +34,7 @@ namespace wrench {
 
         ~ComputeThread();
 
-        ComputeThread(std::string hostname, double flops, std::string reply_mailbox);
+        ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox);
 
         int main();
 

@@ -23,23 +23,26 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param simulation: a pointer to the simulation object
      * @param hostname: the hostname on which to start the service
      * @param network_proximity_service_mailbox the mailbox of the network proximity service
      * @param message_size the size of the message to be sent between network daemons to compute proximity
      * @param measurement_period the time-difference between two message transfer to compute proximity
      * @param noise the noise to add to compute the time-difference
      */
-    NetworkProximityDaemon::NetworkProximityDaemon(std::string hostname,
+    NetworkProximityDaemon::NetworkProximityDaemon(Simulation *simulation,
+                                                   std::string hostname,
                                                    std::string network_proximity_service_mailbox,
                                                    double message_size = 1, double measurement_period = 1000,
                                                    double noise = 100) :
-            NetworkProximityDaemon(std::move(hostname), std::move(network_proximity_service_mailbox),
+            NetworkProximityDaemon(simulation, std::move(hostname), std::move(network_proximity_service_mailbox),
                                    message_size, measurement_period, noise, "") {
     }
 
 
     /**
      * @brief Constructor
+     * @param simulation: a pointer to the simulation object
      * @param hostname: the hostname on which to start the service
      * @param network_proximity_service_mailbox the mailbox of the network proximity service
      * @param message_size the size of the message to be sent between network daemons to compute proximity
@@ -49,12 +52,14 @@ namespace wrench {
      */
 
     NetworkProximityDaemon::NetworkProximityDaemon(
+            Simulation *simulation,
             std::string hostname,
             std::string network_proximity_service_mailbox,
             double message_size = 1, double measurement_period = 1000,
             double noise = 100, std::string suffix = "") :
             Service(std::move(hostname), "network_daemons" + suffix, "network_daemons" + suffix) {
 
+      this->simulation = simulation;
       this->message_size = message_size;
       this->measurement_period = measurement_period;
       this->max_noise = noise;

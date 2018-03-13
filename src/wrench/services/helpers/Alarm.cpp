@@ -69,6 +69,7 @@ namespace wrench {
 
     /**
      * @brief Creates and start an alarm service
+     * @param simulation: a pointer to the simulation object
      * @param date: the date at this the message should be sent
      * @param hostname: the name of the host on which the Alarm daemon should run
      * @param reply_mailbox_name: the mailbox to which the message should be sent
@@ -79,10 +80,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     std::shared_ptr<Alarm>
-    Alarm::createAndStartAlarm(double date, std::string hostname, std::string &reply_mailbox_name,
+    Alarm::createAndStartAlarm(Simulation *simulation, double date, std::string hostname, std::string &reply_mailbox_name,
                                SimulationMessage *msg, std::string suffix) {
       std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
               new Alarm(date, hostname, reply_mailbox_name, msg, suffix));
+      alarm_ptr->setSimulation(simulation);
       try {
         alarm_ptr->start(alarm_ptr, true); // daemonize
       } catch (std::invalid_argument &e) {

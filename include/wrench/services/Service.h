@@ -19,8 +19,6 @@
 
 namespace wrench {
 
-    class Simulation;
-
     /**
      * @brief A top-level class that defines a service
      */
@@ -60,8 +58,6 @@ namespace wrench {
 
         void setStateToDown();
 
-        void setSimulation(Simulation *simulation);
-
         /***********************/
         /** \endcond           */
         /***********************/
@@ -92,9 +88,6 @@ namespace wrench {
 
         /** @brief The service's name */
         std::string name;
-
-        /** @brief The simulation */
-        Simulation *simulation;
 
         /***********************/
         /** \endcond           */

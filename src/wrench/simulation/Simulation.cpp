@@ -152,14 +152,14 @@ namespace wrench {
 
       // Check that the simulation is correctly initialized
       try {
-        this->check_simulation_setup();
+        this->checkSimulationSetup();
       } catch (std::runtime_error &e) {
         throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
       }
 
       // Start all services (and the WMS)
       try {
-        this->start_all_processes();
+        this->startAllProcesses();
       } catch (std::runtime_error &e) {
         throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
       }
@@ -177,7 +177,7 @@ namespace wrench {
      *
      * @throw std::runtime_exception
      */
-    void Simulation::check_simulation_setup() {
+    void Simulation::checkSimulationSetup() {
 
       // Check that the simulation is initialized
       if (not this->s4u_simulation->isInitialized()) {
@@ -273,7 +273,7 @@ namespace wrench {
      *
      * @throw std::runtime_error
      */
-    void Simulation::start_all_processes() {
+    void Simulation::startAllProcesses() {
 
       try {
         // Start the WMSes
@@ -414,6 +414,7 @@ namespace wrench {
         throw std::invalid_argument("Simulation::setFileRegistryService(): invalid arguments");
       }
       this->file_registry_service = std::shared_ptr<FileRegistryService>(file_registry_service);
+      this->file_registry_service->setSimulation(this);
       return file_registry_service;
     }
 

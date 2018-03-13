@@ -35,7 +35,7 @@ namespace wrench {
     /**
      * @brief Constructor, which starts the workunit executor on the host
      *
-     * @param simulation: the simulation
+     * @param simulation: a pointer to the simulation object
      * @param hostname: the name of the host
      * @param num_cores: the number of cores available to the executor
      * @param ram_utilization: the number of bytes of RAM used by the executor
@@ -306,7 +306,7 @@ namespace wrench {
         }
         std::shared_ptr<ComputeThread> compute_thread;
         try {
-          compute_thread = std::shared_ptr<ComputeThread>(new ComputeThread(S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
+          compute_thread = std::shared_ptr<ComputeThread>(new ComputeThread(this->simulation, S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
           compute_thread->start(compute_thread, true);
         } catch (std::exception &e) {
           // Some internal SimGrid exceptions...????
