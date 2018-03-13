@@ -472,6 +472,7 @@ namespace wrench {
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
+      network_listener->setSimulation(this->simulation);
       network_listener->start(network_listener,true);
       network_listeners.push_back(std::move(network_listener));
 #endif
@@ -812,6 +813,7 @@ namespace wrench {
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
+      network_listener->setSimulation(this->simulation);
       network_listener->start(network_listener,true);
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;
@@ -1980,6 +1982,7 @@ namespace wrench {
                                                                              "14000", "28000",
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
+      network_listener->setSimulation(this->simulation);
       network_listener->start(network_listener, true);
       network_listeners.push_back(network_listener);
 

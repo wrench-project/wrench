@@ -2502,7 +2502,6 @@ void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
   EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
   simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
-
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
