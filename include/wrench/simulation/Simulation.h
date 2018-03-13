@@ -105,9 +105,9 @@ namespace wrench {
 
         std::set<std::shared_ptr<StorageService>> storage_services;
 
-        void check_simulation_setup();
+        void checkSimulationSetup();
 
-        void start_all_processes();
+        void startAllProcesses();
 
     };
 

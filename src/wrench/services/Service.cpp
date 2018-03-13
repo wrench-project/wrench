@@ -165,14 +165,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the simulation
-     * @param simulation: a simulation
-     */
-    void Service::setSimulation(Simulation *simulation) {
-      this->simulation = simulation;
-    }
-
-    /**
      * @brief Set default and user defined properties
      * @param default_property_values: list of default properties
      * @param overridden_poperty_values: list of overridden properties (override the default)

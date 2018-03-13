@@ -131,7 +131,6 @@ namespace wrench {
             supports_standard_jobs(supports_standard_jobs),
             default_storage_service(default_storage_service) {
 
-      this->simulation = nullptr; // will be filled in via Simulation::add()
       this->state = ComputeService::UP;
     }
 

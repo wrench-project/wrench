@@ -60,7 +60,6 @@ namespace wrench {
 
         friend class Simulation;
 
-        Simulation *simulation;
         std::string callback_mailbox;
         StandardJob *job;
         std::set<std::tuple<std::string, unsigned long, double>> compute_resources;

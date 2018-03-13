@@ -58,27 +58,9 @@ namespace wrench {
       validateProperties();
 
       // Seed the master_rng
-      this->master_rng.seed(this->getPropertyValueAsDouble(wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED));
+      this->master_rng.seed((unsigned int)(this->getPropertyValueAsDouble(wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED)));
 
-      // Create the network daemons
-      std::vector<std::string>::iterator it;
-      for (it = this->hosts_in_network.begin(); it != this->hosts_in_network.end(); it++) {
-        std::shared_ptr<NetworkProximityDaemon> np_daemon = std::shared_ptr<NetworkProximityDaemon>(
-                new NetworkProximityDaemon(*it, this->mailbox_name,
-                                           this->getPropertyValueAsDouble(
-                                                   NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
-                                           this->getPropertyValueAsDouble(
-                                                   NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
-                                           this->getPropertyValueAsDouble(
-                                                   NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE)));
 
-        this->network_daemons.push_back(np_daemon);
-
-        // if this network service type is 'vivaldi', setup the coordinate lookup table
-        if (boost::iequals(this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE), "vivaldi")) {
-          this->coordinate_lookup_table.insert(std::pair<std::string, std::complex<double>>(*it, (0.0)));
-        }
-      }
     }
 
     /**
@@ -199,10 +181,28 @@ namespace wrench {
 
       WRENCH_INFO("Network Proximity Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
+      // Create  and stathe network daemons
+      for (auto h : this->hosts_in_network) {
+        std::shared_ptr<NetworkProximityDaemon> np_daemon = std::shared_ptr<NetworkProximityDaemon>(
+                new NetworkProximityDaemon(this->simulation, h, this->mailbox_name,
+                                           this->getPropertyValueAsDouble(
+                                                   NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE),
+                                           this->getPropertyValueAsDouble(
+                                                   NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
+                                           this->getPropertyValueAsDouble(
+                                                   NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE)));
+        this->network_daemons.push_back(np_daemon);
+
+        // if this network service type is 'vivaldi', setup the coordinate lookup table
+        if (boost::iequals(this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE), "vivaldi")) {
+          this->coordinate_lookup_table.insert(std::pair<std::string, std::complex<double>>(h, (0.0)));
+        }
+      }
+
       // Start all network daemons
       try {
-        for (auto it = this->network_daemons.begin(); it != this->network_daemons.end(); it++) {
-          (*it)->start((*it), true); // daemonized
+        for (auto &network_daemon : this->network_daemons) {
+          network_daemon->start(network_daemon, true); // daemonized
         }
       } catch (std::runtime_error &e) {
         throw;

@@ -492,6 +492,7 @@ namespace wrench {
                                               this->getPropertyValueAsDouble(
                                                       StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD)));
 
+        workunit_executor->setSimulation(this->simulation);
         workunit_executor->start(workunit_executor, true);
 
         // Update core availabilities
