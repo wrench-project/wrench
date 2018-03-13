@@ -49,8 +49,8 @@ namespace wrench {
       batch_submission_data["now"] = S4U_Simulation::getClock();
 
       int idx = 0;
+      batch_submission_data["events"] = nlohmann::json::array();
       for (auto job : set_of_jobs) {
-        batch_submission_data["events"] = nlohmann::json::array();
         batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
         batch_submission_data["events"][idx]["type"] = "QUERY";
         batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = "unique_"+std::get<0>(job);
@@ -851,7 +851,6 @@ namespace wrench {
         unsigned long time_in_minutes = batch_job->getAllocatedTime();
 
         batch_submission_data["events"][i]["timestamp"] = batch_job->getAppearedTimeStamp();
-        std::cerr << "The diff between the timestamp and now is "<< S4U_Simulation::getClock() - batch_job->getAppearedTimeStamp() << "\n";
         batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
         batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
         batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
