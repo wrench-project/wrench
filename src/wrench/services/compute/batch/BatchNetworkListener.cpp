@@ -72,29 +72,7 @@ namespace wrench {
       WRENCH_INFO("Batch Network Listener Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
       /** Main loop **/
-      if (MY_LISTENER_TYPE == NETWORK_LISTENER_TYPE::LISTENER) {
-        while (true) {
-          this->read();
-          try {
-            S4U_Mailbox::putMessage(this->mailbox_name,
-                                    new BatchJobReplyFromSchedulerMessage(this->reply_received,
-                                                                          this->getPropertyValueAsDouble(
-                                                                                  BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD)));
-
-            //TODO::check if this message is simulation_ends message
-            //TODO::if this message is simulation_ends message, then I have to terminate
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
-          }
-        }
-      } else if (MY_LISTENER_TYPE == NETWORK_LISTENER_TYPE::SENDER) {
-        if (this->data_to_send.empty()) {
-          throw std::runtime_error(
-                  "BatchNetworkListener::BatchNetworkListener():Network sending process has no data to send"
-          );
-        }
-//        this->send();
-      } else if (MY_LISTENER_TYPE == NETWORK_LISTENER_TYPE::SENDER_RECEIVER) {
+      if (MY_LISTENER_TYPE == NETWORK_LISTENER_TYPE::SENDER_RECEIVER) {
         if (this->data_to_send.empty()) {
           throw std::runtime_error(
                   "BatchNetworkListener::BatchNetworkListener():Network sending process has no data to send"
@@ -113,18 +91,27 @@ namespace wrench {
       return 0;
     }
 
-    void BatchNetworkListener::read() {
-#ifdef ENABLE_BATSCHED
-      zmq::context_t context(1);
-      zmq::socket_t socket(context, ZMQ_REP);
 
-      socket.bind("tcp://*:" + this->self_port);
+    void BatchNetworkListener::sendExecuteMessageToBatchService(std::string answer_mailbox, std::string execute_job_reply_data) {
+      try {
+        S4U_Mailbox::putMessage(this->batch_service_mailbox,
+                                new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data,
+                                                                       this->getPropertyValueAsDouble(
+                                                                               BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+    }
 
-      //  Get the reply.
-      zmq::message_t reply;
-      socket.recv(&reply);
-      this->reply_received = std::string(static_cast<char *>(reply.data()), reply.size());
-#endif
+    void BatchNetworkListener::sendQueryAnswerMessageToBatchService(double estimated_waiting_time) {
+      try {
+        S4U_Mailbox::putMessage(this->batch_service_mailbox,
+                                new BatchQueryAnswerMessage(estimated_waiting_time,
+                                                            this->getPropertyValueAsDouble(
+                                                                    BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
     }
 
     void BatchNetworkListener::send_receive() {
@@ -152,24 +139,19 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_network_listener_mailbox");
       for (auto decisions:decision_events) {
         std::string decision_type = decisions["type"];
-        if (strcmp(decision_type.c_str(), "EXECUTE_JOB") == 0) {
-          double decision_timestamp = decisions["timestamp"];
-          double time_to_sleep = S4U_Simulation::getClock() - decision_timestamp;
-          nlohmann::json execute_json_data = decisions["data"];
-          std::string execute_job_reply_data = execute_json_data.dump();
-          if (time_to_sleep > 0) {
-            S4U_Simulation::sleep(time_to_sleep);
-          }
-          try {
-            S4U_Mailbox::putMessage(this->batch_service_mailbox,
-                                    new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data,
-                                                                           this->getPropertyValueAsDouble(
-                                                                                   BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD)));
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            throw WorkflowExecutionException(cause);
-          }
+        double decision_timestamp = decisions["timestamp"];
+        double time_to_sleep = S4U_Simulation::getClock() - decision_timestamp;
+        nlohmann::json execute_json_data = decisions["data"];
+        std::string job_reply_data = execute_json_data.dump();
+        if (time_to_sleep > 0) {
+          S4U_Simulation::sleep(time_to_sleep);
         }
-
+        if (strcmp(decision_type.c_str(), "EXECUTE_JOB") == 0) {
+          sendExecuteMessageToBatchService(answer_mailbox, job_reply_data);
+        } else if (strcmp(decision_type.c_str(), "ANSWER") == 0) {
+          double estimated_waiting_time = execute_json_data["estimate_waiting_time"]["estimated_waiting_time"];
+          sendQueryAnswerMessageToBatchService(estimated_waiting_time);
+        }
       }
 
       double decision_now = reply_decisions["now"];
@@ -187,19 +169,6 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
-#endif
-    }
-
-    void BatchNetworkListener::send() {
-#ifdef ENABLE_BATSCHED
-      zmq::context_t context(1);
-      zmq::socket_t socket(context, ZMQ_REQ);
-
-      socket.connect("tcp://localhost:" + this->sched_port);
-      std::string data = this->data_to_send;
-      zmq::message_t request(strlen(data.c_str()));
-      memcpy(request.data(), data.c_str(), strlen(data.c_str()));
-      socket.send(request);
 #endif
     }
 
