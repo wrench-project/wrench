@@ -404,7 +404,7 @@ namespace wrench {
 
       std::complex<double> sender_coordinates, peer_coordinates;
 
-      std::map<std::string, std::complex<double>>::iterator search = this->coordinate_lookup_table.find(
+      auto search = this->coordinate_lookup_table.find(
               sender_hostname);
       if (search != this->coordinate_lookup_table.end()) {
         sender_coordinates = search->second;
