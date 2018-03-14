@@ -12,6 +12,7 @@
 #define WRENCH_FILEREGISTRYSERVICE_H
 
 #include <set>
+#include <wrench/services/network_proximity/NetworkProximityService.h>
 
 #include "wrench/services/Service.h"
 #include "FileRegistryServiceProperty.h"
@@ -57,6 +58,9 @@ namespace wrench {
 
         std::set<StorageService *> lookupEntry(WorkflowFile *file);
 
+        std::map<double, StorageService *> lookupEntry(WorkflowFile *file, std::string reference_host,
+                                                       NetworkProximityService *);
+
         void addEntry(WorkflowFile *file, StorageService *storage_service);
 
         void removeEntry(WorkflowFile *file, StorageService *storage_service);
@@ -69,6 +73,7 @@ namespace wrench {
         /****************************/
         /** \cond INTERNAL          */
         /****************************/
+
         ~FileRegistryService();
         /****************************/
         /** \endcond                */
@@ -77,7 +82,6 @@ namespace wrench {
     private:
 
         friend class Simulation;
-
 
         FileRegistryService(std::string hostname,
                             std::map<std::string, std::string> plist,

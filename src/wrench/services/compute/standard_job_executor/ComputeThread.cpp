@@ -26,16 +26,16 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param simulation: a pointer to the simulation object
+     * @param hostname: the host on which the compute thread should run
      * @param flops: the number of flops to perform
+     * @param reply_mailbox: the mailbox to which the "done/failed" message should be sent
      */
-    ComputeThread::ComputeThread(double flops, std::string reply_mailbox) :
-            S4U_Daemon("compute_thread_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber())) {
+    ComputeThread::ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox) :
+            Service(hostname, "compute_thread", "compute_thread") {
+      this->simulation = simulation;
       this->flops = flops;
       this->reply_mailbox = reply_mailbox;
-
-      // Start my daemon on the host
-      this->hostname = S4U_Simulation::getHostName();
-      this->start_daemon(this->hostname, false);
     }
 
     int ComputeThread::main() {
@@ -64,23 +64,21 @@ namespace wrench {
      */
     void ComputeThread::kill() {
       try {
-        this->kill_actor();
+        this->killActor();
       } catch (std::shared_ptr<FatalFailure> &e) {
         WRENCH_INFO("Failed to kill a compute thread.. .perhaps it's already dead... nevermind");
       }
     }
-
 
     /**
     * join()
     */
     void ComputeThread::join() {
       try {
-        this->join_actor();
+        this->joinActor();
       } catch (std::shared_ptr<FatalFailure> &e) {
         throw;
       }
     }
-
 
 };

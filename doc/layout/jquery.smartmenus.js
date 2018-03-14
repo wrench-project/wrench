@@ -895,7 +895,7 @@
 					// neglect event if we touched a visible deeper level sub menu
 					if (this.getClosestMenu(touchPoint.target) == $sub[0]) {
 						var data = $sub.dataSM('scroll');
-						if (/(start_daemon|down)$/i.test(e.type)) {
+						if (/(startDaemon|down)$/i.test(e.type)) {
 							if (this.menuScrollStop($sub)) {
 								// if we were scrolling, just stop and don't activate any link on the first touch
 								e.preventDefault();

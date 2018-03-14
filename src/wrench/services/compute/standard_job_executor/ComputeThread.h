@@ -23,16 +23,18 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    class Simulation;
+
     /**
      * @brief A compute thread
      */
-    class ComputeThread : public S4U_Daemon {
+    class ComputeThread : public Service {
 
     public:
 
         ~ComputeThread();
 
-        ComputeThread(double flops, std::string reply_mailbox);
+        ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox);
 
         int main();
 

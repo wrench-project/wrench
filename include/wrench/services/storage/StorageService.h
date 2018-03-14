@@ -83,6 +83,7 @@ namespace wrench {
     protected:
 
         friend class Simulation;
+        friend class FileRegistryService;
 
         void stageFile(WorkflowFile *);
 

@@ -21,10 +21,18 @@ namespace wrench {
 		/** \cond INTERNAL     */
 		/***********************/
 
+    class Simulation;
+
 		/**
 		 * @brief A generic "running daemon that listens on a mailbox" abstraction
 		 */
 		class S4U_Daemon {
+
+        class LifeSaver {
+        public:
+            explicit LifeSaver(std::shared_ptr<S4U_Daemon> &reference) : reference(reference) {}
+            std::shared_ptr<S4U_Daemon> reference;
+        };
 
 		public:
 				/** @brief The name of the daemon */
@@ -34,12 +42,14 @@ namespace wrench {
 				/** @brief The name of the host on which the daemon is running */
 				std::string hostname;
 
-				S4U_Daemon(std::string process_name_prefix, std::string mailbox_prefix);
-				S4U_Daemon(std::string process_name_prefix);
+				S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix);
+				S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
 				virtual ~S4U_Daemon();
 
-				void start_daemon(std::string hostname, bool daemonized = false);
+				void startDaemon(bool daemonized);
+
+        void createLifeSaver(std::shared_ptr<S4U_Daemon> reference);
 
 				virtual void cleanup();
 
@@ -47,14 +57,19 @@ namespace wrench {
         void setTerminated();
 				std::string getName();
 
-		protected:
-				void kill_actor();
-				void join_actor();
+        LifeSaver *life_saver = nullptr;
+
+        void setSimulation(Simulation *simulation);
+
+    protected:
+
+        void killActor();
+        void joinActor();
+        Simulation *simulation;
 
 		private:
 				bool terminated;
 				simgrid::s4u::ActorPtr s4u_actor;
-
 
 		};
 
