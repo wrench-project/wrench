@@ -2551,7 +2551,7 @@ private:
       {
 
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0);
         task->addInputFile(this->workflow->getFileById("input_file"));
         task->addOutputFile(this->workflow->getFileById("output_file"));
 
@@ -2574,7 +2574,7 @@ private:
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "4";
         batch_job_args["-t"] = "5"; //time in minutes
-        batch_job_args["-c"] = "4"; //number of cores per node
+        batch_job_args["-c"] = "1"; //number of cores per node
         try {
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
@@ -2659,7 +2659,7 @@ private:
         for (int i=0; i<10; i++) {
           std::string job_id = "new_job"+std::to_string(i);
           unsigned int nodes = rand() % 4 + 1;
-          double walltime_seconds = nodes * (rand() % 1000 + 1);
+          double walltime_seconds = nodes * (rand() % 10 + 1);
           std::tuple<std::string, unsigned int, double> my_job = {job_id, nodes, walltime_seconds};
           set_of_jobs.insert(my_job);
         }
