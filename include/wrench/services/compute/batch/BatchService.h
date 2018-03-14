@@ -92,10 +92,10 @@ namespace wrench {
         unsigned long random_interval = 10;
 
         //create alarms for standard jobs
-        std::vector<std::shared_ptr<Alarm>> standard_job_alarms;
+        std::map<std::string,std::shared_ptr<Alarm>> standard_job_alarms;
 
         //alarms for pilot jobs (only one pilot job alarm)
-        std::vector<std::shared_ptr<Alarm>> pilot_job_alarms;
+        std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
 
         //vector of network listeners
         std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;

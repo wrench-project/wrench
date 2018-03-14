@@ -36,6 +36,8 @@ namespace wrench {
         static std::shared_ptr<Alarm> createAndStartAlarm(Simulation *simulation, double date, std::string hostname, std::string &reply_mailbox_name,
                                                           SimulationMessage *msg, std::string suffix);
 
+        void kill();
+
     private:
         Alarm(double date, std::string hostname, std::string &reply_mailbox_name,
               SimulationMessage *msg, std::string suffix);
