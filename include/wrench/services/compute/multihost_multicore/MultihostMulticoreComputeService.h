@@ -141,14 +141,14 @@ namespace wrench {
         double ttl;
         bool has_ttl;
         double death_date;
-        Alarm *death_alarm = nullptr;
+        std::shared_ptr<Alarm> death_alarm = nullptr;
 
         PilotJob *containing_pilot_job; // In case this service is in fact a pilot job
 
         // Set of current standard job executors
-        std::set<std::unique_ptr<StandardJobExecutor>> standard_job_executors;
+        std::set<std::shared_ptr<StandardJobExecutor>> standard_job_executors;
         // Set of completed standard job executors
-        std::set<std::unique_ptr<StandardJobExecutor>> completed_job_executors;
+        std::set<std::shared_ptr<StandardJobExecutor>> completed_job_executors;
 
         // Set of running jobs
         std::set<WorkflowJob *> running_jobs;

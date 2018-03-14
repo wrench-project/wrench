@@ -30,8 +30,7 @@ namespace wrench {
      * @param mailbox_name_prefix: the prefix for the mailbox name
      */
     Service::Service(std::string hostname, std::string process_name_prefix, std::string mailbox_name_prefix) :
-            S4U_Daemon(process_name_prefix, mailbox_name_prefix) {
-      this->hostname = hostname;
+            S4U_Daemon(hostname, process_name_prefix, mailbox_name_prefix) {
       this->name = process_name_prefix;
     }
 
@@ -82,16 +81,17 @@ namespace wrench {
 
     /**
      * @brief Start the service
+     * @param this_service: a shared pointer to this service object
      * @param daemonize: true if the daemon is to be truly daemonized, false otherwise
      * 
      * @throw std::runtime_error
      */
-    void Service::start(bool daemonize) {
+    void Service::start(std::shared_ptr<Service> this_service, bool daemonize) {
       try {
-        this->start_daemon(this->hostname, daemonize);
         this->state = Service::UP;
+        this->createLifeSaver(this_service);
+        this->startDaemon(daemonize);
       } catch (std::invalid_argument &e) {
-        XBT_INFO("THROWING!! %s", e.what());
         throw std::runtime_error("Service::start(): " + std::string(e.what()));
       }
     }
@@ -123,7 +123,6 @@ namespace wrench {
       }
 
       // Wait for the ack
-//      WRENCH_INFO("Waiting for the 'I am dead' ack from the daemon");
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
@@ -132,7 +131,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (ServiceDaemonStoppedMessage *msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
         this->state = Service::DOWN;
       } else {
         throw std::runtime_error("Service::stop(): Unexpected [" + message->getName() + "] message");
@@ -166,27 +165,19 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the simulation
-     * @param simulation: a simulation
-     */
-    void Service::setSimulation(Simulation *simulation) {
-      this->simulation = simulation;
-    }
-
-    /**
      * @brief Set default and user defined properties
      * @param default_property_values: list of default properties
-     * @param plist: user defined list of properties
+     * @param overridden_poperty_values: list of overridden properties (override the default)
      */
     void Service::setProperties(std::map<std::string, std::string> default_property_values,
-                                std::map<std::string, std::string> plist) {
+                                std::map<std::string, std::string> overridden_poperty_values) {
       // Set default properties
-      for (auto p : default_property_values) {
+      for (auto const &p : default_property_values) {
         this->setProperty(p.first, p.second);
       }
 
-      // Set specified properties
-      for (auto p : plist) {
+      // Set specified properties (possible overwriting default ones)
+      for (auto const &p : overridden_poperty_values) {
         this->setProperty(p.first, p.second);
       }
     }

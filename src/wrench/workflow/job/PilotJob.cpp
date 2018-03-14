@@ -54,8 +54,8 @@ namespace wrench {
      *        (this class will take case of memory deallocation)
      * @param cs: a compute service
      */
-    void PilotJob::setComputeService(ComputeService *cs) {
-      this->compute_service = std::unique_ptr<ComputeService>(cs);
+    void PilotJob::setComputeService(std::shared_ptr<ComputeService> cs) {
+      this->compute_service = cs;
     }
 
     /**

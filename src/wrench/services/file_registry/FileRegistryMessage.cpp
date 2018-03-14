@@ -56,7 +56,48 @@ namespace wrench {
       this->locations = locations;
     }
 
+    /**
+     * @brief FileRegistryFileLookupByProximityRequestMessage class
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param file: the file to look up
+     * @param reference_host: the host from which network proximity will be calculated from // TODO: put explanation here or leave in header file??
+     * @param network_proximity_service: a reference to the network proximity service to be used
+     * @param payload: the message size in bytes
+     */
+    FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(
+            std::string answer_mailbox, WorkflowFile *file, std::string reference_host,
+           NetworkProximityService *network_proximity_service, double payload) :
+    FileRegistryMessage("FILE_LOOKUP_BY_PROXIMITY_REQUEST", payload) {
+        if (file == nullptr) {
+            throw std::invalid_argument("FileRegistryFileLookupByProximityRequestMessage::FileRegistryFileLookupByProximityRequestMessage(): Invalid Argument");
+        }
+        this->answer_mailbox = answer_mailbox;
+        this->file = file;
+        this->reference_host = reference_host;
+        this->network_proximity_service = network_proximity_service;
+    }
 
+    /**
+     * @brief FileRegistryFileLookupByProximityRequestMessage class
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param file: the file to look up
+     * @param reference_host: the host from which network proximity will be calculated from // 
+     * @param locations: the map of locations at which the file resides in ascending order with respect to their distance (network proximity) from 'reference_host'
+     * @param payload: the message size in bytes
+     */
+    FileRegistryFileLookupByProximityAnswerMessage::FileRegistryFileLookupByProximityAnswerMessage(
+            WorkflowFile *file, std::string reference_host,
+            std::map<double, StorageService *> locations,
+            double payload) :
+            FileRegistryMessage("FILE_LOOKUP_BY_PROXIMITY_ANSWER", payload) {
+        if (file == nullptr) {
+            throw std::invalid_argument(
+                    "FileRegistryFileLookupByProximityAnswertMessage::FileRegistryFileLookupByProximityAnswerMessage(): Invalid Argument");
+        }
+        this->file = file;
+        this->reference_host = reference_host;
+        this->locations = locations;
+    }
     /**
      * @brief FileRegistryRemoveEntryRequestMessage class
      * @param answer_mailbox: the mailbox to which the answer message should be sent

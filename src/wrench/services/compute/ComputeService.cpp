@@ -27,10 +27,8 @@ namespace wrench {
      *        method of derived classes
      */
     void ComputeService::stop() {
-
       // Call the super class's method
       Service::stop();
-
     }
 
 
@@ -133,7 +131,6 @@ namespace wrench {
             supports_standard_jobs(supports_standard_jobs),
             default_storage_service(default_storage_service) {
 
-      this->simulation = nullptr; // will be filled in via Simulation::add()
       this->state = ComputeService::UP;
     }
 
@@ -417,7 +414,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto *msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ComputeServiceResourceInformationAnswerMessage *>(message.get())) {
         return msg->info;
 
       } else {
