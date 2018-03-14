@@ -93,4 +93,8 @@ namespace wrench {
       return alarm_ptr;
     }
 
+    void Alarm::kill() {
+      this->killActor();
+    }
+
 };
