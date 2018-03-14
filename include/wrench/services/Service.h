@@ -19,8 +19,6 @@
 
 namespace wrench {
 
-    class Simulation;
-
     /**
      * @brief A top-level class that defines a service
      */
@@ -38,7 +36,7 @@ namespace wrench {
             DOWN,
         };
 
-        virtual void start(bool daemonize = false);
+        void start(std::shared_ptr<Service> this_service, bool daemonize = false);
 
         virtual void stop();
 
@@ -60,8 +58,6 @@ namespace wrench {
 
         void setStateToDown();
 
-        void setSimulation(Simulation *simulation);
-
         /***********************/
         /** \endcond           */
         /***********************/
@@ -80,7 +76,7 @@ namespace wrench {
         void setProperty(std::string, std::string);
 
         void setProperties(std::map<std::string, std::string> default_property_values,
-                           std::map<std::string, std::string> plist);
+                           std::map<std::string, std::string> overriden_poperty_values);
 
         void serviceSanityCheck();
 
@@ -92,12 +88,6 @@ namespace wrench {
 
         /** @brief The service's name */
         std::string name;
-
-        /** @brief The name of the host that runs the service */
-        std::string hostname;
-
-        /** @brief The simulation */
-        Simulation *simulation;
 
         /***********************/
         /** \endcond           */

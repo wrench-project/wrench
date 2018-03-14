@@ -16,7 +16,6 @@
 #include <xbt/ex.hpp>
 
 
-
 XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon, "Log category for S4U_Daemon");
 
 
@@ -25,10 +24,18 @@ namespace wrench {
     /**
      * @brief Constructor (daemon with a mailbox)
      *
+     * @param hostname: the name of the host on which the daemon will run
      * @param process_name_prefix: the prefix of the name of the simulated process/actor
      * @param mailbox_prefix: the prefix of the mailbox (to which a unique integer is appended)
      */
-    S4U_Daemon::S4U_Daemon(std::string process_name_prefix, std::string mailbox_prefix) {
+    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix) {
+
+      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
+        throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
+      }
+
+      this->hostname = hostname;
+      this->simulation = nullptr;
       unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
       this->mailbox_name = mailbox_prefix + "_" + std::to_string(seq);
       this->process_name = process_name_prefix + "_" + std::to_string(seq);
@@ -40,24 +47,39 @@ namespace wrench {
      *
      * @param process_name: the prefix of the name of the simulated process/actor
      */
-    S4U_Daemon::S4U_Daemon(std::string process_name_prefix) {
+    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
+      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
+        throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
+      }
+
+      this->hostname = hostname;
       this->process_name = process_name_prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
       this->mailbox_name="";
       this->terminated = false;
     }
 
     S4U_Daemon::~S4U_Daemon() {
-//        WRENCH_INFO("In the Daemon Destructor");
+//      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
+    }
+
+    void S4U_Daemon::cleanup(){
+      WRENCH_INFO("Cleaning Up");
     }
 
 
     /**
      * \cond
      */
-    static int daemon_goodbye(void *x, void *y) {
+    static int daemon_goodbye(void *x, void* service_instance) {
       WRENCH_INFO("Terminating");
+      if (service_instance) {
+        auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
+        service->cleanup();
+        delete service->life_saver;
+      }
       return 0;
     }
+
 
     /**
      * \endcond
@@ -69,12 +91,17 @@ namespace wrench {
      * @param hostname: the name of the host on which to start the daemon
      * @param daemonized: whether the S4U actor should be daemonized (untstart_ested)
      */
-    void S4U_Daemon::start_daemon(std::string hostname, bool daemonized) {
+    void S4U_Daemon::startDaemon(bool daemonized) {
 
-      // Check that the host exists, and if not throw an exceptions
-      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
-        WRENCH_INFO("THROWING IN S$UDAEMON: '%s'", hostname.c_str());
-        throw std::invalid_argument("S4U_DaemonWithMailbox::start_daemon(): Unknown host name '" + hostname + "'");
+      // Check that there is a lifesaver
+      if (not this->life_saver) {
+        throw std::runtime_error("S4U_Daemon::startDaemon(): You must call createLifeSaver() before calling startDaemon()");
+      }
+
+      // Check that the simulation pointer is set
+      if (not this->simulation) {
+        std::cerr << "S4U_Daemon::startDaemon(): You must call setSimulation() before calling startDaemon() (" + this->getName() + ")\n";
+        throw std::runtime_error("S4U_Daemon::startDaemon(): You must call setSimulation() before calling startDaemon() (" + this->getName() + ")");
       }
 
       // Create the s4u_actor
@@ -87,24 +114,20 @@ namespace wrench {
         std::abort();
       }
 
-      // TODO: This wasn't working right last time Henri checked... but it's likely no big deal
-      if (daemonized)
+      if (daemonized) {
         this->s4u_actor->daemonize();
-
-      this->s4u_actor->onExit(daemon_goodbye, (void *) (this->process_name.c_str()));
-
+      }
+      this->s4u_actor->onExit(daemon_goodbye, (void *) (this));
 
       // Set the mailbox_name receiver
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
       mailbox->setReceiver(this->s4u_actor);
-
-      this->hostname = hostname;
     }
 
     /**
      * @brief Kill the daemon/actor.
      */
-    void S4U_Daemon::kill_actor() {
+    void S4U_Daemon::killActor() {
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         try {
           // Sleeping a tiny bit to avoid the following behavior:
@@ -129,19 +152,17 @@ namespace wrench {
     /**
      * @brief Kill the daemon/actor.
      */
-    void S4U_Daemon::join_actor() {
+    void S4U_Daemon::joinActor() {
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         try {
           this->s4u_actor->join();
         } catch (xbt_ex &e) {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
-        } catch (std::exception &e)
-        {
+        } catch (std::exception &e) {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
         }
       }
     }
-
 
     /**
      * @brief Set the terminated status of the daemon/actor
@@ -157,6 +178,24 @@ namespace wrench {
      */
     std::string S4U_Daemon::getName() {
       return this->process_name;
+    }
+
+    /**
+     * @brief creates a life saver for the daemon
+     * @param reference
+     */
+    void S4U_Daemon::createLifeSaver(std::shared_ptr<S4U_Daemon> reference) {
+      if (this->life_saver) {
+        throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");
+      }
+      this->life_saver = new S4U_Daemon::LifeSaver(reference);
+    }
+
+    /**
+     * @brief Sets the reference to the simulation object
+     */
+    void S4U_Daemon::setSimulation(Simulation  *simulation) {
+      this->simulation = simulation;
     }
 
 };

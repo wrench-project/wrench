@@ -39,14 +39,12 @@ namespace wrench {
         std::string reply_received;
         std::string batch_service_mailbox;
 
-
-
         NETWORK_LISTENER_TYPE MY_LISTENER_TYPE;
 
-
-        void read();
-        void send();
         void send_receive();
+
+        void sendExecuteMessageToBatchService(std::string answer_mailbox, std::string execute_job_reply_data);
+        void sendQueryAnswerMessageToBatchService(double estimated_waiting_time);
     };
 }
 

@@ -99,6 +99,17 @@ namespace wrench{
     };
 
     /**
+     * @brief BatchQueryAnswerMessage class
+     */
+    class BatchQueryAnswerMessage : public BatchServiceMessage {
+    public:
+        BatchQueryAnswerMessage(double batsched_job_estimated_time, double payload);
+
+        /** @brief The estimated time to run the job done by batsched */
+        double estimated_waiting_time;
+    };
+
+    /**
      * @brief BatchFakeReplyMessage class
      */
     class BatchFakeJobSubmissionReplyMessage : public BatchServiceMessage {

@@ -50,22 +50,7 @@ namespace wrench {
             std::string suffix) :
             Service(hostname, "file_registry" + suffix, "file_registry" + suffix) {
 
-      // Set default properties
-      for (auto p : this->default_property_values) {
-        this->setProperty(p.first, p.second);
-      }
-
-      // Set specified properties
-      for (auto p : plist) {
-        this->setProperty(p.first, p.second);
-      }
-
-//      // Start the daemon on the same host
-//      try {
-//        this->start_daemon(hostname);
-//      } catch (std::invalid_argument e) {
-//        throw e;
-//      }
+      this->setProperties(this->default_property_values, plist);
     }
 
 
@@ -106,7 +91,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (FileRegistryFileLookupAnswerMessage *msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
         std::set<StorageService *> result = msg->locations;
 //        msg->locations.clear(); // TODO: Understand why this removes a memory leak
         return result;
@@ -198,7 +183,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (FileRegistryAddEntryAnswerMessage *msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
         return;
       } else {
         std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -238,7 +223,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (FileRegistryRemoveEntryAnswerMessage *msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
         if (!msg->success) {
           WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service",
                       file->getId().c_str(), storage_service->getName().c_str());
@@ -293,7 +278,7 @@ namespace wrench {
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
-      if (ServiceStopDaemonMessage *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -304,7 +289,7 @@ namespace wrench {
         }
         return false;
 
-      } else if (FileRegistryFileLookupRequestMessage *msg = dynamic_cast<FileRegistryFileLookupRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<FileRegistryFileLookupRequestMessage *>(message.get())) {
         std::set<StorageService *> locations;
         if (this->entries.find(msg->file) != this->entries.end()) {
           locations = this->entries[msg->file];
@@ -348,7 +333,7 @@ namespace wrench {
         }
         return true;
 
-      } else if (FileRegistryAddEntryRequestMessage *msg = dynamic_cast<FileRegistryAddEntryRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<FileRegistryAddEntryRequestMessage *>(message.get())) {
         addEntryToDatabase(msg->file, msg->storage_service);
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
@@ -359,7 +344,7 @@ namespace wrench {
         }
         return true;
 
-      } else if (FileRegistryRemoveEntryRequestMessage *msg = dynamic_cast<FileRegistryRemoveEntryRequestMessage *>(message.get())) {
+      } else if (auto msg = dynamic_cast<FileRegistryRemoveEntryRequestMessage *>(message.get())) {
 
         bool success = removeEntryFromDatabase(msg->file, msg->storage_service);
         try {

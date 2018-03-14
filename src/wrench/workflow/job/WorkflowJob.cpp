@@ -81,7 +81,7 @@ namespace wrench {
      * @return the next callback mailbox
      */
     std::string WorkflowJob::getCallbackMailbox() {
-      if (this->callback_mailbox_stack.size() == 0) {
+      if (this->callback_mailbox_stack.empty()) {
         return this->workflow->getCallbackMailbox();
       }
       return this->callback_mailbox_stack.top();
@@ -105,7 +105,7 @@ namespace wrench {
      * @return the next callback mailbox
      */
     std::string WorkflowJob::popCallbackMailbox() {
-      if (this->callback_mailbox_stack.size() == 0) {
+      if (this->callback_mailbox_stack.empty()) {
         return this->workflow->getCallbackMailbox();
       }
       std::string mailbox = this->callback_mailbox_stack.top();

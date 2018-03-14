@@ -15,7 +15,6 @@
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "wrench/services/compute/batch/BatchJob.h"
 #include "wrench/services/compute/batch/BatchNetworkListener.h"
-#include "wrench/services/compute/batch/BatchRequestReplyProcess.h"
 #include "wrench/services/compute/batch/BatchServiceProperty.h"
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
@@ -73,6 +72,8 @@ namespace wrench {
         //returns jobid,started time, running time
         std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
 
+        std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>>);
+
         ~BatchService();
 
 
@@ -90,14 +91,14 @@ namespace wrench {
         //Configuration to create randomness in measurement period initially
         unsigned long random_interval = 10;
 
-        //create alarms for standardjobs
-        std::vector<std::unique_ptr<Alarm>> standard_job_alarms;
+        //create alarms for standard jobs
+        std::map<std::string,std::shared_ptr<Alarm>> standard_job_alarms;
 
         //alarms for pilot jobs (only one pilot job alarm)
-        std::vector<std::unique_ptr<Alarm>> pilot_job_alarms;
+        std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
 
         //vector of network listeners
-        std::vector<std::unique_ptr<BatchNetworkListener>> network_listeners;
+        std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
 
         /* Resources information in Batchservice */
         unsigned long total_num_of_nodes;
@@ -108,10 +109,10 @@ namespace wrench {
         /*End Resources information in Batchservice */
 
         // Vector of standard job executors
-        std::set<std::unique_ptr<StandardJobExecutor>> running_standard_job_executors;
+        std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
 
         // Vector of standard job executors
-        std::set<std::unique_ptr<StandardJobExecutor>> finished_standard_job_executors;
+        std::set<std::shared_ptr<StandardJobExecutor>> finished_standard_job_executors;
 
         //Queue of pending batch jobs
         std::deque<std::unique_ptr<BatchJob>> pending_jobs;
@@ -129,7 +130,7 @@ namespace wrench {
                                                        "energy_bf_monitoring",
                                                        "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
                                                        "filler", "killer", "killer2", "rejecter", "sleeper",
-                                                       "submitter"
+                                                       "submitter", "waiting_time_estimator"
         };
 
         //Batch queue ordering options
@@ -196,7 +197,7 @@ namespace wrench {
         BatchJob *scheduleJob(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
-        void terminate();
+        void cleanup() override;
 
         //Fail the standard jobs inside the pilot jobs
         void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
