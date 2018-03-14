@@ -10,6 +10,7 @@
 
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
+#include <algorithm>
 
 #include "../include/TestWithFork.h"
 
@@ -18,9 +19,11 @@ class FileRegistryTest : public ::testing::Test {
 public:
     wrench::StorageService *storage_service1 = nullptr;
     wrench::StorageService *storage_service2 = nullptr;
+    wrench::StorageService *storage_service3 = nullptr;
     wrench::ComputeService *compute_service = nullptr;
 
     void do_FileRegistry_Test();
+    void do_lookupEntry_Test();
 
 protected:
     FileRegistryTest() {
@@ -39,7 +42,7 @@ protected:
               "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
               "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
               "       <link id=\"2\" bandwidth=\"1000GBps\" latency=\"1000us\"/>"
-              "       <link id=\"3\" bandwidth=\"2000GBps\" latency=\"0us\"/>"
+              "       <link id=\"3\" bandwidth=\"2000GBps\" latency=\"1500us\"/>"
               "       <link id=\"4\" bandwidth=\"3000GBps\" latency=\"0us\"/>"
               "       <link id=\"5\" bandwidth=\"8000GBps\" latency=\"0us\"/>"
               "       <link id=\"6\" bandwidth=\"2900GBps\" latency=\"0us\"/>"
@@ -70,7 +73,7 @@ protected:
 };
 
 /**********************************************************************/
-/**  SIMPLE PROXIMITY TEST                                            **/
+/**  SIMPLE FILE REGISTRY TEST                                       **/
 /**********************************************************************/
 
 class FileRegistryTestWMS : public wrench::WMS {
@@ -258,4 +261,133 @@ void FileRegistryTest::do_FileRegistry_Test() {
   free(argv[0]);
   free(argv);
 }
+/**********************************************************************/
+/**   LOOKUP ENTRY BY PROXIMITY TEST                                 **/
+/**********************************************************************/
 
+class FileRegistryLookupEntryTestWMS : public wrench::WMS {
+
+public:
+    FileRegistryLookupEntryTestWMS(FileRegistryTest *test,
+                        const std::set<wrench::ComputeService *> &compute_services,
+                        const std::set<wrench::StorageService *> &storage_services,
+                        std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    FileRegistryTest *test;
+
+    int main() {
+
+      wrench::WorkflowFile *file1 = workflow->addFile("file1", 100.0);
+      wrench::WorkflowFile * nullptr_file = nullptr;
+      wrench::FileRegistryService *frs = simulation->getFileRegistryService();
+      wrench::NetworkProximityService *nps = *(simulation->getRunningNetworkProximityServices().begin());
+
+      frs->addEntry(file1, this->test->storage_service1);
+      frs->addEntry(file1, this->test->storage_service2);
+      frs->addEntry(file1, this->test->storage_service3);
+
+      wrench::S4U_Simulation::sleep(100.0);
+
+      std::vector<std::string> file1_expected_locations = {"Host4", "Host1", "Host2"};
+      std::vector<std::string> file1_locations;
+        std::map<double, wrench::StorageService *> file1_locations_by_proximity;
+
+      EXPECT_THROW(frs->lookupEntry(nullptr_file, "Host3", nps), std::invalid_argument);
+
+      EXPECT_NO_THROW(file1_locations_by_proximity = frs->lookupEntry(file1, "Host3", nps));
+
+      for (auto &storage_service : file1_locations_by_proximity) {
+        file1_locations.push_back(storage_service.second->getHostname());
+      }
+
+      bool is_equal = std::equal(file1_expected_locations.begin(), file1_expected_locations.end(),
+      file1_locations.begin());
+
+      if (!is_equal) {
+        throw std::runtime_error("lookupEntry using NetworkProximityService did not return Storage Services in ascending order of Network Proximity");
+      }
+
+      auto last_location = file1_locations_by_proximity.rbegin();
+      if (last_location->second->getHostname() != "Host2") {
+        throw std::runtime_error(
+                "lookupEntry using NetworkProximityService did not return the correct unmonitored Storage Service");
+      } else if (last_location->first != DBL_MAX) {
+        throw std::runtime_error(
+                "lookupEntry using NetworkProximityService did not include the unmonitored Storage Service");
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(FileRegistryTest, LookupEntry) {
+  DO_TEST_WITH_FORK(do_lookupEntry_Test);
+}
+
+void FileRegistryTest::do_lookupEntry_Test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("file_registry_lookup_entry_test");
+
+  simulation->init(&argc, argv);
+
+  simulation->instantiatePlatform(platform_file_path);
+
+  std::string host1 = simulation->getHostnameList()[0];
+  std::string host2 = simulation->getHostnameList()[1];
+  std::string host3 = simulation->getHostnameList()[2];
+  std::string host4 = simulation->getHostnameList()[3];
+
+  std::unique_ptr<wrench::NetworkProximityService> network_proximity_service(new wrench::NetworkProximityService(host1, {host1, host3, host4}));
+
+  simulation->add(std::move(network_proximity_service));
+
+  compute_service = simulation->add(
+          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+                  new wrench::MultihostMulticoreComputeService(host1, true, true,
+                                                               {std::make_tuple(host1,
+                                                                                wrench::ComputeService::ALL_CORES,
+                                                                                wrench::ComputeService::ALL_RAM)},
+                                                               nullptr,
+                                                               {})));
+
+  storage_service1 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(host1, 10000000000000.0)));
+
+  storage_service2 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(host2, 10000000000000.0)));
+
+  storage_service3 = simulation->add(
+          std::unique_ptr<wrench::SimpleStorageService>(
+                  new wrench::SimpleStorageService(host4, 10000000000000.0)));
+
+  wrench::WMS *wms = nullptr;
+  wms = simulation->add(
+          std::unique_ptr<wrench::WMS>(new FileRegistryLookupEntryTestWMS(
+                  this,
+                  {compute_service}, {storage_service1, storage_service2, storage_service3}, host1)));
+
+  wms->addWorkflow(workflow);
+
+  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
+          new wrench::FileRegistryService(host1));
+
+  simulation->setFileRegistryService(std::move(file_registry_service));
+
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
