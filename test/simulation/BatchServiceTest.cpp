@@ -2596,7 +2596,7 @@ private:
         double expected_wait_time = 300 - first_job_running;
         double tolerance = 1; // in seconds
         double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - tolerance));
-         if (delta > 1) { 
+         if (delta > 1) {
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
 
