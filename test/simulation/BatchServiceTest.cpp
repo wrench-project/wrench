@@ -2586,17 +2586,17 @@ private:
         }
         double first_job_running = this->simulation->getCurrentSimulatedDate();
 
-
         auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->compute_services.begin()));
-        std::string job_id = "my_job1";
+        std::string job_id = "my_tentative_job";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
         std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
         std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
         double expected_wait_time = 300 - first_job_running;
-        double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - 5));  // TODO: Weird 5s correction applied to what conservative_bf tells us
-         if (delta > 1) { // 1 second accuracy threshold
+        double tolerance = 1; // in seconds
+        double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - tolerance));
+         if (delta > 1) { 
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
 
@@ -2621,72 +2621,6 @@ private:
 
       }
 
-      {
-
-        // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
-        task->addInputFile(this->workflow->getFileById("input_file"));
-        task->addOutputFile(this->workflow->getFileById("output_file"));
-
-
-        // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
-
-        wrench::StandardJob *job = job_manager->createStandardJob(
-                {task},
-                {
-                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
-                },
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileById("input_file"), this->test->storage_service1,
-                        this->test->storage_service2)},
-                {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
-                                                                              this->test->storage_service2)});
-
-        std::map<std::string, std::string> batch_job_args;
-        batch_job_args["-N"] = "4";
-        batch_job_args["-t"] = "5"; //time in minutes
-        batch_job_args["-c"] = "4"; //number of cores per node
-        try {
-          job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-        } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error(
-                  "Got some exception"
-          );
-        }
-
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->compute_services.begin()));
-        std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs = {};
-        for (int i=0; i<10; i++) {
-          std::string job_id = "new_job"+std::to_string(i);
-          unsigned int nodes = rand() % 4 + 1;
-          double walltime_seconds = nodes * (rand() % 10 + 1);
-          std::tuple<std::string, unsigned int, double> my_job = {job_id, nodes, walltime_seconds};
-          set_of_jobs.insert(my_job);
-        }
-        std::map<std::string, double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(
-                set_of_jobs);
-
-        // Wait for a workflow execution event
-        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
-        try {
-          event = this->workflow->waitForNextExecutionEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
-        }
-        switch (event->type) {
-          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-            // success, do nothing for now
-            break;
-          }
-          default: {
-            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-          }
-        }
-        this->workflow->removeTask(task);
-
-      }
 
       return 0;
     }
