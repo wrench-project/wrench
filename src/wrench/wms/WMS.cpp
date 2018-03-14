@@ -26,10 +26,12 @@ namespace wrench {
      *
      * @param scheduler: a standard job scheduler implementation (if nullptr then none is used)
      * @param scheduler: a pilot job scheduler implementation (if nullptr then none is used)
-     * @param compute_services: a set of compute services available to run jobs
-     * @param storage_services: a set of storage services available to the WMS
+     * @param compute_services: a set of compute services available to run jobs (if {} then none is available)
+     * @param storage_services: a set of storage services available to the WMS (if {} then none is available)
+     * @param network_proximity_services: a set of network proximity services available to the WMS (if {} then none is available)
+     * @param file_registry_service: the file registry services available to the WMS (if nullptr then none is available)
      * @param hostname: the name of the host on which to run the WMS
-     * @param suffix: a string to append to the process name
+     * @param suffix: a string to append to the WMS process name (useful for debug output)
 
      *
      * @throw std::invalid_argument
@@ -38,16 +40,19 @@ namespace wrench {
              std::unique_ptr<PilotJobScheduler> pilot_job_scheduler,
              const std::set<ComputeService *> &compute_services,
              const std::set<StorageService *> &storage_services,
+             const std::set<NetworkProximityService *> &network_proximity_services,
+             FileRegistryService *file_registry_service,
              const std::string &hostname,
              const std::string suffix) :
-            S4U_Daemon("wms_" + suffix, "wms_" + suffix),
-            compute_services(std::move(compute_services)),
-            storage_services(std::move(storage_services)),
+            Service(hostname, "wms_" + suffix, "wms_" + suffix),
+            compute_services(compute_services),
+            storage_services(storage_services),
+            network_proximity_services(network_proximity_services),
+            file_registry_service(file_registry_service),
             standard_job_scheduler(std::move(standard_job_scheduler)),
             pilot_job_scheduler(std::move(pilot_job_scheduler))
-             {
+    {
 
-      this->hostname = hostname;
       this->workflow = nullptr;
     }
 
@@ -78,8 +83,9 @@ namespace wrench {
      */
     void WMS::checkDeferredStart() {
       if (S4U_Simulation::getClock() < this->start_time) {
-        new Alarm(this->start_time, this->hostname, this->mailbox_name,
-                  new AlarmWMSDeferredStartMessage(this->mailbox_name, this->start_time, 0), "wms_start");
+
+        Alarm::createAndStartAlarm(this->simulation, this->start_time, this->hostname, this->mailbox_name,
+                                   new AlarmWMSDeferredStartMessage(this->mailbox_name, this->start_time, 0), "wms_start");
 
         // Wait for a message
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -96,10 +102,10 @@ namespace wrench {
           std::runtime_error("Got a NULL message... Likely this means the WMS cannot be started. Aborting!");
         }
 
-        WRENCH_INFO("Got a [%s] message", message->getName().c_str());
-
-        if (auto *msg = dynamic_cast<AlarmWMSDeferredStartMessage *>(message.get())) {
+        if (auto msg = dynamic_cast<AlarmWMSDeferredStartMessage *>(message.get())) {
           // The WMS can be started
+        } else {
+          throw std::runtime_error("WMS::checkDeferredStart(): Unexpected " + message->getName() + " message");
         }
       }
     }
@@ -123,18 +129,39 @@ namespace wrench {
     }
 
     /**
-     * @brief Obtain the list of compute services
+     * @brief Obtain the list of compute services available to the WMS
      *
      * @return a set of compute services
      */
-    std::set<ComputeService *> WMS::getRunningComputeServices() {
-      std::set<ComputeService *> set = {};
-      for (auto compute_service : this->compute_services) {
-        if (compute_service->isUp()) {
-          set.insert(compute_service);
-        }
-      }
-      return set;
+    std::set<ComputeService *> WMS::getAvailableComputeServices() {
+      return this->compute_services;
+    }
+
+    /**
+    * @brief Obtain the list of storage services available to the WMS
+    *
+    * @return a set of storage services
+    */
+    std::set<StorageService *> WMS::getAvailableStorageServices() {
+      return this->storage_services;
+    }
+
+    /**
+    * @brief Obtain the list of network proximity services available to the WMS
+    *
+    * @return a set of network proximity services
+    */
+    std::set<NetworkProximityService *> WMS::getAvailableNetworkProximityServices() {
+      return this->network_proximity_services;
+    }
+
+    /**
+    * @brief Obtain the file registry service available to the WMS
+    *
+    * @return a file registry services
+    */
+    FileRegistryService * WMS::getAvailableFileRegistryService() {
+      return this->file_registry_service;
     }
 
     /**
@@ -233,40 +260,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the simulation
-     *
-     * @param simulation: the current simulation
-     *
-     * @throw std::invalid_argument
-     */
-    void WMS::setSimulation(Simulation *simulation) {
-      this->simulation = simulation;
-    }
-
-    /**
-     * @brief Start the WMS daemon
-     *
-     * @throw std::runtime_error
-     */
-    void WMS::start() {
-      // Start the daemon
-      try {
-        this->start_daemon(this->hostname);
-      } catch (std::invalid_argument &e) {
-        throw std::runtime_error("WMS:start(): " + std::string(e.what()));
-      }
-    }
-
-    /**
-     * @brief Get the name of the host on which the WMS is running
-     *
-     * @return the hostname
-     */
-    std::string WMS::getHostname() {
-      return this->hostname;
-    }
-
-    /**
      * @brief Set the workflow to be executed by the WMS
      * @param workflow: a workflow to execute
      * @param start_time: the simulated time when the WMS should start executed the workflow (0 if not specified)
@@ -296,23 +289,28 @@ namespace wrench {
       return this->workflow;
     }
 
-
     /**
      * @brief Instantiate a job manager
      * @return a job manager
      */
-    std::unique_ptr<JobManager> WMS::createJobManager() {
-      return std::unique_ptr<JobManager>(new JobManager(this));
+    std::shared_ptr<JobManager> WMS::createJobManager() {
+      auto job_manager_raw_ptr = new JobManager(this);
+      std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
+      job_manager->setSimulation(this->simulation);
+      job_manager->start(job_manager, true); // Always daemonize
+      return job_manager;
     }
-
 
     /**
      * @brief Instantiate a data movement manager
      * @return a data movement manager
      */
-    std::unique_ptr<DataMovementManager> WMS::createDataMovementManager() {
-      return std::unique_ptr<DataMovementManager>(new DataMovementManager(this));
+    std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
+      auto data_movement_manager_raw_ptr = new DataMovementManager(this);
+      std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
+      data_movement_manager->setSimulation(this->simulation);
+      data_movement_manager->start(data_movement_manager, true); // Always daemonize
+      return data_movement_manager;
     }
-
 
 };

@@ -80,10 +80,11 @@ class FileRegistryTestWMS : public wrench::WMS {
 
 public:
     FileRegistryTestWMS(FileRegistryTest *test,
-                const std::set<wrench::ComputeService *> &compute_services,
-                const std::set<wrench::StorageService *> &storage_services,
-                std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+                        const std::set<wrench::ComputeService *> &compute_services,
+                        const std::set<wrench::StorageService *> &storage_services,
+                        wrench::FileRegistryService *file_registry_service,
+                        std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, file_registry_service, hostname, "test") {
       this->test = test;
     }
 
@@ -96,7 +97,7 @@ private:
 
       wrench::WorkflowFile *file1 = workflow->addFile("file1", 100.0);
       wrench::WorkflowFile *file2 = workflow->addFile("file2", 100.0);
-      wrench::FileRegistryService *frs = simulation->getFileRegistryService();
+      wrench::FileRegistryService *frs = this->getAvailableFileRegistryService();
 
       bool success;
       std::set<wrench::StorageService *> locations;
@@ -221,37 +222,33 @@ void FileRegistryTest::do_FileRegistry_Test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {}))));
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0))));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+  // Create a file registry service
+  wrench::FileRegistryService *file_registry_service = nullptr;
+  EXPECT_THROW(simulation->setFileRegistryService(nullptr), std::invalid_argument);
+  EXPECT_NO_THROW(file_registry_service = simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new FileRegistryTestWMS(
+          new FileRegistryTestWMS(
                   this,
-                  {compute_service}, {storage_service1, storage_service2}, hostname))));
+                  {compute_service}, {storage_service1, storage_service2}, file_registry_service, hostname)));
+
+
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
-
-  // Create a file registry service
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(hostname));
-
-  EXPECT_THROW(simulation->setFileRegistryService(nullptr), std::invalid_argument);
-  EXPECT_NO_THROW(simulation->setFileRegistryService(std::move(file_registry_service)));
-
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -269,10 +266,12 @@ class FileRegistryLookupEntryTestWMS : public wrench::WMS {
 
 public:
     FileRegistryLookupEntryTestWMS(FileRegistryTest *test,
-                        const std::set<wrench::ComputeService *> &compute_services,
-                        const std::set<wrench::StorageService *> &storage_services,
-                        std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, hostname, "test") {
+                                   const std::set<wrench::ComputeService *> &compute_services,
+                                   const std::set<wrench::StorageService *> &storage_services,
+                                   const std::set<wrench::NetworkProximityService *> &network_proximity_services,
+                                   wrench::FileRegistryService *file_registry_service,
+                                   std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, network_proximity_services, file_registry_service, hostname, "test") {
       this->test = test;
     }
 
@@ -284,8 +283,8 @@ private:
 
       wrench::WorkflowFile *file1 = workflow->addFile("file1", 100.0);
       wrench::WorkflowFile * nullptr_file = nullptr;
-      wrench::FileRegistryService *frs = simulation->getFileRegistryService();
-      wrench::NetworkProximityService *nps = *(simulation->getRunningNetworkProximityServices().begin());
+      wrench::FileRegistryService *frs = this->getAvailableFileRegistryService();
+      wrench::NetworkProximityService *nps = *(this->getAvailableNetworkProximityServices().begin());
 
       frs->addEntry(file1, this->test->storage_service1);
       frs->addEntry(file1, this->test->storage_service2);
@@ -293,9 +292,10 @@ private:
 
       wrench::S4U_Simulation::sleep(100.0);
 
+
       std::vector<std::string> file1_expected_locations = {"Host4", "Host1", "Host2"};
       std::vector<std::string> file1_locations(3);
-        std::map<double, wrench::StorageService *> file1_locations_by_proximity;
+      std::map<double, wrench::StorageService *> file1_locations_by_proximity;
 
       bool success = true;
       try {
@@ -313,12 +313,13 @@ private:
         throw std::runtime_error("Should be able to lookup a file");
       }
 
+      int count=0;
       for (auto &storage_service : file1_locations_by_proximity) {
-        file1_locations.push_back(storage_service.second->getHostname());
+        file1_locations[count++] = storage_service.second->getHostname();
       }
 
       bool is_equal = std::equal(file1_expected_locations.begin(), file1_expected_locations.end(),
-      file1_locations.begin());
+                                 file1_locations.begin());
 
       if (!is_equal) {
         throw std::runtime_error("lookupEntry using NetworkProximityService did not return Storage Services in ascending order of Network Proximity");
@@ -358,43 +359,41 @@ void FileRegistryTest::do_lookupEntry_Test() {
   std::string host3 = simulation->getHostnameList()[2];
   std::string host4 = simulation->getHostnameList()[3];
 
-  std::unique_ptr<wrench::NetworkProximityService> network_proximity_service(new wrench::NetworkProximityService(host1, {host1, host3, host4}));
+  wrench::NetworkProximityService *network_proximity_service = new wrench::NetworkProximityService(host1, {host1, host3, host4});
 
   simulation->add(std::move(network_proximity_service));
 
-  compute_service = simulation->add(
-          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-                  new wrench::MultihostMulticoreComputeService(host1, true, true,
-                                                               {std::make_tuple(host1,
-                                                                                wrench::ComputeService::ALL_CORES,
-                                                                                wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+//  compute_service = simulation->add(
+//          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
+//                  new wrench::MultihostMulticoreComputeService(host1, true, true,
+//                                                               {std::make_tuple(host1,
+//                                                                                wrench::ComputeService::ALL_CORES,
+//                                                                                wrench::ComputeService::ALL_RAM)},
+//                                                               nullptr,
+//                                                               {})));
 
   storage_service1 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(host1, 10000000000000.0)));
+          new wrench::SimpleStorageService(host1, 10000000000000.0));
 
   storage_service2 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(host2, 10000000000000.0)));
+          new wrench::SimpleStorageService(host2, 10000000000000.0));
 
   storage_service3 = simulation->add(
-          std::unique_ptr<wrench::SimpleStorageService>(
-                  new wrench::SimpleStorageService(host4, 10000000000000.0)));
+          new wrench::SimpleStorageService(host4, 10000000000000.0));
+
+
+  wrench::FileRegistryService *file_registry_service(
+          new wrench::FileRegistryService(host1));
+
+  simulation->setFileRegistryService(file_registry_service);
 
   wrench::WMS *wms = nullptr;
   wms = simulation->add(
-          std::unique_ptr<wrench::WMS>(new FileRegistryLookupEntryTestWMS(
+          new FileRegistryLookupEntryTestWMS(
                   this,
-                  {compute_service}, {storage_service1, storage_service2, storage_service3}, host1)));
+                  {}, {storage_service1, storage_service2, storage_service3}, {network_proximity_service}, file_registry_service, host1));
 
   wms->addWorkflow(workflow);
-
-  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
-          new wrench::FileRegistryService(host1));
-
-  simulation->setFileRegistryService(std::move(file_registry_service));
 
   EXPECT_NO_THROW(simulation->launch());
 

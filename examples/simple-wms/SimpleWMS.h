@@ -43,7 +43,7 @@ namespace wrench {
         int main() override;
 
         /** @brief The job manager */
-        std::unique_ptr<JobManager> job_manager;
+        std::shared_ptr<JobManager> job_manager;
         /** @brief Whether the workflow execution should be aborted */
         bool abort = false;
     };

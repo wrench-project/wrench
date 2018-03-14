@@ -32,13 +32,10 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Mult
 
 namespace wrench {
 
-    WorkunitMulticoreExecutor::~WorkunitMulticoreExecutor() {
-    }
-
     /**
      * @brief Constructor, which starts the workunit executor on the host
      *
-     * @param simulation: the simulation
+     * @param simulation: a pointer to the simulation object
      * @param hostname: the name of the host
      * @param num_cores: the number of cores available to the executor
      * @param ram_utilization: the number of bytes of RAM used by the executor
@@ -57,7 +54,7 @@ namespace wrench {
             Workunit *workunit,
             StorageService *default_storage_service,
             double thread_startup_overhead) :
-            S4U_Daemon("workunit_multicore_executor_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber())) {
+            Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
 
       if (thread_startup_overhead < 0) {
         throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): thread_startup_overhead must be >= 0");
@@ -67,16 +64,12 @@ namespace wrench {
       }
 
       this->simulation = simulation;
-      this->hostname = hostname;
       this->callback_mailbox = callback_mailbox;
       this->workunit = workunit;
       this->thread_startup_overhead = thread_startup_overhead;
       this->num_cores = num_cores;
       this->ram_utilization = ram_utilization;
       this->default_storage_service = default_storage_service;
-
-      // Start my daemon on the host
-      this->start_daemon(this->hostname);
 
     }
 
@@ -92,14 +85,14 @@ namespace wrench {
       // First kill the executor's main actor
       WRENCH_INFO("Killing WorkunitExecutor [%s]", this->getName().c_str());
 
-      this->kill_actor();
+      this->killActor();
 
 
       // Then kill all compute threads, if any
       WRENCH_INFO("Killing %ld compute threads", this->compute_threads.size());
-      for (unsigned long i=0; i < this->compute_threads.size(); i++) {
-        WRENCH_INFO("Killing compute thread [%s]", this->compute_threads[i]->getName().c_str());
-        this->compute_threads[i]->kill();
+      for (auto const &compute_thread : this->compute_threads) {
+        WRENCH_INFO("Killing compute thread [%s]", compute_thread->getName().c_str());
+        compute_thread->kill();
       }
 //      WRENCH_INFO("Clearing before everything got killed\n");
 //      this->compute_threads.clear();
@@ -311,10 +304,10 @@ namespace wrench {
           WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
           throw WorkflowExecutionException(new FatalFailure());
         }
-        ComputeThread *compute_thread;
+        std::shared_ptr<ComputeThread> compute_thread;
         try {
-          compute_thread = new ComputeThread(effective_flops, tmp_mailbox);
-
+          compute_thread = std::shared_ptr<ComputeThread>(new ComputeThread(this->simulation, S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
+          compute_thread->start(compute_thread, true);
         } catch (std::exception &e) {
           // Some internal SimGrid exceptions...????
           WRENCH_INFO("Could not create compute thread... perhaps I am being killed?");
@@ -322,7 +315,7 @@ namespace wrench {
           break;
         }
         WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
-        this->compute_threads.push_back(std::unique_ptr<ComputeThread>(compute_thread));
+        this->compute_threads.push_back(compute_thread);
       }
 
       if (!success) {
@@ -373,15 +366,6 @@ namespace wrench {
       if (!success) {
         throw WorkflowExecutionException(new ComputeThreadHasDied());
       }
-      return;
-    }
-
-    /**
-     * @brief Returns the name of the host the executor is running on
-     * @return a hostname
-     */
-    std::string WorkunitMulticoreExecutor::getHostname() {
-      return this->hostname;
     }
 
     /**
