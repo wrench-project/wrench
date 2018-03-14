@@ -206,7 +206,7 @@ TEST_F(FileRegistryTest, SimpleFunctionality) {
 void FileRegistryTest::do_FileRegistry_Test() {
 
   // Create and initialize a simulation
-  wrench::Simulation *simulation = new wrench::Simulation();
+  auto simulation = new wrench::Simulation();
   int argc = 1;
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("file_registry_test");
@@ -294,12 +294,24 @@ private:
       wrench::S4U_Simulation::sleep(100.0);
 
       std::vector<std::string> file1_expected_locations = {"Host4", "Host1", "Host2"};
-      std::vector<std::string> file1_locations;
+      std::vector<std::string> file1_locations(3);
         std::map<double, wrench::StorageService *> file1_locations_by_proximity;
 
-      EXPECT_THROW(frs->lookupEntry(nullptr_file, "Host3", nps), std::invalid_argument);
+      bool success = true;
+      try {
+        frs->lookupEntry(nullptr_file, "Host3", nps);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to lookup a nullptr file");
+      }
 
-      EXPECT_NO_THROW(file1_locations_by_proximity = frs->lookupEntry(file1, "Host3", nps));
+      try {
+        file1_locations_by_proximity = frs->lookupEntry(file1, "Host3", nps);
+      } catch (std::exception &e) {
+        throw std::runtime_error("Should be able to lookup a file");
+      }
 
       for (auto &storage_service : file1_locations_by_proximity) {
         file1_locations.push_back(storage_service.second->getHostname());
