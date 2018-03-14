@@ -61,11 +61,9 @@ namespace wrench{
         void start(bool daemonize = true);
 
         double query(std::pair<std::string, std::string> hosts);
-        
+
         std::vector<std::string> getHostnameList();
-
-        // TODO: add function to return coordinate of desired network daemon
-
+        
         std::pair<double, double> getCoordinate(std::string);
 
         std::string getNetworkProximityServiceType();
