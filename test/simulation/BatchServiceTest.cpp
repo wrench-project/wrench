@@ -2930,7 +2930,9 @@ private:
         std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
-        std::cerr << "\n\n\nThe estimated waiting time is "<<jobs_estimated_waiting_time[job_id]<<"\n\n\n";
+        if ((jobs_estimated_waiting_time[job_id] - 900) > 1) {
+          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+        }
 
         job_id = "my_job2";
         nodes = 1;
@@ -2939,7 +2941,10 @@ private:
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
-        std::cerr << "\n\n\nThe estimated waiting time is "<<jobs_estimated_waiting_time[job_id]<<"\n\n\n";
+        if ((jobs_estimated_waiting_time[job_id] - 300) > 1) {
+          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+        }
+
 
         job_id = "my_job3";
         nodes = 2;
@@ -2948,7 +2953,10 @@ private:
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
-        std::cerr << "\n\n\nThe estimated waiting time is "<<jobs_estimated_waiting_time[job_id]<<"\n\n\n";
+        if ((jobs_estimated_waiting_time[job_id] - 300) > 1) {
+          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+        }
+
 
         job_id = "my_job4";
         nodes = 3;
@@ -2957,7 +2965,10 @@ private:
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
-        std::cerr << "\n\n\nThe estimated waiting time is "<<jobs_estimated_waiting_time[job_id]<<"\n\n\n";
+        if ((jobs_estimated_waiting_time[job_id] - 900) > 1) {
+          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+        }
+
 
 
         for (int i=0; i<3; i++) {
