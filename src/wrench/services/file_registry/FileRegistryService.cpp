@@ -120,7 +120,7 @@ namespace wrench {
     /**
      * @brief Retrieve a list of storage services that hold a file, sorted by increasing network distance from a reference host, according to a network proximity service
      * @param file: the file of interest
-     * @param reference_host: reference host
+     * @param reference_host: reference host from which network proximity values will be measured
      * @param network_proximity_service: the network proximity service
      *
      * @return a map of <distance , storage service> pairs
@@ -323,7 +323,7 @@ namespace wrench {
 
       } else if (FileRegistryFileLookupByProximityRequestMessage *msg = dynamic_cast<FileRegistryFileLookupByProximityRequestMessage *> (message.get())) {
 
-        std::string host_to_measure_from = msg->host_to_measure_from;
+        std::string reference_host = msg->reference_host;
 
         std::map<double, StorageService *> locations;
         std::set<StorageService *> storage_services_with_file;
@@ -335,15 +335,14 @@ namespace wrench {
         auto locations_itr = locations.cbegin();
 
         for (auto &storage_service: storage_services_with_file) {
-          proximity = msg->network_proximity_service->query(std::make_pair(host_to_measure_from, storage_service->hostname));
+          proximity = msg->network_proximity_service->query(std::make_pair(reference_host, storage_service->hostname));
           locations_itr = locations.insert(locations_itr, std::make_pair(proximity, storage_service));
         }
 
-        // TODO: make this lookup greater since we are using the network proximity service??
         S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_OVERHEAD));
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox, new FileRegistryFileLookupByProximityAnswerMessage(msg->file,
-                                                                                                           msg->host_to_measure_from, locations, this->getPropertyValueAsDouble(FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                                                                                                           msg->reference_host, locations, this->getPropertyValueAsDouble(FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }

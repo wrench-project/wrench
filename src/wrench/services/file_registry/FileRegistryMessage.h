@@ -63,7 +63,7 @@ namespace wrench {
     class FileRegistryFileLookupByProximityRequestMessage : public FileRegistryMessage {
     public:
         FileRegistryFileLookupByProximityRequestMessage(std::string answer_mailbox, WorkflowFile *file,
-                                                        std::string host_to_measure_from,
+                                                        std::string reference_host,
                 NetworkProximityService *network_proximity_service, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
@@ -77,7 +77,7 @@ namespace wrench {
          * 'A' and 'C' so that the locations of the workflow file may be sorted with respect to
          * their current network proximity value
          */
-        std::string host_to_measure_from;
+        std::string reference_host;
 
         NetworkProximityService *network_proximity_service;
     };
@@ -88,7 +88,7 @@ namespace wrench {
     class FileRegistryFileLookupByProximityAnswerMessage : public FileRegistryMessage {
     public:
         FileRegistryFileLookupByProximityAnswerMessage(WorkflowFile *file,
-                                                       std::string host_to_measure_from,
+                                                       std::string reference_host,
                                                        std::map<double, StorageService *> locations,
                                                        double payload);
 
@@ -101,7 +101,7 @@ namespace wrench {
          * 'A' and 'C' so that the locations of the workflow file may be sorted with respect to
          * their current network proximity value
          */
-        std::string host_to_measure_from;
+        std::string reference_host;
         /**
          * @brief A map of all locations where the file resides sorted with respect to their distance from
          * the host 'host_to_measure_from'
