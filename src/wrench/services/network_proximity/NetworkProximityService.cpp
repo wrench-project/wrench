@@ -56,7 +56,6 @@ namespace wrench {
 
         this->setProperties(default_property_values, plist);
 
-        // TODO: Check all other properties
         validateProperties();
 
         // Seed the master_rng
@@ -471,6 +470,14 @@ namespace wrench {
 //        output.close();
         // END WRITING VIVALDI RESULTS
 
+    }
+
+    /**
+     * @brief Get the network proximity service type
+     * @return a string specifying the network proximity service type
+     */
+    std::string NetworkProximityService::getNetworkProximityServiceType() {
+        return this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
     }
 
     /**
