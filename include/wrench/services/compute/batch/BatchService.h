@@ -55,7 +55,7 @@ namespace wrench {
                  {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,             "1024"},
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
                  {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
-                 {BatchServiceProperty::BATCH_FAKE_SUBMISSION,                       "false"}
+                 {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0",}
                 };
 
     public:

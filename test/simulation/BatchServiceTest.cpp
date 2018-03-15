@@ -2334,7 +2334,6 @@ void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::BatchService(hostname, true, true,
                                            simulation->getHostnameList(), storage_service1, {
-                                                   {wrench::BatchServiceProperty::BATCH_FAKE_SUBMISSION, "true"}
                                            })));
 
   // Create a WMS
@@ -2755,10 +2754,11 @@ void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
+                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "5"}
                                    })));
 
-//  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -2935,7 +2935,7 @@ private:
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
-        if ((jobs_estimated_waiting_time[job_id] - 300) > 1) {
+        if (fabs(jobs_estimated_waiting_time[job_id] - 300) > 1) {
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
 
@@ -2947,7 +2947,7 @@ private:
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
-        if ((jobs_estimated_waiting_time[job_id] - 300) > 1) {
+        if (fabs(jobs_estimated_waiting_time[job_id] - 300) > 1) {
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
 
@@ -2959,7 +2959,7 @@ private:
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
-        if ((jobs_estimated_waiting_time[job_id] - 900) > 1) {
+        if (fabs(jobs_estimated_waiting_time[job_id] - 900) > 1) {
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
 
@@ -3038,7 +3038,8 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
+                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
+                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"}
                                    })));
 
   // Create a WMS
