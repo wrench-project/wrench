@@ -67,7 +67,6 @@ namespace wrench {
       std::string data = batch_submission_data.dump();
       std::shared_ptr<BatchNetworkListener> network_listener =
               std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, batchsched_query_mailbox,
-                                                                             std::to_string(this->self_port),
                                                                              std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
@@ -211,7 +210,6 @@ namespace wrench {
 
 #ifdef ENABLE_BATSCHED
       this->batsched_port = 28000 + S4U_Mailbox::generateUniqueSequenceNumber();
-      this->self_port = 14000 + S4U_Mailbox::generateUniqueSequenceNumber();
       this->run_batsched();
 #else
       is_bat_sched_ready = true;
@@ -472,7 +470,6 @@ namespace wrench {
 
       std::shared_ptr<BatchNetworkListener> network_listener =
               std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                             std::to_string(this->self_port),
                                                                              std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
@@ -807,7 +804,6 @@ namespace wrench {
       std::string data = batch_submission_data.dump();
       std::shared_ptr<BatchNetworkListener> network_listener =
               std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                             std::to_string(this->self_port),
                                                                              std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
@@ -988,7 +984,6 @@ namespace wrench {
 //
 //      std::unique_ptr<BatchNetworkListener> network_listener =
 //              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-//                                                                             std::to_string(this->self_port),
 //                                                                             std::to_string(this->batsched_port),
 //                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
 //                                                                             data));
@@ -1945,7 +1940,6 @@ namespace wrench {
       std::string data = batch_submission_data.dump();
       std::shared_ptr<BatchNetworkListener> network_listener =
               std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                             std::to_string(this->self_port),
                                                                              std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));

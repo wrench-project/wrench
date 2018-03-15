@@ -88,7 +88,6 @@ namespace wrench {
                      std::string suffix);
 
 #ifdef ENABLE_BATSCHED
-        unsigned int self_port;
         unsigned int batsched_port;
 #endif
 

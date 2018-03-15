@@ -16,7 +16,7 @@ namespace wrench {
             LISTENER,SENDER,SENDER_RECEIVER
         };
 
-        BatchNetworkListener(std::string hostname, std::string batch_service_mailbox, std::string self_port, std::string sched_port,
+        BatchNetworkListener(std::string hostname, std::string batch_service_mailbox, std::string sched_port,
                              NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send,std::map<std::string, std::string> plist = {});
 
 
@@ -28,7 +28,7 @@ namespace wrench {
                  {BatchServiceProperty::BATCH_EXECUTE_JOB_PAYLOAD,           "1024"}
                 };
 
-        BatchNetworkListener(std::string, std::string batch_service_mailbox, std::string self_port, std::string sched_port,
+        BatchNetworkListener(std::string, std::string batch_service_mailbox, std::string sched_port,
                              NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send, std::map<std::string, std::string> plist, std::string suffix);
 
 
