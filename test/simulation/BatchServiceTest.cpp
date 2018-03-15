@@ -2429,7 +2429,8 @@ private:
         std::string job_id = "my_tentative_job";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
-        std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
+        //std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
+        std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
         double expected_wait_time = 300 - first_job_running;
@@ -2609,11 +2610,11 @@ private:
         std::string job_id = "my_job1";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
-        std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
+        std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
         double expected_wait_time = 300 - first_job_running;
-        double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - 5));  // TODO: Weird 5s correction applied to what conservative_bf tells us
+        double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - 1));  // TODO: Weird 5s correction applied to what conservative_bf tells us
         if (delta > 1) { // 1 second accuracy threshold
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
@@ -2680,7 +2681,7 @@ private:
           std::string job_id = "new_job"+std::to_string(i);
           unsigned int nodes = rand() % 4 + 1;
           double walltime_seconds = nodes * (rand() % 10 + 1);
-          std::tuple<std::string, unsigned int, double> my_job = {job_id, nodes, walltime_seconds};
+          std::tuple<std::string, unsigned int, double> my_job = std::make_tuple(job_id, nodes, walltime_seconds);
           set_of_jobs.insert(my_job);
         }
         std::map<std::string, double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(
@@ -2755,7 +2756,7 @@ void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
-                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "5"}
+                                           {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"}
                                    })));
 
   simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
@@ -2920,7 +2921,7 @@ private:
         std::string job_id = "my_job1";
         unsigned int nodes = 1;
         double walltime_seconds = 400;
-        std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
+        std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
@@ -2931,7 +2932,7 @@ private:
         job_id = "my_job2";
         nodes = 1;
         walltime_seconds = 299;
-        my_job = {job_id,nodes,walltime_seconds};
+        my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
@@ -2943,7 +2944,7 @@ private:
         job_id = "my_job3";
         nodes = 2;
         walltime_seconds = 299;
-        my_job = {job_id,nodes,walltime_seconds};
+        my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
@@ -2955,7 +2956,7 @@ private:
         job_id = "my_job4";
         nodes = 3;
         walltime_seconds = 299;
-        my_job = {job_id,nodes,walltime_seconds};
+        my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 

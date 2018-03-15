@@ -417,7 +417,7 @@ namespace wrench {
         }
         if (action == READ) {
           try {
-            WRENCH_INFO("Reading file %s", f->getId().c_str());
+            WRENCH_INFO("Reading file %s from storage service %s", f->getId().c_str(), storage_service->getName().c_str());
             storage_service->readFile(f);
             WRENCH_INFO("File %s read", f->getId().c_str());
           } catch (std::runtime_error &e) {
@@ -428,7 +428,7 @@ namespace wrench {
         } else {
           // Write the file
           try {
-            WRENCH_INFO("Writing file %s", f->getId().c_str());
+            WRENCH_INFO("Writing file %s to storage sercice %s", f->getId().c_str(), storage_service->getName().c_str());
             storage_service->writeFile(f);
             WRENCH_INFO("Wrote file %s", f->getId().c_str());
           } catch (std::runtime_error &e) {
