@@ -53,8 +53,8 @@ namespace wrench {
       for (auto job : set_of_jobs) {
         batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
         batch_submission_data["events"][idx]["type"] = "QUERY";
-        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = "unique_"+std::get<0>(job);
-        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = "unique_"+std::get<0>(job);
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = std::get<0>(job);
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = std::get<0>(job);
         batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(job);
         batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<2>(job);
       }
@@ -548,9 +548,11 @@ namespace wrench {
       bool job_on_the_list = false;
 
       std::set<std::unique_ptr<BatchJob>>::iterator it;
+      std::string job_id = "";
       for (it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
         if ((*it)->getWorkflowJob() == job) {
           job_on_the_list = true;
+          job_id = std::to_string(it->get()->getJobID());
           std::set<std::tuple<std::string, unsigned long, double>> resources = (*it)->getResourcesAllocated();
           for (auto r : resources) {
             this->available_nodes_to_cores[std::get<0>(r)] += std::get<1>(r);
@@ -558,6 +560,12 @@ namespace wrench {
           this->running_jobs.erase(it);
           break;
         }
+      }
+
+      if (job_on_the_list) {
+#ifdef ENABLE_BATSCHED
+        this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "");
+#endif
       }
 
       return;
@@ -1567,7 +1575,8 @@ namespace wrench {
           exit(2);
         }
 
-        const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), NULL};
+        std::string rjms_delay = this->getPropertyValueAsString(BatchServiceProperty::BATCH_RJMS_DELAY);
+        const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
         if (execvp(args[0], (char **) args) == -1) {
           exit(3);
         }
@@ -1798,42 +1807,6 @@ namespace wrench {
         resources.insert(std::make_tuple(this->host_id_to_names[node], cores_per_node_asked_for,
                                          0)); // TODO: Is setting RAM to 0 ok here?
       }
-
-//      if (this->getPropertyValueAsString(
-//              BatchServiceProperty::BATCH_FAKE_SUBMISSION) == "true") {
-//
-//        if (time_in_minutes > 0) {
-//          batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
-//          SimulationMessage *msg =
-//                  new AlarmNotifyBatschedMessage(std::to_string(batch_job->getJobID()), 0);
-//          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation, batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
-//                            "batch_alarm_notify_batsched");
-//          standard_job_alarms[batch_job->getWorkflowJob()->getName()] = alarm_ptr;
-//        } else {
-//#ifdef ENABLE_BATSCHED
-//          this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY",
-//                                          "");
-//#endif
-//        }
-//
-//        WRENCH_INFO("Sending Batch Fake Submission Reply by job %s", workflow_job->getName().c_str());
-//        std::string json_string_available_resources = this->convertAvailableResourcesToJsonString(
-//                this->available_nodes_to_cores);
-//        std::string json_string_resources = this->convertResourcesToJsonString(resources);
-//        try {
-//          S4U_Mailbox::putMessage(workflow_job->popCallbackMailbox(),
-//                                  new ComputeServiceInformationMessage(workflow_job, "\nResources Allocated:{\n" +
-//                                                                                     json_string_resources + "\n}\n",
-//                                                                       this->getPropertyValueAsDouble(
-//                                                                               BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD
-//                                                                       )));
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//          throw std::runtime_error(
-//                  "BatchService::processExecuteJobFromBatSched():: Network Error while sending the fake job submission reply"
-//          );
-//        }
-//        return;
-//      }
 
       processExecution(resources, workflow_job, batch_job, num_nodes_allocated, time_in_minutes,
                        cores_per_node_asked_for);
