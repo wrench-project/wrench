@@ -67,7 +67,8 @@ namespace wrench {
       std::string data = batch_submission_data.dump();
       std::shared_ptr<BatchNetworkListener> network_listener =
               std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, batchsched_query_mailbox,
-                                                                             "14000", "28000",
+                                                                             std::to_string(this->self_port),
+                                                                             std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
       network_listener->setSimulation(this->simulation);
@@ -209,6 +210,8 @@ namespace wrench {
       this->generateUniqueJobId();
 
 #ifdef ENABLE_BATSCHED
+      this->batsched_port = 28000 + S4U_Mailbox::generateUniqueSequenceNumber();
+      this->self_port = 14000 + S4U_Mailbox::generateUniqueSequenceNumber();
       this->run_batsched();
 #else
       is_bat_sched_ready = true;
@@ -469,7 +472,8 @@ namespace wrench {
 
       std::shared_ptr<BatchNetworkListener> network_listener =
               std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                             "14000", "28000",
+                                                                             std::to_string(this->self_port),
+                                                                             std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
       network_listener->setSimulation(this->simulation);
@@ -795,7 +799,8 @@ namespace wrench {
       std::string data = batch_submission_data.dump();
       std::shared_ptr<BatchNetworkListener> network_listener =
               std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                             "14000", "28000",
+                                                                             std::to_string(this->self_port),
+                                                                             std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
       network_listener->setSimulation(this->simulation);
@@ -975,7 +980,8 @@ namespace wrench {
 //
 //      std::unique_ptr<BatchNetworkListener> network_listener =
 //              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-//                                                                             "14000", "28000",
+//                                                                             std::to_string(this->self_port),
+//                                                                             std::to_string(this->batsched_port),
 //                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
 //                                                                             data));
 //
@@ -985,7 +991,7 @@ namespace wrench {
 
       zmq::context_t context(1);
       zmq::socket_t socket(context, ZMQ_REQ);
-      socket.connect("tcp://localhost:28000");
+      socket.connect("tcp://localhost:" + std::to_string(this->batsched_port));
 
 
       nlohmann::json simulation_ends_msg;
@@ -1949,6 +1955,7 @@ namespace wrench {
 
     void BatchService::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                                  std::string kill_reason) {
+#ifdef ENABLE_BATSCHED
       nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
       batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
@@ -1961,12 +1968,14 @@ namespace wrench {
       std::string data = batch_submission_data.dump();
       std::shared_ptr<BatchNetworkListener> network_listener =
               std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                             "14000", "28000",
+                                                                             std::to_string(this->self_port),
+                                                                             std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
       network_listener->setSimulation(this->simulation);
       network_listener->start(network_listener, true);
       network_listeners.push_back(network_listener);
+#endif
 
     }
 

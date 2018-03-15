@@ -87,6 +87,10 @@ namespace wrench {
                      std::map<std::string, std::string> plist,
                      std::string suffix);
 
+#ifdef ENABLE_BATSCHED
+        unsigned int self_port;
+        unsigned int batsched_port;
+#endif
 
         //Configuration to create randomness in measurement period initially
         unsigned long random_interval = 10;
@@ -192,7 +196,7 @@ namespace wrench {
         void terminateRunningStandardJob(StandardJob *job);
 
         std::set<std::tuple<std::string, unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
-                                                                        unsigned long, unsigned long, double);
+                                                                                 unsigned long, unsigned long, double);
 
         BatchJob *scheduleJob(std::string);
 
