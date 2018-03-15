@@ -1556,6 +1556,8 @@ namespace wrench {
 */
     void BatchService::run_batsched() {
 
+#ifdef ENABLE_BATSCHED
+
       this->pid = getpid();
 
       int top_pid = fork();
@@ -1635,6 +1637,7 @@ namespace wrench {
                 "Error while fork-exec of batsched"
         );
       }
+#endif
     }
 
 
