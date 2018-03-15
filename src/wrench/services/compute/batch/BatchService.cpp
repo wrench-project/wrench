@@ -28,9 +28,12 @@
 #ifdef ENABLE_BATSCHED
 #include <zmq.hpp>
 #include <zmq.h>
+
 #endif
 
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
