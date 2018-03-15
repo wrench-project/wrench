@@ -1019,10 +1019,9 @@ namespace wrench {
 
 
       if (this->supports_pilot_jobs) {
-        std::set<std::unique_ptr<BatchJob>>::iterator it;
-        for (it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
-          if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-            PilotJob *p_job = (PilotJob *) ((*it)->getWorkflowJob());
+        for (auto & job : this->running_jobs) {
+          if ((job)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+            PilotJob *p_job = (PilotJob *) ((job)->getWorkflowJob());
             BatchService *cs = (BatchService *) p_job->getComputeService();
             if (cs == nullptr) {
               throw std::runtime_error(
@@ -1031,7 +1030,7 @@ namespace wrench {
             try {
               cs->stop();
             } catch (wrench::WorkflowExecutionException &e) {
-              return;
+              // ignore
             }
           }
         }
