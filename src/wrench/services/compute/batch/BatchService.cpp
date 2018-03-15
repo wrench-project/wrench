@@ -1576,7 +1576,8 @@ namespace wrench {
           exit(2);
         }
 
-        const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), NULL};
+	std::string socket_endpoint = "tcp://*:"+std::to_string(this->batsched_port);
+        const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s", socket_endpoint.c_str(), NULL};
         if (execvp(args[0], (char **) args) == -1) {
           exit(3);
         }
