@@ -770,9 +770,9 @@ namespace wrench {
       nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
       batch_submission_data["events"] = nlohmann::json::array();
-      int i = 0;
+      size_t i;
       std::deque<std::unique_ptr<BatchJob>>::iterator it;
-      for (it = this->pending_jobs.begin(); i < this->pending_jobs.size(); it++) {
+      for (i=0, it = this->pending_jobs.begin(); i < this->pending_jobs.size(); i++, it++) {
 
         BatchJob *batch_job = it->get();
 
@@ -787,7 +787,7 @@ namespace wrench {
         batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
         batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
         batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
-        batch_submission_data["events"][i++]["data"]["job"]["walltime"] = time_in_minutes * 60;
+        batch_submission_data["events"][i]["data"]["job"]["walltime"] = time_in_minutes * 60;
         PointerUtil::moveUniquePtrFromDequeToSet(it, &(this->pending_jobs),
                                                  &(this->waiting_jobs));
 
