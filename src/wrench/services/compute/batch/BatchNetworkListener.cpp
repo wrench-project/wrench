@@ -32,10 +32,10 @@ namespace wrench {
     * @param sched_port the port to send messages to scheduler
     */
     BatchNetworkListener::BatchNetworkListener(std::string hostname, std::string batch_service_mailbox,
-                                               std::string self_port, std::string sched_port,
+                                               std::string sched_port,
                                                NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send,
                                                std::map<std::string, std::string> plist) :
-            BatchNetworkListener(hostname, batch_service_mailbox, self_port,
+            BatchNetworkListener(hostname, batch_service_mailbox,
                                  sched_port, MY_TYPE, data_to_send, plist, "") {
     }
 
@@ -43,18 +43,16 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
-    * @param self_port the port to listen to messages from scheduler
     * @param sched_port the port to send messages to scheduler
     * @param suffix the suffix to append
     */
     BatchNetworkListener::BatchNetworkListener(
-            std::string hostname, std::string batch_service_mailbox, std::string self_port, std::string sched_port,
+            std::string hostname, std::string batch_service_mailbox, std::string sched_port,
             NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send, std::map<std::string, std::string> plist,
             std::string suffix = "") :
             Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
 
       // Start the daemon on the same host
-      this->self_port = self_port;
       this->sched_port = sched_port;
       this->MY_LISTENER_TYPE = MY_TYPE;
       this->data_to_send = data_to_send;
