@@ -1602,12 +1602,14 @@ namespace wrench {
           {
             //now fork a process that sleeps until its parent is dead
             int nested_pid = fork();
+	    int parent_pid = getppid();
 
             if(nested_pid > 0) {
               //I am the parent, whose child fork exec'd batsched
             } else if (nested_pid == 0) {
               int ppid = getppid();
-              while (ppid != 1) {
+              while (ppid == parent_pid) {
+		sleep(1);
                 ppid = getppid();
               }
               //check if the child that forked batsched is still running
