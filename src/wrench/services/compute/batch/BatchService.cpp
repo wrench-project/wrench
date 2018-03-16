@@ -509,6 +509,7 @@ namespace wrench {
       }
 
       WRENCH_INFO("Batch Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      this->clean_exit = true;
       return 0;
     }
 
@@ -954,9 +955,11 @@ namespace wrench {
  */
     void BatchService::cleanup() {
 
-      this->setStateToDown();
-      WRENCH_INFO("Failing current standard jobs");
-      this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      if (this->clean_exit) {
+        this->setStateToDown();
+        WRENCH_INFO("Failing current standard jobs");
+        this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
 
 //      //remove standard job alarms
 //      std::vector<std::unique_ptr<Alarm>>::iterator it;
@@ -1018,19 +1021,21 @@ namespace wrench {
 #endif
 
 
-      if (this->supports_pilot_jobs) {
-        for (auto & job : this->running_jobs) {
-          if ((job)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-            PilotJob *p_job = (PilotJob *) ((job)->getWorkflowJob());
-            BatchService *cs = (BatchService *) p_job->getComputeService();
-            if (cs == nullptr) {
-              throw std::runtime_error(
-                      "BatchService::terminate(): can't find compute service associated to pilot job");
-            }
-            try {
-              cs->stop();
-            } catch (wrench::WorkflowExecutionException &e) {
-              // ignore
+      if (this->clean_exit) {
+        if (this->supports_pilot_jobs) {
+          for (auto &job : this->running_jobs) {
+            if ((job)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+              PilotJob *p_job = (PilotJob *) ((job)->getWorkflowJob());
+              BatchService *cs = (BatchService *) p_job->getComputeService();
+              if (cs == nullptr) {
+                throw std::runtime_error(
+                        "BatchService::terminate(): can't find compute service associated to pilot job");
+              }
+              try {
+                cs->stop();
+              } catch (wrench::WorkflowExecutionException &e) {
+                // ignore
+              }
             }
           }
         }
