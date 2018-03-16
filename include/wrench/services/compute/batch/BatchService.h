@@ -91,6 +91,8 @@ namespace wrench {
         unsigned int batsched_port;
 #endif
 
+        bool clean_exit = false;
+
         //Configuration to create randomness in measurement period initially
         unsigned long random_interval = 10;
 
