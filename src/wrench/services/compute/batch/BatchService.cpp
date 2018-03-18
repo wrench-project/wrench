@@ -28,7 +28,8 @@
 #ifdef ENABLE_BATSCHED
 #include <zmq.hpp>
 #include <zmq.h>
-
+#include <sys/types.h>
+#include <sys/wait.h>
 #endif
 
 
