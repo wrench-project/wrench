@@ -109,16 +109,16 @@ namespace wrench{
         double estimated_waiting_time;
     };
 
-    /**
-     * @brief BatchFakeReplyMessage class
-     */
-    class BatchFakeJobSubmissionReplyMessage : public BatchServiceMessage {
-    public:
-        BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload);
-
-        /** @brief The resources info in json data string */
-        std::string json_data_string;
-    };
+//    /**
+//     * @brief BatchFakeReplyMessage class
+//     */
+//    class BatchFakeJobSubmissionReplyMessage : public BatchServiceMessage {
+//    public:
+//        BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload);
+//
+//        /** @brief The resources info in json data string */
+//        std::string json_data_string;
+//    };
 
 
     /**
