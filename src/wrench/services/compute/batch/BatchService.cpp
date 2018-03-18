@@ -31,10 +31,6 @@
 
 #endif
 
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
@@ -45,7 +41,8 @@ namespace wrench {
     }
 
 
-    std::map<std::string,double> BatchService::getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs) {
+    std::map<std::string, double>
+    BatchService::getQueueWaitingTimeEstimate(std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs) {
 //      std::string job_id,unsigned int num_nodes, double walltime_seconds
 #ifdef ENABLE_BATSCHED
       nlohmann::json batch_submission_data;
@@ -217,19 +214,19 @@ namespace wrench {
     }
 
 
-/**
- * @brief Synchronously submit a standard job to the batch service
- *
- * @param job: a standard job
- * @param batch_job_args: batch-specific arguments
- *      - "-N": number of hosts
- *      - "-c": number of cores on each host
- *      - "-t": duration (in seconds)
- *
- * @throw WorkflowExecutionException
- * @throw std::runtime_error
- *
- */
+    /**
+     * @brief Synchronously submit a standard job to the batch service
+     *
+     * @param job: a standard job
+     * @param batch_job_args: batch-specific arguments
+     *      - "-N": number of hosts
+     *      - "-c": number of cores on each host
+     *      - "-t": duration (in seconds)
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     *
+     */
     void BatchService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
@@ -321,18 +318,18 @@ namespace wrench {
     }
 
 
-/**
- * @brief Synchronously submit a pilot job to the compute service
- *
- * @param job: a pilot job
- * @param batch_job_args: batch-specific arguments
- *      - "-N": number of hosts
- *      - "-c": number of cores on each host
- *      - "-t": duration (in seconds)
- *
- * @throw WorkflowExecutionException
- * @throw std::runtime_error
- */
+    /**
+     * @brief Synchronously submit a pilot job to the compute service
+     *
+     * @param job: a pilot job
+     * @param batch_job_args: batch-specific arguments
+     *      - "-N": number of hosts
+     *      - "-c": number of cores on each host
+     *      - "-t": duration (in seconds)
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
     void BatchService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
@@ -486,21 +483,21 @@ namespace wrench {
         // Process running jobs
         std::set<std::unique_ptr<BatchJob>>::iterator it;
         for (it = this->running_jobs.begin(); it != this->running_jobs.end();) {
-            if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
-              if ((*it)->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-                this->processStandardJobTimeout(
-                        (StandardJob *) (*it)->getWorkflowJob());
-                this->updateResources((*it)->getResourcesAllocated());
-                it = this->running_jobs.erase(it);
-              } else if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-              } else {
-                throw std::runtime_error(
-                        "BatchService::main(): Received a JOB type other than Standard and Pilot jobs"
-                );
-              }
+          if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
+            if ((*it)->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
+              this->processStandardJobTimeout(
+                      (StandardJob *) (*it)->getWorkflowJob());
+              this->updateResources((*it)->getResourcesAllocated());
+              it = this->running_jobs.erase(it);
+            } else if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
             } else {
-              ++it;
+              throw std::runtime_error(
+                      "BatchService::main(): Received a JOB type other than Standard and Pilot jobs"
+              );
             }
+          } else {
+            ++it;
+          }
         }
 
         if (life && is_bat_sched_ready) {
@@ -621,11 +618,11 @@ namespace wrench {
       }
     }
 
-/**
- * @brief fail a running standard job
- * @param job: the job
- * @param cause: the failure cause
- */
+    /**
+     * @brief fail a running standard job
+     * @param job: the job
+     * @param cause: the failure cause
+     */
     void BatchService::failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
 
       WRENCH_INFO("Failing running job %s", job->getName().c_str());
@@ -645,10 +642,10 @@ namespace wrench {
       }
     }
 
-/**
-* @brief terminate a running standard job
-* @param job: the job
-*/
+    /**
+    * @brief terminate a running standard job
+    * @param job: the job
+    */
     void BatchService::terminateRunningStandardJob(StandardJob *job) {
 
       StandardJobExecutor *executor = nullptr;
@@ -844,10 +841,10 @@ namespace wrench {
       return false;
     }
 
-/**
-* @brief Declare all current jobs as failed (likely because the daemon is being terminated
-* or has timed out (because it's in fact a pilot job))
-*/
+    /**
+    * @brief Declare all current jobs as failed (likely because the daemon is being terminated
+    * or has timed out (because it's in fact a pilot job))
+    */
     void BatchService::failCurrentStandardJobs(std::shared_ptr<FailureCause> cause) {
 
 
@@ -882,9 +879,9 @@ namespace wrench {
     }
 
 
-/**
- * @brief Notify upper level job submitters
- */
+    /**
+     * @brief Notify upper level job submitters
+     */
     void BatchService::notifyJobSubmitters(PilotJob *job) {
 
       WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox_name %s",
@@ -900,14 +897,14 @@ namespace wrench {
     }
 
 
-/**
-* @brief Synchronously terminate a pilot job to the compute service
-*
-* @param job: a pilot job
-*
-* @throw WorkflowExecutionException
-* @throw std::runtime_error
-*/
+    /**
+    * @brief Synchronously terminate a pilot job to the compute service
+    *
+    * @param job: a pilot job
+    *
+    * @throw WorkflowExecutionException
+    * @throw std::runtime_error
+    */
     void BatchService::terminatePilotJob(PilotJob *job) {
 
       if (this->state == Service::DOWN) {
@@ -1224,7 +1221,7 @@ namespace wrench {
                                                                this)),
                                                this->getPropertyValueAsDouble(
                                                        BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
-            } catch (std::shared_ptr<NetworkError> &cause) { }
+            } catch (std::shared_ptr<NetworkError> &cause) {}
             return;
           }
         }
@@ -1245,7 +1242,7 @@ namespace wrench {
                                                            this)),
                                            this->getPropertyValueAsDouble(
                                                    BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) { }
+        } catch (std::shared_ptr<NetworkError> &cause) {}
         return;
       }
 
@@ -1333,12 +1330,12 @@ namespace wrench {
     }
 
 
-/**
- * @brief Process a pilot job termination request
- *
- * @param job: the job to terminate
- * @param answer_mailbox: the mailbox to which the answer message should be sent
- */
+  /**
+   * @brief Process a pilot job termination request
+   *
+   * @param job: the job to terminate
+   * @param answer_mailbox: the mailbox to which the answer message should be sent
+   */
     void BatchService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
 
 
@@ -1431,13 +1428,13 @@ namespace wrench {
       }
     }
 
-/**
- * @brief Process a standard job completion
- * @param executor: the standard job executor
- * @param job: the job
- *
- * @throw std::runtime_error
- */
+  /**
+   * @brief Process a standard job completion
+   * @param executor: the standard job executor
+   * @param job: the job
+   *
+   * @throw std::runtime_error
+   */
     void BatchService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
       bool executor_on_the_list = false;
       std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
@@ -1484,12 +1481,12 @@ namespace wrench {
       return;
     }
 
-/**
- * @brief Process a work failure
- * @param worker_thread: the worker thread that did the work
- * @param work: the work
- * @param cause: the cause of the failure
- */
+  /**
+   * @brief Process a work failure
+   * @param worker_thread: the worker thread that did the work
+   * @param work: the work
+   * @param cause: the cause of the failure
+   */
     void BatchService::processStandardJobFailure(StandardJobExecutor *executor,
                                                  StandardJob *job,
                                                  std::shared_ptr<FailureCause> cause) {
@@ -1531,11 +1528,11 @@ namespace wrench {
     }
 
 
-/**
- * @brief fail a pending standard job
- * @param job: the job
- * @param cause: the failure cause
- */
+  /**
+   * @brief fail a pending standard job
+   * @param job: the job
+   * @param cause: the failure cause
+   */
     void BatchService::failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
       // Send back a job failed message
       WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
@@ -1555,12 +1552,12 @@ namespace wrench {
       return jobid++;
     }
 
-/**
-* @brief: Start a batsched process
-*           - exit code 1: unsupported algorithm
-*           - exit code 2: unsupported queuing option
-*           - exit code 3: execvp error
-*/
+    /**
+    * @brief: Start a batsched process
+    *           - exit code 1: unsupported algorithm
+    *           - exit code 2: unsupported queuing option
+    *           - exit code 3: execvp error
+    */
     void BatchService::run_batsched() {
 
 #ifdef ENABLE_BATSCHED
@@ -1586,7 +1583,7 @@ namespace wrench {
         }
 
         std::string rjms_delay = this->getPropertyValueAsString(BatchServiceProperty::BATCH_RJMS_DELAY);
-	      std::string socket_endpoint = "tcp://*:"+std::to_string(this->batsched_port);
+        std::string socket_endpoint = "tcp://*:"+std::to_string(this->batsched_port);
         const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s", socket_endpoint.c_str(),  "--rjms_delay", rjms_delay.c_str(), NULL};
         if (execvp(args[0], (char **) args) == -1) {
           exit(3);
@@ -1602,14 +1599,14 @@ namespace wrench {
           {
             //now fork a process that sleeps until its parent is dead
             int nested_pid = fork();
-	    int parent_pid = getppid();
+      int parent_pid = getppid();
 
             if(nested_pid > 0) {
               //I am the parent, whose child fork exec'd batsched
             } else if (nested_pid == 0) {
               int ppid = getppid();
               while (ppid == parent_pid) {
-		sleep(1);
+                sleep(1);
                 ppid = getppid();
               }
               //check if the child that forked batsched is still running
@@ -1686,7 +1683,9 @@ namespace wrench {
           SimulationMessage *msg =
                   new AlarmJobTimeOutMessage(job, 0);
 
-          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation, batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
+                                                                        batch_job->getEndingTimeStamp(), this->hostname,
+                                                                        this->mailbox_name, msg,
                                                                         "batch_standard");
           standard_job_alarms[job->getName()] = alarm_ptr;
 
@@ -1749,8 +1748,10 @@ namespace wrench {
 
           SimulationMessage *msg =
                   new AlarmJobTimeOutMessage(job, 0);
-          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation, batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
-                            "batch_pilot");
+          std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
+                                                                        batch_job->getEndingTimeStamp(), host_to_run_on,
+                                                                        this->mailbox_name, msg,
+                                                                        "batch_pilot");
 
           this->pilot_job_alarms[job->getName()] = alarm_ptr;
 
@@ -1994,7 +1995,7 @@ namespace wrench {
 
       // Num hosts
       std::vector<double> num_hosts;
-      num_hosts.push_back((double)(this->nodes_to_cores_map.size()));
+      num_hosts.push_back((double) (this->nodes_to_cores_map.size()));
       dict.insert(std::make_pair("num_hosts", num_hosts));
 
       // Num cores per hosts

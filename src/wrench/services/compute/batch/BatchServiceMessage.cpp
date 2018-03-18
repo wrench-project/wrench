@@ -37,6 +37,10 @@ namespace wrench {
         throw std::invalid_argument(
                 "BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(): Empty job arguments to scheduler");
       }
+      if (answer_mailbox.empty()) {
+        throw std::invalid_argument(
+                "BatchSimulationBeginsToSchedulerMessage::BatchSimulationBeginsToSchedulerMessage(): Empty answer mailbox");
+      }
       this->answer_mailbox = answer_mailbox;
       this->job_args_to_scheduler = job_args_to_scheduler;
     }
@@ -50,6 +54,10 @@ namespace wrench {
      */
     BatchSchedReadyMessage::BatchSchedReadyMessage(std::string answer_mailbox, double payload)
             : BatchServiceMessage("BATCH_SCHED_READY", payload) {
+      if (answer_mailbox.empty()) {
+        throw std::invalid_argument(
+                "BatchSchedReadyMessage::BatchSchedReadyMessage(): Empty answer mailbox");
+      }
       this->answer_mailbox = answer_mailbox;
     }
 
@@ -65,6 +73,14 @@ namespace wrench {
                                                                            std::string batsched_decision_reply,
                                                                            double payload)
             : BatchServiceMessage("BATCH_EXECUTE_JOB", payload) {
+      if (answer_mailbox.empty()) {
+        throw std::invalid_argument(
+                "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer mailbox");
+      }
+      if (batsched_decision_reply.empty()) {
+        throw std::invalid_argument(
+                "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty batsched decision reply");
+      }
       this->answer_mailbox = answer_mailbox;
       this->batsched_decision_reply = batsched_decision_reply;
     }
@@ -99,24 +115,30 @@ namespace wrench {
         throw std::invalid_argument(
                 "BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): Empty job arguments to scheduler");
       }
+      if (job == nullptr) {
+        throw std::invalid_argument("BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): invalid job");
+      }
+      if (answer_mailbox.empty()) {
+        throw std::invalid_argument("BatchJobSubmissionToSchedulerMessage::BatchJobSubmissionToSchedulerMessage(): invalid answer mailbox");
+      }
       this->job_args_to_scheduler = job_args_to_scheduler;
       this->answer_mailbox = answer_mailbox;
       this->job = job;
     }
 
 
-    /**
-     * @brief Constructor
-     * @param answer_mailbox: the mailbox to reply to
-     * @param json_data_string: the current and the expected resources required
-     * @param payload: message size in bytes
-     *
-     * @throw std::invalid_argument
-     */
-    BatchFakeJobSubmissionReplyMessage::BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload)
-            : BatchServiceMessage("BATCH_FAKE_JOB_SUBMISSION_REPLY", payload) {
-      this->json_data_string = json_data_string;
-    }
+//    /**
+//     * @brief Constructor
+//     * @param answer_mailbox: the mailbox to reply to
+//     * @param json_data_string: the current and the expected resources required
+//     * @param payload: message size in bytes
+//     *
+//     * @throw std::invalid_argument
+//     */
+//    BatchFakeJobSubmissionReplyMessage::BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload)
+//            : BatchServiceMessage("BATCH_FAKE_JOB_SUBMISSION_REPLY", payload) {
+//      this->json_data_string = json_data_string;
+//    }
 
     /**
      * @brief Constructor
@@ -142,6 +164,10 @@ namespace wrench {
       if (job == nullptr) {
         throw std::invalid_argument(
                 "BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(): Invalid arguments");
+      }
+      if (answer_mailbox.empty()) {
+        throw std::invalid_argument(
+                "BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(): Empty answer mailbox");
       }
       this->job = job;
       this->answer_mailbox = answer_mailbox;

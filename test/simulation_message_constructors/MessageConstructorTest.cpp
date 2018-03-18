@@ -9,6 +9,7 @@
 
 #include <gtest/gtest.h>
 #include <map>
+#include <wrench/services/compute/batch/BatchServiceMessage.h>
 
 #include "wrench/workflow/Workflow.h"
 #include "../../src/wrench/services/file_registry/FileRegistryMessage.h"
@@ -28,6 +29,7 @@ protected:
       compute_service = (wrench::ComputeService *)(1234);
       workflow_job = (wrench::WorkflowJob *)(1234);
       standard_job = (wrench::StandardJob *)(1234);
+      batch_job = (wrench::BatchJob *)(1234);
       pilot_job = (wrench::PilotJob *)(1234);
       failure_cause = std::make_shared<wrench::FileNotFound>(file, storage_service);
     }
@@ -40,6 +42,7 @@ protected:
     wrench::ComputeService *compute_service;
     wrench::WorkflowJob *workflow_job;
     wrench::StandardJob *standard_job;
+    wrench::BatchJob *batch_job;
     wrench::PilotJob *pilot_job;
     std::shared_ptr<wrench::FileNotFound> failure_cause;
 };
@@ -267,4 +270,26 @@ TEST_F(MessageConstructorTest, NetworkProximityMessages) {
 
 }
 
+
+
+TEST_F(MessageConstructorTest, BatchServiceMessages) {
+
+  EXPECT_NO_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox_name", "foo", 666));
+  EXPECT_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox_name", "", 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox_name", workflow_job, "foo", 666));
+  EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("", workflow_job, "foo", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox_name", nullptr, "foo", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox_name", workflow_job, "", 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::BatchJobReplyFromSchedulerMessage("reply", 666));
+
+  EXPECT_NO_THROW(new wrench::BatchServiceJobRequestMessage("mailbox_name", batch_job, 666));
+  EXPECT_THROW(new wrench::BatchServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::BatchServiceJobRequestMessage("mailbox_name", nullptr, 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::AlarmJobTimeOutMessage(workflow_job, 666));
+
+  EXPECT_NO_THROW(new wrench::AlarmNotifyBatschedMessage("job_id", 666));
+}
 
