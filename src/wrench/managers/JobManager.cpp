@@ -218,7 +218,7 @@ namespace wrench {
                                          unsigned long num_cores_per_host,
                                          double ram_per_host,
                                          double duration) {
-      if ((workflow == nullptr) ||  (duration <= 0.0)) {
+      if ((workflow == nullptr) ||  (ram_per_host < 0) || (duration <= 0.0)) {
         throw std::invalid_argument("JobManager::createPilotJob(): Invalid arguments");
       }
       PilotJob *raw_ptr = new PilotJob(workflow, num_hosts, num_cores_per_host, ram_per_host, duration);

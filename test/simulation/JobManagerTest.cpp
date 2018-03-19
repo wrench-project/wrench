@@ -29,6 +29,8 @@ public:
     wrench::Simulation *simulation;
 
     void do_JobManagerConstructorTest_test();
+    void do_JobManagerCreateJobTest_test();
+    void do_JobManagerSubmitJobTest_test();
 
 
 protected:
@@ -107,7 +109,6 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-
       // Kill the Job Manager abruptly, just for kicks
       job_manager->kill();
 
@@ -136,6 +137,230 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          new JobManagerConstructorTestWMS(
+                  this, hostname)));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+/**********************************************************************/
+/**  DO CREATE JOB TEST                                             **/
+/**********************************************************************/
+
+class JobManagerCreateJobTestWMS : public wrench::WMS {
+
+public:
+    JobManagerCreateJobTestWMS(JobManagerTest *test,
+                                 std::string hostname) :
+            wrench::WMS(nullptr, nullptr,
+                        {}, {}, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    JobManagerTest *test;
+
+    int main() {
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      bool success;
+
+      success = true;
+      try {
+        job_manager->createStandardJob({nullptr}, {});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+      }
+
+      success = true;
+      try {
+        job_manager->createStandardJob({}, {});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job with nothing in it");
+      }
+
+      success = true;
+      try {
+        job_manager->createPilotJob(nullptr, 10, 10, 10, 10);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a pilot job with a nullptr workflow");
+      }
+
+      success = true;
+      try {
+        job_manager->createPilotJob(this->workflow, 10, 10, -12, 10);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job with a negative ram per host");
+      }
+
+      success = true;
+      try {
+        job_manager->createPilotJob(this->workflow, 10, 10, 10, -12);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job with a negative duration");
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(JobManagerTest, CreateJobTest) {
+  DO_TEST_WITH_FORK(do_JobManagerConstructorTest_test);
+}
+
+void JobManagerTest::do_JobManagerCreateJobTest_test() {
+
+  // Create and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          new JobManagerConstructorTestWMS(
+                  this, hostname)));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+/**********************************************************************/
+/**  DO SUBMIT JOB TEST                                              **/
+/**********************************************************************/
+
+class JobManagerSubmitJobTestWMS : public wrench::WMS {
+
+public:
+    JobManagerSubmitJobTestWMS(JobManagerTest *test,
+                               std::string hostname) :
+            wrench::WMS(nullptr, nullptr,
+                        {}, {}, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    JobManagerTest *test;
+
+    int main() {
+
+      // Submit a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      bool success;
+
+      success = true;
+      try {
+        job_manager->submitJob(nullptr, (wrench::ComputeService *)(1234), {});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to submit a job with a nullptr job");
+      }
+
+      success = true;
+      try {
+        job_manager->submitJob((wrench::WorkflowJob *)(1234), nullptr, {});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to submit a job with a nullptr compute service");
+      }
+
+      success = true;
+      try {
+        job_manager->terminateJob(nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to terminate a nullptr job");
+      }
+
+      success = true;
+      try {
+        job_manager->forgetJob(nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to forget a nullptr job");
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(JobManagerTest, SubmitJobTest) {
+  DO_TEST_WITH_FORK(do_JobManagerConstructorTest_test);
+}
+
+void JobManagerTest::do_JobManagerSubmitJobTest_test() {
+
+  // Submit and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Submit a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           new JobManagerConstructorTestWMS(
