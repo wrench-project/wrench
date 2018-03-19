@@ -54,7 +54,8 @@ namespace wrench {
       }
 
       // Create the WorkflowTask object
-      WorkflowTask *task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency, memory_requirement);
+      WorkflowTask *task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency,
+                                            memory_requirement);
       // Create a DAG node for it
       task->workflow = this;
       task->DAG = this->DAG.get();
@@ -100,7 +101,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     WorkflowTask *Workflow::getWorkflowTaskByID(const std::string id) {
-      if (not tasks[id]) {
+      if (tasks.find(id) == tasks.end()) {
         throw std::invalid_argument("Workflow::getWorkflowTaskByID(): Unknown WorkflowTask ID " + id);
       }
       return tasks[id].get();
@@ -123,8 +124,7 @@ namespace wrench {
 
       if (not pathExists(src, dst)) {
 
-        WRENCH_DEBUG("Adding control dependency %s-->%s",
-                     src->getId().c_str(), dst->getId().c_str());
+        WRENCH_DEBUG("Adding control dependency %s-->%s", src->getId().c_str(), dst->getId().c_str());
         DAG->addArc(src->DAG_node, dst->DAG_node);
 
         if (src->getState() != WorkflowTask::COMPLETED) {
@@ -296,10 +296,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void Workflow::loadFromJSON(const std::string &filename) {
-      ///make workflow task
-      wrench::WorkflowTask *task;
 
-      /// read a JSON file
       std::ifstream file;
       nlohmann::json j;
 
@@ -316,36 +313,52 @@ namespace wrench {
       try {
         workflowJobs = j.at("workflow");
       } catch (std::out_of_range &e) {
-        std::cerr << "out of range" << '\n';
+        throw std::invalid_argument("Workflow::loadFromJson(): Could not find a workflow entry");
       }
+
+      wrench::WorkflowTask *task;
 
       for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
         if (it.key() == "jobs") {
           std::vector<nlohmann::json> jobs = it.value();
 
           for (auto &job : jobs) {
-            std::string name = job.at("name");
-            double flops = job.at("runtime");
-            int num_procs = 1;
-            task = this->addTask(name, flops, num_procs);
-            std::vector<nlohmann::json> files = job.at("files");
+            if (job.at("type") == "compute") {
+              std::string name = job.at("name");
+              double flops = job.at("runtime");
+              int num_procs = 1;
+              task = this->addTask(name, flops, num_procs);
+              std::vector<nlohmann::json> files = job.at("files");
 
-            for (auto &f : files) {
-              double size = f.at("size");
-              std::string link = f.at("link");
-              std::string id = f.at("name");
-              wrench::WorkflowFile *file = nullptr;
-              try {
-                file = this->getWorkflowFileByID(id);
-              } catch (const std::invalid_argument &ia) {
-                // making a new file
-                file = this->addFile(id, size);
+              // task files
+              for (auto &f : files) {
+                double size = f.at("size");
+                std::string link = f.at("link");
+                std::string id = f.at("name");
+                wrench::WorkflowFile *workflow_file = nullptr;
+                try {
+                  workflow_file = this->getWorkflowFileByID(id);
+                } catch (const std::invalid_argument &ia) {
+                  // making a new file
+                  workflow_file = this->addFile(id, size);
+                }
+                if (link == "input") {
+                  task->addInputFile(workflow_file);
+                }
+                if (link == "output") {
+                  task->addOutputFile(workflow_file);
+                }
               }
-              if (link == "input") {
-                task->addInputFile(file);
-              }
-              if (link == "output") {
-                task->addOutputFile(file);
+
+              std::vector<nlohmann::json> parents = job.at("parents");
+              // task dependencies
+              for (auto &parent : parents) {
+                try {
+                  WorkflowTask *parent_task = this->getWorkflowTaskByID(parent);
+                  this->addControlDependency(parent_task, task);
+                } catch (std::invalid_argument &e) {
+                  // do nothing
+                }
               }
             }
           }
