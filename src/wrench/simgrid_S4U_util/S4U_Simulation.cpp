@@ -109,6 +109,25 @@ namespace wrench {
       return hostname_list;
     }
 
+    std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByCluster() {
+      std::map<std::string, std::vector<std::string>> result;
+      std::vector<simgrid::kernel::routing::ClusterZone*>clusters;
+
+      this->engine->getNetzoneByType<simgrid::kernel::routing::ClusterZone>(&clusters);
+      for (auto c : clusters) {
+        std::vector<simgrid::s4u::Host*> host_list;
+        c->getHosts(&host_list);
+        std::vector<std::string> hostname_list;
+        hostname_list.reserve(host_list.size());
+        for (auto h : host_list) {
+          hostname_list.push_back(std::string(h->getCname()));
+        }
+        result.insert({c->getName(), hostname_list});
+      }
+
+      return result;
+    }
+
     /**
      * @brief Determines whether a host exists for a given hostname
      * @param hostname: the hostname

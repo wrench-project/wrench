@@ -41,6 +41,7 @@ namespace wrench {
         void instantiatePlatform(std::string);
 
         std::vector<std::string> getHostnameList();
+        std::map<std::string, std::vector<std::string>> getHostnameListByCluster();
 
         bool hostExists(std::string hostname);
 
