@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,30 +8,33 @@
  */
 
 
-#include "wrench/logging/TerminalOutput.h"
-#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
-#include "wrench/services/compute/batch/BatchService.h"
-#include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
-#include <wrench/services/ServiceMessage.h>
-#include <wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h>
-#include <wrench/util/PointerUtil.h>
-#include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/services/compute/ComputeServiceMessage.h"
-#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/workflow/job/PilotJob.h"
-#include "wrench/services/compute/batch/BatchServiceMessage.h"
 #include <json.hpp>
 #include <boost/algorithm/string.hpp>
-#include <wrench/util/MessageManager.h>
+
+#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
+#include "wrench/exceptions/WorkflowExecutionException.h"
+#include "wrench/logging/TerminalOutput.h"
+#include "wrench/services/ServiceMessage.h"
+#include "wrench/services/compute/ComputeServiceMessage.h"
+#include "wrench/services/compute/batch/BatchService.h"
+#include "wrench/services/compute/batch/BatchServiceMessage.h"
+#include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
+#include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
+#include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/util/MessageManager.h"
+#include "wrench/util/PointerUtil.h"
+#include "wrench/workflow/job/PilotJob.h"
 
 #ifdef ENABLE_BATSCHED
+
 #include <zmq.hpp>
 #include <zmq.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#endif
+#include <signal.h>
 
+#endif
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
@@ -55,9 +58,12 @@ namespace wrench {
         batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
         batch_submission_data["events"][idx]["type"] = "QUERY";
         batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = std::get<0>(job);
-        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = std::get<0>(job);
-        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(job);
-        batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<2>(job);
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = std::get<0>(
+                job);
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(
+                job);
+        batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<2>(
+                job);
       }
 
 
@@ -69,12 +75,12 @@ namespace wrench {
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
       network_listener->setSimulation(this->simulation);
-      network_listener->start(network_listener,true);
+      network_listener->start(network_listener, true);
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;
 
 
-      std::map<std::string,double> jobs_estimated_waiting_time = {};
+      std::map<std::string, double> jobs_estimated_waiting_time = {};
       for (auto job : set_of_jobs) {
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -85,7 +91,7 @@ namespace wrench {
         }
 
         if (auto *msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
-            jobs_estimated_waiting_time[std::get<0>(job)] = msg->estimated_waiting_time;
+          jobs_estimated_waiting_time[std::get<0>(job)] = msg->estimated_waiting_time;
         } else {
           throw std::runtime_error(
                   "BatchService::getQueueWaitingTimeEstimate(): Received an unexpected [" + message->getName() +
@@ -472,7 +478,7 @@ namespace wrench {
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
       network_listener->setSimulation(this->simulation);
-      network_listener->start(network_listener,true);
+      network_listener->start(network_listener, true);
       network_listeners.push_back(std::move(network_listener));
 #endif
 
@@ -780,7 +786,7 @@ namespace wrench {
       batch_submission_data["events"] = nlohmann::json::array();
       size_t i;
       std::deque<std::unique_ptr<BatchJob>>::iterator it;
-      for (i=0, it = this->pending_jobs.begin(); i < this->pending_jobs.size(); i++, it++) {
+      for (i = 0, it = this->pending_jobs.begin(); i < this->pending_jobs.size(); i++, it++) {
 
         BatchJob *batch_job = it->get();
 
@@ -807,7 +813,7 @@ namespace wrench {
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
       network_listener->setSimulation(this->simulation);
-      network_listener->start(network_listener,true);
+      network_listener->start(network_listener, true);
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;
 #else
@@ -1331,12 +1337,12 @@ namespace wrench {
     }
 
 
-  /**
-   * @brief Process a pilot job termination request
-   *
-   * @param job: the job to terminate
-   * @param answer_mailbox: the mailbox to which the answer message should be sent
-   */
+    /**
+     * @brief Process a pilot job termination request
+     *
+     * @param job: the job to terminate
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     */
     void BatchService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
 
 
@@ -1429,13 +1435,13 @@ namespace wrench {
       }
     }
 
-  /**
-   * @brief Process a standard job completion
-   * @param executor: the standard job executor
-   * @param job: the job
-   *
-   * @throw std::runtime_error
-   */
+    /**
+     * @brief Process a standard job completion
+     * @param executor: the standard job executor
+     * @param job: the job
+     *
+     * @throw std::runtime_error
+     */
     void BatchService::processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job) {
       bool executor_on_the_list = false;
       std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
@@ -1482,12 +1488,12 @@ namespace wrench {
       return;
     }
 
-  /**
-   * @brief Process a work failure
-   * @param worker_thread: the worker thread that did the work
-   * @param work: the work
-   * @param cause: the cause of the failure
-   */
+    /**
+     * @brief Process a work failure
+     * @param worker_thread: the worker thread that did the work
+     * @param work: the work
+     * @param cause: the cause of the failure
+     */
     void BatchService::processStandardJobFailure(StandardJobExecutor *executor,
                                                  StandardJob *job,
                                                  std::shared_ptr<FailureCause> cause) {
@@ -1529,11 +1535,11 @@ namespace wrench {
     }
 
 
-  /**
-   * @brief fail a pending standard job
-   * @param job: the job
-   * @param cause: the failure cause
-   */
+    /**
+     * @brief fail a pending standard job
+     * @param job: the job
+     * @param cause: the failure cause
+     */
     void BatchService::failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
       // Send back a job failed message
       WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
@@ -1584,8 +1590,9 @@ namespace wrench {
         }
 
         std::string rjms_delay = this->getPropertyValueAsString(BatchServiceProperty::BATCH_RJMS_DELAY);
-        std::string socket_endpoint = "tcp://*:"+std::to_string(this->batsched_port);
-        const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s", socket_endpoint.c_str(),  "--rjms_delay", rjms_delay.c_str(), NULL};
+        std::string socket_endpoint = "tcp://*:" + std::to_string(this->batsched_port);
+        const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
+                              socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
         if (execvp(args[0], (char **) args) == -1) {
           exit(3);
         }
@@ -1596,13 +1603,12 @@ namespace wrench {
         sleep(1); // Wait one second to let batsched the time to start (this is pretty ugly)
         int exit_code = waitpid(top_pid, NULL, WNOHANG);
         switch (exit_code) {
-          case 0:
-          {
+          case 0: {
             //now fork a process that sleeps until its parent is dead
             int nested_pid = fork();
-      int parent_pid = getppid();
+            int parent_pid = getppid();
 
-            if(nested_pid > 0) {
+            if (nested_pid > 0) {
               //I am the parent, whose child fork exec'd batsched
             } else if (nested_pid == 0) {
               int ppid = getppid();
@@ -1615,7 +1621,7 @@ namespace wrench {
                 kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched
               }
               //my parent has died so, I will kill myself instead of exiting and becoming a zombie
-              kill(getpid(),SIGKILL);
+              kill(getpid(), SIGKILL);
               //exit(is_sent); //if exit myself and become a zombie :D
 
             }
