@@ -28,7 +28,7 @@ public:
     wrench::Simulation *simulation;
 
 
-    void do_ConstructorTest_test();
+    void do_StandardJobExecutorConstructorTest_test();
 
     void do_OneSingleCoreTaskTest_test();
 
@@ -92,10 +92,10 @@ protected:
 /**  DO CONSTRUCTOR TEST                                             **/
 /**********************************************************************/
 
-class ConstructorTestWMS : public wrench::WMS {
+class StandardJobExecutorConstructorTestWMS : public wrench::WMS {
 
 public:
-    ConstructorTestWMS(StandardJobExecutorTest *test,
+    StandardJobExecutorConstructorTestWMS(StandardJobExecutorTest *test,
                        const std::set<wrench::ComputeService *> &compute_services,
                        const std::set<wrench::StorageService *> &storage_services,
                        std::string hostname) :
@@ -439,10 +439,10 @@ private:
 };
 
 TEST_F(StandardJobExecutorTest, ConstructorTest) {
-  DO_TEST_WITH_FORK(do_ConstructorTest_test);
+  DO_TEST_WITH_FORK(do_StandardJobExecutorConstructorTest_test);
 }
 
-void StandardJobExecutorTest::do_ConstructorTest_test() {
+void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
 
   // Create and initialize a simulation
   simulation = new wrench::Simulation();
@@ -477,7 +477,7 @@ void StandardJobExecutorTest::do_ConstructorTest_test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          new ConstructorTestWMS(
+          new StandardJobExecutorConstructorTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
