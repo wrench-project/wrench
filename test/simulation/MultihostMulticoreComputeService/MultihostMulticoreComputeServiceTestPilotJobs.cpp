@@ -127,6 +127,7 @@ private:
         success = false;
       }
 
+
       if (success) {
         throw std::runtime_error(
                 "Should not be able to submit a pilot job to a compute service that does not support them");
@@ -226,6 +227,7 @@ private:
       // Create a pilot job that requires 1 host, 1 core per host, 0 bytes of RAM per host, and 1 hour
       wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 3600);
 
+
       std::string job_type_as_string = pilot_job->getTypeAsString();
       if (job_type_as_string != "Pilot") {
         throw std::runtime_error("Job type as string should be 'Pilot'");
@@ -237,6 +239,8 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
+
+
 
       // Wait for the pilot job start
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -254,6 +258,29 @@ private:
         default: {
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
         }
+      }
+
+
+      // Getting the list of running pilot jobs
+      std::set<wrench::PilotJob *>running_pilot_jobs = job_manager->getRunningPilotJobs();
+      if ((running_pilot_jobs.size() != 1) || (*(running_pilot_jobs.begin()) != pilot_job)) {
+        throw std::runtime_error("Job manager returns an invalid list of running pilot jobs");
+      }
+
+      // Create another pilot job that requires 1 host, all core per host, 0 bytes of RAM per host, and 1 hour
+      wrench::PilotJob *big_pilot_job = job_manager->createPilotJob(this->workflow, 1, 2, 0, 3600);
+
+      // Submit this other job
+      try {
+        job_manager->submitJob(big_pilot_job, this->test->compute_service);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
+      }
+
+      // Getting the list of pending pilot jobs
+      std::set<wrench::PilotJob *>pending_pilot_jobs = job_manager->getPendingPilotJobs();
+      if ((pending_pilot_jobs.size() != 1) || (*(pending_pilot_jobs.begin()) != big_pilot_job)) {
+        throw std::runtime_error("Job manager returns an invalid list of pending pilot jobs");
       }
 
       // Create a 1-task standard job
@@ -305,6 +332,8 @@ private:
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
         }
       }
+
+      // At this point another pilot job is running/pending, but this should be fine
 
       return 0;
     }
