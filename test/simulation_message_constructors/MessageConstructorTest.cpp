@@ -64,24 +64,24 @@ TEST_F(MessageConstructorTest, SimulationMessages) {
 
 TEST_F(MessageConstructorTest, FileRegistryMessages) {
 
-  EXPECT_NO_THROW(new wrench::FileRegistryFileLookupRequestMessage("mailbox_name", file, 666));
+  EXPECT_NO_THROW(new wrench::FileRegistryFileLookupRequestMessage("mailbox", file, 666));
   EXPECT_THROW(new wrench::FileRegistryFileLookupRequestMessage("", file, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::FileRegistryFileLookupRequestMessage("mailbox_name", nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::FileRegistryFileLookupRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::FileRegistryFileLookupAnswerMessage(file, {}, 666));
   EXPECT_THROW(new wrench::FileRegistryFileLookupAnswerMessage(nullptr, {}, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::FileRegistryRemoveEntryRequestMessage("mailbox_name", file, storage_service, 666));
+  EXPECT_NO_THROW(new wrench::FileRegistryRemoveEntryRequestMessage("mailbox", file, storage_service, 666));
   EXPECT_THROW(new wrench::FileRegistryRemoveEntryRequestMessage("", file, storage_service, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::FileRegistryRemoveEntryRequestMessage("mailbox_name", nullptr, storage_service, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::FileRegistryRemoveEntryRequestMessage("mailbox_name", file, nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::FileRegistryRemoveEntryRequestMessage("mailbox", nullptr, storage_service, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::FileRegistryRemoveEntryRequestMessage("mailbox", file, nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::FileRegistryRemoveEntryAnswerMessage(true, 666));
 
-  EXPECT_NO_THROW(new wrench::FileRegistryAddEntryRequestMessage("mailbox_name", file, storage_service, 666));
+  EXPECT_NO_THROW(new wrench::FileRegistryAddEntryRequestMessage("mailbox", file, storage_service, 666));
   EXPECT_THROW(new wrench::FileRegistryAddEntryRequestMessage("", file, storage_service, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::FileRegistryAddEntryRequestMessage("mailbox_name", nullptr, storage_service, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::FileRegistryAddEntryRequestMessage("mailbox_name", file, nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::FileRegistryAddEntryRequestMessage("mailbox", nullptr, storage_service, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::FileRegistryAddEntryRequestMessage("mailbox", file, nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::FileRegistryAddEntryAnswerMessage(666));
 }
@@ -90,9 +90,9 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 
   std::map<std::string, std::string> args;
   args.insert(std::make_pair("a","b"));
-  EXPECT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("mailbox_name", standard_job, args, 666));
+  EXPECT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("mailbox", standard_job, args, 666));
   EXPECT_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("", standard_job, args, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("mailbox_name", nullptr, args, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::ComputeServiceSubmitStandardJobRequestMessage("mailbox", nullptr, args, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job, compute_service, true, nullptr, 666));
   EXPECT_NO_THROW(new wrench::ComputeServiceSubmitStandardJobAnswerMessage(standard_job, compute_service, false, failure_cause, 666));
@@ -110,9 +110,9 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
   EXPECT_THROW(new wrench::ComputeServiceStandardJobFailedMessage(standard_job, nullptr, failure_cause, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::ComputeServiceStandardJobFailedMessage(standard_job, compute_service, nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("mailbox_name", standard_job, 666));
+  EXPECT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("mailbox", standard_job, 666));
   EXPECT_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("", standard_job, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("mailbox_name", nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::ComputeServiceTerminateStandardJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, true, nullptr, 666));
   EXPECT_NO_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, false, failure_cause, 666));
@@ -121,9 +121,9 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
   EXPECT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, true, failure_cause, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, false, nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox_name", pilot_job, 666));
+  EXPECT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox", pilot_job, 666));
   EXPECT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("", pilot_job, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox_name", nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job, compute_service, true, nullptr, 666));
   EXPECT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job, compute_service, false, failure_cause, 666));
@@ -144,9 +144,9 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
   EXPECT_THROW(new wrench::ComputeServicePilotJobFailedMessage(nullptr, compute_service, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::ComputeServicePilotJobFailedMessage(pilot_job, nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("mailbox_name", pilot_job, 666));
+  EXPECT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("mailbox", pilot_job, 666));
   EXPECT_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("", pilot_job, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("mailbox_name", nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::ComputeServiceTerminatePilotJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, compute_service, true, nullptr, 666));
   EXPECT_NO_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, compute_service, false, failure_cause, 666));
@@ -156,7 +156,7 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
   EXPECT_THROW(new wrench::ComputeServiceTerminatePilotJobAnswerMessage(pilot_job, compute_service, false, nullptr, 666), std::invalid_argument);
 
 
-  EXPECT_NO_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("mailbox_name", 666));
+  EXPECT_NO_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("mailbox", 666));
   EXPECT_THROW(new wrench::ComputeServiceResourceInformationRequestMessage("", 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::make_pair("something", std::vector<double>({2.3, 4.5}))}, 666));
@@ -167,7 +167,7 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 
 TEST_F(MessageConstructorTest, CloudServiceMessages) {
 
-  EXPECT_NO_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("mailbox_name", 600));
+  EXPECT_NO_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("mailbox", 600));
   EXPECT_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("", 666), std::invalid_argument);
 
   std::vector<std::string> arg;
@@ -175,31 +175,31 @@ TEST_F(MessageConstructorTest, CloudServiceMessages) {
   EXPECT_NO_THROW(new wrench::CloudServiceGetExecutionHostsAnswerMessage(arg, 600));
 
   std::map<std::string, std::string> plist;
-  EXPECT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox_name", "host", "host", true, true, 42, 10, plist, 666));
+  EXPECT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "host", true, true, 42, 10, plist, 666));
   EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("", "host", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox_name", "", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox_name", "host", "", true, true, 42, 0, plist, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "", true, true, 42, 0, plist, 666), std::invalid_argument);
 }
 
 
 
 TEST_F(MessageConstructorTest, StorageServiceMessages) {
-  EXPECT_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage("mailbox_name", 666));
+  EXPECT_NO_THROW(new wrench::StorageServiceFreeSpaceRequestMessage("mailbox", 666));
   EXPECT_THROW(new wrench::StorageServiceFreeSpaceRequestMessage("", 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::StorageServiceFreeSpaceAnswerMessage(0.1, 666));
   EXPECT_THROW(new wrench::StorageServiceFreeSpaceAnswerMessage(-0.1, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::StorageServiceFileLookupRequestMessage("mailbox_name", file, 666));
+  EXPECT_NO_THROW(new wrench::StorageServiceFileLookupRequestMessage("mailbox", file, 666));
   EXPECT_THROW(new wrench::StorageServiceFileLookupRequestMessage("", file, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileLookupRequestMessage("mailbox_name", nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileLookupRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::StorageServiceFileLookupAnswerMessage(file, true, 666));
   EXPECT_THROW(new wrench::StorageServiceFileLookupAnswerMessage(nullptr, true, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::StorageServiceFileDeleteRequestMessage("mailbox_name", file, 666));
+  EXPECT_NO_THROW(new wrench::StorageServiceFileDeleteRequestMessage("mailbox", file, 666));
   EXPECT_THROW(new wrench::StorageServiceFileDeleteRequestMessage("", file, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileDeleteRequestMessage("mailbox_name", nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileDeleteRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, nullptr, 666));
   EXPECT_NO_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, false, failure_cause, 666));
@@ -212,10 +212,10 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   EXPECT_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, failure_cause, 666),
                std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox_name", file, storage_service, 666));
+  EXPECT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, storage_service, 666));
   EXPECT_THROW(new wrench::StorageServiceFileCopyRequestMessage("", file, storage_service, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox_name", nullptr, storage_service, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox_name", file, nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", nullptr, storage_service, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, true, nullptr, 666));
   EXPECT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, false, failure_cause, 666));
@@ -224,22 +224,22 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, true, failure_cause, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, false, nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox_name", file, 666));
+  EXPECT_NO_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox", file, 666));
   EXPECT_THROW(new wrench::StorageServiceFileWriteRequestMessage("", file, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox_name", nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, true, nullptr, "mailbox_name", 666));
-  EXPECT_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, false, failure_cause, "mailbox_name", 666));
-  EXPECT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(nullptr, storage_service, true, nullptr, "mailbox_name", 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, nullptr, true, nullptr, "mailbox_name", 666), std::invalid_argument);
+  EXPECT_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, true, nullptr, "mailbox", 666));
+  EXPECT_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, false, failure_cause, "mailbox", 666));
+  EXPECT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(nullptr, storage_service, true, nullptr, "mailbox", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, nullptr, true, nullptr, "mailbox", 666), std::invalid_argument);
   EXPECT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, true, nullptr, "", 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, true, failure_cause, "mailbox_name", 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, false, nullptr, "mailbox_name", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, true, failure_cause, "mailbox", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, false, nullptr, "mailbox", 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox_name", "mailbox_name", file, 666));
-  EXPECT_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox_name", file, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox_name", "", file, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox_name", nullptr, 666), std::invalid_argument);
+  EXPECT_NO_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", file, 666));
+  EXPECT_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox", file, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "", file, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox", nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, storage_service, true, nullptr, 666));
   EXPECT_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, storage_service, false, failure_cause, 666));
@@ -255,10 +255,10 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
 
 TEST_F(MessageConstructorTest, NetworkProximityMessages) {
 
-  EXPECT_NO_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox_name", std::make_pair("a","b"), 666));
+  EXPECT_NO_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("a","b"), 666));
   EXPECT_THROW(new wrench::NetworkProximityLookupRequestMessage("", std::make_pair("a","b"), 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox_name", std::make_pair("","b"), 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox_name", std::make_pair("a",""), 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("","b"), 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("a",""), 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("a","b"), 1.0, 666));
   EXPECT_THROW(new wrench::NetworkProximityLookupAnswerMessage(std::make_pair("","b"), 1.0, 666), std::invalid_argument);
@@ -274,19 +274,26 @@ TEST_F(MessageConstructorTest, NetworkProximityMessages) {
 
 TEST_F(MessageConstructorTest, BatchServiceMessages) {
 
-  EXPECT_NO_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox_name", "foo", 666));
-  EXPECT_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox_name", "", 666), std::invalid_argument);
+  EXPECT_NO_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox", "foo", 666));
+  EXPECT_THROW(new wrench::BatchSimulationBeginsToSchedulerMessage("mailbox", "", 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox_name", workflow_job, "foo", 666));
+  EXPECT_NO_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox", workflow_job, "foo", 666));
   EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("", workflow_job, "foo", 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox_name", nullptr, "foo", 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox_name", workflow_job, "", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox", nullptr, "foo", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox", workflow_job, "", 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::BatchJobReplyFromSchedulerMessage("reply", 666));
 
-  EXPECT_NO_THROW(new wrench::BatchServiceJobRequestMessage("mailbox_name", batch_job, 666));
+  EXPECT_NO_THROW(new wrench::BatchSchedReadyMessage("mailbox", 666));
+  EXPECT_THROW(new wrench::BatchSchedReadyMessage("", 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("mailbox", "string", 666));
+  EXPECT_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("", "string", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("mailbox", "", 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", batch_job, 666));
   EXPECT_THROW(new wrench::BatchServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::BatchServiceJobRequestMessage("mailbox_name", nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::AlarmJobTimeOutMessage(workflow_job, 666));
 
