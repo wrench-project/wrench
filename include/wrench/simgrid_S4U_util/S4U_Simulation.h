@@ -12,6 +12,7 @@
 #define WRENCH_S4U_SIMULATION_H
 
 #include <simgrid/s4u.hpp>
+#include <simgrid/kernel/routing/ClusterZone.hpp>
 
 namespace wrench {
 
@@ -40,6 +41,7 @@ namespace wrench {
 				bool isInitialized();
         bool isPlatformSetup();
         std::vector<std::string> getAllHostnames();
+        std::map<std::string, std::vector<std::string>> getAllHostnamesByCluster();
         void shutdown();
 
 
