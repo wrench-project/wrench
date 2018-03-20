@@ -133,7 +133,15 @@ namespace wrench {
     std::vector<std::string> Simulation::getHostnameList() {
       return this->s4u_simulation->getAllHostnames();
     }
-
+    /**
+     * @brief Retrieve the list of names of all the hosts in each cluster composing the platform
+     *
+     * @return a map of (clustername, hostnames)
+     *
+     */
+    std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
+      return this->s4u_simulation->getAllHostnamesByCluster();
+    }
     /**
      * @brief Check that a hostname exists in the platform
      *
