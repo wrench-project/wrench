@@ -1604,18 +1604,20 @@ namespace wrench {
         int exit_code = waitpid(top_pid, NULL, WNOHANG);
         switch (exit_code) {
           case 0: {
+            int tether[2]; // this is a local variable, only defined in this scope
+            if (pipe(tether) != 0) {  // the pipe however is opened during the whole duration of both processes
+              throw std::runtime_error("run_batsched(): pipe failed.");
+            }
             //now fork a process that sleeps until its parent is dead
             int nested_pid = fork();
-            int parent_pid = getppid();
 
             if (nested_pid > 0) {
               //I am the parent, whose child fork exec'd batsched
             } else if (nested_pid == 0) {
-              int ppid = getppid();
-              while (ppid == parent_pid) {
-                sleep(1);
-                ppid = getppid();
-              }
+              char foo;
+              close(tether[1]); // closing write end
+              read(tether[0], &foo, 1); // blocking read which returns when the parent dies
+
               //check if the child that forked batsched is still running
               if (getpgid(top_pid)) {
                 kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched
