@@ -35,7 +35,7 @@ wrench-simple-wms-batch <PATH-TO-WRENCH-SRC-FOLDER>/examples/batch_hosts.xml <PA
 ## Understanding the Simple-WMS Examples      {#getting-started-example-simplewms}
 
 The `SimpleWMS` example requires two arguments: (1) a [SimGrid virtual platform 
-description file](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html); and
+description file](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/platform.html); and
 (2) a WRENCH workflow file.
 
 **SimGrid virtual platform description file:** 
@@ -44,7 +44,7 @@ of the platform on which an application execution is to be simulates. This is do
 a platform description file that includes definitions of compute hosts, clusters of hosts, 
 storage resources, network links, routes between hosts, etc.
 A detailed description on how to create a platform description file can be found
-[here](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html).
+[here](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/platform.html).
 
 **WRENCH workflow file:**
 WRENCH provides native parsers for [DAX](http://workflowarchive.org) (DAG in XML) 
