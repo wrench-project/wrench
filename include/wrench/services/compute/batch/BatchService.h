@@ -55,7 +55,8 @@ namespace wrench {
                  {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,             "1024"},
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
                  {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
-                 {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0",}
+                 {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
+                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,                     ""}
                 };
 
     public:
@@ -74,7 +75,7 @@ namespace wrench {
 
         std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>>);
 
-        ~BatchService();
+        ~BatchService() override;
 
 
     private:
@@ -90,6 +91,8 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
         unsigned int batsched_port;
 #endif
+
+        std::vector<std::tuple<std::string, double, double, double, double, int>> workload_trace;
 
         bool clean_exit = false;
 
