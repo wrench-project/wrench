@@ -499,12 +499,17 @@ namespace wrench {
           this->completed_standard_jobs.insert(job);
 
           // Forward the notification along the notification chain
-          try {
-            S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                     new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            keep_going = true;
+          std::string callback_mailbox = job->popCallbackMailbox();
+          if (not callback_mailbox.empty()) {
+            try {
+              S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
+                                       new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+              // ignore
+            }
           }
+          keep_going = true;
+
         } else if (auto msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
 
           // update job state

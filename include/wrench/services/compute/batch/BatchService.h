@@ -185,6 +185,8 @@ namespace wrench {
 
         bool dispatchNextPendingJob();
 
+        void startBackgroundWorkloadProcess();
+
         void processGetResourceInformation(const std::string &answer_mailbox);
 
         void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);

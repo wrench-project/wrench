@@ -24,7 +24,7 @@ namespace wrench {
 
       std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs = {};
 
-        std::ifstream infile(filename);
+      std::ifstream infile(filename);
       if (not infile.is_open()) {
         throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): Cannot open trace file " + filename);
       }
