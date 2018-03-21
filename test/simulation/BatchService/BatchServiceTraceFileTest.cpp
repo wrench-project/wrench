@@ -77,9 +77,9 @@ class BatchTraceFileReplayTestWMS : public wrench::WMS {
 
 public:
     BatchTraceFileReplayTestWMS(BatchServiceTest *test,
-                                       const std::set<wrench::ComputeService *> &compute_services,
-                                       const std::set<wrench::StorageService *> &storage_services,
-                                       std::string hostname) :
+                                const std::set<wrench::ComputeService *> &compute_services,
+                                const std::set<wrench::StorageService *> &storage_services,
+                                std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services,
                         {}, nullptr, hostname, "test") {
       this->test = test;
@@ -101,7 +101,7 @@ private:
         //Let's load the trace file
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>
                 trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("test/trace_files/NASA-iPSC-1993-3.swf",
-                                                                              0);
+                                                                             0);
         for (auto const &job : trace_file_jobs) {
           double sub_time = std::get<1>(job);
           double curtime = wrench::S4U_Simulation::getClock();
@@ -144,24 +144,6 @@ private:
 
           num_submitted_jobs++;
 
-//          // Wait for a fake job submission reply
-//          std::unique_ptr<wrench::SimulationMessage> message = nullptr;
-//          try {
-//            std::cout << "Listening to mailbox_name " << this->workflow->getCallbackMailbox() << "\n";
-//            message = wrench::S4U_Mailbox::getMessage(this->workflow->getCallbackMailbox());
-//          } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-//            throw std::runtime_error("Got a network error");
-//          }
-//
-//          // TODO: Why is this "fake"?
-//          if (auto *m = dynamic_cast<wrench::ComputeServiceInformationMessage *>(message.get())) {
-//            std::cout << "Resources information obtained " << m->information << "\n";
-//          } else {
-//            throw std::runtime_error(
-//                    "Reply from Fake Job submission was not obtained");
-//          }
-
-//          this->workflow->removeTask(task);
         }
       }
 
@@ -289,7 +271,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/tmp/not_there"}}
-                                   )), std::invalid_argument);
+          )), std::invalid_argument);
 
   std::string trace_file_path = "/tmp/swf_trace";
   FILE *trace_file;
@@ -304,7 +286,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/tmp/not_there"}}
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   // Create another invalid trace file
@@ -317,7 +299,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/tmp/not_there"}}
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   // Create another invalid trace file
@@ -331,7 +313,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/tmp/not_there"}}
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
   // Create another invalid trace file
@@ -345,14 +327,14 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/tmp/not_there"}}
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
 
   // Create a Valid trace file
   trace_file = fopen(trace_file_path.c_str(), "w");
   fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1 ");  // job that takes the whole machine
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 2 3600 -1 ");  // job that takes half the machine
+  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1 ");  // job that takes half the machine
   fclose(trace_file);
 
   // Create a WMS
