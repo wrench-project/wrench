@@ -161,7 +161,7 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 
   EXPECT_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::make_pair("something", std::vector<double>({2.3, 4.5}))}, 666));
 
-  EXPECT_NO_THROW(new wrench::ComputeServiceInformationMessage(workflow_job, "info", 666));
+//  EXPECT_NO_THROW(new wrench::ComputeServiceInformationMessage(workflow_job, "info", 666));
 }
 
 
