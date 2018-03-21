@@ -226,7 +226,7 @@ namespace wrench {
           double flops = std::get<2>(j);
           double requested_flops = std::get<3>(j);
           double requested_ram = std::get<4>(j);
-          int num_nodes = std::get<5>(j);
+          unsigned int num_nodes = std::get<5>(j);
 
           if (num_nodes > this->total_num_of_nodes) {
             throw std::invalid_argument("Workload trace file contains a job that requires too many compute nodes");

@@ -92,7 +92,7 @@ namespace wrench {
         unsigned int batsched_port;
 #endif
 
-        std::vector<std::tuple<std::string, double, double, double, double, int>> workload_trace;
+        std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> workload_trace;
 
         bool clean_exit = false;
 
