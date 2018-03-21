@@ -220,7 +220,7 @@ namespace wrench {
      */
     std::string NotEnoughComputeResources::toString() {
       return "Compute service " + this->compute_service->getName() + " on host " +
-             this->compute_service->getHostname() + " does not have enough cores to support job " + job->getName();
+             this->compute_service->getHostname() + " does not have enough compute resources to support job " + job->getName();
     }
 
     /**

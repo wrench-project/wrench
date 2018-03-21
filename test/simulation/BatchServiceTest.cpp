@@ -65,6 +65,8 @@ public:
 
     void do_BatchJobLittleComplexEstimateWaitingTimeTest_test();
 
+    void do_WorkloadTraceFileTest_test();
+
 protected:
     BatchServiceTest() {
 
@@ -206,16 +208,16 @@ void BatchServiceTest::do_StandardJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                           storage_service1, {})));
+          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+                                   storage_service1, {})));
 
   simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
@@ -347,23 +349,23 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                           storage_service1, {})));
+          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+                                   storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           new OnePilotJobSubmissionTestWMS(
                   this,
-                          {compute_service}, {storage_service1, storage_service2}, hostname)));
+                  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -541,24 +543,24 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1, {})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           new StandardPlusPilotJobSubmissionTestWMS(
                   this,
-                          {compute_service}, {storage_service1, storage_service2}, hostname)));
+                  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
@@ -677,17 +679,17 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1,  {})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1,  {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -805,17 +807,17 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1, {})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -950,17 +952,17 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1, {})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1093,17 +1095,17 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1, {})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1302,18 +1304,18 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1,
-                                           {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1,
+                                   {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1493,17 +1495,17 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1, {})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1677,17 +1679,17 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1, {})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1844,17 +1846,17 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1,  {})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1,  {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1993,17 +1995,17 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(),
-                                           storage_service1, {})));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -2150,20 +2152,20 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname,
-                                           true, true,
-                                           simulation->getHostnameList(), storage_service1,  {
-                                                   {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "filler"},
-                                                   {wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"}
-                                           })));
+          new wrench::BatchService(hostname,
+                                   true, true,
+                                   simulation->getHostnameList(), storage_service1,  {
+                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "filler"},
+                                           {wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"}
+                                   })));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -2219,35 +2221,37 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
+
+      // Submit the jobs
+      unsigned long num_submitted_jobs = 0;
       {
         //Let's load the trace file
-        std::vector<std::pair<double, std::tuple<std::string, double, int, int, double, int>>>
-                trace_file_tasks = wrench::TraceFileLoader::loadFromTraceFile("test/trace_files/NASA-iPSC-1993-3.swf",
+        std::vector<std::tuple<std::string, double, double, double, double, int>>
+                trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("test/trace_files/NASA-iPSC-1993-3.swf",
                                                                               0);
-        for (auto tasks_info:trace_file_tasks) {
-          double sub_time = tasks_info.first;
+        for (auto const &job : trace_file_jobs) {
+          double sub_time = std::get<1>(job);
           double curtime = wrench::S4U_Simulation::getClock();
           double sleeptime = sub_time - curtime;
           if (sleeptime > 0)
             wrench::S4U_Simulation::sleep(sleeptime);
-          std::tuple<std::string, double, int, int, double, int> task_args = std::get<1>(tasks_info);
-          std::string id = std::get<0>(task_args);
-          double flops = std::get<1>(task_args);
-          int min_num_cores = std::get<2>(task_args);
-          int max_num_cores = std::get<3>(task_args);
-          double parallel_efficiency = std::get<4>(task_args);
-          int num_nodes = std::get<5>(task_args);
-          if (min_num_cores == -1 || max_num_cores == -1) {
-            min_num_cores = 10;
-            max_num_cores = 10;
-          }
+          std::string id = std::get<0>(job);
+          double flops = std::get<2>(job);
+          double requested_flops = std::get<3>(job);
+          double requested_ram = std::get<4>(job);
+          int num_nodes = std::get<5>(job);
+          int min_num_cores = 10;
+          int max_num_cores = 10;
+          double parallel_efficiency = 1.0;
+          // Ignore jobs that are too big
           if (num_nodes > 4) {
             continue;
           }
+//          std::cerr << "SUBMITTING " << "sub="<< sub_time << "num_nodes=" << num_nodes << " id="<<id << " flops="<<flops << " rflops="<<requested_flops << " ram="<<requested_ram << "\n";
           wrench::WorkflowTask *task = this->workflow->addTask(id, flops, min_num_cores, max_num_cores,
                                                                parallel_efficiency);
 
-          wrench::StandardJob *job = job_manager->createStandardJob(
+          wrench::StandardJob *standard_job = job_manager->createStandardJob(
                   {task},
                   {},
                   {},
@@ -2257,33 +2261,54 @@ private:
 
           std::map<std::string, std::string> batch_job_args;
           batch_job_args["-N"] = std::to_string(num_nodes);
-          batch_job_args["-t"] = std::to_string(flops);
-          batch_job_args["-c"] = std::to_string(min_num_cores); //use all cores
+          batch_job_args["-t"] = std::to_string(requested_flops);
+          batch_job_args["-c"] = std::to_string(max_num_cores); //use all cores
           try {
-            job_manager->submitJob(job, this->test->compute_service, batch_job_args);
+            job_manager->submitJob(standard_job, this->test->compute_service, batch_job_args);
           } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error(
-                    "Got some exception"
-            );
+            throw std::runtime_error("Failed to submit a job");
           }
 
-          // Wait for a fake job submission reply
-          std::unique_ptr<wrench::SimulationMessage> message = nullptr;
-          try {
-            std::cout << "Listening to mailbox_name " << this->workflow->getCallbackMailbox() << "\n";
-            message = wrench::S4U_Mailbox::getMessage(this->workflow->getCallbackMailbox());
-          } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-            throw wrench::WorkflowExecutionException(cause);
-          }
+          num_submitted_jobs++;
 
-          if (auto *m = dynamic_cast<wrench::ComputeServiceInformationMessage *>(message.get())) {
-            std::cout << "Resources information obtained " << m->information << "\n";
-          } else {
-            throw std::runtime_error(
-                    "BatchServiceTest::BatchFakeJobSubmissionTestWMS(): Reply from Fake Job submission was not obtained");
-          }
+//          // Wait for a fake job submission reply
+//          std::unique_ptr<wrench::SimulationMessage> message = nullptr;
+//          try {
+//            std::cout << "Listening to mailbox_name " << this->workflow->getCallbackMailbox() << "\n";
+//            message = wrench::S4U_Mailbox::getMessage(this->workflow->getCallbackMailbox());
+//          } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+//            throw std::runtime_error("Got a network error");
+//          }
+//
+//          // TODO: Why is this "fake"?
+//          if (auto *m = dynamic_cast<wrench::ComputeServiceInformationMessage *>(message.get())) {
+//            std::cout << "Resources information obtained " << m->information << "\n";
+//          } else {
+//            throw std::runtime_error(
+//                    "Reply from Fake Job submission was not obtained");
+//          }
 
-          this->workflow->removeTask(task);
+//          this->workflow->removeTask(task);
+        }
+      }
+
+      // Wait for the execution events
+      for (int i=0; i < num_submitted_jobs; i++) {
+        // Wait for a workflow execution event
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = this->workflow->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        }
+        switch (event->type) {
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+            // success, do nothing for now
+            break;
+          }
+          default: {
+            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+          }
         }
       }
 
@@ -2291,20 +2316,9 @@ private:
     }
 };
 
-#ifdef ENABLE_BATSCHED
-
-TEST_F(BatchServiceTest, DISABLED_BatchTraceFileJobSubmissionTest) {
+TEST_F(BatchServiceTest, BatchTraceFileJobSubmissionTest) {
   DO_TEST_WITH_FORK(do_BatchTraceFileJobSubmissionTest_test);
 }
-
-#else
-
-TEST_F(BatchServiceTest, DISABLED_BatchTraceFileJobSubmissionTest) {
-  DO_TEST_WITH_FORK(do_BatchTraceFileJobSubmissionTest_test);
-}
-
-#endif
-
 
 void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
 
@@ -2324,17 +2338,17 @@ void BatchServiceTest::do_BatchTraceFileJobSubmissionTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(), storage_service1, {
-                                           })));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(), storage_service1, {
+                                   })));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -2372,9 +2386,9 @@ class BatchJobBasicEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobBasicEstimateWaitingTimeTestWMS(BatchServiceTest *test,
-                                       const std::set<wrench::ComputeService *> &compute_services,
-                                       const std::set<wrench::StorageService *> &storage_services,
-                                       std::string hostname) :
+                                            const std::set<wrench::ComputeService *> &compute_services,
+                                            const std::set<wrench::StorageService *> &storage_services,
+                                            std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
       this->test = test;
@@ -2436,7 +2450,7 @@ private:
         double expected_wait_time = 300 - first_job_running;
         double tolerance = 1; // in seconds
         double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - tolerance));
-         if (delta > 1) {
+        if (delta > 1) {
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
 
@@ -2499,23 +2513,23 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::BatchService(hostname, true, true,
-                                           simulation->getHostnameList(), storage_service1, {
-                                                   {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
-                                           })));
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(), storage_service1, {
+                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
+                                   })));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(new BatchJobBasicEstimateWaitingTimeTestWMS(
-                  this, {compute_service}, {storage_service1, storage_service2}, hostname)));
+          this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
@@ -2795,9 +2809,9 @@ class BatchJobLittleComplexEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobLittleComplexEstimateWaitingTimeTestWMS(BatchServiceTest *test,
-                                       const std::set<wrench::ComputeService *> &compute_services,
-                                       const std::set<wrench::StorageService *> &storage_services,
-                                       std::string hostname) :
+                                                    const std::set<wrench::ComputeService *> &compute_services,
+                                                    const std::set<wrench::StorageService *> &storage_services,
+                                                    std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
       this->test = test;
@@ -3062,6 +3076,88 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
   // Staging the input_file on the storage service
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+/**********************************************************************/
+/**  WORKLOAD TRACE FILE TEST                                        **/
+/**********************************************************************/
+
+class WorkloadTraceFileTestWMS : public wrench::WMS {
+
+public:
+    WorkloadTraceFileTestWMS(BatchServiceTest *test,
+                             const std::set<wrench::ComputeService *> &compute_services,
+                             const std::set<wrench::StorageService *> &storage_services,
+                             std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+                        hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      return 0;
+    }
+};
+
+TEST_F(BatchServiceTest, WorkloadTraceFileTest) {
+  DO_TEST_WITH_FORK(do_WorkloadTraceFileTest_test);
+}
+
+
+void BatchServiceTest::do_WorkloadTraceFileTest_test() {
+
+  // Create and initialize a simulation
+  auto simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("batch_service_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Batch Service with a non-existing workload trace file
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(), storage_service1,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/tmp/not_there"}}
+                                   )), std::invalid_argument);
+
+  // Create a simple trace file
+  std::string trace_file_path = "/tmp/swf_trace";
+  FILE *trace_file = fopen(trace_file_path.c_str(), "w");
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1 ");
+  fclose(trace_file);
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(new WorkloadTraceFileTestWMS(
+          this, {compute_service}, {}, hostname)));
+
+  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would

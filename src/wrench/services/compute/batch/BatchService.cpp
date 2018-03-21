@@ -10,6 +10,7 @@
 
 #include <json.hpp>
 #include <boost/algorithm/string.hpp>
+#include <wrench/util/TraceFileLoader.h>
 
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
@@ -168,7 +169,7 @@ namespace wrench {
       double speed = Simulation::getHostFlopRate(*(compute_hosts.begin()));
       double ram = Simulation::getHostMemoryCapacity(*(compute_hosts.begin()));
 
-      for (auto const h : compute_hosts) {
+      for (auto const &h : compute_hosts) {
         // Compute speed
         if (fabs(speed - Simulation::getHostFlopRate(h)) > DBL_EPSILON) {
           throw std::invalid_argument(
@@ -198,7 +199,8 @@ namespace wrench {
       //create a map for host to cores
       int i = 0;
       for (auto h : compute_hosts) {
-        if (cores_per_host > 0 && not this->supports_pilot_jobs) {
+        // TODO: Why do we have the "not this->supports_pilot_jobs" below?
+        if (cores_per_host < ComputeService::ALL_CORES && not this->supports_pilot_jobs) {
           this->nodes_to_cores_map.insert({h, cores_per_host});
           this->available_nodes_to_cores.insert({h, cores_per_host});
         } else {
@@ -210,6 +212,32 @@ namespace wrench {
 
       this->total_num_of_nodes = compute_hosts.size();
 
+      // Check that the workload file is valid
+      std::string workload_file = this->getPropertyValueAsString(BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE);
+      if (not workload_file.empty()) {
+        try {
+          this->workload_trace = TraceFileLoader::loadFromTraceFile(workload_file, 0);
+        } catch (std::exception &e) {
+          throw;
+        }
+        for (auto const &j : this->workload_trace) {
+          std::string id = std::get<0>(j);
+          double submit_time = std::get<1>(j);
+          double flops = std::get<2>(j);
+          double requested_flops = std::get<3>(j);
+          double requested_ram = std::get<4>(j);
+          int num_nodes = std::get<5>(j);
+
+          if (num_nodes > this->total_num_of_nodes) {
+            throw std::invalid_argument("Workload trace file contains a job that requires too many compute nodes");
+          }
+          if (requested_ram > ram) {
+            throw std::invalid_argument("Workload trace file contains a job that requires too much ram per compute nodes");
+          }
+        }
+      }
+
+      // TODO: Why do we have this here???
       this->generateUniqueJobId();
 
 #ifdef ENABLE_BATSCHED
@@ -232,6 +260,7 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
+     * @throw std::invalid_argument
      *
      */
     void BatchService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) {
@@ -1217,6 +1246,10 @@ namespace wrench {
 
           {
             try {
+              std::cerr << "%%%%%%%%%%%%%%%%%%%%%%%%%%\n";
+              std::cerr << requested_hosts << " | " << this->available_nodes_to_cores.size() << "\n";
+              std::cerr << requested_num_cores_per_host << " |" << Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first) << "\n";
+              std::cerr << required_ram_per_host << " | " << Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first) << "\n";
               S4U_Mailbox::dputMessage(answer_mailbox,
                                        new ComputeServiceSubmitStandardJobAnswerMessage(
                                                (StandardJob *) job->getWorkflowJob(),
