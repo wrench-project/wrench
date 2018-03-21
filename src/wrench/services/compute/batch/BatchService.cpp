@@ -511,6 +511,13 @@ namespace wrench {
       network_listeners.push_back(std::move(network_listener));
 #endif
 
+      if (not this->workload_trace.empty()) {
+        try {
+          startBackgroundWorkloadProcess();
+        } catch (std::runtime_error &e) {
+          throw;
+        }
+      }
       /** Main loop **/
       bool life = true;
       while (life) {
@@ -2090,5 +2097,12 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
+    }
+
+    /**
+     * @brief Start the process that will replay the background load
+     */
+    void BatchService::startBackgroundWorkloadProcess() {
+
     }
 }

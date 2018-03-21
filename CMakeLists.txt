@@ -197,7 +197,9 @@ set(TEST_FILES
         test/simulation/MultihostMulticoreComputeService/StandardJobExecutorTest.cpp
         test/simulation/NetworkProximityTest.cpp
         test/simulation/FileRegistryTest.cpp
-        test/simulation/BatchServiceTest.cpp
+        test/simulation/BatchService/BatchServiceTest.cpp
+        test/simulation/BatchService/BatchServiceTraceFileTest.cpp
+        test/simulation/BatchService/BatchServiceQueueWaitTimePredictionTest.cpp
         test/simulation/CloudServiceTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/MultipleWMSTest.cpp
