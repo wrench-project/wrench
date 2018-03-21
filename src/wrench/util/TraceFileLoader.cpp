@@ -24,14 +24,15 @@ namespace wrench {
 
       std::vector<std::tuple<std::string, double, double, double, double, int>> trace_file_jobs = {};
 
-      try {
         std::ifstream infile(filename);
-        infile.exceptions(std::ifstream::failbit);
+      if (not infile.is_open()) {
+        throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): Cannot open trace file " + filename);
+      }
+
+      try {
         std::string line;
         while (std::getline(infile, line)) {
-          if (line[0] == ';') {
-
-          } else {
+          if (line[0] != ';') {
             std::istringstream iss(line);
             std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
                                             std::istream_iterator<std::string>{}};
@@ -48,6 +49,7 @@ namespace wrench {
                   break;
                 case 1: // Submit time
                   if (sscanf(item.c_str(), "%lf", &sub_time) != 1) {
+
                     throw std::invalid_argument(
                             "TraceFileLoader::loadFromTraceFile(): Invalid submission time in trace file '" + item +
                             "'");
@@ -153,7 +155,7 @@ namespace wrench {
           }
         }
       } catch (std::exception &e) {
-        throw std::invalid_argument("Cannot read workload trace file '" + filename +"'");
+        throw std::invalid_argument("Errors while reading workload trace file '" + filename +"': " + e.what());
       }
       return trace_file_jobs;
     }
