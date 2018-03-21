@@ -40,7 +40,7 @@ In WRENCH, a user simulation is defined via the wrench::Simulation class. Briefl
 a simulation is described by the following actions: 
 
 -# `init(int *, char **)`: Initialize the simulation, which parses out WRENCH-specific 
-and [SimGrid-specific](http://simgrid.gforge.inria.fr/simgrid/3.18/doc/options.html) 
+and [SimGrid-specific](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/options.html) 
 command-line arguments.
 
 -# `instantiatePlatform(std::string &)`: Instantiate a simulated platform. It requires a 
