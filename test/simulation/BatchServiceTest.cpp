@@ -2293,7 +2293,7 @@ private:
       }
 
       // Wait for the execution events
-      for (int i=0; i < num_submitted_jobs; i++) {
+      for (unsigned long i=0; i < num_submitted_jobs; i++) {
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {

@@ -1246,10 +1246,6 @@ namespace wrench {
 
           {
             try {
-              std::cerr << "%%%%%%%%%%%%%%%%%%%%%%%%%%\n";
-              std::cerr << requested_hosts << " | " << this->available_nodes_to_cores.size() << "\n";
-              std::cerr << requested_num_cores_per_host << " |" << Simulation::getHostNumCores(this->available_nodes_to_cores.begin()->first) << "\n";
-              std::cerr << required_ram_per_host << " | " << Simulation::getHostMemoryCapacity(this->available_nodes_to_cores.begin()->first) << "\n";
               S4U_Mailbox::dputMessage(answer_mailbox,
                                        new ComputeServiceSubmitStandardJobAnswerMessage(
                                                (StandardJob *) job->getWorkflowJob(),
