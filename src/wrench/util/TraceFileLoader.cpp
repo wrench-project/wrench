@@ -19,10 +19,10 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    std::vector<std::tuple<std::string, double, double, double, double, int>>
+    std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>
     TraceFileLoader::loadFromTraceFile(std::string filename, double load_time_compensation) {
 
-      std::vector<std::tuple<std::string, double, double, double, double, int>> trace_file_jobs = {};
+      std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs = {};
 
         std::ifstream infile(filename);
       if (not infile.is_open()) {
@@ -148,9 +148,9 @@ namespace wrench {
             }
 
             // Add the job to the list
-            std::tuple<std::string, double, double, double, double, int> job =
-                    std::tuple<std::string, double, double, double, double, int>(
-                            id, sub_time, flops, requested_flops, requested_ram, requested_num_nodes);
+            std::tuple<std::string, double, double, double, double, unsigned int> job =
+                    std::tuple<std::string, double, double, double, double, unsigned int>(
+                            id, sub_time, flops, requested_flops, requested_ram, (unsigned int)requested_num_nodes);
             trace_file_jobs.push_back(job);
           }
         }

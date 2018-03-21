@@ -17,7 +17,7 @@ namespace wrench {
 
     class TraceFileLoader {
     public:
-        static std::vector<std::tuple<std::string, double, double, double, double, int>> loadFromTraceFile(std::string filename,double load_time_compensation);
+        static std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> loadFromTraceFile(std::string filename,double load_time_compensation);
     };
 }
 
