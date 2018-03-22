@@ -9,6 +9,7 @@
 
 
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
+#include <wrench/services/compute/batch/BatchService.h>
 #include "WorkloadTraceFileReplayer.h"
 
 namespace wrench {
@@ -23,6 +24,7 @@ namespace wrench {
     WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(Simulation *simulation,
                                                          std::string hostname,
                                                          BatchService *batch_service,
+                                                         unsigned long num_cores_per_node,
                                                          std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> &workload_trace
     ) :
             Service(std::move(hostname), "workload_trace_file_replayer", "workload_trace_file_replayer"),
@@ -47,33 +49,44 @@ namespace wrench {
         double requested_ram = std::get<4>(job);
         int num_nodes = std::get<5>(job);
 
+//        // Get the number of cores per node
+//        // TODO: This is pretty ugly...
+//        unsigned long num_cores = this->batch_service->nodes_to_cores_map.begin()->second;
+//
+//        // Create a list of tasks the use all resources
+//        std::vector<WorkflowTask *> tasks;
+//        for (size_t i=0; i < num_nodes; i++) {
+//          tasks.push_back(new WorkflowTask());
+//        }
+//
+//
+//
+//        // Create job that takes up all resources
+////          std::cerr << "SUBMITTING " << "sub="<< sub_time << "num_nodes=" << num_nodes << " id="<<id << " flops="<<flops << " rflops="<<requested_flops << " ram="<<requested_ram << "\n";
+//        WorkflowTask *task = this->workflow->addTask(id, flops, min_num_cores, max_num_cores,
+//                                                             parallel_efficiency);
+//
+//        wrench::StandardJob *standard_job = job_manager->createStandardJob(
+//                {task},
+//                {},
+//                {},
+//                {},
+//                {});
+//
+//
+//        std::map<std::string, std::string> batch_job_args;
+//        batch_job_args["-N"] = std::to_string(num_nodes);
+//        batch_job_args["-t"] = std::to_string(requested_flops);
+//        batch_job_args["-c"] = std::to_string(max_num_cores); //use all cores
+//        try {
+//          job_manager->submitJob(standard_job, this->test->compute_service, batch_job_args);
+//        } catch (wrench::WorkflowExecutionException &e) {
+//          throw std::runtime_error("Failed to submit a job");
+//        }
+//
+//        num_submitted_jobs++;
 
-        // Create job that takes up all resources
-//          std::cerr << "SUBMITTING " << "sub="<< sub_time << "num_nodes=" << num_nodes << " id="<<id << " flops="<<flops << " rflops="<<requested_flops << " ram="<<requested_ram << "\n";
-        WorkflowTask *task = this->workflow->addTask(id, flops, min_num_cores, max_num_cores,
-                                                             parallel_efficiency);
-
-        wrench::StandardJob *standard_job = job_manager->createStandardJob(
-                {task},
-                {},
-                {},
-                {},
-                {});
-
-
-        std::map<std::string, std::string> batch_job_args;
-        batch_job_args["-N"] = std::to_string(num_nodes);
-        batch_job_args["-t"] = std::to_string(requested_flops);
-        batch_job_args["-c"] = std::to_string(max_num_cores); //use all cores
-        try {
-          job_manager->submitJob(standard_job, this->test->compute_service, batch_job_args);
-        } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error("Failed to submit a job");
-        }
-
-        num_submitted_jobs++;
-
-      }
+//      }
     }
 
     return 0;

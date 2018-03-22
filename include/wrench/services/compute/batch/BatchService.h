@@ -81,7 +81,6 @@ namespace wrench {
 
 
     private:
-
         friend class WorkloadTraceFileReplayer;
 
         BatchService(std::string hostname,
@@ -97,7 +96,20 @@ namespace wrench {
         unsigned int batsched_port;
 #endif
 
+        //submits a standard job
+        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) override;
+
+        //submits a standard job
+        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &batch_job_args) override;
+
+        // terminate a standard job
+        void terminateStandardJob(StandardJob *job) override;
+
+        // terminate a pilot job
+        void terminatePilotJob(PilotJob *job) override;
+
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> workload_trace;
+        std::shared_ptr<WorkloadTraceFileReplayer> workload_trace_replayer;
 
         bool clean_exit = false;
 
@@ -115,6 +127,7 @@ namespace wrench {
 
         /* Resources information in Batchservice */
         unsigned long total_num_of_nodes;
+        unsigned long num_cores_per_node;
         std::map<std::string, unsigned long> nodes_to_cores_map;
         std::vector<double> timeslots;
         std::map<std::string, unsigned long> available_nodes_to_cores;
@@ -172,17 +185,6 @@ namespace wrench {
 
         std::string convertResourcesToJsonString(std::set<std::tuple<std::string, unsigned long, double>>);
 
-        //submits a standard job
-        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) override;
-
-        //submits a standard job
-        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &batch_job_args) override;
-
-        // terminate a standard job
-        void terminateStandardJob(StandardJob *job) override;
-
-        // terminate a pilot job
-        void terminatePilotJob(PilotJob *job) override;
 
         int main() override;
 
@@ -261,7 +263,6 @@ namespace wrench {
                                        std::string kill_reason);
 
 
-        std::shared_ptr<WorkloadTraceFileReplayer> workload_trace_replayer;
     };
 }
 

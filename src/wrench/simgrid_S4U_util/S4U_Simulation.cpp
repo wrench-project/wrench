@@ -109,7 +109,6 @@ namespace wrench {
       return hostname_list;
     }
 
-    /*
     std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByCluster() {
       std::map<std::string, std::vector<std::string>> result;
       std::vector<simgrid::kernel::routing::ClusterZone*>clusters;
@@ -128,7 +127,6 @@ namespace wrench {
 
       return result;
     }
-    */
 
     /**
      * @brief Determines whether a host exists for a given hostname

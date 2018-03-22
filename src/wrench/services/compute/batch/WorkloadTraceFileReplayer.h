@@ -27,6 +27,7 @@ namespace wrench {
         WorkloadTraceFileReplayer(Simulation *simulation,
                                   std::string hostname,
                                   BatchService *batch_service,
+                                  unsigned long num_cores_per_node,
                                   std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> &workload_trace
         );
 

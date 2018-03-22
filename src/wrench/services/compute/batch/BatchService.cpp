@@ -211,6 +211,7 @@ namespace wrench {
         this->host_id_to_names[i++] = h;
       }
 
+      this->num_cores_per_node = this->nodes_to_cores_map.begin()->second;
       this->total_num_of_nodes = compute_hosts.size();
 
       // Check that the workload file is valid
@@ -2110,7 +2111,8 @@ namespace wrench {
 
       // Create the trace replayer process
       this->workload_trace_replayer = std::shared_ptr<WorkloadTraceFileReplayer>(
-              new WorkloadTraceFileReplayer(this->simulation, S4U_Simulation::getHostName(), this, this->workload_trace)
+              new WorkloadTraceFileReplayer(this->simulation, S4U_Simulation::getHostName(), this,
+                                            this->num_cores_per_node, this->workload_trace)
               );
       try {
         this->workload_trace_replayer->start(this->workload_trace_replayer, true);
