@@ -27,6 +27,8 @@ protected:
       file = workflow->addFile("file", 1);
       storage_service = (wrench::StorageService *)(1234);
       compute_service = (wrench::ComputeService *)(1234);
+      network_proximity_service = (wrench::NetworkProximityService *)(1234);
+      network_proximity_daemon = (wrench::NetworkProximityDaemon *)(1234);
       workflow_job = (wrench::WorkflowJob *)(1234);
       standard_job = (wrench::StandardJob *)(1234);
       batch_job = (wrench::BatchJob *)(1234);
@@ -40,6 +42,8 @@ protected:
     wrench::WorkflowFile *file;
     wrench::StorageService *storage_service;
     wrench::ComputeService *compute_service;
+    wrench::NetworkProximityService *network_proximity_service;
+    wrench::NetworkProximityDaemon *network_proximity_daemon;
     wrench::WorkflowJob *workflow_job;
     wrench::StandardJob *standard_job;
     wrench::BatchJob *batch_job;
@@ -60,7 +64,6 @@ TEST_F(MessageConstructorTest, SimulationMessages) {
   EXPECT_THROW(new wrench::SimulationMessage("name", -1), std::invalid_argument);
 
 }
-
 
 TEST_F(MessageConstructorTest, FileRegistryMessages) {
 
@@ -83,7 +86,25 @@ TEST_F(MessageConstructorTest, FileRegistryMessages) {
   EXPECT_THROW(new wrench::FileRegistryAddEntryRequestMessage("mailbox", nullptr, storage_service, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::FileRegistryAddEntryRequestMessage("mailbox", file, nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::FileRegistryAddEntryAnswerMessage(666));
+    EXPECT_NO_THROW(new wrench::FileRegistryAddEntryAnswerMessage(666));
+
+    EXPECT_NO_THROW(new wrench::FileRegistryFileLookupByProximityRequestMessage("mailbox", file, "reference_host",
+                                                                                network_proximity_service, 666));
+    EXPECT_THROW(new wrench::FileRegistryFileLookupByProximityRequestMessage("", file, "reference_host",
+                                                                             network_proximity_service, 666),
+                 std::invalid_argument);
+    EXPECT_THROW(new wrench::FileRegistryFileLookupByProximityRequestMessage("", nullptr, "reference_host",
+                                                                             network_proximity_service, 666),
+                 std::invalid_argument);
+    EXPECT_THROW(
+            new wrench::FileRegistryFileLookupByProximityRequestMessage("", file, "", network_proximity_service, 666),
+            std::invalid_argument);
+    EXPECT_THROW(new wrench::FileRegistryFileLookupByProximityRequestMessage("", file, "reference_host", nullptr, 666),
+                 std::invalid_argument);
+
+    EXPECT_NO_THROW(new wrench::FileRegistryFileLookupByProximityAnswerMessage(file, "reference_host", {{}}, 666));
+    EXPECT_THROW(new wrench::FileRegistryFileLookupByProximityAnswerMessage(nullptr, "reference_host", {{}}, 666), std::invalid_argument);
+    EXPECT_THROW(new wrench::FileRegistryFileLookupByProximityAnswerMessage(file, "", {{}}, 666), std::invalid_argument);
 }
 
 TEST_F(MessageConstructorTest, ComputeServiceMessages) {
@@ -252,7 +273,6 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   EXPECT_THROW(new wrench::StorageServiceFileContentMessage(nullptr), std::invalid_argument);
 }
 
-
 TEST_F(MessageConstructorTest, NetworkProximityMessages) {
 
   EXPECT_NO_THROW(new wrench::NetworkProximityLookupRequestMessage("mailbox", std::make_pair("a","b"), 666));
@@ -268,6 +288,15 @@ TEST_F(MessageConstructorTest, NetworkProximityMessages) {
   EXPECT_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("","b"), 1.0, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::NetworkProximityComputeAnswerMessage(std::make_pair("a",""), 1.0, 666), std::invalid_argument);
 
+  EXPECT_NO_THROW(new wrench::NextContactDaemonRequestMessage(network_proximity_daemon, 666));
+  EXPECT_THROW(new wrench::NextContactDaemonRequestMessage(nullptr, 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::CoordinateLookupRequestMessage("mailbox", "requested_host", 666));
+  EXPECT_THROW(new wrench::CoordinateLookupRequestMessage("", "requested_host", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::CoordinateLookupRequestMessage("mailbox", "", 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::CoordinateLookupAnswerMessage("requested_host", std::make_pair(1.0,1.0), 666));
+  EXPECT_THROW(new wrench::CoordinateLookupAnswerMessage("", std::make_pair(1.0, 1.0), 666), std::invalid_argument);
 }
 
 

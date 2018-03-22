@@ -75,6 +75,9 @@ namespace wrench {
      */
     NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(NetworkProximityDaemon *daemon, double payload) :
             NetworkProximityMessage("NEXT_CONTACT_DAEMON_REQUEST", payload) {
+        if(daemon == nullptr) {
+            throw std::invalid_argument("NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(): Invalid argument");
+        }
         this->daemon = daemon;
     }
 
@@ -108,6 +111,9 @@ namespace wrench {
      */
     CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string answer_mailbox, std::string requested_host, double payload) :
             NetworkProximityMessage("COORDINATE_LOOKUP_REQUEST", payload) {
+        if (answer_mailbox == "" || requested_host == "") {
+            throw std::invalid_argument("CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(): Invalid argument");
+        }
         this->answer_mailbox = answer_mailbox;
         this->requested_host = requested_host;
     }
@@ -122,6 +128,9 @@ namespace wrench {
                                                                  std::pair<double, double> xy_coordinate,
                                                                  double payload) :
             NetworkProximityMessage("COORDINATE_LOOKUP_ANSWER", payload) {
+        if (requested_host == "") {
+            throw std::invalid_argument("CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(): Invalid argument");
+        }
         this->requested_host = requested_host;
         this->xy_coordinate = xy_coordinate;
     }
