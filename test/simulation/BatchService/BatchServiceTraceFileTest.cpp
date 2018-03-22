@@ -241,6 +241,9 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
+      wrench::Simulation::sleep(10);
+      // At this point, a 4-node 30-min job should have to wait 2 hours, and 2-node 30-min job should have to wait 1 hour
+
       return 0;
     }
 };

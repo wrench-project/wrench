@@ -233,19 +233,19 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause;
     };
 
-    /**
-     * @brief ComputeServiceInformationMessage class
-     */
-    class ComputeServiceInformationMessage : public ComputeServiceMessage {
-    public:
-        ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload);
-
-        /** @brief The job that is replying the information*/
-        WorkflowJob* job;
-
-        /** @brief The information to reply back */
-        std::string information;
-    };
+//    /**
+//     * @brief ComputeServiceInformationMessage class
+//     */
+//    class ComputeServiceInformationMessage : public ComputeServiceMessage {
+//    public:
+//        ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload);
+//
+//        /** @brief The job that is replying the information*/
+//        WorkflowJob* job;
+//
+//        /** @brief The information to reply back */
+//        std::string information;
+//    };
 
 
     /**
