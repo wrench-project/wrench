@@ -139,9 +139,9 @@ namespace wrench {
      * @return a map of (clustername, hostnames)
      *
      */
-    //std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
-    //  return this->s4u_simulation->getAllHostnamesByCluster();
-    //}
+    std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
+      return this->s4u_simulation->getAllHostnamesByCluster();
+    }
     /**
      * @brief Check that a hostname exists in the platform
      *
