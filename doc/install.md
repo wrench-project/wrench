@@ -22,7 +22,7 @@ And, one of the following:
 
 ## Dependencies ##                  {#install-prerequisites-dependencies}
 
-- [SimGrid](http://simgrid.gforge.inria.fr/) -- version 3.17 or higher
+- [SimGrid](http://simgrid.gforge.inria.fr/) -- version 3.19 or higher
 - [Lemon C++ library](http://lemon.cs.elte.hu/) -- version 1.3.1 or higher 
 - [PugiXML](http://pugixml.org/) -- version 1.8 or higher 
 - [JSON for Modern C++](https://github.com/nlohmann/json) -- version 2.1.1 or higher 

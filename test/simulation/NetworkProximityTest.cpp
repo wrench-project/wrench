@@ -476,6 +476,13 @@ private:
       if (vivaldi_proximity < 0 || vivaldi_proximity > 0.000001) {
         throw std::runtime_error("Vivaldi algorithm computed the wrong proximity between hosts connected by a 0 latency link");
       }
+      
+      std::string target_host = vivaldi_service->getHostnameList()[0];
+      std::pair<double,double> coordinates = vivaldi_service->getCoordinate(target_host);
+      
+      if (coordinates.first == 0 && coordinates.second == 0) {
+        throw std::runtime_error("Vivaldi algorithm did not update the coordinates of host:" + target_host);
+      }
 
       return 0;
     }

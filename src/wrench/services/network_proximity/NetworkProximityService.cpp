@@ -62,6 +62,7 @@ namespace wrench {
       this->master_rng.seed(this->getPropertyValueAsDouble(wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED));
     }
 
+    // ADD TEST
     /**
      * @brief Look up the current (x,y) coordinates of a given host for Vivaldi network service type
      * @param requested_host: the host whose coordinates are being requested
@@ -387,7 +388,7 @@ namespace wrench {
 
       return std::shared_ptr<NetworkProximityDaemon>(this->network_daemons.at(chosen_peer_index));
     }
-
+    
     /**
      * @brief Internal method to compute and update coordinates based on Vivaldi algorithm
      * @param proximity_value: one way elapsed time to send a message from the sender to the receiving peer
@@ -467,6 +468,7 @@ namespace wrench {
       return this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
     }
 
+    // ADD TEST
     /**
      * @brief Internal method to validate Network Proximity Service Properties
      * @throw std::invalid_argument
