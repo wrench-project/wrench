@@ -26,6 +26,7 @@
 #include "wrench/util/MessageManager.h"
 #include "wrench/util/PointerUtil.h"
 #include "wrench/workflow/job/PilotJob.h"
+#include "WorkloadTraceFileReplayer.h"
 
 #ifdef ENABLE_BATSCHED
 
@@ -237,8 +238,8 @@ namespace wrench {
         }
       }
 
-      // TODO: Why do we have this here???
-      this->generateUniqueJobId();
+//      // TODO: Why do we have this here???
+//      this->generateUniqueJobId();
 
 #ifdef ENABLE_BATSCHED
       this->batsched_port = 28000 + S4U_Mailbox::generateUniqueSequenceNumber();
@@ -708,9 +709,8 @@ namespace wrench {
       WRENCH_INFO("Terminating a standard job executor");
       executor->kill();
 
-      //TODO: Restore the allocated resources
+      // Do not update the resource availability, because this is done at a higher level
 
-      return;
     }
 
     std::set<std::tuple<std::string, unsigned long, double>>
@@ -1367,7 +1367,6 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
-
 
       return;
     }
@@ -2101,8 +2100,23 @@ namespace wrench {
 
     /**
      * @brief Start the process that will replay the background load
+     *
+     * @throw std::runtime_error
      */
     void BatchService::startBackgroundWorkloadProcess() {
+      if (this->workload_trace.empty()) {
+        throw std::runtime_error("BatchService::startBackgroundWorkloadProcess(): no workload trace file specified");
+      }
 
+      // Create the trace replayer process
+      this->workload_trace_replayer = std::shared_ptr<WorkloadTraceFileReplayer>(
+              new WorkloadTraceFileReplayer(this->simulation, S4U_Simulation::getHostName(), this, this->workload_trace)
+              );
+      try {
+        this->workload_trace_replayer->start(this->workload_trace_replayer, true);
+      } catch (std::runtime_error &e) {
+        throw;
+      }
+      return;
     }
 }

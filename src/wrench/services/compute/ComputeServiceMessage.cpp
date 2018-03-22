@@ -342,16 +342,16 @@ namespace wrench {
       this->failure_cause = failure_cause;
     }
 
-    /**
-     * @brief Constructor
-     * @param num: information to reply back
-     * @param payload: the message size in bytes
-     *
-     * @throw std::invalid_argument
-     */
-    ComputeServiceInformationMessage::ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload)
-            : ComputeServiceMessage("INFORMATION_REPLY", payload), job(job), information(std::move(information)) {}
-
+//    /**
+//     * @brief Constructor
+//     * @param num: information to reply back
+//     * @param payload: the message size in bytes
+//     *
+//     * @throw std::invalid_argument
+//     */
+//    ComputeServiceInformationMessage::ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload)
+//            : ComputeServiceMessage("INFORMATION_REPLY", payload), job(job), information(std::move(information)) {}
+//
 
     /**
      * @brief Constructor

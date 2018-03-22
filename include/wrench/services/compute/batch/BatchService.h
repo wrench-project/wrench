@@ -26,6 +26,8 @@
 
 namespace wrench {
 
+    class WorkloadTraceFileReplayer; // forward
+
     class BatchService : public ComputeService {
 
         /**
@@ -79,6 +81,9 @@ namespace wrench {
 
 
     private:
+
+        friend class WorkloadTraceFileReplayer;
+
         BatchService(std::string hostname,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
@@ -256,6 +261,7 @@ namespace wrench {
                                        std::string kill_reason);
 
 
+        std::shared_ptr<WorkloadTraceFileReplayer> workload_trace_replayer;
     };
 }
 

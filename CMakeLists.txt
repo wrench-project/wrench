@@ -166,6 +166,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchJob.cpp
         src/wrench/services/compute/batch/BatchServiceMessage.cpp
         src/wrench/services/compute/batch/BatchService.cpp
+        src/wrench/services/compute/batch/WorkloadTraceFileReplayer.cpp
         src/wrench/services/compute/batch/BatchServiceProperty.cpp
         src/wrench/services/compute/batch/BatchNetworkListener.cpp
         src/wrench/services/helpers/Alarm.cpp
