@@ -180,18 +180,11 @@ namespace wrench {
 
         unsigned long generateUniqueJobId();
 
-        void removeJobFromRunningList(BatchJob *job);
-
-        std::string convertAvailableResourcesToJsonString(std::map<std::string, unsigned long>);
-
-        std::string convertResourcesToJsonString(std::set<std::tuple<std::string, unsigned long, double>>);
-
+        void removeJobFromRunningList(BatchJob *job);\
 
         int main() override;
 
         bool processNextMessage();
-
-        bool dispatchNextPendingJob();
 
         void startBackgroundWorkloadProcess();
 
