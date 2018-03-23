@@ -45,8 +45,8 @@ namespace wrench{
      */
     class AlarmJobTimeOutMessage : public ServiceMessage {
     public:
-        AlarmJobTimeOutMessage(WorkflowJob* job,double payload);
-        WorkflowJob* job;
+        AlarmJobTimeOutMessage(BatchJob* job,double payload);
+        BatchJob* job;
     };
 
     /**
