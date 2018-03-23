@@ -138,12 +138,15 @@ namespace wrench {
         // Vector of standard job executors
         std::set<std::shared_ptr<StandardJobExecutor>> finished_standard_job_executors;
 
+        // Master List of batch jobs
+        std::set<std::unique_ptr<BatchJob>>  all_jobs;
+
         //Queue of pending batch jobs
-        std::deque<std::unique_ptr<BatchJob>> pending_jobs;
+        std::deque<BatchJob *> pending_jobs;
         //A set of running batch jobs
-        std::set<std::unique_ptr<BatchJob>> running_jobs;
+        std::set<BatchJob *> running_jobs;
         // A set of waiting jobs that have been submitted to batsched, but not scheduled
-        std::set<std::unique_ptr<BatchJob>> waiting_jobs;
+        std::set<BatchJob *> waiting_jobs;
 
         //Batch Service request reply process
         std::unique_ptr<BatchNetworkListener> request_reply_process;
@@ -177,7 +180,7 @@ namespace wrench {
 
         unsigned long generateUniqueJobId();
 
-        std::string foundRunningJobOnTheList(WorkflowJob *job);
+        void removeJobFromRunningList(BatchJob *job);
 
         std::string convertAvailableResourcesToJsonString(std::map<std::string, unsigned long>);
 
@@ -230,21 +233,23 @@ namespace wrench {
         void processPilotJobTimeout(PilotJob *job);
 
         //notify upper level job submitters (about pilot job termination)
-        void notifyJobSubmitters(PilotJob *job);
+//        void notifyJobSubmitters(PilotJob *job);
 
         //free up resources
         void freeUpResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
 
-        void freeUpResources(StandardJob *job);
+//        void freeUpResources(StandardJob *job);
 
         //send call back to the pilot job submitters
-        void sendPilotJobCallBackMessage(PilotJob *job);
+        void sendPilotJobExpirationNotification(PilotJob *job);
 
         //send call back to the standard job submitters
-        void sendStandardJobCallBackMessage(StandardJob *job);
+        void sendStandardJobFailureNotification(StandardJob *job);
 
-        //send all the jobs in the queue to the batscheduler
-        bool scheduleAllQueuedJobs();
+        //try to schedule a queued job
+        void sendAllQueuedJobsToBatsched();
+        bool scheduleOneQueuedJob();
+
 
         // process a job submission
         void processJobSubmission(BatchJob *job, std::string answer_mailbox);
