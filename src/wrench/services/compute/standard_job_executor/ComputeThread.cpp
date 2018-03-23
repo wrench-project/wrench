@@ -11,7 +11,6 @@
 #include <xbt.h>
 #include <wrench-dev.h>
 #include "ComputeThread.h"
-#include <xbt/ex.hpp>
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(compute_thread, "Log category for ComputeThread");
@@ -40,7 +39,7 @@ namespace wrench {
 
     int ComputeThread::main() {
       try {
-        WRENCH_INFO("New compute threads beginning %.2f-flop computation", this->flops);
+        WRENCH_INFO("New compute thread (%.2f flops, will report to %s)", this->flops, reply_mailbox.c_str());
         S4U_Simulation::compute(this->flops);
       } catch (std::exception &e) {
         WRENCH_INFO("Probably got killed while I was computing");
