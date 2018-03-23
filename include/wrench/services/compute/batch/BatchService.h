@@ -172,15 +172,14 @@ namespace wrench {
         //Is sched ready?
         bool is_bat_sched_ready;
 
-        //timestamp received from batscheduler
-        double batsched_timestamp;
-
         //fork the batsched_process
         void run_batsched();
 
         unsigned long generateUniqueJobId();
 
-        void removeJobFromRunningList(BatchJob *job);\
+        void removeJobFromRunningList(BatchJob *job);
+
+        void freeJobFromJobsList(BatchJob* job);
 
         int main() override;
 
@@ -195,10 +194,6 @@ namespace wrench {
         void processStandardJobFailure(StandardJobExecutor *executor,
                                        StandardJob *job,
                                        std::shared_ptr<FailureCause> cause);
-
-        void failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
-
-        void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
 
         void terminateRunningStandardJob(StandardJob *job);
 
@@ -225,13 +220,8 @@ namespace wrench {
         //Process standardjob timeout
         void processPilotJobTimeout(PilotJob *job);
 
-        //notify upper level job submitters (about pilot job termination)
-//        void notifyJobSubmitters(PilotJob *job);
-
         //free up resources
         void freeUpResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
-
-//        void freeUpResources(StandardJob *job);
 
         //send call back to the pilot job submitters
         void sendPilotJobExpirationNotification(PilotJob *job);
@@ -241,8 +231,8 @@ namespace wrench {
 
         //try to schedule a queued job
         void sendAllQueuedJobsToBatsched();
-        bool scheduleOneQueuedJob();
 
+        bool scheduleOneQueuedJob();
 
         // process a job submission
         void processJobSubmission(BatchJob *job, std::string answer_mailbox);
