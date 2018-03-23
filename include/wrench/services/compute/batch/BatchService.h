@@ -211,7 +211,7 @@ namespace wrench {
         std::set<std::tuple<std::string, unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
                                                                                  unsigned long, unsigned long, double);
 
-        BatchJob *scheduleJob(std::string);
+        BatchJob *pickJobForScheduling(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup() override;
