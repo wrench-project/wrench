@@ -11,6 +11,7 @@
 #define WRENCH_WMS_H
 
 #include "wrench/simgrid_S4U_util/S4U_Daemon.h"
+#include "wrench/services/Service.h"
 #include "wrench/wms/DynamicOptimization.h"
 #include "wrench/wms/StaticOptimization.h"
 #include "wrench/wms/scheduler/PilotJobScheduler.h"

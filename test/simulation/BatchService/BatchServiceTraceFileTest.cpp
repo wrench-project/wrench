@@ -241,7 +241,7 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::Simulation::sleep(10);
+      wrench::Simulation::sleep(100000);
       // At this point, a 4-node 30-min job should have to wait 2 hours, and 2-node 30-min job should have to wait 1 hour
 
       return 0;
@@ -273,7 +273,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/tmp/not_there"}}
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there"}}
           )), std::invalid_argument);
 
   std::string trace_file_path = "/tmp/swf_trace";
@@ -281,8 +281,21 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create an invalid trace file
   trace_file = fopen(trace_file_path.c_str(), "w");
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 ");     // MISSING FIELD
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 2 3600 -1 ");  // job that takes half the machine
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600\n");     // MISSING FIELD
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
+  fclose(trace_file);
+
+  // Create a Batch Service with a bogus trace file, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(), storage_service1,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )), std::invalid_argument);
+
+  // Create another invalid trace file
+  trace_file  = fopen(trace_file_path.c_str(), "w");
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 hello -1\n");     // INVALID FIELD
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
   fclose(trace_file);
 
   // Create a Batch Service with a bogus trace file, which should throw
@@ -294,21 +307,8 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create another invalid trace file
   trace_file = fopen(trace_file_path.c_str(), "w");
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 hello -1");     // INVALID FIELD
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 2 3600 -1 ");  // job that takes half the machine
-  fclose(trace_file);
-
-  // Create a Batch Service with a bogus trace file, which should throw
-  ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), storage_service1,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
-          )), std::invalid_argument);
-
-  // Create another invalid trace file
-  trace_file = fopen(trace_file_path.c_str(), "w");
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 -1 3600 -1");     // MISSING NUM PROCS
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 2 3600 -1 ");  // job that takes half the machine
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 -1 3600 -1\n");     // MISSING NUM PROCS
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
   fclose(trace_file);
 
 
@@ -321,8 +321,8 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create another invalid trace file
   trace_file = fopen(trace_file_path.c_str(), "w");
-  fprintf(trace_file, "1 0 -1 -1 -1 -1 -1 4 -1 -1");     // MISSING TIME
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 2 3600 -1 ");  // job that takes half the machine
+  fprintf(trace_file, "1 0 -1 -1 -1 -1 -1 4 -1 -1\n");     // MISSING TIME
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
   fclose(trace_file);
 
 
@@ -336,9 +336,17 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Valid trace file
   trace_file = fopen(trace_file_path.c_str(), "w");
-  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1 ");  // job that takes the whole machine
-  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1 ");  // job that takes half the machine
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1\n");  // job that takes the whole machine
+  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
   fclose(trace_file);
+
+  // Create a Batch Service with a non-existing workload trace file, which should throw
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(), storage_service1,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )));
+
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

@@ -231,14 +231,15 @@ namespace wrench {
           unsigned int num_nodes = std::get<5>(j);
 
           if (num_nodes > this->total_num_of_nodes) {
+            std::cerr << "Workload trace file contains a job that requires too many compute nodes";
             throw std::invalid_argument("Workload trace file contains a job that requires too many compute nodes");
           }
           if (requested_ram > ram) {
+            std::cerr << "Workload trace file contains a job that requires too much ram per compute nodes";
             throw std::invalid_argument("Workload trace file contains a job that requires too much ram per compute nodes");
           }
         }
       }
-
 //      // TODO: Why do we have this here???
 //      this->generateUniqueJobId();
 
@@ -520,10 +521,12 @@ namespace wrench {
           throw;
         }
       }
+
       /** Main loop **/
       bool life = true;
       while (life) {
         life = processNextMessage();
+        WRENCH_INFO("NUMBER OF PENDING JOBS: %ld", this->pending_jobs.size());
 
         // Process running jobs
         std::set<std::unique_ptr<BatchJob>>::iterator it;
@@ -549,6 +552,7 @@ namespace wrench {
           while (this->scheduleAllQueuedJobs());
         }
       }
+
 
       WRENCH_INFO("Batch Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       this->clean_exit = true;
@@ -802,11 +806,12 @@ namespace wrench {
       return resources;
     }
 
-    BatchJob *BatchService::scheduleJob(std::string job_selection_algorithm) {
+    BatchJob *BatchService::pickJobForScheduling(std::string job_selection_algorithm) {
       if (job_selection_algorithm == "FCFS") {
         BatchJob *batch_job = (*this->pending_jobs.begin()).get();
-        PointerUtil::moveUniquePtrFromDequeToSet(this->pending_jobs.begin(), &(this->pending_jobs),
-                                                 &(this->running_jobs));
+//        WRENCH_INFO("MOVING JOB %ld from PENDING_JOBS to RUNNING_JOBS", batch_job->getJobID());
+//        PointerUtil::moveUniquePtrFromDequeToSet(this->pending_jobs.begin(), &(this->pending_jobs),
+//                                                 &(this->running_jobs));
         return batch_job;
       }
       return nullptr;
@@ -854,19 +859,19 @@ namespace wrench {
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;
 #else
-      BatchJob *batch_job = scheduleJob(this->getPropertyValueAsString(BatchServiceProperty::JOB_SELECTION_ALGORITHM));
+      BatchJob *batch_job = pickJobForScheduling(this->getPropertyValueAsString(BatchServiceProperty::JOB_SELECTION_ALGORITHM));
       if (batch_job == nullptr) {
         throw std::runtime_error(
                 "BatchService::scheduleAllQueuedJobs(): Got no such job in pending queue to dispatch"
         );
       }
+      WRENCH_INFO("PICKED JOB %ld for potential scheduling", batch_job->getJobID());
       WorkflowJob *workflow_job = batch_job->getWorkflowJob();
 
       /* Get the nodes and cores per nodes asked for */
       unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
       unsigned long num_nodes_asked_for = batch_job->getNumNodes();
       unsigned long time_in_minutes = batch_job->getAllocatedTime();
-
 
       //Try to schedule hosts based on FIRSTFIT OR BESTFIT
       // Asking for the FULL RAM (TODO: Change this?)
@@ -875,9 +880,22 @@ namespace wrench {
               num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_CORES);
 
       if (resources.empty()) {
+        WRENCH_INFO("NO DICE for job %ld  (total of %ld pending jobs)",
+                    batch_job->getJobID(), this->pending_jobs.size());
+        WRENCH_INFO("BUG: WE SHOULD PUT THE JOB BACK INTO THE PENDING JOBS?????????");
         return false;
       }
 
+      WRENCH_INFO("MOVING JOB %ld from PENDING_JOBS to RUNNING_JOBS", batch_job->getJobID());
+      for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); it++) {
+        if ((*it).get() == batch_job) {
+          PointerUtil::moveUniquePtrFromDequeToSet(it, &(this->pending_jobs),
+                                                   &(this->running_jobs));
+          break;
+        }
+      }
+//      PointerUtil::moveUniquePtrFromDequeToSet(batch_job, &(this->pending_jobs),
+//                                               &(this->running_jobs));
       processExecution(resources, workflow_job, batch_job, num_nodes_asked_for, time_in_minutes,
                        cores_per_node_asked_for);
 #endif
@@ -2115,6 +2133,7 @@ namespace wrench {
                                             this->num_cores_per_node, this->workload_trace)
               );
       try {
+        this->workload_trace_replayer->setSimulation(this->simulation);
         this->workload_trace_replayer->start(this->workload_trace_replayer, true);
       } catch (std::runtime_error &e) {
         throw;

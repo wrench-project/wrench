@@ -8,7 +8,11 @@
  */
 
 #include <fstream>
+#include <xbt/log.h>
+#include <wrench-dev.h>
 #include "wrench/util/TraceFileLoader.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(trace_file_loader, "Log category for Trace File Loader");
 
 namespace wrench {
 
@@ -36,6 +40,12 @@ namespace wrench {
             std::istringstream iss(line);
             std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
                                             std::istream_iterator<std::string>{}};
+
+            if (tokens.size() < 10) {
+              throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): Seeing less than 10 fields per line in trace file '" + filename +
+                                          "'");
+            }
+
             std::string id;
             double flops=-1, requested_flops=-1, requested_ram=-1;
             int itemnum = 0;
@@ -49,7 +59,6 @@ namespace wrench {
                   break;
                 case 1: // Submit time
                   if (sscanf(item.c_str(), "%lf", &sub_time) != 1) {
-
                     throw std::invalid_argument(
                             "TraceFileLoader::loadFromTraceFile(): Invalid submission time in trace file '" + item +
                             "'");
