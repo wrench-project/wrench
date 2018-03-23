@@ -286,10 +286,11 @@ private:
 
       // Create the batch-specific argument
       batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
-      batch_job_args["-t"] = std::to_string(1800 / 60); // Time in minutes (at least 1 minute)
+      batch_job_args["-t"] = std::to_string(18000 / 60); // Time in minutes (at least 1 minute)
       batch_job_args["-c"] = std::to_string(10); //number of cores per task
 
       // Submit this job to the batch service
+      std::cerr << "SUBMITTING JOB: 2 nodes for 30 minutes";
       job_manager->submitJob(standard_job_1, *(this->getAvailableComputeServices().begin()), batch_job_args);
 
 
@@ -313,10 +314,11 @@ private:
       // Create the batch-specific argument
       batch_job_args.clear();
       batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
-      batch_job_args["-t"] = std::to_string(1800 / 60); // Time in minutes (at least 1 minute)
+      batch_job_args["-t"] = std::to_string(18000 / 60); // Time in minutes (at least 1 minute)
       batch_job_args["-c"] = std::to_string(10); //number of cores per task
 
       // Submit this job to the batch service
+      std::cerr << "SUBMITTING JOB: 2 nodes for 30 minutes";
       job_manager->submitJob(standard_job_2, *(this->getAvailableComputeServices().begin()), batch_job_args);
 
 

@@ -231,11 +231,9 @@ namespace wrench {
           unsigned int num_nodes = std::get<5>(j);
 
           if (num_nodes > this->total_num_of_nodes) {
-            std::cerr << "Workload trace file contains a job that requires too many compute nodes";
             throw std::invalid_argument("Workload trace file contains a job that requires too many compute nodes");
           }
           if (requested_ram > ram) {
-            std::cerr << "Workload trace file contains a job that requires too much ram per compute nodes";
             throw std::invalid_argument("Workload trace file contains a job that requires too much ram per compute nodes");
           }
         }
@@ -1867,6 +1865,7 @@ namespace wrench {
       }
 
       /* Get the nodes and cores per nodes asked for */
+ 
       std::string nodes_allocated_by_batsched = execute_events["alloc"];
       std::vector<std::string> allocations;
       boost::split(allocations, nodes_allocated_by_batsched, boost::is_any_of(" "));
@@ -1885,11 +1884,12 @@ namespace wrench {
           std::string::size_type sz;
           unsigned long start = std::stoi(start_node, &sz);
           unsigned long end = std::stoi(end_node, &sz);
-          for (unsigned long i = start; i < end; i++) {
+          for (unsigned long i = start; i <= end; i++) {
             node_resources.push_back(i);
           }
         }
       }
+
       unsigned long num_nodes_allocated = node_resources.size();
       unsigned long time_in_minutes = batch_job->getAllocatedTime();
       unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
