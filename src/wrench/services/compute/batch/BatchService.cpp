@@ -1375,7 +1375,7 @@ namespace wrench {
 
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-      this->notifyJobEventsToBatSched(job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
+      this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
 #endif
 
       // Forward the notification
@@ -1395,7 +1395,6 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      */
     void BatchService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
-
 
       std::string job_id;
       for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); it++) {
@@ -1534,7 +1533,7 @@ namespace wrench {
 
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-      this->notifyJobEventsToBatSched(job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
+      this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
 #endif
 
       // Send the callback to the originator
@@ -1597,7 +1596,7 @@ namespace wrench {
 
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-      this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "");
+      this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "");
 #endif
 
       // Fail the job
@@ -1855,8 +1854,6 @@ namespace wrench {
           workflow_job = batch_job->getWorkflowJob();
           this->waiting_jobs.erase(batch_job);
           this->running_jobs.insert(batch_job);
-//          PointerUtil::moveUniquePtrFromSetToSet(it1, &(this->waiting_jobs),
-//                                                 &(this->running_jobs));
           break;
         }
       }
@@ -2042,33 +2039,6 @@ namespace wrench {
       network_listeners.push_back(network_listener);
     }
 
-
-    std::string
-    BatchService::convertAvailableResourcesToJsonString(std::map<std::string, unsigned long> avail_resources) {
-      std::string output = "";
-      std::string convrt = "";
-      std::string result = "";
-      for (auto it = avail_resources.cbegin(); it != avail_resources.cend(); it++) {
-        convrt = std::to_string(it->second);
-        output += (it->first) + ":" + (convrt) + ", ";
-      }
-      result = output.substr(0, output.size() - 2);
-      return result;
-    }
-
-    std::string
-    BatchService::convertResourcesToJsonString(std::set<std::tuple<std::string, unsigned long, double>> resources) {
-      // We completely ignore RAM here
-      std::string output = "";
-      std::string convrt = "";
-      std::string result = "";
-      for (auto r : resources) {
-        convrt = std::to_string(std::get<1>(r));
-        output += std::get<0>(r) + ":" + (convrt) + ", ";
-      }
-      result = output.substr(0, output.size() - 2);
-      return result;
-    }
 
     /**
     * @brief Process a "get resource description message"
