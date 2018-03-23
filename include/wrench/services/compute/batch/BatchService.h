@@ -150,19 +150,12 @@ namespace wrench {
         //Is sched ready?
         bool is_bat_sched_ready;
 
-        //timestamp received from batscheduler
-        double batsched_timestamp;
-
         //fork the batsched_process
         void run_batsched();
 
         unsigned long generateUniqueJobId();
 
         std::string foundRunningJobOnTheList(WorkflowJob *job);
-
-        std::string convertAvailableResourcesToJsonString(std::map<std::string, unsigned long>);
-
-        std::string convertResourcesToJsonString(std::set<std::tuple<std::string, unsigned long, double>>);
 
         //submits a standard job
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) override;
@@ -219,16 +212,11 @@ namespace wrench {
         //Process standardjob timeout
         void processPilotJobTimeout(PilotJob *job);
 
-        //notify upper level job submitters (about pilot job termination)
-        void notifyJobSubmitters(PilotJob *job);
-
         //update the resources
         void updateResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
 
         void updateResources(StandardJob *job);
 
-        //send call back to the pilot job submitters
-        void sendPilotJobCallBackMessage(PilotJob *job);
 
         //send call back to the standard job submitters
         void sendStandardJobCallBackMessage(StandardJob *job);

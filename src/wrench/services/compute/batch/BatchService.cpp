@@ -517,17 +517,6 @@ namespace wrench {
       return 0;
     }
 
-    void BatchService::sendPilotJobCallBackMessage(PilotJob *job) {
-      try {
-        S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                 new ComputeServicePilotJobExpiredMessage(job, this,
-                                                                          this->getPropertyValueAsDouble(
-                                                                                  BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
-
     void BatchService::sendStandardJobCallBackMessage(StandardJob *job) {
       WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
       try {
@@ -885,23 +874,6 @@ namespace wrench {
       }
     }
 
-
-    /**
-     * @brief Notify upper level job submitters
-     */
-    void BatchService::notifyJobSubmitters(PilotJob *job) {
-
-      WRENCH_INFO("Letting the level above know that the pilot job has ended on mailbox_name %s",
-                  job->getCallbackMailbox().c_str());
-      try {
-        S4U_Mailbox::putMessage(job->popCallbackMailbox(),
-                                new ComputeServicePilotJobExpiredMessage(job, this,
-                                                                         this->getPropertyValueAsDouble(
-                                                                                 BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
 
 
     /**
@@ -1966,33 +1938,6 @@ namespace wrench {
 
     }
 
-
-    std::string
-    BatchService::convertAvailableResourcesToJsonString(std::map<std::string, unsigned long> avail_resources) {
-      std::string output = "";
-      std::string convrt = "";
-      std::string result = "";
-      for (auto it = avail_resources.cbegin(); it != avail_resources.cend(); it++) {
-        convrt = std::to_string(it->second);
-        output += (it->first) + ":" + (convrt) + ", ";
-      }
-      result = output.substr(0, output.size() - 2);
-      return result;
-    }
-
-    std::string
-    BatchService::convertResourcesToJsonString(std::set<std::tuple<std::string, unsigned long, double>> resources) {
-      // We completely ignore RAM here
-      std::string output = "";
-      std::string convrt = "";
-      std::string result = "";
-      for (auto r : resources) {
-        convrt = std::to_string(std::get<1>(r));
-        output += std::get<0>(r) + ":" + (convrt) + ", ";
-      }
-      result = output.substr(0, output.size() - 2);
-      return result;
-    }
 
     /**
     * @brief Process a "get resource description message"
