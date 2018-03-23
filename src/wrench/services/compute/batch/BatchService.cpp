@@ -568,8 +568,6 @@ namespace wrench {
     }
 
 
-    // TODO: Is it weird that this function below is never called?
-
     /**
      * @brief Send back notification that a pilot job has expired
      * @param job
@@ -589,8 +587,13 @@ namespace wrench {
      * @brief Send back notification that a standard job has failed
      * @param job
      */
-    void BatchService::sendStandardJobFailureNotification(StandardJob *job) {
+    void BatchService::sendStandardJobFailureNotification(StandardJob *job, std::string job_id) {
       WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
+
+#ifdef ENABLE_BATSCHED
+      this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "");
+#endif
+
       try {
         S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                 new ComputeServiceStandardJobFailedMessage(job, this,
@@ -601,6 +604,7 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         return; // ignore
       }
+
     }
 
     /**
@@ -1160,7 +1164,6 @@ namespace wrench {
 
       } else if (auto msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
         processStandardJobCompletion(msg->executor, msg->job);
-
         return true;
 
       } else if (auto msg = dynamic_cast<StandardJobExecutorFailedMessage *>(message.get())) {
@@ -1179,7 +1182,7 @@ namespace wrench {
           this->processStandardJobTimeout((StandardJob *)(msg->job->getWorkflowJob()));
           this->removeJobFromRunningList(msg->job);
           this->freeUpResources(msg->job->getResourcesAllocated());
-          this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob());
+          this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob(), std::to_string(msg->job->getJobID()));
           return true;
         } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
           auto *pilot_job = (PilotJob *) msg->job->getWorkflowJob();
