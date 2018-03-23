@@ -24,7 +24,7 @@ namespace wrench {
       auto workflow = new Workflow();
 
       // Create the set of tasks
-      for (size_t i = 0; i < this->num_nodes; i++) {
+      for (int i = 0; i < this->num_nodes; i++) {
         double time_fudge = 1; // 1 second seems to make it all work!
         double task_flops = this->num_cores_per_task * (this->batch_service_core_flop_rate * (this->time - time_fudge));
         double parallel_efficiency = 1.0;
