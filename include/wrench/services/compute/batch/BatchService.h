@@ -92,9 +92,7 @@ namespace wrench {
                      std::map<std::string, std::string> plist,
                      std::string suffix);
 
-#ifdef ENABLE_BATSCHED
-        unsigned int batsched_port;
-#endif
+        unsigned int batsched_port; // ONLY USED FOR BATSCHED
 
         //submits a standard job
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) override;
@@ -234,10 +232,10 @@ namespace wrench {
         //notify upper level job submitters (about pilot job termination)
         void notifyJobSubmitters(PilotJob *job);
 
-        //update the resources
-        void updateResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
+        //free up resources
+        void freeUpResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
 
-        void updateResources(StandardJob *job);
+        void freeUpResources(StandardJob *job);
 
         //send call back to the pilot job submitters
         void sendPilotJobCallBackMessage(PilotJob *job);
@@ -254,14 +252,15 @@ namespace wrench {
         //process execute events from batsched
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
-        //process execution of job
-        void processExecution(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
+        //start a job
+        void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
                               BatchJob *, unsigned long, unsigned long, unsigned long);
 
         //notify batsched about job completion/failure/killed events
         void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                        std::string kill_reason);
 
+        void startBatschedNetworkListener();
 
     };
 }
