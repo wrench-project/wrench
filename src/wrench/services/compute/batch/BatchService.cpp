@@ -526,7 +526,6 @@ namespace wrench {
       bool life = true;
       while (life) {
         life = processNextMessage();
-        WRENCH_INFO("NUMBER OF PENDING JOBS: %ld", this->pending_jobs.size());
 
         // Process running jobs
         std::set<std::unique_ptr<BatchJob>>::iterator it;
@@ -809,9 +808,6 @@ namespace wrench {
     BatchJob *BatchService::pickJobForScheduling(std::string job_selection_algorithm) {
       if (job_selection_algorithm == "FCFS") {
         BatchJob *batch_job = (*this->pending_jobs.begin()).get();
-//        WRENCH_INFO("MOVING JOB %ld from PENDING_JOBS to RUNNING_JOBS", batch_job->getJobID());
-//        PointerUtil::moveUniquePtrFromDequeToSet(this->pending_jobs.begin(), &(this->pending_jobs),
-//                                                 &(this->running_jobs));
         return batch_job;
       }
       return nullptr;
@@ -858,6 +854,8 @@ namespace wrench {
       network_listener->start(network_listener, true);
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;
+
+      return false;
 #else
       BatchJob *batch_job = pickJobForScheduling(this->getPropertyValueAsString(BatchServiceProperty::JOB_SELECTION_ALGORITHM));
       if (batch_job == nullptr) {
@@ -865,7 +863,6 @@ namespace wrench {
                 "BatchService::scheduleAllQueuedJobs(): Got no such job in pending queue to dispatch"
         );
       }
-      WRENCH_INFO("PICKED JOB %ld for potential scheduling", batch_job->getJobID());
       WorkflowJob *workflow_job = batch_job->getWorkflowJob();
 
       /* Get the nodes and cores per nodes asked for */
@@ -873,20 +870,22 @@ namespace wrench {
       unsigned long num_nodes_asked_for = batch_job->getNumNodes();
       unsigned long time_in_minutes = batch_job->getAllocatedTime();
 
+      WRENCH_INFO("Trying to see if I can run job %s", workflow_job->getName().c_str());
+
       //Try to schedule hosts based on FIRSTFIT OR BESTFIT
       // Asking for the FULL RAM (TODO: Change this?)
       std::set<std::tuple<std::string, unsigned long, double>> resources = this->scheduleOnHosts(
               this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
               num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_CORES);
 
+
       if (resources.empty()) {
-        WRENCH_INFO("NO DICE for job %ld  (total of %ld pending jobs)",
-                    batch_job->getJobID(), this->pending_jobs.size());
-        WRENCH_INFO("BUG: WE SHOULD PUT THE JOB BACK INTO THE PENDING JOBS?????????");
+        WRENCH_INFO("Can't run job %s", workflow_job->getName().c_str());
         return false;
       }
 
-      WRENCH_INFO("MOVING JOB %ld from PENDING_JOBS to RUNNING_JOBS", batch_job->getJobID());
+      WRENCH_INFO("RUNNING job %s", workflow_job->getName().c_str());
+
       for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); it++) {
         if ((*it).get() == batch_job) {
           PointerUtil::moveUniquePtrFromDequeToSet(it, &(this->pending_jobs),
@@ -898,9 +897,9 @@ namespace wrench {
 //                                               &(this->running_jobs));
       processExecution(resources, workflow_job, batch_job, num_nodes_asked_for, time_in_minutes,
                        cores_per_node_asked_for);
+      return true;
 #endif
 
-      return false;
     }
 
     /**

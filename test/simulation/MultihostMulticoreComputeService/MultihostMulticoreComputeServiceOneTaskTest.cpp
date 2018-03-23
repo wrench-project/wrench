@@ -366,7 +366,7 @@ private:
       // Create a job with a vector of empty tasks (and no file copies)
       success = true;
       try {
-        job = job_manager->createStandardJob({nullptr},
+        job = job_manager->createStandardJob({nullptr, nullptr},
                                              {{test->input_file,  test->storage_service1},
                                               {test->output_file, test->storage_service1}});
       } catch (std::invalid_argument &e) {
@@ -379,7 +379,7 @@ private:
       // Create a job with nullptrs in file locations
       success = true;
       try {
-        job = job_manager->createStandardJob({test->task},
+        job = job_manager->createStandardJob({test->task, test->task_big},
                                              {{nullptr,  test->storage_service1},
                                               {test->output_file, test->storage_service1}});
       } catch (std::invalid_argument &e) {
@@ -392,7 +392,7 @@ private:
       // Create a job with nullptrs in file locations
       success = true;
       try {
-        job = job_manager->createStandardJob({test->task},
+        job = job_manager->createStandardJob({test->task, test->task_big},
                                              {{test->input_file,  nullptr},
                                               {test->output_file, test->storage_service1}});
       } catch (std::invalid_argument &e) {

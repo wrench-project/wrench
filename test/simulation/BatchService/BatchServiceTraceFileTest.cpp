@@ -52,8 +52,8 @@ protected:
               "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
               "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
               "       <link id=\"3\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
-              "       <route src=\"Host3\" dst=\"Host1\"> <link_ctn id=\"2\"/> </route>"
-              "       <route src=\"Host4\" dst=\"Host1\"> <link_ctn id=\"2\"/> </route>"
+              "       <route src=\"Host3\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
+              "       <route src=\"Host4\" dst=\"Host1\"> <link_ctn id=\"1\"/> </route>"
               "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\""
               "/> </route>"
               "   </zone> "
@@ -241,9 +241,108 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::Simulation::sleep(100000);
-      // At this point, a 4-node 30-min job should have to wait 2 hours, and 2-node 30-min job should have to wait 1 hour
+      wrench::Simulation::sleep(10);
+      // At this point, using the FCFS algorithm, a 2-node 30-min job should complete around t=1.5 hours
+      // and 4-node 30-min job should complete around t=2.5 hours
 
+      std::vector<wrench::WorkflowTask *> tasks;
+      std::map<std::string, std::string> batch_job_args;
+
+      // Create and submit a job that needs 2 nodes and 30 minutes
+      for (size_t i = 0; i < 2; i++) {
+        double time_fudge = 1; // 1 second seems to make it all work!
+        double task_flops = 10 * (1 * (1800 - time_fudge));
+        int num_cores = 10;
+        double parallel_efficiency = 1.0;
+        tasks.push_back(workflow->addTask("test_job_1_task_" + std::to_string(i),
+                                          task_flops,
+                                          num_cores, num_cores, parallel_efficiency,
+                                          0.0));
+      }
+
+      // Create a Standard Job with only the tasks
+      wrench::StandardJob *standard_job_2_nodes;
+      standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+
+      // Create the batch-specific argument
+      batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
+      batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
+      batch_job_args["-c"] = std::to_string(10); //number of cores per task
+
+      // Submit this job to the batch service
+      job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+
+
+      // Create and submit a job that needs 2 nodes and 30 minutes
+      tasks.clear();
+      for (size_t i = 0; i < 4; i++) {
+        double time_fudge = 1; // 1 second seems to make it all work!
+        double task_flops = 10 * (1 * (1800 - time_fudge));
+        int num_cores = 10;
+        double parallel_efficiency = 1.0;
+        tasks.push_back(workflow->addTask("test_job_2_task_" + std::to_string(i),
+                                          task_flops,
+                                          num_cores, num_cores, parallel_efficiency,
+                                          0.0));
+      }
+
+
+      // Create a Standard Job with only the tasks
+      wrench::StandardJob *standard_job_4_nodes;
+      standard_job_4_nodes = job_manager->createStandardJob(tasks, {});
+
+      // Create the batch-specific argument
+      batch_job_args.clear();
+      batch_job_args["-N"] = std::to_string(4); // Number of nodes/tasks
+      batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
+      batch_job_args["-c"] = std::to_string(10); //number of cores per task
+
+      // Submit this job to the batch service
+      job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+
+
+      // Wait for the two execution events
+      for (auto job : {standard_job_2_nodes, standard_job_4_nodes}) {
+        // Wait for the workflow execution event
+        WRENCH_INFO("Waiting for job completion of job %s", job->getName().c_str());
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = workflow->waitForNextExecutionEvent();
+          switch (event->type) {
+            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+              if (event->job != job) {
+                throw std::runtime_error("Wrong job completion order: got " +
+                                                 event->job->getName() + " but expected " + job->getName());
+              }
+              break;
+            }
+            default: {
+              throw std::runtime_error(
+                      "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+            }
+          }
+        } catch (wrench::WorkflowExecutionException &e) {
+          //ignore (network error or something)
+        }
+
+        double completion_time = this->simulation->getCurrentSimulatedDate();
+        double expected_completion_time;
+        if (job == standard_job_2_nodes) {
+          expected_completion_time = 3600  + 1800;
+        } else if (job == standard_job_4_nodes) {
+          expected_completion_time = 3600 * 2 + 1800;
+        } else {
+          throw std::runtime_error("Phantom job completion!");
+        }
+        double delta = fabs(expected_completion_time - completion_time);
+        double tolerance = 5;
+        if (delta > tolerance) {
+          throw std::runtime_error("Unexpected job completion time for job " + job->getName() + ": " +
+          std::to_string(completion_time) + " (expected: " + std::to_string(expected_completion_time) + ")");
+        }
+
+      }
+      delete workflow;
       return 0;
     }
 };
@@ -339,6 +438,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1\n");  // job that takes the whole machine
   fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
   fclose(trace_file);
+
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   EXPECT_NO_THROW(compute_service = simulation->add(
