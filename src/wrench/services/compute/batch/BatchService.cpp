@@ -1804,7 +1804,6 @@ namespace wrench {
       return jobs_estimated_waiting_time;
     }
 
-<<<<<<< HEAD
       /**
      * @brief Notify a job even to BATSCHED (BATSCHED ONLY)
      * @param job_id
