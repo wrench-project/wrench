@@ -408,9 +408,9 @@ namespace wrench {
 
 
     /**
-   * @brief Constructor
-   *
-   */
+     * @brief Constructor
+     *
+     */
     ComputeThreadHasDied::ComputeThreadHasDied() : FailureCause(
             COMPUTE_THREAD_HAS_DIED) {
     }
@@ -425,9 +425,9 @@ namespace wrench {
     };
 
     /**
-  * @brief Constructor
-  *
-  */
+    * @brief Constructor
+    *
+    */
     FatalFailure::FatalFailure() : FailureCause(
             FATAL_FAILURE) {
     }
@@ -438,7 +438,31 @@ namespace wrench {
      * @return the message
      */
     std::string FatalFailure::toString() {
-      return "Unknown Failure Cause";
+      return "Internal implementation, likely a WRENCH bug";
     };
+
+    /**
+     * @brief Constructor
+     * @param service: the service
+     */
+    FunctionalityNotAvailable::FunctionalityNotAvailable(Service *service) : FailureCause(FUNCTIONALITY_NOT_AVAILABLE) {
+      this->service = service;
+    }
+
+    /**
+     * @brief Getter
+     * @return the service
+     */
+    Service* FunctionalityNotAvailable::getService() {
+      return this->service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string FunctionalityNotAvailable::toString() {
+      return "The request functionality is not available on service " + this->service->getName();
+    }
 
 };
