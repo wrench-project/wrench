@@ -193,10 +193,7 @@ namespace wrench {
       }
 
 #ifdef ENABLE_BATSCHED
-      this->batsched_port = 28000 + S4U_Mailbox::generateUniqueSequenceNumber();
-      this->runBatsched();
-#else
-      this->is_bat_sched_ready = true;
+      this->startBatsched();
 #endif
       
     }
@@ -504,15 +501,15 @@ namespace wrench {
 //          }
 //        }
 
-        #ifdef ENABLE_BATSCHED
+#ifdef ENABLE_BATSCHED
         if (keep_going && is_bat_sched_ready) {
           this->sendAllQueuedJobsToBatsched();
         }
-        #else
+#else
         if (keep_going) {
           while (this->scheduleOneQueuedJob());
         }
-        #endif
+#endif
       }
 
       this->clean_exit = true;
@@ -943,31 +940,7 @@ namespace wrench {
       }
 
 #ifdef ENABLE_BATSCHED
-
-      // Stop Batsched
-      zmq::context_t context(1);
-      zmq::socket_t socket(context, ZMQ_REQ);
-      socket.connect("tcp://localhost:" + std::to_string(this->batsched_port));
-
-
-      nlohmann::json simulation_ends_msg;
-      simulation_ends_msg["now"] = S4U_Simulation::getClock();
-      simulation_ends_msg["events"][0]["timestamp"] = S4U_Simulation::getClock();
-      simulation_ends_msg["events"][0]["type"] = "SIMULATION_ENDS";
-      simulation_ends_msg["events"][0]["data"] = {};
-      std::string data_to_send = simulation_ends_msg.dump();
-
-      zmq::message_t request(strlen(data_to_send.c_str()));
-      memcpy(request.data(), data_to_send.c_str(), strlen(data_to_send.c_str()));
-      socket.send(request);
-
-      //  Get the reply.
-      zmq::message_t reply;
-      socket.recv(&reply);
-
-      std::string reply_data;
-      reply_data = std::string(static_cast<char *>(reply.data()), reply.size());
-
+      this->stopBatsched();
 #endif
 
       if (this->clean_exit) {
@@ -1932,8 +1905,9 @@ namespace wrench {
      *           - exit code 2: unsupported queuing option
      *           - exit code 3: execvp error
      */
-    void BatchService::runBatsched() {
+    void BatchService::startBatsched() {
 
+      this->batsched_port = 28000 + S4U_Mailbox::generateUniqueSequenceNumber();
       this->pid = getpid();
 
 
@@ -1972,7 +1946,7 @@ namespace wrench {
           case 0: {
             int tether[2]; // this is a local variable, only defined in this scope
             if (pipe(tether) != 0) {  // the pipe however is opened during the whole duration of both processes
-              throw std::runtime_error("runBatsched(): pipe failed.");
+              throw std::runtime_error("startBatsched(): pipe failed.");
             }
             //now fork a process that sleeps until its parent is dead
             int nested_pid = fork();
@@ -1997,20 +1971,20 @@ namespace wrench {
             return;
           case 1:
             throw std::runtime_error(
-                    "runBatsched(): Scheduling algorithm " +
+                    "startBatsched(): Scheduling algorithm " +
                     this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
                     " not supported by the batch service");
           case 2:
             throw std::runtime_error(
-                    "runBatsched(): Queuing option " +
+                    "startBatsched(): Queuing option " +
                     this->getPropertyValueAsString(BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM) +
                     "not supported by the batch service");
           case 3:
             throw std::runtime_error(
-                    "runBatsched(): Cannot start the batsched process");
+                    "startBatsched(): Cannot start the batsched process");
           default:
             throw std::runtime_error(
-                    "runBatsched(): Unknown fatal error");
+                    "startBatsched(): Unknown fatal error");
         }
 
       } else {
@@ -2020,6 +1994,39 @@ namespace wrench {
         );
       }
     }
+
+
+    /**
+     * @brief: Stop the batsched process
+     */
+    void BatchService::stopBatsched() {
+       // Stop Batsched
+      zmq::context_t context(1);
+      zmq::socket_t socket(context, ZMQ_REQ);
+      socket.connect("tcp://localhost:" + std::to_string(this->batsched_port));
+
+
+      nlohmann::json simulation_ends_msg;
+      simulation_ends_msg["now"] = S4U_Simulation::getClock();
+      simulation_ends_msg["events"][0]["timestamp"] = S4U_Simulation::getClock();
+      simulation_ends_msg["events"][0]["type"] = "SIMULATION_ENDS";
+      simulation_ends_msg["events"][0]["data"] = {};
+      std::string data_to_send = simulation_ends_msg.dump();
+
+      zmq::message_t request(strlen(data_to_send.c_str()));
+      memcpy(request.data(), data_to_send.c_str(), strlen(data_to_send.c_str()));
+      socket.send(request);
+
+      //  Get the reply.
+      zmq::message_t reply;
+      socket.recv(&reply);
+
+      // TODO: Is this below useful?
+      std::string reply_data;
+      reply_data = std::string(static_cast<char *>(reply.data()), reply.size());
+
+    }
+
 
     std::map<std::string, double>
     BatchService::getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs) {
