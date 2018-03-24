@@ -2090,9 +2090,6 @@ namespace wrench {
     }
 
 
-};
-
-
 #endif  // ENABLE_BATSCHED
 
 };
