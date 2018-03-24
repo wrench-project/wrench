@@ -7,18 +7,18 @@
  * (at your option) any later version.
  */
 
+#ifdef ENABLE_BATSCHED
+
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/batch/BatchServiceMessage.h"
 #include "wrench/services/compute/batch/BatchServiceProperty.h"
-#include "wrench/services/compute/batch/BatchNetworkListener.h"
+#include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 #include <json.hpp>
-#ifdef ENABLE_BATSCHED
 #include <zmq.hpp>
 #include <zmq.h>
-#endif
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_network_listener_service, "Log category for Batch Network Listener Service");
 
@@ -65,7 +65,6 @@ namespace wrench {
     int BatchNetworkListener::main() {
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
 
-#ifdef ENABLE_BATSCHED
 
       WRENCH_INFO("Batch Network Listener Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
@@ -82,8 +81,6 @@ namespace wrench {
                 "BatchNetworkListener::BatchNetworkListener():Invalid Network Listener type given"
         );
       }
-
-#endif
 
       WRENCH_INFO("Batch Network Listener Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
@@ -113,7 +110,6 @@ namespace wrench {
     }
 
     void BatchNetworkListener::send_receive() {
-#ifdef ENABLE_BATSCHED
       zmq::context_t context(1);
       zmq::socket_t socket(context, ZMQ_REQ);
       socket.connect("tcp://localhost:" + this->sched_port);
@@ -167,8 +163,9 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
-#endif
     }
 
-
 }
+
+#endif
+

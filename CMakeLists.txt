@@ -89,7 +89,7 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchServiceMessage.h
         include/wrench/services/compute/batch/BatchService.h
         include/wrench/services/compute/batch/BatchServiceProperty.h
-        include/wrench/services/compute/batch/BatchNetworkListener.h
+        include/wrench/services/compute/batch/BatschedNetworkListener.h
         include/wrench/services/helpers/Alarm.h
         include/wrench/util/PointerUtil.h
         include/wrench/util/MessageManager.h
@@ -169,7 +169,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/WorkloadTraceFileReplayer.cpp
         src/wrench/services/compute/batch/OneJobWMS.cpp
         src/wrench/services/compute/batch/BatchServiceProperty.cpp
-        src/wrench/services/compute/batch/BatchNetworkListener.cpp
+        src/wrench/services/compute/batch/BatschedNetworkListener.cpp
         src/wrench/services/helpers/Alarm.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp

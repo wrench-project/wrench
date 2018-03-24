@@ -14,7 +14,7 @@
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "wrench/services/compute/batch/BatchJob.h"
-#include "wrench/services/compute/batch/BatchNetworkListener.h"
+#include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/services/compute/batch/BatchServiceProperty.h"
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
@@ -120,8 +120,6 @@ namespace wrench {
         //alarms for pilot jobs (only one pilot job alarm)
         std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
 
-        //vector of network listeners
-        std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
 
         /* Resources information in Batchservice */
         unsigned long total_num_of_nodes;
@@ -148,8 +146,7 @@ namespace wrench {
         // A set of waiting jobs that have been submitted to batsched, but not scheduled
         std::set<BatchJob *> waiting_jobs;
 
-        //Batch Service request reply process
-        std::unique_ptr<BatchNetworkListener> request_reply_process;
+
 
         //Batch scheduling supported algorithms
         std::set<std::string> scheduling_algorithms = {"easy_bf", "conservative_bf", "easy_bf_plot_liquid_load_horizon",
@@ -227,31 +224,38 @@ namespace wrench {
         //send call back to the standard job submitters
         void sendStandardJobFailureNotification(StandardJob *job, std::string job_id);
 
-        //try to schedule a queued job
-        void sendAllQueuedJobsToBatsched();
-
+        // Try to schedule a job
         bool scheduleOneQueuedJob();
 
         // process a job submission
         void processJobSubmission(BatchJob *job, std::string answer_mailbox);
 
-        //process execute events from batsched
-        void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
         //start a job
         void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
                               BatchJob *, unsigned long, unsigned long, unsigned long);
 
-        //notify batsched about job completion/failure/killed events
-        void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
-                                       std::string kill_reason);
-
-        void startBatschedNetworkListener();
 
 #ifdef ENABLE_BATSCHED
+
+        //Batch Service request reply process
+        std::unique_ptr<BatchNetworkListener> request_reply_process;
+
+        //vector of network listeners
+        std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
+
         void startBatsched();
         void stopBatsched();
         std::map<std::string,double> getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string,unsigned int,double>>);
+
+        void startBatschedNetworkListener();
+
+        void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
+                                       std::string kill_reason);
+        void sendAllQueuedJobsToBatsched();
+
+        //process execute events from batsched
+        void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
 #endif // ENABLE_BATSCHED
 
