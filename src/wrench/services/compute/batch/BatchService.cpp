@@ -2075,9 +2075,9 @@ namespace wrench {
       return jobs_estimated_waiting_time;
     }
 
+#endif  // ENABLE_BATSCHED
+
 };
 
 
-#endif  // ENABLE_BATSCHED
 
-}
