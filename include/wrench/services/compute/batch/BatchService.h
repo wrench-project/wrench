@@ -249,7 +249,8 @@ namespace wrench {
         void startBatschedNetworkListener();
 
 #ifdef ENABLE_BATSCHED
-        void runBatsched();
+        void startBatsched();
+        void stopBatsched();
         std::map<std::string,double> getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string,unsigned int,double>>);
 
 #endif // ENABLE_BATSCHED
