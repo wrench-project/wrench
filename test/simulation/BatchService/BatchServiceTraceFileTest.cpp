@@ -101,10 +101,17 @@ private:
       {
 	char *wd = get_current_dir_name();
 	std::cerr << "WORKING DIR = " << std::string(wd) << "\n";
+       	std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs;
         //Let's load the trace file
-        std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>
-                trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("../test/trace_files/NASA-iPSC-1993-3.swf",
-                                                                             0);
+	try {	
+                trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("../test/trace_files/NASA-iPSC-1993-3.swf", 0);
+        } catch (std::invalid_argument &e) {
+          // Ignore and try alternate path
+          trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("test/trace_files/NASA-iPSC-1993-3.swf", 0);
+	  // If this doens't work, then we have a problem, so we simply let the exception be uncaught
+        }
+
+
         for (auto const &job : trace_file_jobs) {
           double sub_time = std::get<1>(job);
           double curtime = wrench::S4U_Simulation::getClock();
