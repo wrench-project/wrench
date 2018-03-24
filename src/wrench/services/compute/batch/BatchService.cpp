@@ -49,58 +49,11 @@ namespace wrench {
 
     std::map<std::string, double>
     BatchService::getQueueWaitingTimeEstimate(std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs) {
-//      std::string job_id,unsigned int num_nodes, double walltime_seconds
+
 #ifdef ENABLE_BATSCHED
-      nlohmann::json batch_submission_data;
-      batch_submission_data["now"] = S4U_Simulation::getClock();
-
-      int idx = 0;
-      batch_submission_data["events"] = nlohmann::json::array();
-      for (auto job : set_of_jobs) {
-        batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
-        batch_submission_data["events"][idx]["type"] = "QUERY";
-        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = std::get<0>(job);
-        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = std::get<0>(
-                job);
-        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(
-                job);
-        batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<2>(
-                job);
-      }
-
-
-      std::string batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailboxName("batchsched_query_mailbox");
-      std::string data = batch_submission_data.dump();
-      std::shared_ptr<BatchNetworkListener> network_listener =
-              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, batchsched_query_mailbox,
-                                                                             std::to_string(this->batsched_port),
-                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
-                                                                             data));
-      network_listener->setSimulation(this->simulation);
-      network_listener->start(network_listener, true);
-      network_listeners.push_back(std::move(network_listener));
-      this->is_bat_sched_ready = false;
-
-
-      std::map<std::string, double> jobs_estimated_waiting_time = {};
-      for (auto job : set_of_jobs) {
-        // Get the answer
-        std::unique_ptr<SimulationMessage> message = nullptr;
-        try {
-          message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          throw WorkflowExecutionException(cause);
-        }
-
-        if (auto *msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
-          jobs_estimated_waiting_time[std::get<0>(job)] = msg->estimated_waiting_time;
-        } else {
-          throw std::runtime_error(
-                  "BatchService::getQueueWaitingTimeEstimate(): Received an unexpected [" + message->getName() +
-                  "] message!");
-        }
-      }
-      return jobs_estimated_waiting_time;
+      return getQueueWaitingTimeEstimateFromBatsched(set_of_jobs);
+#else
+      throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(new FunctionalityNotAvailable(this)));
 #endif
     }
 
@@ -241,10 +194,11 @@ namespace wrench {
 
 #ifdef ENABLE_BATSCHED
       this->batsched_port = 28000 + S4U_Mailbox::generateUniqueSequenceNumber();
-      this->run_batsched();
+      this->runBatsched();
 #else
-      is_bat_sched_ready = true;
+      this->is_bat_sched_ready = true;
 #endif
+      
     }
 
 
@@ -628,7 +582,7 @@ namespace wrench {
         return;
       }
 
-      for (auto const& j: this->all_jobs) {
+      for (auto const & j: this->all_jobs) {
         if (j->getWorkflowJob() == job->getWorkflowJob()) {
           this->all_jobs.erase(j);
           break;
@@ -1554,102 +1508,7 @@ namespace wrench {
       return jobid++;
     }
 
-    /**
-    * @brief: Start a batsched process
-    *           - exit code 1: unsupported algorithm
-    *           - exit code 2: unsupported queuing option
-    *           - exit code 3: execvp error
-    */
-    void BatchService::run_batsched() {
 
-#ifdef ENABLE_BATSCHED
-
-      this->pid = getpid();
-
-      int top_pid = fork();
-      if (top_pid == 0) { // Child process that will exec batsched
-
-        std::string algorithm = this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM);
-        bool is_supported = this->scheduling_algorithms.find(algorithm) != this->scheduling_algorithms.end();
-        if (not is_supported) {
-          exit(1);
-        }
-
-        std::string queue_ordering = this->getPropertyValueAsString(
-                BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM);
-        bool is_queue_ordering_available =
-                this->queue_ordering_options.find(queue_ordering) != this->queue_ordering_options.end();
-        if (not is_queue_ordering_available) {
-          std::cerr << "The queue ordering option " + queue_ordering + " is not supported by the batch service" << "\n";
-          exit(2);
-        }
-
-        std::string rjms_delay = this->getPropertyValueAsString(BatchServiceProperty::BATCH_RJMS_DELAY);
-        std::string socket_endpoint = "tcp://*:" + std::to_string(this->batsched_port);
-        const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
-                              socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
-        if (execvp(args[0], (char **) args) == -1) {
-          exit(3);
-        }
-
-
-      } else if (top_pid > 0) {
-        // parent process
-        sleep(1); // Wait one second to let batsched the time to start (this is pretty ugly)
-        int exit_code = waitpid(top_pid, NULL, WNOHANG);
-        switch (exit_code) {
-          case 0: {
-            int tether[2]; // this is a local variable, only defined in this scope
-            if (pipe(tether) != 0) {  // the pipe however is opened during the whole duration of both processes
-              throw std::runtime_error("run_batsched(): pipe failed.");
-            }
-            //now fork a process that sleeps until its parent is dead
-            int nested_pid = fork();
-
-            if (nested_pid > 0) {
-              //I am the parent, whose child fork exec'd batsched
-            } else if (nested_pid == 0) {
-              char foo;
-              close(tether[1]); // closing write end
-              read(tether[0], &foo, 1); // blocking read which returns when the parent dies
-
-              //check if the child that forked batsched is still running
-              if (getpgid(top_pid)) {
-                kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched
-              }
-              //my parent has died so, I will kill myself instead of exiting and becoming a zombie
-              kill(getpid(), SIGKILL);
-              //exit(is_sent); //if exit myself and become a zombie :D
-
-            }
-          }
-            return;
-          case 1:
-            throw std::runtime_error(
-                    "run_batsched(): Scheduling algorithm " +
-                    this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
-                    " not supported by the batch service");
-          case 2:
-            throw std::runtime_error(
-                    "run_batsched(): Queuing option " +
-                    this->getPropertyValueAsString(BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM) +
-                    "not supported by the batch service");
-          case 3:
-            throw std::runtime_error(
-                    "run_batsched(): Cannot start the batsched process");
-          default:
-            throw std::runtime_error(
-                    "run_batsched(): Unknown fatal error");
-        }
-
-      } else {
-        // fork failed
-        throw std::runtime_error(
-                "Error while fork-exec of batsched"
-        );
-      }
-#endif
-    }
 
 
     void
@@ -2059,4 +1918,166 @@ namespace wrench {
       }
       return;
     }
+
+
+    /********************************************************************************************/
+    /** BATSCHED INTERFACE METHODS BELOW                                                        */
+    /********************************************************************************************/
+
+#ifdef ENABLE_BATSCHED
+
+    /**
+     * @brief: Start a batsched process
+     *           - exit code 1: unsupported algorithm
+     *           - exit code 2: unsupported queuing option
+     *           - exit code 3: execvp error
+     */
+    void BatchService::runBatsched() {
+
+      this->pid = getpid();
+
+
+      int top_pid = fork();
+      if (top_pid == 0) { // Child process that will exec batsched
+
+        std::string algorithm = this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM);
+        bool is_supported = this->scheduling_algorithms.find(algorithm) != this->scheduling_algorithms.end();
+        if (not is_supported) {
+          exit(1);
+        }
+
+        std::string queue_ordering = this->getPropertyValueAsString(
+                BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM);
+        bool is_queue_ordering_available =
+                this->queue_ordering_options.find(queue_ordering) != this->queue_ordering_options.end();
+        if (not is_queue_ordering_available) {
+          std::cerr << "The queue ordering option " + queue_ordering + " is not supported by the batch service" << "\n";
+          exit(2);
+        }
+
+        std::string rjms_delay = this->getPropertyValueAsString(BatchServiceProperty::BATCH_RJMS_DELAY);
+        std::string socket_endpoint = "tcp://*:" + std::to_string(this->batsched_port);
+        const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
+                              socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
+        if (execvp(args[0], (char **) args) == -1) {
+          exit(3);
+        }
+
+
+      } else if (top_pid > 0) {
+        // parent process
+        sleep(1); // Wait one second to let batsched the time to start (this is pretty ugly)
+        int exit_code = waitpid(top_pid, NULL, WNOHANG);
+        switch (exit_code) {
+          case 0: {
+            int tether[2]; // this is a local variable, only defined in this scope
+            if (pipe(tether) != 0) {  // the pipe however is opened during the whole duration of both processes
+              throw std::runtime_error("runBatsched(): pipe failed.");
+            }
+            //now fork a process that sleeps until its parent is dead
+            int nested_pid = fork();
+
+            if (nested_pid > 0) {
+              //I am the parent, whose child fork exec'd batsched
+            } else if (nested_pid == 0) {
+              char foo;
+              close(tether[1]); // closing write end
+              read(tether[0], &foo, 1); // blocking read which returns when the parent dies
+
+              //check if the child that forked batsched is still running
+              if (getpgid(top_pid)) {
+                kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched
+              }
+              //my parent has died so, I will kill myself instead of exiting and becoming a zombie
+              kill(getpid(), SIGKILL);
+              //exit(is_sent); //if exit myself and become a zombie :D
+
+            }
+          }
+            return;
+          case 1:
+            throw std::runtime_error(
+                    "runBatsched(): Scheduling algorithm " +
+                    this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
+                    " not supported by the batch service");
+          case 2:
+            throw std::runtime_error(
+                    "runBatsched(): Queuing option " +
+                    this->getPropertyValueAsString(BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM) +
+                    "not supported by the batch service");
+          case 3:
+            throw std::runtime_error(
+                    "runBatsched(): Cannot start the batsched process");
+          default:
+            throw std::runtime_error(
+                    "runBatsched(): Unknown fatal error");
+        }
+
+      } else {
+        // fork failed
+        throw std::runtime_error(
+                "Error while fork-exec of batsched"
+        );
+      }
+    }
+
+    std::map<std::string, double>
+    BatchService::getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs) {
+          nlohmann::json batch_submission_data;
+      batch_submission_data["now"] = S4U_Simulation::getClock();
+
+      int idx = 0;
+      batch_submission_data["events"] = nlohmann::json::array();
+      for (auto job : set_of_jobs) {
+        batch_submission_data["events"][idx]["timestamp"] = S4U_Simulation::getClock();
+        batch_submission_data["events"][idx]["type"] = "QUERY";
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job_id"] = std::get<0>(job);
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["id"] = std::get<0>(
+                job);
+        batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(
+                job);
+        batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<2>(
+                job);
+      }
+
+
+      std::string batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailboxName("batchsched_query_mailbox");
+      std::string data = batch_submission_data.dump();
+      std::shared_ptr<BatchNetworkListener> network_listener =
+              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, batchsched_query_mailbox,
+                                                                             std::to_string(this->batsched_port),
+                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                                             data));
+      network_listener->setSimulation(this->simulation);
+      network_listener->start(network_listener, true);
+      network_listeners.push_back(std::move(network_listener));
+      this->is_bat_sched_ready = false;
+
+
+      std::map<std::string, double> jobs_estimated_waiting_time = {};
+      for (auto job : set_of_jobs) {
+        // Get the answer
+        std::unique_ptr<SimulationMessage> message = nullptr;
+        try {
+          message = S4U_Mailbox::getMessage(batchsched_query_mailbox);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          throw WorkflowExecutionException(cause);
+        }
+
+        if (auto *msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
+          jobs_estimated_waiting_time[std::get<0>(job)] = msg->estimated_waiting_time;
+        } else {
+          throw std::runtime_error(
+                  "BatchService::getQueueWaitingTimeEstimate(): Received an unexpected [" + message->getName() +
+                  "] message!");
+        }
+      }
+      return jobs_estimated_waiting_time;
+    }
+
+};
+
+
+#endif  // ENABLE_BATSCHED
+
 }

@@ -172,8 +172,6 @@ namespace wrench {
         //Is sched ready?
         bool is_bat_sched_ready;
 
-        //fork the batsched_process
-        void run_batsched();
 
         unsigned long generateUniqueJobId();
 
@@ -249,6 +247,12 @@ namespace wrench {
                                        std::string kill_reason);
 
         void startBatschedNetworkListener();
+
+#ifdef ENABLE_BATSCHED
+        void runBatsched();
+        std::map<std::string,double> getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string,unsigned int,double>>);
+
+#endif // ENABLE_BATSCHED
 
     };
 }
