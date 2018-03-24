@@ -16,6 +16,7 @@
 #include <wrench/services/compute/batch/BatchServiceMessage.h>
 #include <wrench/util/TraceFileLoader.h>
 #include "wrench/workflow/job/PilotJob.h"
+#include <unistd.h>
 
 #include "../../include/TestWithFork.h"
 
@@ -98,6 +99,8 @@ private:
       // Submit the jobs
       unsigned long num_submitted_jobs = 0;
       {
+	char *wd = get_current_dir_name();
+	std::cerr << "WORKING DIR = " << std::string(wd) << "\n";
         //Let's load the trace file
         std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>
                 trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("test/trace_files/NASA-iPSC-1993-3.swf",

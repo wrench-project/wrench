@@ -290,7 +290,6 @@ private:
       batch_job_args["-c"] = std::to_string(10); //number of cores per task
 
       // Submit this job to the batch service
-      std::cerr << "SUBMITTING JOB: 2 nodes for 30 minutes";
       job_manager->submitJob(standard_job_1, *(this->getAvailableComputeServices().begin()), batch_job_args);
 
 
@@ -318,7 +317,6 @@ private:
       batch_job_args["-c"] = std::to_string(10); //number of cores per task
 
       // Submit this job to the batch service
-      std::cerr << "SUBMITTING JOB: 2 nodes for 30 minutes";
       job_manager->submitJob(standard_job_2, *(this->getAvailableComputeServices().begin()), batch_job_args);
 
 
