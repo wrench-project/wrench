@@ -408,42 +408,7 @@ namespace wrench {
       throw std::runtime_error("BatchService::terminateStandardJob(): Not implemented in WRENCH yet!");
     }
 
-    /**
-     * @brief Start a network listener process (for BATSCHED only)
-     */
-    void BatchService::startBatschedNetworkListener() {
 
-      nlohmann::json compute_resources_map;
-      compute_resources_map["now"] = S4U_Simulation::getClock();
-      compute_resources_map["events"][0]["timestamp"] = S4U_Simulation::getClock();
-      compute_resources_map["events"][0]["type"] = "SIMULATION_BEGINS";
-      compute_resources_map["events"][0]["data"]["nb_resources"] = this->nodes_to_cores_map.size();
-      compute_resources_map["events"][0]["data"]["allow_time_sharing"] = false;
-      compute_resources_map["events"][0]["data"]["config"]["redis"]["enabled"] = false;
-      std::map<std::string, unsigned long>::iterator it;
-      int count = 0;
-      for (it = this->nodes_to_cores_map.begin(); it != this->nodes_to_cores_map.end(); it++) {
-        compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
-        compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
-        compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
-        compute_resources_map["events"][0]["data"]["resources_data"][count++]["state"] = "idle";
-      }
-      std::string data = compute_resources_map.dump();
-
-
-      try {
-        std::shared_ptr<BatchNetworkListener> network_listener =
-                std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                               std::to_string(this->batsched_port),
-                                                                               BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
-                                                                               data));
-        network_listener->setSimulation(this->simulation);
-        network_listener->start(network_listener, true);
-        this->network_listeners.push_back(std::move(network_listener));
-      } catch (std::runtime_error &e) {
-        throw;
-      }
-    }
 
     /**
      * @brief Main method of the daemon
@@ -737,53 +702,7 @@ namespace wrench {
       return nullptr;
     }
 
-    void BatchService::sendAllQueuedJobsToBatsched() {
-      if (this->pending_jobs.empty()) {
-        return;
-      }
 
-      // Send ALL Queued jobs to batsched, and move them all to the WAITING queue
-      // The WAITING queue is: those jobs that I need to hear from Batsched about
-
-      nlohmann::json batch_submission_data;
-      batch_submission_data["now"] = S4U_Simulation::getClock();
-      batch_submission_data["events"] = nlohmann::json::array();
-      size_t i;
-      std::deque<BatchJob *>::iterator it;
-      for (i = 0, it = this->pending_jobs.begin(); i < this->pending_jobs.size(); i++, it++) {
-
-        BatchJob *batch_job = *it;
-
-        /* Get the nodes and cores per nodes asked for */
-        unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
-        unsigned long num_nodes_asked_for = batch_job->getNumNodes();
-        unsigned long time_in_minutes = batch_job->getAllocatedTime();
-
-        batch_submission_data["events"][i]["timestamp"] = batch_job->getAppearedTimeStamp();
-        batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
-        batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
-        batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
-        batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
-        batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
-        batch_submission_data["events"][i]["data"]["job"]["walltime"] = time_in_minutes * 60;
-        this->pending_jobs.erase(it);
-        this->waiting_jobs.insert(*it);
-//        PointerUtil::moveUniquePtrFromDequeToSet(it, &(this->pending_jobs),
-//                                                 &(this->waiting_jobs));
-
-      }
-      std::string data = batch_submission_data.dump();
-      std::shared_ptr<BatchNetworkListener> network_listener =
-              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                             std::to_string(this->batsched_port),
-                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
-                                                                             data));
-      network_listener->setSimulation(this->simulation);
-      network_listener->start(network_listener, true);
-      network_listeners.push_back(std::move(network_listener));
-      this->is_bat_sched_ready = false;
-
-    }
 
     /**
      * @brief Schedule one queued job
@@ -1004,14 +923,6 @@ namespace wrench {
         processGetResourceInformation(msg->answer_mailbox);
         return true;
 
-      } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
-        is_bat_sched_ready = true;
-        return true;
-
-      } else if (auto msg = dynamic_cast<BatchExecuteJobFromBatSchedMessage *>(message.get())) {
-        processExecuteJobFromBatSched(msg->batsched_decision_reply);
-        return true;
-
       } else if (auto msg = dynamic_cast<BatchServiceJobRequestMessage *>(message.get())) {
         processJobSubmission(msg->job, msg->answer_mailbox);
         return true;
@@ -1055,12 +966,19 @@ namespace wrench {
                   "BatchService::processNextMessage(): Alarm about unknown job type"
           );
         }
+#ifdef ENABLE_BATSCHED
+      } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
+        is_bat_sched_ready = true;
+        return true;
+
+      } else if (auto msg = dynamic_cast<BatchExecuteJobFromBatSchedMessage *>(message.get())) {
+        processExecuteJobFromBatSched(msg->batsched_decision_reply);
+        return true;
       } else if (auto msg = dynamic_cast<AlarmNotifyBatschedMessage *>(message.get())) {
         //first forward this notification to the batsched
-#ifdef ENABLE_BATSCHED
         this->notifyJobEventsToBatSched(msg->job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
-#endif
         return true;
+#endif
       } else {
         throw std::runtime_error(
                 "BatchService::processNextMessage(): Unknown message type: " +
@@ -1601,202 +1519,6 @@ namespace wrench {
     }
 
 
-    void BatchService::processExecuteJobFromBatSched(std::string bat_sched_reply) {
-      nlohmann::json execute_events = nlohmann::json::parse(bat_sched_reply);
-      WorkflowJob *workflow_job = nullptr;
-      BatchJob *batch_job = nullptr;
-      for (auto it1 = this->waiting_jobs.begin(); it1 != this->waiting_jobs.end(); it1++) {
-        if (std::to_string((*it1)->getJobID()) == execute_events["job_id"]) {
-          batch_job = (*it1);
-          workflow_job = batch_job->getWorkflowJob();
-          this->waiting_jobs.erase(batch_job);
-          this->running_jobs.insert(batch_job);
-          break;
-        }
-      }
-      if (workflow_job == nullptr) {
-        throw std::runtime_error(
-                "BatchService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of jobs batchservice has"
-        );
-      }
-
-      /* Get the nodes and cores per nodes asked for */
- 
-      std::string nodes_allocated_by_batsched = execute_events["alloc"];
-      std::vector<std::string> allocations;
-      boost::split(allocations, nodes_allocated_by_batsched, boost::is_any_of(" "));
-      std::vector<unsigned long> node_resources;
-      for (auto alloc:allocations) {
-        std::vector<std::string> each_allocations;
-        boost::split(each_allocations, alloc, boost::is_any_of("-"));
-        if (each_allocations.size() < 2) {
-          std::string start_node = each_allocations[0];
-          std::string::size_type sz;
-          int start = std::stoi(start_node, &sz);
-          node_resources.push_back(start);
-        } else {
-          std::string start_node = each_allocations[0];
-          std::string end_node = each_allocations[1];
-          std::string::size_type sz;
-          unsigned long start = std::stoi(start_node, &sz);
-          unsigned long end = std::stoi(end_node, &sz);
-          for (unsigned long i = start; i <= end; i++) {
-            node_resources.push_back(i);
-          }
-        }
-      }
-
-      unsigned long num_nodes_allocated = node_resources.size();
-      unsigned long time_in_minutes = batch_job->getAllocatedTime();
-      unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
-
-      std::set<std::tuple<std::string, unsigned long, double>> resources = {};
-      std::vector<std::string> hosts_assigned = {};
-      std::map<std::string, unsigned long>::iterator it;
-
-      for (auto node:node_resources) {
-        this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
-        resources.insert(std::make_tuple(this->host_id_to_names[node], cores_per_node_asked_for,
-                                         0)); // TODO: Is setting RAM to 0 ok here?
-      }
-
-      startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_minutes,
-               cores_per_node_asked_for);
-
-
-
-//        switch (workflow_job->getType()) {
-//            case WorkflowJob::STANDARD: {
-//                auto job = (StandardJob*) workflow_job;
-//                WRENCH_INFO("Creating a StandardJobExecutor on %ld cores for a standard job on %ld nodes",
-//                            cores_per_node_asked_for, num_nodes_allocated);
-//                // Create a standard job executor
-//                std::cout<<"Executor arguments "<<this->mailbox_name<<" "<<std::get<0>(*resources.begin())<<"\n";
-//                StandardJobExecutor *executor = new StandardJobExecutor(
-//                        this->simulation,
-//                        this->mailbox_name,
-//                        std::get<0>(*resources.begin()),
-//                        (StandardJob *) workflow_job,
-//                        resources,
-//                        this->default_storage_service,
-//                        {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
-//                                 this->getPropertyValueAsString(
-//                                         BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}});
-//                this->running_standard_job_executors.insert(std::unique_ptr<StandardJobExecutor>(executor));
-//                batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
-////          this->running_jobs.insert(std::move(batch_job_ptr));
-//                this->timeslots.push_back(batch_job->getEndingTimeStamp());
-//                //remember the allocated resources for the job
-//                batch_job->setAllocatedResources(resources);
-//
-//                SimulationMessage* msg =
-//                        new AlarmJobTimeOutMessage(job, 0);
-//
-//                std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
-//                                                                                    "batch_standard"));
-//
-//                standard_job_alarms.push_back(
-//                        std::move(alarm_ptr));
-//
-//
-//                return;
-//            }
-//                break;
-//
-//            case WorkflowJob::PILOT: {
-//                PilotJob *job = (PilotJob *) workflow_job;
-//                WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job",
-//                            num_nodes_allocated, cores_per_node_asked_for);
-//
-//                std::string host_to_run_on = resources.begin()->first;
-//                std::vector<std::string> nodes_for_pilot_job = {};
-//                for (auto it = resources.begin(); it != resources.end(); it++) {
-//                    nodes_for_pilot_job.push_back(it->first);
-//                }
-//
-//                //set the ending timestamp of the batchjob (pilotjob)
-//
-//                double timeout_timestamp = std::min(job->getDuration(), time_in_minutes * 60 * 1.0);
-//                batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
-//
-//                ComputeService *cs =
-//                        new MultihostMulticoreComputeService(host_to_run_on,
-//                                                             true, false,
-//                                                             resources,
-//                                                             this->default_storage_service
-//                        );
-//                cs->setSimulation(this->simulation);
-//
-//                // Create and launch a compute service for the pilot job
-//                job->setComputeService(cs);
-//
-//
-//                // Put the job in the running queue
-////          this->running_jobs.insert(std::move(batch_job_ptr));
-//                this->timeslots.push_back(batch_job->getEndingTimeStamp());
-//
-//                //remember the allocated resources for the job
-//                batch_job->setAllocatedResources(resources);
-//
-//
-//                // Send the "Pilot job has started" callback
-//                // Note the getCallbackMailbox instead of the popCallbackMailbox, because
-//                // there will be another callback upon termination.
-//                try {
-//                    S4U_Mailbox::dputMessage(job->getCallbackMailbox(),
-//                                             new ComputeServicePilotJobStartedMessage(job, this,
-//                                                                                      this->getPropertyValueAsDouble(
-//                                                                                              BatchServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
-//                } catch (std::shared_ptr<NetworkError> &cause) {
-//                    throw WorkflowExecutionException(cause);
-//                }
-//
-//                SimulationMessage* msg =
-//                        new AlarmJobTimeOutMessage(job, 0);
-//                std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
-//                                                                                    "batch_pilot"));
-//
-//                this->pilot_job_alarms.push_back(
-//                        std::move(alarm_ptr));
-//
-//                // Push my own mailbox_name onto the pilot job!
-////          job->pushCallbackMailbox(this->mailbox_name);
-//
-//                return;
-//            }
-//                break;
-//        }
-
-    }
-
-    /**
-     * @brief Notify a job even to BATSCHED (BATSCHED ONLY)
-     * @param job_id
-     * @param status
-     * @param job_state
-     * @param kill_reason
-     */
-    void BatchService::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
-                                                 std::string kill_reason) {
-      nlohmann::json batch_submission_data;
-      batch_submission_data["now"] = S4U_Simulation::getClock();
-      batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
-      batch_submission_data["events"][0]["type"] = "JOB_COMPLETED";
-      batch_submission_data["events"][0]["data"]["job_id"] = job_id;
-      batch_submission_data["events"][0]["data"]["status"] = status;
-      batch_submission_data["events"][0]["data"]["job_state"] = job_state;
-      batch_submission_data["events"][0]["data"]["kill_reason"] = kill_reason;
-
-      std::string data = batch_submission_data.dump();
-      std::shared_ptr<BatchNetworkListener> network_listener =
-              std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
-                                                                             std::to_string(this->batsched_port),
-                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
-                                                                             data));
-      network_listener->setSimulation(this->simulation);
-      network_listener->start(network_listener, true);
-      network_listeners.push_back(network_listener);
-    }
 
 
     /**
@@ -2081,6 +1803,292 @@ namespace wrench {
       }
       return jobs_estimated_waiting_time;
     }
+
+      /**
+     * @brief Notify a job even to BATSCHED (BATSCHED ONLY)
+     * @param job_id
+     * @param status
+     * @param job_state
+     * @param kill_reason
+     */
+    void BatchService::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
+                                                 std::string kill_reason) {
+      nlohmann::json batch_submission_data;
+      batch_submission_data["now"] = S4U_Simulation::getClock();
+      batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
+      batch_submission_data["events"][0]["type"] = "JOB_COMPLETED";
+      batch_submission_data["events"][0]["data"]["job_id"] = job_id;
+      batch_submission_data["events"][0]["data"]["status"] = status;
+      batch_submission_data["events"][0]["data"]["job_state"] = job_state;
+      batch_submission_data["events"][0]["data"]["kill_reason"] = kill_reason;
+
+      std::string data = batch_submission_data.dump();
+      std::shared_ptr<BatchNetworkListener> network_listener =
+              std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
+                                                                             std::to_string(this->batsched_port),
+                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                                             data));
+      network_listener->setSimulation(this->simulation);
+      network_listener->start(network_listener, true);
+      network_listeners.push_back(network_listener);
+    }
+
+    /**
+     * @brief Start a network listener process (for BATSCHED only)
+     */
+    void BatchService::startBatschedNetworkListener() {
+
+      nlohmann::json compute_resources_map;
+      compute_resources_map["now"] = S4U_Simulation::getClock();
+      compute_resources_map["events"][0]["timestamp"] = S4U_Simulation::getClock();
+      compute_resources_map["events"][0]["type"] = "SIMULATION_BEGINS";
+      compute_resources_map["events"][0]["data"]["nb_resources"] = this->nodes_to_cores_map.size();
+      compute_resources_map["events"][0]["data"]["allow_time_sharing"] = false;
+      compute_resources_map["events"][0]["data"]["config"]["redis"]["enabled"] = false;
+      std::map<std::string, unsigned long>::iterator it;
+      int count = 0;
+      for (it = this->nodes_to_cores_map.begin(); it != this->nodes_to_cores_map.end(); it++) {
+        compute_resources_map["events"][0]["data"]["resources_data"][count]["id"] = std::to_string(count);
+        compute_resources_map["events"][0]["data"]["resources_data"][count]["name"] = it->first;
+        compute_resources_map["events"][0]["data"]["resources_data"][count]["core"] = it->second;
+        compute_resources_map["events"][0]["data"]["resources_data"][count++]["state"] = "idle";
+      }
+      std::string data = compute_resources_map.dump();
+
+
+      try {
+        std::shared_ptr<BatchNetworkListener> network_listener =
+                std::shared_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
+                                                                               std::to_string(this->batsched_port),
+                                                                               BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                                               data));
+        network_listener->setSimulation(this->simulation);
+        network_listener->start(network_listener, true);
+        this->network_listeners.push_back(std::move(network_listener));
+      } catch (std::runtime_error &e) {
+        throw;
+      }
+    }
+
+   void BatchService::sendAllQueuedJobsToBatsched() {
+      if (this->pending_jobs.empty()) {
+        return;
+      }
+
+      // Send ALL Queued jobs to batsched, and move them all to the WAITING queue
+      // The WAITING queue is: those jobs that I need to hear from Batsched about
+
+      nlohmann::json batch_submission_data;
+      batch_submission_data["now"] = S4U_Simulation::getClock();
+      batch_submission_data["events"] = nlohmann::json::array();
+      size_t i;
+      std::deque<BatchJob *>::iterator it;
+      for (i = 0, it = this->pending_jobs.begin(); i < this->pending_jobs.size(); i++, it++) {
+
+        BatchJob *batch_job = *it;
+
+        /* Get the nodes and cores per nodes asked for */
+        unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
+        unsigned long num_nodes_asked_for = batch_job->getNumNodes();
+        unsigned long time_in_minutes = batch_job->getAllocatedTime();
+
+        batch_submission_data["events"][i]["timestamp"] = batch_job->getAppearedTimeStamp();
+        batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
+        batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
+        batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
+        batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
+        batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
+        batch_submission_data["events"][i]["data"]["job"]["walltime"] = time_in_minutes * 60;
+        this->pending_jobs.erase(it);
+        this->waiting_jobs.insert(*it);
+//        PointerUtil::moveUniquePtrFromDequeToSet(it, &(this->pending_jobs),
+//                                                 &(this->waiting_jobs));
+
+      }
+      std::string data = batch_submission_data.dump();
+      std::shared_ptr<BatchNetworkListener> network_listener =
+              std::unique_ptr<BatchNetworkListener>(new BatchNetworkListener(this->hostname, this->mailbox_name,
+                                                                             std::to_string(this->batsched_port),
+                                                                             BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                                             data));
+      network_listener->setSimulation(this->simulation);
+      network_listener->start(network_listener, true);
+      network_listeners.push_back(std::move(network_listener));
+      this->is_bat_sched_ready = false;
+
+    }
+
+
+
+
+    void BatchService::processExecuteJobFromBatSched(std::string bat_sched_reply) {
+      nlohmann::json execute_events = nlohmann::json::parse(bat_sched_reply);
+      WorkflowJob *workflow_job = nullptr;
+      BatchJob *batch_job = nullptr;
+      for (auto it1 = this->waiting_jobs.begin(); it1 != this->waiting_jobs.end(); it1++) {
+        if (std::to_string((*it1)->getJobID()) == execute_events["job_id"]) {
+          batch_job = (*it1);
+          workflow_job = batch_job->getWorkflowJob();
+          this->waiting_jobs.erase(batch_job);
+          this->running_jobs.insert(batch_job);
+          break;
+        }
+      }
+      if (workflow_job == nullptr) {
+        throw std::runtime_error(
+                "BatchService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of jobs batchservice has"
+        );
+      }
+
+      /* Get the nodes and cores per nodes asked for */
+
+      std::string nodes_allocated_by_batsched = execute_events["alloc"];
+      std::vector<std::string> allocations;
+      boost::split(allocations, nodes_allocated_by_batsched, boost::is_any_of(" "));
+      std::vector<unsigned long> node_resources;
+      for (auto alloc:allocations) {
+        std::vector<std::string> each_allocations;
+        boost::split(each_allocations, alloc, boost::is_any_of("-"));
+        if (each_allocations.size() < 2) {
+          std::string start_node = each_allocations[0];
+          std::string::size_type sz;
+          int start = std::stoi(start_node, &sz);
+          node_resources.push_back(start);
+        } else {
+          std::string start_node = each_allocations[0];
+          std::string end_node = each_allocations[1];
+          std::string::size_type sz;
+          unsigned long start = std::stoi(start_node, &sz);
+          unsigned long end = std::stoi(end_node, &sz);
+          for (unsigned long i = start; i <= end; i++) {
+            node_resources.push_back(i);
+          }
+        }
+      }
+
+      unsigned long num_nodes_allocated = node_resources.size();
+      unsigned long time_in_minutes = batch_job->getAllocatedTime();
+      unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
+
+      std::set<std::tuple<std::string, unsigned long, double>> resources = {};
+      std::vector<std::string> hosts_assigned = {};
+      std::map<std::string, unsigned long>::iterator it;
+
+      for (auto node:node_resources) {
+        this->available_nodes_to_cores[this->host_id_to_names[node]] -= cores_per_node_asked_for;
+        resources.insert(std::make_tuple(this->host_id_to_names[node], cores_per_node_asked_for,
+                                         0)); // TODO: Is setting RAM to 0 ok here?
+      }
+
+      startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_minutes,
+               cores_per_node_asked_for);
+
+
+
+//        switch (workflow_job->getType()) {
+//            case WorkflowJob::STANDARD: {
+//                auto job = (StandardJob*) workflow_job;
+//                WRENCH_INFO("Creating a StandardJobExecutor on %ld cores for a standard job on %ld nodes",
+//                            cores_per_node_asked_for, num_nodes_allocated);
+//                // Create a standard job executor
+//                std::cout<<"Executor arguments "<<this->mailbox_name<<" "<<std::get<0>(*resources.begin())<<"\n";
+//                StandardJobExecutor *executor = new StandardJobExecutor(
+//                        this->simulation,
+//                        this->mailbox_name,
+//                        std::get<0>(*resources.begin()),
+//                        (StandardJob *) workflow_job,
+//                        resources,
+//                        this->default_storage_service,
+//                        {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
+//                                 this->getPropertyValueAsString(
+//                                         BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}});
+//                this->running_standard_job_executors.insert(std::unique_ptr<StandardJobExecutor>(executor));
+//                batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + time_in_minutes * 60);
+////          this->running_jobs.insert(std::move(batch_job_ptr));
+//                this->timeslots.push_back(batch_job->getEndingTimeStamp());
+//                //remember the allocated resources for the job
+//                batch_job->setAllocatedResources(resources);
+//
+//                SimulationMessage* msg =
+//                        new AlarmJobTimeOutMessage(job, 0);
+//
+//                std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), this->hostname, this->mailbox_name, msg,
+//                                                                                    "batch_standard"));
+//
+//                standard_job_alarms.push_back(
+//                        std::move(alarm_ptr));
+//
+//
+//                return;
+//            }
+//                break;
+//
+//            case WorkflowJob::PILOT: {
+//                PilotJob *job = (PilotJob *) workflow_job;
+//                WRENCH_INFO("Allocating %ld nodes with %ld cores per node to a pilot job",
+//                            num_nodes_allocated, cores_per_node_asked_for);
+//
+//                std::string host_to_run_on = resources.begin()->first;
+//                std::vector<std::string> nodes_for_pilot_job = {};
+//                for (auto it = resources.begin(); it != resources.end(); it++) {
+//                    nodes_for_pilot_job.push_back(it->first);
+//                }
+//
+//                //set the ending timestamp of the batchjob (pilotjob)
+//
+//                double timeout_timestamp = std::min(job->getDuration(), time_in_minutes * 60 * 1.0);
+//                batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
+//
+//                ComputeService *cs =
+//                        new MultihostMulticoreComputeService(host_to_run_on,
+//                                                             true, false,
+//                                                             resources,
+//                                                             this->default_storage_service
+//                        );
+//                cs->setSimulation(this->simulation);
+//
+//                // Create and launch a compute service for the pilot job
+//                job->setComputeService(cs);
+//
+//
+//                // Put the job in the running queue
+////          this->running_jobs.insert(std::move(batch_job_ptr));
+//                this->timeslots.push_back(batch_job->getEndingTimeStamp());
+//
+//                //remember the allocated resources for the job
+//                batch_job->setAllocatedResources(resources);
+//
+//
+//                // Send the "Pilot job has started" callback
+//                // Note the getCallbackMailbox instead of the popCallbackMailbox, because
+//                // there will be another callback upon termination.
+//                try {
+//                    S4U_Mailbox::dputMessage(job->getCallbackMailbox(),
+//                                             new ComputeServicePilotJobStartedMessage(job, this,
+//                                                                                      this->getPropertyValueAsDouble(
+//                                                                                              BatchServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+//                } catch (std::shared_ptr<NetworkError> &cause) {
+//                    throw WorkflowExecutionException(cause);
+//                }
+//
+//                SimulationMessage* msg =
+//                        new AlarmJobTimeOutMessage(job, 0);
+//                std::unique_ptr<Alarm> alarm_ptr = std::unique_ptr<Alarm>(new Alarm(batch_job->getEndingTimeStamp(), host_to_run_on, this->mailbox_name, msg,
+//                                                                                    "batch_pilot"));
+//
+//                this->pilot_job_alarms.push_back(
+//                        std::move(alarm_ptr));
+//
+//                // Push my own mailbox_name onto the pilot job!
+////          job->pushCallbackMailbox(this->mailbox_name);
+//
+//                return;
+//            }
+//                break;
+//        }
+
+    }
+
 
 };
 
