@@ -99,16 +99,14 @@ private:
       // Submit the jobs
       unsigned long num_submitted_jobs = 0;
       {
-	char *wd = get_current_dir_name();
-	std::cerr << "WORKING DIR = " << std::string(wd) << "\n";
-       	std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs;
+        std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs;
         //Let's load the trace file
-	try {	
-                trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("../test/trace_files/NASA-iPSC-1993-3.swf", 0);
+        try {
+          trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("../test/trace_files/NASA-iPSC-1993-3.swf", 0);
         } catch (std::invalid_argument &e) {
           // Ignore and try alternate path
           trace_file_jobs = wrench::TraceFileLoader::loadFromTraceFile("test/trace_files/NASA-iPSC-1993-3.swf", 0);
-	  // If this doens't work, then we have a problem, so we simply let the exception be uncaught
+          // If this doesn't work, then we have a problem, so we simply let the exception be uncaught
         }
 
 
@@ -322,7 +320,7 @@ private:
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
               if (event->job != job) {
                 throw std::runtime_error("Wrong job completion order: got " +
-                                                 event->job->getName() + " but expected " + job->getName());
+                                         event->job->getName() + " but expected " + job->getName());
               }
               break;
             }
@@ -348,7 +346,7 @@ private:
         double tolerance = 5;
         if (delta > tolerance) {
           throw std::runtime_error("Unexpected job completion time for job " + job->getName() + ": " +
-          std::to_string(completion_time) + " (expected: " + std::to_string(expected_completion_time) + ")");
+                                   std::to_string(completion_time) + " (expected: " + std::to_string(expected_completion_time) + ")");
         }
 
       }
