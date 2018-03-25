@@ -149,7 +149,6 @@ private:
         } catch (std::runtime_error &e) {
           throw std::runtime_error("Exception while getting queue waiting time estimate: " + e.what());
         }
-}
         double expected_wait_time = 300 - first_job_running;
         double tolerance = 1; // in seconds
         double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - tolerance));
