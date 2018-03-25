@@ -53,7 +53,7 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
       return getQueueWaitingTimeEstimateFromBatsched(set_of_jobs);
 #else
-      throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(new FunctionalityNotAvailable(this)));
+      throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(new FunctionalityNotAvailable(this, "queue wait time prediction")));
 #endif
     }
 
@@ -698,7 +698,10 @@ namespace wrench {
       if (job_selection_algorithm == "FCFS") {
         BatchJob *batch_job = *this->pending_jobs.begin();
         return batch_job;
+      } else {
+        throw std::runtime_error("Unsupported batch scheduling algorithm " + job_selection_algorithm);
       }
+      // Getting here is an error
       return nullptr;
     }
 
@@ -717,7 +720,7 @@ namespace wrench {
       BatchJob *batch_job = pickJobForScheduling(this->getPropertyValueAsString(BatchServiceProperty::JOB_SELECTION_ALGORITHM));
       if (batch_job == nullptr) {
         throw std::runtime_error(
-                "BatchService::scheduleAllQueuedJobs(): Got no such job in pending queue to dispatch"
+                "BatchService::scheduleAllQueuedJobs(): Found no job in pending queue to dispatch"
         );
       }
       WorkflowJob *workflow_job = batch_job->getWorkflowJob();

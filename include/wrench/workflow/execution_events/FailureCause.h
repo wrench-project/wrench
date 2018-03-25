@@ -183,12 +183,13 @@ namespace wrench {
      */
     class FunctionalityNotAvailable : public FailureCause {
     public:
-        FunctionalityNotAvailable(Service *service);
+        FunctionalityNotAvailable(Service *service, std::string functionality_name);
         Service *getService();
         std::string toString();
 
     private:
         Service *service;
+        std::string functionality_name;
     };
 
 
