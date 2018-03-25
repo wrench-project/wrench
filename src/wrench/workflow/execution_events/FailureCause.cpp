@@ -445,8 +445,9 @@ namespace wrench {
      * @brief Constructor
      * @param service: the service
      */
-    FunctionalityNotAvailable::FunctionalityNotAvailable(Service *service) : FailureCause(FUNCTIONALITY_NOT_AVAILABLE) {
+    FunctionalityNotAvailable::FunctionalityNotAvailable(Service *service, std::string functionality_name) : FailureCause(FUNCTIONALITY_NOT_AVAILABLE) {
       this->service = service;
+      this->functionality_name = functionality_name;
     }
 
     /**
@@ -462,7 +463,7 @@ namespace wrench {
      * @return the message
      */
     std::string FunctionalityNotAvailable::toString() {
-      return "The request functionality is not available on service " + this->service->getName();
+      return "The request functionality (" + this->functionality_name + ") is not available on service " + this->service->getName();
     }
 
 };
