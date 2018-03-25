@@ -143,11 +143,12 @@ private:
         std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
 
+          std::map<std::string,double> jobs_estimated_waiting_time;
         #ifdef ENABLE_BATSCHED
         try {
-          std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+          jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
         } catch (std::runtime_error &e) {
-          throw std::runtime_error("Exception while getting queue waiting time estimate: " + e.what());
+          throw std::runtime_error("Exception while getting queue waiting time estimate: " + std::string(e.what()));
         }
         double expected_wait_time = 300 - first_job_running;
         double tolerance = 1; // in seconds
@@ -159,7 +160,7 @@ private:
         #else
         bool success = true;
         try {
-          std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+          jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
         } catch (wrench::WorkflowExecutionException &e) {
           success = false;
           if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
