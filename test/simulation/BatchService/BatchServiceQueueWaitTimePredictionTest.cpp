@@ -142,7 +142,14 @@ private:
         //std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
         std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
-        std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+
+        #ifdef ENABLE_BATSCHED
+        try {
+          std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+        } catch (std::runtime_error &e) {
+          throw std::runtime_error("Exception while getting queue waiting time estimate: " + e.what());
+        }
+}
         double expected_wait_time = 300 - first_job_running;
         double tolerance = 1; // in seconds
         double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - tolerance));
@@ -150,6 +157,25 @@ private:
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
 
+        #else
+        bool success = true;
+        try {
+          std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+        } catch (wrench::WorkflowExecutionException &e) {
+          success = false;
+          if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
+            throw std::runtime_error("Got an exception, as expected, but not the right failure cause");
+          }
+          auto real_cause = (wrench::FunctionalityNotAvailable *) e.getCause().get();
+          if (real_cause->getService() != batch_service) {
+            throw std::runtime_error(
+                    "Got the expected exception, but the failure cause does not point to the right service");
+          }
+        }
+        if (success) {
+          throw std::runtime_error("Should not be able to get a queue waiting time estimate");
+        }
+        #endif
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -176,19 +202,9 @@ private:
     }
 };
 
-#ifdef ENABLE_BATSCHED
-
 TEST_F(BatchServiceTest, BatchJobBasicEstimateWaitingTimeTest) {
   DO_TEST_WITH_FORK(do_BatchJobBasicEstimateWaitingTimeTest_test);
 }
-
-#else
-
-TEST_F(BatchServiceTest, DISABLED_BatchJobBasicEstimateWaitingTimeTest) {
-  DO_TEST_WITH_FORK(do_BatchJobBasicEstimateWaitingTimeTest_test);
-}
-
-#endif
 
 
 void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
@@ -216,11 +232,19 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
+  #ifdef ENABLE_BATSCHED
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
                                    })));
+  #else
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(), storage_service1, {
+                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}
+                                   })));
+  #endif
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
