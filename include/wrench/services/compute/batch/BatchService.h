@@ -53,9 +53,12 @@ namespace wrench {
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
                  {BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD,        "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
-                 {BatchServiceProperty::JOB_SELECTION_ALGORITHM,                     "FCFS"},
                  {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,             "1024"},
+                #ifdef ENABLE_BATSCHED
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
+                #else
+                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "FCFS"},
+                #endif
                  {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
                  {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
                  {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,                     ""}
@@ -257,6 +260,8 @@ namespace wrench {
         //process execute events from batsched
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
+#else
+        std::set<std::string> supported_scheduling_algorithms = {"FCFS"};
 #endif // ENABLE_BATSCHED
 
     };

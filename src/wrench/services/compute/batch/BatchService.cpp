@@ -15,8 +15,6 @@
 #include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
-#include "wrench/services/ServiceMessage.h"
-#include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/services/compute/batch/BatchService.h"
 #include "wrench/services/compute/batch/BatchServiceMessage.h"
 #include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
@@ -194,8 +192,14 @@ namespace wrench {
 
 #ifdef ENABLE_BATSCHED
       this->startBatsched();
+#else
+      if (this->supported_scheduling_algorithms.find(this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM))
+                                                     == this->supported_scheduling_algorithms.end()) {
+        throw std::invalid_argument(" BatchService::BatchService(): unsupported scheduling algorithm " +
+                                    this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM));
+      }
 #endif
-      
+
     }
 
 
@@ -717,7 +721,7 @@ namespace wrench {
         return false;
       }
 
-      BatchJob *batch_job = pickJobForScheduling(this->getPropertyValueAsString(BatchServiceProperty::JOB_SELECTION_ALGORITHM));
+      BatchJob *batch_job = pickJobForScheduling(this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM));
       if (batch_job == nullptr) {
         throw std::runtime_error(
                 "BatchService::scheduleAllQueuedJobs(): Found no job in pending queue to dispatch"
@@ -970,7 +974,7 @@ namespace wrench {
           );
         }
 #ifdef ENABLE_BATSCHED
-      } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
+        } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
         is_bat_sched_ready = true;
         return true;
 

@@ -205,6 +205,14 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
   EXPECT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
+
+  // Create a Batch Service with a bogus scheduling algorithm
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+                                   storage_service1,
+                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}})), std::invalid_argument);
+
+
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),

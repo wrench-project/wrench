@@ -17,19 +17,33 @@ namespace wrench {
     public:
         /** @brief The overhead to start a thread execution, in seconds **/
         DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
-        /** @brief The host selection algorithm. Can be:
-         *    - FIRSTFIT
-         *    - BESTFIT
+
+        /** @brief The batch scheduling algorithm. Can be:
+         *    - If ENABLE_BATSCHED is set to off / not set:
+         *      - "FCFS": First Come First Serve
+         *    - If ENABLE_BATSCHED is set to on:
+         *      - whatever scheduling algorithm is supported by Batsched
+         *                  (by default: "easy_bf")
+         *
          **/
+        DECLARE_PROPERTY_NAME(BATCH_SCHEDULING_ALGORITHM);
+
+        /** @brief The batch queue ordering algorithm
+         *     - If ENABLE_BATSCHED is set to off / not set: ignored
+         *     - If ENABLE_BATSCHED is set to on:
+         *       - whatever queue ordering algorithm is supported by Batsched
+         *                  (by default: "fcfs")
+         */
+        DECLARE_PROPERTY_NAME(BATCH_QUEUE_ORDERING_ALGORITHM);
+
+        /** @brief The host selection algorithm (only used if
+        *         ENABLE_BATSCHED is set of off or not set). Can be:
+        *    - FIRSTFIT
+        *    - BESTFIT
+        **/
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
-        /** @brief The job selection algorithm. Can be:
-         *    - FCFS
-         **/
-        DECLARE_PROPERTY_NAME(JOB_SELECTION_ALGORITHM);
 
         DECLARE_PROPERTY_NAME(SCHEDULER_REPLY_MESSAGE_PAYLOAD);
-        DECLARE_PROPERTY_NAME(BATCH_SCHEDULING_ALGORITHM);
-        DECLARE_PROPERTY_NAME(BATCH_QUEUE_ORDERING_ALGORITHM);
         DECLARE_PROPERTY_NAME(BATCH_SCHED_READY_PAYLOAD);
         DECLARE_PROPERTY_NAME(BATCH_EXECUTE_JOB_PAYLOAD);
         DECLARE_PROPERTY_NAME(BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD);
