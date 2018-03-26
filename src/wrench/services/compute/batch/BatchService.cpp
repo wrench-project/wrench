@@ -193,8 +193,8 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
       this->startBatsched();
 #else
-      if (this->supported_scheduling_algorithms.find(this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM))
-                                                     == this->supported_scheduling_algorithms.end()) {
+      if (this->scheduling_algorithms.find(this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM))
+                                                     == this->scheduling_algorithms.end()) {
         throw std::invalid_argument(" BatchService::BatchService(): unsupported scheduling algorithm " +
                                     this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM));
       }
