@@ -549,8 +549,6 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
           new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
                                    storage_service1, {})));
 
-  std::cerr << "HERE\n";
-
   // Create a File Registry Service
   simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
 
@@ -576,7 +574,6 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  std::cerr << "LAUNCHING!\n";
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
