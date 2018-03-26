@@ -1644,6 +1644,7 @@ namespace wrench {
       if (top_pid == 0) { // Child process that will exec batsched
 
 
+
         std::string algorithm = this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM);
         bool is_supported = this->scheduling_algorithms.find(algorithm) != this->scheduling_algorithms.end();
         if (not is_supported) {
@@ -1669,10 +1670,14 @@ namespace wrench {
 
       } else if (top_pid > 0) {
         // parent process
-        sleep(1); // Wait one second to let batsched the time to start (this is pretty ugly)
-        int exit_code; 
-        waitpid(top_pid, &exit_code, WNOHANG);
-	exit_code = WIFEXITED(exit_code);
+        sleep(2); // Wait one second to let batsched the time to start (this is pretty ugly)
+        int exit_code = 0; 
+        int status = waitpid(top_pid, &exit_code, WNOHANG);
+	if (status == 0) {
+             exit_code = 0;
+	}  else {
+	     exit_code = WIFEXITED(exit_code);
+        } 
         switch (exit_code) {
           case 0: {
             int tether[2]; // this is a local variable, only defined in this scope

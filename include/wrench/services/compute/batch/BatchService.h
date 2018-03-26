@@ -167,7 +167,7 @@ namespace wrench {
 
         };
 #else
-        std::set<std::string> scheduling_algorithms = {"FCFS"}
+        std::set<std::string> scheduling_algorithms = {"FCFS"
         };
 
         //Batch queue ordering options
