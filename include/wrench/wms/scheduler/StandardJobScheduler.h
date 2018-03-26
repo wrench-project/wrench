@@ -20,6 +20,7 @@ namespace wrench {
     class ComputeService;
     class DataMovementManager;
     class JobManager;
+    class WorkflowTask;
 
     class StandardJobScheduler {
 

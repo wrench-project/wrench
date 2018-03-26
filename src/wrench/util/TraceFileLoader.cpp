@@ -8,7 +8,11 @@
  */
 
 #include <fstream>
+#include <xbt/log.h>
+#include <wrench-dev.h>
 #include "wrench/util/TraceFileLoader.h"
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(trace_file_loader, "Log category for Trace File Loader");
 
 namespace wrench {
 
@@ -19,34 +23,41 @@ namespace wrench {
     *
     * @throw std::invalid_argument
     */
-    std::vector<std::pair<double, std::tuple<std::string, double, int, int, double, int>>>
+    std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>
     TraceFileLoader::loadFromTraceFile(std::string filename, double load_time_compensation) {
 
-      std::vector<std::pair<double, std::tuple<std::string, double, int, int, double, int>>> trace_file_jobs = {};
+      std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> trace_file_jobs = {};
+
+      std::ifstream infile(filename);
+      if (not infile.is_open()) {
+        throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): Cannot open trace file " + filename);
+      }
 
       try {
-        std::ifstream infile(filename);
-        infile.exceptions(std::ifstream::failbit);
         std::string line;
         while (std::getline(infile, line)) {
-          if (line[0] == ';') {
-
-          } else {
+          if (line[0] != ';') {
             std::istringstream iss(line);
             std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
                                             std::istream_iterator<std::string>{}};
+
+            if (tokens.size() < 10) {
+              throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): Seeing less than 10 fields per line in trace file '" + filename +
+                                          "'");
+            }
+
             std::string id;
-            double flops, parallel_efficiency;
-            int min_num_cores, max_num_cores;
+            double flops=-1, requested_flops=-1, requested_ram=-1;
             int itemnum = 0;
-            double sub_time = 0;
-            int num_nodes = 0;
+            double sub_time = -1;
+            int requested_num_nodes = -1;
+            int num_nodes = -1;
             for (auto item:tokens) {
               switch (itemnum) {
-                case 0:
+                case 0: // Job ID
                   id = item;
                   break;
-                case 1:
+                case 1: // Submit time
                   if (sscanf(item.c_str(), "%lf", &sub_time) != 1) {
                     throw std::invalid_argument(
                             "TraceFileLoader::loadFromTraceFile(): Invalid submission time in trace file '" + item +
@@ -54,54 +65,66 @@ namespace wrench {
                   }
                   sub_time += load_time_compensation;
                   break;
-                case 2:
-                  //probably not required right now (this one is wait time)
+                case 2: // Wait time
                   break;
-                case 3:
+                case 3: // Run time
                   //assuming flops and runtime are the same (in seconds)
                   if (sscanf(item.c_str(), "%lf", &flops) != 1) {
                     throw std::invalid_argument(
-                            "TraceFileLoader::loadFromTraceFile(): Invalid submission time in trace file '" + item +
+                            "TraceFileLoader::loadFromTraceFile(): Invalid run time in trace file '" + item +
                             "'");
                   }
                   break;
-                case 4:
-                  //min and max cores making the same, the total cores in the node
-                  //assuming flops and runtime are the same (in seconds)
+                case 4: // Number of Allocated Processors
                   if (sscanf(item.c_str(), "%d", &num_nodes) != 1) {
                     throw std::invalid_argument(
-                            "TraceFileLoader::loadFromTraceFile(): Invalid submission time in trace file '" + item +
+                            "TraceFileLoader::loadFromTraceFile(): Invalid number of processors '" + item +
                             "'");
                   }
-                  max_num_cores = -1;
-                  min_num_cores = -1;
                   break;
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                  // Average CPU Time Used, Used Memory, Requested Number of Processors, Requested Time, Requested Memory, Status
-                  // These all fields are probably meaningless in models, only relevant in real logs
+                case 5:// Average CPU time Used
                   break;
-                case 11:
-                  //This is used id, but we don't have/need this feature yet
+                case 6: // Used Memory
                   break;
-                case 12:
-                  //This is group id, but we don't have/need this yet
+                case 7: // Requested Number of Processors
+                  if (sscanf(item.c_str(), "%d", &requested_num_nodes) != 1) {
+                    throw std::invalid_argument(
+                            "TraceFileLoader::loadFromTraceFile(): Invalid requested number of processors '" + item +
+                            "'");
+                  }
                   break;
-                case 13:
-                  // Executable (Application number), probably not necessary
+                case 8: // Requested time
+                  //assuming flops and runtime are the same (in seconds)
+                  if (sscanf(item.c_str(), "%lf", &requested_flops) != 1) {
+                    throw std::invalid_argument(
+                            "TraceFileLoader::loadFromTraceFile(): Invalid requested time in trace file '" + item +
+                            "'");
+                  }
                   break;
-                case 14:
-                  // Queue number, is maintained inside the simulation, (we have only one queue)
+                case 9: // Requested memory
+                  // In KiB
+                  if (sscanf(item.c_str(), "%lf", &requested_ram) != 1) {
+                    throw std::invalid_argument(
+                            "TraceFileLoader::loadFromTraceFile(): Invalid requested memory in trace file '" + item +
+                            "'");
+                  }
+                  requested_ram *= 1024.0;
                   break;
-                case 15:
-                case 16:
-                case 17:
-                  // Partition Number, Preceeding Job number, Think time from Preceeding Job
-                  // Not necessary in case of models, I guess
+                case 10: // Status
+                  break;
+                case 11: // User ID
+                  break;
+                case 12: // Group ID
+                  break;
+                case 13: // Executable number
+                  break;
+                case 14: // Queue number
+                  break;
+                case 15: // Partition number
+                  break;
+                case 16: // Preceding job number
+                  break;
+                case 17: // Think time
                   break;
                 default:
                   throw std::runtime_error(
@@ -110,15 +133,38 @@ namespace wrench {
               }
               itemnum++;
             }
-            std::pair<double, std::tuple<std::string, double, int, int, double, int>> task = std::make_pair(
-                    sub_time, std::tuple<std::string, double, int, int, double, int>(id, flops,
-                                                                                     min_num_cores, max_num_cores,
-                                                                                     1, num_nodes));
-            trace_file_jobs.push_back(task);
+
+            // Fix/check values
+            if (requested_flops < 0) {
+              requested_flops = flops;
+            } else if (flops < 0) {
+              flops = requested_flops;
+            }
+            if ((requested_flops < 0) or (flops < 0)) {
+              throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): invalid job with negative flops and negative requested flops");
+            }
+            if (requested_ram < 0) {
+              requested_ram = 0;
+            }
+            if (sub_time < 0) {
+              throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): invalid job with negative submission time");
+            }
+            if (requested_num_nodes < 0) {
+              requested_num_nodes = num_nodes;
+            }
+            if (requested_num_nodes < 0) {
+              throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): invalid job with negative (requested) number of node");
+            }
+
+            // Add the job to the list
+            std::tuple<std::string, double, double, double, double, unsigned int> job =
+                    std::tuple<std::string, double, double, double, double, unsigned int>(
+                            id, sub_time, flops, requested_flops, requested_ram, (unsigned int)requested_num_nodes);
+            trace_file_jobs.push_back(job);
           }
         }
       } catch (std::exception &e) {
-        std::cout << "Got an exception: " << e.what() << "\n";
+        throw std::invalid_argument("Errors while reading workload trace file '" + filename +"': " + e.what());
       }
       return trace_file_jobs;
     }

@@ -79,6 +79,9 @@ namespace wrench {
         /** @brief The compute service to which the job was submitted */
         ComputeService *parent_compute_service;
 
+    private:
+        bool forward_notification_to_original_source;
+
         /***********************/
         /** \endcond           */
         /***********************/

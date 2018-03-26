@@ -182,7 +182,7 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 
   EXPECT_NO_THROW(new wrench::ComputeServiceResourceInformationAnswerMessage({std::make_pair("something", std::vector<double>({2.3, 4.5}))}, 666));
 
-  EXPECT_NO_THROW(new wrench::ComputeServiceInformationMessage(workflow_job, "info", 666));
+//  EXPECT_NO_THROW(new wrench::ComputeServiceInformationMessage(workflow_job, "info", 666));
 }
 
 
@@ -324,7 +324,8 @@ TEST_F(MessageConstructorTest, BatchServiceMessages) {
   EXPECT_THROW(new wrench::BatchServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::AlarmJobTimeOutMessage(workflow_job, 666));
+  EXPECT_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job, 666));
+  EXPECT_THROW(new wrench::AlarmJobTimeOutMessage(nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::AlarmNotifyBatschedMessage("job_id", 666));
 }

@@ -14,7 +14,7 @@
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "wrench/services/compute/batch/BatchJob.h"
-#include "wrench/services/compute/batch/BatchNetworkListener.h"
+#include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/services/compute/batch/BatchServiceProperty.h"
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
@@ -25,6 +25,8 @@
 #include <tuple>
 
 namespace wrench {
+
+    class WorkloadTraceFileReplayer; // forward
 
     class BatchService : public ComputeService {
 
@@ -51,11 +53,15 @@ namespace wrench {
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
                  {BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD,        "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
-                 {BatchServiceProperty::JOB_SELECTION_ALGORITHM,                     "FCFS"},
                  {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,             "1024"},
+                #ifdef ENABLE_BATSCHED
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
+                #else
+                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "FCFS"},
+                #endif
                  {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
-                 {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0",}
+                 {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
+                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,                     ""}
                 };
 
     public:
@@ -74,10 +80,12 @@ namespace wrench {
 
         std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>>);
 
-        ~BatchService();
+        ~BatchService() override;
 
 
     private:
+        friend class WorkloadTraceFileReplayer;
+
         BatchService(std::string hostname,
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
@@ -87,75 +95,7 @@ namespace wrench {
                      std::map<std::string, std::string> plist,
                      std::string suffix);
 
-#ifdef ENABLE_BATSCHED
-        unsigned int batsched_port;
-#endif
-
-        bool clean_exit = false;
-
-        //Configuration to create randomness in measurement period initially
-        unsigned long random_interval = 10;
-
-        //create alarms for standard jobs
-        std::map<std::string,std::shared_ptr<Alarm>> standard_job_alarms;
-
-        //alarms for pilot jobs (only one pilot job alarm)
-        std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
-
-        //vector of network listeners
-        std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
-
-        /* Resources information in Batchservice */
-        unsigned long total_num_of_nodes;
-        std::map<std::string, unsigned long> nodes_to_cores_map;
-        std::vector<double> timeslots;
-        std::map<std::string, unsigned long> available_nodes_to_cores;
-        std::map<unsigned long, std::string> host_id_to_names;
-        /*End Resources information in Batchservice */
-
-        // Vector of standard job executors
-        std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
-
-        // Vector of standard job executors
-        std::set<std::shared_ptr<StandardJobExecutor>> finished_standard_job_executors;
-
-        //Queue of pending batch jobs
-        std::deque<std::unique_ptr<BatchJob>> pending_jobs;
-        //A set of running batch jobs
-        std::set<std::unique_ptr<BatchJob>> running_jobs;
-        // A set of waiting jobs that have been submitted to batsched, but not scheduled
-        std::set<std::unique_ptr<BatchJob>> waiting_jobs;
-
-        //Batch Service request reply process
-        std::unique_ptr<BatchNetworkListener> request_reply_process;
-
-        //Batch scheduling supported algorithms
-        std::set<std::string> scheduling_algorithms = {"easy_bf", "conservative_bf", "easy_bf_plot_liquid_load_horizon",
-                                                       "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
-                                                       "energy_bf_monitoring",
-                                                       "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
-                                                       "filler", "killer", "killer2", "rejecter", "sleeper",
-                                                       "submitter", "waiting_time_estimator"
-        };
-
-        //Batch queue ordering options
-        std::set<std::string> queue_ordering_options = {"fcfs", "lcfs", "desc_bounded_slowdown", "desc_slowdown",
-                                                        "asc_size", "desc_size", "asc_walltime", "desc_walltime"
-
-        };
-
-
-        pid_t pid;
-
-        //Is sched ready?
-        bool is_bat_sched_ready;
-
-        //fork the batsched_process
-        void run_batsched();
-
-        unsigned long generateUniqueJobId();
-
-        std::string foundRunningJobOnTheList(WorkflowJob *job);
+        unsigned int batsched_port; // ONLY USED FOR BATSCHED
 
         //submits a standard job
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) override;
@@ -169,11 +109,90 @@ namespace wrench {
         // terminate a pilot job
         void terminatePilotJob(PilotJob *job) override;
 
+        std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> workload_trace;
+        std::shared_ptr<WorkloadTraceFileReplayer> workload_trace_replayer;
+
+        bool clean_exit = false;
+
+        //Configuration to create randomness in measurement period initially
+        unsigned long random_interval = 10;
+
+        //create alarms for standard jobs
+        std::map<std::string,std::shared_ptr<Alarm>> standard_job_alarms;
+
+        //alarms for pilot jobs (only one pilot job alarm)
+        std::map<std::string,std::shared_ptr<Alarm>> pilot_job_alarms;
+
+
+        /* Resources information in Batchservice */
+        unsigned long total_num_of_nodes;
+        unsigned long num_cores_per_node;
+        std::map<std::string, unsigned long> nodes_to_cores_map;
+        std::vector<double> timeslots;
+        std::map<std::string, unsigned long> available_nodes_to_cores;
+        std::map<unsigned long, std::string> host_id_to_names;
+        /*End Resources information in Batchservice */
+
+        // Vector of standard job executors
+        std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
+
+        // Vector of standard job executors
+        std::set<std::shared_ptr<StandardJobExecutor>> finished_standard_job_executors;
+
+        // Master List of batch jobs
+        std::set<std::unique_ptr<BatchJob>>  all_jobs;
+
+        //Queue of pending batch jobs
+        std::deque<BatchJob *> pending_jobs;
+        //A set of running batch jobs
+        std::set<BatchJob *> running_jobs;
+        // A set of waiting jobs that have been submitted to batsched, but not scheduled
+        std::set<BatchJob *> waiting_jobs;
+
+
+
+        //Batch scheduling supported algorithms
+#ifdef ENABLE_BATSCHED
+        std::set<std::string> scheduling_algorithms = {"easy_bf", "conservative_bf", "easy_bf_plot_liquid_load_horizon",
+                                                       "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
+                                                       "energy_bf_monitoring",
+                                                       "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
+                                                       "filler", "killer", "killer2", "rejecter", "sleeper",
+                                                       "submitter", "waiting_time_estimator"
+        };
+
+        //Batch queue ordering options
+        std::set<std::string> queue_ordering_options = {"fcfs", "lcfs", "desc_bounded_slowdown", "desc_slowdown",
+                                                        "asc_size", "desc_size", "asc_walltime", "desc_walltime"
+
+        };
+#else
+        std::set<std::string> scheduling_algorithms = {"FCFS"
+        };
+
+        //Batch queue ordering options
+        std::set<std::string> queue_ordering_options = {
+        };
+
+#endif
+
+
+        pid_t pid;
+
+        //Is sched ready?
+        bool is_bat_sched_ready;
+
+        unsigned long generateUniqueJobId();
+
+        void removeJobFromRunningList(BatchJob *job);
+
+        void freeJobFromJobsList(BatchJob* job);
+
         int main() override;
 
         bool processNextMessage();
 
-        bool dispatchNextPendingJob();
+        void startBackgroundWorkloadProcess();
 
         void processGetResourceInformation(const std::string &answer_mailbox);
 
@@ -183,16 +202,12 @@ namespace wrench {
                                        StandardJob *job,
                                        std::shared_ptr<FailureCause> cause);
 
-        void failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
-
-        void failRunningStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause);
-
         void terminateRunningStandardJob(StandardJob *job);
 
         std::set<std::tuple<std::string, unsigned long, double>> scheduleOnHosts(std::string host_selection_algorithm,
                                                                                  unsigned long, unsigned long, double);
 
-        BatchJob *scheduleJob(std::string);
+        BatchJob *pickJobForScheduling(std::string);
 
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup() override;
@@ -212,32 +227,49 @@ namespace wrench {
         //Process standardjob timeout
         void processPilotJobTimeout(PilotJob *job);
 
-        //update the resources
-        void updateResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
+        //free up resources
+        void freeUpResources(std::set<std::tuple<std::string, unsigned long, double>> resources);
 
-        void updateResources(StandardJob *job);
-
+        //send call back to the pilot job submitters
+        void sendPilotJobExpirationNotification(PilotJob *job);
 
         //send call back to the standard job submitters
-        void sendStandardJobCallBackMessage(StandardJob *job);
+        void sendStandardJobFailureNotification(StandardJob *job, std::string job_id);
 
-        //send all the jobs in the queue to the batscheduler
-        bool scheduleAllQueuedJobs();
+        // Try to schedule a job
+        bool scheduleOneQueuedJob();
 
         // process a job submission
         void processJobSubmission(BatchJob *job, std::string answer_mailbox);
 
+
+        //start a job
+        void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
+                              BatchJob *, unsigned long, unsigned long, unsigned long);
+
+
+#ifdef ENABLE_BATSCHED
+
+        //Batch Service request reply process
+        std::unique_ptr<BatchNetworkListener> request_reply_process;
+
+        //vector of network listeners
+        std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
+
+        void startBatsched();
+        void stopBatsched();
+        std::map<std::string,double> getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string,unsigned int,double>>);
+
+        void startBatschedNetworkListener();
+
+        void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
+                                       std::string kill_reason);
+        void sendAllQueuedJobsToBatsched();
+
         //process execute events from batsched
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
-        //process execution of job
-        void processExecution(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
-                              BatchJob *, unsigned long, unsigned long, unsigned long);
-
-        //notify batsched about job completion/failure/killed events
-        void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
-                                       std::string kill_reason);
-
+#endif // ENABLE_BATSCHED
 
     };
 }

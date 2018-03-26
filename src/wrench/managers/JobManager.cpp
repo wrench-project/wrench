@@ -499,12 +499,17 @@ namespace wrench {
           this->completed_standard_jobs.insert(job);
 
           // Forward the notification along the notification chain
-          try {
-            S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                     new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            keep_going = true;
+          std::string callback_mailbox = job->popCallbackMailbox();
+          if (not callback_mailbox.empty()) {
+            try {
+              S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
+                                       new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+              // ignore
+            }
           }
+          keep_going = true;
+
         } else if (auto msg = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
 
           // update job state
@@ -569,19 +574,19 @@ namespace wrench {
             keep_going = true;
           }
 
-        } else if (auto msg = dynamic_cast<ComputeServiceInformationMessage *>(message.get())) {
-
-          // update job state
-          WorkflowJob *job = msg->job;
-
-          // Forward the notification to the source
-          WRENCH_INFO("Forwarding information to %s", job->getOriginCallbackMailbox().c_str());
-          try {
-            S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
-                                     new ComputeServiceInformationMessage(job, msg->information, msg->payload));
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            keep_going = true;
-          }
+//        } else if (auto msg = dynamic_cast<ComputeServiceInformationMessage *>(message.get())) {
+//
+//          // update job state
+//          WorkflowJob *job = msg->job;
+//
+//          // Forward the notification to the source
+//          WRENCH_INFO("Forwarding information to %s", job->getOriginCallbackMailbox().c_str());
+//          try {
+//            S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
+//                                     new ComputeServiceInformationMessage(job, msg->information, msg->payload));
+//          } catch (std::shared_ptr<NetworkError> &cause) {
+//            keep_going = true;
+//          }
 
         } else {
           throw std::runtime_error("JobManager::main(): Unexpected [" + message->getName() + "] message");

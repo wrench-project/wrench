@@ -184,7 +184,6 @@ namespace wrench {
       }
 
       // Create my compute resources record
-      this->total_num_cores = 0;
       for (auto host : compute_resources) {
         unsigned long num_cores = std::get<1>(host);
         if (num_cores == ComputeService::ALL_CORES) {

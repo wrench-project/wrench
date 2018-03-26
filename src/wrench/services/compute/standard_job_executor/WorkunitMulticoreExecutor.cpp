@@ -23,7 +23,7 @@
 #include "ComputeThread.h"
 #include "wrench/simulation/Simulation.h"
 
-#include <xbt/ex.hpp>
+#include <xbt.h>
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Multicore Workunit Executor");
@@ -166,7 +166,7 @@ namespace wrench {
         return 0;
       }
 
-      WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
+//      WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -297,7 +297,7 @@ namespace wrench {
       // Create an compute thread to run the computation on each core
       bool success = true;
       for (unsigned long i = 0; i < this->num_cores; i++) {
-        WRENCH_INFO("Creating compute thread %ld", i);
+//        WRENCH_INFO("Creating compute thread %ld", i);
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
         } catch (std::exception &e) {
@@ -314,7 +314,7 @@ namespace wrench {
           success = false;
           break;
         }
-        WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
+//        WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
         this->compute_threads.push_back(compute_thread);
       }
 
