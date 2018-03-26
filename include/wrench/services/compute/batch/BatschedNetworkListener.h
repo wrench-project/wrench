@@ -1,10 +1,16 @@
-//
-// Created by Suraj Pandey on 10/17/17.
-//
+/**
+ * Copyright (c) 2017. The WRENCH Team.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ */
 
 #ifndef WRENCH_BATCHNETWORKLISTENER_H
 #define WRENCH_BATCHNETWORKLISTENER_H
 
+#ifdef ENABLE_BATSCHED
 
 #include <wrench/services/Service.h>
 #include "BatchServiceProperty.h"
@@ -48,5 +54,6 @@ namespace wrench {
     };
 }
 
+#endif // ENABLE_BATSCHED
 
 #endif //WRENCH_BATCHNETWORKLISTENER_H

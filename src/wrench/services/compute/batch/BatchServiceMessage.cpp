@@ -180,8 +180,14 @@ namespace wrench {
      *
      * @throw std::invalid_arguments
      */
-    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(WorkflowJob *job, double payload)
-            : ServiceMessage("ALARM_JOB_TIMED_OUT", payload), job(job) {}
+    AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(BatchJob *job, double payload)
+            : ServiceMessage("ALARM_JOB_TIMED_OUT", payload) {
+      if (job == nullptr) {
+        throw std::invalid_argument(
+                "AlarmJobTimeOutMessage::AlarmJobTimeOutMessage: Invalid argument");
+      }
+      this->job = job;
+    }
 
     /**
      * @brief Constructor

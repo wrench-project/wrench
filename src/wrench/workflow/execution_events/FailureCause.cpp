@@ -220,7 +220,7 @@ namespace wrench {
      */
     std::string NotEnoughComputeResources::toString() {
       return "Compute service " + this->compute_service->getName() + " on host " +
-             this->compute_service->getHostname() + " does not have enough cores to support job " + job->getName();
+             this->compute_service->getHostname() + " does not have enough compute resources to support job " + job->getName();
     }
 
     /**
@@ -408,9 +408,9 @@ namespace wrench {
 
 
     /**
-   * @brief Constructor
-   *
-   */
+     * @brief Constructor
+     *
+     */
     ComputeThreadHasDied::ComputeThreadHasDied() : FailureCause(
             COMPUTE_THREAD_HAS_DIED) {
     }
@@ -425,9 +425,9 @@ namespace wrench {
     };
 
     /**
-  * @brief Constructor
-  *
-  */
+    * @brief Constructor
+    *
+    */
     FatalFailure::FatalFailure() : FailureCause(
             FATAL_FAILURE) {
     }
@@ -438,7 +438,32 @@ namespace wrench {
      * @return the message
      */
     std::string FatalFailure::toString() {
-      return "Unknown Failure Cause";
+      return "Internal implementation, likely a WRENCH bug";
     };
+
+    /**
+     * @brief Constructor
+     * @param service: the service
+     */
+    FunctionalityNotAvailable::FunctionalityNotAvailable(Service *service, std::string functionality_name) : FailureCause(FUNCTIONALITY_NOT_AVAILABLE) {
+      this->service = service;
+      this->functionality_name = functionality_name;
+    }
+
+    /**
+     * @brief Getter
+     * @return the service
+     */
+    Service* FunctionalityNotAvailable::getService() {
+      return this->service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string FunctionalityNotAvailable::toString() {
+      return "The request functionality (" + this->functionality_name + ") is not available on service " + this->service->getName();
+    }
 
 };

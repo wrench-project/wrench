@@ -63,7 +63,9 @@ namespace wrench {
             /** @brief The job cannot be forgotten because it's not completed */
                     JOB_CANNOT_BE_FORGOTTEN,
             /** @brief A compute thread has died */
-                    COMPUTE_THREAD_HAS_DIED
+                    COMPUTE_THREAD_HAS_DIED,
+            /** @brief A functionality is not available */
+                    FUNCTIONALITY_NOT_AVAILABLE
 
         };
 
@@ -175,6 +177,21 @@ namespace wrench {
         WorkflowJob *job;
         ComputeService *compute_service;
     };
+
+    /**
+     * @brief A requested functionality is not available on that service
+     */
+    class FunctionalityNotAvailable : public FailureCause {
+    public:
+        FunctionalityNotAvailable(Service *service, std::string functionality_name);
+        Service *getService();
+        std::string toString();
+
+    private:
+        Service *service;
+        std::string functionality_name;
+    };
+
 
     /**
      * @brief A "compute service doesn't have enough cores" failure cause

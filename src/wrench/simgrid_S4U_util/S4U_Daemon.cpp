@@ -63,7 +63,7 @@ namespace wrench {
     }
 
     void S4U_Daemon::cleanup(){
-      WRENCH_INFO("Cleaning Up (default: nothing to do)");
+//      WRENCH_INFO("Cleaning Up (default: nothing to do)");
     }
 
 
