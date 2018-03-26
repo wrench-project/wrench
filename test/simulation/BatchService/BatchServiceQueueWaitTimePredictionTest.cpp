@@ -236,7 +236,7 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
+                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bfXXX"}
                                    })));
   #else
   EXPECT_NO_THROW(compute_service = simulation->add(
@@ -245,6 +245,8 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}
                                    })));
   #endif
+
+  exit(0);
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

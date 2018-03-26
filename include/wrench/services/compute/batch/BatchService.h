@@ -152,6 +152,7 @@ namespace wrench {
 
 
         //Batch scheduling supported algorithms
+#ifdef ENABLE_BATSCHED
         std::set<std::string> scheduling_algorithms = {"easy_bf", "conservative_bf", "easy_bf_plot_liquid_load_horizon",
                                                        "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
                                                        "energy_bf_monitoring",
@@ -165,6 +166,15 @@ namespace wrench {
                                                         "asc_size", "desc_size", "asc_walltime", "desc_walltime"
 
         };
+#else
+        std::set<std::string> scheduling_algorithms = {"FCFS"}
+        };
+
+        //Batch queue ordering options
+        std::set<std::string> queue_ordering_options = {
+        };
+
+#endif
 
 
         pid_t pid;
@@ -260,8 +270,6 @@ namespace wrench {
         //process execute events from batsched
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
-#else
-        std::set<std::string> supported_scheduling_algorithms = {"FCFS"};
 #endif // ENABLE_BATSCHED
 
     };

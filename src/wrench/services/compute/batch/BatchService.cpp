@@ -1643,6 +1643,7 @@ namespace wrench {
       int top_pid = fork();
       if (top_pid == 0) { // Child process that will exec batsched
 
+
         std::string algorithm = this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM);
         bool is_supported = this->scheduling_algorithms.find(algorithm) != this->scheduling_algorithms.end();
         if (not is_supported) {
@@ -1654,7 +1655,6 @@ namespace wrench {
         bool is_queue_ordering_available =
                 this->queue_ordering_options.find(queue_ordering) != this->queue_ordering_options.end();
         if (not is_queue_ordering_available) {
-          std::cerr << "The queue ordering option " + queue_ordering + " is not supported by the batch service" << "\n";
           exit(2);
         }
 
@@ -1670,7 +1670,9 @@ namespace wrench {
       } else if (top_pid > 0) {
         // parent process
         sleep(1); // Wait one second to let batsched the time to start (this is pretty ugly)
-        int exit_code = waitpid(top_pid, NULL, WNOHANG);
+        int exit_code; 
+        waitpid(top_pid, &exit_code, WNOHANG);
+	exit_code = WIFEXITED(exit_code);
         switch (exit_code) {
           case 0: {
             int tether[2]; // this is a local variable, only defined in this scope
@@ -1699,12 +1701,12 @@ namespace wrench {
           }
             return;
           case 1:
-            throw std::runtime_error(
+            throw std::invalid_argument(
                     "startBatsched(): Scheduling algorithm " +
                     this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
                     " not supported by the batch service");
           case 2:
-            throw std::runtime_error(
+            throw std::invalid_argument(
                     "startBatsched(): Queuing option " +
                     this->getPropertyValueAsString(BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM) +
                     "not supported by the batch service");
