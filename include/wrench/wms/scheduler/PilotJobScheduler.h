@@ -20,8 +20,10 @@ namespace wrench {
     class DataMovementManager;
     class JobManager;
 
+    /**
+     * @brief A (virtual) base class for implementing pilot job schedulers
+     */
     class PilotJobScheduler {
-
 
     public:
         /**
@@ -51,7 +53,6 @@ namespace wrench {
 
         DataMovementManager *data_movement_manager;
         JobManager *job_manager;
-
 
     };
 };

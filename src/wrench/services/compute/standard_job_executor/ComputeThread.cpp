@@ -40,6 +40,10 @@ namespace wrench {
       this->reply_mailbox = reply_mailbox;
     }
 
+    /**
+     * @brief The main method of the compute thread
+     * @return
+     */
     int ComputeThread::main() {
       try {
         WRENCH_INFO("New compute thread (%.2f flops, will report to %s)", this->flops, reply_mailbox.c_str());

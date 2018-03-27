@@ -1481,7 +1481,7 @@ namespace wrench {
                                                        resources,
                                                        this->default_storage_service
                   ));
-          cs->setSimulation(this->simulation);
+          cs->simulation = this->simulation;
           job->setComputeService(cs);
 
           try {
@@ -1616,7 +1616,7 @@ namespace wrench {
                                             this->num_cores_per_node, this->workload_trace)
       );
       try {
-        this->workload_trace_replayer->setSimulation(this->simulation);
+        this->workload_trace_replayer->simulation = this->simulation;
         this->workload_trace_replayer->start(this->workload_trace_replayer, true);
       } catch (std::runtime_error &e) {
         throw;

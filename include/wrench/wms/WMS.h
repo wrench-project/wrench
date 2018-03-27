@@ -41,14 +41,6 @@ namespace wrench {
 
         void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
 
-        /***********************/
-        /** \cond DEVELOPER */
-        /***********************/
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
     protected:
 
         /***********************/

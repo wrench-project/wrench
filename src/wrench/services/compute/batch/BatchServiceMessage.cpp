@@ -191,7 +191,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a workflow job
+     * @param job_id: the id of a batch job
      * @param payload: message size in bytes
      *
      * @throw std::invalid_arguments

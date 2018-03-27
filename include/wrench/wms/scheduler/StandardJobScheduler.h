@@ -22,6 +22,9 @@ namespace wrench {
     class JobManager;
     class WorkflowTask;
 
+    /**
+     * @brief A (virtual) base class for implementing standard job schedulers
+     */
     class StandardJobScheduler {
 
     public:

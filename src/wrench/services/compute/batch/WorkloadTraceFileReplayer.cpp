@@ -65,7 +65,7 @@ namespace wrench {
                 core_flop_rate));
 
         // Start the OneJobWMS
-        one_job_wms->setSimulation(this->simulation);
+        one_job_wms->simulation = this->simulation;
         one_job_wms->start(one_job_wms, true); // Daemonize!
         // will not get out of scope, but it's ok because of the cool life-saver!
 
