@@ -45,6 +45,7 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: mailbox to which the answer message should be sent
     * @param job: a standard job
+    * @param service_specific_args: a map of extra arguments (each specified by a name and value, both strings) required by some services
     * @param payload: message size in bytes
     *
     * @throw std::invalid_arguments

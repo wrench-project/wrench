@@ -57,15 +57,15 @@ namespace wrench {
         void setTerminated();
 				std::string getName();
 
-        LifeSaver *life_saver = nullptr;
+				/** @brief the daemon's life saved */
+				LifeSaver *life_saver = nullptr;
 
-        void setSimulation(Simulation *simulation);
-
+        /** @brief a pointer to the simulation object */
+        Simulation *simulation;
     protected:
 
         void killActor();
         void joinActor();
-        Simulation *simulation;
 
 		private:
 				bool terminated;

@@ -91,7 +91,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param vm_hostname: the new VM hostname
+     * @param success: whether the VM creation was successfull or not
      * @param payload: the message size in bytes
      */
     CloudServiceCreateVMAnswerMessage::CloudServiceCreateVMAnswerMessage(bool success, double payload) :

@@ -324,7 +324,7 @@ namespace wrench {
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
-      service->setSimulation(this);
+      service->simulation = this;
       this->compute_services.insert(std::shared_ptr<ComputeService>(service));
       return service;
     }
@@ -347,7 +347,7 @@ namespace wrench {
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
-      service->setSimulation(this);
+      service->simulation = this;
       this->network_proximity_services.insert(std::shared_ptr<NetworkProximityService>(service));
       return service;
     }
@@ -371,7 +371,7 @@ namespace wrench {
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
-      service->setSimulation(this);
+      service->simulation = this;
       this->storage_services.insert(std::shared_ptr<StorageService>(service));
       return service;
     }
@@ -394,7 +394,7 @@ namespace wrench {
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::setWMS(): Simulation is not initialized");
       }
-      wms->setSimulation(this);
+      wms->simulation = this;
       this->wmses.insert(std::shared_ptr<WMS>(wms));
       return wms;
     }
@@ -414,7 +414,7 @@ namespace wrench {
         throw std::invalid_argument("Simulation::setFileRegistryService(): invalid arguments");
       }
       this->file_registry_service = std::shared_ptr<FileRegistryService>(file_registry_service);
-      this->file_registry_service->setSimulation(this);
+      this->file_registry_service->simulation = this;
       return file_registry_service;
     }
 

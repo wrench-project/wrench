@@ -24,15 +24,14 @@ namespace wrench {
     /**
      * @brief Constructor:  a WMS with a workflow instance, a scheduler implementation, and a list of compute services
      *
-     * @param scheduler: a standard job scheduler implementation (if nullptr then none is used)
-     * @param scheduler: a pilot job scheduler implementation (if nullptr then none is used)
+     * @param standard_job_scheduler: a standard job scheduler implementation (if nullptr then none is used)
+     * @param pilot_job_scheduler: a pilot job scheduler implementation (if nullptr then none is used)
      * @param compute_services: a set of compute services available to run jobs (if {} then none is available)
      * @param storage_services: a set of storage services available to the WMS (if {} then none is available)
      * @param network_proximity_services: a set of network proximity services available to the WMS (if {} then none is available)
      * @param file_registry_service: the file registry services available to the WMS (if nullptr then none is available)
      * @param hostname: the name of the host on which to run the WMS
      * @param suffix: a string to append to the WMS process name (useful for debug output)
-
      *
      * @throw std::invalid_argument
      */
@@ -296,7 +295,7 @@ namespace wrench {
     std::shared_ptr<JobManager> WMS::createJobManager() {
       auto job_manager_raw_ptr = new JobManager(this);
       std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
-      job_manager->setSimulation(this->simulation);
+      job_manager->simulation = this->simulation;
       job_manager->start(job_manager, true); // Always daemonize
       return job_manager;
     }
@@ -308,7 +307,7 @@ namespace wrench {
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
       auto data_movement_manager_raw_ptr = new DataMovementManager(this);
       std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
-      data_movement_manager->setSimulation(this->simulation);
+      data_movement_manager->simulation = this->simulation;
       data_movement_manager->start(data_movement_manager, true); // Always daemonize
       return data_movement_manager;
     }

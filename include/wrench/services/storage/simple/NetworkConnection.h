@@ -17,8 +17,17 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     class WorkflowFile;
 
+    /**
+     * @brief A helper class that implements a network connection abstraction to
+     *        be used by a service, e.g., that needs to limit its number of concurrent
+     *        connections
+     */
     class NetworkConnection {
 
     public:
@@ -45,6 +54,10 @@ namespace wrench {
         /** @brief: the mailbox to which to send an ack when this connection completes/fails */
         std::string ack_mailbox;
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 
 };
 

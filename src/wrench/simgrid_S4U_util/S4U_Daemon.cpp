@@ -62,6 +62,9 @@ namespace wrench {
 //      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
     }
 
+    /**
+     * @brief Cleanup function called when the daemon terminates (for whatever reason)
+     */
     void S4U_Daemon::cleanup(){
 //      WRENCH_INFO("Cleaning Up (default: nothing to do)");
     }
@@ -100,8 +103,7 @@ namespace wrench {
 
       // Check that the simulation pointer is set
       if (not this->simulation) {
-        std::cerr << "S4U_Daemon::startDaemon(): You must call setSimulation() before calling startDaemon() (" + this->getName() + ")\n";
-        throw std::runtime_error("S4U_Daemon::startDaemon(): You must call setSimulation() before calling startDaemon() (" + this->getName() + ")");
+        throw std::runtime_error("S4U_Daemon::startDaemon(): You must set the simulation field before calling startDaemon() (" + this->getName() + ")");
       }
 
       // Create the s4u_actor
@@ -189,14 +191,6 @@ namespace wrench {
         throw std::runtime_error("S4U_Daemon::createLifeSaver(): Lifesaver already created!");
       }
       this->life_saver = new S4U_Daemon::LifeSaver(reference);
-    }
-
-    /**
-     * @brief Sets the reference to the simulation object
-     * @param simulation: pointer to the simulation object
-     */
-    void S4U_Daemon::setSimulation(Simulation  *simulation) {
-      this->simulation = simulation;
     }
 
 };

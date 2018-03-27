@@ -84,7 +84,7 @@ namespace wrench {
                                SimulationMessage *msg, std::string suffix) {
       std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
               new Alarm(date, hostname, reply_mailbox_name, msg, suffix));
-      alarm_ptr->setSimulation(simulation);
+      alarm_ptr->simulation = simulation;
       try {
         alarm_ptr->start(alarm_ptr, true); // daemonize
       } catch (std::invalid_argument &e) {
@@ -93,6 +93,9 @@ namespace wrench {
       return alarm_ptr;
     }
 
+    /**
+     * @brief Brutally terminate the alarm's actor
+     */
     void Alarm::kill() {
       this->killActor();
     }
