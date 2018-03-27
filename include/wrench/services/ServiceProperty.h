@@ -27,9 +27,7 @@ namespace wrench {
     class ServiceProperty {
 
     public:
-        /** @brief The number of bytes in the control message sent to the daemon to terminate it **/
         DECLARE_PROPERTY_NAME(STOP_DAEMON_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to confirm it has terminate **/
         DECLARE_PROPERTY_NAME(DAEMON_STOPPED_MESSAGE_PAYLOAD);
 
     };

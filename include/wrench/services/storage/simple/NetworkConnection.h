@@ -32,13 +32,18 @@ namespace wrench {
         bool hasFailed();
         std::unique_ptr<SimulationMessage> getMessage();
 
-
+        /** @brief: the connection type */
         int type;
+        /** @brief: the file (for a DATA connection) */
         WorkflowFile *file;
+        /** @brief: the mailbox for this connection */
         std::string mailbox;
-        std::string ack_mailbox;
+        /** @brief The low-level pending communication */
         std::unique_ptr<S4U_PendingCommunication> comm;
+        /** @brief The failure cause, in case the communication fails */
         std::shared_ptr<FailureCause> failure_cause;
+        /** @brief: the mailbox to which to send an ack when this connection completes/fails */
+        std::string ack_mailbox;
     };
 
 };
