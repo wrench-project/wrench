@@ -336,6 +336,7 @@ namespace wrench {
             return true;
           }
         }
+        return true;
       } else {
         throw std::runtime_error(
                 "NetworkProximityService::processNextMessage(): Unknown message type: " +
