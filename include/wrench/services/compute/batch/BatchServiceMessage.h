@@ -141,7 +141,7 @@ namespace wrench{
      */
     class BatchJobReplyFromSchedulerMessage : public BatchServiceMessage {
     public:
-        BatchJobReplyFromSchedulerMessage(std::string reply, double payload);
+        BatchJobReplyFromSchedulerMessage(std::string, double);
 
         /** @brief The message replied by the scheduler */
         std::string reply;
