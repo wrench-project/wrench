@@ -132,6 +132,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     *
+     * @param mailbox: a mailbox name
      */
     S4U_PendingCommunication::S4U_PendingCommunication(std::string mailbox) : mailbox_name(mailbox) {
     }

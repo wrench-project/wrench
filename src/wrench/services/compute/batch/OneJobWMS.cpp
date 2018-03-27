@@ -16,6 +16,10 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(one_job_wms, "Log category for One Job WMS");
 
 namespace wrench {
 
+    /**
+     * @brief main method ot the OneJobWMS daemon
+     * @return 0 on success
+     */
     int OneJobWMS::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);

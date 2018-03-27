@@ -32,7 +32,7 @@ namespace wrench {
         /**
          * @brief A helper method to move a unique_ptr from a set to another
          * @tparam T: template class
-         * @param ptr: unique pointer to an object of class T that's in a set
+         * @param it: iterator
          * @param from: pointer to the set in which the object is
          * @param to: pointer to the set to which the object should be moved
          */

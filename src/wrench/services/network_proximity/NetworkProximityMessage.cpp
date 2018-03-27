@@ -26,14 +26,17 @@ namespace wrench {
      * @param hosts: the pair of hosts to look for
      * @param payload: the message size in bytes
      */
-    NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(std::string answer_mailbox, std::pair<std::string,std::string> hosts, double payload) :
+    NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(std::string answer_mailbox,
+                                                                               std::pair<std::string, std::string> hosts,
+                                                                               double payload) :
             NetworkProximityMessage("PROXIMITY_LOOKUP_REQUEST", payload) {
 
-        if ((answer_mailbox == "") || (std::get<0>(hosts)=="") || (std::get<1>(hosts)=="")) {
-            throw std::invalid_argument("NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(): Invalid argument");
-        }
-        this->answer_mailbox = answer_mailbox;
-        this->hosts = hosts;
+      if ((answer_mailbox == "") || (std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
+        throw std::invalid_argument(
+                "NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(): Invalid argument");
+      }
+      this->answer_mailbox = answer_mailbox;
+      this->hosts = hosts;
     }
 
 
@@ -43,13 +46,15 @@ namespace wrench {
      * @param proximityvalue: the proximity value between the pair of hosts
      * @param payload: the message size in bytes
      */
-    NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(std::pair<std::string,std::string> hosts, double proximityvalue, double payload) :
+    NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(std::pair<std::string, std::string> hosts,
+                                                                             double proximityvalue, double payload) :
             NetworkProximityMessage("PROXIMITY_LOOKUP_ANSWER", payload) {
-        if ((std::get<0>(hosts)=="") || (std::get<1>(hosts)=="")) {
-            throw std::invalid_argument("NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(): Invalid argument");
-        }
-        this->hosts = hosts;
-        this->proximityValue = proximityvalue;
+      if ((std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
+        throw std::invalid_argument(
+                "NetworkProximityLookupAnswerMessage::NetworkProximityLookupAnswerMessage(): Invalid argument");
+      }
+      this->hosts = hosts;
+      this->proximityValue = proximityvalue;
     }
 
     /**
@@ -58,27 +63,30 @@ namespace wrench {
      * @param proximityvalue: the proximity value between the pair of hosts
      * @param payload: the message size in bytes
      */
-    NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(std::pair<std::string,std::string> hosts,double proximityvalue,double payload) :
+    NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(
+            std::pair<std::string, std::string> hosts, double proximityvalue, double payload) :
             NetworkProximityMessage("PROXIMITY_COMPUTE_ANSWER", payload) {
-        if ((std::get<0>(hosts)=="") || (std::get<1>(hosts)=="")) {
-            throw std::invalid_argument("NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(): Invalid argument");
-        }
-        this->hosts = hosts;
-        this->proximityValue = proximityvalue;
+      if ((std::get<0>(hosts) == "") || (std::get<1>(hosts) == "")) {
+        throw std::invalid_argument(
+                "NetworkProximityComputeAnswerMessage::NetworkProximityComputeAnswerMessage(): Invalid argument");
+      }
+      this->hosts = hosts;
+      this->proximityValue = proximityvalue;
     }
 
 
     /**
      * @brief NextContactDaemonRequestMessage class
-     * @param damone: the network proximity daemon to return the request to
+     * @param daemon: the network proximity daemon to return the request to
      * @param payload: the message size in bytes
      */
     NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(NetworkProximityDaemon *daemon, double payload) :
             NetworkProximityMessage("NEXT_CONTACT_DAEMON_REQUEST", payload) {
-        if(daemon == nullptr) {
-            throw std::invalid_argument("NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(): Invalid argument");
-        }
-        this->daemon = daemon;
+      if (daemon == nullptr) {
+        throw std::invalid_argument(
+                "NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(): Invalid argument");
+      }
+      this->daemon = daemon;
     }
 
     /**
@@ -87,10 +95,11 @@ namespace wrench {
      * @param next_mailbox_to_send: the next mailbox to contact
      * @param payload: the message size in bytes
      */
-    NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,std::string next_mailbox_to_send,double payload) :
+    NextContactDaemonAnswerMessage::NextContactDaemonAnswerMessage(std::string next_host_to_send,
+                                                                   std::string next_mailbox_to_send, double payload) :
             NetworkProximityMessage("NEXT_CONTACT_DAEMON_ANSWER", payload) {
-        this->next_host_to_send = next_host_to_send;
-        this->next_mailbox_to_send = next_mailbox_to_send;
+      this->next_host_to_send = next_host_to_send;
+      this->next_mailbox_to_send = next_mailbox_to_send;
     }
 
 
@@ -105,17 +114,19 @@ namespace wrench {
 
     /**
      * @brief CoordinateLookupRequestMessage class
-     * @param the mailbox to return the answer to
+     * @param answer_mailbox: the mailbox to return the answer to
      * @param requested_host: the host whose coordinates are being requested
      * @param payload: the message size in bytes
      */
-    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string answer_mailbox, std::string requested_host, double payload) :
+    CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string answer_mailbox,
+                                                                   std::string requested_host, double payload) :
             NetworkProximityMessage("COORDINATE_LOOKUP_REQUEST", payload) {
-        if (answer_mailbox == "" || requested_host == "") {
-            throw std::invalid_argument("CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(): Invalid argument");
-        }
-        this->answer_mailbox = answer_mailbox;
-        this->requested_host = requested_host;
+      if (answer_mailbox == "" || requested_host == "") {
+        throw std::invalid_argument(
+                "CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(): Invalid argument");
+      }
+      this->answer_mailbox = answer_mailbox;
+      this->requested_host = requested_host;
     }
 
     /**
@@ -128,10 +139,10 @@ namespace wrench {
                                                                  std::pair<double, double> xy_coordinate,
                                                                  double payload) :
             NetworkProximityMessage("COORDINATE_LOOKUP_ANSWER", payload) {
-        if (requested_host == "") {
-            throw std::invalid_argument("CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(): Invalid argument");
-        }
-        this->requested_host = requested_host;
-        this->xy_coordinate = xy_coordinate;
+      if (requested_host == "") {
+        throw std::invalid_argument("CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(): Invalid argument");
+      }
+      this->requested_host = requested_host;
+      this->xy_coordinate = xy_coordinate;
     }
 }

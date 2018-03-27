@@ -13,13 +13,17 @@
 
 namespace wrench {
 
+    /**
+     * @brief Constructor
+     * @param num_connections: maximum number of connections that can be active at the same time
+     */
     NetworkConnectionManager::NetworkConnectionManager(unsigned long num_connections) {
       this->num_connections = num_connections;
     }
 
     /**
-     *
-     * @return a NetworkConnection that has finished and its status, or {nullptr, false}
+     * @brief Wait for the next network connection to change state
+     * @return a network connection that has finished and its status
      */
     std::pair<std::unique_ptr<NetworkConnection>, bool> NetworkConnectionManager::waitForNetworkConnection() {
 
@@ -49,11 +53,18 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Add a new connection
+     * @param connection: a network connection
+     */
     void NetworkConnectionManager::addConnection(std::unique_ptr<NetworkConnection> connection) {
       this->queued_connections.push_front(std::move(connection));
       this->startQueuedConnections();
     }
 
+    /**
+     * @brief Start queued connections
+     */
     void NetworkConnectionManager::startQueuedConnections() {
 
       while ((this->running_connections.size() < this->num_connections) and

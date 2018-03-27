@@ -87,7 +87,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param batsched_job_estimated_time: the estimated time to run the job done by batsched
+     * @param estimated_waiting_time: the estimated time to run the job done by batsched
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument

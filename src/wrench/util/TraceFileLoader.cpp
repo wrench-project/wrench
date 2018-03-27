@@ -20,6 +20,7 @@ namespace wrench {
     * @brief Load the workflow trace file
     *
     * @param filename: the path to the trace file
+    * @param load_time_compensation: an offset to add to submit times in the trace file
     *
     * @throw std::invalid_argument
     */

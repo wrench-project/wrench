@@ -39,7 +39,8 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param simulation: the simulation
+     * @param simulation: a reference to a simulation object
+     * @param callback_mailbox: the mailbox to which a reply will be sent
      * @param hostname: the hostname of the host that should run this executor (could be the first compute resources - see below)
      * @param job: the job to execute
      * @param compute_resources: a non-empty list of <hostname, num_cores, memory> tuples, which represent

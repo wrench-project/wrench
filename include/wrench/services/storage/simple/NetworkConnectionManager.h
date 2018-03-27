@@ -17,6 +17,13 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
+    /**
+     * @brief An abstraction that manages a pool of network connections
+     */
     class NetworkConnectionManager {
 
     public:
@@ -37,6 +44,9 @@ namespace wrench {
 
     };
 
+    /***********************/
+    /** \endcond           */
+    /***********************/
 };
 
 
