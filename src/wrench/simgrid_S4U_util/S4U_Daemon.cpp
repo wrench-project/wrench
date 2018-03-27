@@ -193,6 +193,7 @@ namespace wrench {
 
     /**
      * @brief Sets the reference to the simulation object
+     * @param simulation: pointer to the simulation object
      */
     void S4U_Daemon::setSimulation(Simulation  *simulation) {
       this->simulation = simulation;

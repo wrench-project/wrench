@@ -27,7 +27,7 @@ namespace wrench {
         );
       }
       this->jobid = jobid;
-      this->time_in_minutes = time_in_minutes;
+      this->allocated_time = time_in_minutes * 60.0;
       this->num_nodes = num_nodes;
       this->cores_per_node = cores_per_node;
       this->ending_time_stamp = ending_time_stamp;
@@ -38,8 +38,12 @@ namespace wrench {
       return this->cores_per_node;
     }
 
-    unsigned long BatchJob::getAllocatedTime() {
-      return this->time_in_minutes;
+    double BatchJob::getAllocatedTime() {
+      return this->allocated_time;
+    }
+
+    double BatchJob::setAllocatedTime(double time) {
+      this->allocated_time = time;
     }
 
     double BatchJob::getMemoryRequirement() {

@@ -307,7 +307,7 @@ private:
 
       {
 
-        // Create a sequential task that lasts one min and requires 2 cores
+        // Create a sequential task that lasts 5 minutes and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0);
         task->addInputFile(this->workflow->getFileById("input_file"));
         task->addOutputFile(this->workflow->getFileById("output_file"));
@@ -349,8 +349,9 @@ private:
         std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
-        double expected_wait_time = 300 - first_job_running;
-        double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - 1));  // TODO: Weird 5s correction applied to what conservative_bf tells us
+        std::cerr << "RECEIVED: " << jobs_estimated_waiting_time[job_id] << "\n";
+        double expected_wait_time = 300 - first_job_running; // in seconds
+        double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - 1));
         if (delta > 1) { // 1 second accuracy threshold
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
