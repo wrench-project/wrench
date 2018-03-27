@@ -1043,7 +1043,6 @@ namespace wrench {
         return;
       }
 
-
       // Check that the job can be admitted in terms of resources:
       //      - number of nodes,
       //      - number of cores per host

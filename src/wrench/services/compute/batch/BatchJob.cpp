@@ -42,7 +42,7 @@ namespace wrench {
       return this->allocated_time;
     }
 
-    double BatchJob::setAllocatedTime(double time) {
+    void BatchJob::setAllocatedTime(double time) {
       this->allocated_time = time;
     }
 
