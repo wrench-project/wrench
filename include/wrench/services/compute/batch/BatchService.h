@@ -71,7 +71,7 @@ namespace wrench {
                      std::map<std::string, std::string> plist = {});
 
         //returns jobid,started time, running time
-        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
+//        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
 
         std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>>);
 

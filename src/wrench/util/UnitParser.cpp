@@ -27,6 +27,10 @@ namespace wrench {
         explicit unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators);
     };
 
+    /**
+     * @brief Constructor
+     * @param generators: generators
+     */
     unit_scale::unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators)
     {
       for (const auto& gen : generators) {

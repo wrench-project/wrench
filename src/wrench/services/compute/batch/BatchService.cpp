@@ -40,11 +40,19 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 
 namespace wrench {
 
+    /**
+     * @brief Constructor
+     */
     BatchService::~BatchService() {
       MessageManager::cleanUpMessages(this->mailbox_name);
     }
 
 
+    /**
+     * @brief Retrieve queue wait time estimates for a set of job configurations
+     * @param set_of_jobs: the set of job configurations, each of them with an id
+     * @return queue wait time predictions in seconds (as a map of ids)
+     */
     std::map<std::string, double>
     BatchService::getQueueWaitingTimeEstimate(std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs) {
 
