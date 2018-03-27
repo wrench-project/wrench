@@ -23,6 +23,7 @@ namespace wrench {
      * @param simulation: a pointer to the simulation object
      * @param hostname: the hostname on which the trace file replayer will run
      * @param batch_service: the batch service to which it submits jobs
+     * @param num_cores_per_node: the number of cores per host on the batch-scheduled platform
      * @param workload_trace: the workload trace it replays
      */
     WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(Simulation *simulation,

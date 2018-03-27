@@ -45,7 +45,8 @@ namespace wrench {
     /**
      * @brief Constructor (daemon without a mailbox)
      *
-     * @param process_name: the prefix of the name of the simulated process/actor
+     * @param hostname: the name of the host on which the daemon will run
+     * @param process_name_prefix: the prefix of the name of the simulated process/actor
      */
     S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
       if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {

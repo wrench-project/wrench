@@ -1793,7 +1793,7 @@ namespace wrench {
                                                                              std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-      network_listener->setSimulation(this->simulation);
+      network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;
@@ -1844,7 +1844,7 @@ namespace wrench {
                                                                              std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-      network_listener->setSimulation(this->simulation);
+      network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
       network_listeners.push_back(network_listener);
     }
@@ -1878,7 +1878,7 @@ namespace wrench {
                                                                                std::to_string(this->batsched_port),
                                                                                BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                                data));
-        network_listener->setSimulation(this->simulation);
+        network_listener->simulation = this->simulation;
         network_listener->start(network_listener, true);
         this->network_listeners.push_back(std::move(network_listener));
       } catch (std::runtime_error &e) {
@@ -1927,7 +1927,7 @@ namespace wrench {
                                                                              std::to_string(this->batsched_port),
                                                                              BatchNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                                              data));
-      network_listener->setSimulation(this->simulation);
+      network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
       network_listeners.push_back(std::move(network_listener));
       this->is_bat_sched_ready = false;

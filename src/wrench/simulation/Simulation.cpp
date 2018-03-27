@@ -144,7 +144,7 @@ namespace wrench {
     }
     /**
      * @brief Check that a hostname exists in the platform
-     *
+     * @param hostname: a host name
      * @return true or false
      */
     bool Simulation::hostExists(std::string hostname) {
