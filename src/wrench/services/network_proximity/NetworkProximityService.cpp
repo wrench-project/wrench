@@ -85,10 +85,10 @@ namespace wrench {
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
-                                new CoordinateLookupRequestMessage(answer_mailbox, std::move(requested_host),
+                                new CoordinateLookupRequestMessage(answer_mailbox, requested_host,
                                                                    this->getPropertyValueAsDouble(
                                                                            NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -96,7 +96,8 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        std::cerr << cause->toString() << std::endl;
         throw WorkflowExecutionException(cause);
       }
 

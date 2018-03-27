@@ -29,6 +29,8 @@ public:
 
     void do_VivaldiConverge_Test();
 
+    void do_Coordinate_Test();
+
 protected:
     NetworkProximityTest() {
 
@@ -308,7 +310,6 @@ private:
                 "CompareProxTestWMS::main():: Expected proximity between a pair to be less than the other pair of hosts"
         );
       }
-
       return 0;
     }
 };
@@ -397,9 +398,13 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 class VivaldiConvergeWMS : public wrench::WMS {
 public:
     VivaldiConvergeWMS(NetworkProximityTest *test,
+                       std::set<wrench::ComputeService *> compute_services,
+                       std::set<wrench::StorageService *> storage_services,
+                       std::set<wrench::NetworkProximityService *> network_proximity_services,
                        std::string hostname) :
-            wrench::WMS(nullptr, nullptr, {}, {}, {}, nullptr, hostname, "test") {
-      this->test = test;
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services,
+                        network_proximity_services, nullptr, hostname, "test") {
+        this->test = test;
     }
 
 private:
@@ -413,15 +418,14 @@ private:
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
 
       std::pair<std::string, std::string> hosts_to_compute_proximity;
-      hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
-                                                  this->simulation->getHostnameList()[3]);
-      int count = 0, max_count = 100;
+      hosts_to_compute_proximity = std::make_pair("Host3", "Host4");
+
       std::set<wrench::NetworkProximityService *> network_proximity_services = this->getAvailableNetworkProximityServices();
 
       wrench::NetworkProximityService* alltoall_service;
       wrench::NetworkProximityService* vivaldi_service;
 
-        for (auto  nps : network_proximity_services) {
+        for (auto  &nps : network_proximity_services) {
             std::string type = nps->getNetworkProximityServiceType();
 
         if (boost::iequals(type, "alltoall")) {
@@ -433,57 +437,28 @@ private:
         }
       }
 
+      wrench::S4U_Simulation::sleep(1000);
       double alltoall_proximity = alltoall_service->query(hosts_to_compute_proximity);
-
-      while (alltoall_proximity < 0 && count < max_count) {
-        count++;
-        wrench::S4U_Simulation::sleep(10.0);
-        alltoall_proximity = alltoall_service->query(hosts_to_compute_proximity);
-      }
-
-      if (count == max_count) {
-        throw std::runtime_error("Never got an answer to proximity query");
-      }
-
-      if (alltoall_proximity < 0.0) {
-        throw std::runtime_error("Got a negative proximity value");
-      }
-
-      wrench::S4U_Simulation::sleep(100);
       double vivaldi_proximity = vivaldi_service->query(hosts_to_compute_proximity);
 
-      if (vivaldi_proximity > 1000) {
+
+      if (vivaldi_proximity > 0.1) {
         throw std::runtime_error("Vivaldi proximity is larger than it should be");
       }
 
-
       // Check values
-      double epsilon = 0.1 * 1000;
-
-      if (fabs(1000 - alltoall_proximity) > epsilon) {
-        throw std::runtime_error("All-to-all algorithm goe a strange value: " + std::to_string(alltoall_proximity));
-      }
+      double epsilon = 0.1;
 
       if (fabs(vivaldi_proximity - alltoall_proximity) > epsilon) {
         throw std::runtime_error("Vivaldi algorithm did not converge");
       }
-
-      hosts_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[1],
-                                                  this->simulation->getHostnameList()[2]);
-
-      vivaldi_proximity = vivaldi_service->query(hosts_to_compute_proximity);
-
-      if (vivaldi_proximity < 0 || vivaldi_proximity > 0.000001) {
-        throw std::runtime_error("Vivaldi algorithm computed the wrong proximity between hosts connected by a 0 latency link");
-      }
       
-      std::string target_host = vivaldi_service->getHostnameList()[0];
+      std::string target_host = "Host3";
       std::pair<double,double> coordinates = vivaldi_service->getCoordinate(target_host);
-      
+
       if (coordinates.first == 0 && coordinates.second == 0) {
         throw std::runtime_error("Vivaldi algorithm did not update the coordinates of host:" + target_host);
       }
-
       return 0;
     }
 };
@@ -529,11 +504,11 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
   std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
 
   //Get two hosts to communicate with each other for proximity value
-  std::string network_daemon1 = simulation->getHostnameList()[0];
-  std::string network_daemon2 = simulation->getHostnameList()[1];
-  std::string network_daemon3 = simulation->getHostnameList()[2];
-  std::string network_daemon4 = simulation->getHostnameList()[3];
-  std::vector<std::string> hosts_in_network = {network_daemon1, network_daemon2, network_daemon3, network_daemon4};
+  std::string host1 = simulation->getHostnameList()[0];
+  std::string host2 = simulation->getHostnameList()[1];
+  std::string host3 = simulation->getHostnameList()[2];
+  std::string host4 = simulation->getHostnameList()[3];
+  std::vector<std::string> hosts_in_network = {host1, host2, host3, host4};
 
   wrench::NetworkProximityService* alltoall_network_service = nullptr;
   wrench::NetworkProximityService* vivaldi_network_service = nullptr;
@@ -554,7 +529,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          new CompareProxTestWMS(
+          new VivaldiConvergeWMS(
                   this,
                   (std::set<wrench::ComputeService *>){compute_service},
                   (std::set<wrench::StorageService *>){storage_service1},
