@@ -14,6 +14,10 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     class unit_scale;
 
     class UnitParser {
@@ -26,6 +30,10 @@ namespace wrench {
 
 
     };
+
+    /***********************/
+    /** \cond              */
+    /***********************/
 };
 
 

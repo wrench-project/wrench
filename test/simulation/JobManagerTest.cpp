@@ -181,7 +181,7 @@ private:
 
       success = true;
       try {
-        job_manager->createStandardJob({nullptr}, {});
+        job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>){nullptr}, {});
       } catch (std::invalid_argument &e) {
         success = false;
       }

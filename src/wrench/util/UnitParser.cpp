@@ -17,6 +17,7 @@
 
 namespace wrench {
 
+
     /* Nested Utility Class (Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp */
 
     class unit_scale : public std::unordered_map<std::string, double> {

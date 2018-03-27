@@ -24,12 +24,25 @@ namespace wrench {
 
 
     public:
+        /**
+         * @brief Method that schedules pilot jobs, according to whatever decision algorithm
+         *        it implements, over a set of compute services
+         * @param compute_services: the set of compute services
+         */
         virtual void schedulePilotJobs(const std::set<ComputeService *> &compute_services) = 0;
 
+        /**
+         * @brief Set a reference to the data manager to be used by this scheduler (nullptr: none is used)
+         * @param data_movement_manager: a data movement manager
+         */
         void setDataMovementManager(DataMovementManager *data_movement_manager) {
           this->data_movement_manager = data_movement_manager;
         }
 
+        /**
+         * @brief Set a reference to the job manager to be used by this scheduler (nullptr: none is used)
+         * @param job_manager: a job manager
+         */
         void setJobManager(JobManager *job_manager) {
           this->job_manager = job_manager;
         }

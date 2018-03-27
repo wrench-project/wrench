@@ -19,6 +19,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(compute_thread, "Log category for ComputeThread");
 
 namespace wrench {
 
+    /**
+     * @brief Destructor
+     */
     ComputeThread::~ComputeThread() {
 //      WRENCH_INFO("In COMPUTETHREAD DESTRUCTOR");
     }
