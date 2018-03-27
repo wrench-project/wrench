@@ -51,9 +51,7 @@ namespace wrench {
                  {BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD,        "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
-                 {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,             "1024"},
                 #ifdef ENABLE_BATSCHED
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
                 #else
@@ -71,9 +69,6 @@ namespace wrench {
                      std::vector<std::string> compute_hosts,
                      StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {});
-
-        //cancels the job
-        void cancelJob(unsigned long jobid);
 
         //returns jobid,started time, running time
         std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
@@ -246,7 +241,7 @@ namespace wrench {
 
         //start a job
         void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
-                              BatchJob *, unsigned long, unsigned long, unsigned long);
+                              BatchJob *, unsigned long, double, unsigned long);
 
 
 #ifdef ENABLE_BATSCHED

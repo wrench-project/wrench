@@ -146,6 +146,10 @@ namespace wrench {
         /** @brief The current (x,y) coordinate corresponding to the requested_host */
         std::pair<double, double> xy_coordinate;
     };
+
+    /***********************/
+    /** \endcond          **/
+    /***********************/
 }
 
 
