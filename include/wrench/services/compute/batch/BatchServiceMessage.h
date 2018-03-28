@@ -46,6 +46,7 @@ namespace wrench{
     class AlarmJobTimeOutMessage : public ServiceMessage {
     public:
         AlarmJobTimeOutMessage(BatchJob* job,double payload);
+        /** @brief The batch job */
         BatchJob* job;
     };
 
@@ -55,6 +56,7 @@ namespace wrench{
     class AlarmNotifyBatschedMessage : public ServiceMessage {
     public:
         AlarmNotifyBatschedMessage(std::string job_id,double payload);
+        /** @brief the batch job's id */
         std::string job_id;
     };
 
