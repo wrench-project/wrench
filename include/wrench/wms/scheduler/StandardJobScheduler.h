@@ -56,7 +56,9 @@ namespace wrench {
 
     protected:
 
+        /** @brief A data movement manager that the scheduler can use */
         DataMovementManager *data_movement_manager;
+        /** @brief A job manager tha the scheduler can use */
         JobManager *job_manager;
 
     };

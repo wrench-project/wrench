@@ -83,6 +83,11 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Given a string size specification with units (e.g., "13Mb") return the size in bytes
+     * @param string: the size specification
+     * @return the size in bytes
+     */
     double UnitParser::parse_size(std::string string) {
       static const unit_scale units{std::make_tuple("b", 0.125, 2, true), std::make_tuple("b", 0.125, 10, true),
                                     std::make_tuple("B", 1.0, 2, true), std::make_tuple("B", 1.0, 10, true)};

@@ -79,6 +79,9 @@ namespace wrench {
          */
         std::string reference_host;
 
+        /**
+         * @brief The network proximity service to be used
+         */
         NetworkProximityService *network_proximity_service;
     };
 
