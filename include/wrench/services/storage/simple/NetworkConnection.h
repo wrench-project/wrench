@@ -32,9 +32,14 @@ namespace wrench {
 
     public:
 
-        static constexpr unsigned char INCOMING_DATA = 0;
-        static constexpr unsigned char OUTGOING_DATA = 1;
-        static constexpr unsigned char INCOMING_CONTROL = 2;
+        /** @brief An enumerated type that denotes whether a network connection is
+         * incoming or outgoing, and whether it's about data or about control
+         */
+        enum NetworkConnectionType {
+            INCOMING_DATA,
+            OUTGOING_DATA,
+            INCOMING_CONTROL
+        };
 
         NetworkConnection(int type, WorkflowFile* file, std::string mailbox, std::string ack_mailbox);
         bool start();

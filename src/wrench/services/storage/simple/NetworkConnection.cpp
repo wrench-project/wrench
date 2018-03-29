@@ -19,9 +19,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_data_connection, "Log catego
 
 namespace wrench {
 
-    constexpr unsigned char NetworkConnection::INCOMING_DATA;
-    constexpr unsigned char NetworkConnection::OUTGOING_DATA;
-    constexpr unsigned char NetworkConnection::INCOMING_CONTROL;
+//    constexpr unsigned char NetworkConnection::INCOMING_DATA;
+//    constexpr unsigned char NetworkConnection::OUTGOING_DATA;
+//    constexpr unsigned char NetworkConnection::INCOMING_CONTROL;
 
     /**
      * @brief: Constructor
