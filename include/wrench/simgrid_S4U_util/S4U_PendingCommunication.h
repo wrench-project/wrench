@@ -20,7 +20,9 @@ namespace wrench {
 
     class SimulationMessage;
 
+    /*******************/
     /** \cond INTERNAL */
+    /*******************/
 
     /** @brief This is a simple wrapper class around S4U */
     class S4U_PendingCommunication {
@@ -37,12 +39,17 @@ namespace wrench {
                 std::vector<S4U_PendingCommunication*> pending_comms,
                 double timeout);
 
+        /** @brief The SimGrid communication handle */
         simgrid::s4u::CommPtr comm_ptr;
+        /** @brief The message */
         SimulationMessage *simulation_message;
+        /** @brief The mailbox name */
         std::string mailbox_name;
     };
 
+    /*******************/
     /** \endcond */
+    /*******************/
 
 };
 

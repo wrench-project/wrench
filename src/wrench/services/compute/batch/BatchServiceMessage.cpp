@@ -127,18 +127,6 @@ namespace wrench {
     }
 
 
-//    /**
-//     * @brief Constructor
-//     * @param answer_mailbox: the mailbox to reply to
-//     * @param json_data_string: the current and the expected resources required
-//     * @param payload: message size in bytes
-//     *
-//     * @throw std::invalid_argument
-//     */
-//    BatchFakeJobSubmissionReplyMessage::BatchFakeJobSubmissionReplyMessage(std::string json_data_string, double payload)
-//            : BatchServiceMessage("BATCH_FAKE_JOB_SUBMISSION_REPLY", payload) {
-//      this->json_data_string = json_data_string;
-//    }
 
     /**
      * @brief Constructor

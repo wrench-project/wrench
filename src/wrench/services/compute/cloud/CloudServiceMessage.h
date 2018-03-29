@@ -82,7 +82,7 @@ namespace wrench {
     class CloudServiceCreateVMAnswerMessage : public CloudServiceMessage {
     public:
         CloudServiceCreateVMAnswerMessage(bool success, double payload);
-
+        /** @brief Whether the VM creation was successful or not */
         bool success;
     };
 

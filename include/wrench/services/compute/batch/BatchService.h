@@ -28,6 +28,9 @@ namespace wrench {
 
     class WorkloadTraceFileReplayer; // forward
 
+    /**
+     * @brief A batch-scheduled compute service
+     */
     class BatchService : public ComputeService {
 
         /**

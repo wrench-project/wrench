@@ -21,25 +21,6 @@ namespace wrench {
             ServiceMessage("ComputeServiceMessage::" + name, payload) {
     }
 
-//    /**
-//     * @brief Constructor
-//     * @param job: a workflow job
-//     * @param cs: a compute service
-//     * @param payload: message size in bytes
-//     *
-//     * @throw std::invalid_argument
-//     */
-//    ComputeServiceJobTypeNotSupportedMessage::ComputeServiceJobTypeNotSupportedMessage(WorkflowJob *job,
-//                                                                                       ComputeService *cs,
-//                                                                                       double payload)
-//            : ComputeServiceMessage("JOB_TYPE_NOT_SUPPORTED", payload) {
-//      if ((job == nullptr) || (cs == nullptr)) {
-//        throw std::invalid_argument(
-//                "ComputeServiceJobTypeNotSupportedMessage::ComputeServiceJobTypeNotSupportedMessage(): Invalid arguments");
-//      }
-//      this->job = job;
-//      this->compute_service = cs;
-//    }
 
     /**
     * @brief Constructor

@@ -21,11 +21,20 @@ namespace wrench {
     class JobManager;
 
     /**
-     * @brief A (virtual) base class for implementing pilot job schedulers
+     * @brief A (mostly virtual) base class for implementing pilot job schedulers
      */
     class PilotJobScheduler {
 
     public:
+
+        /**
+         * @brief Constructor
+         */
+        PilotJobScheduler() {
+          this->data_movement_manager = nullptr;
+          this->job_manager = nullptr;
+        }
+
         /**
          * @brief Method that schedules pilot jobs, according to whatever decision algorithm
          *        it implements, over a set of compute services
@@ -34,11 +43,19 @@ namespace wrench {
         virtual void schedulePilotJobs(const std::set<ComputeService *> &compute_services) = 0;
 
         /**
-         * @brief Set a reference to the data manager to be used by this scheduler (nullptr: none is used)
+         * @brief Set a reference to the data movement manager to be used by this scheduler (nullptr: none is used)
          * @param data_movement_manager: a data movement manager
          */
         void setDataMovementManager(DataMovementManager *data_movement_manager) {
           this->data_movement_manager = data_movement_manager;
+        }
+
+        /**
+         * @brief Get a reference to the data movement manager to be used by this scheduler (nullptr: none is used)
+         * @return a data movement manager
+         */
+        DataMovementManager *getDataMovementManager() {
+          return this->data_movement_manager;
         }
 
         /**
@@ -49,7 +66,15 @@ namespace wrench {
           this->job_manager = job_manager;
         }
 
-    protected:
+        /**
+         * @brief Get a reference to the job manager to be used by this scheduler (nullptr: none is used)
+         * @return a job manager
+         */
+        JobManager *getJobManager() {
+          return this->job_manager;
+        }
+
+    private:
 
         DataMovementManager *data_movement_manager;
         JobManager *job_manager;

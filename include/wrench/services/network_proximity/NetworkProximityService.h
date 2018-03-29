@@ -41,6 +41,10 @@ namespace wrench{
 
     public:
 
+        /**
+         * @brief A convenient constant that is returned as a latency between two hosts
+         *        when no latency estimates are available for this pair of hosts.
+         */
         static constexpr double NOT_AVAILABLE = DBL_MAX;
 
 
