@@ -476,7 +476,7 @@ private:
         double now = wrench::S4U_Simulation::getClock();
 
         // Submit a PilotJob that lasts 3600 seconds and takes 2 cores and 0 bytes per host
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 2, 2, 0, 3600);
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(2, 2, 0, 3600);
 
         job_manager->submitJob(pilot_job, this->test->cs_fcfs_aggressive_maximum_maximum_flops_best_fit);
 

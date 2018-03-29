@@ -201,7 +201,7 @@ private:
 
       success = true;
       try {
-        job_manager->createPilotJob(nullptr, 10, 10, 10, 10);
+        job_manager->createPilotJob(10, 10, 10, 10);
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -211,7 +211,7 @@ private:
 
       success = true;
       try {
-        job_manager->createPilotJob(this->workflow, 10, 10, -12, 10);
+        job_manager->createPilotJob(10, 10, -12, 10);
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -221,7 +221,7 @@ private:
 
       success = true;
       try {
-        job_manager->createPilotJob(this->workflow, 10, 10, 10, -12);
+        job_manager->createPilotJob(10, 10, 10, -12);
       } catch (std::invalid_argument &e) {
         success = false;
       }
