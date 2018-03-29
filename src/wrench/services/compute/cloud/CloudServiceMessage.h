@@ -38,6 +38,7 @@ namespace wrench {
     public:
         CloudServiceGetExecutionHostsRequestMessage(const std::string &answer_mailbox, double payload);
 
+        /** @brief The mailbox to which a reply should be sent */
         std::string answer_mailbox;
     };
 
@@ -48,6 +49,7 @@ namespace wrench {
     public:
         CloudServiceGetExecutionHostsAnswerMessage(std::vector<std::string> &execution_hosts, double payload);
 
+        /** @brief The list of execution hosts */
         std::vector<std::string> execution_hosts;
     };
 

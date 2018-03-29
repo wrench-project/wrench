@@ -266,6 +266,7 @@ namespace wrench {
     public:
         ComputeServiceResourceInformationAnswerMessage(std::map<std::string, std::vector<double>> info, double payload);
 
+        /** @brief The resource information map */
         std::map<std::string, std::vector<double>> info;
     };
 

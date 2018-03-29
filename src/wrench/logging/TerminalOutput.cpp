@@ -20,7 +20,7 @@ namespace wrench {
     /**
      * @brief Set the color of log messages printed to the terminal
      *
-     * @param color: WRENCH_LOGGING_COLOR_RED, WRENCH_LOGGING_COLOR_GREEN, etc.
+     * @param color: "WRENCH_LOGGING_COLOR_RED", "WRENCH_LOGGING_COLOR_GREEN", etc.
      */
     void TerminalOutput::setThisProcessLoggingColor(std::string color) {
       TerminalOutput::colormap[simgrid::s4u::Actor::self()] = color;
