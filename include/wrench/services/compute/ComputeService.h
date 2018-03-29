@@ -77,9 +77,21 @@ namespace wrench {
 
         StorageService *getDefaultStorageService();
 
+        /**
+         * @brief Submit a standard job to the service (to be overridden)
+         *
+         * @param job
+         * @param service_specific_arguments
+         */
         virtual void
         submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
+        /**
+         * @brief Submit a pilot job to the service (to be overridden)
+         *
+         * @param job
+         * @param service_specific_arguments
+         */
         virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         /***********************/

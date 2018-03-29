@@ -35,7 +35,6 @@ namespace wrench {
     /**
      * @brief Submit a job to the batch service
      * @param job: the job
-     * @param service_specific_arguments: arguments specific to a compute service:
      * @param service_specific_args: arguments specific for compute services:
      *      - to a multicore_compute_service: {}
      *      - to a batch service: {"-t":"<int>","-n":"<int>","-N":"<int>","-c":"<int>"}
