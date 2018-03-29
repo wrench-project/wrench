@@ -23,6 +23,11 @@ namespace wrench {
      */
     class StaticOptimization {
     public:
+        /**
+         * @brief Method to pre-process a workflow so as to optimize its execution (to be overridden)
+         *
+         * @param workflow: the workflow
+         */
         virtual void process(Workflow *workflow) = 0;
     };
 

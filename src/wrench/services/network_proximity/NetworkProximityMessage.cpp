@@ -105,7 +105,6 @@ namespace wrench {
 
     /**
      * @brief NetworkProximityTransferMessage class
-     * @param message_to_transfer: the message to transfer to measure proximity
      * @param payload: the message size in bytes
      */
     NetworkProximityTransferMessage::NetworkProximityTransferMessage(double payload) :

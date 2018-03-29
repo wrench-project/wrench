@@ -72,7 +72,11 @@ namespace wrench {
         FailureCause(CauseType cause);
 
 
-        /** @brief Return an error message that describes the failure cause (to be overriden) */
+        /**
+         * @brief Return an error message that describes the failure cause (to be overriden)
+         *
+         * @return an error message
+         */
         virtual std::string toString() = 0;
 
         CauseType getCauseType();
@@ -215,6 +219,9 @@ namespace wrench {
      */
     class NetworkError : public FailureCause {
     public:
+        /** @brief Enumerated type to describe whether the network error occured
+         * while sending or receiving
+         */
         enum OperationType {
             SENDING,
             RECEIVING
