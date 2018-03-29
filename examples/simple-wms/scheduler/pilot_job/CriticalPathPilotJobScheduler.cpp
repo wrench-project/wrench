@@ -70,7 +70,7 @@ namespace wrench {
       WRENCH_INFO("Submitting a pilot job (1 host, 1 core, %lf seconds)", pilot_job_duration);
 
       //TODO: For now we are asking for a pilot job that requires no RAM
-      WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createPilotJob(workflow, 1, 1, 0.0, pilot_job_duration);
+      WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createPilotJob(1, 1, 0.0, pilot_job_duration);
       this->getJobManager()->submitJob(job, target_service);
 
     }

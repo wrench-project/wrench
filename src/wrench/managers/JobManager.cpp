@@ -8,6 +8,7 @@
  */
 
 #include <string>
+#include <wrench/wms/WMS.h>
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
@@ -204,7 +205,6 @@ namespace wrench {
     /**
      * @brief Create a pilot job
      *
-     * @param workflow: a workflow
      * @param num_hosts: the number of hosts required by the pilot job
      * @param num_cores_per_host: the number of cores per host required by the pilot job
      * @param ram_per_host: the number of bytes of RAM required by the pilot job on each host
@@ -213,15 +213,14 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    PilotJob *JobManager::createPilotJob(Workflow *workflow,
-                                         unsigned long num_hosts,
+    PilotJob *JobManager::createPilotJob(unsigned long num_hosts,
                                          unsigned long num_cores_per_host,
                                          double ram_per_host,
                                          double duration) {
-      if ((workflow == nullptr) ||  (ram_per_host < 0) || (duration <= 0.0)) {
+      if ((ram_per_host < 0) || (duration <= 0.0)) {
         throw std::invalid_argument("JobManager::createPilotJob(): Invalid arguments");
       }
-      PilotJob *raw_ptr = new PilotJob(workflow, num_hosts, num_cores_per_host, ram_per_host, duration);
+      PilotJob *raw_ptr = new PilotJob(this->wms->workflow, num_hosts, num_cores_per_host, ram_per_host, duration);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
       this->jobs[raw_ptr] = std::move(job);
       return raw_ptr;
