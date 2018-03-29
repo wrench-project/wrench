@@ -58,21 +58,6 @@ namespace wrench {
 
 
     /**
-     * @brief NetworkProximityComputeSendMessage class
-     */
-    class NetworkProximityComputeSendMessage : public NetworkProximityMessage {
-    public:
-        NetworkProximityComputeSendMessage(std::string send_to_mailbox, std::string message_to_send, std::string reply_to_mailbox);
-
-        /** @brief The mailbox where message should be sent */
-        std::string send_to_mailbox;
-        /** @brief The message to be sent*/
-        std::string message_to_send;
-        /** @brief The mailbox to reply the computed proximity value*/
-        std::string reply_to_mailbox;
-    };
-
-    /**
      * @brief NetworkProximityComputeAnswerMessage class
      */
     class NetworkProximityComputeAnswerMessage : public NetworkProximityMessage {

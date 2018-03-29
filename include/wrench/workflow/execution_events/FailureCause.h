@@ -71,6 +71,8 @@ namespace wrench {
 
         FailureCause(CauseType cause);
 
+
+        /** @brief Return an error message that describes the failure cause (to be overriden) */
         virtual std::string toString() = 0;
 
         CauseType getCauseType();
@@ -235,6 +237,7 @@ namespace wrench {
     */
     class NetworkTimeout : public FailureCause {
     public:
+        /** A enumerated tupe that describes the operation that led to the network timeout */
         enum OperationType {
             SENDING,
             RECEIVING
