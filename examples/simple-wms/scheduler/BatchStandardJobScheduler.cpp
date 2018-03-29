@@ -42,12 +42,12 @@ namespace wrench {
       for (auto itc : tasks) {
         //TODO add support to pilot jobs
 
-        WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
+        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(itc.second, {});
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
         batch_job_args["-t"] = "2000000"; //time in minutes
         batch_job_args["-c"] = "1"; //number of cores per node
-        job_manager->submitJob(job, batch_service, batch_job_args);
+        this->getJobManager()->submitJob(job, batch_service, batch_job_args);
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }
