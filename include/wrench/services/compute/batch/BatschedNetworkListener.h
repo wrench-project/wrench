@@ -10,14 +10,15 @@
 #ifndef WRENCH_BATCHNETWORKLISTENER_H
 #define WRENCH_BATCHNETWORKLISTENER_H
 
-#ifdef ENABLE_BATSCHED
-
 #include <wrench/services/Service.h>
 #include "BatchServiceProperty.h"
+
 namespace wrench {
 
-    class BatchNetworkListener:public Service {
-    public:
+
+    class BatchNetworkListener: public Service {
+
+  public:
         enum NETWORK_LISTENER_TYPE{
             LISTENER,SENDER,SENDER_RECEIVER
         };
@@ -51,9 +52,9 @@ namespace wrench {
 
         void sendExecuteMessageToBatchService(std::string answer_mailbox, std::string execute_job_reply_data);
         void sendQueryAnswerMessageToBatchService(double estimated_waiting_time);
+
     };
 }
 
-#endif // ENABLE_BATSCHED
 
 #endif //WRENCH_BATCHNETWORKLISTENER_H

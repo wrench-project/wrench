@@ -40,6 +40,7 @@ namespace wrench {
          *  is needed when instantiat services
          */
         static constexpr unsigned long ALL_CORES = ULONG_MAX;
+
         /** @brief A convenient constant to mean "use all ram on the physical host" whenever a ram capacity
          *  is needed when instantiating services
          */
