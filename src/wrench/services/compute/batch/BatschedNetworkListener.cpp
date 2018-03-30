@@ -7,7 +7,6 @@
  * (at your option) any later version.
  */
 
-#ifdef ENABLE_BATSCHED
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
@@ -16,9 +15,12 @@
 #include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
+
+#ifdef ENABLE_BATSCHED
 #include <json.hpp>
 #include <zmq.hpp>
 #include <zmq.h>
+#endif
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_network_listener_service, "Log category for Batch Network Listener Service");
 
@@ -28,8 +30,11 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
-    * @param self_port the port to listen to messages from scheduler
-    * @param sched_port the port to send messages to scheduler
+    * @param batch_service_mailbox: the name of the mailbox of the batch_service
+    * @param sched_port the port to send messages to Batsched
+    * @param MY_TYPE: the type of this listener
+    * @param data_to_send: data to send
+    * @param plist: property list
     */
     BatchNetworkListener::BatchNetworkListener(std::string hostname, std::string batch_service_mailbox,
                                                std::string sched_port,
@@ -43,7 +48,11 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
-    * @param sched_port the port to send messages to scheduler
+    * @param batch_service_mailbox: the name of the mailbox of the batch_service
+    * @param sched_port the port to send messages to Batsched
+    * @param MY_TYPE: the type of this listener
+    * @param data_to_send: data to send
+    * @param plist: property list
     * @param suffix the suffix to append
     */
     BatchNetworkListener::BatchNetworkListener(
@@ -52,6 +61,7 @@ namespace wrench {
             std::string suffix = "") :
             Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
 
+      #ifdef ENABLE_BATSCHED
       // Start the daemon on the same host
       this->sched_port = sched_port;
       this->MY_LISTENER_TYPE = MY_TYPE;
@@ -59,10 +69,19 @@ namespace wrench {
       this->batch_service_mailbox = batch_service_mailbox;
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
+      #else
+      throw std::runtime_error("BatchNetworkListener::BatchNetworkListener(): This should not be called unless ENABLE_BATSCHED is set to on!");
+      #endif
 
     }
 
+    /**
+     * @brief: main routine of the BatchNetworkListener service
+     * @return
+     */
     int BatchNetworkListener::main() {
+
+      #ifdef ENABLE_BATSCHED
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
 
 
@@ -84,10 +103,19 @@ namespace wrench {
 
       WRENCH_INFO("Batch Network Listener Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
+      #else
+      throw std::runtime_error("BatchNetworkListener::main(): This should not be called unless ENABLE_BATSCHED is set to on!");
+      #endif
     }
 
 
+    /**
+     * @brief An an "execute" message to the batch service
+     * @param answer_mailbox: mailbox on which ack will be received
+     * @param execute_job_reply_data: message to send
+     */
     void BatchNetworkListener::sendExecuteMessageToBatchService(std::string answer_mailbox, std::string execute_job_reply_data) {
+      #ifdef ENABLE_BATSCHED
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
                                 new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data,
@@ -96,9 +124,17 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
+      #else
+      throw std::runtime_error("BatchNetworkListener::sendExecuteMessageToBatchService(): This should not be called unless ENABLE_BATSCHED is set to on!");
+      #endif
     }
 
+    /**
+     * @brief An an "query answer" message to the batch service
+     * @param estimated_waiting_time: queue waitint time estimate
+     */
     void BatchNetworkListener::sendQueryAnswerMessageToBatchService(double estimated_waiting_time) {
+      #ifdef ENABLE_BATSCHED
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
                                 new BatchQueryAnswerMessage(estimated_waiting_time,
@@ -107,9 +143,16 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
+      #else
+      throw std::runtime_error("BatchNetworkListener::sendQueryAnswerMessageToBatchService(): This should not be called unless ENABLE_BATSCHED is set to on!");
+      #endif
     }
 
+    /**
+     * @brief Method to interact with Batsched
+     */
     void BatchNetworkListener::send_receive() {
+      #ifdef ENABLE_BATSCHED
       zmq::context_t context(1);
       zmq::socket_t socket(context, ZMQ_REQ);
       socket.connect("tcp://localhost:" + this->sched_port);
@@ -163,9 +206,12 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
+
+      #else
+      throw std::runtime_error("BatchNetworkListener::send_receive(): This should not be called unless ENABLE_BATSCHED is set to on!");
+      #endif
     }
 
 }
 
-#endif
 

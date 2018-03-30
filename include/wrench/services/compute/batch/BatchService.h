@@ -247,13 +247,10 @@ namespace wrench {
                               BatchJob *, unsigned long, double, unsigned long);
 
 
-#ifdef ENABLE_BATSCHED
-
-        //Batch Service request reply process
-        std::unique_ptr<BatchNetworkListener> request_reply_process;
-
-        //vector of network listeners
+        //vector of network listeners (only useful when ENABLE_BATSCHED == on)
         std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
+
+#ifdef ENABLE_BATSCHED
 
         void startBatsched();
         void stopBatsched();
