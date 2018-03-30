@@ -1822,7 +1822,9 @@ namespace wrench {
         } else {
           throw std::runtime_error(
                   "BatchService::getQueueWaitingTimeEstimate(): Received an unexpected [" + message->getName() +
-                  "] message!");
+                  "] message.\nThis likely means that the scheduling algorithm that Batsched was configured to use (" +
+                   this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
+                   ") does not support queue waiting time predictions!");
         }
       }
       return jobs_estimated_waiting_time;

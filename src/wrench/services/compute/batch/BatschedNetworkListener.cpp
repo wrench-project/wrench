@@ -153,6 +153,8 @@ namespace wrench {
      */
     void BatchNetworkListener::send_receive() {
       #ifdef ENABLE_BATSCHED
+
+      WRENCH_INFO("In send_receive()");
       zmq::context_t context(1);
       zmq::socket_t socket(context, ZMQ_REQ);
       socket.connect("tcp://localhost:" + this->sched_port);
