@@ -1429,8 +1429,8 @@ namespace wrench {
       switch (workflow_job->getType()) {
         case WorkflowJob::STANDARD: {
           auto job = (StandardJob *) workflow_job;
-          WRENCH_INFO("Creating a StandardJobExecutor on %ld cores for a standard job on %ld nodes",
-                      cores_per_node_asked_for, num_nodes_allocated);
+          WRENCH_INFO("Creating a StandardJobExecutor for a standard job on %ld nodes with %ld cores per node",
+                      num_nodes_allocated, cores_per_node_asked_for);
           // Create a standard job executor
           std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(
                   new StandardJobExecutor(

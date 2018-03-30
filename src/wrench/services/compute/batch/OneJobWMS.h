@@ -20,6 +20,9 @@ namespace wrench {
 
     class BatchService;
 
+    /**
+     * @brief A WMS that only submits a single job to a batch service
+     */
     class OneJobWMS : public WMS {
 
     public:

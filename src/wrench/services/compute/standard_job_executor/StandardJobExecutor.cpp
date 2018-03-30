@@ -841,6 +841,7 @@ namespace wrench {
 
       for (auto const &wu : this->ready_workunits) {
         sorted_workunits.push_back(wu.get());
+//        std::cerr << "WORKUNITS.GET = " << wu.get() << ": " << wu.get()->tasks.size() << "\n";
       }
 
 //      std::cerr << "SORTED LENGTH = " << sorted_workunits.size() << "\n";
@@ -854,8 +855,13 @@ namespace wrench {
       std::sort(sorted_workunits.begin(), sorted_workunits.end(),
                 [selection_algorithm](const Workunit*  wu1, const Workunit*  wu2) -> bool
                 {
-//                    std::cerr << "IN LAMBDA\n";
+//                    std::cerr << "IN LAMBDA1: " << wu1 << "  " << wu2 << "\n";
+//                    std::cerr << "IN LAMBDA2: " << wu1->tasks.size() << "  " << wu2->tasks.size() << "\n";
                     // Non-computational workunits have higher priority
+
+                    if (wu1->tasks.empty() and wu2->tasks.empty()) {
+                      return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                    }
                     if (wu1->tasks.empty()) {
                       return true;
                     }
@@ -864,8 +870,14 @@ namespace wrench {
                     }
 
                     if (selection_algorithm == "maximum_flops") {
+                      if (wu1->tasks[0]->getFlops() == wu2->tasks[0]->getFlops()) {
+                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                      }
                       return (wu1->tasks[0]->getFlops() >= wu2->tasks[0]->getFlops());
                     } else if (selection_algorithm == "maximum_minimum_cores") {
+                      if (wu1->tasks[0]->getMinNumCores() == wu2->tasks[0]->getMinNumCores()) {
+                        return ((uintptr_t) wu1 > (uintptr_t) wu2);
+                      }
                       return (wu1->tasks[0]->getMinNumCores() >= wu2->tasks[0]->getMinNumCores());
                     } else {
                       throw std::runtime_error("Unknown StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM property '"
@@ -873,7 +885,6 @@ namespace wrench {
                     }
                 });
 
-//      std::cerr << "RETURNING FROM sortReadyWorkunits()\n";
       return sorted_workunits;
     }
 
