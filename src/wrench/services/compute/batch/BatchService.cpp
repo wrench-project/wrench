@@ -57,7 +57,11 @@ namespace wrench {
     BatchService::getQueueWaitingTimeEstimate(std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs) {
 
 #ifdef ENABLE_BATSCHED
+      try {
       return getQueueWaitingTimeEstimateFromBatsched(set_of_jobs);
+      } catch (std::runtime_error &e) {
+        throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(new FunctionalityNotAvailable(this, "queue wait time prediction")));
+      }
 #else
       throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(new FunctionalityNotAvailable(this, "queue wait time prediction")));
 #endif
