@@ -39,8 +39,6 @@ namespace wrench {
 
     int WorkloadTraceFileReplayer::main() {
 
-      WRENCH_INFO("Workload trace file replayer starting!");
-
       double core_flop_rate = *(this->batch_service->getCoreFlopRate().begin());
 
       for (auto job : this->workload_trace) {

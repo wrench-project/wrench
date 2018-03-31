@@ -173,7 +173,7 @@ set(SOURCE_FILES
         src/wrench/services/helpers/Alarm.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
-        src/wrench/util/TraceFileLoader.cpp
+        src/wrench/services/compute/batch/TraceFileLoader.cpp
         src/wrench/services/storage/simple/NetworkConnectionManager.cpp
         src/wrench/services/storage/simple/NetworkConnection.cpp
         src/wrench/util/UnitParser.cpp

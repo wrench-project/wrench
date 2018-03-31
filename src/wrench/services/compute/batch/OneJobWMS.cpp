@@ -62,8 +62,13 @@ namespace wrench {
         event = workflow->waitForNextExecutionEvent();
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-            // success, do nothing for now
+            // success, do nothing
             WRENCH_INFO("Received job completion notification");
+            break;
+          }
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+            // failre, do nothing
+            WRENCH_INFO("Received job failure notification: %s", event->failure_cause->toString().c_str());
             break;
           }
           default: {
