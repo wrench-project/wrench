@@ -86,6 +86,7 @@ namespace wrench {
       WRENCH_INFO("Killing WorkunitExecutor [%s]", this->getName().c_str());
 
       this->killActor();
+      WRENCH_INFO("Killed WorkunitExecutor [%s]", this->getName().c_str());
 
 
       // Then kill all compute threads, if any

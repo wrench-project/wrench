@@ -152,6 +152,21 @@ namespace wrench {
     }
 
     /**
+    * @brief Suspend the daemon/actor.
+    */
+    void S4U_Daemon::suspendActor() {
+      if ((this->s4u_actor != nullptr) && (not this->terminated)) {
+        try {
+          this->s4u_actor->suspend();
+        } catch (xbt_ex &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        } catch (std::exception &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        }
+      }
+    }
+
+    /**
      * @brief Kill the daemon/actor.
      */
     void S4U_Daemon::joinActor() {

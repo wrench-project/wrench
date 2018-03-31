@@ -73,7 +73,7 @@ namespace wrench {
     protected:
 
         void killActor();
-
+        void suspendActor();
         void joinActor();
 
     private:
