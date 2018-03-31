@@ -95,7 +95,7 @@ namespace wrench {
                 {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "best_fit"},
         };
 
-        int main();
+        int main() override;
 
 //        void setProperty(std::string property, std::string value);
 //        std::string getPropertyValueAsString(std::string property);
