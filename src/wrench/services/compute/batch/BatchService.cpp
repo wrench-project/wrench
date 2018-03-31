@@ -185,7 +185,7 @@ namespace wrench {
         } catch (std::exception &e) {
           throw;
         }
-        for (auto const &j : this->workload_trace) {
+        for (auto &j : this->workload_trace) {
           std::string id = std::get<0>(j);
           double submit_time = std::get<1>(j);
           double flops = std::get<2>(j);
@@ -194,10 +194,12 @@ namespace wrench {
           unsigned int num_nodes = std::get<5>(j);
 
           if (num_nodes > this->total_num_of_nodes) {
-            throw std::invalid_argument("Workload trace file contains a job that requires too many compute nodes");
+//          throw std::invalid_argument("Workload trace file contains a job that requires too many compute nodes");
+            std::get<5>(j) = this->total_num_of_nodes;
           }
           if (requested_ram > ram) {
-            throw std::invalid_argument("Workload trace file contains a job that requires too much ram per compute nodes");
+//          throw std::invalid_argument("Workload trace file contains a job that requires too much ram per compute nodes");
+            std::get<4>(j) = ram;
           }
         }
       }

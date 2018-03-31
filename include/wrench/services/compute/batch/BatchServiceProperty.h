@@ -55,7 +55,10 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 
         /**
-         * @brief Path to a workload trace file to be replayed
+         * @brief Path to a workload trace file to be replayed. The trace file neede to
+         * be in the SWF format (see http://www.cs.huji.ac.il/labs/parallel/workload/swf.html).
+         * Note that jobs in the trace whose node processor requirements exceed the capacity
+         * of the batch service will simply be capped at that capacity.
          */
         DECLARE_PROPERTY_NAME(SIMULATED_WORKLOAD_TRACE_FILE);
 
