@@ -495,9 +495,9 @@ namespace wrench {
 #endif
       }
 
-        this->setStateToDown();
-        this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-        this->terminateRunningPilotJobs();
+      this->setStateToDown();
+      this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      this->terminateRunningPilotJobs();
 
       return 0;
     }
@@ -590,10 +590,8 @@ namespace wrench {
     void BatchService::processStandardJobTimeout(StandardJob *job) {
       std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
 
-	std::cerr << " IN PROCESS TIME OUT\n";
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if (((*it).get())->getJob() == job) {
-	  std::cerr << "KILLING A STANDARD JOB EXEC\n";
           ((*it).get())->kill();
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));
@@ -1145,7 +1143,7 @@ namespace wrench {
       }
       // Add the RJMS delay to the job's requested time
       job->setAllocatedTime(job->getAllocatedTime() +
-                                    this->getPropertyValueAsDouble(BatchServiceProperty::BATCH_RJMS_DELAY));
+                            this->getPropertyValueAsDouble(BatchServiceProperty::BATCH_RJMS_DELAY));
       this->all_jobs.insert(std::unique_ptr<BatchJob>(job));
       this->pending_jobs.push_back(job);
     }
@@ -1683,6 +1681,10 @@ namespace wrench {
         std::string socket_endpoint = "tcp://*:" + std::to_string(this->batsched_port);
         const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
                               socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
+
+        // Comment the two lines below to see Batsched output
+        fclose(stdout);
+        fclose(stderr);
         if (execvp(args[0], (char **) args) == -1) {
           exit(3);
         }
