@@ -495,7 +495,10 @@ namespace wrench {
 #endif
       }
 
-      this->clean_exit = true;
+        this->setStateToDown();
+        this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+        this->terminateRunningPilotJobs();
+
       return 0;
     }
 
@@ -787,6 +790,7 @@ namespace wrench {
     * or has timed out (because it's in fact a pilot job))
     */
     void BatchService::failCurrentStandardJobs(std::shared_ptr<FailureCause> cause) {
+      WRENCH_INFO("Failing current standard jobs");
       for (auto const & j : this->running_jobs) {
         WorkflowJob *workflow_job = j->getWorkflowJob();
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
@@ -870,41 +874,39 @@ namespace wrench {
     }
 
 
-/**
- * @brief Terminate the daemon, dealing with pending/running jobs
- */
+    /**
+    * @brief Terminate the daemon, dealing with pending/running jobs
+    */
     void BatchService::cleanup() {
-
-      if (this->clean_exit) {
-        this->setStateToDown();
-        WRENCH_INFO("Failing current standard jobs");
-        this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
 
 #ifdef ENABLE_BATSCHED
       this->stopBatsched();
 #endif
 
-      if (this->clean_exit) {
-        if (this->supports_pilot_jobs) {
-          for (auto &job : this->running_jobs) {
-            if ((job)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-              PilotJob *p_job = (PilotJob *) ((job)->getWorkflowJob());
-              BatchService *cs = (BatchService *) p_job->getComputeService();
-              if (cs == nullptr) {
-                throw std::runtime_error(
-                        "BatchService::terminate(): can't find compute service associated to pilot job");
-              }
-              try {
-                cs->stop();
-              } catch (wrench::WorkflowExecutionException &e) {
-                // ignore
-              }
+
+
+    }
+
+
+    void BatchService::terminateRunningPilotJobs() {
+      if (this->supports_pilot_jobs) {
+        WRENCH_INFO("Failing running pilot jobs");
+        for (auto &job : this->running_jobs) {
+          if ((job)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+            PilotJob *p_job = (PilotJob *) ((job)->getWorkflowJob());
+            BatchService *cs = (BatchService *) p_job->getComputeService();
+            if (cs == nullptr) {
+              throw std::runtime_error(
+                      "BatchService::terminate(): can't find compute service associated to pilot job");
+            }
+            try {
+              cs->stop();
+            } catch (wrench::WorkflowExecutionException &e) {
+              // ignore
             }
           }
         }
       }
-
     }
 
 

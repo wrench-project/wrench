@@ -81,7 +81,7 @@ namespace wrench {
         if (std::get<1>(host) < ComputeService::ALL_CORES) {
           if (std::get<1>(host) > S4U_Simulation::getNumCores(std::get<0>(host))) {
             throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
-                                                " has only " + std::to_string(S4U_Simulation::getNumCores(std::get<0>(host))) + " cores");
+                                        " has only " + std::to_string(S4U_Simulation::getNumCores(std::get<0>(host))) + " cores");
           }
         } else {
           // Set the num_cores to the maximum
@@ -98,7 +98,7 @@ namespace wrench {
           double host_memory_capacity = S4U_Simulation::getHostMemoryCapacity(std::get<0>(host));
           if (std::get<2>(host) > host_memory_capacity) {
             throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
-                                                " has only " + std::to_string(
+                                        " has only " + std::to_string(
                     S4U_Simulation::getHostMemoryCapacity(std::get<0>(host))) + " bytes of RAM");
           }
         } else {
@@ -153,6 +153,7 @@ namespace wrench {
       }
 
       // Set instance variables
+      this->kill_lock = simgrid::s4u::Mutex::createMutex();
       this->simulation = simulation;
       this->callback_mailbox = callback_mailbox;
       this->job = job;
@@ -204,21 +205,25 @@ namespace wrench {
      */
     void StandardJobExecutor::kill() {
 
-      // THE ORDER IN WHICH WE KILL THINGS IS  IMPORTANT
-      // WEIRDLY, KILLING IN THIS ORDER WORKS BETTER IT SEEMS....
-      // TODO: INVESTIGATE?
-      std::cerr << "SUSPENDING ACTOR FOR " << this->getName() << "\n";
-      this->suspendActor();
+//      std::cerr << "IN StandardJobExecutor::kill(): getting the lock\n";
 
+      this->kill_lock->lock();
+
+//      std::cerr << "ACTOR SUSPENDED, KILLING WUEs : " << this->running_workunit_executors.size() << "\n";
       // Kill all Workunit executors
-	std::cerr << "KILLING THE RUNNING WORKUNIT EXECUTORS: " << this->running_workunit_executors.size() << "\n";
       for (auto const &wue : this->running_workunit_executors) {
+//        std::cerr << "KILLING WUE " << wue->getName() << "\n";
         wue->kill();
       }
 
-      // Kill the StandardJobExecutor
-      WRENCH_INFO("KILLING STANDARD JOB EXECUTOR ACTOR for %s\n", this->getName().c_str());
+//      std::cerr << "KILLING ACTOR\n";
+
+      // Then kill the actor
       this->killActor();
+
+//      WRENCH_INFO("In StnadardJobExecutor::kill(): releasing the lock");
+      this->kill_lock->unlock();
+
 
     }
 
@@ -347,6 +352,14 @@ namespace wrench {
      */
     void StandardJobExecutor::dispatchReadyWorkunits() {
 
+      // If there is no ready work unit, there is nothing to dispatch
+      if (this->ready_workunits.empty()) {
+        return;
+      }
+
+      // Don't kill me while I am doing this!
+      this->kill_lock->lock();
+
 //      std::cerr << "** IN DISPATCH READY WORK UNITS\n";
 //      for (auto wu : this->ready_workunits) {
 //        std::cerr << "WU: num_comp_tasks " << wu->tasks.size() << "\n";
@@ -355,10 +368,6 @@ namespace wrench {
 //        }
 //      }
 
-      // If there is no ready work unit, there is nothing to dispatch
-      if (this->ready_workunits.empty()) {
-        return;
-      }
 
       // Get an ordered (by the task selection algorithm) list of the ready workunits
       std::vector<Workunit *> sorted_ready_workunits = sortReadyWorkunits();
@@ -375,8 +384,6 @@ namespace wrench {
       // hosts/cores, if possible
       for (auto wu : sorted_ready_workunits) {
 
-
-
         // Compute the workunit's minimum number os cores, desired number of cores, and minimum amount of ram
         unsigned long minimum_num_cores;
         unsigned long desired_num_cores;
@@ -387,35 +394,9 @@ namespace wrench {
           desired_num_cores = computeWorkUnitDesiredNumCores(wu);
           required_ram = computeWorkUnitMinMemory(wu);
         } catch (std::runtime_error &e) {
+          this->kill_lock->unlock();
           throw;
         }
-
-
-//        if (wu->tasks.size() == 0) {
-//          desired_num_cores = 1;
-//          minimum_num_cores = 1;
-//
-//        } else if (wu->tasks.size() == 1) {
-//          std::string core_allocation_algorithm =
-//                  this->getPropertyValueAsString(StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM);
-//
-//          minimum_num_cores = wu->tasks[0]->getMinNumCores();
-//
-//          if (core_allocation_algorithm == "maximum") {
-//            desired_num_cores = wu->tasks[0]->getMaxNumCores();
-//          } else if (core_allocation_algorithm == "minimum") {
-//            desired_num_cores = wu->tasks[0]->getMinNumCores();
-//          } else {
-//            throw std::runtime_error("Unknown StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
-//                                     + core_allocation_algorithm + "'");
-//          }
-//        } else {
-//          throw std::runtime_error(
-//                  "StandardJobExecutor::dispatchNextPendingWork(): Found a workunit with more than one computational tasks!!");
-//        }
-
-//        std::cerr << "** ITS DESIRED NUM CORES: " << desired_num_cores << "\n";
-
 
         // Find a host on which to run the workunit, and on how many cores
         std::string target_host = "";
@@ -464,6 +445,7 @@ namespace wrench {
             }
           }
         } else {
+          this->kill_lock->unlock();
           throw std::runtime_error("Unknown StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM property '"
                                    + host_selection_algorithm + "'");
         }
@@ -508,7 +490,7 @@ namespace wrench {
         this->running_workunit_executors.insert(workunit_executor);
 
         for (auto it = this->ready_workunits.begin();
-                it != this->ready_workunits.end(); it++) {
+             it != this->ready_workunits.end(); it++) {
           if ((*it).get() == wu) {
             PointerUtil::moveUniquePtrFromSetToSet(it, &(this->ready_workunits), &(this->running_workunits));
             break;
@@ -518,6 +500,8 @@ namespace wrench {
       }
 
       sorted_ready_workunits.clear();
+
+      this->kill_lock->unlock();
 
     }
 
@@ -578,6 +562,9 @@ namespace wrench {
             WorkunitMulticoreExecutor *workunit_executor,
             Workunit *workunit) {
 
+      // Don't kill me while I am doing this
+      this->kill_lock->lock();
+
       // Update core availabilities
       this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
       // Update RAM availabilities
@@ -614,6 +601,7 @@ namespace wrench {
         this->job->incrementNumCompletedTasks();
       }
 
+
       // Send the callback to the originator if the job has completed
       if ((this->non_ready_workunits.empty()) &&
           (this->ready_workunits.empty()) &&
@@ -629,6 +617,7 @@ namespace wrench {
                                                                              StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           WRENCH_INFO("Failed to send the callback... oh well");
+          this->kill_lock->unlock();
           return;
         }
       } else {
@@ -663,6 +652,8 @@ namespace wrench {
         }
       }
 
+      this->kill_lock->unlock();
+
     }
 
 
@@ -678,6 +669,9 @@ namespace wrench {
             Workunit *workunit,
             std::shared_ptr<FailureCause> cause) {
 
+
+      // Don't kill me while I am doing this
+      this->kill_lock->lock();
 
       WRENCH_INFO("A workunit executor has failed to complete a workunit on behalf of job '%s'", this->job->getName().c_str());
 
@@ -733,6 +727,7 @@ namespace wrench {
       // Deal with completed workunits
       this->completed_workunits.clear();
 
+
       // Send the notification back
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox,
@@ -740,8 +735,10 @@ namespace wrench {
                                                                      this->getPropertyValueAsDouble(
                                                                              StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
+        // do nothing
       }
+
+      this->kill_lock->unlock();
 
     }
 
