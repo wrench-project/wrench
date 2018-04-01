@@ -441,6 +441,7 @@ namespace wrench {
       while (keep_going) {
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
+          WRENCH_INFO("Waiting for a message");
           message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
           continue;

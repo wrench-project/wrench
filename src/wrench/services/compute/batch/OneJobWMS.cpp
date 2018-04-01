@@ -47,7 +47,7 @@ namespace wrench {
       // Create the batch-specific argument
       std::map<std::string, std::string> batch_job_args;
       batch_job_args["-N"] = std::to_string(this->num_nodes); // Number of nodes/taks
-      batch_job_args["-t"] = std::to_string(MAX(1, this->requested_time / 60)); // Time in minutes (at least 1 minute)
+      batch_job_args["-t"] = std::to_string(1 + this->requested_time / 60); // Time in minutes (note the +1)
       batch_job_args["-c"] = std::to_string(this->num_cores_per_task); //number of cores per task
 
       // Submit this job to the batch service

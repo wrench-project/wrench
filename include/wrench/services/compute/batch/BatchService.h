@@ -211,6 +211,9 @@ namespace wrench {
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup() override;
 
+        // Terminate currently running pilot jobs
+        void terminateRunningPilotJobs();
+
         //Fail the standard jobs inside the pilot jobs
         void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
 

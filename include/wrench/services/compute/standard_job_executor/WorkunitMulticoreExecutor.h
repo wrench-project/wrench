@@ -37,10 +37,6 @@ namespace wrench {
 
     public:
 
-	~WorkunitMulticoreExecutor() {
-            std::cerr << "***** WORKUNIT MULTICORE EXECUTOR " << (unsigned long) this << " DESTRUCTED!\n";
-        }
-
         WorkunitMulticoreExecutor(
                      Simulation *simulation,
                      std::string hostname,
@@ -60,6 +56,10 @@ namespace wrench {
         Workunit *workunit;
 
     private:
+
+        // This is used for safe killing of actors
+        simgrid::s4u::MutexPtr kill_lock;
+
         int main();
 
         void performWork(Workunit *work);
