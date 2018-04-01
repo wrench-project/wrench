@@ -545,7 +545,6 @@ private:
         std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
-        std::cerr << "RECEIVED: " << jobs_estimated_waiting_time[job_id] << "\n";
         double expected_wait_time = 300 - first_job_running; // in seconds
         double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - 1));
         if (delta > 1) { // 1 second accuracy threshold
