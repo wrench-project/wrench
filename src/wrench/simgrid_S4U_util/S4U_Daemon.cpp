@@ -130,6 +130,7 @@ namespace wrench {
      * @brief Kill the daemon/actor.
      */
     void S4U_Daemon::killActor() {
+      std::cerr << "IN A4U_DAEMON KILL ACTOR\n";
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         try {
           // Sleeping a tiny bit to avoid the following behavior:
@@ -139,12 +140,15 @@ namespace wrench {
           // (Actor A could have set a reference to B, and that reference
           // would be available on A's object, which then C can look at to
           // say "since I killed A, I should kill at its children as well"
-          S4U_Simulation::sleep(0.0001);
+//          S4U_Simulation::sleep(0.0001);
+	  std::cerr << "ABOUT TO CALL KILL on s4u_actor\n";
           this->s4u_actor->kill();
+	  std::cerr << "CALLED it\n";
 
         } catch (xbt_ex &e) {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
         } catch (std::exception &e) {
+          std::cerr << "WTF? " << e.what() << "\n";
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
         }
         this->terminated = true;

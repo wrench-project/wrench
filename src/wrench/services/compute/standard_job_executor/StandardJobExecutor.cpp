@@ -207,15 +207,17 @@ namespace wrench {
       // THE ORDER IN WHICH WE KILL THINGS IS  IMPORTANT
       // WEIRDLY, KILLING IN THIS ORDER WORKS BETTER IT SEEMS....
       // TODO: INVESTIGATE?
+      std::cerr << "SUSPENDING ACTOR FOR " << this->getName() << "\n";
       this->suspendActor();
 
       // Kill all Workunit executors
+	std::cerr << "KILLING THE RUNNING WORKUNIT EXECUTORS: " << this->running_workunit_executors.size() << "\n";
       for (auto const &wue : this->running_workunit_executors) {
         wue->kill();
       }
 
       // Kill the StandardJobExecutor
-      WRENCH_INFO("KILLING STANDARD JOB EXECUTOR ACTOR\n");
+      WRENCH_INFO("KILLING STANDARD JOB EXECUTOR ACTOR for %s\n", this->getName().c_str());
       this->killActor();
 
     }

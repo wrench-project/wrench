@@ -37,6 +37,10 @@ namespace wrench {
 
     public:
 
+	~WorkunitMulticoreExecutor() {
+            std::cerr << "***** WORKUNIT MULTICORE EXECUTOR " << (unsigned long) this << " DESTRUCTED!\n";
+        }
+
         WorkunitMulticoreExecutor(
                      Simulation *simulation,
                      std::string hostname,
