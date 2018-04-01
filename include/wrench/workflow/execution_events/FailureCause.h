@@ -65,7 +65,9 @@ namespace wrench {
             /** @brief A compute thread has died */
                     COMPUTE_THREAD_HAS_DIED,
             /** @brief A functionality is not available */
-                    FUNCTIONALITY_NOT_AVAILABLE
+                    FUNCTIONALITY_NOT_AVAILABLE,
+            /** @brief A job was terminated due to a timeout */
+                    JOB_TIMEOUT
 
         };
 
@@ -308,6 +310,20 @@ namespace wrench {
         std::string toString();
 
     private:
+    };
+
+
+    /**
+    * @brief A "job has times out" failure cause
+    */
+    class JobTimeout : public FailureCause {
+    public:
+        JobTimeout(WorkflowJob *job);
+        WorkflowJob *getJob();
+        std::string toString();
+
+    private:
+        WorkflowJob *job;
     };
 
 
