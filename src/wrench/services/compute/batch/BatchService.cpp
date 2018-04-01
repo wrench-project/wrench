@@ -587,8 +587,10 @@ namespace wrench {
     void BatchService::processStandardJobTimeout(StandardJob *job) {
       std::set<std::shared_ptr<StandardJobExecutor>>::iterator it;
 
+	std::cerr << " IN PROCESS TIME OUT\n";
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if (((*it).get())->getJob() == job) {
+	  std::cerr << "KILLING A STANDARD JOB EXEC\n";
           ((*it).get())->kill();
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));

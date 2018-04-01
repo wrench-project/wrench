@@ -81,6 +81,7 @@ namespace wrench {
       }
 
       // Clean up
+      job_manager->stop();
       delete workflow;
 
       return 0;

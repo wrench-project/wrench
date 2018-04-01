@@ -70,7 +70,9 @@ namespace wrench {
      */
     void ComputeThread::kill() {
       try {
+	std::cerr << "COMPUTE_THREAD POIRE: Calling killActor()\n";
         this->killActor();
+	std::cerr << "COMPUTE_THREAD POIRE: Actor killed!\n";
       } catch (std::shared_ptr<FatalFailure> &e) {
         WRENCH_INFO("Failed to kill a compute thread.. .perhaps it's already dead... nevermind");
       }
