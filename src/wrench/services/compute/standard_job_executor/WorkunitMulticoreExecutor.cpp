@@ -63,7 +63,6 @@ namespace wrench {
         throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): num_cores must be >= 1");
       }
 
-      this->kill_lock = simgrid::s4u::Mutex::createMutex();
       this->simulation = simulation;
       this->callback_mailbox = callback_mailbox;
       this->workunit = workunit;
@@ -79,7 +78,7 @@ namespace wrench {
      */
     void WorkunitMulticoreExecutor::kill() {
 
-      this->kill_lock->lock();
+      this->acquireDaemonLock();
 
       // Then kill all compute threads, if any
       WRENCH_INFO("Killing %ld compute threads", this->compute_threads.size());
@@ -90,7 +89,7 @@ namespace wrench {
 
       this->killActor();
 
-      this->kill_lock->unlock();
+      this->releaseDaemonLock();
 
     }
 
@@ -289,7 +288,7 @@ namespace wrench {
       std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");
 
       // Nobody kills me while I am starting compute threads!
-      this->kill_lock->lock();
+      this->acquireDaemonLock();
 
       WRENCH_INFO("%ld compute threads", this->num_cores);
       // Create an compute thread to run the computation on each core
@@ -300,7 +299,7 @@ namespace wrench {
           S4U_Simulation::sleep(this->thread_startup_overhead);
         } catch (std::exception &e) {
           WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
-          this->kill_lock->unlock();
+          this->releaseDaemonLock();
           throw WorkflowExecutionException(new FatalFailure());
         }
         std::shared_ptr<ComputeThread> compute_thread;
@@ -325,12 +324,12 @@ namespace wrench {
 //        for (auto ct : this->compute_threads) {
 //          ct->kill();
 //        }
-        this->kill_lock->unlock();
+        this->releaseDaemonLock();
         throw WorkflowExecutionException(new ComputeThreadHasDied());
       }
       WRENCH_INFO("Waiting for completion of all compute threads");
 
-      this->kill_lock->unlock();  // People can kill me now
+      this->releaseDaemonLock();  // People can kill me now
 
       success = true;
       // Wait for all actors to complete

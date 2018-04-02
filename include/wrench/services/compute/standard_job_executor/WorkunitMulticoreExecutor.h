@@ -57,9 +57,6 @@ namespace wrench {
 
     private:
 
-        // This is used for safe killing of actors
-        simgrid::s4u::MutexPtr kill_lock;
-
         int main();
 
         void performWork(Workunit *work);
