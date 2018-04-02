@@ -58,9 +58,6 @@ namespace wrench {
 
     private:
 
-        // This is used for safe killing of actors
-        simgrid::s4u::MutexPtr kill_lock;
-
         friend class Simulation;
 
         std::string callback_mailbox;

@@ -153,7 +153,6 @@ namespace wrench {
       }
 
       // Set instance variables
-      this->kill_lock = simgrid::s4u::Mutex::createMutex();
       this->simulation = simulation;
       this->callback_mailbox = callback_mailbox;
       this->job = job;
@@ -205,24 +204,17 @@ namespace wrench {
      */
     void StandardJobExecutor::kill() {
 
-//      std::cerr << "IN StandardJobExecutor::kill(): getting the lock\n";
+      this->acquireDaemonLock();
 
-      this->kill_lock->lock();
-
-//      std::cerr << "ACTOR SUSPENDED, KILLING WUEs : " << this->running_workunit_executors.size() << "\n";
       // Kill all Workunit executors
       for (auto const &wue : this->running_workunit_executors) {
-//        std::cerr << "KILLING WUE " << wue->getName() << "\n";
         wue->kill();
       }
-
-//      std::cerr << "KILLING ACTOR\n";
 
       // Then kill the actor
       this->killActor();
 
-//      WRENCH_INFO("In StnadardJobExecutor::kill(): releasing the lock");
-      this->kill_lock->unlock();
+      this->releaseDaemonLock();
 
 
     }
@@ -358,7 +350,7 @@ namespace wrench {
       }
 
       // Don't kill me while I am doing this!
-      this->kill_lock->lock();
+      this->acquireDaemonLock();
 
 //      std::cerr << "** IN DISPATCH READY WORK UNITS\n";
 //      for (auto wu : this->ready_workunits) {
@@ -394,7 +386,7 @@ namespace wrench {
           desired_num_cores = computeWorkUnitDesiredNumCores(wu);
           required_ram = computeWorkUnitMinMemory(wu);
         } catch (std::runtime_error &e) {
-          this->kill_lock->unlock();
+          this->releaseDaemonLock();
           throw;
         }
 
@@ -445,7 +437,7 @@ namespace wrench {
             }
           }
         } else {
-          this->kill_lock->unlock();
+          this->releaseDaemonLock();
           throw std::runtime_error("Unknown StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM property '"
                                    + host_selection_algorithm + "'");
         }
@@ -501,7 +493,7 @@ namespace wrench {
 
       sorted_ready_workunits.clear();
 
-      this->kill_lock->unlock();
+      this->releaseDaemonLock();
 
     }
 
@@ -563,7 +555,7 @@ namespace wrench {
             Workunit *workunit) {
 
       // Don't kill me while I am doing this
-      this->kill_lock->lock();
+      this->acquireDaemonLock();
 
       // Update core availabilities
       this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
@@ -617,7 +609,7 @@ namespace wrench {
                                                                              StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           WRENCH_INFO("Failed to send the callback... oh well");
-          this->kill_lock->unlock();
+          this->releaseDaemonLock();
           return;
         }
       } else {
@@ -652,7 +644,7 @@ namespace wrench {
         }
       }
 
-      this->kill_lock->unlock();
+      this->releaseDaemonLock();
 
     }
 
@@ -671,7 +663,7 @@ namespace wrench {
 
 
       // Don't kill me while I am doing this
-      this->kill_lock->lock();
+      this->acquireDaemonLock();
 
       WRENCH_INFO("A workunit executor has failed to complete a workunit on behalf of job '%s'", this->job->getName().c_str());
 
@@ -738,7 +730,7 @@ namespace wrench {
         // do nothing
       }
 
-      this->kill_lock->unlock();
+      this->releaseDaemonLock();
 
     }
 

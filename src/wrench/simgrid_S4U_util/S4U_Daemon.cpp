@@ -198,7 +198,7 @@ namespace wrench {
     }
 
     /**
-     * @brief creates a life saver for the daemon
+     * @brief Create a life saver for the daemon
      * @param reference
      */
     void S4U_Daemon::createLifeSaver(std::shared_ptr<S4U_Daemon> reference) {
@@ -208,4 +208,17 @@ namespace wrench {
       this->life_saver = new S4U_Daemon::LifeSaver(reference);
     }
 
+    /**
+     * @brief Lock the daemon's lock
+     */
+    void S4U_Daemon::acquireDaemonLock() {
+      this->daemon_lock->lock();
+    }
+
+    /**
+     * @brief Unlock the daemon's lock
+     */
+    void S4U_Daemon::releaseDaemonLock() {
+      this->daemon_lock->unlock();
+    }
 };

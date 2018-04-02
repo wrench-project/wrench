@@ -75,8 +75,13 @@ namespace wrench {
         void killActor();
         void suspendActor();
         void joinActor();
+        void acquireDaemonLock();
+        void releaseDaemonLock();
 
     private:
+        // Lock use typically to prevent kill() from killing the actor
+        // while it's in the middle of doing something critical
+        simgrid::s4u::MutexPtr daemon_lock;
         bool terminated;
         simgrid::s4u::ActorPtr s4u_actor;
 
