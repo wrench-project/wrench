@@ -7,8 +7,8 @@
  * (at your option) any later version.
  */
 
-#ifndef WRENCH_BATCHNETWORKLISTENER_H
-#define WRENCH_BATCHNETWORKLISTENER_H
+#ifndef WRENCH_BATSCHEDNETWORKLISTENER_H
+#define WRENCH_BATSCHEDNETWORKLISTENER_H
 
 #include <wrench/services/Service.h>
 #include "BatchServiceProperty.h"
@@ -16,14 +16,22 @@
 namespace wrench {
 
 
-    class BatchNetworkListener: public Service {
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
 
-  public:
+    class BatschedNetworkListener: public Service {
+
+    public:
+
+        /** @brief Enumerated type to specified the type of the BatschedNetworkListener */
         enum NETWORK_LISTENER_TYPE{
-            LISTENER,SENDER,SENDER_RECEIVER
+            LISTENER,
+            SENDER,
+            SENDER_RECEIVER
         };
 
-        BatchNetworkListener(std::string hostname, std::string batch_service_mailbox, std::string sched_port,
+        BatschedNetworkListener(std::string hostname, std::string batch_service_mailbox, std::string sched_port,
                              NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send,std::map<std::string, std::string> plist = {});
 
 
@@ -35,7 +43,7 @@ namespace wrench {
                  {BatchServiceProperty::BATCH_EXECUTE_JOB_PAYLOAD,           "0"}
                 };
 
-        BatchNetworkListener(std::string, std::string batch_service_mailbox, std::string sched_port,
+        BatschedNetworkListener(std::string, std::string batch_service_mailbox, std::string sched_port,
                              NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send, std::map<std::string, std::string> plist, std::string suffix);
 
 
@@ -54,7 +62,11 @@ namespace wrench {
         void sendQueryAnswerMessageToBatchService(double estimated_waiting_time);
 
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 }
 
 
-#endif //WRENCH_BATCHNETWORKLISTENER_H
+#endif //WRENCH_BATSCHEDNETWORKLISTENER_H

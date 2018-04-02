@@ -251,7 +251,7 @@ namespace wrench {
 
 
         //vector of network listeners (only useful when ENABLE_BATSCHED == on)
-        std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
+        std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
 
 #ifdef ENABLE_BATSCHED
 
