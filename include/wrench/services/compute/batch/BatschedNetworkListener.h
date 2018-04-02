@@ -20,6 +20,9 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+    /**
+     * @brief A helper service that handles all interaction with Batsched
+     */
     class BatschedNetworkListener: public Service {
 
     public:
