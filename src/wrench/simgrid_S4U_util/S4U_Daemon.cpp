@@ -34,6 +34,7 @@ namespace wrench {
         throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
       }
 
+      this->daemon_lock = simgrid::s4u::Mutex::createMutex();
       this->hostname = hostname;
       this->simulation = nullptr;
       unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();

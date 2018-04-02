@@ -1683,8 +1683,8 @@ namespace wrench {
                               socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
 
         // Comment the two lines below to see Batsched output
-        fclose(stdout);
-        fclose(stderr);
+//        fclose(stdout);
+//        fclose(stderr);
         if (execvp(args[0], (char **) args) == -1) {
           exit(3);
         }
