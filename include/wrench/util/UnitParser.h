@@ -20,6 +20,10 @@ namespace wrench {
 
     class unit_scale;
 
+    /**
+     * @brief A class used to part string specification of values with units into
+     *        a single value (e.g., "2KB" -> 2048 bytes, "2Kb" -> 256 bytes)
+     */
     class UnitParser {
 
         /**
