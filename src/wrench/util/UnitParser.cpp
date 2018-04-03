@@ -17,16 +17,23 @@
 
 namespace wrench {
 
-    /* Nested Utility Class (Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp */
 
-    class unit_scale : public std::unordered_map<std::string, double> {
-    public:
-        using std::unordered_map<std::string, double>::unordered_map;
-        // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>
-        explicit unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators);
-    };
+//    /**
+//     * @brief A helper nested class to facilitate unit conversion
+//     * (Essentially Cut-And-Pasted from simgrid/src/surf/xml/surfxml_sax_cb.cpp)
+//     */
+//    class unit_scale : public std::unordered_map<std::string, double> {
+//    public:
+//        using std::unordered_map<std::string, double>::unordered_map;
+//        // tuples are : <unit, value for unit, base (2 or 10), true if abbreviated>
+//        explicit unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators);
+//    };
 
-    unit_scale::unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators)
+    /**
+     * @brief Constructor
+     * @param generators: generators
+     */
+    UnitParser::unit_scale::unit_scale(std::initializer_list<std::tuple<const std::string, double, int, bool>> generators)
     {
       for (const auto& gen : generators) {
         const std::string& unit = std::get<0>(gen);
@@ -57,7 +64,7 @@ namespace wrench {
       }
     }
 
-    double UnitParser::parseValueWithUnit(std::string string, const unit_scale& units, const char* default_unit) {
+    double UnitParser::parseValueWithUnit(std::string string, const UnitParser::unit_scale& units, const char* default_unit) {
       char* ptr;
       const char *c_string = string.c_str();
       errno = 0;
@@ -78,8 +85,13 @@ namespace wrench {
     }
 
 
+    /**
+     * @brief Given a string size specification with units (e.g., "13Mb") return the size in bytes
+     * @param string: the size specification
+     * @return the size in bytes
+     */
     double UnitParser::parse_size(std::string string) {
-      static const unit_scale units{std::make_tuple("b", 0.125, 2, true), std::make_tuple("b", 0.125, 10, true),
+      static const UnitParser::unit_scale units{std::make_tuple("b", 0.125, 2, true), std::make_tuple("b", 0.125, 10, true),
                                     std::make_tuple("B", 1.0, 2, true), std::make_tuple("B", 1.0, 10, true)};
       double size;
       try {

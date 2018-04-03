@@ -424,7 +424,7 @@ namespace wrench {
                                                        supports_pilot_jobs,
                                                        compute_resources,
                                                        default_storage_service, plist));
-          cs->setSimulation(this->simulation);
+          cs->simulation = this->simulation;
 
           this->cs_available_ram[pm_hostname] -= ram_memory;
 

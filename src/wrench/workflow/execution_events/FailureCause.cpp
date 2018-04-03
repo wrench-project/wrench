@@ -225,6 +225,9 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     *
+     * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING
+     * @param mailbox: the name of a mailbox
      */
     NetworkError::NetworkError(NetworkError::OperationType operation_type, std::string mailbox) : FailureCause(NETWORK_ERROR) {
       this->operation_type = operation_type;
@@ -271,6 +274,9 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     *
+     * @param operation_type: NetworkTimeout::OperationType::SENDING or NetworkTimeout::OperationType::RECEIVING
+     * @param mailbox: the mailbox name
      */
     NetworkTimeout::NetworkTimeout(NetworkTimeout::OperationType operation_type, std::string mailbox) : FailureCause(NETWORK_TIMEOUT) {
       this->operation_type = operation_type;
@@ -444,10 +450,11 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param service: the service
+     * @param functionality_name: a description of the functionality that's not available
      */
     FunctionalityNotAvailable::FunctionalityNotAvailable(Service *service, std::string functionality_name) : FailureCause(FUNCTIONALITY_NOT_AVAILABLE) {
       this->service = service;
-      this->functionality_name = functionality_name;
+      this->functionality_name = std::move(functionality_name);
     }
 
     /**
@@ -465,5 +472,32 @@ namespace wrench {
     std::string FunctionalityNotAvailable::toString() {
       return "The request functionality (" + this->functionality_name + ") is not available on service " + this->service->getName();
     }
+
+    /**
+    * @brief Constructor
+    *
+    * @param job: the job that has timed out
+    */
+    JobTimeout::JobTimeout(WorkflowJob *job) : FailureCause(
+            JOB_TIMEOUT) {
+      this->job = job;
+    }
+
+
+    /**
+     * @brief Getter
+     * @return the job
+     */
+    WorkflowJob *JobTimeout::getJob() {
+      return this->job;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string JobTimeout::toString() {
+      return "Job has timed out - likely not enough time was requested from a (batch-scheduled?) compute service";
+    };
 
 };

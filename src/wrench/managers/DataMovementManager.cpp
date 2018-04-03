@@ -25,9 +25,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(data_movement_manager, "Log category for Data Movem
 namespace wrench {
 
     /**
-     * @brief Constructor, which starts a DataMovementManager daemon
+     * @brief Constructor
      *
-     * @param workflow: the workflow whose data (files) are to be managed
+     * @param wms: the WMS that uses this data movement manager
      */
     DataMovementManager::DataMovementManager(WMS *wms) :
             Service(wms->hostname, "data_movement_manager", "data_movement_manager") {

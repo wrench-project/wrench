@@ -44,7 +44,7 @@ namespace wrench {
                                     max_parallel : max_parallel - compute_services.size());
 
       // If there is always a pilot job in the system, do nothing
-      if ((job_manager->getRunningPilotJobs().size() > 0)) {
+      if ((this->getJobManager()->getRunningPilotJobs().size() > 0)) {
         WRENCH_INFO("There is already a pilot job in the system...");
         return;
       }
@@ -70,8 +70,8 @@ namespace wrench {
       WRENCH_INFO("Submitting a pilot job (1 host, 1 core, %lf seconds)", pilot_job_duration);
 
       //TODO: For now we are asking for a pilot job that requires no RAM
-      WorkflowJob *job = (WorkflowJob *) job_manager->createPilotJob(workflow, 1, 1, 0.0, pilot_job_duration);
-      job_manager->submitJob(job, target_service);
+      WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createPilotJob(1, 1, 0.0, pilot_job_duration);
+      this->getJobManager()->submitJob(job, target_service);
 
     }
 

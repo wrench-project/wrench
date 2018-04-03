@@ -47,7 +47,7 @@ namespace wrench {
 
         friend class WMS;
 
-        DataMovementManager(WMS *wms);
+        explicit DataMovementManager(WMS *wms);
 
     private:
 

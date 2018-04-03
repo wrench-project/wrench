@@ -63,7 +63,7 @@ namespace wrench {
         }
 
         // Decision making
-        WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
+        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(itc.second, {});
         unsigned long mim_num_cores = ((StandardJob *) (job))->getMinimumRequiredNumCores();
 
         if (sum_num_idle_cores < mim_num_cores) {
@@ -81,7 +81,7 @@ namespace wrench {
             return;
           }
         }
-        job_manager->submitJob(job, cloud_service);
+        this->getJobManager()->submitJob(job, cloud_service);
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }

@@ -77,16 +77,8 @@ namespace wrench {
      * @brief Kill the worker thread
      */
     void WorkunitMulticoreExecutor::kill() {
-      // THE ORDER HERE IS SUPER IMPORTANT
-      // IF WE KILL THE COMPUTE THREADS, THE JOIN() RETURNS
-      // AND THE WORKUNIT EXECUTOR MOVES ON FOR A WHILE... WHICH IS BAD
 
-
-      // First kill the executor's main actor
-      WRENCH_INFO("Killing WorkunitExecutor [%s]", this->getName().c_str());
-
-      this->killActor();
-
+      this->acquireDaemonLock();
 
       // Then kill all compute threads, if any
       WRENCH_INFO("Killing %ld compute threads", this->compute_threads.size());
@@ -94,8 +86,10 @@ namespace wrench {
         WRENCH_INFO("Killing compute thread [%s]", compute_thread->getName().c_str());
         compute_thread->kill();
       }
-//      WRENCH_INFO("Clearing before everything got killed\n");
-//      this->compute_threads.clear();
+
+      this->killActor();
+
+      this->releaseDaemonLock();
 
     }
 
@@ -293,7 +287,10 @@ namespace wrench {
 
       std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");
 
-      WRENCH_INFO("Creating %ld compute threads", this->num_cores);
+      // Nobody kills me while I am starting compute threads!
+      this->acquireDaemonLock();
+
+      WRENCH_INFO("%ld compute threads", this->num_cores);
       // Create an compute thread to run the computation on each core
       bool success = true;
       for (unsigned long i = 0; i < this->num_cores; i++) {
@@ -302,6 +299,7 @@ namespace wrench {
           S4U_Simulation::sleep(this->thread_startup_overhead);
         } catch (std::exception &e) {
           WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
+          this->releaseDaemonLock();
           throw WorkflowExecutionException(new FatalFailure());
         }
         std::shared_ptr<ComputeThread> compute_thread;
@@ -314,9 +312,11 @@ namespace wrench {
           success = false;
           break;
         }
-//        WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
+        WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
         this->compute_threads.push_back(compute_thread);
       }
+
+
 
       if (!success) {
         WRENCH_INFO("Failed to create some compute threads...");
@@ -324,9 +324,12 @@ namespace wrench {
 //        for (auto ct : this->compute_threads) {
 //          ct->kill();
 //        }
+        this->releaseDaemonLock();
         throw WorkflowExecutionException(new ComputeThreadHasDied());
       }
       WRENCH_INFO("Waiting for completion of all compute threads");
+
+      this->releaseDaemonLock();  // People can kill me now
 
       success = true;
       // Wait for all actors to complete
@@ -359,9 +362,6 @@ namespace wrench {
 
       }
       #endif
-
-      // DON'T CLEAR THEM HERE, IN CASE I AM GETTING KILLED!!!
-//      this->compute_threads.clear();
 
       if (!success) {
         throw WorkflowExecutionException(new ComputeThreadHasDied());
