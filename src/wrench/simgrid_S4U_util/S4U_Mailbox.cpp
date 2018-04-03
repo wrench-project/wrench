@@ -217,7 +217,6 @@ namespace wrench {
     * @brief Asynchronously receive a message from a mailbox
     *
     * @param mailbox_name: the mailbox name
-    * @param msg: the SimulationMessage
     *
     * @return: a pending communication handle
     *

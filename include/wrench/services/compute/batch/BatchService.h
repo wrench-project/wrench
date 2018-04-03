@@ -28,6 +28,9 @@ namespace wrench {
 
     class WorkloadTraceFileReplayer; // forward
 
+    /**
+     * @brief A batch-scheduled compute service
+     */
     class BatchService : public ComputeService {
 
         /**
@@ -51,9 +54,7 @@ namespace wrench {
                  {BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD,        "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
-                 {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,             "1024"},
                 #ifdef ENABLE_BATSCHED
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
                 #else
@@ -72,11 +73,8 @@ namespace wrench {
                      StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {});
 
-        //cancels the job
-        void cancelJob(unsigned long jobid);
-
         //returns jobid,started time, running time
-        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
+//        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
 
         std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>>);
 
@@ -213,6 +211,9 @@ namespace wrench {
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup() override;
 
+        // Terminate currently running pilot jobs
+        void terminateRunningPilotJobs();
+
         //Fail the standard jobs inside the pilot jobs
         void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
 
@@ -246,16 +247,13 @@ namespace wrench {
 
         //start a job
         void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
-                              BatchJob *, unsigned long, unsigned long, unsigned long);
+                              BatchJob *, unsigned long, double, unsigned long);
 
+
+        //vector of network listeners (only useful when ENABLE_BATSCHED == on)
+        std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
 
 #ifdef ENABLE_BATSCHED
-
-        //Batch Service request reply process
-        std::unique_ptr<BatchNetworkListener> request_reply_process;
-
-        //vector of network listeners
-        std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
 
         void startBatsched();
         void stopBatsched();

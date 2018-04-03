@@ -178,7 +178,7 @@ namespace wrench {
      * @param hostname: the name of the host on which the job executor should be started
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param compute_resources: compute_resources: a set of hostnames (the service
+     * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
      * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
@@ -698,7 +698,7 @@ namespace wrench {
                                                                 job,
                                                                 "_pilot_job",
                                                                 this->default_storage_service));
-      cs->setSimulation(this->simulation);
+      cs->simulation = this->simulation;
       job->setComputeService(cs);
 
       // Start the compute service

@@ -36,7 +36,6 @@ namespace wrench {
         throw std::invalid_argument("SimpleStorageService::SimpleStorageService(): Invalid argument");
       }
 
-      this->simulation = nullptr; // will be filled in via Simulation::add()
       this->state = StorageService::UP;
       this->capacity = capacity;
     }

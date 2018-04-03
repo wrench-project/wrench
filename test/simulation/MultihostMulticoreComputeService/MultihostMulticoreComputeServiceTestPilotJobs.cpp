@@ -114,7 +114,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 3600);  // Asking for 0 RAM
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0, 3600);  // Asking for 0 RAM
 
       // Submit a pilot job
       bool success = true;
@@ -225,7 +225,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that requires 1 host, 1 core per host, 0 bytes of RAM per host, and 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0, 3600);
 
 
       std::string job_type_as_string = pilot_job->getTypeAsString();
@@ -268,7 +268,7 @@ private:
       }
 
       // Create another pilot job that requires 1 host, all core per host, 0 bytes of RAM per host, and 1 hour
-      wrench::PilotJob *big_pilot_job = job_manager->createPilotJob(this->workflow, 1, 2, 0, 3600);
+      wrench::PilotJob *big_pilot_job = job_manager->createPilotJob(1, 2, 0, 3600);
 
       // Submit this other job
       try {
@@ -425,7 +425,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 3600);
 
       // Submit a pilot job
       try {
@@ -576,7 +576,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM, and 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 3600);
 
       // Try to terminate it right now, which is stupid
 //      bool success = true;
@@ -686,7 +686,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 3600);
 
       // Submit a pilot job
       try {
@@ -840,7 +840,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 3600);
 
       // Submit a pilot job
       try {

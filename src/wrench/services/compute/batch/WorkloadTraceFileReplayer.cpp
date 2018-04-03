@@ -23,6 +23,7 @@ namespace wrench {
      * @param simulation: a pointer to the simulation object
      * @param hostname: the hostname on which the trace file replayer will run
      * @param batch_service: the batch service to which it submits jobs
+     * @param num_cores_per_node: the number of cores per host on the batch-scheduled platform
      * @param workload_trace: the workload trace it replays
      */
     WorkloadTraceFileReplayer::WorkloadTraceFileReplayer(Simulation *simulation,
@@ -37,8 +38,6 @@ namespace wrench {
             num_cores_per_node(num_cores_per_node) {}
 
     int WorkloadTraceFileReplayer::main() {
-
-      WRENCH_INFO("Workload trace file replayer starting!");
 
       double core_flop_rate = *(this->batch_service->getCoreFlopRate().begin());
 
@@ -65,7 +64,7 @@ namespace wrench {
                 core_flop_rate));
 
         // Start the OneJobWMS
-        one_job_wms->setSimulation(this->simulation);
+        one_job_wms->simulation = this->simulation;
         one_job_wms->start(one_job_wms, true); // Daemonize!
         // will not get out of scope, but it's ok because of the cool life-saver!
 

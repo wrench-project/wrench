@@ -16,6 +16,10 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(one_job_wms, "Log category for One Job WMS");
 
 namespace wrench {
 
+    /**
+     * @brief main method ot the OneJobWMS daemon
+     * @return 0 on success
+     */
     int OneJobWMS::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
@@ -43,7 +47,7 @@ namespace wrench {
       // Create the batch-specific argument
       std::map<std::string, std::string> batch_job_args;
       batch_job_args["-N"] = std::to_string(this->num_nodes); // Number of nodes/taks
-      batch_job_args["-t"] = std::to_string(MAX(1, this->requested_time / 60)); // Time in minutes (at least 1 minute)
+      batch_job_args["-t"] = std::to_string(1 + this->requested_time / 60); // Time in minutes (note the +1)
       batch_job_args["-c"] = std::to_string(this->num_cores_per_task); //number of cores per task
 
       // Submit this job to the batch service
@@ -58,8 +62,13 @@ namespace wrench {
         event = workflow->waitForNextExecutionEvent();
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-            // success, do nothing for now
+            // success, do nothing
             WRENCH_INFO("Received job completion notification");
+            break;
+          }
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+            // failre, do nothing
+            WRENCH_INFO("Received job failure notification: %s", event->failure_cause->toString().c_str());
             break;
           }
           default: {
@@ -72,6 +81,7 @@ namespace wrench {
       }
 
       // Clean up
+      job_manager->stop();
       delete workflow;
 
       return 0;
