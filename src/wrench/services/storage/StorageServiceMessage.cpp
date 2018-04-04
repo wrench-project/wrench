@@ -156,7 +156,7 @@ namespace wrench {
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
                                                                                WorkflowFile *file,
                                                                                StorageService *src,
-                                                                               double payload) : StorageServiceMessage(
+                                                                               double payload, FileRegistryService *file_registry_service) : StorageServiceMessage(
             "FILE_COPY_REQUEST", payload) {
       if ((answer_mailbox == "") || (file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
@@ -164,6 +164,7 @@ namespace wrench {
       this->answer_mailbox = answer_mailbox;
       this->file = file;
       this->src = src;
+      this->file_registry_service = file_registry_service;
     }
 
     /**
@@ -180,7 +181,7 @@ namespace wrench {
                                                                              StorageService *storage_service,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
-                                                                             double payload)
+                                                                             double payload, FileRegistryService *file_registry_service)
             : StorageServiceMessage("FILE_COPY_ANSWER", payload) {
       if ((file == nullptr) || (storage_service == nullptr) ||
               (success && (failure_cause != nullptr)) ||
@@ -191,6 +192,7 @@ namespace wrench {
       this->storage_service = storage_service;
       this->success = success;
       this->failure_cause = failure_cause;
+      this->file_registry_service = file_registry_service;
     }
 
     /**

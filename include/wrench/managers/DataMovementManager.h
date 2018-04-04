@@ -39,9 +39,9 @@ namespace wrench {
 
         void kill();
 
-        void initiateAsynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst);
+        void initiateAsynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst, FileRegistryService *file_registry_service=nullptr);
 
-        void doSynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst);
+        void doSynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst, FileRegistryService *file_registry_service=nullptr);
 
     protected:
 
@@ -51,13 +51,15 @@ namespace wrench {
 
     private:
 
-
         int main();
 
         WMS *wms = nullptr;
 
         bool processNextMessage();
 
+        struct CopyRequestSpecs;
+
+        std::list<CopyRequestSpecs> pending_file_copies;
     };
 
     /***********************/
