@@ -28,7 +28,7 @@ namespace wrench {
 
 
     /**
-     * @brief A top-level class that defines a storage service.
+     * @brief A simulated storage service
      */
     class StorageService : public Service {
 

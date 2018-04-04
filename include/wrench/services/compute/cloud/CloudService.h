@@ -27,7 +27,7 @@ namespace wrench {
     class ComputeService;
 
     /**
-     * @brief A cloud ComputeService
+     * @brief A simulated cloud-based compute service
      */
     class CloudService : public ComputeService {
 

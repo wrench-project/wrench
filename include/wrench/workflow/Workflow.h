@@ -23,7 +23,7 @@ class WorkflowTask;
 namespace wrench {
 
     /**
-     * @brief A workflow that an be executed by a WMS
+     * @brief A workflow (to be executed by a WMS)
      */
     class Workflow {
 
