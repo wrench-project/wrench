@@ -26,6 +26,7 @@ namespace wrench {
 
     class FailureCause;
 
+    class FileRegistryService;
 
     /**
      * @brief A top-level class that defines a storage service.
@@ -44,7 +45,7 @@ namespace wrench {
 
         virtual bool lookupFile(WorkflowFile *file);
 
-        virtual void deleteFile(WorkflowFile *file);
+        virtual void deleteFile(WorkflowFile *file, FileRegistryService *file_registry_service=nullptr);
 
         /***********************/
         /** \cond INTERNAL    **/
