@@ -57,7 +57,16 @@ namespace wrench {
 
         bool processNextMessage();
 
-        struct CopyRequestSpecs;
+        struct CopyRequestSpecs {
+            WorkflowFile *&file;
+            StorageService *&src;
+            StorageService *&dst;
+            FileRegistryService *&file_registry_service;
+
+            bool operator==(const CopyRequestSpecs &rhs) const {
+              return (file == rhs.file) && (src == rhs.src) && (dst == rhs.dst) && (file_registry_service == rhs.file_registry_service);
+            }
+        };
 
         std::list<CopyRequestSpecs> pending_file_copies;
     };

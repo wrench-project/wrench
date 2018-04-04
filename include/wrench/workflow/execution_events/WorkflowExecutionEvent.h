@@ -28,6 +28,8 @@ namespace wrench {
 
     class StorageService;
 
+    class FileRegistryService;
+
     class FailureCause;
 
     /***********************/
@@ -73,6 +75,10 @@ namespace wrench {
         StorageService *storage_service = nullptr;
         /** @brief The relevant failure cause, or nullptr */
         std::shared_ptr<FailureCause> failure_cause = nullptr;
+        /** @brief The relevant file registry service, or nullptr */
+        FileRegistryService *file_registry_service = nullptr;
+        /** @brief Whether the relevant file registry service has been updated */
+        bool file_registry_service_updated = false;
 
 
     private:

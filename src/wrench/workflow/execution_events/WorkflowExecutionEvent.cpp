@@ -68,10 +68,14 @@ namespace wrench {
           event->type = WorkflowExecutionEvent::FILE_COPY_COMPLETION;
           event->file = m->file;
           event->storage_service = m->storage_service;
+          event->file_registry_service = m->file_registry_service;
+          event->file_registry_service_updated = m->file_registry_service_updated;
         } else {
           event->type = WorkflowExecutionEvent::FILE_COPY_FAILURE;
           event->file = m->file;
           event->storage_service = m->storage_service;
+          event->file_registry_service = m->file_registry_service;
+          event->file_registry_service_updated = m->file_registry_service_updated;
           event->failure_cause = std::move(m->failure_cause);
         }
       } else {
