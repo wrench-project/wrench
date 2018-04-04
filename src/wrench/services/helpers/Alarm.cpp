@@ -18,7 +18,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
 namespace wrench {
 
     /**
-     * @brief Constructor  (which starts the daemon!)
+     * @brief Constructor
      *
      * @param date: the date at this the message should be sent
      * @param hostname: the name of the host on which the Alarm daemon should run
@@ -70,12 +70,12 @@ namespace wrench {
     /**
      * @brief Creates and start an alarm service
      * @param simulation: a pointer to the simulation object
-     * @param date: the date at this the message should be sent
-     * @param hostname: the name of the host on which the Alarm daemon should run
-     * @param reply_mailbox_name: the mailbox to which the message should be sent
+     * @param date: the simulation date at this the alarm service should send a message
+     * @param hostname: the name of the host on which to start the alarm service
+     * @param reply_mailbox_name: the mailbox to which the alarm service will send a message
      * @param msg: the message to send
-     * @param suffix: a (possibly empty) suffix to append to the daemon name
-     * @return a reference to the alarm service
+     * @param suffix: a (possibly empty) suffix to append to the daemon name (useful in debug output)
+     * @return a shared_ptr reference to the alarm service
      *
      * @throw std::invalid_argument
      */
@@ -94,7 +94,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Brutally terminate the alarm's actor
+     * @brief Immediately terminate the alarm's actor, meaning that it will never send its alarm message
      */
     void Alarm::kill() {
       this->killActor();

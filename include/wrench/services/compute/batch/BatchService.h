@@ -29,7 +29,7 @@ namespace wrench {
     class WorkloadTraceFileReplayer; // forward
 
     /**
-     * @brief A batch-scheduled compute service
+     * @brief A simulated batch-scheduled compute service
      */
     class BatchService : public ComputeService {
 

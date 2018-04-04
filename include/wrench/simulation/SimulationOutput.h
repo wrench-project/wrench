@@ -22,7 +22,7 @@
 namespace wrench {
 
     /**
-     * @brief The post-mortem simulation-generated data
+     * @brief Post-mortem simulation-generated data
      */
     class SimulationOutput {
 

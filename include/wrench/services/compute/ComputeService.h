@@ -30,7 +30,7 @@ namespace wrench {
     class StorageService;
 
     /**
-     * @brief  A top-level class that defines a compute service.
+     * @brief A simulated compute service
      */
     class ComputeService : public Service {
 
