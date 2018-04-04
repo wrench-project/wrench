@@ -13,6 +13,7 @@
 #include <wrench/simulation/SimulationMessage.h>
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/services/storage/StorageService.h>
+#include <wrench/services/file_registry/FileRegistryService.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <services/storage/StorageServiceMessage.h>
 #include <wrench/workflow/WorkflowFile.h>
@@ -82,12 +83,14 @@ namespace wrench {
      */
     void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
                                                            StorageService *src,
-                                                           StorageService *dst) {
+                                                           StorageService *dst,
+                                                            FileRegistryService *file_registry_service) {
       if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
 
       try {
+        this->pending_file_copies.push_front({file, src, dst, file_registry_service});
         dst->initiateFileCopy(this->mailbox_name, file, src);
       } catch (WorkflowExecutionException &e) {
         throw;
@@ -105,16 +108,18 @@ namespace wrench {
      */
     void DataMovementManager::doSynchronousFileCopy(WorkflowFile *file,
                                                     StorageService *src,
-                                                    StorageService *dst) {
+                                                    StorageService *dst,
+                                                    FileRegistryService *file_registry_service) {
       if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
 
-      try {
-        dst->copyFile(file, src);
-      } catch (WorkflowExecutionException &e) {
-        throw;
-      }
+        try {
+            this->pending_file_copies.push_front({file, src, dst, file_registry_service});
+            dst->copyFile(file, src);
+        } catch (WorkflowExecutionException &e) {
+            throw;
+        }
     }
 
 
@@ -169,6 +174,9 @@ namespace wrench {
 
       } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
+          // if successful, update FileRegistryService if requested
+
+
         // Forward it back
         try {
           S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
@@ -187,5 +195,14 @@ namespace wrench {
       return false;
     }
 
+    struct DataMovementManager::CopyRequestSpecs {
+        WorkflowFile *&file;
+        StorageService *&src;
+        StorageService *&dst;
+        FileRegistryService *&file_registry_service;
 
+        bool operator==(const CopyRequestSpecs &rhs) const {
+            return (file == rhs.file) && (src == rhs.src) && (dst == rhs.dst) && (file_registry_service == rhs.file_registry_service);
+        }
+    };
 };
