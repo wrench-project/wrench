@@ -46,6 +46,8 @@ namespace wrench {
                     FILE_NOT_FOUND,
             /** @brief The file to be written was already there */
                     FILE_ALREADY_THERE,
+            /** @brief The file is already being copied there */
+                    FILE_ALREADY_BEING_COPIED,
             /** @brief The storage service does not have enough space to support operation */
                     STORAGE_NO_ENOUGH_SPACE,
             /** @brief The service cannot be used because it is down (likely was terminated) */
@@ -157,6 +159,22 @@ namespace wrench {
         StorageService *storage_service;
     };
 
+    /**
+     * @brief A "file is already being copied" failure cause
+     */
+    class FileAlreadyBeingCopied : public FailureCause {
+
+    public:
+        FileAlreadyBeingCopied(WorkflowFile *file, StorageService *dst);
+
+        WorkflowFile *getFile();
+        StorageService *getStorageService();
+        std::string toString();
+
+    private:
+        WorkflowFile *file;
+        StorageService *storage_service;
+    };
 
     /**
      * @brief A "service is down" failure cause

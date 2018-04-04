@@ -141,18 +141,23 @@ namespace wrench {
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyAnswerMessage(WorkflowFile *file, StorageService *storage_service,
-                                            bool success, std::shared_ptr<FailureCause> cause, double payload, FileRegistryService* file_registry_service=nullptr);
+                                            FileRegistryService *file_registry_service,
+                                            bool file_registry_service_updated,
+                                            bool success, std::shared_ptr<FailureCause> cause,
+                                            double payload);
 
         /** @brief The file was was copied, or not */
         WorkflowFile *file;
         /** @brief The storage service that performed the copy */
         StorageService *storage_service;
+        /** @brief The file registry service that the user had requested be updated, or nullptr if none */
+        FileRegistryService *file_registry_service;
+        /** @brief Whether a file registry service has been updated or not */
+        bool file_registry_service_updated;
         /** @brief Whether the copy was successful */
         bool success;
         /** @brief The cause of the failure, or nullptr if success */
         std::shared_ptr<FailureCause> failure_cause;
-        /** @brief The file registry service to use */
-        FileRegistryService *file_registry_service;
     };
 
     /**

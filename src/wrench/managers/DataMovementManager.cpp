@@ -25,6 +25,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(data_movement_manager, "Log category for Data Movem
 
 namespace wrench {
 
+
+
     /**
      * @brief Constructor
      *
@@ -84,13 +86,19 @@ namespace wrench {
     void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
                                                            StorageService *src,
                                                            StorageService *dst,
-                                                            FileRegistryService *file_registry_service) {
+                                                           FileRegistryService *file_registry_service) {
       if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
 
+      for (auto const &p : this->pending_file_copies) {
+        if ((p.file == file) and (p.dst == dst)) {
+          throw new WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
+        }
+      }
+
       try {
-        this->pending_file_copies.push_front({file, src, dst, file_registry_service});
+        this->pending_file_copies.push_front((CopyRequestSpecs){file, src, dst, file_registry_service});
         dst->initiateFileCopy(this->mailbox_name, file, src);
       } catch (WorkflowExecutionException &e) {
         throw;
@@ -114,20 +122,36 @@ namespace wrench {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
 
-        try {
-            this->pending_file_copies.push_front({file, src, dst, file_registry_service});
-            dst->copyFile(file, src);
-        } catch (WorkflowExecutionException &e) {
-            throw;
+      try {
+        for (auto const &p : this->pending_file_copies) {
+          if ((p.file == file) and (p.dst == dst)) {
+            throw new WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
+          }
+        }for (auto const &p : this->pending_file_copies) {
+          if ((p.file == file) and (p.dst == dst)) {
+            throw new WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
+          }
         }
+        dst->copyFile(file, src);
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      }
+
+      try {
+        if (file_registry_service) {
+          file_registry_service->addEntry(file, dst);
+        }
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      }
     }
 
 
 
-    /**
-     * @brief Main method of the daemon that implements the DataMovementManager
-     * @return 0 on success
-     */
+/**
+ * @brief Main method of the daemon that implements the DataMovementManager
+ * @return 0 on success
+ */
     int DataMovementManager::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
@@ -143,12 +167,12 @@ namespace wrench {
       return 0;
     }
 
-    /**
-     * @brief Process the next message
-     * @return true if the daemon should continue, false otherwise
-     *
-     * @throw std::runtime_error
-     */
+/**
+ * @brief Process the next message
+ * @return true if the daemon should continue, false otherwise
+ *
+ * @throw std::runtime_error
+ */
     bool DataMovementManager::processNextMessage() {
 
       std::unique_ptr<SimulationMessage> message = nullptr;
@@ -174,14 +198,35 @@ namespace wrench {
 
       } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
-          // if successful, update FileRegistryService if requested
 
+        // Remove the record and find the File Registry Service, if any
+        FileRegistryService *file_registry_service = nullptr;
+        for (auto it = this->pending_file_copies.begin(); it != this->pending_file_copies.end(); ++it) {
+          if (((*it).file == msg->file) and ((*it).dst == msg->storage_service)) {
+            file_registry_service = (*it).file_registry_service;
+            this->pending_file_copies.erase(it); // remove the entry
+            break;
+          }
+        }
+
+        bool file_registry_service_updated = false;
+        if (file_registry_service) {
+          try {
+            file_registry_service->addEntry(msg->file, msg->storage_service);
+            file_registry_service_updated = true;
+          } catch (WorkflowExecutionException &e) {
+            // don't throw, just keep file_registry_service_update to false
+          }
+        }
 
         // Forward it back
         try {
           S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
                                    new StorageServiceFileCopyAnswerMessage(msg->file,
-                                                                           msg->storage_service, msg->success,
+                                                                           msg->storage_service,
+                                                                           file_registry_service,
+                                                                           file_registry_service_updated,
+                                                                           msg->success,
                                                                            std::move(msg->failure_cause), 0));
         } catch  (std::shared_ptr<NetworkError> &cause) {
           return true;
@@ -195,14 +240,5 @@ namespace wrench {
       return false;
     }
 
-    struct DataMovementManager::CopyRequestSpecs {
-        WorkflowFile *&file;
-        StorageService *&src;
-        StorageService *&dst;
-        FileRegistryService *&file_registry_service;
 
-        bool operator==(const CopyRequestSpecs &rhs) const {
-            return (file == rhs.file) && (src == rhs.src) && (dst == rhs.dst) && (file_registry_service == rhs.file_registry_service);
-        }
-    };
 };
