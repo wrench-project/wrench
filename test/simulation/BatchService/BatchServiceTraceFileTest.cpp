@@ -318,9 +318,9 @@ private:
           event = workflow->waitForNextExecutionEvent();
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-              if (event->job != job) {
+              if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job) {
                 throw std::runtime_error("Wrong job completion order: got " +
-                                         event->job->getName() + " but expected " + job->getName());
+                                                 dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job->getName() + " but expected " + job->getName());
               }
               break;
             }

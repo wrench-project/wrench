@@ -238,12 +238,12 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   EXPECT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", nullptr, storage_service, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, true, nullptr, 666));
-  EXPECT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, false, failure_cause, 666));
-  EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(nullptr, storage_service, true, nullptr, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, nullptr, true, nullptr, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, true, failure_cause, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, false, nullptr, 666), std::invalid_argument);
+  EXPECT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, nullptr, false, true, nullptr, 666));
+  EXPECT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, nullptr, false, false, failure_cause, 666));
+  EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(nullptr, storage_service, nullptr, false, true, nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, nullptr, nullptr, false,true, nullptr, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, nullptr, false, true, failure_cause, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, nullptr, false, false, nullptr, 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox", file, 666));
   EXPECT_THROW(new wrench::StorageServiceFileWriteRequestMessage("", file, 666), std::invalid_argument);

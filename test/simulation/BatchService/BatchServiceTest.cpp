@@ -336,9 +336,9 @@ private:
           event = workflow->waitForNextExecutionEvent();
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-              if (event->job != job) {
+              if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job) {
                 throw std::runtime_error("Wrong job completion order: got " +
-                                         event->job->getName() + " but expected " + job->getName());
+                                         dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job->getName() + " but expected " + job->getName());
               }
               break;
             }
@@ -1642,10 +1642,10 @@ private:
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-            if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+            if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
               throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
             }
-            wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
+            wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
             std::string error_msg = real_cause->toString();
             if (real_cause->getService() != this->test->compute_service) {
               std::runtime_error(

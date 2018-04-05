@@ -412,7 +412,8 @@ namespace wrench {
           WRENCH_INFO("Cannot perform file copy due to lack of space");
           try {
             S4U_Mailbox::putMessage(answer_mailbox,
-                                    new StorageServiceFileCopyAnswerMessage(file, this, false,
+                                    new StorageServiceFileCopyAnswerMessage(file, this, nullptr, false,
+                                                                            false,
                                                                             std::shared_ptr<FailureCause>(
                                                                                     new StorageServiceNotEnoughSpace(
                                                                                             file,
@@ -442,7 +443,8 @@ namespace wrench {
       } catch (WorkflowExecutionException &e) {
         try {
           S4U_Mailbox::putMessage(answer_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(file, this, false, e.getCause(),
+                                  new StorageServiceFileCopyAnswerMessage(file, this, nullptr, false,
+                                                                          false, e.getCause(),
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -495,7 +497,8 @@ namespace wrench {
                 "Sending back an ack since this was a file copy and some client is waiting for me to say something");
         try {
           S4U_Mailbox::putMessage(connection->ack_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(connection->file, this, false, connection->failure_cause,
+                                  new StorageServiceFileCopyAnswerMessage(connection->file, this, nullptr, false,
+                                                                          false, connection->failure_cause,
                                                                           this->getPropertyValueAsDouble(
                                                                                   SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -522,7 +525,8 @@ namespace wrench {
                   "Sending back an ack since this was a file copy and some client is waiting for me to say something");
           try {
             S4U_Mailbox::putMessage(connection->ack_mailbox,
-                                    new StorageServiceFileCopyAnswerMessage(connection->file, this, true, nullptr,
+                                    new StorageServiceFileCopyAnswerMessage(connection->file, this, nullptr, false,
+                                                                            true, nullptr,
                                                                             this->getPropertyValueAsDouble(
                                                                                     SimpleStorageServiceProperty::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::shared_ptr<NetworkError> &cause) {

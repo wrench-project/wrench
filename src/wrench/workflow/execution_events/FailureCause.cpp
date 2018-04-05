@@ -415,6 +415,43 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param file: the file that is already being copied
+     * @param storage_service:  the storage service to which is is being copied
+     */
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, StorageService *storage_service)
+            : FailureCause(FILE_ALREADY_BEING_COPIED) {
+      this->file = file;
+      this->storage_service = storage_service;
+    }
+
+    /**
+     * @brief Getter
+     * @return the file
+     */
+    WorkflowFile *FileAlreadyBeingCopied::getFile() {
+      return this->file;
+    }
+
+    /**
+     * @brief Getter
+     * @return the storage service
+     */
+    StorageService *FileAlreadyBeingCopied::getStorageService() {
+      return this->storage_service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string FileAlreadyBeingCopied::toString() {
+      return "File " + this->file->getId() + " is already being copied to  Storage Service " +
+             this->storage_service->getName();
+    }
+
+
+    /**
+     * @brief Constructor
      *
      */
     ComputeThreadHasDied::ComputeThreadHasDied() : FailureCause(

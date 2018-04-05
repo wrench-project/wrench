@@ -170,30 +170,37 @@ namespace wrench {
      */
     void WMS::waitForAndProcessNextEvent() {
       std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+      WorkflowExecutionEvent *event_ptr = event.release();
 
       switch (event->type) {
         case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-          processEventStandardJobCompletion(std::move(event));
+          processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>(
+                  dynamic_cast<StandardJobCompletedEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          processEventStandardJobFailure(std::move(event));
+          processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent>(
+                  dynamic_cast<StandardJobFailedEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::PILOT_JOB_START: {
-          processEventPilotJobStart(std::move(event));
+          processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent>(
+                  dynamic_cast<PilotJobStartedEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-          processEventPilotJobExpiration(std::move(event));
+          processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent>(
+                  dynamic_cast<PilotJobExpiredEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-          processEventFileCopyCompletion(std::move(event));
+          processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent>(
+                  dynamic_cast<FileCopyCompletedEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          processEventFileCopyFailure(std::move(event));
+          processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent>(
+                  dynamic_cast<FileCopyFailedEvent *>(event_ptr)));
           break;
         }
         default: {
@@ -208,9 +215,9 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventStandardJobCompletion(std::unique_ptr<WorkflowExecutionEvent> event) {
-      auto job = (StandardJob *) (event->job);
-      WRENCH_INFO("Notified that a %ld-task job has completed", job->getNumTasks());
+    void WMS::processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent> event) {
+      auto standard_job = event->standard_job;
+      WRENCH_INFO("Notified that a %ld-task job has completed", standard_job->getNumTasks());
     }
 
     /**
@@ -218,7 +225,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent> event) {
       WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
     }
 
@@ -227,7 +234,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventPilotJobStart(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent> event) {
       WRENCH_INFO("Notified that a pilot job has started!");
     }
 
@@ -236,7 +243,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventPilotJobExpiration(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent> event) {
       WRENCH_INFO("Notified that a pilot job has expired!");
     }
 
@@ -245,7 +252,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventFileCopyCompletion(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent> event) {
       WRENCH_INFO("Notified that a file copy is completed!");
     }
 
@@ -254,7 +261,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventFileCopyFailure(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent> event) {
       WRENCH_INFO("Notified that a file copy has failed!");
     }
 
