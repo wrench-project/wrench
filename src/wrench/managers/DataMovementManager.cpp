@@ -92,17 +92,13 @@ namespace wrench {
       }
 
       for (auto const &p : this->pending_file_copies) {
-        if ((p.file == file) and (p.dst == dst)) {
+        if ((p->file == file) and (p->dst == dst)) {
           throw new WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
         }
       }
 
       try {
-        this->pending_file_copies.push_front((CopyRequestSpecs){file, src, dst, file_registry_service});
-        std::cerr << "IN INITIATE ASYNC COPY I PUSHED SOMETHING: Let's look at it \n";
-        for (auto foo : this->pending_file_copies) {
-          std::cerr << "----> " << (unsigned long)(foo.file) << "\n";
-        }
+        this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(new CopyRequestSpecs(file, src, dst, file_registry_service)));
         dst->initiateFileCopy(this->mailbox_name, file, src);
       } catch (WorkflowExecutionException &e) {
         throw;
@@ -128,11 +124,11 @@ namespace wrench {
 
       try {
         for (auto const &p : this->pending_file_copies) {
-          if ((p.file == file) and (p.dst == dst)) {
+          if ((p->file == file) and (p->dst == dst)) {
             throw new WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
           }
         }for (auto const &p : this->pending_file_copies) {
-          if ((p.file == file) and (p.dst == dst)) {
+          if ((p->file == file) and (p->dst == dst)) {
             throw new WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
           }
         }
@@ -181,13 +177,6 @@ namespace wrench {
  */
     bool DataMovementManager::processNextMessage() {
 
-
-      std::cerr << "IN PROCESS NEXT MESSAGE THIS IS WHAT WE HAVE:\n";
-      for (auto foo : this->pending_file_copies) {
-        std::cerr << "   ----> " << (unsigned long)(foo.file) << "\n";
-      }
-
-
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
@@ -196,11 +185,6 @@ namespace wrench {
         return true;
       }  catch (std::shared_ptr<FatalFailure> &cause) {
         return true;
-      }
-
-      std::cerr << "IN PROCESS NEXT MESSAGE THIS IS WHAT WE HAVE AFTER GETTING A MESSAGE:\n";
-      for (auto foo : this->pending_file_copies) {
-        std::cerr << "   ----> " << foo.file_registry_service << "\n";
       }
 
       if (message == nullptr) {
@@ -216,32 +200,13 @@ namespace wrench {
 
       } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
-        for (auto studd : this->pending_file_copies) {
-          std::cerr << "AAAHERE" << (unsigned long)(studd.file) << "\n";
-        }
-
-        for (auto it = this->pending_file_copies.begin();
-             it != this->pending_file_copies.end();
-             ++it) {
-          std::cerr << "HERE: " << (unsigned long) ((*it).file) << "\n";
-        }
-
-
         // Remove the record and find the File Registry Service, if any
         FileRegistryService *file_registry_service = nullptr;
         for (auto it = this->pending_file_copies.begin();
              it != this->pending_file_copies.end();
              ++it) {
-          std::cerr << "((*it)->file = " << (unsigned long )((*it).file) << "\n";
-          std::cerr << "((*it)->file = " << ((*it).file)->getId() << "\n";
-          std::cerr << "((*it)->dst = " << (unsigned long)((*it).dst) << "\n";
-          std::cerr << "((*it)->dst = " << ((*it).dst)->getName() << "\n";
-          std::cerr << "msg->file = " << (msg->file)->getId() << "\n";
-          std::cerr << "msg->file = " << (unsigned long)(msg->file) << "\n";
-          std::cerr << "msg->storage_service = " << (unsigned long)(msg->storage_service) << "\n";
-          std::cerr << "msg->storage_service = " << (msg->storage_service)->getName() << "\n";
-          if (((*it).file == msg->file) and ((*it).dst == msg->storage_service)) {
-            file_registry_service = (*it).file_registry_service;
+          if (((*it)->file == msg->file) and ((*it)->dst == msg->storage_service)) {
+            file_registry_service = (*it)->file_registry_service;
             this->pending_file_copies.erase(it); // remove the entry
             break;
           }
