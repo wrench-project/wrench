@@ -22,7 +22,7 @@ namespace wrench {
 
 
     /**
-     * @brief Properties for a Service
+     * @brief Configurable properties for a Service
      */
     class ServiceProperty {
 

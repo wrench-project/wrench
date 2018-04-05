@@ -20,7 +20,7 @@
 namespace wrench {
 
     /**
-     * @brief A top-level class that defines a service
+     * @brief A simulated service that can be added to the simulation
      */
     class Service : public S4U_Daemon {
 

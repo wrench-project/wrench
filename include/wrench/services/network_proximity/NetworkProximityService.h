@@ -20,7 +20,8 @@
 namespace wrench{
 
     /**
-     * @brief A network proximity service
+     * @brief A simulated network proximity service that estimates inter-host latencies
+     *        and can be queries for such estimates
      */
     class NetworkProximityService: public Service {
 

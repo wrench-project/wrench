@@ -17,7 +17,7 @@
 namespace wrench {
 
     /**
-     * @brief Properties for a StorageService
+     * @brief Configurable properties for a StorageService
      */
     class StorageServiceProperty : public ServiceProperty {
 
