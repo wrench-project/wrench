@@ -43,8 +43,8 @@ namespace wrench {
       }
 
       if (auto m = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
-        return std::unique_ptr<StandardJobCompletionEvent>(
-          new StandardJobCompletionEvent(m->job, m->compute_service));
+        return std::unique_ptr<StandardJobCompletedEvent>(
+          new StandardJobCompletedEvent(m->job, m->compute_service));
 
       } else if (auto m = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
         return std::unique_ptr<StandardJobFailedEvent>(
@@ -61,7 +61,7 @@ namespace wrench {
       } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (m->success) {
           return std::unique_ptr<FileCopyCompletedEvent>(
-                  new FileCopyCompletedEvent(m->file, m->storage_service));
+                  new FileCopyCompletedEvent(m->file, m->storage_service, m->file_registry_service, m->file_registry_service_updated));
 
         } else {
           return std::unique_ptr<FileCopyFailedEvent>(

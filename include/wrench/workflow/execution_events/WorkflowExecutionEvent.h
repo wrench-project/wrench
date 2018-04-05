@@ -29,6 +29,8 @@ namespace wrench {
     class StorageService;
     class FileRegistryService;
 
+    class FileRegistryService;
+
     class FailureCause;
 
     /***********************/
@@ -64,6 +66,8 @@ namespace wrench {
         /** @brief The event type */
         WorkflowExecutionEvent::EventType type;
 
+        virtual ~WorkflowExecutionEvent() = default;
+
         WorkflowExecutionEvent(EventType type) : type(type) {}
 
         friend class Workflow;
@@ -72,12 +76,12 @@ namespace wrench {
 
     };
 
-    class StandardJobCompletionEvent : public WorkflowExecutionEvent {
+    class StandardJobCompletedEvent : public WorkflowExecutionEvent {
 
     public:
 
-        StandardJobCompletionEvent(StandardJob *standard_job,
-                                   ComputeService *compute_service)
+        StandardJobCompletedEvent(StandardJob *standard_job,
+                                  ComputeService *compute_service)
                 : WorkflowExecutionEvent(STANDARD_JOB_COMPLETION),
                   standard_job(standard_job), compute_service(compute_service) {}
 
@@ -134,25 +138,9 @@ namespace wrench {
     public:
 
         FileCopyCompletedEvent(WorkflowFile *file,
-                               StorageService *storage_service)
-                : WorkflowExecutionEvent(FILE_COPY_COMPLETION),
-                  file(file), storage_service(storage_service) {}
-
-        WorkflowFile *file;
-        StorageService *storage_service;
-    };
-
-
-    class FileCopyFailedEvent : public WorkflowExecutionEvent {
-
-    public:
-
-        FileCopyFailedEvent(WorkflowFile *file,
-                            StorageService *storage_service,
-                            FileRegistryService *file_registry_service,
-                            bool file_registry_service_updated,
-                            std::shared_ptr<FailureCause> failure_cause
-        )
+                               StorageService *storage_service,
+                               FileRegistryService *file_registry_service,
+                               bool file_registry_service_updated)
                 : WorkflowExecutionEvent(FILE_COPY_COMPLETION),
                   file(file), storage_service(storage_service),
                   file_registry_service(file_registry_service),
@@ -162,6 +150,23 @@ namespace wrench {
         StorageService *storage_service;
         FileRegistryService *file_registry_service;
         bool file_registry_service_updated;
+    };
+
+
+    class FileCopyFailedEvent : public WorkflowExecutionEvent {
+
+    public:
+
+        FileCopyFailedEvent(WorkflowFile *file,
+                            StorageService *storage_service,
+                            std::shared_ptr<FailureCause> failure_cause
+        )
+                : WorkflowExecutionEvent(FILE_COPY_FAILURE),
+                  file(file), storage_service(storage_service),
+                  failure_cause(failure_cause) {}
+
+        WorkflowFile *file;
+        StorageService *storage_service;
         std::shared_ptr<FailureCause> failure_cause;
 
     };

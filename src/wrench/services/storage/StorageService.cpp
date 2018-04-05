@@ -448,7 +448,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void StorageService::deleteFile(WorkflowFile *file) {
+    void StorageService::deleteFile(WorkflowFile *file, FileRegistryService *file_registry_service) {
 
       if (file == nullptr) {
         throw std::invalid_argument("StorageService::deleteFile(): Invalid arguments");
@@ -457,6 +457,8 @@ namespace wrench {
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
+
+      bool unregister = (file_registry_service != nullptr) ? true : false;
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("delete_file");
@@ -484,6 +486,11 @@ namespace wrench {
           throw WorkflowExecutionException(std::move(msg->failure_cause));
         }
         WRENCH_INFO("Deleted file %s on storage service %s", file->getId().c_str(), this->getName().c_str());
+
+        if (unregister) {
+            file_registry_service->removeEntry(file, this);
+        }
+
       } else {
         throw std::runtime_error("StorageService::deleteFile(): Unexpected [" + message->getName() + "] message");
       }

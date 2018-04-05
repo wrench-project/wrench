@@ -325,7 +325,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
+          if (dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
             throw std::runtime_error("Should have gotten a 'out of space' failure cause");
           }
           break;
@@ -353,7 +353,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
+          if (dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
             throw std::runtime_error("Should have gotten a 'file not found' failure cause");
           }
           break;
@@ -1019,11 +1019,12 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
+          if (dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
             throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " +
-                                     std::to_string(event->failure_cause->getCauseType()));
+                                     std::to_string(dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType()));
           }
-          wrench::StorageServiceNotEnoughSpace *real_cause = (wrench::StorageServiceNotEnoughSpace *) event->failure_cause.get();
+          wrench::StorageServiceNotEnoughSpace *real_cause =
+                  (wrench::StorageServiceNotEnoughSpace *) dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause.get();
           if (real_cause->getFile() != this->test->file_500) {
             throw std::runtime_error(
                     "Got the expected exception and failure type, but the failure cause doesn't point to the right file");
@@ -1056,11 +1057,11 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
+          if (dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
             throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " +
-                                     std::to_string(event->failure_cause->getCauseType()));
+                                     std::to_string(dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType()));
           }
-          wrench::FileNotFound *real_cause = (wrench::FileNotFound *) event->failure_cause.get();
+          wrench::FileNotFound *real_cause = (wrench::FileNotFound *) dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause.get();
           if (real_cause->getFile() != this->test->file_100) {
             throw std::runtime_error(
                     "Got the expected exception and failure type, but the failure cause doesn't point to the right file");
@@ -1095,11 +1096,11 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          if (dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
             throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " +
-                                     std::to_string(event->failure_cause->getCauseType()));
+                                     std::to_string(dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType()));
           }
-          wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) event->failure_cause.get();
+          wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause.get();
           if (real_cause->getService() != this->test->storage_service_1000) {
             throw std::runtime_error(
                     "Got the expected exception and failure type, but the failure cause doesn't point to the right storage service");

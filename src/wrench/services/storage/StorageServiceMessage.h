@@ -16,6 +16,7 @@
 
 #include <wrench/services/ServiceMessage.h>
 #include <wrench/workflow/execution_events/FailureCause.h>
+#include <wrench/services/file_registry/FileRegistryService.h>
 
 
 namespace wrench {
@@ -122,7 +123,7 @@ namespace wrench {
     class StorageServiceFileCopyRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
-                                             double payload);
+                                             double payload, FileRegistryService *file_registry_service=nullptr);
 
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
@@ -130,6 +131,8 @@ namespace wrench {
         WorkflowFile *file;
         /** @brief The storage service from which to copy the file */
         StorageService *src;
+        /** @brief The file registry service to use */
+        FileRegistryService *file_registry_service;
     };
 
     /**
@@ -138,12 +141,19 @@ namespace wrench {
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyAnswerMessage(WorkflowFile *file, StorageService *storage_service,
-                                            bool success, std::shared_ptr<FailureCause> cause, double payload);
+                                            FileRegistryService *file_registry_service,
+                                            bool file_registry_service_updated,
+                                            bool success, std::shared_ptr<FailureCause> cause,
+                                            double payload);
 
         /** @brief The file was was copied, or not */
         WorkflowFile *file;
         /** @brief The storage service that performed the copy */
         StorageService *storage_service;
+        /** @brief The file registry service that the user had requested be updated, or nullptr if none */
+        FileRegistryService *file_registry_service;
+        /** @brief Whether a file registry service has been updated or not */
+        bool file_registry_service_updated;
         /** @brief Whether the copy was successful */
         bool success;
         /** @brief The cause of the failure, or nullptr if success */
