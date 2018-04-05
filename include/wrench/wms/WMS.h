@@ -28,7 +28,7 @@ namespace wrench {
     class FileRegistryService;
 
     /**
-     * @brief A top-level class that defines a workflow management system (WMS)
+     * @brief A simulated workflow management system (WMS)
      */
     class WMS : public Service {
 

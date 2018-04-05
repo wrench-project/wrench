@@ -24,7 +24,7 @@ namespace wrench {
     class StorageService;
 
     /**
-     * @brief A file registry service (a.k.a. replica catalog)
+     * @brief A simulated file registry service (a.k.a. replica catalog)
      */
     class FileRegistryService : public Service {
 

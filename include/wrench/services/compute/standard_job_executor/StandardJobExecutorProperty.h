@@ -20,7 +20,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Properties for a StandardJobExecutor
+     * @brief Configurable properties for a StandardJobExecutor
      */
     class StandardJobExecutorProperty {
 

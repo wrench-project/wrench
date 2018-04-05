@@ -16,7 +16,7 @@ namespace wrench {
 
 
     /**
-     * @brief Properties for a BatchService
+     * @brief Configurable properties for a BatchService
      */
     class BatchServiceProperty: public ComputeServiceProperty {
 
