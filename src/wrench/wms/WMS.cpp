@@ -172,7 +172,8 @@ namespace wrench {
       std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
       WorkflowExecutionEvent *event_ptr = event.release();
 
-      switch (event->type) {
+      
+      switch (event_ptr->type) {
         case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
           processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>(
                   dynamic_cast<StandardJobCompletedEvent *>(event_ptr)));
