@@ -220,14 +220,17 @@ namespace wrench {
 
         bool file_registry_service_updated = false;
         if (request.file_registry_service) {
+          WRENCH_INFO("Trying to do a register");
           try {
             request.file_registry_service->addEntry(request.file, request.dst);
             file_registry_service_updated = true;
           } catch (WorkflowExecutionException &e) {
+            WRENCH_INFO("Oops, couldn't do it");
             // don't throw, just keep file_registry_service_update to false
           }
         }
 
+          WRENCH_INFO("Forwarding status message");
         // Forward it back
         try {
           S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
