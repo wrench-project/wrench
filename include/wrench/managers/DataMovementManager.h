@@ -59,17 +59,15 @@ namespace wrench {
 
         struct CopyRequestSpecs {
             WorkflowFile *file;
-            StorageService *src;
             StorageService *dst;
             FileRegistryService *file_registry_service;
 
             CopyRequestSpecs(WorkflowFile *file,
-            StorageService *src,
             StorageService *dst,
-            FileRegistryService *file_registry_service) : file(file), src(src), dst(dst), file_registry_service(file_registry_service) {}
+            FileRegistryService *file_registry_service) : file(file), dst(dst), file_registry_service(file_registry_service) {}
 
             bool operator==(const CopyRequestSpecs &rhs) const {
-              return (file == rhs.file) && (src == rhs.src) && (dst == rhs.dst) && (file_registry_service == rhs.file_registry_service);
+              return (file == rhs.file) && (dst == rhs.dst);
             }
         };
 
