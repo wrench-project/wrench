@@ -212,13 +212,15 @@ private:
         }
 
         async_dual_copy_event2 = workflow->waitForNextExecutionEvent();
-
-        if (!async_dual_copy_event2->file_registry_service_updated) {
-            throw std::runtime_error("Asynchronous file copy should have set the event's file_registry_service_updated variable to true");
+      
+        if (async_dual_copy_event2->type != wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION)  {
+            throw std::runtime_error(std::string("Unexpected workflow execution even (type=") + std::to_string(async_dual_copy_event2->type) + ")");
         }
 
-        if (async_dual_copy_event2->type != wrench::WorkflowExecutionEvent::EventType::FILE_COPY_COMPLETION) {
-            throw std::runtime_error("Asynchronous file copy should have completed");
+        auto async_dual_copy_event2_real = dynamic_cast<wrench::FileCopyCompletedEvent *>(async_dual_copy_event2.get());
+
+        if (!async_dual_copy_event2_real->file_registry_service_updated) {
+            throw std::runtime_error("Asynchronous file copy should have set the event's file_registry_service_updated variable to true");
         }
 
         if (!double_copy_failed) {
