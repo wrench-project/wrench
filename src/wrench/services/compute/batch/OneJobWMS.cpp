@@ -68,7 +68,9 @@ namespace wrench {
           }
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
             // failre, do nothing
-            WRENCH_INFO("Received job failure notification: %s", event->failure_cause->toString().c_str());
+            wrench::StandardJobFailedEvent *real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+            WRENCH_INFO("Received job failure notification: %s",
+                        real_event->failure_cause->toString().c_str());
             break;
           }
           default: {

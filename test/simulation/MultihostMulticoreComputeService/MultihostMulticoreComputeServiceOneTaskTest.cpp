@@ -1041,7 +1041,8 @@ private:
           break;
         }
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          throw std::runtime_error("Unexpected job failure: " + event->failure_cause->toString());
+          throw std::runtime_error("Unexpected job failure: " +
+                                           dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->toString());
         }
         default: {
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
@@ -1188,11 +1189,11 @@ private:
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
           bool success = false;
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::NO_STORAGE_SERVICE_FOR_FILE) {
+          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::NO_STORAGE_SERVICE_FOR_FILE) {
             throw std::runtime_error(
                     "Got an Standard Job Failure as expected, but it does not have the correct failure cause type");
           }
-          auto real_cause = (wrench::NoStorageServiceForFile *) event->failure_cause.get();
+          auto real_cause = (wrench::NoStorageServiceForFile *) dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get();
           std::string error_msg = real_cause->toString();
           if (real_cause->getFile() != test->input_file) {
             throw std::runtime_error(
