@@ -209,7 +209,7 @@ set(TEST_FILES
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-wms/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        test/simulation/JobManagerTest.cpp)
+        test/simulation/JobManagerTest.cpp test/simulation/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
