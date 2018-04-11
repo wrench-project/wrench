@@ -24,6 +24,8 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
 
+#define NETWORK_TIMOUT_VALUE 1.0
+
 namespace wrench {
 
 
@@ -73,10 +75,14 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
       }
 
+      if (this->state != Service::UP) {
+        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+      }
+
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
 
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
+        S4U_Mailbox::dputMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
                                                                                              this->getPropertyValueAsDouble(
                                                                                                      FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -86,8 +92,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -118,6 +126,10 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
       }
 
+      if (this->state != Service::UP) {
+        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+      }
+
       // check to see if the 'reference_host' is valid
       std::vector<std::string> monitored_hosts = network_proximity_service->getHostnameList();
       if(std::find(monitored_hosts.cbegin(), monitored_hosts.cend(), reference_host) == monitored_hosts.cend()) {
@@ -127,7 +139,7 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry_by_proximity");
 
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file, reference_host, network_proximity_service,
+        S4U_Mailbox::dputMessage(this->mailbox_name, new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file, reference_host, network_proximity_service,
                                                                                                         this->getPropertyValueAsDouble(
                                                                                                                 FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -137,8 +149,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -164,10 +178,14 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
       }
 
+      if (this->state != Service::UP) {
+        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+      }
+
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
 
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
+        S4U_Mailbox::dputMessage(this->mailbox_name,
                                 new FileRegistryAddEntryRequestMessage(answer_mailbox, file, storage_service,
                                                                        this->getPropertyValueAsDouble(
                                                                                FileRegistryServiceProperty::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
@@ -177,10 +195,13 @@ namespace wrench {
 
       std::unique_ptr<SimulationMessage> message = nullptr;
 
+      WRENCH_INFO("Waiting for the reply from the File Registry Service");
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw (WorkflowExecutionException(cause));
       }
 
       if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
@@ -204,10 +225,15 @@ namespace wrench {
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
       }
+
+      if (this->state != Service::UP) {
+        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+      }
+
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
 
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
+        S4U_Mailbox::dputMessage(this->mailbox_name,
                                 new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, storage_service,
                                                                           this->getPropertyValueAsDouble(
                                                                                   FileRegistryServiceProperty::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
@@ -218,9 +244,11 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw (WorkflowExecutionException(cause));
       }
 
       if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
