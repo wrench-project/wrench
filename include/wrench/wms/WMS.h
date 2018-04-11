@@ -73,17 +73,17 @@ namespace wrench {
 
         void waitForAndProcessNextEvent();
 
-        virtual void processEventStandardJobCompletion(std::unique_ptr<WorkflowExecutionEvent>);
+        virtual void processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>);
 
-        virtual void processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent>);
+        virtual void processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent>);
 
-        virtual void processEventPilotJobStart(std::unique_ptr<WorkflowExecutionEvent>);
+        virtual void processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent>);
 
-        virtual void processEventPilotJobExpiration(std::unique_ptr<WorkflowExecutionEvent>);
+        virtual void processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent>);
 
-        virtual void processEventFileCopyCompletion(std::unique_ptr<WorkflowExecutionEvent>);
+        virtual void processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent>);
 
-        virtual void processEventFileCopyFailure(std::unique_ptr<WorkflowExecutionEvent>);
+        virtual void processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent>);
 
         /***********************/
         /** \endcond           */

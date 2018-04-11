@@ -42,57 +42,36 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      std::unique_ptr<WorkflowExecutionEvent> event =
-              std::unique_ptr<WorkflowExecutionEvent>(new WorkflowExecutionEvent());
-
-
       if (auto m = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
-        event->type = WorkflowExecutionEvent::STANDARD_JOB_COMPLETION;
-        event->job = (WorkflowJob *) m->job;
-        event->compute_service = m->compute_service;
+        return std::unique_ptr<StandardJobCompletedEvent>(
+          new StandardJobCompletedEvent(m->job, m->compute_service));
+
       } else if (auto m = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
-        event->type = WorkflowExecutionEvent::STANDARD_JOB_FAILURE;
-        event->job = (WorkflowJob *) m->job;
-        event->compute_service = m->compute_service;
-        event->failure_cause = m->cause;
+        return std::unique_ptr<StandardJobFailedEvent>(
+                new StandardJobFailedEvent(m->job, m->compute_service, m->cause));
+
       } else if (auto m = dynamic_cast<ComputeServicePilotJobStartedMessage *>(message.get())) {
-        event->type = WorkflowExecutionEvent::PILOT_JOB_START;
-        event->job = (WorkflowJob *) m->job;
-        event->compute_service = m->compute_service;
+        return std::unique_ptr<PilotJobStartedEvent>(
+                new PilotJobStartedEvent(m->job, m->compute_service));
+
       } else if (auto m = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
-        event->type = WorkflowExecutionEvent::PILOT_JOB_EXPIRATION;
-        event->job = (WorkflowJob *) m->job;
-        event->compute_service = m->compute_service;
+      return std::unique_ptr<PilotJobExpiredEvent>(
+              new PilotJobExpiredEvent(m->job, m->compute_service));
+
       } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (m->success) {
-          event->type = WorkflowExecutionEvent::FILE_COPY_COMPLETION;
-          event->file = m->file;
-          event->storage_service = m->storage_service;
-          event->file_registry_service = m->file_registry_service;
-          event->file_registry_service_updated = m->file_registry_service_updated;
+          return std::unique_ptr<FileCopyCompletedEvent>(
+                  new FileCopyCompletedEvent(m->file, m->storage_service, m->file_registry_service, m->file_registry_service_updated));
+
         } else {
-          event->type = WorkflowExecutionEvent::FILE_COPY_FAILURE;
-          event->file = m->file;
-          event->storage_service = m->storage_service;
-          event->file_registry_service = m->file_registry_service;
-          event->file_registry_service_updated = m->file_registry_service_updated;
-          event->failure_cause = std::move(m->failure_cause);
+          return std::unique_ptr<FileCopyFailedEvent>(
+                  new FileCopyFailedEvent(m->file, m->storage_service, m->failure_cause));
         }
       } else {
         throw std::runtime_error(
                 "WorkflowExecutionEvent::waitForNextExecutionEvent(): Non-handled message type when generating execution event");
       }
-      return event;
     }
 
-
-    /**
-     * @brief Constructor
-     */
-    WorkflowExecutionEvent::WorkflowExecutionEvent() {
-      this->type = WorkflowExecutionEvent::UNDEFINED;
-      this->job = nullptr;
-      this->compute_service = nullptr;
-    }
 
 };
