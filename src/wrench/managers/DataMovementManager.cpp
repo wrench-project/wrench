@@ -91,14 +91,21 @@ namespace wrench {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
 
-      for (auto const &p : this->pending_file_copies) {
-        if ((p->file == file) and (p->dst == dst)) {
-          throw new WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
-        }
-      }
+      DataMovementManager::CopyRequestSpecs request(file, dst, file_registry_service);
 
       try {
-        this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(new CopyRequestSpecs(file, src, dst, file_registry_service)));
+        for (auto const &p : this->pending_file_copies) {
+          if (*p == request) {
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
+          }
+        }
+      } catch (WorkflowExecutionException &e) {
+        throw;
+      }
+
+
+      try {
+        this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(new CopyRequestSpecs(file, dst, file_registry_service)));
         dst->initiateFileCopy(this->mailbox_name, file, src);
       } catch (WorkflowExecutionException &e) {
         throw;
@@ -122,16 +129,15 @@ namespace wrench {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
 
+      DataMovementManager::CopyRequestSpecs request(file, dst, file_registry_service);
+
       try {
         for (auto const &p : this->pending_file_copies) {
-          if ((p->file == file) and (p->dst == dst)) {
-            throw new WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
-          }
-        }for (auto const &p : this->pending_file_copies) {
-          if ((p->file == file) and (p->dst == dst)) {
-            throw new WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
+          if (*p == request) {
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
           }
         }
+
         dst->copyFile(file, src);
       } catch (WorkflowExecutionException &e) {
         throw;
@@ -201,21 +207,21 @@ namespace wrench {
       } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
         // Remove the record and find the File Registry Service, if any
-        FileRegistryService *file_registry_service = nullptr;
+        DataMovementManager::CopyRequestSpecs request(msg->file, msg->storage_service, nullptr);
         for (auto it = this->pending_file_copies.begin();
              it != this->pending_file_copies.end();
              ++it) {
-          if (((*it)->file == msg->file) and ((*it)->dst == msg->storage_service)) {
-            file_registry_service = (*it)->file_registry_service;
+          if (*(*it) == request) {
+            request.file_registry_service = (*it)->file_registry_service;
             this->pending_file_copies.erase(it); // remove the entry
             break;
           }
         }
 
         bool file_registry_service_updated = false;
-        if (file_registry_service) {
+        if (request.file_registry_service) {
           try {
-            file_registry_service->addEntry(msg->file, msg->storage_service);
+            request.file_registry_service->addEntry(request.file, request.dst);
             file_registry_service_updated = true;
           } catch (WorkflowExecutionException &e) {
             // don't throw, just keep file_registry_service_update to false
@@ -225,9 +231,9 @@ namespace wrench {
         // Forward it back
         try {
           S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
-                                   new StorageServiceFileCopyAnswerMessage(msg->file,
-                                                                           msg->storage_service,
-                                                                           file_registry_service,
+                                   new StorageServiceFileCopyAnswerMessage(request.file,
+                                                                           request.dst,
+                                                                           request.file_registry_service,
                                                                            file_registry_service_updated,
                                                                            msg->success,
                                                                            std::move(msg->failure_cause), 0));
