@@ -201,6 +201,7 @@ set(TEST_FILES
         test/simulation/NetworkProximityTest.cpp
         test/simulation/FileRegistryTest.cpp
         test/simulation/BatchService/BatchServiceTest.cpp
+        test/simulation/BatchService/BatchServiceFCFSTest.cpp
         test/simulation/BatchService/BatchServiceTraceFileTest.cpp
         test/simulation/BatchService/BatchServiceQueueWaitTimePredictionTest.cpp
         test/simulation/CloudServiceTest.cpp
