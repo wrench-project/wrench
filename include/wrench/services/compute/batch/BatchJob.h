@@ -29,6 +29,8 @@ namespace wrench {
         void setAllocatedTime(double);
         unsigned long getAllocatedCoresPerNode();
         double getMemoryRequirement();
+        double getBeginTimeStamp();
+        double setBeginTimeStamp(double);
         double getEndingTimeStamp();
         double getAppearedTimeStamp();
         unsigned long getNumNodes();
@@ -43,6 +45,7 @@ namespace wrench {
         WorkflowJob* job;
         unsigned long num_nodes;
         unsigned long cores_per_node;
+        double begin_time_stamp;
         double ending_time_stamp;
         double appeared_time_stamp;
         std::set<std::tuple<std::string,unsigned long, double>> resources_allocated;
