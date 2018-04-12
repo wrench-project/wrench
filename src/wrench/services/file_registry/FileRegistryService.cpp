@@ -24,7 +24,7 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
 
-#define NETWORK_TIMOUT_VALUE 1.0
+#define NETWORK_TIMEOUT_VALUE 1.0
 
 namespace wrench {
 
@@ -92,7 +92,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
+        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMEOUT_VALUE);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<NetworkTimeout> &cause) {
@@ -149,7 +149,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
+        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMEOUT_VALUE);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<NetworkTimeout> &cause) {
@@ -197,7 +197,7 @@ namespace wrench {
 
       WRENCH_INFO("Waiting for the reply from the File Registry Service");
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
+        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMEOUT_VALUE);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<NetworkTimeout> &cause) {
@@ -244,7 +244,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
+        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMEOUT_VALUE);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<NetworkTimeout> &cause) {
