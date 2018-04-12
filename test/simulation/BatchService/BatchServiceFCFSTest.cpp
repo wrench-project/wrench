@@ -191,7 +191,7 @@ private:
     }
 };
 
-#ifdef ENABLED_BATSCHED
+#ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceFCFSTest, DISABLED_SimpleFCFSTest) {
   DO_TEST_WITH_FORK(do_SimpleFCFS_test);
 }
