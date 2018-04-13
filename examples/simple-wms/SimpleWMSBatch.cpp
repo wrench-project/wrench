@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   /* Reading and parsing the workflow description file to create a wrench::Workflow object */
   std::cerr << "Loading workflow..." << std::endl;
   wrench::Workflow workflow;
-  workflow.loadFromDAX(workflow_file);
+  workflow.loadFromDAX(workflow_file, "1000Gf");
   std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
   std::cerr.flush();
 

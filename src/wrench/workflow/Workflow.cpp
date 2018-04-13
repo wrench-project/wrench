@@ -12,6 +12,7 @@
 #include <lemon/bfs.h>
 #include <pugixml.hpp>
 #include <json.hpp>
+#include <wrench/util/UnitParser.h>
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simulation/SimulationMessage.h"
@@ -203,178 +204,13 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a workflow based on a DAX file
-     *
-     * @param filename: the path to the DAX file
-     *
-     * @throw std::invalid_argument
-     */
-    void Workflow::loadFromDAX(const std::string &filename) {
-
-      pugi::xml_document dax_tree;
-
-      if (not dax_tree.load_file(filename.c_str())) {
-        throw std::invalid_argument("Workflow::loadFromDAX(): Invalid DAX file");
-      }
-
-      // Get the root node
-      pugi::xml_node dag = dax_tree.child("adag");
-
-      // Iterate through the "job" nodes
-      for (pugi::xml_node job = dag.child("job"); job; job = job.next_sibling("job")) {
-        WorkflowTask *task;
-        // Get the job attributes
-        std::string id = job.attribute("id").value();
-        std::string name = job.attribute("name").value();
-        double flops = std::strtod(job.attribute("runtime").value(), NULL);
-        int num_procs = 1;
-        bool found_one = false;
-        for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
-          if (job.attribute(tag.c_str())) {
-            if (found_one) {
-              std::cerr << "THROWING\n";
-              throw std::invalid_argument(
-                      "Workflow::loadFromDAX(): multiple \"number of cores/procs\" specification for task " + id);
-            } else {
-              found_one = true;
-              num_procs = std::stoi(job.attribute("num_procs").value());
-            }
-          }
-        }
-
-
-        // Create the task
-        // If the DAX says num_procs = x, then we set min_cores=1, min_cores=x, efficiency=1.0
-        task = this->addTask(id, flops, 1, num_procs, 1.0);
-
-        // Go through the children "uses" nodes
-        for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
-          // getMessage the "uses" attributes
-          // TODO: There are several attributes that we're ignoring for now...
-          std::string id = uses.attribute("file").value();
-
-          double size = std::strtod(uses.attribute("size").value(), NULL);
-          std::string link = uses.attribute("link").value();
-          // Check whether the file already exists
-          WorkflowFile *file = nullptr;
-
-          try {
-            file = this->getWorkflowFileByID(id);
-          } catch (std::invalid_argument &e) {
-            file = this->addFile(id, size);
-          }
-          if (link == "input") {
-            task->addInputFile(file);
-          }
-          if (link == "output") {
-            task->addOutputFile(file);
-          }
-          // TODO: Are there other types of "link" values?
-        }
-      }
-
-      // Iterate through the "child" nodes to handle control dependencies
-      for (pugi::xml_node child = dag.child("child"); child; child = child.next_sibling("child")) {
-
-        WorkflowTask *child_task = this->getWorkflowTaskByID(child.attribute("ref").value());
-
-        // Go through the children "parent" nodes
-        for (pugi::xml_node parent = child.child("parent"); parent; parent = parent.next_sibling("parent")) {
-          std::string parent_id = parent.attribute("ref").value();
-
-          WorkflowTask *parent_task = this->getWorkflowTaskByID(parent_id);
-          this->addControlDependency(parent_task, child_task);
-        }
-      }
-    }
-
-    /**
-     * @brief Create a workflow based on a JSON file
-     *
-     * @param filename: the path to the JSON file
-     *
-     * @throw std::invalid_argument
-     */
-    void Workflow::loadFromJSON(const std::string &filename) {
-
-      std::ifstream file;
-      nlohmann::json j;
-
-      //handle the exceptions of opening the json file
-      file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-      try {
-        file.open(filename);
-        file >> j;
-      } catch (const std::ifstream::failure &e) {
-        throw std::invalid_argument("Workflow::loadFromJson(): Invalid Json file");
-      }
-
-      nlohmann::json workflowJobs;
-      try {
-        workflowJobs = j.at("workflow");
-      } catch (std::out_of_range &e) {
-        throw std::invalid_argument("Workflow::loadFromJson(): Could not find a workflow entry");
-      }
-
-      wrench::WorkflowTask *task;
-
-      for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
-        if (it.key() == "jobs") {
-          std::vector<nlohmann::json> jobs = it.value();
-
-          for (auto &job : jobs) {
-            if (job.at("type") == "compute") {
-              std::string name = job.at("name");
-              double flops = job.at("runtime");
-              int num_procs = 1;
-              task = this->addTask(name, flops, num_procs);
-              std::vector<nlohmann::json> files = job.at("files");
-
-              // task files
-              for (auto &f : files) {
-                double size = f.at("size");
-                std::string link = f.at("link");
-                std::string id = f.at("name");
-                wrench::WorkflowFile *workflow_file = nullptr;
-                try {
-                  workflow_file = this->getWorkflowFileByID(id);
-                } catch (const std::invalid_argument &ia) {
-                  // making a new file
-                  workflow_file = this->addFile(id, size);
-                }
-                if (link == "input") {
-                  task->addInputFile(workflow_file);
-                }
-                if (link == "output") {
-                  task->addOutputFile(workflow_file);
-                }
-              }
-
-              std::vector<nlohmann::json> parents = job.at("parents");
-              // task dependencies
-              for (auto &parent : parents) {
-                try {
-                  WorkflowTask *parent_task = this->getWorkflowTaskByID(parent);
-                  this->addControlDependency(parent_task, task);
-                } catch (std::invalid_argument &e) {
-                  // do nothing
-                }
-              }
-            }
-          }
-        }
-      }
-      file.close();
-    }
-
-    /**
-     * @brief Determine whether one source is an ancestor of a destination task
-     *
-     * @param src: the soure workflow task
-     * @param dst: the destination task
-     *
-     * @return true if there is a path from src to dst, false otherwise
-     */
+ * @brief Determine whether one source is an ancestor of a destination task
+ *
+ * @param src: the soure workflow task
+ * @param dst: the destination task
+ *
+ * @return true if there is a path from src to dst, false otherwise
+ */
     bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
       lemon::Bfs<lemon::ListDigraph> bfs(*DAG);
 
@@ -637,5 +473,201 @@ namespace wrench {
       }
       return total_flops;
     }
+
+
+
+
+    /**
+     * @brief Create a workflow based on a DAX file
+     *
+     * @param filename: the path to the DAX file
+     * @param reference_flop_rate: the compute speed (in flops/sec, assuming a task's computation is purely flops).
+     *                             The DAX file specified task execution times in seconds,
+     *                             but the WRENCH simulation needs some notion of "amount of computation" to
+     *                             apply reasonable scaling. (Because the XML platform description specifies host compute
+     *                             speeds in flops/sec).
+     *
+     * @throw std::invalid_argument
+     */
+    void Workflow::loadFromDAX(const std::string &filename, const std::string &reference_flop_rate) {
+
+      pugi::xml_document dax_tree;
+
+      double flop_rate;
+
+      try {
+        flop_rate = UnitParser::parse_compute_speed(reference_flop_rate);
+      } catch (std::invalid_argument &e) {
+        throw;
+      }
+
+      if (not dax_tree.load_file(filename.c_str())) {
+        throw std::invalid_argument("Workflow::loadFromDAX(): Invalid DAX file");
+      }
+
+      // Get the root node
+      pugi::xml_node dag = dax_tree.child("adag");
+
+      // Iterate through the "job" nodes
+      for (pugi::xml_node job = dag.child("job"); job; job = job.next_sibling("job")) {
+        WorkflowTask *task;
+        // Get the job attributes
+        std::string id = job.attribute("id").value();
+        std::string name = job.attribute("name").value();
+        double runtime = std::strtod(job.attribute("runtime").value(), NULL);
+        int num_procs = 1;
+        bool found_one = false;
+        for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
+          if (job.attribute(tag.c_str())) {
+            if (found_one) {
+              std::cerr << "THROWING\n";
+              throw std::invalid_argument(
+                      "Workflow::loadFromDAX(): multiple \"number of cores/procs\" specification for task " + id);
+            } else {
+              found_one = true;
+              num_procs = std::stoi(job.attribute("num_procs").value());
+            }
+          }
+        }
+
+
+        // Create the task
+        // If the DAX says num_procs = x, then we set min_cores=1, max_cores=x, efficiency=1.0
+        task = this->addTask(id, runtime * flop_rate, 1, num_procs, 1.0);
+
+        // Go through the children "uses" nodes
+        for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
+          // getMessage the "uses" attributes
+          // TODO: There are several attributes that we're ignoring for now...
+          std::string id = uses.attribute("file").value();
+
+          double size = std::strtod(uses.attribute("size").value(), NULL);
+          std::string link = uses.attribute("link").value();
+          // Check whether the file already exists
+          WorkflowFile *file = nullptr;
+
+          try {
+            file = this->getWorkflowFileByID(id);
+          } catch (std::invalid_argument &e) {
+            file = this->addFile(id, size);
+          }
+          if (link == "input") {
+            task->addInputFile(file);
+          }
+          if (link == "output") {
+            task->addOutputFile(file);
+          }
+          // TODO: Are there other types of "link" values?
+        }
+      }
+
+      // Iterate through the "child" nodes to handle control dependencies
+      for (pugi::xml_node child = dag.child("child"); child; child = child.next_sibling("child")) {
+
+        WorkflowTask *child_task = this->getWorkflowTaskByID(child.attribute("ref").value());
+
+        // Go through the children "parent" nodes
+        for (pugi::xml_node parent = child.child("parent"); parent; parent = parent.next_sibling("parent")) {
+          std::string parent_id = parent.attribute("ref").value();
+
+          WorkflowTask *parent_task = this->getWorkflowTaskByID(parent_id);
+          this->addControlDependency(parent_task, child_task);
+        }
+      }
+    }
+
+    /**
+     * @brief Create a workflow based on a JSON file
+     *
+     * @param filename: the path to the JSON file
+     * @param reference_flop_rate: the compute speed (in flops/sec, assuming a task's computation is purely flops).
+     *                             The JSON file specified task execution times in seconds,
+     *                             but the WRENCH simulation needs some notion of "amount of computation" to
+     *                             apply reasonable scaling. (Because the XML platform description specifies host compute
+     *                             speeds in flops/sec)
+     *
+     * @throw std::invalid_argument
+     */
+    void Workflow::loadFromJSON(const std::string &filename, const std::string &reference_flop_rate) {
+
+      std::ifstream file;
+      nlohmann::json j;
+
+      double flop_rate;
+
+      try {
+        flop_rate = UnitParser::parse_compute_speed(reference_flop_rate);
+      } catch (std::invalid_argument &e) {
+        throw;
+      }
+
+      //handle the exceptions of opening the json file
+      file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+      try {
+        file.open(filename);
+        file >> j;
+      } catch (const std::ifstream::failure &e) {
+        throw std::invalid_argument("Workflow::loadFromJson(): Invalid Json file");
+      }
+
+      nlohmann::json workflowJobs;
+      try {
+        workflowJobs = j.at("workflow");
+      } catch (std::out_of_range &e) {
+        throw std::invalid_argument("Workflow::loadFromJson(): Could not find a workflow entry");
+      }
+
+      wrench::WorkflowTask *task;
+
+      for (nlohmann::json::iterator it = workflowJobs.begin(); it != workflowJobs.end(); ++it) {
+        if (it.key() == "jobs") {
+          std::vector<nlohmann::json> jobs = it.value();
+
+          for (auto &job : jobs) {
+            if (job.at("type") == "compute") {
+              std::string name = job.at("name");
+              double runtime = job.at("runtime");
+              int num_procs = 1;
+              task = this->addTask(name, runtime * flop_rate, num_procs);
+              std::vector<nlohmann::json> files = job.at("files");
+
+              // task files
+              for (auto &f : files) {
+                double size = f.at("size");
+                std::string link = f.at("link");
+                std::string id = f.at("name");
+                wrench::WorkflowFile *workflow_file = nullptr;
+                try {
+                  workflow_file = this->getWorkflowFileByID(id);
+                } catch (const std::invalid_argument &ia) {
+                  // making a new file
+                  workflow_file = this->addFile(id, size);
+                }
+                if (link == "input") {
+                  task->addInputFile(workflow_file);
+                }
+                if (link == "output") {
+                  task->addOutputFile(workflow_file);
+                }
+              }
+
+              std::vector<nlohmann::json> parents = job.at("parents");
+              // task dependencies
+              for (auto &parent : parents) {
+                try {
+                  WorkflowTask *parent_task = this->getWorkflowTaskByID(parent);
+                  this->addControlDependency(parent_task, task);
+                } catch (std::invalid_argument &e) {
+                  // do nothing
+                }
+              }
+            }
+          }
+        }
+      }
+      file.close();
+    }
+
+
 
 };

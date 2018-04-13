@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
   /* Reading and parsing the workflow description file to create a wrench::Workflow object */
   std::cerr << "Loading workflow..." << std::endl;
   wrench::Workflow workflow;
-  workflow.loadFromDAX(workflow_file);
+  workflow.loadFromDAX(workflow_file, "1000Gf");
   std::cerr << "The workflow has " << workflow.getNumberOfTasks() << " tasks " << std::endl;
   std::cerr.flush();
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv) {
   wrench::NetworkProximityService *NPS = new wrench::NetworkProximityService(hostname_copy, hostname_list_copy, {
           {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "alltoall"},
           {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.0"},
-          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "10"},
+          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "600"},
           {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}});
 
   simulation.add(NPS);

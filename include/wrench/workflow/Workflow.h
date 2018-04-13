@@ -49,9 +49,9 @@ namespace wrench {
 
         void addControlDependency(WorkflowTask *, WorkflowTask *);
 
-        void loadFromDAX(const std::string &filename);
+        void loadFromDAX(const std::string &filename, const std::string &reference_flop_rate);
 
-        void loadFromJSON(const std::string &filename);
+        void loadFromJSON(const std::string &filename, const std::string &reference_flop_rate);
 
         unsigned long getNumberOfTasks();
 

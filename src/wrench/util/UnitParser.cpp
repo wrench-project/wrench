@@ -89,6 +89,8 @@ namespace wrench {
      * @brief Given a string size specification with units (e.g., "13Mb") return the size in bytes
      * @param string: the size specification
      * @return the size in bytes
+     *
+     * @throws std::invalid_argument
      */
     double UnitParser::parse_size(std::string string) {
       static const UnitParser::unit_scale units{std::make_tuple("b", 0.125, 2, true), std::make_tuple("b", 0.125, 10, true),
@@ -97,11 +99,29 @@ namespace wrench {
       try {
         size = parseValueWithUnit(string, units, "B");  // default: bytes
       } catch (std::runtime_error &e) {
-        throw;
+        throw std::invalid_argument(e.what());
       }
       return size;
     }
 
+
+    /**
+     * @brief Given a string compute speed specification with units (e.g., "3f", "10Gf") return the size in bytes
+     * @param string: the size specification
+     * @return the size in bytes
+     *
+     * @throws std::invalid_argument
+     */
+    double UnitParser::parse_compute_speed(std::string string) {
+      static const UnitParser::unit_scale units{std::make_tuple("f", 1.0, 10, true)};
+      double compute_speed;
+      try {
+        compute_speed = parseValueWithUnit(string, units, "f");  // default: bytes
+      } catch (std::runtime_error &e) {
+        throw std::invalid_argument(e.what());
+      }
+      return compute_speed;
+    }
 
 
 
