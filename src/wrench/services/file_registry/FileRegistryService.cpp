@@ -24,8 +24,6 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(file_registry_service, "Log category for File Registry Service");
 
-#define NETWORK_TIMOUT_VALUE 1.0
-
 namespace wrench {
 
 
@@ -82,7 +80,7 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
 
       try {
-        S4U_Mailbox::dputMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
+        S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
                                                                                              this->getPropertyValueAsDouble(
                                                                                                      FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -92,7 +90,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<NetworkTimeout> &cause) {
@@ -139,7 +137,7 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry_by_proximity");
 
       try {
-        S4U_Mailbox::dputMessage(this->mailbox_name, new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file, reference_host, network_proximity_service,
+        S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file, reference_host, network_proximity_service,
                                                                                                         this->getPropertyValueAsDouble(
                                                                                                                 FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -149,7 +147,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<NetworkTimeout> &cause) {
@@ -185,7 +183,7 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
 
       try {
-        S4U_Mailbox::dputMessage(this->mailbox_name,
+        S4U_Mailbox::putMessage(this->mailbox_name,
                                 new FileRegistryAddEntryRequestMessage(answer_mailbox, file, storage_service,
                                                                        this->getPropertyValueAsDouble(
                                                                                FileRegistryServiceProperty::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
@@ -195,9 +193,8 @@ namespace wrench {
 
       std::unique_ptr<SimulationMessage> message = nullptr;
 
-      WRENCH_INFO("Waiting for the reply from the File Registry Service");
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<NetworkTimeout> &cause) {
@@ -233,7 +230,7 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
 
       try {
-        S4U_Mailbox::dputMessage(this->mailbox_name,
+        S4U_Mailbox::putMessage(this->mailbox_name,
                                 new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, storage_service,
                                                                           this->getPropertyValueAsDouble(
                                                                                   FileRegistryServiceProperty::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
@@ -244,7 +241,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, NETWORK_TIMOUT_VALUE);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<NetworkTimeout> &cause) {

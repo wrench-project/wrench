@@ -72,6 +72,11 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::pair<double, double> NetworkProximityService::getCoordinate(std::string requested_host) {
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
       if (boost::iequals(
               this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
               "alltoall")) {
@@ -95,9 +100,11 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         std::cerr << cause->toString() << std::endl;
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -118,6 +125,10 @@ namespace wrench {
      * @throw std::runtime_error
      */
     double NetworkProximityService::query(std::pair<std::string, std::string> hosts) {
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
 
       std::string network_service_type = this->getPropertyValueAsString(
               NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
@@ -143,8 +154,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 

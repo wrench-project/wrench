@@ -57,8 +57,10 @@ namespace wrench {
       // Get the answer
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -116,8 +118,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -1197,8 +1201,10 @@ namespace wrench {
       // Get the answer
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -1244,8 +1250,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -1375,45 +1383,7 @@ namespace wrench {
       }
     }
 
-//    /**
-//     * @brief Process a get number of cores request
-//     *
-//     * @param answer_mailbox: the mailbox_name to which the answer message should be sent
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void MultihostMulticoreComputeService::processGetNumCores(const std::string &answer_mailbox) {
-//      ComputeServiceNumCoresAnswerMessage *answer_message = new ComputeServiceNumCoresAnswerMessage(
-//              this->total_num_cores,
-//              this->getPropertyValueAsDouble(
-//                      ComputeServiceProperty::NUM_CORES_ANSWER_MESSAGE_PAYLOAD));
-//      try {
-//        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//        return;
-//      }
-//    }
-
-//    /**
-//     * @brief Process a get number of idle cores request
-//     *
-//     * @param answer_mailbox: the mailbox_name to which the answer message should be sent
-//     */
-//    void MultihostMulticoreComputeService::processGetNumIdleCores(const std::string &answer_mailbox) {
-//      unsigned long num_available_cores = 0;
-//      for (auto r : this->core_and_ram_availabilities) {
-//        num_available_cores += r.second;
-//      }
-//      ComputeServiceNumIdleCoresAnswerMessage *answer_message = new ComputeServiceNumIdleCoresAnswerMessage(
-//              num_available_cores,
-//              this->getPropertyValueAsDouble(
-//                      MultihostMulticoreComputeServiceProperty::NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD));
-//      try {
-//        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//        return;
-//      }
-//    }
+//    /*
 
 /**
  * @brief Process a submit standard job request
