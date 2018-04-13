@@ -30,7 +30,7 @@ namespace wrench {
         unsigned long getAllocatedCoresPerNode();
         double getMemoryRequirement();
         double getBeginTimeStamp();
-        double setBeginTimeStamp(double);
+        void setBeginTimeStamp(double);
         double getEndingTimeStamp();
         double getAppearedTimeStamp();
         unsigned long getNumNodes();

@@ -77,7 +77,7 @@ namespace wrench {
     }
 
 
-    double BatchJob::setBeginTimeStamp(double time_stamp) {
+    void BatchJob::setBeginTimeStamp(double time_stamp) {
       this->begin_time_stamp = time_stamp;
     }
 
