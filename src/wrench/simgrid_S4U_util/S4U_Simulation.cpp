@@ -240,7 +240,7 @@ namespace wrench {
           }
           try {
             capacity_value = UnitParser::parse_size(capacity_string);
-          } catch (std::runtime_error &e) {
+          } catch (std::invalid_argument &e) {
             throw std::invalid_argument(
                     "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->getCname()) + "'has invalid memory capacity specification '" + tag +":" +
                     std::string(capacity_string) + "'");

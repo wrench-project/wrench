@@ -11,6 +11,7 @@
 #ifndef WRENCH_UNITPARSER_H
 #define WRENCH_UNITPARSER_H
 
+#include <unordered_map>
 
 namespace wrench {
 
@@ -42,6 +43,7 @@ namespace wrench {
 
     public:
         static double parse_size(std::string string);
+        static double parse_compute_speed(std::string string);
 
 
     };
