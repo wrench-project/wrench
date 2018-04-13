@@ -134,9 +134,11 @@ namespace wrench {
       // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<StorageServiceFreeSpaceAnswerMessage *>(message.get())) {
@@ -181,9 +183,11 @@ namespace wrench {
       // Wait for a reply
       std::unique_ptr<SimulationMessage> message;
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<StorageServiceFileLookupAnswerMessage *>(message.get())) {
@@ -212,7 +216,7 @@ namespace wrench {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      // Send a synchronous message to the daemon
+      // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
@@ -231,10 +235,12 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<FatalFailure> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -289,7 +295,7 @@ namespace wrench {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      // Send a synchronous message to the daemon
+      // Send a  message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
@@ -308,9 +314,11 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<StorageServiceFileWriteAnswerMessage *>(message.get())) {
@@ -475,9 +483,11 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<StorageServiceFileDeleteAnswerMessage *>(message.get())) {
@@ -653,7 +663,7 @@ namespace wrench {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
 
-      // Send a synchronous message to the daemon
+      // Send a message to the daemon
       std::string request_answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
 
       try {
@@ -672,9 +682,11 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(request_answer_mailbox);
+        message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {

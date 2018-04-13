@@ -113,11 +113,10 @@ namespace wrench {
           should_add_incoming_control_connection = false;
         }
 
-        // Wait a connection
+        // Wait for a connection
         std::pair<std::unique_ptr<NetworkConnection>, bool> finished_connection;
 
         finished_connection = this->network_connection_manager->waitForNetworkConnection();
-
         if (std::get<0>(finished_connection)->type == NetworkConnection::INCOMING_CONTROL) {
           should_continue = processControlMessage(std::move(std::get<0>(finished_connection)));
           should_add_incoming_control_connection = true;
@@ -360,7 +359,6 @@ namespace wrench {
         return true;
       }
 
-
       // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
       if (success) {
         this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
@@ -450,6 +448,7 @@ namespace wrench {
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
+        return true;
       }
 
 
@@ -496,7 +495,7 @@ namespace wrench {
         WRENCH_INFO(
                 "Sending back an ack since this was a file copy and some client is waiting for me to say something");
         try {
-          S4U_Mailbox::putMessage(connection->ack_mailbox,
+          S4U_Mailbox::dputMessage(connection->ack_mailbox,
                                   new StorageServiceFileCopyAnswerMessage(connection->file, this, nullptr, false,
                                                                           false, connection->failure_cause,
                                                                           this->getPropertyValueAsDouble(

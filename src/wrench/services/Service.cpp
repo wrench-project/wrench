@@ -126,8 +126,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(ack_mailbox);
+        message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -191,5 +193,22 @@ namespace wrench {
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }
+    }
+
+    /**
+     * @brief Returns the service's network timeout value
+     * @return a duration in seconds
+     */
+    double Service::getNetworkTimeoutValue() {
+      return this->network_timeout;
+    }
+
+    /**
+     * @brief Sets the service's network timeout value
+     * @param value: a duration in seconds (<0 means: never timeout)
+     *
+     */
+    void Service::setNetworkTimeoutValue(double value) {
+      this->network_timeout = value;
     }
 };
