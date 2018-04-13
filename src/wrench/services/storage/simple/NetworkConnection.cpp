@@ -127,6 +127,8 @@ namespace wrench {
      * @return  the message, or nullptr if the connection has failed
      */
     std::unique_ptr<SimulationMessage> NetworkConnection::getMessage() {
+
+      WRENCH_INFO("Getting the message from connection");
       if (this->type == NetworkConnection::OUTGOING_DATA) {
         throw std::runtime_error("NetworkConnection::getMessage(): Cannot be called on an outgoing connection");
       }

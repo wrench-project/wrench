@@ -76,7 +76,14 @@ namespace wrench {
         //returns jobid,started time, running time
 //        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
 
+        /***********************/
+        /** \cond DEVELOPER   **/
+        /***********************/
         std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>>);
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
         ~BatchService() override;
 

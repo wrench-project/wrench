@@ -88,8 +88,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -139,8 +141,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -180,8 +184,10 @@ namespace wrench {
       // Get the answer
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -226,8 +232,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 

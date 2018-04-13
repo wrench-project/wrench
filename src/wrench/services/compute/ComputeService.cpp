@@ -352,8 +352,10 @@ namespace wrench {
       // Get the reply
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 

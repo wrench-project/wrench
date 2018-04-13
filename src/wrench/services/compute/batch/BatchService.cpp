@@ -288,9 +288,9 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
-                                new BatchServiceJobRequestMessage(answer_mailbox, batch_job,
-                                                                  this->getPropertyValueAsDouble(
-                                                                          BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                 new BatchServiceJobRequestMessage(answer_mailbox, batch_job,
+                                                                   this->getPropertyValueAsDouble(
+                                                                           BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -298,8 +298,10 @@ namespace wrench {
       // Get the answer
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -399,8 +401,10 @@ namespace wrench {
       // Get the answer
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }  catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -852,8 +856,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -1452,9 +1458,10 @@ namespace wrench {
                                    this->getPropertyValueAsString(
                                            BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}}));
           executor->start(executor, true);
-
-          this->running_standard_job_executors.insert(executor);
+          batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + allocated_time);
+          this->running_standard_job_executors.insert(executor);
+
 //          this->running_jobs.insert(std::move(batch_job_ptr));
           this->timeslots.push_back(batch_job->getEndingTimeStamp());
           //remember the allocated resources for the job
@@ -1487,9 +1494,6 @@ namespace wrench {
 
           //set the ending timestamp of the batchjob (pilotjob)
 
-          double timeout_timestamp = std::min(job->getDuration(), allocated_time);
-          batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
-
           // Create and launch a compute service for the pilot job
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(host_to_run_on,
@@ -1502,6 +1506,9 @@ namespace wrench {
 
           try {
             cs->start(cs, true);
+            batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
+            double timeout_timestamp = std::min(job->getDuration(), allocated_time);
+            batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
           } catch (std::runtime_error &e) {
             throw;
           }

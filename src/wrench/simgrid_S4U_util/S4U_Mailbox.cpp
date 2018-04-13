@@ -69,7 +69,7 @@ namespace wrench {
      * @brief Synchronously receive a message from a mailbox, with a timeout
      *
      * @param mailbox_name: the mailbox name
-     * @param timeout:  a timeout value in seconds
+     * @param timeout:  a timeout value in seconds (<0 means never timeout)
      * @return the message, or nullptr (in which case it's likely a brutal termination)
      *
      * @throw std::shared_ptr<NetworkError>
@@ -77,9 +77,15 @@ namespace wrench {
      * @throw std::shared_ptr<FatalFailure>
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name, double timeout) {
+
+      if (timeout < 0) {
+        return S4U_Mailbox::getMessage(mailbox_name);
+      }
+
       WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox_name.c_str(), timeout);
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
       void *data = nullptr;
+
       try {
         data = mailbox->get(timeout);
       } catch (xbt_ex &e) {
@@ -97,6 +103,7 @@ namespace wrench {
 
       // This is just because it seems that after something like a killAll() we get a nullptr
       if (data == nullptr) {
+
         throw std::shared_ptr<FatalFailure>(new FatalFailure());
       }
 

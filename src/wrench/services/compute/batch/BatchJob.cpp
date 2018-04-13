@@ -76,13 +76,24 @@ namespace wrench {
       return this->num_nodes;
     }
 
+
+    void BatchJob::setBeginTimeStamp(double time_stamp) {
+      this->begin_time_stamp = time_stamp;
+    }
+
+
+    double BatchJob::getBeginTimeStamp() {
+      return this->begin_time_stamp;
+    }
+
+
     double BatchJob::getEndingTimeStamp() {
       return this->ending_time_stamp;
     }
 
     void BatchJob::setEndingTimeStamp(double time_stamp) {
       if (this->ending_time_stamp > 0) {
-        throw std::invalid_argument(
+        throw std::runtime_error(
                 "BatchJob::setEndingTimeStamp(): Cannot set time stamp again for the same job"
         );
       }
