@@ -295,7 +295,8 @@ namespace wrench {
         try {
           available_cores = S4U_Simulation::getNumCores(hname);
         } catch (std::runtime_error &e) {
-          throw std::invalid_argument("MultihostMulticoreComputeService::initiateInstance(): Host '" + hname + "' does not exist");
+          throw std::invalid_argument(
+                  "MultihostMulticoreComputeService::initiateInstance(): Host '" + hname + "' does not exist");
         }
         if (requested_cores == ComputeService::ALL_CORES) {
           requested_cores = available_cores;
@@ -367,7 +368,8 @@ namespace wrench {
         WRENCH_INFO("Will be terminating at date %lf", this->death_date);
 //        std::shared_ptr<SimulationMessage> msg = std::shared_ptr<SimulationMessage>(new ServiceTTLExpiredMessage(0));
         SimulationMessage *msg = new ServiceTTLExpiredMessage(0);
-        this->death_alarm = Alarm::createAndStartAlarm(this->simulation, death_date, this->hostname, this->mailbox_name, msg, "service_string");
+        this->death_alarm = Alarm::createAndStartAlarm(this->simulation, death_date, this->hostname, this->mailbox_name,
+                                                       msg, "service_string");
       } else {
         this->death_date = -1.0;
         this->death_alarm = nullptr;
@@ -694,14 +696,15 @@ namespace wrench {
         compute_resources.insert(std::make_tuple(h, job->getNumCoresPerHost(), job->getMemoryPerHost()));
       }
 
-      std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(new MultihostMulticoreComputeService(this->hostname,
-                                                                true, false,
-                                                                compute_resources,
-                                                                this->property_list,
-                                                                job->getDuration(),
-                                                                job,
-                                                                "_pilot_job",
-                                                                this->default_storage_service));
+      std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
+              new MultihostMulticoreComputeService(this->hostname,
+                                                   true, false,
+                                                   compute_resources,
+                                                   this->property_list,
+                                                   job->getDuration(),
+                                                   job,
+                                                   "_pilot_job",
+                                                   this->default_storage_service));
       cs->simulation = this->simulation;
       job->setComputeService(cs);
 
@@ -1277,7 +1280,7 @@ namespace wrench {
  * @param answer_mailbox: the mailbox to which the answer message should be sent
  */
     void MultihostMulticoreComputeService::processStandardJobTerminationRequest(StandardJob *job,
-                                                                                std::string answer_mailbox) {
+                                                                                const std::string &answer_mailbox) {
 
       // Check whether job is pending
       for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
@@ -1335,7 +1338,8 @@ namespace wrench {
  * @param answer_mailbox: the mailbox to which the answer message should be sent
  */
     void
-    MultihostMulticoreComputeService::processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox) {
+    MultihostMulticoreComputeService::processPilotJobTerminationRequest(PilotJob *job,
+                                                                        const std::string &answer_mailbox) {
 
       // Check whether job is pending
       for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
@@ -1468,7 +1472,8 @@ namespace wrench {
  *
  * @throw std::runtime_error
  */
-    void MultihostMulticoreComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) {
+    void MultihostMulticoreComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
+                                                                  PilotJob *job) {
       WRENCH_INFO("Asked to run a pilot job with %ld hosts and %ld cores per host for %lf seconds",
                   job->getNumHosts(), job->getNumCoresPerHost(), job->getDuration());
 
@@ -1530,7 +1535,7 @@ namespace wrench {
 
       // Num hosts
       std::vector<double> num_hosts;
-      num_hosts.push_back((double)(this->compute_resources.size()));
+      num_hosts.push_back((double) (this->compute_resources.size()));
       dict.insert(std::make_pair("num_hosts", num_hosts));
 
       // Num cores per hosts
