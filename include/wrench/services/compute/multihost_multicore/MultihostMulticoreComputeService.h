@@ -176,9 +176,9 @@ namespace wrench {
 
         void processPilotJobCompletion(PilotJob *job);
 
-        void processStandardJobTerminationRequest(StandardJob *job, std::string answer_mailbox);
+        void processStandardJobTerminationRequest(StandardJob *job, const std::string &answer_mailbox);
 
-        void processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox);
+        void processPilotJobTerminationRequest(PilotJob *job, const std::string &answer_mailbox);
 
         bool processNextMessage();
 
@@ -208,7 +208,7 @@ namespace wrench {
         void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                       std::map<std::string, std::string> &service_specific_arguments);
 
-        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
+        void processSubmitPilotJob(const std::string &answer_mailbox,  PilotJob *job);
     };
 };
 
