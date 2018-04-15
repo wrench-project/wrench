@@ -382,7 +382,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceFCFSQueueWaitTimePrediction, DISABLED_SimpleFCFSQueueWaitTimePrediction) {
+TEST_F(BatchServiceFCFSTest, DISABLED_SimpleFCFSQueueWaitTimePrediction) {
   DO_TEST_WITH_FORK(do_SimpleFCFSQueueWaitTimePrediction_test);
 }
 #else
