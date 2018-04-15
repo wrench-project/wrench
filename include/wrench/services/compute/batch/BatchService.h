@@ -57,12 +57,12 @@ namespace wrench {
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
                 #ifdef ENABLE_BATSCHED
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
+                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
                 #else
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "FCFS"},
                 #endif
-                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
                  {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
-                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,                     ""}
+                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""}
                 };
 
     public:
@@ -79,7 +79,7 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-        std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>>);
+        std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
 
         /***********************/
         /** \endcond          **/
@@ -260,6 +260,8 @@ namespace wrench {
         //vector of network listeners (only useful when ENABLE_BATSCHED == on)
         std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
 
+        std::map<std::string,double> getQueueWaitingTimeEstimateForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
+
 #ifdef ENABLE_BATSCHED
 
         void startBatsched();
@@ -276,6 +278,7 @@ namespace wrench {
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
 #endif // ENABLE_BATSCHED
+
 
     };
 }

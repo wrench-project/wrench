@@ -51,19 +51,26 @@ namespace wrench {
     /**
      * @brief Retrieve queue wait time estimates for a set of job configurations
      * @param set_of_jobs: the set of job configurations, each of them with an id
-     * @return queue wait time predictions in seconds (as a map of ids)
+     * @return queue wait time predictions in seconds (as a map of ids). A prediction that's negative
+     *         means that the job configuration can not run on the service (e.g., not enough hosts,
+     *         not enough cores per host)
      */
     std::map<std::string, double>
-    BatchService::getQueueWaitingTimeEstimate(std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs) {
+    BatchService::getQueueWaitingTimeEstimate(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
 
 #ifdef ENABLE_BATSCHED
       try {
-      return getQueueWaitingTimeEstimateFromBatsched(set_of_jobs);
+        return getQueueWaitingTimeEstimateFromBatsched(set_of_jobs);
       } catch (std::runtime_error &e) {
         throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(new FunctionalityNotAvailable(this, "queue wait time prediction")));
       }
 #else
-      throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(new FunctionalityNotAvailable(this, "queue wait time prediction")));
+      if (this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) == "FCFS") {
+        return getQueueWaitingTimeEstimateForFCFS(set_of_jobs);
+      } else {
+        throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(
+                new FunctionalityNotAvailable(this, "queue wait time prediction")));
+      }
 #endif
     }
 
@@ -288,9 +295,9 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
-                                 new BatchServiceJobRequestMessage(answer_mailbox, batch_job,
-                                                                   this->getPropertyValueAsDouble(
-                                                                           BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                new BatchServiceJobRequestMessage(answer_mailbox, batch_job,
+                                                                  this->getPropertyValueAsDouble(
+                                                                          BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -761,7 +768,7 @@ namespace wrench {
       // Asking for the FULL RAM (TODO: Change this?)
       std::set<std::tuple<std::string, unsigned long, double>> resources = this->scheduleOnHosts(
               this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
-              num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_CORES);
+              num_nodes_asked_for, cores_per_node_asked_for, ComputeService::ALL_RAM);
 
 
       if (resources.empty()) {
@@ -1647,6 +1654,170 @@ namespace wrench {
       return;
     }
 
+    /**
+     * @brief Returns queue wait time estimages for the FCFS (non-batsched) algorithm
+     * @param set_of_jobs: a set of job specifications (<id, num hosts, time>)
+     *
+     * @return a map of queue wait time predictions
+     */
+    std::map<std::string, double>
+    BatchService::getQueueWaitingTimeEstimateForFCFS(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
+
+      // Set the available time of each code to zero (i.e., now)
+      // (invariant: for each host, core availabilities are sorted by
+      //             non-decreasing available time)
+      std::map<std::string, std::vector<double>> core_available_times;
+      for (auto h : this->nodes_to_cores_map) {
+        std::string hostname = h.first;
+        unsigned long num_cores = h.second;
+        std::vector<double> zeros;
+        for (int i=0;i < num_cores; i++) {
+          zeros.push_back(0);
+        }
+        core_available_times.insert(std::make_pair(hostname, zeros));
+      }
+
+
+      // Update core availabilities for jobs that are currently running
+      for (auto job : this->running_jobs) {
+        double time_to_finish =  MAX(0, job->getBeginTimeStamp() +
+                                        job->getAllocatedTime() -
+                                        this->simulation->getCurrentSimulatedDate());
+        for (auto resource : job->getResourcesAllocated()) {
+          std::string hostname = std::get<0>(resource);
+          unsigned long num_cores = std::get<1>(resource);
+          double ram = std::get<2>(resource);
+          // Update available_times
+          double new_available_time = *(core_available_times[hostname].begin() + num_cores -1) + time_to_finish;
+          for (int i=0; i < num_cores; i++) {
+            *(core_available_times[hostname].begin() + i) = new_available_time;
+          }
+          // Sort them!
+          std::sort(core_available_times[hostname].begin(), core_available_times[hostname].end());
+        }
+      }
+
+      #if 0
+      std::cerr << "TIMELINES AFTER ACCOUNTING FOR RUNNING JOBS: \n";
+      for (auto h : core_available_times) {
+        std::cerr << "  " << h.first << ":\n";
+        for (auto t : h.second) {
+          std::cerr << "     core : " << t << "\n";
+        }
+      }
+      std::cerr << "----------------------------------------\n";
+      #endif
+
+      // Go through the pending jobs and update core availabilities
+      for (auto job : this->pending_jobs) {
+        double duration = job->getAllocatedTime();
+        unsigned long num_hosts = job->getNumNodes();
+        unsigned long num_cores_per_host = job->getAllocatedCoresPerNode();
+
+        #if 0
+        std::cerr << "ACCOUNTING FOR RUNNING JOB WITH " << "duration:" <<
+                  duration << " num_hosts=" << num_hosts << " num_cores_per_host=" << num_cores_per_host << "\n";
+        #endif
+
+        // Compute the  earliest start times on all hosts
+        std::vector<std::pair<std::string, double>> earliest_start_times;
+        for (auto h : core_available_times) {
+          double earliest_start_time = *(h.second.begin() + num_cores_per_host - 1);
+          earliest_start_times.emplace_back(std::make_pair(h.first, earliest_start_time));
+        }
+
+        // Sort the hosts by earliest start times
+        std::sort(earliest_start_times.begin(), earliest_start_times.end(),
+                  [] (std::pair<std::string, double> const& a, std::pair<std::string, double> const& b) {
+                      return std::get<1>(a) < std::get<1>(b); });
+
+        // Compute the actual earliest start time
+        double earliest_job_start_time = (*(earliest_start_times.begin() + num_hosts - 1)).second;
+
+        // Update the core available times on each host used for the job
+        for (int i=0; i < num_hosts; i++) {
+          std::string hostname = (*(earliest_start_times.begin() + i)).first;
+          for (int i=0; i < num_cores_per_host; i++) {
+            *(core_available_times[hostname].begin() + i) =  earliest_job_start_time + duration;
+          }
+          std::sort(core_available_times[hostname].begin(), core_available_times[hostname].end());
+        }
+
+        // Go through all hosts and make sure that no core is available before earliest_job_start_time
+        // since this is a simple FCFS algorithm with no "jumping ahead" of any kind
+        for (auto h : this->nodes_to_cores_map) {
+          std::string hostname = h.first;
+          unsigned long num_cores = h.second;
+          for (int i=0; i < num_cores; i++) {
+            if (*(core_available_times[hostname].begin() + i) < earliest_job_start_time) {
+              *(core_available_times[hostname].begin() + i) = earliest_job_start_time;
+            }
+          }
+          std::sort(core_available_times[hostname].begin(), core_available_times[hostname].end());
+        }
+
+        #if 0
+        std::cerr << "AFTER ACCOUNTING FOR THIS JOB: \n";
+        for (auto h : core_available_times) {
+          std::cerr << "  " << h.first << ":\n";
+          for (auto t : h.second) {
+            std::cerr << "     core : " << t << "\n";
+          }
+        }
+        std::cerr << "----------------------------------------\n";
+        #endif
+
+      }
+
+      // We now have the predicted available times for each cores given
+      // everything that's running and pending. We can compute predictions.
+      std::map<std::string, double> predictions;
+
+      for (auto job : set_of_jobs) {
+        std::string id = std::get<0>(job);
+        unsigned int num_hosts = std::get<1>(job);
+        unsigned int num_cores_per_host = std::get<2>(job);
+        double duration = std::get<3>(job);
+
+        double earliest_job_start_time;
+
+        if ((num_hosts > core_available_times.size()) ||
+            (num_cores_per_host > this->num_cores_per_node)) {
+
+          earliest_job_start_time = -1.0;
+
+        } else {
+
+          #if 0
+          std::cerr << "COMPUTING PREDICTIONS for JOB: num_hosts=" << num_hosts <<
+                    ", num_cores_per_hosts=" << num_cores_per_host << ", duration=" << duration << "\n";
+          #endif
+
+          // Compute the earliest start times on all hosts
+          std::vector<std::pair<std::string, double>> earliest_start_times;
+          for (auto h : core_available_times) {
+            double earliest_start_time = *(h.second.begin() + num_cores_per_host - 1);
+            earliest_start_times.emplace_back(std::make_pair(h.first, earliest_start_time));
+          }
+
+
+          // Sort the hosts by putative start times
+          std::sort(earliest_start_times.begin(), earliest_start_times.end(),
+                    [](std::pair<std::string, double> const &a, std::pair<std::string, double> const &b) {
+                        return std::get<1>(a) < std::get<1>(b);
+                    });
+
+          earliest_job_start_time = (*(earliest_start_times.begin() + num_hosts - 1)).second;
+        }
+
+        predictions.insert(std::make_pair(id, earliest_job_start_time));
+
+      }
+
+      return predictions;
+
+    }
+
 
     /********************************************************************************************/
     /** BATSCHED INTERFACE METHODS BELOW                                                        */
@@ -1794,9 +1965,11 @@ namespace wrench {
 
 
     std::map<std::string, double>
-    BatchService::getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs) {
+    BatchService::getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
           nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
+
+      // TODO: THIS IGNORES THE NUMBER OF CORES (IS THIS A LIMITATION OF BATSCHED?)
 
       int idx = 0;
       batch_submission_data["events"] = nlohmann::json::array();
@@ -1808,7 +1981,7 @@ namespace wrench {
                 job);
         batch_submission_data["events"][idx]["data"]["requests"]["estimate_waiting_time"]["job"]["res"] = std::get<1>(
                 job);
-        batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<2>(
+        batch_submission_data["events"][idx++]["data"]["requests"]["estimate_waiting_time"]["job"]["walltime"] = std::get<3>(
                 job);
       }
 

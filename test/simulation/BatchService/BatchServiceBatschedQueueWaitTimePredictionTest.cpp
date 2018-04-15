@@ -141,8 +141,8 @@ private:
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
         //std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
-        std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
-        std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
+        std::tuple<std::string,unsigned int,unsigned int, double> my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
+        std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
 
         std::map<std::string,double> jobs_estimated_waiting_time;
 
@@ -189,9 +189,16 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
 TEST_F(BatchServiceTest, BatchJobBrokenEstimateWaitingTimeTest) {
   DO_TEST_WITH_FORK(do_BatchJobBrokenEstimateWaitingTimeTest_test);
 }
+
+#else
+TEST_F(BatchServiceTest, DISABLED_BatchJobBrokenEstimateWaitingTimeTest) {
+  DO_TEST_WITH_FORK(do_BatchJobBrokenEstimateWaitingTimeTest_test);
+}
+#endif
 
 
 void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
@@ -219,7 +226,7 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
-  #ifdef ENABLE_BATSCHED
+//  #ifdef ENABLE_BATSCHED
   EXPECT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1, {
@@ -230,13 +237,13 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
                                    simulation->getHostnameList(), storage_service1, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}
                                    })));
-  #else
-  EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), storage_service1, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}
-                                   })));
-  #endif
+//  #else
+//  EXPECT_NO_THROW(compute_service = simulation->add(
+//          new wrench::BatchService(hostname, true, true,
+//                                   simulation->getHostnameList(), storage_service1, {
+//                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}
+//                                   })));
+//  #endif
 
 
   // Create a WMS
@@ -337,11 +344,11 @@ private:
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
         //std::tuple<std::string,unsigned int,double> my_job = {job_id,nodes,walltime_seconds};
-        std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
-        std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
+        std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
+        std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
 
           std::map<std::string,double> jobs_estimated_waiting_time;
-        #ifdef ENABLE_BATSCHED
+//        #ifdef ENABLE_BATSCHED
         try {
           jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
         } catch (std::runtime_error &e) {
@@ -354,25 +361,25 @@ private:
           throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
         }
 
-        #else
-        bool success = true;
-        try {
-          jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
-        } catch (wrench::WorkflowExecutionException &e) {
-          success = false;
-          if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
-            throw std::runtime_error("Got an exception, as expected, but not the right failure cause");
-          }
-          auto real_cause = (wrench::FunctionalityNotAvailable *) e.getCause().get();
-          if (real_cause->getService() != batch_service) {
-            throw std::runtime_error(
-                    "Got the expected exception, but the failure cause does not point to the right service");
-          }
-        }
-        if (success) {
-          throw std::runtime_error("Should not be able to get a queue waiting time estimate");
-        }
-        #endif
+//        #else
+//        bool success = true;
+//        try {
+//          jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+//        } catch (wrench::WorkflowExecutionException &e) {
+//          success = false;
+//          if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
+//            throw std::runtime_error("Got an exception, as expected, but not the right failure cause");
+//          }
+//          auto real_cause = (wrench::FunctionalityNotAvailable *) e.getCause().get();
+//          if (real_cause->getService() != batch_service) {
+//            throw std::runtime_error(
+//                    "Got the expected exception, but the failure cause does not point to the right service");
+//          }
+//        }
+//        if (success) {
+//          throw std::runtime_error("Should not be able to get a queue waiting time estimate");
+//        }
+//        #endif
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -399,9 +406,19 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
+
 TEST_F(BatchServiceTest, BatchJobBasicEstimateWaitingTimeTest) {
   DO_TEST_WITH_FORK(do_BatchJobBasicEstimateWaitingTimeTest_test);
 }
+
+#else
+
+TEST_F(BatchServiceTest, DISABLED_BatchJobBasicEstimateWaitingTimeTest) {
+  DO_TEST_WITH_FORK(do_BatchJobBasicEstimateWaitingTimeTest_test);
+}
+
+#endif
 
 
 void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
@@ -429,19 +446,19 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
-  #ifdef ENABLE_BATSCHED
+//  #ifdef ENABLE_BATSCHED
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(), storage_service1, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
                                    })));
-  #else
-  EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), storage_service1, {
-                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}
-                                   })));
-  #endif
+//  #else
+//  EXPECT_NO_THROW(compute_service = simulation->add(
+//          new wrench::BatchService(hostname, true, true,
+//                                   simulation->getHostnameList(), storage_service1, {
+//                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}
+//                                   })));
+//  #endif
 
 
   // Create a WMS
@@ -542,8 +559,8 @@ private:
         std::string job_id = "my_job1";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
-        std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
-        std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
+        std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
+        std::set<std::tuple<std::string,unsigned int,unsigned int,double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
         double expected_wait_time = 300 - first_job_running; // in seconds
         double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - 1));
@@ -608,12 +625,12 @@ private:
         }
 
         auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->compute_services.begin()));
-        std::set<std::tuple<std::string, unsigned int, double>> set_of_jobs = {};
+        std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs = {};
         for (int i=0; i<10; i++) {
           std::string job_id = "new_job"+std::to_string(i);
           unsigned int nodes = rand() % 4 + 1;
           double walltime_seconds = nodes * (rand() % 10 + 1);
-          std::tuple<std::string, unsigned int, double> my_job = std::make_tuple(job_id, nodes, walltime_seconds);
+          std::tuple<std::string, unsigned int, unsigned int, double> my_job = std::make_tuple(job_id, nodes,1, walltime_seconds);
           set_of_jobs.insert(my_job);
         }
         std::map<std::string, double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(
@@ -853,8 +870,8 @@ private:
         std::string job_id = "my_job1";
         unsigned int nodes = 1;
         double walltime_seconds = 400;
-        std::tuple<std::string,unsigned int,double> my_job = std::make_tuple(job_id,nodes,walltime_seconds);
-        std::set<std::tuple<std::string,unsigned int,double>> set_of_jobs = {my_job};
+        std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
+        std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
         std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
         if ((jobs_estimated_waiting_time[job_id] - 900) > 1) {
@@ -864,7 +881,7 @@ private:
         job_id = "my_job2";
         nodes = 1;
         walltime_seconds = 299;
-        my_job = std::make_tuple(job_id,nodes,walltime_seconds);
+        my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
@@ -876,7 +893,7 @@ private:
         job_id = "my_job3";
         nodes = 2;
         walltime_seconds = 299;
-        my_job = std::make_tuple(job_id,nodes,walltime_seconds);
+        my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
@@ -888,7 +905,7 @@ private:
         job_id = "my_job4";
         nodes = 3;
         walltime_seconds = 299;
-        my_job = std::make_tuple(job_id,nodes,walltime_seconds);
+        my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
         set_of_jobs = {my_job};
         jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 
