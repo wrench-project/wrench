@@ -1671,7 +1671,7 @@ namespace wrench {
         std::string hostname = h.first;
         unsigned long num_cores = h.second;
         std::vector<double> zeros;
-        for (int i=0;i < num_cores; i++) {
+        for (unsigned int i=0;i < num_cores; i++) {
           zeros.push_back(0);
         }
         core_available_times.insert(std::make_pair(hostname, zeros));
@@ -1689,7 +1689,7 @@ namespace wrench {
           double ram = std::get<2>(resource);
           // Update available_times
           double new_available_time = *(core_available_times[hostname].begin() + num_cores -1) + time_to_finish;
-          for (int i=0; i < num_cores; i++) {
+          for (unsigned int i=0; i < num_cores; i++) {
             *(core_available_times[hostname].begin() + i) = new_available_time;
           }
           // Sort them!
@@ -1735,9 +1735,9 @@ namespace wrench {
         double earliest_job_start_time = (*(earliest_start_times.begin() + num_hosts - 1)).second;
 
         // Update the core available times on each host used for the job
-        for (int i=0; i < num_hosts; i++) {
+        for (unsigned int i=0; i < num_hosts; i++) {
           std::string hostname = (*(earliest_start_times.begin() + i)).first;
-          for (int i=0; i < num_cores_per_host; i++) {
+          for (unsigned int i=0; i < num_cores_per_host; i++) {
             *(core_available_times[hostname].begin() + i) =  earliest_job_start_time + duration;
           }
           std::sort(core_available_times[hostname].begin(), core_available_times[hostname].end());
@@ -1748,7 +1748,7 @@ namespace wrench {
         for (auto h : this->nodes_to_cores_map) {
           std::string hostname = h.first;
           unsigned long num_cores = h.second;
-          for (int i=0; i < num_cores; i++) {
+          for (unsigned int i=0; i < num_cores; i++) {
             if (*(core_available_times[hostname].begin() + i) < earliest_job_start_time) {
               *(core_available_times[hostname].begin() + i) = earliest_job_start_time;
             }
