@@ -15,7 +15,7 @@
 #include "../../src/wrench/services/file_registry/FileRegistryMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "../../src/wrench/services/storage/StorageServiceMessage.h"
-#include "../../src/wrench/services/compute/cloud/CloudServiceMessage.h"
+#include "../../src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.h"
 #include "../../src/wrench/services/network_proximity/NetworkProximityMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
 
@@ -188,18 +188,18 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 
 TEST_F(MessageConstructorTest, CloudServiceMessages) {
 
-  EXPECT_NO_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("mailbox", 600));
-  EXPECT_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("", 666), std::invalid_argument);
+  EXPECT_NO_THROW(new wrench::VirtualizedClusterServiceGetExecutionHostsRequestMessage("mailbox", 600));
+  EXPECT_THROW(new wrench::VirtualizedClusterServiceGetExecutionHostsRequestMessage("", 666), std::invalid_argument);
 
   std::vector<std::string> arg;
   arg.push_back("aaa");
-  EXPECT_NO_THROW(new wrench::CloudServiceGetExecutionHostsAnswerMessage(arg, 600));
+  EXPECT_NO_THROW(new wrench::VirtualizedClusterServiceGetExecutionHostsAnswerMessage(arg, 600));
 
   std::map<std::string, std::string> plist;
-  EXPECT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "host", true, true, 42, 10, plist, 666));
-  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("", "host", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "", true, true, 42, 0, plist, 666), std::invalid_argument);
+  EXPECT_NO_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("mailbox", "host", "host", true, true, 42, 10, plist, 666));
+  EXPECT_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("", "host", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("mailbox", "", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("mailbox", "host", "", true, true, 42, 0, plist, 666), std::invalid_argument);
 }
 
 
