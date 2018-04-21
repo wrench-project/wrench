@@ -116,7 +116,7 @@ private:
       try {
         auto cs = (wrench::CloudService *) *this->getAvailableComputeServices().begin();
         std::string execution_host = cs->getExecutionHosts()[0];
-        cs->createVM(execution_host, "vm_" + execution_host, 2);
+        cs->createVM(execution_host, 2);
         job_manager->submitJob(two_task_job, this->test->compute_service);
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());

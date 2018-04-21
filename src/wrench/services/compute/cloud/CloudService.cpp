@@ -23,6 +23,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_service, "Log category for Cloud Service");
 
 namespace wrench {
 
+    static unsigned long VM_ID = 1;
+
     /**
      * @brief Constructor
      *
@@ -106,22 +108,23 @@ namespace wrench {
      * @brief Create a multicore executor VM in a physical machine
      *
      * @param pm_hostname: the name of the physical machine host
-     * @param vm_hostname: the name of the new VM host
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
-     * @param ram_memory: the VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue)
+     * @param ram_memory: the VM RAM memory capacity (-1 means "use all memory available on the host", this can be lead to an out of memory issue)
      * @param plist: a property list ({} means "use all defaults")
      *
      * @return Whether the VM creation succeeded
      *
      * @throw WorkflowExecutionException
      */
-    bool CloudService::createVM(const std::string &pm_hostname,
-                                const std::string &vm_hostname,
-                                unsigned long num_cores,
-                                double ram_memory,
-                                std::map<std::string, std::string> plist) {
+    std::string CloudService::createVM(const std::string &pm_hostname,
+                                       unsigned long num_cores,
+                                       double ram_memory,
+                                       std::map<std::string, std::string> plist) {
 
       serviceSanityCheck();
+
+      // vm host name
+      std::string vm_hostname = "vm" + std::to_string(VM_ID++) + "_" + pm_hostname;
 
       // send a "create vm" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
@@ -149,7 +152,10 @@ namespace wrench {
       }
 
       if (auto msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(message.get())) {
-        return msg->success;
+        if (msg->success) {
+          return vm_hostname;
+        }
+        return nullptr;
       } else {
         throw std::runtime_error("CloudService::createVM(): Unexpected [" + msg->getName() + "] message");
       }
@@ -408,14 +414,16 @@ namespace wrench {
           }
 
           // RAM memory management
-          if (this->cs_available_ram.find(pm_hostname) == this->cs_available_ram.end()) {
-            this->cs_available_ram[pm_hostname] = S4U_Simulation::getHostMemoryCapacity(pm_hostname);
-          }
-          if (ram_memory <= 0 || ram_memory == ComputeService::ALL_RAM) {
-            ram_memory = this->cs_available_ram[pm_hostname];
-          }
-          if (this->cs_available_ram[pm_hostname] == 0 || this->cs_available_ram[pm_hostname] < ram_memory) {
-            throw std::runtime_error("Requested memory is below available memory");
+          if (ram_memory != 0) { // RAM is a requirement for creating the VM
+            if (this->cs_available_ram.find(pm_hostname) == this->cs_available_ram.end()) {
+              this->cs_available_ram[pm_hostname] = S4U_Simulation::getHostMemoryCapacity(pm_hostname);
+            }
+            if (ram_memory < 0 || ram_memory == ComputeService::ALL_RAM) {
+              ram_memory = this->cs_available_ram[pm_hostname];
+            }
+            if (this->cs_available_ram[pm_hostname] < ram_memory) {
+              throw std::runtime_error("Requested memory is below available memory");
+            }
           }
 
           // create a VM on the provided physical machine

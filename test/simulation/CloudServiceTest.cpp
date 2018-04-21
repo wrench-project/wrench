@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,7 +130,7 @@ private:
       try {
         auto cs = (wrench::CloudService *) this->test->compute_service;
         std::string execution_host = cs->getExecutionHosts()[0];
-        cs->createVM(execution_host, "vm_" + execution_host, 2, 10);
+        cs->createVM(execution_host, 2, 10);
         job_manager->submitJob(two_task_job, this->test->compute_service);
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
@@ -244,10 +244,10 @@ private:
         auto cs = (wrench::CloudService *) this->test->compute_service;
         std::string execution_host = cs->getExecutionHosts()[0];
 
-        cs->createVM(execution_host, "vm1_" + execution_host, 1, 10);
-        cs->createVM(execution_host, "vm2_" + execution_host, 1, 10);
-        cs->createVM(execution_host, "vm3_" + execution_host, 1, 10);
-        cs->createVM(execution_host, "vm4_" + execution_host, 1, 10);
+        cs->createVM(execution_host, 1, 10);
+        cs->createVM(execution_host, 1, 10);
+        cs->createVM(execution_host, 1, 10);
+        cs->createVM(execution_host, 1, 10);
 
         job_manager->submitJob(pilot_job, this->test->compute_service);
 
@@ -367,7 +367,7 @@ private:
         auto cs = (wrench::CloudService *) this->test->compute_service;
         std::string execution_host = cs->getExecutionHosts()[0];
 
-        cs->createVM(execution_host, "vm_1" + execution_host, 0, 10);
+        cs->createVM(execution_host, 0, 10);
         num_cores = cs->getNumCores();
         sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
 
@@ -379,7 +379,7 @@ private:
         }
 
         // create a VM with two cores
-        cs->createVM(execution_host, "vm_2" + execution_host, 2, 10);
+        cs->createVM(execution_host, 2, 10);
         num_cores = cs->getNumCores();
         sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
 
