@@ -43,7 +43,8 @@ namespace wrench {
                                                          std::vector<std::string> &execution_hosts,
                                                          StorageService *default_storage_service,
                                                          std::map<std::string, std::string> plist) :
-            ComputeService(hostname, "cloud_service", "cloud_service", supports_standard_jobs, supports_pilot_jobs,
+            ComputeService(hostname, "virtualized_cluster_service", "virtualized_cluster_service",
+                           supports_standard_jobs, supports_pilot_jobs,
                            default_storage_service) {
 
       if (execution_hosts.empty()) {
@@ -162,7 +163,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Submit a standard job to the cloud service
+     * @brief Submit a standard job to the virtualized cluster service
      *
      * @param job: a standard job
      * @param service_specific_args: service specific arguments
@@ -210,7 +211,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Asynchronously submit a pilot job to the cloud service
+     * @brief Asynchronously submit a pilot job to the virtualized cluster service
      *
      * @param job: a pilot job
      * @param service_specific_args: service specific arguments
@@ -291,7 +292,8 @@ namespace wrench {
     int VirtualizedClusterService::main() {
 
       TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
-      WRENCH_INFO("Cloud Service starting on host %s listening on mailbox_name %s", this->hostname.c_str(),
+      WRENCH_INFO("Virtualized Cluster Service starting on host %s listening on mailbox_name %s",
+                  this->hostname.c_str(),
                   this->mailbox_name.c_str());
 
       /** Main loop **/
@@ -299,7 +301,7 @@ namespace wrench {
         // no specific action
       }
 
-      WRENCH_INFO("Cloud Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      WRENCH_INFO("Virtualized Cluster Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
@@ -576,7 +578,7 @@ namespace wrench {
       }
 
       // Do we have enough hosts?
-      // currently, the cloud service does not support
+      // currently, the virtualized cluster service does not support
       if (job->getNumHosts() > 1 || not available_host) {
         try {
           S4U_Mailbox::dputMessage(

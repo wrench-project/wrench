@@ -52,6 +52,7 @@ namespace wrench {
     private:
         friend class Simulation;
 
+        int main() override;
     };
 
 }

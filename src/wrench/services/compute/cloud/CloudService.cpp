@@ -10,6 +10,7 @@
 
 #include <cfloat>
 #include <numeric>
+#include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/cloud/CloudService.h"
 
 
@@ -38,4 +39,24 @@ namespace wrench {
             VirtualizedClusterService(hostname, supports_standard_jobs, supports_pilot_jobs, execution_hosts,
                                       default_storage_service, plist) {}
 
+    /**
+     * @brief Main method of the daemon
+     *
+     * @return 0 on termination
+     */
+    int CloudService::main() {
+
+      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
+      WRENCH_INFO("Cloud Service starting on host %s listening on mailbox_name %s",
+                  this->hostname.c_str(),
+                  this->mailbox_name.c_str());
+
+      /** Main loop **/
+      while (this->processNextMessage()) {
+        // no specific action
+      }
+
+      WRENCH_INFO("Cloud Service on host %s terminated!", S4U_Simulation::getHostName().c_str());
+      return 0;
+    }
 }
