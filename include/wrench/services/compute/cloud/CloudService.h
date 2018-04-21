@@ -59,11 +59,10 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        bool createVM(const std::string &pm_hostname,
-                      const std::string &vm_hostname,
-                      unsigned long num_cores,
-                      double ram_memory = ComputeService::ALL_RAM,
-                      std::map<std::string, std::string> plist = {});
+        std::string createVM(const std::string &pm_hostname,
+                             unsigned long num_cores,
+                             double ram_memory = ComputeService::ALL_RAM,
+                             std::map<std::string, std::string> plist = {});
 
         std::vector<std::string> getExecutionHosts();
 
@@ -72,6 +71,7 @@ namespace wrench {
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
         void terminateStandardJob(StandardJob *job) override;
+
         void terminatePilotJob(PilotJob *job) override;
 
         /***********************/
@@ -119,7 +119,6 @@ namespace wrench {
         std::vector<std::string> execution_hosts;
 
         std::map<std::string, double> cs_available_ram;
-
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
         std::map<std::string, std::tuple<simgrid::s4u::VirtualMachine *, std::shared_ptr<ComputeService>, unsigned long>> vm_list;
