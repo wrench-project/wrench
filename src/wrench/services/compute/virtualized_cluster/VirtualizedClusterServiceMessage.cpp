@@ -8,7 +8,7 @@
  *
  */
 
-#include "CloudServiceMessage.h"
+#include "VirtualizedClusterServiceMessage.h"
 
 namespace wrench {
 
@@ -18,8 +18,8 @@ namespace wrench {
      * @param name: the message name
      * @param payload: the message size in bytes
      */
-    CloudServiceMessage::CloudServiceMessage(const std::string &name, double payload) :
-            ComputeServiceMessage("CloudServiceMessage::" + name, payload) {
+    VirtualizedClusterServiceMessage::VirtualizedClusterServiceMessage(const std::string &name, double payload) :
+            ComputeServiceMessage("VirtualizedClusterServiceMessage::" + name, payload) {
     }
 
     /**
@@ -30,14 +30,15 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    CloudServiceGetExecutionHostsRequestMessage::CloudServiceGetExecutionHostsRequestMessage(
-            const std::string &answer_mailbox, double payload) : CloudServiceMessage("GET_EXECUTION_HOSTS_REQUEST",
-                                                                                     payload) {
+    VirtualizedClusterServiceGetExecutionHostsRequestMessage::VirtualizedClusterServiceGetExecutionHostsRequestMessage(
+            const std::string &answer_mailbox, double payload) : VirtualizedClusterServiceMessage(
+            "GET_EXECUTION_HOSTS_REQUEST",
+            payload) {
 
       if (answer_mailbox.empty()) {
         throw std::invalid_argument(
-                "CloudServiceGetExecutionHostsRequestMessage::CloudServiceGetExecutionHostsRequestMessage(): "
-                        "Invalid arguments");
+                "VirtualizedClusterServiceGetExecutionHostsRequestMessage::VirtualizedClusterServiceGetExecutionHostsRequestMessage(): "
+                "Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
     }
@@ -48,8 +49,8 @@ namespace wrench {
      * @param execution_hosts: the hosts available for running virtual machines
      * @param payload: the message size in bytes
      */
-    CloudServiceGetExecutionHostsAnswerMessage::CloudServiceGetExecutionHostsAnswerMessage(
-            std::vector<std::string> &execution_hosts, double payload) : CloudServiceMessage(
+    VirtualizedClusterServiceGetExecutionHostsAnswerMessage::VirtualizedClusterServiceGetExecutionHostsAnswerMessage(
+            std::vector<std::string> &execution_hosts, double payload) : VirtualizedClusterServiceMessage(
             "GET_EXECUTION_HOSTS_ANSWER", payload), execution_hosts(execution_hosts) {}
 
     /**
@@ -67,21 +68,23 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(const std::string &answer_mailbox,
-                                                                           const std::string &pm_hostname,
-                                                                           const std::string &vm_hostname,
-                                                                           bool supports_standard_jobs,
-                                                                           bool supports_pilot_jobs,
-                                                                           unsigned long num_cores,
-                                                                           double ram_memory,
-                                                                           std::map<std::string, std::string> &plist,
-                                                                           double payload) :
-            CloudServiceMessage("CREATE_VM_REQUEST", payload), supports_standard_jobs(supports_standard_jobs),
+    VirtualizedClusterServiceCreateVMRequestMessage::VirtualizedClusterServiceCreateVMRequestMessage(
+            const std::string &answer_mailbox,
+            const std::string &pm_hostname,
+            const std::string &vm_hostname,
+            bool supports_standard_jobs,
+            bool supports_pilot_jobs,
+            unsigned long num_cores,
+            double ram_memory,
+            std::map<std::string, std::string> &plist,
+            double payload) :
+            VirtualizedClusterServiceMessage("CREATE_VM_REQUEST", payload),
+            supports_standard_jobs(supports_standard_jobs),
             supports_pilot_jobs(supports_pilot_jobs), num_cores(num_cores), ram_memory(ram_memory), plist(plist) {
 
       if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty()) {
         throw std::invalid_argument(
-                "CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(): Invalid arguments");
+                "VirtualizedClusterServiceCreateVMRequestMessage::VirtualizedClusterServiceCreateVMRequestMessage(): Invalid arguments");
       }
       this->answer_mailbox = answer_mailbox;
       this->pm_hostname = pm_hostname;
@@ -94,7 +97,8 @@ namespace wrench {
      * @param success: whether the VM creation was successfull or not
      * @param payload: the message size in bytes
      */
-    CloudServiceCreateVMAnswerMessage::CloudServiceCreateVMAnswerMessage(bool success, double payload) :
-            CloudServiceMessage("CREATE_VM_ANSWER", payload), success(success) {}
+    VirtualizedClusterServiceCreateVMAnswerMessage::VirtualizedClusterServiceCreateVMAnswerMessage(bool success,
+                                                                                                   double payload) :
+            VirtualizedClusterServiceMessage("CREATE_VM_ANSWER", payload), success(success) {}
 
 }
