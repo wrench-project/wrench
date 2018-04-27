@@ -1,40 +1,40 @@
 WRENCH 101                        {#wrench-101}
 ============
 
+
 @WRENCHUserDoc <div class="doc-type">User Documentation</div><div class="doc-link">Other: <a href="../developer/getting-started.html">Developer</a> - <a href="../internal/getting-started.html">Internal</a></div> @endWRENCHDoc
 @WRENCHDeveloperDoc  <div class="doc-type">Developer Documentation</div><div class="doc-link">Other: <a href="../user/getting-started.html">User</a> - <a href="../internal/getting-started.html">Internal</a></div> @endWRENCHDoc
 @WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/getting-started.html">User</a> -  <a href="../developer/getting-started.html">Developer</a></div> @endWRENCHDoc
 
-[TOC]
 
-WRENCH 101 provides detailed information for WRENCH's [classes of users](@ref overview-users) 
-seeking to obtain the best experience from WRENCH's capabilities. For instructions on how to
+WRENCH 101 is a page and a set of documents that provide detailed information for each WRENCH's [classes of users](@ref overview-users),
+which serves as higher-level documentation than the [API Reference](./annotated.html). For instructions on how to
 [install](@ref install), run a [first example](@ref getting-started), or 
-[prepare the environment](@ref getting-started-prep), please refer to their respective sections 
+[create a basic WRENCH-based simulator](@ref getting-started-prep), please refer to their respective sections 
 in the documentation.
 
 
-<!--################ 101 Guide Description ################ -->
+<!--################################################ -->
+<!--################ 101 FOR USERS  ################ -->
+<!--################################################ -->
+
 
 @WRENCHUserDoc
-This **User 101** guide describes WRENCH's simulation components (building blocks) 
-necessary to build a simulator and run simulation scenarios. 
-@endWRENCHDoc
-
-@WRENCHDeveloperDoc 
-This **Developer 101** guide describes WRENCH's architectural components necessary
-to build your own workflow management systems (including schedulers, optimizations,
-etc.), and services (e.g., compute, storage, network, etc.).  
-@endWRENCHDoc
-
-@WRENCHInternalDoc
-This **Internal 101** guide provides detailed description of WRENCH's architecture
-and modules for users who wish to contribute to WRENCH's core code. 
-@endWRENCHDoc
 
 
+This **User 101** guide describes all the WRENCH's simulation components (building blocks) 
+necessary to build a custom simulator and run simulation scenarios. 
 
-# Building a WRENCH's Simulation #         {#wrench-101-simulation}
+---
+
+[TOC]
+
+---
+
+# 10,000-ft view of a WRENCH-based simulator #      {#wrench-101-simulator-10000ft}
+
+
+# Blueprint for a WRENCH-based simulator #         {#wrench-101-simulator-blueprint}
 
 In WRENCH, a user simulation is defined via the wrench::Simulation class. Briefly,
 a simulation is described by the following actions: 
@@ -99,16 +99,106 @@ by several of these components), while wrench::FileRegistryService and
 wrench::NetworkProximityService are defined by their own `set()` functions. 
 
 
-
-# Creating your own WMS #         {#wrench-101-wms}
-
+# Customizing Services #         {#wrench-101-customizing-services}
 
 
-@WRENCHNotUserDoc
-# Creating a Compute Service #         {#wrench-101-cs}
+# Turning logging on/off #        {#wrench-101-logging-onoff}
 
-# Creating a Storage Service #         {#wrench-101-ss}
+
+# Analyzing Simulation Output #   {#wrench-101-simulation-output}
+
+
 @endWRENCHDoc
+
+
+
+
+
+
+<!--################################################ -->
+<!--############# 101 FOR DEVELOPERS  ############## -->
+<!--################################################ -->
+
+
+@WRENCHDeveloperDoc 
+
+
+This **Developer 101** guide describes WRENCH's architectural components necessary
+to build your own WMS (Workflow Management Systems).
+
+---
+
+[TOC]
+
+---
+
+
+# 10,000-ft view of a simulated WMS #           {#wrench-101-WMS-10000ft}
+
+
+# Blueprint for a WMS in WRENCH #               {#wrench-101-WMS-blueprint}
+
+
+# Interacting with services  #                  {#wrench-101-WMS-services}
+
+# Running workflow tasks #                      {#wrench-101-WMS-tasks}
+
+# Moving workflow data #                        {#wrench-101-WMS-data}
+
+# Schedulers for decision-making #              {#wrench-101-WMS-schedulers}
+
+# Workflow execution events #                   {#wrench-101-WMS-events}
+
+# Logging #                                     {#wrench-101-WMS-logging}
+
+
+  
+@endWRENCHDoc
+
+
+
+
+
+
+<!--################################################ -->
+<!--############### 101 FOR INTERNAL  ############## -->
+<!--################################################ -->
+
+
+@WRENCHInternalDoc
+
+
+This **Internal 101** guide is intend to users who want to contribute code to WRENCH to
+extend its capabilities. 
+
+---
+
+Make sure to read the [User 101 Guide](../user/wrench-101.html)
+and the   [Developer 101 Guide](../developer/wrench-101.html) to understand
+how WRENCH works from  those perspectives.   The largest portion of the
+WRENCH code base is the "Internal" code base, and for now, the way to go
+is to look at the [API Reference](./annotated.html). Do not hesitate to contact
+the WRENCH team with questions about the internals of WRENCH if you want to contribute.  
+Of course, forking [The WRENCH repository](http://github.com/wrench-project/wrench) and
+creating pull requests is the preferred way to contribute to WRENCH as an Internal developer. 
+  
+  
+Here is a in-progress misc item list of interest:
+  
+  - Most (soon to be all) interaction with SimGrid is done by the classes in the
+      `src/simgrid_S4U_util` directory
+  - A WRENCH simulation, list any SimGrid simulation, is comprised of simulated processes
+    that communicate via messages with put/get-like operations into mailboxes. These
+    processes are essentially implemented as threads, but they are not scheduled by the OS. Instead,
+    they are scheduled by SimGrid in round-robin fashion. Each thread runs without interruption in between
+    two SimGrid API calls. Therefore, although in principle WRENCH is massively multi-threaded, there are
+    _almost_ no needs to locks when sharing data among threads. 
+  
+
+
+@endWRENCHDoc
+
+
 
 
 
