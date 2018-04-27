@@ -10,10 +10,12 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 #include <numeric>
+#include <thread>
+#include <chrono>
 
 #include "../include/TestWithFork.h"
 
-class CloudServiceTest : public ::testing::Test {
+class VirtualizedClusterServiceTest : public ::testing::Test {
 
 public:
     wrench::WorkflowFile *input_file;
@@ -32,12 +34,14 @@ public:
 
     void do_StandardJobTaskTest_test();
 
+    void do_VMMigrationTest_test();
+
     void do_PilotJobTaskTest_test();
 
     void do_NumCoresTest_test();
 
 protected:
-    CloudServiceTest() {
+    VirtualizedClusterServiceTest() {
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
@@ -75,15 +79,15 @@ protected:
 
       // Create a platform file
       std::string xml = "<?xml version='1.0'?>"
-              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-              "<platform version=\"4.1\"> "
-              "   <zone id=\"AS0\" routing=\"Full\"> "
-              "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-              "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
-              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-              "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
-              "   </zone> "
-              "</platform>";
+                        "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                        "<platform version=\"4.1\"> "
+                        "   <zone id=\"AS0\" routing=\"Full\"> "
+                        "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
+                        "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+                        "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                        "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                        "   </zone> "
+                        "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
       fclose(platform_file);
@@ -100,17 +104,17 @@ protected:
 class CloudStandardJobTestWMS : public wrench::WMS {
 
 public:
-    CloudStandardJobTestWMS(CloudServiceTest *test,
+    CloudStandardJobTestWMS(VirtualizedClusterServiceTest *test,
                             const std::set<wrench::ComputeService *> &compute_services,
                             const std::set<wrench::StorageService *> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
 private:
 
-    CloudServiceTest *test;
+    VirtualizedClusterServiceTest *test;
 
     int main() {
       // Create a data movement manager
@@ -157,11 +161,11 @@ private:
     }
 };
 
-TEST_F(CloudServiceTest, CloudStandardJobTestWMS) {
+TEST_F(VirtualizedClusterServiceTest, CloudStandardJobTestWMS) {
   DO_TEST_WITH_FORK(do_StandardJobTaskTest_test);
 }
 
-void CloudServiceTest::do_StandardJobTaskTest_test() {
+void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -184,12 +188,12 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {})));
+          new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          new CloudStandardJobTestWMS(this,  {compute_service}, {storage_service}, hostname)));
+          new CloudStandardJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -209,23 +213,144 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
 }
 
 /**********************************************************************/
+/**                   VM MIGRATION SIMULATION TEST                   **/
+/**********************************************************************/
+
+class VirtualizedClusterVMMigrationTestWMS : public wrench::WMS {
+
+public:
+    VirtualizedClusterVMMigrationTestWMS(VirtualizedClusterServiceTest *test,
+                                         const std::set<wrench::ComputeService *> &compute_services,
+                                         const std::set<wrench::StorageService *> &storage_services,
+                                         std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    VirtualizedClusterServiceTest *test;
+
+    int main() {
+      // Create a data movement manager
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Create a file registry service
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+
+      // Create a 2-task job
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+                                                                         {}, {});
+
+      // Submit the 2-task job for execution
+      try {
+        auto cs = (wrench::CloudService *) this->test->compute_service;
+        std::string src_host = cs->getExecutionHosts()[0];
+        std::string vm_host = cs->createVM(src_host, 2, 10);
+
+        job_manager->submitJob(two_task_job, this->test->compute_service);
+
+        // migrating the VM
+        std::string dest_host = cs->getExecutionHosts()[1];
+        cs->migrateVM(vm_host, dest_host);
+
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      // Wait for a workflow execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+      try {
+        event = this->workflow->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(VirtualizedClusterServiceTest, VirtualizedClusterVMMigrationTestWMS) {
+  DO_TEST_WITH_FORK(do_VMMigrationTest_test);
+}
+
+void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("virtualized_cluster_service_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service = simulation->add(
+          new wrench::SimpleStorageService(hostname, 100.0)));
+
+  // Create a Virtualized Cluster Service
+  std::vector<std::string> execution_hosts = simulation->getHostnameList();
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          new wrench::VirtualizedClusterService(hostname, true, false, execution_hosts, storage_service, {})));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          new VirtualizedClusterVMMigrationTestWMS(this, {compute_service}, {storage_service}, hostname)));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Create a file registry
+  EXPECT_NO_THROW(simulation->setFileRegistryService(
+          new wrench::FileRegistryService(hostname)));
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+  // Running a "run a single task" simulation
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+  free(argv[0]);
+  free(argv);
+}
+
+
+/**********************************************************************/
 /**  PILOT JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST           **/
 /**********************************************************************/
 
 class CloudPilotJobTestWMS : public wrench::WMS {
 
 public:
-    CloudPilotJobTestWMS(CloudServiceTest *test,
+    CloudPilotJobTestWMS(VirtualizedClusterServiceTest *test,
                          const std::set<wrench::ComputeService *> &compute_services,
                          const std::set<wrench::StorageService *> &storage_services,
                          std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
 private:
 
-    CloudServiceTest *test;
+    VirtualizedClusterServiceTest *test;
 
     int main() {
       // Create a data movement manager
@@ -280,11 +405,11 @@ private:
     }
 };
 
-TEST_F(CloudServiceTest, CloudPilotJobTestWMS) {
+TEST_F(VirtualizedClusterServiceTest, CloudPilotJobTestWMS) {
   DO_TEST_WITH_FORK(do_PilotJobTaskTest_test);
 }
 
-void CloudServiceTest::do_PilotJobTaskTest_test() {
+void VirtualizedClusterServiceTest::do_PilotJobTaskTest_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -307,12 +432,12 @@ void CloudServiceTest::do_PilotJobTaskTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::CloudService(hostname, false, true, execution_hosts, storage_service, {})));
+          new wrench::CloudService(hostname, false, true, execution_hosts, storage_service, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          new CloudPilotJobTestWMS(this,  {compute_service}, {storage_service}, hostname)));
+          new CloudPilotJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -338,17 +463,17 @@ void CloudServiceTest::do_PilotJobTaskTest_test() {
 class CloudNumCoresTestWMS : public wrench::WMS {
 
 public:
-    CloudNumCoresTestWMS(CloudServiceTest *test,
+    CloudNumCoresTestWMS(VirtualizedClusterServiceTest *test,
                          const std::set<wrench::ComputeService *> &compute_services,
                          const std::set<wrench::StorageService *> &storage_services,
                          std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
 
 private:
 
-    CloudServiceTest *test;
+    VirtualizedClusterServiceTest *test;
 
     int main() {
       try {
@@ -398,11 +523,11 @@ private:
     }
 };
 
-TEST_F(CloudServiceTest, CloudNumCoresTestWMS) {
+TEST_F(VirtualizedClusterServiceTest, CloudNumCoresTestWMS) {
   DO_TEST_WITH_FORK(do_NumCoresTest_test);
 }
 
-void CloudServiceTest::do_NumCoresTest_test() {
+void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -425,12 +550,12 @@ void CloudServiceTest::do_NumCoresTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {})));
+          new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {})));
 
   // Create a WMS
-  wrench::WMS  *wms = nullptr;
+  wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          new CloudNumCoresTestWMS(this,  {compute_service}, {storage_service}, hostname)));
+          new CloudNumCoresTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
