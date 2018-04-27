@@ -213,7 +213,7 @@ set(TEST_FILES
         test/simulation/MultipleWMSTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
-        examples/simple-wms/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
+        examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
         test/simulation/JobManagerTest.cpp test/simulation/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp)
 
 # wrench library
@@ -245,7 +245,6 @@ add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 
 # additional packages
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
-
 
 # build examples
 foreach (cmakefile ${CMAKEFILES_TXT})
