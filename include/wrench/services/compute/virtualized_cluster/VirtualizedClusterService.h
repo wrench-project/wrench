@@ -42,6 +42,8 @@ namespace wrench {
                  {VirtualizedClusterServiceProperty::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                  {VirtualizedClusterServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
                  {VirtualizedClusterServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                 {VirtualizedClusterServiceProperty::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
+                 {VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
                  {VirtualizedClusterServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
                  {VirtualizedClusterServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                  {VirtualizedClusterServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
@@ -65,7 +67,9 @@ namespace wrench {
                                      double ram_memory = ComputeService::ALL_RAM,
                                      std::map<std::string, std::string> plist = {});
 
-        virtual std::vector<std::string> getExecutionHosts();
+        virtual bool migrateVM(const std::string &vm_hostname, const std::string &dest_pm_hostname);
+
+        std::vector<std::string> getExecutionHosts();
 
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
@@ -109,6 +113,10 @@ namespace wrench {
                                      unsigned long num_cores,
                                      double ram_memory,
                                      std::map<std::string, std::string> plist);
+
+        virtual void processMigrateVM(const std::string &answer_mailbox,
+                                      const std::string &vm_hostname,
+                                      const std::string &dest_pm_hostname);
 
         virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                               std::map<std::string, std::string> &service_specific_args);

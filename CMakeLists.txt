@@ -208,7 +208,7 @@ set(TEST_FILES
         test/simulation/BatchService/BatchServiceFCFSTest.cpp
         test/simulation/BatchService/BatchServiceTraceFileTest.cpp
         test/simulation/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
-        test/simulation/CloudServiceTest.cpp
+        test/simulation/VirtualizedClusterServiceTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/MultipleWMSTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp

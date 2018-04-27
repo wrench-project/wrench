@@ -70,12 +70,15 @@ namespace wrench {
 
         if (sum_num_idle_cores < mim_num_cores) {
           try {
-            std::string pm_host = choosePMHostname();
+//            std::string pm_host = choosePMHostname();
+            std::string pm_host = "Jupiter";
             std::string vm_host = cloud_service->createVM(pm_host, mim_num_cores, mim_mem);
 
             if (not vm_host.empty()) {
               this->vm_list[pm_host].push_back(vm_host);
             }
+
+            cloud_service->migrateVM(vm_host, "Fafard");
 
           } catch (WorkflowExecutionException &e) {
             // unable to create a new VM, tasks won't be scheduled in this iteration.

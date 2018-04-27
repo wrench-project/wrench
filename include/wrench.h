@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 #include "wrench/services/storage/simple/SimpleStorageServiceProperty.h"
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/file_registry/FileRegistryServiceProperty.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudService.h"
 #include "wrench/services/compute/cloud/CloudServiceProperty.h"
 #include "wrench/services/compute/batch/BatchService.h"
