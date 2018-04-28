@@ -218,7 +218,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
           new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
                                    storage_service1, {})));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -408,7 +408,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
           new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
                                    storage_service1, {})));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -550,7 +550,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
                                    storage_service1, {})));
 
   // Create a File Registry Service
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -561,7 +561,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -756,7 +756,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -891,7 +891,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1019,7 +1019,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1164,7 +1164,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1307,7 +1307,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1517,7 +1517,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1707,7 +1707,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1891,7 +1891,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2058,7 +2058,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2207,7 +2207,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2367,7 +2367,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow).get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);

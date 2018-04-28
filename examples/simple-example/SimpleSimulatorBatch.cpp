@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
   std::string file_registry_service_host = hostname_list[(hostname_list.size() > 2) ? 1 : 0];
   std::cerr << "Instantiating a FileRegistryService on " << file_registry_service_host << "..." << std::endl;
   wrench::FileRegistryService *file_registry_service =
-          simulation.setFileRegistryService(new wrench::FileRegistryService(file_registry_service_host));
+          simulation.add(new wrench::FileRegistryService(file_registry_service_host));
 
   /* It is necessary to store, or "stage", input files for the first task(s) of the workflow on some storage
    * service, so that workflow execution can be initiated. The getInputFiles() method of the Workflow class

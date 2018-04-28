@@ -172,7 +172,7 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
 
 
   // Create a file registry service
-  wrench::FileRegistryService *file_registry_service = simulation->setFileRegistryService( new wrench::FileRegistryService(hostname));
+  wrench::FileRegistryService *file_registry_service = simulation->add( new wrench::FileRegistryService(hostname));
 
   // Staging the input_file on the storage service
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -349,7 +349,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
 
 
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging the input_file on the storage service
   EXPECT_NO_THROW(simulation->stageFiles({std::make_pair(input_file->getId(), input_file)}, storage_service1));
@@ -495,7 +495,7 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
 
 
   // Create a file registry service
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging the input_file on the storage service
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -602,7 +602,7 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
             new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
     // Create a file registry service
-    simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+    simulation->add(new wrench::FileRegistryService(hostname));
 
     // Staging the input_file on the storage service
     EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
