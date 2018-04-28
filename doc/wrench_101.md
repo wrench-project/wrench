@@ -140,14 +140,28 @@ common one between to minimize workflow execution time).  By default,
 WRENCH does not provide a WMS implementation as part of its core components, however a
 simple implementation (`wrench::SimpleWMS`) is available in the `examples/simple-example` folder. Please,
 refer to the [Creating your own WMS](@ref wrench-101-wms) section for further information
-on how to develop a WMS. 
-At least **one** WMS should be provided for running a simulation.
-
+on how to develop a WMS.  At least **one** WMS should be provided for running a simulation.
 
 
 
 # Customizing Services #         {#wrench-101-customizing-services}
 
+Each service is customizable by passing to its constructor a _property list_, i.e., a key-value map
+ where each key is a property and each value is a string.  Each service defines a property class.
+ For instance, the `wrench::Service` class has an associated `wrench::ServiceProperty` class, 
+ the `wrench::ComputeService` class has an associated `wrench::ComputerServiceProperty` class, and
+ so on at all level of the service class hierarchy. The API documentation for these property
+ class explains what each property means, what possible values are, and what default values are. 
+ Some properties correspond to rather low-level simulation details. For instance, 
+ the `wrench::ServiceProperty` class defines a `wrench::ServiceProperty:STOP_DAEMON_MESSAGE_PAYLOAD`
+ property which can be used to customize the size, in bytes, of the control message sent to the
+ daemon that's the entry point to the service to tell it to terminate.  Other properties
+ have more to do with what the service can or should do when in operation. For instance,
+ the `wrench::BatchSchedulingServiceProperty` class defines a
+ `wrench::BatchSchedulingServiceProperty::BATCH_SCHEDULING_ALGORITHM` which specifies
+ what scheduling algorithm a batch service should for prioritizing jobs.   All property classes
+ inherit from the `wrench::ServiceProperty` class, and you an explore that hierarchy to discover
+ all possible (and there are many) service customization opportunities.
 
 # Turning logging on/off #        {#wrench-101-logging-onoff}
 
