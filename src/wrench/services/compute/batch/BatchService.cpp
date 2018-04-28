@@ -175,6 +175,7 @@ namespace wrench {
       }
 
       // Check that ALL_CORES and ALL_RAM, or actual maximum values, were passed
+      // (this may change one day...)
       if (((cores_per_host != ComputeService::ALL_CORES) and (cores_per_host != num_cores_available)) or
           ((ram_per_host != ComputeService::ALL_RAM) and (ram_per_host != ram_available))) {
         throw std::invalid_argument(
@@ -210,11 +211,9 @@ namespace wrench {
           unsigned int num_nodes = std::get<5>(j);
 
           if (num_nodes > this->total_num_of_nodes) {
-//          throw std::invalid_argument("Workload trace file contains a job that requires too many compute nodes");
             std::get<5>(j) = this->total_num_of_nodes;
           }
           if (requested_ram > ram_available) {
-//          throw std::invalid_argument("Workload trace file contains a job that requires too much ram per compute nodes");
             std::get<4>(j) = ram_available;
           }
         }
@@ -280,6 +279,7 @@ namespace wrench {
                 "BatchService::submitStandardJob(): Batch Service requires -c (number of cores per host) to be specified "
         );
       }
+
 
       //get job time
       unsigned long time_asked_for = 0;
@@ -723,7 +723,7 @@ namespace wrench {
           }
           this->available_nodes_to_cores[target_host] -= cores_per_node;
           hosts_assigned.push_back(target_host);
-          resources.insert(std::make_tuple(target_host, cores_per_node, 0)); // TODO: RAM is set to 0 for now
+          resources.insert(std::make_tuple(target_host, cores_per_node, ComputeService::ALL_RAM));
         }
       } else {
         throw std::invalid_argument(
