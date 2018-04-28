@@ -194,7 +194,7 @@ void CloudServiceTest::do_StandardJobTaskTest_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
@@ -317,7 +317,7 @@ void CloudServiceTest::do_PilotJobTaskTest_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
@@ -435,7 +435,7 @@ void CloudServiceTest::do_NumCoresTest_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service

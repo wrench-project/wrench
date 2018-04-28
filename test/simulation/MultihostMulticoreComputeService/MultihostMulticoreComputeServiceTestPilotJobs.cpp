@@ -180,7 +180,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
 
@@ -382,7 +382,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging the input file on the storage service
   EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
@@ -532,7 +532,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -642,7 +642,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -796,7 +796,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -957,7 +957,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service

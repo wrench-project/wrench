@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
   std::cerr << "Instantiating a FileRegistryService on " << file_registry_service_host << "..." << std::endl;
   wrench::FileRegistryService * file_registry_service =
           new wrench::FileRegistryService(file_registry_service_host);
-  simulation.setFileRegistryService(file_registry_service);
+  simulation.add(file_registry_service);
 
   // TRYING NETWORK PROXIMITY SERVICE WITH VIVALDI....
   std::vector<std::string> hostname_list_copy(hostname_list);

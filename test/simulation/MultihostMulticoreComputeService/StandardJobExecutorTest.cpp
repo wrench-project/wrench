@@ -484,7 +484,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -673,7 +673,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -852,7 +852,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -1030,7 +1030,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -1320,7 +1320,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1677,7 +1677,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1951,7 +1951,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2105,7 +2105,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService("Host3"));
+  simulation->add(new wrench::FileRegistryService("Host3"));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2256,7 +2256,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService("Host3"));
+  simulation->add(new wrench::FileRegistryService("Host3"));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2426,7 +2426,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService("Host3"));
+  simulation->add(new wrench::FileRegistryService("Host3"));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2579,7 +2579,7 @@ void StandardJobExecutorTest::do_DEBUG_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService("Host3"));
+  simulation->add(new wrench::FileRegistryService("Host3"));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);

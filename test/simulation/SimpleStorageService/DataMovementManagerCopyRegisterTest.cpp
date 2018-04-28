@@ -303,7 +303,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
 
   // Create a file registry
   wrench::FileRegistryService *file_registry_service = nullptr;
-  EXPECT_NO_THROW(file_registry_service = simulation->setFileRegistryService(new wrench::FileRegistryService("WMSHost")));
+  EXPECT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
