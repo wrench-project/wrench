@@ -97,6 +97,7 @@ namespace wrench {
                      std::vector<std::string> compute_hosts,
                      StorageService *default_storage_service,
                      unsigned long cores_per_host,
+                     double ram_per_host,
                      std::map<std::string, std::string> plist,
                      std::string suffix);
 
