@@ -32,7 +32,7 @@ public:
 
     void do_OneStandardJobTaskTest_test();
 
-    void do_TwoStandardJobTaskTest_test();
+    void do_TwoStandardJobSubmissionTest_test();
 
     void do_MultipleStandardTaskTest_test();
 
@@ -374,11 +374,11 @@ private:
 };
 
 TEST_F(BatchServiceTest, TwoStandardJobSubmissionTest) {
-  DO_TEST_WITH_FORK(do_TwoStandardJobTaskTest_test);
+  DO_TEST_WITH_FORK(do_TwoStandardJobSubmissionTest_test);
 }
 
 
-void BatchServiceTest::do_TwoStandardJobTaskTest_test() {
+void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 
 
   // Create and initialize a simulation

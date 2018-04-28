@@ -66,7 +66,7 @@ namespace wrench {
       }
 #else
       if ((this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) == "FCFS") and
-              (this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM) == "FIRSTFIT")) {
+          (this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM) == "FIRSTFIT")) {
         return getQueueWaitingTimeEstimateForFCFS(set_of_jobs);
       } else {
         throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(
@@ -81,6 +81,9 @@ namespace wrench {
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_hosts: the hosts running in the network
+     *                 - the hosts have to be homogeneous (speed, number of cores, RAM size)
+     *                 - all cores are used by the Batch Service on each host
+     *                 - all RAM is used by the Batch Service on each host
      * @param default_storage_service: the default storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      */
@@ -92,7 +95,8 @@ namespace wrench {
                                std::map<std::string, std::string> plist) :
             BatchService(hostname, supports_standard_jobs,
                          supports_pilot_jobs, std::move(compute_hosts),
-                         default_storage_service, ComputeService::ALL_CORES, std::move(plist), "") {
+                         default_storage_service, ComputeService::ALL_CORES,
+                         ComputeService::ALL_RAM, std::move(plist), "") {
 
     }
 
@@ -106,6 +110,8 @@ namespace wrench {
      * @param default_storage_service: the default storage service (or nullptr)
      * @param cores_per_host: number of cores used per host
      *              - ComputeService::ALL_CORES to use all cores
+     * @param ram_per_host: RAM per host
+     *              - ComputeService::ALL_RAM to use all RAM
      * @param plist: a property list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
      *
@@ -117,6 +123,7 @@ namespace wrench {
                                std::vector<std::string> compute_hosts,
                                StorageService *default_storage_service,
                                unsigned long cores_per_host,
+                               double ram_per_host,
                                std::map<std::string, std::string> plist, std::string suffix) :
             ComputeService(hostname,
                            "batch" + suffix,
@@ -128,8 +135,13 @@ namespace wrench {
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(plist));
 
+      // Basic checks
       if (cores_per_host == 0) {
         throw std::invalid_argument("BatchService::BatchService(): compute hosts should have at least one core");
+      }
+
+      if (ram_per_host <= 0) {
+        throw std::invalid_argument("BatchService::BatchService(): compute hosts should have at least some RAM");
       }
 
       if (compute_hosts.empty()) {
@@ -137,9 +149,9 @@ namespace wrench {
       }
 
       // Check Platform homogeneity
-      double num_cores = Simulation::getHostNumCores(*(compute_hosts.begin()));
+      double num_cores_available = Simulation::getHostNumCores(*(compute_hosts.begin()));
       double speed = Simulation::getHostFlopRate(*(compute_hosts.begin()));
-      double ram = Simulation::getHostMemoryCapacity(*(compute_hosts.begin()));
+      double ram_available = Simulation::getHostMemoryCapacity(*(compute_hosts.begin()));
 
       for (auto const &h : compute_hosts) {
         // Compute speed
@@ -148,37 +160,33 @@ namespace wrench {
                   "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different flop rates detected)");
         }
         // RAM
-        if (fabs(ram - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
+        if (fabs(ram_available - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
 
           throw std::invalid_argument(
                   "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different RAM capacities detected)");
         }
         // Num cores
-        if (cores_per_host == ComputeService::ALL_CORES) {
-          if (Simulation::getHostNumCores(h) != num_cores) {
-            throw std::invalid_argument(
-                    "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different numbers of cores detected");
-          }
-        } else {
-          if (Simulation::getHostNumCores(h) < cores_per_host) {
-            throw std::invalid_argument(
-                    "BatchService::BatchService(): Compute host has less thatn the specified number of cores (" +
-                    std::to_string(cores_per_host) + "'");
-          }
+
+        if (Simulation::getHostNumCores(h) != num_cores_available) {
+          throw std::invalid_argument(
+                  "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different RAM capacities detected)");
+
         }
+      }
+
+      // Check that ALL_CORES and ALL_RAM, or actual maximum values, were passed
+      if (((cores_per_host != ComputeService::ALL_CORES) and (cores_per_host != num_cores_available)) or
+          ((ram_per_host != ComputeService::ALL_RAM) and (ram_per_host != ram_available))) {
+        throw std::invalid_argument(
+                "BatchService::BatchService(): A Batch Service must be given ALL core and RAM resources of hosts "
+                        "(e.g., passing ComputeService::ALL_CORES and ComputeService::ALL_RAM)");
       }
 
       //create a map for host to cores
       int i = 0;
       for (auto h : compute_hosts) {
-        // TODO: Why do we have the "not this->supports_pilot_jobs" below?
-        if (cores_per_host < ComputeService::ALL_CORES && not this->supports_pilot_jobs) {
-          this->nodes_to_cores_map.insert({h, cores_per_host});
-          this->available_nodes_to_cores.insert({h, cores_per_host});
-        } else {
-          this->nodes_to_cores_map.insert({h, S4U_Simulation::getNumCores(h)});
-          this->available_nodes_to_cores.insert({h, S4U_Simulation::getNumCores(h)});
-        }
+        this->nodes_to_cores_map.insert({h, num_cores_available});
+        this->available_nodes_to_cores.insert({h, num_cores_available});
         this->host_id_to_names[i++] = h;
       }
 
@@ -205,9 +213,9 @@ namespace wrench {
 //          throw std::invalid_argument("Workload trace file contains a job that requires too many compute nodes");
             std::get<5>(j) = this->total_num_of_nodes;
           }
-          if (requested_ram > ram) {
+          if (requested_ram > ram_available) {
 //          throw std::invalid_argument("Workload trace file contains a job that requires too much ram per compute nodes");
-            std::get<4>(j) = ram;
+            std::get<4>(j) = ram_available;
           }
         }
       }
