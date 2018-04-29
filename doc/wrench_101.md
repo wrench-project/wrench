@@ -256,9 +256,8 @@ A Workflow Management System (WMS), i.e., the software that makes all decisions
  
 ```
   while (workflow execution hasn't completed or failed) {
-    make file copies and task executions
-    make these decisions happen by using services
-    wait for some execution event
+    interact with services
+    wait for an event
   }
 ```
 
@@ -278,17 +277,37 @@ typically follows the following steps:
    has access to in total.  A `wrench::StorageService()` has a `getFreeSpace()` method to find
    out have many bytes of free space are available to it.  Note that these methods actually involve
    communication with the service, and thus incur overhead. 
+   
+-# **Go through a main loop:** The heart of the WMS's execution consists in
+   going through a loop until the workflow is executed or has failed to execute. This loop
+   consists of two main steps:
+   
+   - **Interact with services:** This is where the WMS can cause workflow files to be copied
+      between storage services, and where workflow tasks can be submitted to compute services.
+      See below more more details in [interaction with services](#wrench-101-WMS-services).
+   
+   - **Wait for an event:** This is where the WMS is waiting for services to reply with 
+      "work done" or "work failed" events (see [below](#wrench-101-WMS-events) for more details
+      on events)
 
 
 # Interacting with services  #                  {#wrench-101-WMS-services}
 
-# Running workflow tasks #                      {#wrench-101-WMS-tasks}
+         Managers concept
 
 # Moving workflow data #                        {#wrench-101-WMS-data}
 
-# Schedulers for decision-making #              {#wrench-101-WMS-schedulers}
+           Manager
+
+# Running workflow tasks #                      {#wrench-101-WMS-tasks}
+
+        Standard Jobs
+        
 
 # Workflow execution events #                   {#wrench-101-WMS-events}
+
+# Schedulers for decision-making #              {#wrench-101-WMS-schedulers}
+
 
 # Logging #                                     {#wrench-101-WMS-logging}
 
