@@ -90,9 +90,10 @@ storage resources, network links, routers, routes between hosts, etc.)
    time-stamped traces of simulation events. These traces can be processed/analyzed at will.  
       
 
-The above steps are depicted in the figure below: 
+<!-- The above steps are depicted in the figure below: 
 
 ![Overview of the WRENCH simulation setup.](images/wrench-simulation.png)
+-->
 
 # Available services #      {#wrench-101-simulator-services}
 
@@ -123,17 +124,17 @@ entry tasks have input files (because in this case these files have to be somewh
 before execution can start). But some WMSs may complain if none is available.
 
 
-- **Network Proximity Services ** (the class `wrench::NetworkProximityService`): 
+- **Network Proximity Services** (the class `wrench::NetworkProximityService`): 
 These are services that monitor the network and provide a database of 
 host-to-host network distances. This database can be queried by WMSs to make informed
 decisions, e.g., to pick from which storage service a file should be retrieved
 so as to reduce communication time.  Typically, network distances are estimated
-as or based on roud-trip-times between hosts. 
+as or based on round-trip-times between hosts. 
 It is not required to instantiate a network proximity service, but some WMSs may complain if none
 is available.
 
 
-- **Worflow Management Systems (WMSs) ** (classes that derive `wrench::WMS`): 
+- **Worflow Management Systems (WMSs)** (classes that derive `wrench::WMS`): 
 A workflow management system provides the mechanisms for executing a workflow
 applications, include decision-making for optimizing various objectives (the most
 common one between to minimize workflow execution time).  By default,
@@ -147,26 +148,77 @@ on how to develop a WMS.  At least **one** WMS should be provided for running a 
 # Customizing Services #         {#wrench-101-customizing-services}
 
 Each service is customizable by passing to its constructor a _property list_, i.e., a key-value map
- where each key is a property and each value is a string.  Each service defines a property class.
- For instance, the `wrench::Service` class has an associated `wrench::ServiceProperty` class, 
- the `wrench::ComputeService` class has an associated `wrench::ComputerServiceProperty` class, and
- so on at all level of the service class hierarchy. The API documentation for these property
- class explains what each property means, what possible values are, and what default values are. 
- Some properties correspond to rather low-level simulation details. For instance, 
- the `wrench::ServiceProperty` class defines a `wrench::ServiceProperty:STOP_DAEMON_MESSAGE_PAYLOAD`
- property which can be used to customize the size, in bytes, of the control message sent to the
- daemon that's the entry point to the service to tell it to terminate.  Other properties
- have more to do with what the service can or should do when in operation. For instance,
- the `wrench::BatchSchedulingServiceProperty` class defines a
- `wrench::BatchSchedulingServiceProperty::BATCH_SCHEDULING_ALGORITHM` which specifies
- what scheduling algorithm a batch service should for prioritizing jobs.   All property classes
- inherit from the `wrench::ServiceProperty` class, and you an explore that hierarchy to discover
- all possible (and there are many) service customization opportunities.
+where each key is a property and each value is a string.  Each service defines a property class.
+For instance, the `wrench::Service` class has an associated `wrench::ServiceProperty` class, 
+the `wrench::ComputeService` class has an associated `wrench::ComputeServiceProperty` class, and
+so on at all level of the service class hierarchy. The API documentation for these property
+class explains what each property means, what possible values are, and what default values are. 
+Some properties correspond to rather low-level simulation details. For instance, 
+the `wrench::ServiceProperty` class defines a `wrench::ServiceProperty:STOP_DAEMON_MESSAGE_PAYLOAD`
+property which can be used to customize the size, in bytes, of the control message sent to the
+daemon that's the entry point to the service to tell it to terminate.  Other properties
+have more to do with what the service can or should do when in operation. For instance,
+the `wrench::BatchSchedulingServiceProperty` class defines a
+`wrench::BatchSchedulingServiceProperty::BATCH_SCHEDULING_ALGORITHM` which specifies
+what scheduling algorithm a batch service should for prioritizing jobs.   All property classes
+inherit from the `wrench::ServiceProperty` class, and you an explore that hierarchy to discover
+all possible (and there are many) service customization opportunities.
 
-# Turning logging on/off #        {#wrench-101-logging-onoff}
+# Customizing logging  #        {#wrench-101-logging}
 
+When running a WRENCH simulator you'll notice that there is quite a bit of logging output. While logging
+output can be useful to inspect visually the way in which the simulation proceeds, it often becomes necessary
+to disable it.  WRENCH's logging system is a thin layer on top of SimGrid's logging system, and as such
+is controlled via command-line arguments. The simple example in `examples/simple-example` is executed 
+as follows, assuming the working directory is `examples/simple-example`:
+
+```
+./wrench-simple-example-cloud  platform_files/cloud_hosts.xml workflow_files/genome.dax
+```
+
+One first way in which to modify logging is to disable colors, which can be useful to redirect output
+to a file, is to use the `--wrench-no-color` command-line option, anywhere in the argument list, for instance:
+
+```
+./wrench-simple-example-cloud  --wrench-no-color platform_files/cloud_hosts.xml workflow_files/genome.dax
+```
+
+Disabling all logging is done with the SimGrid option `--log=root.threshold:critical`:
+
+```
+./wrench-simple-example-cloud  --wrench-no-color platform_files/cloud_hosts.xml workflow_files/genome.dax
+```
+
+
+
+
+Particular "log categories" can be toggled on and off. Log category names are attached to 
+`*.cpp` files in the WRENCH and SimGrid code. Using the `-help-log-categories` option shows the
+entire log category hierarchy. For instance, there is a log category that's called `wms` for the
+WMS, i.e., those logging messages in the `wrench:WMS` class and a log category that's called
+`simple_wms` for logging message in the `wrench::SimpleWMS` class, which inherits from `wrench::WMS`. 
+These messages are thus essentially displayed by the WMS in the simple example. They can be enabled
+while other message as disabled as follows: 
+
+```
+./wrench-simple-example-cloud   platform_files/cloud_hosts.xml workflow_files/genome.dax --log=root.threshold:critical --log=simple_wms.threshold=debug --log=wms.threshold=debug
+```
+
+Use the `--help-logs` option displays information on the way SimGrid
+logging works. See the 
+[full SimGrid logging documentation](http://simgrid.gforge.inria.fr/simgrid/latest/doc/outcomes_logs.html) for 
+all details.
 
 # Analyzing Simulation Output #   {#wrench-101-simulation-output}
+
+Once the `wrench::Simulation::launch()` method has returned, it is possible to process time-stamped traces
+to analyze simulation output. The `wrench::Simulation` class has an `output` field, which has a templated
+`getTrace()` method to retrieve traces for various information types. For instance, the call
+```
+simulation.output.getTrace<wrench::SimulationTimestampTaskCompletion>()
+```
+returns a vector of time-stamped task completion events. The classes that implement time-stamped events
+are all classes named `wrench::SimulationTimestamp...`
 
 
 @endWRENCHDoc
