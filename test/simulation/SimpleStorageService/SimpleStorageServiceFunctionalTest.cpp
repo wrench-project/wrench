@@ -167,7 +167,7 @@ private:
       // Send a free space request
       double free_space;
       try {
-        free_space = this->test->storage_service_100->howMuchFreeSpace();
+        free_space = this->test->storage_service_100->getFreeSpace();
       } catch (wrench::WorkflowExecutionException &e) {
         free_space = -1.0;
       }
@@ -214,7 +214,7 @@ private:
 
       // Check that the storage capacity is back to what it should be
       try {
-        free_space = this->test->storage_service_100->howMuchFreeSpace();
+        free_space = this->test->storage_service_100->getFreeSpace();
       } catch (wrench::WorkflowExecutionException &e) {
         free_space = -1.0;
       }
@@ -298,7 +298,7 @@ private:
 
       // Check that the free space has been updated at the destination
       try {
-        free_space = this->test->storage_service_100->howMuchFreeSpace();
+        free_space = this->test->storage_service_100->getFreeSpace();
       } catch (wrench::WorkflowExecutionException &e) {
         free_space = -1.0;
       }

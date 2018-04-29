@@ -53,7 +53,7 @@ and one can analyze simulation output.
 
 # Blueprint for a WRENCH-based simulator #         {#wrench-101-simulator-blueprint}
 
-Let's dive down into more details.   Here are the steps that a WRENCH-based simulator typically follows:
+Here are the steps that a WRENCH-based simulator typically follows:
 
 -# **Create and initialize a simulation** -- In WRENCH, a user simulation is defined via the `wrench::Simulation` class. And instance of this class
 must be created, and the `wrench::Simulation::init(int *, char **)` method is called to initialize the simulation (and parse WRENCH-specific 
@@ -80,7 +80,8 @@ storage resources, network links, routers, routes between hosts, etc.)
  services. 
  
 -# **Instantiate at least one WMS per workflow** -- One of the services instantiated must be a `wrench::WMS` instance, i.e., a service that is
- in charge of executing the workflow, as implemented by a WRENCH "developer" using the Developer API.  
+ in charge of executing the workflow, as implemented by a WRENCH "developer" using the Developer API. Associating
+ a workflow to a WMS is done via the `wrench::WMS::addWorkflow()` method.
 
 -# **Launch the simulation** -- This is done via the `wrench::Simulation::launch()` call which first
       sanity checks the simulation setup and then launches and simulators all services, until all WMS services
@@ -134,7 +135,7 @@ It is not required to instantiate a network proximity service, but some WMSs may
 is available.
 
 
-- **Worflow Management Systems (WMSs)** (classes that derive `wrench::WMS`): 
+- **Workflow Management Systems (WMSs)** (classes that derive `wrench::WMS`): 
 A workflow management system provides the mechanisms for executing a workflow
 applications, include decision-making for optimizing various objectives (the most
 common one between to minimize workflow execution time).  By default,
@@ -248,9 +249,35 @@ to build your own WMS (Workflow Management Systems).
 
 # 10,000-ft view of a simulated WMS #           {#wrench-101-WMS-10000ft}
 
+A Workflow Management System (WMS), i.e., the software that makes all decisions
+ and takes all actions for executing a workflo, is implemented in WRENCH as 
+ a simulated process. That process have a `main()` function that goes through 
+ a simple even loop as follows:
+ 
+```
+  while (workflow execution hasn't completed or failed) {
+    make file copies and task executions
+    make these decisions happen by using services
+    wait for some execution event
+  }
+```
 
 
 # Blueprint for a WMS in WRENCH #               {#wrench-101-WMS-blueprint}
+
+A WMS implementation in WRENCH must derive the `wrench::WMS` class, and
+typically follows the following steps:
+
+-# **Get references to running services:** The `wrench:WMS` base class implements
+   a set of methods named `getAvailableComputeServices()`, `getAvailableStorageServices()`, etc. 
+   These methods return sets of services that can be used by the WMS to execute its workflow. 
+   
+-# **Acquire information about the services:** Some service classes provide method to get
+   information about the capabilities of the services. For instance, a `wrench::ComputeService()`
+   has a `getNumHosts()` method that makes it possible to find out how many compute hosts the service
+   has access to in total.  A `wrench::StorageService()` has a `getFreeSpace()` method to find
+   out have many bytes of free space are available to it.  Note that these methods actually involve
+   communication with the service, and thus incur overhead. 
 
 
 # Interacting with services  #                  {#wrench-101-WMS-services}

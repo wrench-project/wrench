@@ -41,7 +41,7 @@ namespace wrench {
 
         void stop();
 
-        virtual double howMuchFreeSpace();
+        virtual double getFreeSpace();
 
         virtual bool lookupFile(WorkflowFile *file);
 
