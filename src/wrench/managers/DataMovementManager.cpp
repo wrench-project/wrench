@@ -160,7 +160,7 @@ namespace wrench {
  */
     int DataMovementManager::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_YELLOW);
 
       WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox_name.c_str());
 

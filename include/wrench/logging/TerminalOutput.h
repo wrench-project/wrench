@@ -16,15 +16,17 @@
 
 #include <iostream>
 
+namespace wrench {
+
 /* Defined color codes */
-#define WRENCH_LOGGING_COLOR_BLACK      "\033[1;30m"
-#define WRENCH_LOGGING_COLOR_RED      "\033[1;31m"
-#define WRENCH_LOGGING_COLOR_GREEN    "\033[1;32m"
-#define WRENCH_LOGGING_COLOR_YELLOW    "\033[1;33m"
-#define WRENCH_LOGGING_COLOR_BLUE      "\033[1;34m"
-#define WRENCH_LOGGING_COLOR_MAGENTA  "\033[1;35m"
-#define WRENCH_LOGGING_COLOR_CYAN      "\033[1;36m"
-#define WRENCH_LOGGING_COLOR_WHITE      "\033[1;37m"
+#define COLOR_BLACK      "\033[1;30m"
+#define COLOR_RED      "\033[1;31m"
+#define COLOR_GREEN    "\033[1;32m"
+#define COLOR_YELLOW    "\033[1;33m"
+#define COLOR_BLUE      "\033[1;34m"
+#define COLOR_MAGENTA  "\033[1;35m"
+#define COLOR_CYAN      "\033[1;36m"
+#define COLOR_WHITE      "\033[1;37m"
 
 /* Wrappers around XBT_* macros */
 
@@ -34,7 +36,6 @@
 
 #define WRENCH_WARN(...)  wrench::TerminalOutput::beginThisProcessColor(); XBT_WARN(__VA_ARGS__) ; wrench::TerminalOutput::endThisProcessColor()
 
-namespace wrench {
 
     /***********************/
     /** \cond DEVELOPER    */

@@ -105,7 +105,7 @@ namespace wrench {
     int WorkunitMulticoreExecutor::main() {
 
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_BLUE);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_BLUE);
 
       WRENCH_INFO("New WorkunitExecutor starting (%s) to do: %ld pre file copies, %ld tasks, %ld post file copies",
                   this->mailbox_name.c_str(),

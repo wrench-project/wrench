@@ -291,7 +291,7 @@ namespace wrench {
     */
     int VirtualizedClusterService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_RED);
       WRENCH_INFO("Virtualized Cluster Service starting on host %s listening on mailbox_name %s",
                   this->hostname.c_str(),
                   this->mailbox_name.c_str());

@@ -267,7 +267,7 @@ namespace wrench {
      */
     int FileRegistryService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
 
       WRENCH_INFO("File Registry Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 

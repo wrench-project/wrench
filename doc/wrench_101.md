@@ -153,12 +153,12 @@ the `wrench::ComputeService` class has an associated `wrench::ComputeServiceProp
 so on at all level of the service class hierarchy. The API documentation for these property
 class explains what each property means, what possible values are, and what default values are. 
 Some properties correspond to rather low-level simulation details. For instance, 
-the `wrench::ServiceProperty` class defines a `wrench::ServiceProperty:STOP_DAEMON_MESSAGE_PAYLOAD`
+the `wrench::ServiceProperty` class defines a `wrench::ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD`
 property which can be used to customize the size, in bytes, of the control message sent to the
 daemon that's the entry point to the service to tell it to terminate.  Other properties
 have more to do with what the service can or should do when in operation. For instance,
-the `wrench::BatchSchedulingServiceProperty` class defines a
-`wrench::BatchSchedulingServiceProperty::BATCH_SCHEDULING_ALGORITHM` which specifies
+the `wrench::BatchServiceProperty` class defines a
+`wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM` which specifies
 what scheduling algorithm a batch service should for prioritizing jobs.   All property classes
 inherit from the `wrench::ServiceProperty` class, and you an explore that hierarchy to discover
 all possible (and there are many) service customization opportunities.
@@ -211,13 +211,16 @@ all details.
 # Analyzing Simulation Output #   {#wrench-101-simulation-output}
 
 Once the `wrench::Simulation::launch()` method has returned, it is possible to process time-stamped traces
-to analyze simulation output. The `wrench::Simulation` class has an `output` field, which has a templated
-`getTrace()` method to retrieve traces for various information types. For instance, the call
+to analyze simulation output. The `wrench::Simulation` class has an `output` field, which is
+an instance of `wrench::SimulationOutput`, which has a templated
+`wrench::SimulationOutput::getTrace()` method to retrieve traces for various information types. 
+For instance, the call
 ```
 simulation.output.getTrace<wrench::SimulationTimestampTaskCompletion>()
 ```
 returns a vector of time-stamped task completion events. The classes that implement time-stamped events
-are all classes named `wrench::SimulationTimestamp...`
+are all classes named `wrench::SimulationTimestampSomething`, where `Something` is pretty self-explanatory
+(e.g., `TaskCompletion`).
 
 
 @endWRENCHDoc
@@ -409,18 +412,18 @@ in the simple example provided in the `examples/simple-example` directory.
 # Logging #                                     {#wrench-101-WMS-logging}
 
 It is often desirable for the WMS to print log output to the terminal. This is easily accomplished using the 
-`WRENCH_INFO`, `WRENCH_DEBUG`, and `WRENCH_WARN` macros, which are used just like `printf`. Each of these
+`wrench::WRENCH_INFO`, `wrench::WRENCH_DEBUG`, and `wrench::WRENCH_WARN` macros, which are used just like `printf`. Each of these
 macros corresponds to a different logging level in SimGrid. See the 
 [SimGrid logging documentation](http://simgrid.gforge.inria.fr/simgrid/latest/doc/outcomes_logs.html) for 
 all details. 
 
 Furthermore, one can change the color of the log messages with the
 `wrench::TerminalOutput::setThisProcessLoggingColor()` method, which takes as
-parameter a color specification (`wrench::TerminalOutput::WRENCH_LOGGING_COLOR_BLACK`,
-`wrench::TerminalOutput::WRENCH_LOGGING_COLOR_RED`, `wrench::TerminalOutput::WRENCH_LOGGING_COLOR_GREEN`,
-`wrench::TerminalOutput::WRENCH_LOGGING_COLOR_YELLOW`, `wrench::TerminalOutput::WRENCH_LOGGING_COLOR_BLUE`,
-`wrench::TerminalOutput::WRENCH_LOGGING_COLOR_MAGENTA`, `wrench::TerminalOutput::WRENCH_LOGGING_COLOR_CYAN`, or
-`wrench::TerminalOutput::WRENCH_LOGGING_COLOR_WHITE`)
+parameter a color specification (`wrench::COLOR_BLACK`,
+`wrench::COLOR_RED`, `wrench::COLOR_GREEN`,
+`wrench::COLOR_YELLOW`, `wrench::COLOR_BLUE`,
+`wrench::COLOR_MAGENTA`, `wrench::COLOR_CYAN`, or
+`wrench::COLOR_WHITE`)
 
   
 @endWRENCHDoc
