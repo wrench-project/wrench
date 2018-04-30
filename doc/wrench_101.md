@@ -25,8 +25,6 @@ in the documentation.
 This **User 101** guide describes all the WRENCH's simulation components (building blocks) 
 necessary to build a custom simulator and run simulation scenarios. 
 
----
-
 [TOC]
 
 ---
@@ -56,24 +54,24 @@ and one can analyze simulation output.
 Here are the steps that a WRENCH-based simulator typically follows:
 
 -# **Create and initialize a simulation** -- In WRENCH, a user simulation is defined via the `wrench::Simulation` class. And instance of this class
-must be created, and the `wrench::Simulation::init(int *, char **)` method is called to initialize the simulation (and parse WRENCH-specific 
+must be created, and the `wrench::Simulation::init()` method is called to initialize the simulation (and parse WRENCH-specific 
 and [SimGrid-specific](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/options.html) 
 command-line arguments and removed them from the command-line argument list).
 
--# **Instantiate a simulated platform** --  This is done with the `wrench::Simulation::instantiatePlatform(std::string &)`
+-# **Instantiate a simulated platform** --  This is done with the `wrench::Simulation::instantiatePlatform()`
 method which takes as argument a 
 [SimGrid virtual platform description file](http://simgrid.gforge.inria.fr/simgrid/3.17/doc/platform.html).
 Any [SimGrid](http://simgrid.gforge.inria.fr) simulation must be provided with the description 
 of the platform on which an application/system execution is to be simulated (compute hosts, clusters of hosts, 
 storage resources, network links, routers, routes between hosts, etc.)
 
--# **Instantiate services on the platform** -- The `wrench::Simulation::add(wrench::Service *)` method is used
+-# **Instantiate services on the platform** -- The `wrench::Simulation::add()` method is used
  to add services to the simulation. Each class of service is created with a particular 
  constructor, which also specifies host(s) on which the service is to be started. Typical kinds of services
  are compute services, storage services, network proximity services, file registry services.  The only service that's necessary
  is a WMS...
  
- -# **Create at least one workflow** --  This is done by creating an instance of the `wrench::Workflow` class, which has
+-# **Create at least one workflow** --  This is done by creating an instance of the `wrench::Workflow` class, which has
  methods to manually add tasks and files to the workflow application, but also methods to import workflows
  from workflow description files ([DAX](http://workflowarchive.org) and [JSON](http://workflowhub.org/traces/). 
  If there are input files to the workflow's entry tasks, these must be staged on instantiated storage
@@ -244,8 +242,6 @@ to build your own WMS (Workflow Management Systems).
 
 [TOC]
 
----
-
 
 # 10,000-ft view of a simulated WMS #           {#wrench-101-WMS-10000ft}
 
@@ -284,11 +280,10 @@ typically follows the following steps:
    
    - **Interact with services:** This is where the WMS can cause workflow files to be copied
       between storage services, and where workflow tasks can be submitted to compute services.
-      See below more more details in the [Interacting with services](#wrench-101-WMS-services) section.
+      See the [Interacting with services](#wrench-101-WMS-services) section below for more details.
    
    - **Wait for an event:** This is where the WMS is waiting for services to reply with 
-      "work done" or "work failed" events (see [below](#wrench-101-WMS-events) for more details
-      on events)
+      "work done" or "work failed" events. See the [Workflow execution events](#wrench-101-WMS-events) section for more details.
 
 
 # Interacting with services  #                  {#wrench-101-WMS-services}
@@ -378,8 +373,9 @@ documentation is being written, these overridable methods are:
   - `wrench::WMS::processEventFileCopyCompletion()`: react to a file copy completion
   - `wrench::WMS::processEventFileCopyFailure()`: react to a file copy failure
   
-Each method above takes in an event as parameter, as documented in the [API Reference](./annotated.html). 
-In the case of failure, the event points to a `wrench::FailureCause` object, which can be accessed to
+Each method above takes in an event object as parameter, and each even class offers
+several methods to inspect the meaning of the event. 
+In the case of failure, the event includes  a `wrench::FailureCause` object, which can be accessed to
 understand the root cause of the failure. 
 
 
