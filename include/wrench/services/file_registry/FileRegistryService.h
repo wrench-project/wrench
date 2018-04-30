@@ -24,7 +24,9 @@ namespace wrench {
     class StorageService;
 
     /**
-     * @brief A simulated file registry service (a.k.a. replica catalog)
+     * @brief A file registry service (a.k.a. replica catalog) that holds a database
+     *        of which files are available at which storage services. A WMS can add,
+     *        lookup, and remove entries at will from this database.
      */
     class FileRegistryService : public Service {
 
