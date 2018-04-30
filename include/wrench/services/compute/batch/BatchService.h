@@ -33,7 +33,7 @@ namespace wrench {
      *        controls access to their resource via a batch queue.
      *
      *        In the current implementation of
-     *        this service, like many of its real-world counterparts, it does not handle memory
+     *        this service, like for many of its real-world counterparts, it does not handle memory
      *        partitioning among jobs on the same host. It also does not simulate effects
      *        of memory sharing (e.g., swapping). When multiple jobs share hosts,
      *        which can happen when jobs require only a few cores per host and can thus
