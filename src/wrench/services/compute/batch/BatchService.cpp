@@ -80,12 +80,14 @@ namespace wrench {
      * @param hostname: the hostname on which to start the service
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param compute_hosts: the hosts running in the network
-     *                 - the hosts have to be homogeneous (speed, number of cores, RAM size)
-     *                 - all cores are used by the Batch Service on each host
-     *                 - all RAM is used by the Batch Service on each host
-     * @param default_storage_service: the default storage service (or nullptr)
-     * @param plist: a property list ({} means "use all defaults")
+     * @param compute_hosts: the available compute hosts
+     *                 - the hosts must be homogeneous (speed, number of cores, RAM size)
+     *                 - all cores are used by the batch service on each host
+     *                 - all RAM is used by the batch service on each host
+     * @param default_storage_service: a default storage service on which workflow tasks executed
+     *                  by this service can read/write input/ouput file if no specific storage service
+     *                  is not specified by the WMS  (nullptr means "no default storage service is specified")
+     * @param plist: a property list that specifies BatchServiceProperty values ({} means "use all defaults")
      */
     BatchService::BatchService(std::string &hostname,
                                bool supports_standard_jobs,
