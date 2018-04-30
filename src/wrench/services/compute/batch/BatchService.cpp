@@ -455,7 +455,7 @@ namespace wrench {
      */
     int BatchService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
 
       WRENCH_INFO("Batch Service starting");
 

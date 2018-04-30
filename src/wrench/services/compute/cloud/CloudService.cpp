@@ -46,7 +46,7 @@ namespace wrench {
      */
     int CloudService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_RED);
       WRENCH_INFO("Cloud Service starting on host %s listening on mailbox_name %s",
                   this->hostname.c_str(),
                   this->mailbox_name.c_str());

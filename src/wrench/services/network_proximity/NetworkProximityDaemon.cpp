@@ -85,7 +85,7 @@ namespace wrench {
 
     int NetworkProximityDaemon::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
 
       WRENCH_INFO("Network Daemons Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 

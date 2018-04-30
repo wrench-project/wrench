@@ -433,7 +433,7 @@ namespace wrench {
      */
     int JobManager::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_YELLOW);
 
       WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
