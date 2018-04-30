@@ -29,12 +29,15 @@ namespace wrench {
     class WorkloadTraceFileReplayer; // forward
 
     /**
-     * @brief A simulated batch-scheduled compute service. Note that in the current implementation
-     *        this service, like many of its real-world counterparts, does not handle memory
+     * @brief A batch-scheduled compute service that manages a set of compute hosts and
+     *        controls access to their resource via a batch queue.
+     *
+     *        In the current implementation of
+     *        this service, like many of its real-world counterparts, it does not handle memory
      *        partitioning among jobs on the same host. It also does not simulate effects
      *        of memory sharing (e.g., swapping). When multiple jobs share hosts,
-     *        which can happen when jobs require only a few cores per host and can thus be co-located on the same
-     *        hosts in a non-exclusive fashion, each job simple runs as if it had access to the
+     *        which can happen when jobs require only a few cores per host and can thus
+     *        be co-located on the same hosts in a non-exclusive fashion, each job simply runs as if it had access to the
      *        full RAM of each compute host it is scheduled on.
      */
     class BatchService : public ComputeService {

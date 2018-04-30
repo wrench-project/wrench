@@ -21,7 +21,9 @@ namespace wrench {
     class ComputeService;
 
     /**
-     * @brief A simulated cloud-based compute service
+     * @brief A cloud-based compute service that manages a set of physical
+     *        hosts and controls access to their resources by (transparently) executing jobs
+     *        in VM instances.
      */
     class CloudService : public VirtualizedClusterService {
 
