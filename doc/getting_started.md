@@ -12,10 +12,8 @@ The first step is to install the WRENCH library, following the instructions
 
 # Running a First Example #         {#getting-started-example}
 
- Typing `make examples` in the top-level directory
-will compile the examples. However, note that `make && make install` also
-compiles all examples by defaults. 
-By default, a successful WRENCH installation puts the examples binaries in the `/usr/local/bin` 
+ Typing `make` in the top-level directory
+will compile the examples, and `make install` will put the examples binaries in the `/usr/local/bin` 
 folder (for MacOS and most Linux distributions). 
 
 

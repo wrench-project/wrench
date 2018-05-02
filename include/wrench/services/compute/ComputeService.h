@@ -30,7 +30,7 @@ namespace wrench {
     class StorageService;
 
     /**
-     * @brief A simulated compute service
+     * @brief The compute service base class
      */
     class ComputeService : public Service {
 
@@ -78,26 +78,15 @@ namespace wrench {
 
         StorageService *getDefaultStorageService();
 
-        /**
-         * @brief Submit a standard job to the service (to be overridden)
-         *
-         * @param job
-         * @param service_specific_arguments
-         */
-        virtual void
-        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
-
-        /**
-         * @brief Submit a pilot job to the service (to be overridden)
-         *
-         * @param job
-         * @param service_specific_arguments
-         */
-        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
-
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
+
+        virtual void
+        submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
+
+        virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
+
 
         virtual void terminateStandardJob(StandardJob *job) = 0;
 
