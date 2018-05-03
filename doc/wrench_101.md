@@ -340,7 +340,7 @@ submitted.
 The most common kind of jobs is the standard job. A standard job is a unit of execution by which a WMS tells a compute service
 to do things. More specifically, in its most complete form, a standard job specifies:
     
-  - A vector of workflow tasks to execute'
+  - A vector of workflow tasks to execute
   - A map of <file, storage service> values which specifies from which storage services particular input files should be read and to
     which storage services output files should be written. (Note that a compute service can be associated to a "by default" storage service
     upon instantiation);
