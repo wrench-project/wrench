@@ -767,6 +767,24 @@ namespace wrench {
         task_work_units.push_back(new Workunit({}, {task}, job->file_locations, {}, {}));
       }
 
+      // Add dependencies between task work units, if any
+      for (auto const &twu : task_work_units) {
+        std::set<Workunit *> parent_work_units;
+        for (auto const &task : twu->tasks) {
+          if (task->getState() != WorkflowTask::READY) {
+            for (auto const &input_file : task->getInputFiles()) {
+              WorkflowTask *parent_task = input_file->getOutputOf();
+              for (auto const &potential_parent_twu : task_work_units) {
+                if (std::find(potential_parent_twu->tasks.begin(), potential_parent_twu->tasks.end(), parent_task) != potential_parent_twu->tasks.end()) {
+                  Workunit::addDependency(potential_parent_twu, twu);
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+
       // Add dependencies from pre copies to possible successors
       if (pre_file_copies_work_unit != nullptr) {
         if (not task_work_units.empty()) {

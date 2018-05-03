@@ -15,10 +15,10 @@ namespace wrench {
 
     /**
     * @brief Constructor
-    * @param pre_file_copies: a set of file copy actions to perform first
+    * @param pre_file_copies: a set of file copy actions to perform in sequence first
     * @param tasks: a set of tasks to execute in sequence
     * @param file_locations: locations where tasks should read/write files
-    * @param post_file_copies: a set of file copy actions to perform after all tasks
+    * @param post_file_copies: a set of file copy actions to perform in sequence after all tasks
     * @param cleanup_file_deletions: a set of file deletion actions to perform last
     */
     Workunit::Workunit(
