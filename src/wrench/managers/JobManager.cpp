@@ -80,7 +80,8 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param tasks: a vector of tasks
+     * @param tasks: a vector of tasks (which must be either READY, or children of COMPLETED tasks or
+     *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies on which storage services input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
@@ -160,7 +161,8 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param tasks: a vector of tasks
+     * @param tasks: a vector of tasks  (which must be either READY, or children of COMPLETED tasks or
+     *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies on which storage services input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
@@ -181,7 +183,7 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param task: a task
+     * @param task: a task (which must be ready)
      * @param file_locations: a map that specifies on which storage services input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
