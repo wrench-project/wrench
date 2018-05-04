@@ -72,6 +72,8 @@ TEST_F(WorkflowTest, WorkflowStructure) {
   EXPECT_EQ(1, t3->getTopLevel());
   EXPECT_EQ(2, t4->getTopLevel());
 
+  EXPECT_EQ(3, workflow->getNumLevels());
+
   // Get tasks with a given top-level
   std::vector<wrench::WorkflowTask *> top_level_equal_to_1_or_2;
   top_level_equal_to_1_or_2 = workflow->getTasksInTopLevelRange(1,2);

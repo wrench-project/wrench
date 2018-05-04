@@ -373,12 +373,19 @@ namespace wrench {
      * @brief Update the task's top level (looking only at the parents)
      */
     void WorkflowTask::updateTopLevel() {
-      unsigned long max_toplevel = 0;
       std::vector<WorkflowTask *> parents = this->workflow->getTaskParents(this);
-      for (auto parent : parents) {
-        max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
+      if (parents.empty()) {
+        this->toplevel = 0;
+      } else {
+        unsigned long max_toplevel = 0;
+        for (auto parent : parents) {
+          max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
+        }
+        this->toplevel = 1 + max_toplevel;
       }
-      this->toplevel = 1 + max_toplevel;
+      if (this->workflow->getNumLevels() < 1 + this->toplevel) {
+        this->workflow->setNumLevels(1 + this->toplevel);
+      }
       std::vector<WorkflowTask *> children = this->workflow->getTaskChildren(this);
       for (auto child : children) {
         child->updateTopLevel();

@@ -230,6 +230,7 @@ namespace wrench {
       DAG = std::unique_ptr<lemon::ListDigraph>(new lemon::ListDigraph());
       DAG_node_map = std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>>(
               new lemon::ListDigraph::NodeMap<WorkflowTask *>(*DAG));
+      this->num_levels = 0;
       this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
     };
 
@@ -677,7 +678,7 @@ namespace wrench {
      * @brief Returns all tasks with top-levels in a range
      * @param min: the low end of the range (inclusive)
      * @param max: the high end of the range (exclusive)
-     * @return
+     * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getTasksInTopLevelRange(unsigned long min, unsigned long max) {
       std::vector<WorkflowTask *> to_return;
@@ -687,6 +688,23 @@ namespace wrench {
         }
       }
       return to_return;
+    }
+
+    /**
+     * @brief Returns the number of levels in the workflow
+     * @return the number of levels
+     */
+    unsigned long Workflow::getNumLevels() {
+      return this->num_levels;
+    }
+
+
+    /**
+     * @brief Sets the number of levels in the workflow
+     * @param num_levels: the number of levels
+     */
+    void Workflow::setNumLevels(unsigned long num_levels) {
+      this->num_levels = num_levels;
     }
 
 
