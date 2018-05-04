@@ -65,6 +65,8 @@ namespace wrench {
 
         bool isDone();
 
+        std::vector<WorkflowTask *> getTasksInTopLevelRange(unsigned long min, unsigned long max);
+
         std::map<std::string, std::vector<WorkflowTask *>> getReadyTasks();
 
         std::vector<WorkflowTask *> getTasks();
