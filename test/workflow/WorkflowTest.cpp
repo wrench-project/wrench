@@ -72,6 +72,14 @@ TEST_F(WorkflowTest, WorkflowStructure) {
   EXPECT_EQ(1, t3->getTopLevel());
   EXPECT_EQ(2, t4->getTopLevel());
 
+  // Get tasks with a given top-level
+  std::vector<wrench::WorkflowTask *> top_level_equal_to_1_or_2;
+  top_level_equal_to_1_or_2 = workflow->getTasksInTopLevelRange(1,2);
+  EXPECT_EQ(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t1), top_level_equal_to_1_or_2.end());
+  EXPECT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t2), top_level_equal_to_1_or_2.end());
+  EXPECT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t3), top_level_equal_to_1_or_2.end());
+  EXPECT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t4), top_level_equal_to_1_or_2.end());
+
   // remove tasks
   workflow->removeTask(t4);
   EXPECT_EQ(0, workflow->getTaskChildren(t3).size());
