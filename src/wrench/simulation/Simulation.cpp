@@ -324,7 +324,7 @@ namespace wrench {
      */
     ComputeService * Simulation::add(ComputeService *service) {
       if (service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid arguments");
+        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
@@ -347,7 +347,7 @@ namespace wrench {
      */
     NetworkProximityService * Simulation::add(NetworkProximityService *service) {
       if (service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid arguments");
+        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
@@ -371,7 +371,7 @@ namespace wrench {
     */
     StorageService * Simulation::add(StorageService *service) {
       if (service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid arguments");
+        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
@@ -394,7 +394,7 @@ namespace wrench {
      */
     WMS * Simulation::add(WMS *wms) {
       if (wms == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid arguments");
+        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr wms)");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
