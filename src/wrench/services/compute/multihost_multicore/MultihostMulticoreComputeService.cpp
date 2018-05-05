@@ -455,7 +455,7 @@ namespace wrench {
     std::set<std::tuple<std::string, unsigned long, double>>
     MultihostMulticoreComputeService::computeResourceAllocationAggressive(StandardJob *job) {
 
-//      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION");
+      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION");
       // Make a copy of core_and_ram_availabilities
       std::map<std::string, std::pair<unsigned long, double>> tentative_core_and_ram_availabilities;
       for (auto r : this->core_and_ram_availabilities) {
@@ -993,9 +993,10 @@ namespace wrench {
       for (auto workflow_job : this->running_jobs) {
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto job = (StandardJob *) workflow_job;
-          this->failRunningStandardJob(job, std::move(cause));
+          this->failRunningStandardJob(job, cause);
         }
       }
+
 
       while (not this->pending_jobs.empty()) {
         WorkflowJob *workflow_job = this->pending_jobs.front();
