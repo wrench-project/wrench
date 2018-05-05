@@ -455,7 +455,7 @@ namespace wrench {
     std::set<std::tuple<std::string, unsigned long, double>>
     MultihostMulticoreComputeService::computeResourceAllocationAggressive(StandardJob *job) {
 
-      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION: %ld", this->core_and_ram_availabilities.size());
+//      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION");
       // Make a copy of core_and_ram_availabilities
       std::map<std::string, std::pair<unsigned long, double>> tentative_core_and_ram_availabilities;
       for (auto r : this->core_and_ram_availabilities) {
@@ -469,10 +469,12 @@ namespace wrench {
         tasks.insert(t);
       }
 
+      std::map<std::string, std::tuple<unsigned long, double>> allocation;
+
+
       // Find the task that can use the most cores somewhere, update availabilities, repeat
       bool keep_going = true;
       while (keep_going) {
-        keep_going = false;
 
         WorkflowTask *picked_task = nullptr;
         std::string picked_picked_host;
@@ -513,13 +515,10 @@ namespace wrench {
           }
 
           if (picked_num_cores == 0) {
-//            WRENCH_INFO("NOPE");
             continue;
           }
 
           if (picked_num_cores > picked_picked_num_cores) {
-//            WRENCH_INFO("PICKED TASK %s on HOST %s with %ld cores",
-//                        t->getId().c_str(), picked_host.c_str(), picked_num_cores);
             picked_task = t;
             picked_picked_num_cores = picked_num_cores;
             picked_picked_ram = picked_ram;
@@ -527,35 +526,42 @@ namespace wrench {
           }
         }
 
-        if (picked_picked_num_cores != 0) {
+
+        if (picked_picked_num_cores > 0) {
+//          WRENCH_INFO("ALLOCATION %s/%ld-%.2lf for task %s", picked_picked_host.c_str(),
+//                      picked_picked_num_cores, picked_picked_ram, picked_task->getId().c_str());
+
+          if (allocation.find(picked_picked_host) != allocation.end()) {
+            std::get<0>(allocation[picked_picked_host]) += picked_picked_num_cores;
+            std::get<1>(allocation[picked_picked_host]) += picked_picked_ram;
+          } else {
+            allocation.insert(
+                    std::make_pair(picked_picked_host,
+                                   std::make_tuple(picked_picked_num_cores,
+                                                   picked_picked_ram)));
+          }
+
           // Update availabilities
           std::get<0>(tentative_core_and_ram_availabilities[picked_picked_host]) -= picked_picked_num_cores;
           std::get<1>(tentative_core_and_ram_availabilities[picked_picked_host]) -= picked_picked_ram;
+
           // Remove the task
           tasks.erase(picked_task);
+
           // We should keep trying!
-          keep_going = true;
+          keep_going = not tasks.empty();
+        } else {
+          keep_going = false;
         }
       }
 
 
-      // Come up with allocation based on tentative availabilities!
-      std::set<std::tuple<std::string, unsigned long, double>> allocation;
-      for (auto r : tentative_core_and_ram_availabilities) {
-        std::string hostname = r.first;
-        unsigned long num_cores = std::get<0>(r.second);
-        double ram = std::get<1>(r.second);
-
-        if ((num_cores <= std::get<0>(this->core_and_ram_availabilities[hostname])) and
-            (ram <= std::get<1>(this->core_and_ram_availabilities[hostname]))) {
-//          WRENCH_INFO("ALLOCATION %s/%ld-%.2lf", hostname.c_str(), std::get<0>(this->core_and_ram_availabilities[hostname]) - num_cores, std::get<1>(this->core_and_ram_availabilities[hostname]) - ram);
-          allocation.insert(
-                  std::make_tuple(hostname, std::get<0>(this->core_and_ram_availabilities[hostname]) - num_cores,
-                                  std::get<1>(this->core_and_ram_availabilities[hostname]) - ram));
-        }
+      // Convert back to a set, which is lame
+      std::set<std::tuple<std::string, unsigned long, double>> to_return;
+      for (auto h : allocation) {
+        to_return.insert(std::make_tuple(h.first, std::get<0>(h.second), std::get<1>(h.second)));
       }
-
-      return allocation;
+      return to_return;
     }
 
 /**
@@ -613,6 +619,8 @@ namespace wrench {
       // Allocate resources for the job based on resource allocation strategies
       std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
       compute_resources = computeResourceAllocation(job);
+
+
 
       // Update core availabilities (and compute total number of cores for printing)
       unsigned long total_cores = 0;
@@ -1473,7 +1481,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void MultihostMulticoreComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-                                                                  PilotJob *job) {
+                                                                 PilotJob *job) {
       WRENCH_INFO("Asked to run a pilot job with %ld hosts and %ld cores per host for %lf seconds",
                   job->getNumHosts(), job->getNumCoresPerHost(), job->getDuration());
 

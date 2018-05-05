@@ -194,8 +194,13 @@ namespace wrench {
      *
      */
     void Workflow::exportToEPS(std::string eps_filename) {
-      graphToEps(*DAG, eps_filename).run();
-      WRENCH_INFO("Export to EPS broken / not implemented at the moment");
+//      typedef lemon::dim2::Point<int> Point;
+//      lemon::ListDigraph::NodeMap<Point> coords(*DAG);
+
+//      graphToEps(*DAG, eps_filename).
+//              coords(coords).             // Doesn't compute coordinates!
+//              run();
+      throw std::runtime_error("Export to EPS broken / not implemented at the moment");
     }
 
     /**
