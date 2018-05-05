@@ -8,6 +8,7 @@
  */
 
 
+#include <iostream>
 #include "wrench/services/compute/ComputeServiceMessage.h"
 
 namespace wrench {
