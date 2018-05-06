@@ -14,10 +14,9 @@
 #include <exception>
 #include <memory>
 #include <string>
+#include <string.h>
+
 #include "wrench/workflow/execution_events/FailureCause.h"
-
-#include <iostream>
-
 namespace wrench {
 
 		/***********************/
