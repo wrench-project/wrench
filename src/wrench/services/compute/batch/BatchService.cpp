@@ -783,7 +783,7 @@ namespace wrench {
 
 
       if (resources.empty()) {
-        WRENCH_INFO("Can't run job %s", workflow_job->getName().c_str());
+        WRENCH_INFO("Can't run job %s right now", workflow_job->getName().c_str());
         return false;
       }
 
@@ -990,11 +990,16 @@ namespace wrench {
         return true;
 
       } else if (auto msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
+        if (this->running_jobs.find(msg->job) == this->running_jobs.end()) {
+          WRENCH_INFO("Received a time out message for an unknown job... ignoring");
+          return true;
+        }
         if (msg->job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-          this->processStandardJobTimeout((StandardJob *)(msg->job->getWorkflowJob()));
+          this->processStandardJobTimeout((StandardJob *) (msg->job->getWorkflowJob()));
           this->removeJobFromRunningList(msg->job);
           this->freeUpResources(msg->job->getResourcesAllocated());
-          this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob(), std::to_string(msg->job->getJobID()));
+          this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob(),
+                                                   std::to_string(msg->job->getJobID()));
           return true;
         } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
           auto *pilot_job = (PilotJob *) msg->job->getWorkflowJob();
@@ -1010,9 +1015,11 @@ namespace wrench {
           return true;
         } else {
           throw std::runtime_error(
-                  "BatchService::processNextMessage(): Alarm about unknown job type"
+                  "BatchService::processNextMessage(): Alarm about unknown job type " +
+                  std::to_string(msg->job->getWorkflowJob()->getType())
           );
         }
+
 #ifdef ENABLE_BATSCHED
         } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
         is_bat_sched_ready = true;
@@ -1287,10 +1294,12 @@ namespace wrench {
             return;
           }
           //this is the list of raw pointers
+
+          BatchJob *to_erase = *it1;
           this->running_jobs.erase(it1);
 
           //this is the list of unique pointers
-          this->freeJobFromJobsList(*it1);
+          this->freeJobFromJobsList(to_erase);
           //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
           this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "");
@@ -1553,6 +1562,7 @@ namespace wrench {
 
           SimulationMessage *msg =
                   new AlarmJobTimeOutMessage(batch_job, 0);
+
           std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
                                                                         batch_job->getEndingTimeStamp(), host_to_run_on,
                                                                         this->mailbox_name, msg,
