@@ -230,7 +230,6 @@ namespace wrench {
           bool one_storage_service_running = false;
           for (const auto &storage_service : this->storage_services) {
             if (not this->hostExists(storage_service->getHostname())) {
-              WRENCH_INFO("HOST DOES NOT EXIST: %s", storage_service->getHostname().c_str());
               throw std::runtime_error(
                       "A StorageService cannot be started on host '" + storage_service->getHostname() + "'");
             }

@@ -64,7 +64,6 @@ namespace wrench {
 
         static std::string stateToString(WorkflowTask::State state);
 
-        WorkflowTask::State getState() const;
 
         WorkflowJob *getJob() const;
 
@@ -82,6 +81,8 @@ namespace wrench {
 
         double getEndDate();
 
+        WorkflowTask::State getState() const;
+
 
         /***********************/
         /** \endcond           */
@@ -95,15 +96,9 @@ namespace wrench {
 
         void updateTopLevel();
 
-        void setState(WorkflowTask::State);
-
-        void setReady();
-
-        void setFailed();
-
-        void setRunning();
-
-        void setCompleted();
+        void setInternalState(WorkflowTask::State);
+        void setVisibleState(WorkflowTask::State);
+        WorkflowTask::State getInternalState() const;
 
         void setJob(WorkflowJob *job);
 
@@ -136,7 +131,8 @@ namespace wrench {
         double end_date = -1.0;            // Date at which task finished execution (getter?)
         unsigned int failure_count = 0;    // Number of times the tasks has failed
 
-        State state;
+        State visible_state;              // To be exposed to developer level
+        State internal_state;              // Not to be exposed to developer level
         Workflow *workflow;                                    // Containing workflow
         lemon::ListDigraph *DAG;                              // Containing workflow
         lemon::ListDigraph::Node DAG_node;                    // pointer to the underlying DAG node

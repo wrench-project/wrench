@@ -302,9 +302,10 @@ namespace wrench {
       switch (job->getType()) {
         case WorkflowJob::STANDARD: {
           ((StandardJob *) job)->state = StandardJob::PENDING;
-          for (auto t : ((StandardJob *) job)->tasks) {
-            t->setState(WorkflowTask::State::PENDING);
-          }
+//          for (auto t : ((StandardJob *) job)->tasks) {
+//            t->setInternalState(WorkflowTask::State::PENDING);
+//            t->setVisibleState(WorkflowTask::State::PENDING);
+//          }
           this->pending_standard_jobs.insert((StandardJob *) job);
           break;
         }
@@ -496,9 +497,15 @@ namespace wrench {
           StandardJob *job = msg->job;
           job->state = StandardJob::State::COMPLETED;
 
+          // Update all visible states
+          for (auto task : job->tasks) {
+            task->setVisibleState(WorkflowTask::COMPLETED);
+          }
+
           // move the job from the "pending" list to the "completed" list
           this->pending_standard_jobs.erase(job);
           this->completed_standard_jobs.insert(job);
+
 
           // Forward the notification along the notification chain
           std::string callback_mailbox = job->popCallbackMailbox();
@@ -520,8 +527,13 @@ namespace wrench {
 
           // update the task states
           for (auto t: job->getTasks()) {
-            t->incrementFailureCount();
-            t->setState(WorkflowTask::State::READY);
+            if (t->getInternalState() == WorkflowTask::COMPLETED) {
+
+              t->setVisibleState(WorkflowTask::COMPLETED);
+            } else {
+              t->incrementFailureCount();
+              t->setVisibleState(WorkflowTask::State::READY);
+            }
           }
 
           // remove the job from the "pending" list

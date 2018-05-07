@@ -615,6 +615,11 @@ namespace wrench {
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if (((*it).get())->getJob() == job) {
           ((*it).get())->kill();
+          for (auto task : job->tasks) {
+            if (task->getInternalState() == WorkflowTask::RUNNING) {
+              task->setInternalState(WorkflowTask::READY);
+            }
+          }
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));
           break;
@@ -773,7 +778,9 @@ namespace wrench {
       unsigned long num_nodes_asked_for = batch_job->getNumNodes();
       double allocated_time = batch_job->getAllocatedTime();
 
-      WRENCH_INFO("Trying to see if I can run job %s", workflow_job->getName().c_str());
+//      WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
+//                  (unsigned long)batch_job,
+//                  workflow_job->getName().c_str());
 
       //Try to schedule hosts based on FIRSTFIT OR BESTFIT
       // Asking for the FULL RAM (TODO: Change this?)
@@ -787,7 +794,7 @@ namespace wrench {
         return false;
       }
 
-      WRENCH_INFO("RUNNING job %s", workflow_job->getName().c_str());
+      WRENCH_INFO("Running job %s", workflow_job->getName().c_str());
 
       // Remove it from the pending list
       for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); it++) {
@@ -991,7 +998,10 @@ namespace wrench {
 
       } else if (auto msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
         if (this->running_jobs.find(msg->job) == this->running_jobs.end()) {
-          WRENCH_INFO("Received a time out message for an unknown job... ignoring");
+          WRENCH_INFO("Received a time out message (%ld) for an unknown batch job (%ld)... ignoring",
+                      (unsigned long)(message.get()),
+                      (unsigned long) msg->job);
+//          WRENCH_INFO("----> %ld", (unsigned long) msg->job->getWorkflowJob());
           return true;
         }
         if (msg->job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
@@ -1002,6 +1012,7 @@ namespace wrench {
                                                    std::to_string(msg->job->getJobID()));
           return true;
         } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+          WRENCH_INFO("Terminating pilot job %s", msg->job->getWorkflowJob()->getName().c_str());
           auto *pilot_job = (PilotJob *) msg->job->getWorkflowJob();
           ComputeService *cs = pilot_job->getComputeService();
           try {
