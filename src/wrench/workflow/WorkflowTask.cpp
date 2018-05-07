@@ -33,7 +33,8 @@ namespace wrench {
                                const double memory_requirement) :
             id(id), flops(flops), min_num_cores(min_num_cores), max_num_cores(max_num_cores),
             parallel_efficiency(parallel_efficiency), memory_requirement(memory_requirement),
-            state(WorkflowTask::READY), job(nullptr) {
+            visible_state(WorkflowTask::READY),
+            internal_state(WorkflowTask::READY), job(nullptr) {
     }
 
     /**
@@ -153,14 +154,23 @@ namespace wrench {
       return count;
     }
 
-
     /**
      * @brief Get the state of the task
      *
      * @return the task state
      */
     WorkflowTask::State WorkflowTask::getState() const {
-      return this->state;
+      return this->visible_state;
+    }
+
+
+    /**
+     * @brief Get the state of the task (as known to the "internal" layer)
+     *
+     * @return the task state
+     */
+    WorkflowTask::State WorkflowTask::getInternalState() const {
+      return this->internal_state;
     }
 
     /**
@@ -198,13 +208,29 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the state of the task
+     * @brief Set the internal state of the task
      *
      * @param state: the task state
      */
-    void WorkflowTask::setState(WorkflowTask::State state) {
-      this->state = state;
+    void WorkflowTask::setInternalState(WorkflowTask::State state) {
+      this->internal_state = state;
     }
+
+    /**
+    * @brief Set the visible state of the task
+    *
+    * @param state: the task state
+    */
+    void WorkflowTask::setVisibleState(WorkflowTask::State state) {
+      if (this->internal_state != state) {
+        throw std::runtime_error("WorkflowTask::setVisibleState(): Visible state doesn't match internal state for"
+                                         "task " + this->getId() +
+                                         " (internal=" + std::to_string(this->internal_state) +
+                                         ", trying to set it to " + std::to_string(state) + ")");
+      }
+      this->visible_state = state;
+    }
+
 
     /**
      * @brief Set the task's containing job
@@ -259,34 +285,6 @@ namespace wrench {
      */
     void WorkflowTask::setEndDate(double date) {
       this->end_date = date;
-    }
-
-    /**
-     * @brief Set the task to the ready state
-     */
-    void WorkflowTask::setReady() {
-      this->workflow->updateTaskState(this, WorkflowTask::READY);
-    }
-
-    /**
-    * @brief Set the task to the failed state
-    */
-    void WorkflowTask::setFailed() {
-      this->workflow->updateTaskState(this, WorkflowTask::FAILED);
-    }
-
-    /**
-     * @brief Set the task to the running state
-     */
-    void WorkflowTask::setRunning() {
-      this->workflow->updateTaskState(this, WorkflowTask::RUNNING);
-    }
-
-    /**
-     * @brief Set the task to the completed state
-     */
-    void WorkflowTask::setCompleted() {
-      this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
     }
 
     /**

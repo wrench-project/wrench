@@ -227,7 +227,7 @@ namespace wrench {
     int StandardJobExecutor::main() {
 
       TerminalOutput::setThisProcessLoggingColor(COLOR_RED);
-      WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores and %.2lf bytes of RAM over %ld hosts: ",
+      WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores and %.2le bytes of RAM over %ld hosts: ",
                   this->mailbox_name.c_str(), this->total_num_cores, this->total_ram, this->core_availabilities.size());
       for (auto h : this->core_availabilities) {
         WRENCH_INFO("  %s: %ld cores", std::get<0>(h).c_str(), std::get<1>(h));
@@ -353,7 +353,7 @@ namespace wrench {
       this->acquireDaemonLock();
 
 //      std::cerr << "** IN DISPATCH READY WORK UNITS\n";
-//      for (auto wu : this->ready_workunits) {
+//      for (auto const &wu : this->ready_workunits) {
 //        std::cerr << "WU: num_comp_tasks " << wu->tasks.size() << "\n";
 //        for (auto t : wu->tasks) {
 //          std::cerr << "    - flops = " << t->getFlops() << ", min_cores = " << t->getMinNumCores() << ", max_cores = " << t->getMaxNumCores() << "\n";
@@ -394,7 +394,7 @@ namespace wrench {
         std::string target_host = "";
         unsigned long target_num_cores = 0;
 
-        WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2lf bytes of RAM",
+        WRENCH_INFO("Looking for a host to run a work unit that needs at least %ld cores, and would like %ld cores, and requires %.2ef bytes of RAM",
                     minimum_num_cores, desired_num_cores, required_ram);
         std::string host_selection_algorithm =
                 this->getPropertyValueAsString(StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM);
@@ -515,6 +515,7 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
       } catch (std::shared_ptr<NetworkError> &cause) {
         // TODO: Send an exception above, and then send some "I failed" message to the service that created me?
+        // TODO: or do nothing, like now?
         return true;
       } catch (std::shared_ptr<FatalFailure> &cause) {
         WRENCH_INFO("Got a Unknown Failure during a communication... likely this means we're all done. Aborting");
@@ -587,7 +588,7 @@ namespace wrench {
       // Process task completions, if any
       for (auto task : workunit->tasks) {
         WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)", task->getId().c_str(),
-                    WorkflowTask::stateToString(task->getState()).c_str());
+                    WorkflowTask::stateToString(task->getInternalState()).c_str());
 
         // Increase the "completed tasks" count of the job
         this->job->incrementNumCompletedTasks();
@@ -617,12 +618,19 @@ namespace wrench {
         for (auto child : workunit->children) {
           child->num_pending_parents--;
           if (child->num_pending_parents == 0) {
-            // Make the child ready!
+            // Make the child's tasks ready
+            for (auto task : child->tasks) {
+              if (task->getInternalState() != WorkflowTask::READY) {
+                throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
+                                         std::to_string(task->getInternalState()));
+              }
+            }
 
-            // Find the workunit in the running workunig queue
+            // Find the child working in the non-ready  queue
             bool found_it = false;
             for (auto it = this->non_ready_workunits.begin(); it != this->non_ready_workunits.end(); it++) {
               if ((*it).get() == child) {
+                // Move it to the ready  queue
                 PointerUtil::moveUniquePtrFromSetToSet(it, &(this->non_ready_workunits), &(this->ready_workunits));
                 found_it = true;
                 break;
@@ -771,7 +779,7 @@ namespace wrench {
       for (auto const &twu : task_work_units) {
         std::set<Workunit *> parent_work_units;
         for (auto const &task : twu->tasks) {
-          if (task->getState() != WorkflowTask::READY) {
+          if (task->getInternalState() != WorkflowTask::READY) {
             for (auto const &input_file : task->getInputFiles()) {
               WorkflowTask *parent_task = input_file->getOutputOf();
               for (auto const &potential_parent_twu : task_work_units) {
@@ -838,11 +846,11 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Sort the a list of ready workunits based on the TASK_SELECTION_ALGORITHM property
-     *
-     * @return a sorted vector of ready tasks
-     */
+/**
+ * @brief Sort the a list of ready workunits based on the TASK_SELECTION_ALGORITHM property
+ *
+ * @return a sorted vector of ready tasks
+ */
     std::vector<Workunit*> StandardJobExecutor::sortReadyWorkunits() {
 
 //      std::cerr << "In sortReadyWorkunits()\n";
@@ -899,18 +907,18 @@ namespace wrench {
     }
 
 
-    /**
-     * @brief Retrieve the executor's job
-     * @return a standard job
-     */
+/**
+ * @brief Retrieve the executor's job
+ * @return a standard job
+ */
     StandardJob *StandardJobExecutor::getJob() {
       return this->job;
     }
 
-    /**
-     * @brief Retrieve the executor's compute resources
-     * @return a set of compute resources
-     */
+/**
+ * @brief Retrieve the executor's compute resources
+ * @return a set of compute resources
+ */
     std::set<std::tuple<std::string, unsigned long, double>>  StandardJobExecutor::getComputeResources() {
       return this->compute_resources;
     }
