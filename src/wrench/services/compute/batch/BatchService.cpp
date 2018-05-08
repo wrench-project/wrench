@@ -50,7 +50,12 @@ namespace wrench {
 
     /**
      * @brief Retrieve queue wait time estimates for a set of job configurations
-     * @param set_of_jobs: the set of job configurations, each of them with an id
+     * @param set_of_jobs: the set of job configurations, each of them with an id. Each configuration
+     *         is a tuple as follows:
+     *             - a configurat id (std::string)
+     *             - a number of hosts (unsigned int)
+     *             - a number of cores per host (unsigned int)
+     *             - a duration in seconds (double)
      * @return queue wait time predictions in seconds (as a map of ids). A prediction that's negative
      *         means that the job configuration can not run on the service (e.g., not enough hosts,
      *         not enough cores per host)
@@ -1706,7 +1711,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns queue wait time estimages for the FCFS (non-batsched) algorithm
+     * @brief Returns queue wait time estimates for the FCFS (non-batsched) algorithm
      * @param set_of_jobs: a set of job specifications (<id, num hosts, time>)
      *
      * @return a map of queue wait time predictions
