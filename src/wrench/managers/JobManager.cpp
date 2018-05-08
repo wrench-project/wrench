@@ -350,6 +350,23 @@ namespace wrench {
 
       if (job->getType() == WorkflowJob::STANDARD) {
         ((StandardJob *)job)->state = StandardJob::State::TERMINATED;
+        for (auto task : ((StandardJob *)job)->tasks) {
+          switch (task->getInternalState()) {
+            case WorkflowTask::TASK_NOT_READY:
+              task->setVisibleState(WorkflowTask::VisibleState::NOT_READY);
+              break;
+            case WorkflowTask::TASK_READY:
+              task->setVisibleState(WorkflowTask::VisibleState::READY);
+              break;
+            case WorkflowTask::TASK_COMPLETED:
+              task->setVisibleState(WorkflowTask::VisibleState::COMPLETED);
+              break;
+            case WorkflowTask::TASK_RUNNING:
+            case WorkflowTask::TASK_FAILED:
+              task->setVisibleState(WorkflowTask::VisibleState::NOT_READY);
+              break;
+          }
+        }
       } else if (job->getType() == WorkflowJob::PILOT) {
         ((PilotJob *) job)->state = PilotJob::State::TERMINATED;
       }
