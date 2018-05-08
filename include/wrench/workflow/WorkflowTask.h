@@ -80,6 +80,8 @@ namespace wrench {
 
         double getEndDate();
 
+        std::string getExecutionHost();
+
         WorkflowTask::State getState() const;
 
 
@@ -118,6 +120,8 @@ namespace wrench {
 
         void incrementFailureCount();
 
+        void setExecutionHost(std::string hostname);
+
         /***********************/
         /** \endcond           */
         /***********************/
@@ -140,6 +144,7 @@ namespace wrench {
         double start_date = -1.0;          // Date at which task began execution (getter?)
         double end_date = -1.0;            // Date at which task finished execution (getter?)
         unsigned int failure_count = 0;    // Number of times the tasks has failed
+        std::string execution_host;        // Host on which the task excuted ("" if not executed successfully - yet)
 
         State visible_state;              // To be exposed to developer level
         InternalState internal_state;              // Not to be exposed to developer level

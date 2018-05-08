@@ -31,10 +31,15 @@ namespace wrench {
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
                                const unsigned long max_num_cores, const double parallel_efficiency,
                                const double memory_requirement) :
-            id(id), flops(flops), min_num_cores(min_num_cores), max_num_cores(max_num_cores),
-            parallel_efficiency(parallel_efficiency), memory_requirement(memory_requirement),
+            id(id), flops(flops),
+            min_num_cores(min_num_cores),
+            max_num_cores(max_num_cores),
+            parallel_efficiency(parallel_efficiency),
+            memory_requirement(memory_requirement),
+            execution_host(""),
             visible_state(WorkflowTask::State::READY),
-            internal_state(WorkflowTask::InternalState::TASK_READY), job(nullptr) {
+            internal_state(WorkflowTask::InternalState::TASK_READY),
+            job(nullptr) {
     }
 
     /**
@@ -436,12 +441,32 @@ namespace wrench {
       }
     }
 
-/**
- * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
- *        tasks have a top-leve of 0)
- * @return
- */
+    /**
+     * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
+     *        tasks have a top-leve of 0)
+     * @return
+     */
     unsigned long WorkflowTask::getTopLevel() {
       return this->toplevel;
     }
+
+    /**
+     * @brief Returns the name of the host on which the task has executed, or "" if
+     *        the task has not been (successfully) executed yet
+     * @return hostname
+     */
+    std::string WorkflowTask::getExecutionHost() {
+      return this->execution_host;
+    }
+
+    /**
+     * @brief Sets the execution host
+     *
+     * @param hostname: the host name
+     */
+    void WorkflowTask::setExecutionHost(std::string hostname) {
+      this->execution_host = hostname;
+    }
+
+
 };
