@@ -256,7 +256,8 @@ namespace wrench {
           break;
         case PENDING:
           if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
-              (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY)) {
+              (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
+              (this->internal_state != WorkflowTask::InternalState::TASK_RUNNING)) {
             sane = false;
           }
           break;
@@ -270,8 +271,8 @@ namespace wrench {
       if (not sane) {
         throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
                                  this->getId() +"' visible state to " +
-                                 std::to_string(state) + " when its internal " +
-                                 "state is " + std::to_string(this->internal_state));
+                                 stateToString(state) + " when its internal " +
+                                 "state is " + stateToString(this->internal_state));
       }
       this->visible_state = state;
     }
