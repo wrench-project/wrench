@@ -33,7 +33,8 @@ namespace wrench {
                                const double memory_requirement) :
             id(id), flops(flops), min_num_cores(min_num_cores), max_num_cores(max_num_cores),
             parallel_efficiency(parallel_efficiency), memory_requirement(memory_requirement),
-            state(WorkflowTask::READY), job(nullptr) {
+            visible_state(WorkflowTask::State::READY),
+            internal_state(WorkflowTask::InternalState::TASK_READY), job(nullptr) {
     }
 
     /**
@@ -153,22 +154,29 @@ namespace wrench {
       return count;
     }
 
-
     /**
      * @brief Get the state of the task
      *
      * @return the task state
      */
     WorkflowTask::State WorkflowTask::getState() const {
-      return this->state;
+      return this->visible_state;
+    }
+
+
+    /**
+     * @brief Get the state of the task (as known to the "internal" layer)
+     *
+     * @return the task state
+     */
+    WorkflowTask::InternalState WorkflowTask::getInternalState() const {
+      return this->internal_state;
     }
 
     /**
-     * @brief Get a task state as a string
-     *
-     * @param state: the state
-     *
-     * @return the state as a string
+     * @brief Convert task state to a string (useful for output, debugging, logging, etc.)
+     * @param state: task state
+     * @return a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::State state) {
       switch (state) {
@@ -178,11 +186,31 @@ namespace wrench {
           return "READY";
         case PENDING:
           return "PENDING";
-        case RUNNING:
-          return "RUNNING";
         case COMPLETED:
           return "COMPLETED";
-        case FAILED:
+        default:
+          return "UNKNOWN STATE";
+      }
+    }
+
+    /**
+     * @brief Get a task state as a string
+     *
+     * @param state: the state
+     *
+     * @return the state as a string
+     */
+    std::string WorkflowTask::stateToString(WorkflowTask::InternalState state) {
+      switch (state) {
+        case TASK_NOT_READY:
+          return "NOT READY";
+        case TASK_READY:
+          return "READY";
+        case TASK_RUNNING:
+          return "RUNNING";
+        case TASK_COMPLETED:
+          return "COMPLETED";
+        case TASK_FAILED:
           return "FAILED";
         default:
           return "UNKNOWN STATE";
@@ -198,106 +226,122 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the state of the task
+     * @brief Set the internal state of the task
      *
      * @param state: the task state
      */
-    void WorkflowTask::setState(WorkflowTask::State state) {
-      this->state = state;
+    void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
+      this->internal_state = state;
     }
 
     /**
-     * @brief Set the task's containing job
-     *
-     * @param job: the job
-     */
+    * @brief Set the visible state of the task
+    *
+    * @param state: the task state
+    */
+    void WorkflowTask::setState(WorkflowTask::State state) {
+
+      // Sanity check
+      bool sane = true;
+      switch(state) {
+        case NOT_READY:
+          if (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) {
+            sane = false;
+          }
+          break;
+        case READY:
+          if (this->internal_state != WorkflowTask::InternalState::TASK_READY) {
+            sane = false;
+          }
+          break;
+        case PENDING:
+          if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
+              (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
+              (this->internal_state != WorkflowTask::InternalState::TASK_RUNNING)) {
+            sane = false;
+          }
+          break;
+        case COMPLETED:
+          if (this->internal_state != WorkflowTask::InternalState::TASK_COMPLETED) {
+            sane = false;
+          }
+          break;
+      }
+
+      if (not sane) {
+        throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
+                                 this->getId() +"' visible state to " +
+                                 stateToString(state) + " when its internal " +
+                                 "state is " + stateToString(this->internal_state));
+      }
+      this->visible_state = state;
+    }
+
+
+/**
+ * @brief Set the task's containing job
+ *
+ * @param job: the job
+ */
     void WorkflowTask::setJob(WorkflowJob *job) {
       this->job = job;
     }
 
-    /**
-     * @brief Get the task's containing job
-     *
-     * @return job: the job
-     */
+/**
+ * @brief Get the task's containing job
+ *
+ * @return job: the job
+ */
     WorkflowJob *WorkflowTask::getJob() const {
       return this->job;
     }
 
 
-    /**
-     * @brief Get the cluster Id for the task
-     *
-     * @return the cluster id, or an empty string
-     */
+/**
+ * @brief Get the cluster Id for the task
+ *
+ * @return the cluster id, or an empty string
+ */
     std::string WorkflowTask::getClusterId() const {
       return this->cluster_id;
     }
 
-    /**
-     * Set the cluster id for the task
-     *
-     * @param id: cluster id the task belongs to
-     */
+/**
+ * Set the cluster id for the task
+ *
+ * @param id: cluster id the task belongs to
+ */
     void WorkflowTask::setClusterId(std::string id) {
       this->cluster_id = id;
     }
 
-    /**
-     * @brief Set the task's start date
-     *
-     * @param date: the end date
-     */
+/**
+ * @brief Set the task's start date
+ *
+ * @param date: the end date
+ */
     void WorkflowTask::setStartDate(double date) {
       this->start_date = date;
     }
 
-    /**
-     * @brief Set the task's end date
-     *
-     * @param date: the end date
-     */
+/**
+ * @brief Set the task's end date
+ *
+ * @param date: the end date
+ */
     void WorkflowTask::setEndDate(double date) {
       this->end_date = date;
     }
 
-    /**
-     * @brief Set the task to the ready state
-     */
-    void WorkflowTask::setReady() {
-      this->workflow->updateTaskState(this, WorkflowTask::READY);
-    }
-
-    /**
-    * @brief Set the task to the failed state
-    */
-    void WorkflowTask::setFailed() {
-      this->workflow->updateTaskState(this, WorkflowTask::FAILED);
-    }
-
-    /**
-     * @brief Set the task to the running state
-     */
-    void WorkflowTask::setRunning() {
-      this->workflow->updateTaskState(this, WorkflowTask::RUNNING);
-    }
-
-    /**
-     * @brief Set the task to the completed state
-     */
-    void WorkflowTask::setCompleted() {
-      this->workflow->updateTaskState(this, WorkflowTask::COMPLETED);
-    }
-
-    /**
-     * @brief Helper method to add a file to a map if necessary
-     *
-     * @param map_to_insert: the map of workflow files to insert
-     * @param map_to_check: the map of workflow files to check
-     * @param f: a workflow file
-     *
-     * @throw std::invalid_argument
-     */
+/**
+ * @brief Helper method to add a file to a map if necessary
+ *
+ * @param map_to_insert: the map of workflow files to insert
+ * @param map_to_check: the map of workflow files to check
+ * @param f: a workflow file
+ *
+ * @throw std::invalid_argument
+ */
     void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
                                     std::map<std::string, WorkflowFile *> &map_to_check,
                                     WorkflowFile *f) {
@@ -312,25 +356,25 @@ namespace wrench {
       map_to_insert[f->id] = f;
     }
 
-    /**
-     * @brief Retrieve the number of times a task has failed
-     * @return the failure count
-     */
+/**
+ * @brief Retrieve the number of times a task has failed
+ * @return the failure count
+ */
     unsigned int WorkflowTask::getFailureCount() {
       return this->failure_count;
     }
 
-    /**
-     * @brief Increment the failure count of a task
-     */
+/**
+ * @brief Increment the failure count of a task
+ */
     void WorkflowTask::incrementFailureCount() {
       this->failure_count++;
     }
 
-    /**
-     * @brief Retrieves the set of input WorkflowFile objects for the task
-     * @return a set workflow files
-     */
+/**
+ * @brief Retrieves the set of input WorkflowFile objects for the task
+ * @return a set workflow files
+ */
     std::set<WorkflowFile *> WorkflowTask::getInputFiles() {
       std::set<WorkflowFile *> input;
 
@@ -340,10 +384,10 @@ namespace wrench {
       return input;
     }
 
-    /**
-     * @brief Retrieves the set of output WorkflowFile objects for the task
-     * @return a set of workflow files
-     */
+/**
+ * @brief Retrieves the set of output WorkflowFile objects for the task
+ * @return a set of workflow files
+ */
     std::set<WorkflowFile *> WorkflowTask::getOutputFiles() {
       std::set<WorkflowFile *> output;
 
@@ -353,25 +397,25 @@ namespace wrench {
       return output;
     }
 
-    /**
-     * @brief Get the task's start date
-     * @return the start date
-     */
+/**
+ * @brief Get the task's start date
+ * @return the start date
+ */
     double WorkflowTask::getStartDate() {
       return this->start_date;
     }
 
-    /**
-     * @brief Get the task's end date
-     * @return the start date
-     */
+/**
+ * @brief Get the task's end date
+ * @return the start date
+ */
     double WorkflowTask::getEndDate() {
       return this->end_date;
     }
 
-    /**
-     * @brief Update the task's top level (looking only at the parents)
-     */
+/**
+ * @brief Update the task's top level (looking only at the parents)
+ */
     void WorkflowTask::updateTopLevel() {
       std::vector<WorkflowTask *> parents = this->workflow->getTaskParents(this);
       if (parents.empty()) {
@@ -392,11 +436,11 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
-     *        tasks have a top-leve of 0)
-     * @return
-     */
+/**
+ * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
+ *        tasks have a top-leve of 0)
+ * @return
+ */
     unsigned long WorkflowTask::getTopLevel() {
       return this->toplevel;
     }

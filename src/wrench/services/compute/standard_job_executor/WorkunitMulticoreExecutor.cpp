@@ -200,6 +200,8 @@ namespace wrench {
       /** Perform all tasks **/
       for (auto task : work->tasks) {
 
+        task->setInternalState(WorkflowTask::InternalState::TASK_RUNNING);
+
         // Read  all input files
         WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getId().c_str());
         try {
@@ -207,17 +209,18 @@ namespace wrench {
                                     work->file_locations,
                                     this->default_storage_service);
         } catch (WorkflowExecutionException &e) {
+          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
         }
 
         // Run the task's computation (which can be multicore)
         WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getId().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
-        task->setRunning();
         task->setStartDate(S4U_Simulation::getClock());
 
         try {
           runMulticoreComputation(task->getFlops(), task->getParallelEfficiency());
         } catch (WorkflowExecutionEvent &e) {
+          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
         }
 
@@ -227,10 +230,26 @@ namespace wrench {
         try {
           StorageService::writeFiles(task->getOutputFiles(), work->file_locations, this->default_storage_service);
         } catch (WorkflowExecutionException &e) {
+          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
         }
 
-        task->setCompleted();
+        task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
+
+        // Deal with Children
+        for (auto child : task->getWorkflow()->getTaskChildren(task)) {
+          bool all_parents_completed = true;
+          for (auto parent : child->getWorkflow()->getTaskParents(child)) {
+            if (parent->getInternalState() != WorkflowTask::InternalState::TASK_COMPLETED) {
+              all_parents_completed = false;
+              break;
+            }
+          }
+          if (all_parents_completed) {
+            child->setInternalState(WorkflowTask::InternalState::TASK_READY);
+          }
+        }
+
 
         task->setEndDate(S4U_Simulation::getClock());
 
@@ -291,7 +310,7 @@ namespace wrench {
       this->acquireDaemonLock();
 
       WRENCH_INFO("%ld compute threads", this->num_cores);
-      // Create an compute thread to run the computation on each core
+      // Create a compute thread to run the computation on each core
       bool success = true;
       for (unsigned long i = 0; i < this->num_cores; i++) {
 //        WRENCH_INFO("Creating compute thread %ld", i);

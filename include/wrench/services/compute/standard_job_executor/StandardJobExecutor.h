@@ -33,7 +33,11 @@ namespace wrench {
     /***********************/
 
     /**  @brief A base abstraction that knows how to execute a standard job
-     *   on a multi-node multi-core platform.
+     *   on a multi-node multi-core platform. Note that when killed in the middle
+     *   of computing, this service will set (internal) running tasks' states to FAILED, and
+     *   likely the calling service will want to make failed tasks ready again. Also, this
+     *   service does not increment task failure counts, as it does not know if the kill() was
+     *   an actual failure (i.e., some timeout) or a feature (i.e., a WMS changing its mind)
      */
     class StandardJobExecutor : public Service {
 
@@ -59,6 +63,7 @@ namespace wrench {
     private:
 
         friend class Simulation;
+        void cleanup() override;
 
         std::string callback_mailbox;
         StandardJob *job;

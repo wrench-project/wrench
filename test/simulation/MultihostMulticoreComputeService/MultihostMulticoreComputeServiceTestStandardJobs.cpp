@@ -658,7 +658,9 @@ private:
       // Check that task states make sense
       if ((this->test->task1->getState() != wrench::WorkflowTask::READY) ||
           (this->test->task2->getState() != wrench::WorkflowTask::READY)) {
-        throw std::runtime_error("Tasks in a FAILED job should be in the READY state");
+        throw std::runtime_error("Tasks in a TERMINATED job should be in the READY state but instead (" +
+        wrench::WorkflowTask::stateToString(this->test->task1->getState()) + ", " +
+        wrench::WorkflowTask::stateToString(this->test->task2->getState()) + ")");
       }
 
       return 0;
@@ -722,7 +724,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
                              wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
   }
 
-  // Check failure counts: Terminations DO NOT count as failures
+  // Check failure counts: Terminations DO NOT COUNT as failures
   if ((this->task1->getFailureCount() != 0) ||
       (this->task2->getFailureCount() != 0)) {
     throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getId() + ": " +

@@ -50,7 +50,12 @@ namespace wrench {
 
     /**
      * @brief Retrieve queue wait time estimates for a set of job configurations
-     * @param set_of_jobs: the set of job configurations, each of them with an id
+     * @param set_of_jobs: the set of job configurations, each of them with an id. Each configuration
+     *         is a tuple as follows:
+     *             - a configurat id (std::string)
+     *             - a number of hosts (unsigned int)
+     *             - a number of cores per host (unsigned int)
+     *             - a duration in seconds (double)
      * @return queue wait time predictions in seconds (as a map of ids). A prediction that's negative
      *         means that the job configuration can not run on the service (e.g., not enough hosts,
      *         not enough cores per host)
@@ -615,7 +620,31 @@ namespace wrench {
 
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if (((*it).get())->getJob() == job) {
+          WRENCH_INFO("CALLING KILL");
           ((*it).get())->kill();
+          WRENCH_INFO("CALLED KILL");
+          // Make failed tasks ready again
+          for (auto task : job->tasks) {
+            switch (task->getInternalState()) {
+              case WorkflowTask::InternalState::TASK_NOT_READY:
+              case WorkflowTask::InternalState::TASK_READY:
+              case WorkflowTask::InternalState::TASK_COMPLETED:
+                break;
+
+              case WorkflowTask::InternalState::TASK_RUNNING:
+                throw std::runtime_error("BatchService::processStandardJobTimeout: task state shouldn't be 'RUNNING'"
+                                                 "after a StandardJobExecutor was killed!");
+              case WorkflowTask::InternalState::TASK_FAILED:
+                // Making failed task READY again
+                task->setInternalState(WorkflowTask::InternalState::TASK_READY);
+                break;
+
+              default:
+                throw std::runtime_error(
+                        "MultihostMulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
+
+            }
+          }
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));
           break;
@@ -802,7 +831,9 @@ namespace wrench {
       unsigned long num_nodes_asked_for = batch_job->getNumNodes();
       double allocated_time = batch_job->getAllocatedTime();
 
-      WRENCH_INFO("Trying to see if I can run job %s", workflow_job->getName().c_str());
+//      WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
+//                  (unsigned long)batch_job,
+//                  workflow_job->getName().c_str());
 
       //Try to schedule hosts based on FIRSTFIT OR BESTFIT
       // Asking for the FULL RAM (TODO: Change this?)
@@ -816,7 +847,7 @@ namespace wrench {
         return false;
       }
 
-      WRENCH_INFO("RUNNING job %s", workflow_job->getName().c_str());
+      WRENCH_INFO("Running job %s", workflow_job->getName().c_str());
 
       // Remove it from the pending list
       for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); it++) {
@@ -1019,7 +1050,10 @@ namespace wrench {
 
       } else if (auto msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
         if (this->running_jobs.find(msg->job) == this->running_jobs.end()) {
-          WRENCH_INFO("Received a time out message for an unknown job... ignoring");
+          WRENCH_INFO("Received a time out message (%ld) for an unknown batch job (%ld)... ignoring",
+                      (unsigned long)(message.get()),
+                      (unsigned long) msg->job);
+//          WRENCH_INFO("----> %ld", (unsigned long) msg->job->getWorkflowJob());
           return true;
         }
         if (msg->job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
@@ -1030,6 +1064,7 @@ namespace wrench {
                                                    std::to_string(msg->job->getJobID()));
           return true;
         } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+          WRENCH_INFO("Terminating pilot job %s", msg->job->getWorkflowJob()->getName().c_str());
           auto *pilot_job = (PilotJob *) msg->job->getWorkflowJob();
           ComputeService *cs = pilot_job->getComputeService();
           try {
@@ -1704,7 +1739,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns queue wait time estimages for the FCFS (non-batsched) algorithm
+     * @brief Returns queue wait time estimates for the FCFS (non-batsched) algorithm
      * @param set_of_jobs: a set of job specifications (<id, num hosts, time>)
      *
      * @return a map of queue wait time predictions
