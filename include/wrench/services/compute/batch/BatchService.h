@@ -146,6 +146,7 @@ namespace wrench {
         std::vector<double> timeslots;
         std::map<std::string, unsigned long> available_nodes_to_cores;
         std::map<unsigned long, std::string> host_id_to_names;
+        std::vector<std::string> compute_hosts;
         /*End Resources information in Batchservice */
 
         // Vector of standard job executors
@@ -264,6 +265,7 @@ namespace wrench {
         //start a job
         void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
                               BatchJob *, unsigned long, double, unsigned long);
+
 
 
         //vector of network listeners (only useful when ENABLE_BATSCHED == on)

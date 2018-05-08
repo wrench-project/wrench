@@ -192,6 +192,7 @@ namespace wrench {
         this->available_nodes_to_cores.insert({h, num_cores_available});
         this->host_id_to_names[i++] = h;
       }
+      this->compute_hosts = compute_hosts;
 
       this->num_cores_per_node = this->nodes_to_cores_map.begin()->second;
       this->total_num_of_nodes = compute_hosts.size();
@@ -726,6 +727,34 @@ namespace wrench {
           this->available_nodes_to_cores[target_host] -= cores_per_node;
           hosts_assigned.push_back(target_host);
           resources.insert(std::make_tuple(target_host, cores_per_node, ComputeService::ALL_RAM));
+        }
+      } else if (host_selection_algorithm == "ROUNDROBIN") {
+        static int round_robin_host_selector_idx = 0;
+        int cur_host_idx = round_robin_host_selector_idx;
+        int host_count = 0;
+        do {
+            cur_host_idx = (cur_host_idx + 1) % available_nodes_to_cores.size();
+            std::vector<std::string>::iterator it = this->compute_hosts.begin();
+            it = it + cur_host_idx;
+            std::string cur_host_name = *it;
+            unsigned long num_available_cores = available_nodes_to_cores[cur_host_name];
+            if (num_available_cores >= cores_per_node) {
+              available_nodes_to_cores[cur_host_name] -= cores_per_node;
+              hosts_assigned.push_back(cur_host_name);
+              resources.insert(std::make_tuple(cur_host_name, cores_per_node, ram_per_node));
+              if (++host_count >= num_nodes) {
+                break;
+              }
+            }
+        } while (cur_host_idx != round_robin_host_selector_idx);
+        if (resources.size() < num_nodes) {
+          resources = {};
+          std::vector<std::string>::iterator it;
+          for (it = hosts_assigned.begin(); it != hosts_assigned.end(); it++) {
+            available_nodes_to_cores[*it] += cores_per_node;
+          }
+        } else {
+          round_robin_host_selector_idx = cur_host_idx;
         }
       } else {
         throw std::invalid_argument(
