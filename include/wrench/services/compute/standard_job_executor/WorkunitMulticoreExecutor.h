@@ -56,6 +56,7 @@ namespace wrench {
         Workunit *workunit;
 
     private:
+
         int main();
 
         void performWork(Workunit *work);

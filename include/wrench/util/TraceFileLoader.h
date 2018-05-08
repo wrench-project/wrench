@@ -15,10 +15,25 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
+
+    /**
+     * @brief A class that can load a job submission trace in the SWF format
+     *        and store it as a vector of simulation-relevant fields
+     */
     class TraceFileLoader {
     public:
-        static std::vector<std::tuple<std::string, double, double, double, double, unsigned int>> loadFromTraceFile(std::string filename,double load_time_compensation);
+        static std::vector<std::tuple<std::string, double, double, double, double, unsigned int>>
+           loadFromTraceFile(std::string filename, double load_time_compensation);
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
+
 }
 
 

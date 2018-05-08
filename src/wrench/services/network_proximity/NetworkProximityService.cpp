@@ -72,6 +72,11 @@ namespace wrench {
      * @throw std::runtime_error
      */
     std::pair<double, double> NetworkProximityService::getCoordinate(std::string requested_host) {
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
       if (boost::iequals(
               this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
               "alltoall")) {
@@ -85,18 +90,21 @@ namespace wrench {
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
-                                new CoordinateLookupRequestMessage(answer_mailbox, std::move(requested_host),
+                                new CoordinateLookupRequestMessage(answer_mailbox, requested_host,
                                                                    this->getPropertyValueAsDouble(
                                                                            NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
-      } catch (std::shared_ptr<NetworkError> cause) {
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        std::cerr << cause->toString() << std::endl;
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -117,6 +125,10 @@ namespace wrench {
      * @throw std::runtime_error
      */
     double NetworkProximityService::query(std::pair<std::string, std::string> hosts) {
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
 
       std::string network_service_type = this->getPropertyValueAsString(
               NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE);
@@ -142,8 +154,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -177,7 +191,7 @@ namespace wrench {
      */
     int NetworkProximityService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
 
       WRENCH_INFO("Network Proximity Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
@@ -335,6 +349,7 @@ namespace wrench {
             return true;
           }
         }
+        return true;
       } else {
         throw std::runtime_error(
                 "NetworkProximityService::processNextMessage(): Unknown message type: " +

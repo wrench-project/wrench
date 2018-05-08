@@ -17,6 +17,11 @@ namespace wrench {
 
     std::map<std::string, std::vector<SimulationMessage *>> MessageManager::mailbox_messages = {};
 
+    /**
+     * @brief Insert a message in the message "database"
+     * @param mailbox: the name of the relevant mailbox
+     * @param msg: the message
+     */
     void MessageManager::manageMessage(std::string mailbox, SimulationMessage *msg) {
       if (mailbox_messages.find(mailbox) == mailbox_messages.end()) {
         mailbox_messages.insert({mailbox, {}});
@@ -24,6 +29,10 @@ namespace wrench {
       mailbox_messages[mailbox].push_back(msg);
     }
 
+    /**
+     * @brief Clean up messages for a given mailbox (so as to free up memory)
+     * @param mailbox: the mailbox name
+     */
     void MessageManager::cleanUpMessages(std::string mailbox) {
       std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
       for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
@@ -36,6 +45,11 @@ namespace wrench {
       }
     }
 
+    /**
+     * @brief Remove a received message from the "databse" of messages
+     * @param mailbox: the name of the mailbox from which the message was received
+     * @param msg: the message
+     */
     void MessageManager::removeReceivedMessages(std::string mailbox, SimulationMessage *msg) {
       std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
       for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {

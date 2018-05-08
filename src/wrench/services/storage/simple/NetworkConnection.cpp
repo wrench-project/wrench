@@ -19,10 +19,20 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_data_connection, "Log catego
 
 namespace wrench {
 
-    constexpr unsigned char NetworkConnection::INCOMING_DATA;
-    constexpr unsigned char NetworkConnection::OUTGOING_DATA;
-    constexpr unsigned char NetworkConnection::INCOMING_CONTROL;
+//    constexpr unsigned char NetworkConnection::INCOMING_DATA;
+//    constexpr unsigned char NetworkConnection::OUTGOING_DATA;
+//    constexpr unsigned char NetworkConnection::INCOMING_CONTROL;
 
+    /**
+     * @brief: Constructor
+     * @param type: the type of connection
+     *              - NetworkConnection::INCOMING_DATA
+     *              - NetworkConnection::OUTGOING_DATA
+     *              - NetworkConnection::INCOMING_CONTROL
+     * @param file: the file (for DATA connection only)
+     * @param mailbox: the mailbox: the mailbox for this connection
+     * @param ack_mailbox: the mailbox to which an ack should be sent when the connection completes/fails
+     */
     NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string mailbox, std::string ack_mailbox) {
       this->type = type;
       this->file = file;
@@ -117,6 +127,8 @@ namespace wrench {
      * @return  the message, or nullptr if the connection has failed
      */
     std::unique_ptr<SimulationMessage> NetworkConnection::getMessage() {
+
+      WRENCH_INFO("Getting the message from connection");
       if (this->type == NetworkConnection::OUTGOING_DATA) {
         throw std::runtime_error("NetworkConnection::getMessage(): Cannot be called on an outgoing connection");
       }

@@ -14,13 +14,15 @@
 #include <string>
 
 #define DECLARE_PROPERTY_NAME(name) static const std::string name
+
+
 #define SET_PROPERTY_NAME(classname, name) const std::string classname::name=#name
 
 namespace wrench {
 
 
     /**
-     * @brief Properties for a Service
+     * @brief Configurable properties for a Service
      */
     class ServiceProperty {
 

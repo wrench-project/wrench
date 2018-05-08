@@ -28,6 +28,18 @@ namespace wrench {
 
     class WorkloadTraceFileReplayer; // forward
 
+    /**
+     * @brief A batch-scheduled compute service that manages a set of compute hosts and
+     *        controls access to their resource via a batch queue.
+     *
+     *        In the current implementation of
+     *        this service, like for many of its real-world counterparts, it does not handle memory
+     *        partitioning among jobs on the same host. It also does not simulate effects
+     *        of memory sharing (e.g., swapping). When multiple jobs share hosts,
+     *        which can happen when jobs require only a few cores per host and can thus
+     *        be co-located on the same hosts in a non-exclusive fashion, each job simply runs as if it had access to the
+     *        full RAM of each compute host it is scheduled on.
+     */
     class BatchService : public ComputeService {
 
         /**
@@ -51,17 +63,15 @@ namespace wrench {
                  {BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
                  {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {BatchServiceProperty::BATCH_FAKE_JOB_REPLY_MESSAGE_PAYLOAD,        "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
-                 {BatchServiceProperty::SCHEDULER_REPLY_MESSAGE_PAYLOAD,             "1024"},
                 #ifdef ENABLE_BATSCHED
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
+                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
                 #else
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "FCFS"},
                 #endif
-                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
                  {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
-                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,                     ""}
+                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""}
                 };
 
     public:
@@ -72,13 +82,17 @@ namespace wrench {
                      StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {});
 
-        //cancels the job
-        void cancelJob(unsigned long jobid);
-
         //returns jobid,started time, running time
-        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
+//        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
 
-        std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,double>>);
+        /***********************/
+        /** \cond DEVELOPER   **/
+        /***********************/
+        std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
         ~BatchService() override;
 
@@ -92,6 +106,7 @@ namespace wrench {
                      std::vector<std::string> compute_hosts,
                      StorageService *default_storage_service,
                      unsigned long cores_per_host,
+                     double ram_per_host,
                      std::map<std::string, std::string> plist,
                      std::string suffix);
 
@@ -212,6 +227,9 @@ namespace wrench {
         //Terminate the batch service (this is usually for pilot jobs when they act as a batch service)
         void cleanup() override;
 
+        // Terminate currently running pilot jobs
+        void terminateRunningPilotJobs();
+
         //Fail the standard jobs inside the pilot jobs
         void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
 
@@ -245,20 +263,19 @@ namespace wrench {
 
         //start a job
         void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
-                              BatchJob *, unsigned long, unsigned long, unsigned long);
+                              BatchJob *, unsigned long, double, unsigned long);
 
+
+        //vector of network listeners (only useful when ENABLE_BATSCHED == on)
+        std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
+
+        std::map<std::string,double> getQueueWaitingTimeEstimateForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
 
 #ifdef ENABLE_BATSCHED
 
-        //Batch Service request reply process
-        std::unique_ptr<BatchNetworkListener> request_reply_process;
-
-        //vector of network listeners
-        std::vector<std::shared_ptr<BatchNetworkListener>> network_listeners;
-
         void startBatsched();
         void stopBatsched();
-        std::map<std::string,double> getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string,unsigned int,double>>);
+        std::map<std::string,double> getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
 
         void startBatschedNetworkListener();
 
@@ -270,6 +287,7 @@ namespace wrench {
         void processExecuteJobFromBatSched(std::string bat_sched_reply);
 
 #endif // ENABLE_BATSCHED
+
 
     };
 }

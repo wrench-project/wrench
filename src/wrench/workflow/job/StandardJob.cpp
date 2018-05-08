@@ -20,7 +20,8 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param tasks: the tasks in the job, which should all be independent and in the READY state
+     * @param tasks: the tasks in the job (which must be either READY, or children of COMPLETED tasks or
+     *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies on which storage service input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
@@ -47,9 +48,17 @@ namespace wrench {
             state(StandardJob::State::NOT_SUBMITTED)
     {
 
+      // Check that this is a ready sub-graph
       for (auto t : tasks) {
         if (t->getState() != WorkflowTask::READY) {
-          throw std::invalid_argument("StandardJob::StandardJob(): All tasks used to create a StandardJob must be READY");
+          for (auto input_file : t->getInputFiles()) {
+            auto parent = input_file->getOutputOf();
+            if (parent->getState() != WorkflowTask::COMPLETED) {
+              if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
+                throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getId() + "' has non-completed parents not included in the job");
+              }
+            }
+          }
         }
       }
 

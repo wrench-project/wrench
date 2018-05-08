@@ -8,6 +8,7 @@
  */
 
 
+#include <iostream>
 #include "wrench/services/compute/ComputeServiceMessage.h"
 
 namespace wrench {
@@ -21,30 +22,12 @@ namespace wrench {
             ServiceMessage("ComputeServiceMessage::" + name, payload) {
     }
 
-//    /**
-//     * @brief Constructor
-//     * @param job: a workflow job
-//     * @param cs: a compute service
-//     * @param payload: message size in bytes
-//     *
-//     * @throw std::invalid_argument
-//     */
-//    ComputeServiceJobTypeNotSupportedMessage::ComputeServiceJobTypeNotSupportedMessage(WorkflowJob *job,
-//                                                                                       ComputeService *cs,
-//                                                                                       double payload)
-//            : ComputeServiceMessage("JOB_TYPE_NOT_SUPPORTED", payload) {
-//      if ((job == nullptr) || (cs == nullptr)) {
-//        throw std::invalid_argument(
-//                "ComputeServiceJobTypeNotSupportedMessage::ComputeServiceJobTypeNotSupportedMessage(): Invalid arguments");
-//      }
-//      this->job = job;
-//      this->compute_service = cs;
-//    }
 
     /**
     * @brief Constructor
     * @param answer_mailbox: mailbox to which the answer message should be sent
     * @param job: a standard job
+    * @param service_specific_args: a map of extra arguments (each specified by a name and value, both strings) required by some services
     * @param payload: message size in bytes
     *
     * @throw std::invalid_arguments
@@ -342,17 +325,6 @@ namespace wrench {
       this->failure_cause = failure_cause;
     }
 
-//    /**
-//     * @brief Constructor
-//     * @param num: information to reply back
-//     * @param payload: the message size in bytes
-//     *
-//     * @throw std::invalid_argument
-//     */
-//    ComputeServiceInformationMessage::ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload)
-//            : ComputeServiceMessage("INFORMATION_REPLY", payload), job(job), information(std::move(information)) {}
-//
-
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which to send the answer
@@ -371,17 +343,6 @@ namespace wrench {
     }
 
 
-//    /**
-//     * @brief Constructor
-//     * @param num: information to reply back
-//     * @param payload: the message size in bytes
-//     *
-//     * @throw std::invalid_argument
-//     */
-//    ComputeServiceInformationMessage::ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload)
-//            : ComputeServiceMessage("INFORMATION_REPLY", payload), job(job), information(std::move(information)) {}
-
-
     /**
      * @brief Constructor
      * @param info: resource description
@@ -389,6 +350,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(std::map<std::string, std::vector<double>> info, double payload)
+    ComputeServiceResourceInformationAnswerMessage::ComputeServiceResourceInformationAnswerMessage(
+            std::map<std::string, std::vector<double>> info, double payload)
             : ComputeServiceMessage("RESOURCE_DESCRIPTION_ANSWER", payload), info(info) {}
 };

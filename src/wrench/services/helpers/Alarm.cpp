@@ -18,7 +18,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(alarm_service, "Log category for Alarm Service");
 namespace wrench {
 
     /**
-     * @brief Constructor  (which starts the daemon!)
+     * @brief Constructor
      *
      * @param date: the date at this the message should be sent
      * @param hostname: the name of the host on which the Alarm daemon should run
@@ -45,7 +45,7 @@ namespace wrench {
      * @return 0 on termination
      */
     int Alarm::main() {
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
       WRENCH_INFO("Alarm Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
       double time_to_sleep = this->date - S4U_Simulation::getClock();
@@ -70,12 +70,12 @@ namespace wrench {
     /**
      * @brief Creates and start an alarm service
      * @param simulation: a pointer to the simulation object
-     * @param date: the date at this the message should be sent
-     * @param hostname: the name of the host on which the Alarm daemon should run
-     * @param reply_mailbox_name: the mailbox to which the message should be sent
+     * @param date: the simulation date at this the alarm service should send a message
+     * @param hostname: the name of the host on which to start the alarm service
+     * @param reply_mailbox_name: the mailbox to which the alarm service will send a message
      * @param msg: the message to send
-     * @param suffix: a (possibly empty) suffix to append to the daemon name
-     * @return a reference to the alarm service
+     * @param suffix: a (possibly empty) suffix to append to the daemon name (useful in debug output)
+     * @return a shared_ptr reference to the alarm service
      *
      * @throw std::invalid_argument
      */
@@ -84,7 +84,7 @@ namespace wrench {
                                SimulationMessage *msg, std::string suffix) {
       std::shared_ptr<Alarm> alarm_ptr = std::shared_ptr<Alarm>(
               new Alarm(date, hostname, reply_mailbox_name, msg, suffix));
-      alarm_ptr->setSimulation(simulation);
+      alarm_ptr->simulation = simulation;
       try {
         alarm_ptr->start(alarm_ptr, true); // daemonize
       } catch (std::invalid_argument &e) {
@@ -93,6 +93,9 @@ namespace wrench {
       return alarm_ptr;
     }
 
+    /**
+     * @brief Immediately terminate the alarm's actor, meaning that it will never send its alarm message
+     */
     void Alarm::kill() {
       this->killActor();
     }

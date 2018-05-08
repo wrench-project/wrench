@@ -30,13 +30,20 @@ namespace wrench {
     class StorageService;
 
     /**
-     * @brief  A top-level class that defines a compute service.
+     * @brief The compute service base class
      */
     class ComputeService : public Service {
 
     public:
 
+        /** @brief A convenient constant to mean "use all cores on the physical host" whenever a number of cores
+         *  is needed when instantiat services
+         */
         static constexpr unsigned long ALL_CORES = ULONG_MAX;
+
+        /** @brief A convenient constant to mean "use all ram on the physical host" whenever a ram capacity
+         *  is needed when instantiating services
+         */
         static constexpr double ALL_RAM = DBL_MAX;
 
         /***********************/
@@ -47,7 +54,7 @@ namespace wrench {
 
         void stop() override;
 
-        void submitJob(WorkflowJob *job, std::map<std::string, std::string> service_specific_args = {});
+        void submitJob(WorkflowJob *job, std::map<std::string, std::string> = {});
 
         void terminateJob(WorkflowJob *job);
 
@@ -71,14 +78,15 @@ namespace wrench {
 
         StorageService *getDefaultStorageService();
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
         virtual void
         submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
         virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
-        /***********************/
-        /** \cond INTERNAL    **/
-        /***********************/
 
         virtual void terminateStandardJob(StandardJob *job) = 0;
 

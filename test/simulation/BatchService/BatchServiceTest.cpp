@@ -32,7 +32,7 @@ public:
 
     void do_OneStandardJobTaskTest_test();
 
-    void do_TwoStandardJobTaskTest_test();
+    void do_TwoStandardJobSubmissionTest_test();
 
     void do_MultipleStandardTaskTest_test();
 
@@ -218,7 +218,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
           new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
                                    storage_service1, {})));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -336,9 +336,9 @@ private:
           event = workflow->waitForNextExecutionEvent();
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-              if (event->job != job) {
+              if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job) {
                 throw std::runtime_error("Wrong job completion order: got " +
-                                         event->job->getName() + " but expected " + job->getName());
+                                         dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job->getName() + " but expected " + job->getName());
               }
               break;
             }
@@ -374,11 +374,11 @@ private:
 };
 
 TEST_F(BatchServiceTest, TwoStandardJobSubmissionTest) {
-  DO_TEST_WITH_FORK(do_TwoStandardJobTaskTest_test);
+  DO_TEST_WITH_FORK(do_TwoStandardJobSubmissionTest_test);
 }
 
 
-void BatchServiceTest::do_TwoStandardJobTaskTest_test() {
+void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 
 
   // Create and initialize a simulation
@@ -408,7 +408,7 @@ void BatchServiceTest::do_TwoStandardJobTaskTest_test() {
           new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
                                    storage_service1, {})));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -462,7 +462,7 @@ private:
 
       {
         // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM and 30 seconds
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 30);
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0, 30);
 
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
@@ -550,7 +550,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
                                    storage_service1, {})));
 
   // Create a File Registry Service
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -561,7 +561,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -660,7 +660,7 @@ private:
 
       {
         // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM, and 30 seconds
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 30);
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 30);
 
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
@@ -756,7 +756,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -891,7 +891,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1019,7 +1019,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1164,7 +1164,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1212,7 +1212,7 @@ private:
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 90);
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 90);
 
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
@@ -1307,7 +1307,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1517,7 +1517,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1571,7 +1571,7 @@ private:
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 90);
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 90);
 
         // Create a sequential task that lasts one min and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
@@ -1642,10 +1642,10 @@ private:
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-            if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+            if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
               throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
             }
-            wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
+            wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
             std::string error_msg = real_cause->toString();
             if (real_cause->getService() != this->test->compute_service) {
               std::runtime_error(
@@ -1707,7 +1707,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1754,7 +1754,7 @@ private:
 
       {
         // Create a pilot job tbat needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 90);
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 90);
 
         // Create a sequential task that lasts one min and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
@@ -1891,7 +1891,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1939,7 +1939,7 @@ private:
 
       {
         // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 90 seconds
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 90);
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0, 90);
 
         // Create a sequential task that lasts one min and requires 5 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 5, 5, 1.0);
@@ -2058,7 +2058,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2207,7 +2207,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2367,7 +2367,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow).get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);

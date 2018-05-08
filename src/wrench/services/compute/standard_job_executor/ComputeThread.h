@@ -26,7 +26,9 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief A compute thread
+     * @brief A helper service that is simply a CPU-bound thread that
+     *        performs a given number of flops and then reports to
+     *        some mailbox saying "I am done"
      */
     class ComputeThread : public Service {
 

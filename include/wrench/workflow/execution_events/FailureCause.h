@@ -46,6 +46,8 @@ namespace wrench {
                     FILE_NOT_FOUND,
             /** @brief The file to be written was already there */
                     FILE_ALREADY_THERE,
+            /** @brief The file is already being copied there */
+                    FILE_ALREADY_BEING_COPIED,
             /** @brief The storage service does not have enough space to support operation */
                     STORAGE_NO_ENOUGH_SPACE,
             /** @brief The service cannot be used because it is down (likely was terminated) */
@@ -65,12 +67,20 @@ namespace wrench {
             /** @brief A compute thread has died */
                     COMPUTE_THREAD_HAS_DIED,
             /** @brief A functionality is not available */
-                    FUNCTIONALITY_NOT_AVAILABLE
+                    FUNCTIONALITY_NOT_AVAILABLE,
+            /** @brief A job was terminated due to a timeout */
+                    JOB_TIMEOUT
 
         };
 
         FailureCause(CauseType cause);
 
+
+        /**
+         * @brief Return an error message that describes the failure cause (to be overriden)
+         *
+         * @return an error message
+         */
         virtual std::string toString() = 0;
 
         CauseType getCauseType();
@@ -149,6 +159,22 @@ namespace wrench {
         StorageService *storage_service;
     };
 
+    /**
+     * @brief A "file is already being copied" failure cause
+     */
+    class FileAlreadyBeingCopied : public FailureCause {
+
+    public:
+        FileAlreadyBeingCopied(WorkflowFile *file, StorageService *dst);
+
+        WorkflowFile *getFile();
+        StorageService *getStorageService();
+        std::string toString();
+
+    private:
+        WorkflowFile *file;
+        StorageService *storage_service;
+    };
 
     /**
      * @brief A "service is down" failure cause
@@ -213,6 +239,9 @@ namespace wrench {
      */
     class NetworkError : public FailureCause {
     public:
+        /** @brief Enumerated type to describe whether the network error occured
+         * while sending or receiving
+         */
         enum OperationType {
             SENDING,
             RECEIVING
@@ -235,6 +264,7 @@ namespace wrench {
     */
     class NetworkTimeout : public FailureCause {
     public:
+        /** A enumerated tupe that describes the operation that led to the network timeout */
         enum OperationType {
             SENDING,
             RECEIVING
@@ -298,6 +328,20 @@ namespace wrench {
         std::string toString();
 
     private:
+    };
+
+
+    /**
+    * @brief A "job has times out" failure cause
+    */
+    class JobTimeout : public FailureCause {
+    public:
+        JobTimeout(WorkflowJob *job);
+        WorkflowJob *getJob();
+        std::string toString();
+
+    private:
+        WorkflowJob *job;
     };
 
 

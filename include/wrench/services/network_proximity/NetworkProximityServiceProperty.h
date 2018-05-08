@@ -15,7 +15,7 @@
 namespace wrench {
 
     /**
-     * @brief Properties for a NetworkProximityService
+     * @brief Configurable properties for a NetworkProximityService
      */
 
     class NetworkProximityServiceProperty:public ServiceProperty {

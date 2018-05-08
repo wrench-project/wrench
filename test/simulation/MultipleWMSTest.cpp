@@ -116,7 +116,7 @@ private:
       try {
         auto cs = (wrench::CloudService *) *this->getAvailableComputeServices().begin();
         std::string execution_host = cs->getExecutionHosts()[0];
-        cs->createVM(execution_host, "vm_" + execution_host, 2);
+        cs->createVM(execution_host, 2);
         job_manager->submitJob(two_task_job, this->test->compute_service);
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
@@ -181,7 +181,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow, 100));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
@@ -239,7 +239,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
   EXPECT_NO_THROW(wms2->addWorkflow(workflow2, 10000));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service

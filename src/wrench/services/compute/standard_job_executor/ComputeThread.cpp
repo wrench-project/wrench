@@ -19,6 +19,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(compute_thread, "Log category for ComputeThread");
 
 namespace wrench {
 
+    /**
+     * @brief Destructor
+     */
     ComputeThread::~ComputeThread() {
 //      WRENCH_INFO("In COMPUTETHREAD DESTRUCTOR");
     }
@@ -37,6 +40,10 @@ namespace wrench {
       this->reply_mailbox = reply_mailbox;
     }
 
+    /**
+     * @brief The main method of the compute thread
+     * @return
+     */
     int ComputeThread::main() {
       try {
         WRENCH_INFO("New compute thread (%.2f flops, will report to %s)", this->flops, reply_mailbox.c_str());

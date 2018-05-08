@@ -17,10 +17,17 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
+    /**
+     * @brief An abstraction that manages a pool of network connections
+     */
     class NetworkConnectionManager {
 
     public:
-        NetworkConnectionManager(unsigned long num_connections);
+        NetworkConnectionManager(unsigned long max_num_data_connections);
 
         void addConnection(std::unique_ptr<NetworkConnection> connection);
 
@@ -28,15 +35,20 @@ namespace wrench {
 
 
     private:
-        unsigned long num_connections;
+        unsigned long max_num_data_connections;
 
-        void startQueuedConnections();
+        void startQueuedDataConnections();
 
-        std::deque<std::unique_ptr<NetworkConnection>> queued_connections;
-        std::vector<std::unique_ptr<NetworkConnection>> running_connections;
+        std::deque<std::unique_ptr<NetworkConnection>> queued_data_connections;
+        std::vector<std::unique_ptr<NetworkConnection>> running_data_connections;
+        std::unique_ptr<NetworkConnection> running_control_connection = nullptr;
+
 
     };
 
+    /***********************/
+    /** \endcond           */
+    /***********************/
 };
 
 

@@ -26,9 +26,10 @@ namespace wrench {
 
     class FailureCause;
 
+    class FileRegistryService;
 
     /**
-     * @brief A top-level class that defines a storage service.
+     * @brief A simulated storage service
      */
     class StorageService : public Service {
 
@@ -40,11 +41,11 @@ namespace wrench {
 
         void stop();
 
-        virtual double howMuchFreeSpace();
+        virtual double getFreeSpace();
 
         virtual bool lookupFile(WorkflowFile *file);
 
-        virtual void deleteFile(WorkflowFile *file);
+        virtual void deleteFile(WorkflowFile *file, FileRegistryService *file_registry_service=nullptr);
 
         /***********************/
         /** \cond INTERNAL    **/

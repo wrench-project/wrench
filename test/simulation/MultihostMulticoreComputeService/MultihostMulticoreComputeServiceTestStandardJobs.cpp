@@ -214,7 +214,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -338,7 +338,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -463,7 +463,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging the input file on the storage service
   EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
@@ -592,7 +592,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -704,7 +704,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -833,7 +833,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -972,7 +972,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -1053,10 +1053,10 @@ private:
       }
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
             throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
           }
-          auto *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
+          auto *real_cause = (wrench::ServiceIsDown *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
           if (real_cause->getService() != this->test->compute_service) {
             std::runtime_error(
                     "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
@@ -1112,7 +1112,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -1193,10 +1193,10 @@ private:
       }
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
             std::runtime_error("Got the correct failure event, but the cause seems wrong");
           }
-          auto *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
+          auto *real_cause = (wrench::ServiceIsDown *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
           if (real_cause->getService() != this->test->storage_service) {
             std::runtime_error(
                     "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
@@ -1251,7 +1251,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service

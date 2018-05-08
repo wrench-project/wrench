@@ -179,9 +179,10 @@ private:
 
       bool success;
 
+
       success = true;
       try {
-        job_manager->createStandardJob({nullptr}, {});
+        job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>){nullptr}, {});
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -201,17 +202,7 @@ private:
 
       success = true;
       try {
-        job_manager->createPilotJob(nullptr, 10, 10, 10, 10);
-      } catch (std::invalid_argument &e) {
-        success = false;
-      }
-      if (success) {
-        throw std::runtime_error("Should not be able to create a pilot job with a nullptr workflow");
-      }
-
-      success = true;
-      try {
-        job_manager->createPilotJob(this->workflow, 10, 10, -12, 10);
+        job_manager->createPilotJob(10, 10, -12, 10);
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -221,7 +212,7 @@ private:
 
       success = true;
       try {
-        job_manager->createPilotJob(this->workflow, 10, 10, 10, -12);
+        job_manager->createPilotJob(10, 10, 10, -12);
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -229,12 +220,40 @@ private:
         throw std::runtime_error("Should not be able to create a standard job with a negative duration");
       }
 
+      wrench::WorkflowTask *t1 = workflow->addTask("t1", 1.0, 1, 1, 1.0, 0.0);
+      wrench::WorkflowTask *t2 = workflow->addTask("t2", 1.0, 1, 1, 1.0, 0.0);
+      wrench::WorkflowFile *f = workflow->addFile("f", 100);
+      t1->addOutputFile(f);
+      t2->addInputFile(f);
+
+      // Create an "ok" job
+      success = true;
+      try {
+        job_manager->createStandardJob({t1, t2}, {});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (!success) {
+        throw std::runtime_error("Should be able to create a standard job with two dependent tasks");
+      }
+
+      // Create a "not ok" job
+      success = true;
+      try {
+        job_manager->createStandardJob((std::vector<wrench::WorkflowTask*>){t2}, {});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job with a not-self-contained task");
+      }
+
       return 0;
     }
 };
 
 TEST_F(JobManagerTest, CreateJobTest) {
-  DO_TEST_WITH_FORK(do_JobManagerConstructorTest_test);
+  DO_TEST_WITH_FORK(do_JobManagerCreateJobTest_test);
 }
 
 void JobManagerTest::do_JobManagerCreateJobTest_test() {
@@ -256,7 +275,7 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          new JobManagerConstructorTestWMS(
+          new JobManagerCreateJobTestWMS(
                   this, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
@@ -336,12 +355,15 @@ private:
         throw std::runtime_error("Should not be able to forget a nullptr job");
       }
 
+
+
+
       return 0;
     }
 };
 
 TEST_F(JobManagerTest, SubmitJobTest) {
-  DO_TEST_WITH_FORK(do_JobManagerConstructorTest_test);
+  DO_TEST_WITH_FORK(do_JobManagerSubmitJobTest_test);
 }
 
 void JobManagerTest::do_JobManagerSubmitJobTest_test() {
@@ -363,10 +385,11 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
   // Submit a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          new JobManagerConstructorTestWMS(
+          new JobManagerSubmitJobTestWMS(
                   this, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
 
   EXPECT_NO_THROW(simulation->launch());
 

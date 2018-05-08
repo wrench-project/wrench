@@ -24,15 +24,14 @@ namespace wrench {
     /**
      * @brief Constructor:  a WMS with a workflow instance, a scheduler implementation, and a list of compute services
      *
-     * @param scheduler: a standard job scheduler implementation (if nullptr then none is used)
-     * @param scheduler: a pilot job scheduler implementation (if nullptr then none is used)
+     * @param standard_job_scheduler: a standard job scheduler implementation (if nullptr then none is used)
+     * @param pilot_job_scheduler: a pilot job scheduler implementation (if nullptr then none is used)
      * @param compute_services: a set of compute services available to run jobs (if {} then none is available)
      * @param storage_services: a set of storage services available to the WMS (if {} then none is available)
      * @param network_proximity_services: a set of network proximity services available to the WMS (if {} then none is available)
-     * @param file_registry_service: the file registry services available to the WMS (if nullptr then none is available)
+     * @param file_registry_service: a file registry services available to the WMS (if nullptr then none is available)
      * @param hostname: the name of the host on which to run the WMS
      * @param suffix: a string to append to the WMS process name (useful for debug output)
-
      *
      * @throw std::invalid_argument
      */
@@ -171,30 +170,38 @@ namespace wrench {
      */
     void WMS::waitForAndProcessNextEvent() {
       std::unique_ptr<WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+      WorkflowExecutionEvent *event_ptr = event.release();
 
-      switch (event->type) {
+      
+      switch (event_ptr->type) {
         case WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-          processEventStandardJobCompletion(std::move(event));
+          processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent>(
+                  dynamic_cast<StandardJobCompletedEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          processEventStandardJobFailure(std::move(event));
+          processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent>(
+                  dynamic_cast<StandardJobFailedEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::PILOT_JOB_START: {
-          processEventPilotJobStart(std::move(event));
+          processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent>(
+                  dynamic_cast<PilotJobStartedEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
-          processEventPilotJobExpiration(std::move(event));
+          processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent>(
+                  dynamic_cast<PilotJobExpiredEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-          processEventFileCopyCompletion(std::move(event));
+          processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent>(
+                  dynamic_cast<FileCopyCompletedEvent *>(event_ptr)));
           break;
         }
         case WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          processEventFileCopyFailure(std::move(event));
+          processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent>(
+                  dynamic_cast<FileCopyFailedEvent *>(event_ptr)));
           break;
         }
         default: {
@@ -209,9 +216,9 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventStandardJobCompletion(std::unique_ptr<WorkflowExecutionEvent> event) {
-      auto job = (StandardJob *) (event->job);
-      WRENCH_INFO("Notified that a %ld-task job has completed", job->getNumTasks());
+    void WMS::processEventStandardJobCompletion(std::unique_ptr<StandardJobCompletedEvent> event) {
+      auto standard_job = event->standard_job;
+      WRENCH_INFO("Notified that a %ld-task job has completed", standard_job->getNumTasks());
     }
 
     /**
@@ -219,7 +226,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent> event) {
       WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
     }
 
@@ -228,7 +235,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventPilotJobStart(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventPilotJobStart(std::unique_ptr<PilotJobStartedEvent> event) {
       WRENCH_INFO("Notified that a pilot job has started!");
     }
 
@@ -237,7 +244,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventPilotJobExpiration(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventPilotJobExpiration(std::unique_ptr<PilotJobExpiredEvent> event) {
       WRENCH_INFO("Notified that a pilot job has expired!");
     }
 
@@ -246,7 +253,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventFileCopyCompletion(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventFileCopyCompletion(std::unique_ptr<FileCopyCompletedEvent> event) {
       WRENCH_INFO("Notified that a file copy is completed!");
     }
 
@@ -255,7 +262,7 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void WMS::processEventFileCopyFailure(std::unique_ptr<WorkflowExecutionEvent> event) {
+    void WMS::processEventFileCopyFailure(std::unique_ptr<FileCopyFailedEvent> event) {
       WRENCH_INFO("Notified that a file copy has failed!");
     }
 
@@ -296,7 +303,7 @@ namespace wrench {
     std::shared_ptr<JobManager> WMS::createJobManager() {
       auto job_manager_raw_ptr = new JobManager(this);
       std::shared_ptr<JobManager> job_manager = std::shared_ptr<JobManager>(job_manager_raw_ptr);
-      job_manager->setSimulation(this->simulation);
+      job_manager->simulation = this->simulation;
       job_manager->start(job_manager, true); // Always daemonize
       return job_manager;
     }
@@ -308,7 +315,7 @@ namespace wrench {
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
       auto data_movement_manager_raw_ptr = new DataMovementManager(this);
       std::shared_ptr<DataMovementManager> data_movement_manager = std::shared_ptr<DataMovementManager>(data_movement_manager_raw_ptr);
-      data_movement_manager->setSimulation(this->simulation);
+      data_movement_manager->simulation = this->simulation;
       data_movement_manager->start(data_movement_manager, true); // Always daemonize
       return data_movement_manager;
     }

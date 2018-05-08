@@ -23,7 +23,7 @@ class WorkflowTask;
 namespace wrench {
 
     /**
-     * @brief A workflow that an be executed by a WMS
+     * @brief A workflow (to be executed by a WMS)
      */
     class Workflow {
 
@@ -49,11 +49,14 @@ namespace wrench {
 
         void addControlDependency(WorkflowTask *, WorkflowTask *);
 
-        void loadFromDAX(const std::string &filename);
+        void loadFromDAX(const std::string &filename, const std::string &reference_flop_rate);
 
-        void loadFromJSON(const std::string &filename);
+        void loadFromJSON(const std::string &filename, const std::string &reference_flop_rate);
 
         unsigned long getNumberOfTasks();
+
+        unsigned long getNumLevels();
+
 
         void exportToEPS(std::string);
 
@@ -64,6 +67,8 @@ namespace wrench {
         /***********************/
 
         bool isDone();
+
+        std::vector<WorkflowTask *> getTasksInTopLevelRange(unsigned long min, unsigned long max);
 
         std::map<std::string, std::vector<WorkflowTask *>> getReadyTasks();
 
@@ -97,11 +102,17 @@ namespace wrench {
         /***********************/
 
     private:
+
+        friend class WorkflowTask;
+
+        void setNumLevels(unsigned long );
         std::unique_ptr<lemon::ListDigraph> DAG;  // Lemon DiGraph
         std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
 
         std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
         std::map<std::string, std::unique_ptr<WorkflowFile>> files;
+
+        unsigned long num_levels;
 
         bool pathExists(WorkflowTask *, WorkflowTask *);
 

@@ -16,8 +16,6 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_scheduler, "Log category for Cloud Scheduler"
 
 namespace wrench {
 
-    static unsigned long VM_ID = 1;
-
     /**
      * @brief Schedule and run a set of ready tasks on available cloud resources
      *
@@ -63,16 +61,19 @@ namespace wrench {
         }
 
         // Decision making
-        WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
+        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(itc.second, {});
         unsigned long mim_num_cores = ((StandardJob *) (job))->getMinimumRequiredNumCores();
+        double mim_mem = 0;
+        for (auto task : itc.second) {
+          mim_mem = std::max(mim_mem, task->getMemoryRequirement());
+        }
 
         if (sum_num_idle_cores < mim_num_cores) {
           try {
             std::string pm_host = choosePMHostname();
-            std::string vm_host = "vm" + std::to_string(VM_ID++) + "_" + pm_host;
+            std::string vm_host = cloud_service->createVM(pm_host, mim_num_cores, mim_mem);
 
-            // TODO: provide proper VM RAM requests
-            if (cloud_service->createVM(pm_host, vm_host, mim_num_cores, 1000)) {
+            if (not vm_host.empty()) {
               this->vm_list[pm_host].push_back(vm_host);
             }
 
@@ -81,7 +82,7 @@ namespace wrench {
             return;
           }
         }
-        job_manager->submitJob(job, cloud_service);
+        this->getJobManager()->submitJob(job, cloud_service);
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }

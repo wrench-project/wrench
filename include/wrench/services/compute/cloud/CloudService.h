@@ -11,14 +11,8 @@
 #ifndef WRENCH_CLOUDSERVICE_H
 #define WRENCH_CLOUDSERVICE_H
 
-#include <map>
-#include <simgrid/s4u/VirtualMachine.hpp>
-
-#include "wrench/services/Service.h"
-#include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h"
 #include "CloudServiceProperty.h"
-#include "wrench/simulation/Simulation.h"
-#include "wrench/workflow/job/PilotJob.h"
 
 namespace wrench {
 
@@ -27,9 +21,11 @@ namespace wrench {
     class ComputeService;
 
     /**
-     * @brief A cloud ComputeService
+     * @brief A cloud-based compute service that manages a set of physical
+     *        hosts and controls access to their resources by (transparently) executing jobs
+     *        in VM instances.
      */
-    class CloudService : public ComputeService {
+    class CloudService : public VirtualizedClusterService {
 
     private:
         std::map<std::string, std::string> default_property_values =
@@ -55,74 +51,10 @@ namespace wrench {
                      StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {});
 
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
-
-        bool createVM(const std::string &pm_hostname,
-                      const std::string &vm_hostname,
-                      unsigned long num_cores,
-                      double ram_memory = ComputeService::ALL_RAM,
-                      std::map<std::string, std::string> plist = {});
-
-        std::vector<std::string> getExecutionHosts();
-
-        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
-
-        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
-
-        void terminateStandardJob(StandardJob *job) override;
-        void terminatePilotJob(PilotJob *job) override;
-
-        /***********************/
-        /** \endcond          **/
-        /***********************/
-
-        /***********************/
-        /** \cond INTERNAL    */
-        /***********************/
-
-        ~CloudService();
-
-        /***********************/
-        /** \endcond          **/
-        /***********************/
-
-
     private:
         friend class Simulation;
 
         int main() override;
-
-        bool processNextMessage();
-
-        void processGetResourceInformation(const std::string &answer_mailbox);
-
-        void processGetExecutionHosts(const std::string &answer_mailbox);
-
-        void processCreateVM(const std::string &answer_mailbox,
-                             const std::string &pm_hostname,
-                             const std::string &vm_hostname,
-                             bool supports_standard_jobs,
-                             bool supports_pilot_jobs,
-                             unsigned long num_cores,
-                             double ram_memory,
-                             std::map<std::string, std::string> plist);
-
-        void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-                                      std::map<std::string, std::string> &service_specific_args);
-
-        void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
-
-        void terminate();
-
-        std::vector<std::string> execution_hosts;
-
-        std::map<std::string, double> cs_available_ram;
-
-
-        /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
-        std::map<std::string, std::tuple<simgrid::s4u::VirtualMachine *, std::shared_ptr<ComputeService>, unsigned long>> vm_list;
     };
 
 }

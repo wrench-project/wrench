@@ -20,6 +20,15 @@ namespace wrench {
     * @brief Load the workflow trace file
     *
     * @param filename: the path to the trace file
+    * @param load_time_compensation: an offset to add to submit times in the trace file
+    *
+    * @return  a vector of tuples, where each tuple is a job description with the following fields:
+    *              - job id
+    *              - submission time
+    *              - actual time
+    *              - requested time,
+    *              - requested ram
+    *              - requested number of nodes
     *
     * @throw std::invalid_argument
     */
@@ -42,12 +51,14 @@ namespace wrench {
                                             std::istream_iterator<std::string>{}};
 
             if (tokens.size() < 10) {
-              throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): Seeing less than 10 fields per line in trace file '" + filename +
-                                          "'");
+              throw std::invalid_argument(
+                      "TraceFileLoader::loadFromTraceFile(): Seeing less than 10 fields per line in trace file '" +
+                      filename +
+                      "'");
             }
 
             std::string id;
-            double flops=-1, requested_flops=-1, requested_ram=-1;
+            double time = -1, requested_time = -1, requested_ram = -1;
             int itemnum = 0;
             double sub_time = -1;
             int requested_num_nodes = -1;
@@ -69,7 +80,7 @@ namespace wrench {
                   break;
                 case 3: // Run time
                   //assuming flops and runtime are the same (in seconds)
-                  if (sscanf(item.c_str(), "%lf", &flops) != 1) {
+                  if (sscanf(item.c_str(), "%lf", &time) != 1) {
                     throw std::invalid_argument(
                             "TraceFileLoader::loadFromTraceFile(): Invalid run time in trace file '" + item +
                             "'");
@@ -95,7 +106,7 @@ namespace wrench {
                   break;
                 case 8: // Requested time
                   //assuming flops and runtime are the same (in seconds)
-                  if (sscanf(item.c_str(), "%lf", &requested_flops) != 1) {
+                  if (sscanf(item.c_str(), "%lf", &requested_time) != 1) {
                     throw std::invalid_argument(
                             "TraceFileLoader::loadFromTraceFile(): Invalid requested time in trace file '" + item +
                             "'");
@@ -135,36 +146,39 @@ namespace wrench {
             }
 
             // Fix/check values
-            if (requested_flops < 0) {
-              requested_flops = flops;
-            } else if (flops < 0) {
-              flops = requested_flops;
+            if (requested_time < 0) {
+              requested_time = time;
+            } else if (time < 0) {
+              time = requested_time;
             }
-            if ((requested_flops < 0) or (flops < 0)) {
-              throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): invalid job with negative flops and negative requested flops");
+            if ((requested_time < 0) or (time < 0)) {
+              throw std::invalid_argument(
+                      "TraceFileLoader::loadFromTraceFile(): invalid job with negative flops and negative requested flops");
             }
             if (requested_ram < 0) {
               requested_ram = 0;
             }
             if (sub_time < 0) {
-              throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): invalid job with negative submission time");
+              throw std::invalid_argument(
+                      "TraceFileLoader::loadFromTraceFile(): invalid job with negative submission time");
             }
             if (requested_num_nodes < 0) {
               requested_num_nodes = num_nodes;
             }
             if (requested_num_nodes < 0) {
-              throw std::invalid_argument("TraceFileLoader::loadFromTraceFile(): invalid job with negative (requested) number of node");
+              throw std::invalid_argument(
+                      "TraceFileLoader::loadFromTraceFile(): invalid job with negative (requested) number of node");
             }
 
             // Add the job to the list
             std::tuple<std::string, double, double, double, double, unsigned int> job =
                     std::tuple<std::string, double, double, double, double, unsigned int>(
-                            id, sub_time, flops, requested_flops, requested_ram, (unsigned int)requested_num_nodes);
+                            id, sub_time, time, requested_time, requested_ram, (unsigned int) requested_num_nodes);
             trace_file_jobs.push_back(job);
           }
         }
       } catch (std::exception &e) {
-        throw std::invalid_argument("Errors while reading workload trace file '" + filename +"': " + e.what());
+        throw std::invalid_argument("Errors while reading workload trace file '" + filename + "': " + e.what());
       }
       return trace_file_jobs;
     }

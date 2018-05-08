@@ -67,6 +67,8 @@ set(HEADER_FILES
         include/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h
         include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h
         include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h
+        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h
+        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceProperty.h
         include/wrench/services/compute/cloud/CloudService.h
         include/wrench/services/compute/cloud/CloudServiceProperty.h
         include/wrench/services/storage/StorageService.h
@@ -146,10 +148,12 @@ set(SOURCE_FILES
         src/wrench/services/storage/StorageServiceMessage.h
         src/wrench/services/file_registry/FileRegistryMessage.cpp
         src/wrench/services/file_registry/FileRegistryMessage.h
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterService.cpp
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceProperty.cpp
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.h
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.cpp
         src/wrench/services/compute/cloud/CloudService.cpp
         src/wrench/services/compute/cloud/CloudServiceProperty.cpp
-        src/wrench/services/compute/cloud/CloudServiceMessage.h
-        src/wrench/services/compute/cloud/CloudServiceMessage.cpp
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp
@@ -173,7 +177,7 @@ set(SOURCE_FILES
         src/wrench/services/helpers/Alarm.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
-        src/wrench/util/TraceFileLoader.cpp
+        src/wrench/services/compute/batch/TraceFileLoader.cpp
         src/wrench/services/storage/simple/NetworkConnectionManager.cpp
         src/wrench/services/storage/simple/NetworkConnection.cpp
         src/wrench/util/UnitParser.cpp
@@ -192,6 +196,7 @@ set(TEST_FILES
         test/simulation/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
         test/simulation/SimpleStorageService/SimpleStorageServicePerformanceTest.cpp
         test/simulation/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
+        test/simulation/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceSchedulingTest.cpp
@@ -200,15 +205,16 @@ set(TEST_FILES
         test/simulation/NetworkProximityTest.cpp
         test/simulation/FileRegistryTest.cpp
         test/simulation/BatchService/BatchServiceTest.cpp
+        test/simulation/BatchService/BatchServiceFCFSTest.cpp
         test/simulation/BatchService/BatchServiceTraceFileTest.cpp
-        test/simulation/BatchService/BatchServiceQueueWaitTimePredictionTest.cpp
+        test/simulation/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
         test/simulation/CloudServiceTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/MultipleWMSTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
-        examples/simple-wms/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        test/simulation/JobManagerTest.cpp)
+        examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
+        test/simulation/JobManagerTest.cpp test/simulation/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
@@ -239,7 +245,6 @@ add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 
 # additional packages
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
-
 
 # build examples
 foreach (cmakefile ${CMAKEFILES_TXT})

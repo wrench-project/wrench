@@ -76,6 +76,7 @@ namespace wrench {
 
         std::set<WorkflowFile *> getInputFiles();
         std::set<WorkflowFile *> getOutputFiles();
+        unsigned long getTopLevel();
 
         double getStartDate();
 
@@ -91,6 +92,8 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+
+        void updateTopLevel();
 
         void setState(WorkflowTask::State);
 
@@ -126,6 +129,8 @@ namespace wrench {
         unsigned long max_num_cores;
         double parallel_efficiency;
         double memory_requirement;
+
+        unsigned long toplevel;           // 0 if entry task
 
         double start_date = -1.0;          // Date at which task began execution (getter?)
         double end_date = -1.0;            // Date at which task finished execution (getter?)

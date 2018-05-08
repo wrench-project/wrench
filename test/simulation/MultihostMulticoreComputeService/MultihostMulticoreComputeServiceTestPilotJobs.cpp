@@ -114,7 +114,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 3600);  // Asking for 0 RAM
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0, 3600);  // Asking for 0 RAM
 
       // Submit a pilot job
       bool success = true;
@@ -180,7 +180,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
 
@@ -225,7 +225,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that requires 1 host, 1 core per host, 0 bytes of RAM per host, and 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0, 3600);
 
 
       std::string job_type_as_string = pilot_job->getTypeAsString();
@@ -268,7 +268,7 @@ private:
       }
 
       // Create another pilot job that requires 1 host, all core per host, 0 bytes of RAM per host, and 1 hour
-      wrench::PilotJob *big_pilot_job = job_manager->createPilotJob(this->workflow, 1, 2, 0, 3600);
+      wrench::PilotJob *big_pilot_job = job_manager->createPilotJob(1, 2, 0, 3600);
 
       // Submit this other job
       try {
@@ -382,7 +382,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging the input file on the storage service
   EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
@@ -425,7 +425,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, and 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 3600);
 
       // Submit a pilot job
       try {
@@ -532,7 +532,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -576,7 +576,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that needs 1 host, 1 code, 0 bytes of RAM, and 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 3600);
 
       // Try to terminate it right now, which is stupid
 //      bool success = true;
@@ -642,7 +642,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -686,7 +686,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 3600);
 
       // Submit a pilot job
       try {
@@ -796,7 +796,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
@@ -840,7 +840,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that needs 1 host, 1 core, 0 bytes of RAM, 1 hour
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 1, 1, 0.0, 3600);
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 3600);
 
       // Submit a pilot job
       try {
@@ -894,10 +894,10 @@ private:
       }
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          if (event->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
             throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
           }
-          wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) (event->failure_cause.get());
+          wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
           if (real_cause->getService() != this->test->compute_service) {
             std::runtime_error(
                     "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
@@ -957,7 +957,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service

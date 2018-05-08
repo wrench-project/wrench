@@ -109,6 +109,10 @@ namespace wrench {
       return hostname_list;
     }
 
+    /**
+     * @brief Retrieve the by-cluster structure of the platform
+     * @return a map of all cluster names and their associated hostname list
+     */
     std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByCluster() {
       std::map<std::string, std::vector<std::string>> result;
       std::vector<simgrid::kernel::routing::ClusterZone*>clusters;
@@ -236,7 +240,7 @@ namespace wrench {
           }
           try {
             capacity_value = UnitParser::parse_size(capacity_string);
-          } catch (std::runtime_error &e) {
+          } catch (std::invalid_argument &e) {
             throw std::invalid_argument(
                     "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->getCname()) + "'has invalid memory capacity specification '" + tag +":" +
                     std::string(capacity_string) + "'");

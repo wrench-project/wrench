@@ -15,7 +15,7 @@
 namespace wrench {
 
     /**
-     * @brief Properties for a CloudService
+     * @brief Configurable properties for a CloudService
      */
     class CloudServiceProperty : public ComputeServiceProperty {
 
