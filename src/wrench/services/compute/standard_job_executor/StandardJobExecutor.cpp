@@ -33,6 +33,7 @@ namespace wrench {
      * @brief Destructor
      */
     StandardJobExecutor::~StandardJobExecutor() {
+      WRENCH_INFO("IN STANDARD JOB EXECUTOR DESTRUCTOR!");
       this->default_property_values.clear();
     }
 
@@ -199,6 +200,23 @@ namespace wrench {
 
     }
 
+    void StandardJobExecutor::cleanup() {
+      for (auto wue: this->running_workunit_executors) {
+        Workunit *wu = wue->workunit;
+        for (auto task : wu->tasks) {
+          if (task->getInternalState() == WorkflowTask::RUNNING) {
+            task->setInternalState(WorkflowTask::FAILED);
+          }
+        }
+      }
+      this->non_ready_workunits.clear();
+      this->ready_workunits.clear();
+      this->running_workunits.clear();
+      this->completed_workunits.clear();
+
+    }
+
+
     /**
      * @brief Kill the executor
      */
@@ -249,15 +267,6 @@ namespace wrench {
 
         /** Detect Termination **/
         if (this->non_ready_workunits.empty() and  this->ready_workunits.empty() and  this->running_workunits.empty()) {
-//          std::cerr << "CANARY 1: " << (*(this->completed_workunits. begin())).use_count() << "\n";
-//          std::shared_ptr<Workunit> canary = std::move(*(this->completed_workunits.begin()));
-//          std::cerr << "CANARY 2: " << canary.use_count() << "\n";
-//          this->completed_workunits.erase(*(this->completed_workunits. begin()));
-//          this->completed_workunits.erase(canary);
-//          std::cerr << "WTF: " << this->completed_workunits.size() << "\n";
-//          std::cerr << "CANARY 3: " << canary.use_count() << "\n";
-          this->completed_workunits.clear();
-
           break;
         }
 
@@ -600,9 +609,6 @@ namespace wrench {
           (this->ready_workunits.empty()) &&
           (this->running_workunits.empty())) {
 
-        // Erase all completed works for the job
-        this->completed_workunits.clear();
-
         try {
           S4U_Mailbox::putMessage(this->callback_mailbox,
                                   new StandardJobExecutorDoneMessage(this->job, this,
@@ -702,11 +708,6 @@ namespace wrench {
                 "StandardJobExecutor::processWorkunitExecutorCompletion(): couldn't find a recently failed workunit in the running workunit list");
       }
 
-      // Remove all other workunits for the job in the "not ready" state
-      this->non_ready_workunits.clear();
-
-      // Remove all other workunits for the job in the "ready" state
-      this->ready_workunits.clear();
 
       // Deal with running workunits!
       for (auto const &wu : this->running_workunits) {
@@ -714,7 +715,7 @@ namespace wrench {
           throw std::runtime_error(
                   "StandardJobExecutor::processWorkunitExecutorFailure(): trying to cancel a running workunit that's doing some file copy operations - not supported (for now)");
         }
-        // find the workunit executor  that's doing the work (lame iteration)
+        // find the workunit executor  that's doing the work and kill it (lame iteration)
         for (auto const &wue : this->running_workunit_executors) {
           if (wue->workunit == wu.get()) {
             wue->kill();
@@ -722,11 +723,6 @@ namespace wrench {
           }
         }
       }
-      this->running_workunits.clear();
-
-      // Deal with completed workunits
-      this->completed_workunits.clear();
-
 
       // Send the notification back
       try {

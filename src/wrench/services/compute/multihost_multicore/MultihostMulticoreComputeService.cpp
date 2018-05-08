@@ -918,36 +918,26 @@ namespace wrench {
       WRENCH_INFO("Terminating a standard job executor");
       executor->kill();
 
-      // Set all non-COMPLETED tasks back to the READY state and wipe out output files
-      // TODO: At some point we'll have to think hard about the task life cycle and make it better/coherent
       for (auto failed_task: job->getTasks()) {
-//        WRENCH_INFO("====> %s %s", failed_task->getId().c_str(), WorkflowTask::stateToString(failed_task->getInternalState()).c_str());
         switch (failed_task->getInternalState()) {
-          case WorkflowTask::NOT_READY: {
+          case WorkflowTask::NOT_READY:
+          case WorkflowTask::READY:
+          case WorkflowTask::COMPLETED:
             break;
-          }
-          case WorkflowTask::READY: {
-            break;
-          }
-//          case WorkflowTask::PENDING: {
-//            failed_task->setInternalState(WorkflowTask::READY);;
-//            break;
-//          }
-          case WorkflowTask::RUNNING: {
+
+          case WorkflowTask::RUNNING:
+            throw std::runtime_error("MultihostMulticoreComputeService::terminateRunningStandardJob(): task state shouldn't be 'RUNNING'"
+                                             "after a StandardJobExecutor was killed!");
+          case WorkflowTask::FAILED:
+            // Making failed task READY again
             failed_task->setInternalState(WorkflowTask::READY);
+//            failed_task->incrementFailureCount();
             break;
-          }
-          case WorkflowTask::COMPLETED: {
-            break;
-          }
-          case WorkflowTask::FAILED: {
-            failed_task->setInternalState(WorkflowTask::READY);
-            break;
-          }
-          default: {
+
+          default:
             throw std::runtime_error(
                     "MultihostMulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
-          }
+
         }
       }
     }

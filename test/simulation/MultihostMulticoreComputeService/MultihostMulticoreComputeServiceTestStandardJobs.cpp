@@ -722,7 +722,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
                              wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
   }
 
-  // Check failure counts: Terminations DO NOT count as failures
+  // Check failure counts: Terminations DO NOT COUNT as failures
   if ((this->task1->getFailureCount() != 0) ||
       (this->task2->getFailureCount() != 0)) {
     throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getId() + ": " +

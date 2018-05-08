@@ -108,7 +108,6 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
 TEST_F(WorkflowTaskTest, StateToString) {
   EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::NOT_READY), "NOT READY");
   EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::READY), "READY");
-  EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::PENDING), "PENDING");
   EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::RUNNING), "RUNNING");
   EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::COMPLETED), "COMPLETED");
   EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::FAILED), "FAILED");

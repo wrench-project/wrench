@@ -186,8 +186,6 @@ namespace wrench {
           return "NOT READY";
         case READY:
           return "READY";
-        case PENDING:
-          return "PENDING";
         case RUNNING:
           return "RUNNING";
         case COMPLETED:
