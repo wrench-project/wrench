@@ -631,7 +631,6 @@ namespace wrench {
               case WorkflowTask::InternalState::TASK_FAILED:
                 // Making failed task READY again
                 task->setInternalState(WorkflowTask::InternalState::TASK_READY);
-//                task->incrementFailureCount();
                 break;
 
               default:
