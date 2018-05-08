@@ -22,23 +22,63 @@ namespace wrench {
     class JobManager;
     class WorkflowTask;
 
+    /**
+     * @brief A (mostly virtual) base class for implementing standard job schedulers
+     */
     class StandardJobScheduler {
 
     public:
 
+        /**
+         * @brief Constructor
+         */
+        StandardJobScheduler() {
+          this->data_movement_manager = nullptr;
+          this->job_manager = nullptr;
+        }
+
+        /**
+         * @brief Method that schedules a set of tasks a standard jobs, according to whatever decision algorithm
+         *        it implements, over a set of compute services
+         * @param compute_services: the set of compute services
+         * @param tasks: the set of tasks
+         */
         virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
                                    const std::map<std::string, std::vector<WorkflowTask *>> &tasks) = 0;
 
+        /**
+         * @brief Set a reference to the data manager to be used by this scheduler (nullptr: none is used)
+         * @param data_movement_manager: a data movement manager
+         */
         void setDataMovementManager(DataMovementManager *data_movement_manager) {
           this->data_movement_manager = data_movement_manager;
         }
 
+        /**
+         * @brief Get a reference to the data movement manager to be used by this scheduler (nullptr: none is used)
+         * @return a data movement manager
+         */
+        DataMovementManager *getDataMovementManager() {
+          return this->data_movement_manager;
+        }
+
+        /**
+         * @brief Set a reference to the job manager to be used by this scheduler (nullptr: none is used)
+         * @param job_manager: a job manager
+         */
         void setJobManager(JobManager *job_manager) {
           this->job_manager = job_manager;
         }
 
-    protected:
+        /**
+         * @brief Get a reference to the job manager to be used by this scheduler (nullptr: none is used)
+         * @return a job manager
+         */
+        JobManager *getJobManager() {
+          return this->job_manager;
+        }
 
+    private:
         DataMovementManager *data_movement_manager;
         JobManager *job_manager;
 

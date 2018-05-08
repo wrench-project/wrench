@@ -222,7 +222,7 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService("WMSHost"));
+  simulation->add(new wrench::FileRegistryService("WMSHost"));
 
   // Staging all files on the WMS storage service
   for (int i=0; i < 10; i++) {

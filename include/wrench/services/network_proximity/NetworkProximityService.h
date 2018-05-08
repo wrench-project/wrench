@@ -20,7 +20,8 @@
 namespace wrench{
 
     /**
-     * @brief A network proximity service
+     * @brief A simulated network proximity service that estimates inter-host latencies
+     *        and can be queries for such estimates
      */
     class NetworkProximityService: public Service {
 
@@ -41,6 +42,10 @@ namespace wrench{
 
     public:
 
+        /**
+         * @brief A convenient constant that is returned as a latency between two hosts
+         *        when no latency estimates are available for this pair of hosts.
+         */
         static constexpr double NOT_AVAILABLE = DBL_MAX;
 
 

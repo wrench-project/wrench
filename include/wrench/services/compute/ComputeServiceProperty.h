@@ -16,7 +16,7 @@
 namespace wrench {
 
     /**
-     * @brief Properties for a ComputeService
+     * @brief Configurable properties for a ComputeService
      */
     class ComputeServiceProperty : public ServiceProperty {
     public:
@@ -52,14 +52,14 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to acknowledge a pilot job termination **/
         DECLARE_PROPERTY_NAME(TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the daemon to ask it for its number of cores **/
-        DECLARE_PROPERTY_NAME(NUM_CORES_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to state how many cores it has **/
-        DECLARE_PROPERTY_NAME(NUM_CORES_ANSWER_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the daemon to ask it for its number of idle cores **/
-        DECLARE_PROPERTY_NAME(NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to state how many idle cores it has **/
-        DECLARE_PROPERTY_NAME(NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD);
+//        /** @brief The number of bytes in the control message sent to the daemon to ask it for its number of cores **/
+//        DECLARE_PROPERTY_NAME(NUM_CORES_REQUEST_MESSAGE_PAYLOAD);
+//        /** @brief The number of bytes in the control message sent by the daemon to state how many cores it has **/
+//        DECLARE_PROPERTY_NAME(NUM_CORES_ANSWER_MESSAGE_PAYLOAD);
+//        /** @brief The number of bytes in the control message sent to the daemon to ask it for its number of idle cores **/
+//        DECLARE_PROPERTY_NAME(NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD);
+//        /** @brief The number of bytes in the control message sent by the daemon to state how many idle cores it has **/
+//        DECLARE_PROPERTY_NAME(NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent to the daemon to ask it for information on its resources **/
         DECLARE_PROPERTY_NAME(RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state information on its resources **/

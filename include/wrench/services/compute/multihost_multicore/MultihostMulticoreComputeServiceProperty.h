@@ -18,7 +18,7 @@
 namespace wrench {
 
    /**
-    * @brief Properties for a MultiHostMulticoreComputeService
+    * @brief Configurable properties for a MultiHostMulticoreComputeService
     */
     class MultihostMulticoreComputeServiceProperty : public ComputeServiceProperty {
 

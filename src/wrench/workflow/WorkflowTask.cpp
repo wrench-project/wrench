@@ -368,4 +368,36 @@ namespace wrench {
     double WorkflowTask::getEndDate() {
       return this->end_date;
     }
+
+    /**
+     * @brief Update the task's top level (looking only at the parents)
+     */
+    void WorkflowTask::updateTopLevel() {
+      std::vector<WorkflowTask *> parents = this->workflow->getTaskParents(this);
+      if (parents.empty()) {
+        this->toplevel = 0;
+      } else {
+        unsigned long max_toplevel = 0;
+        for (auto parent : parents) {
+          max_toplevel = (max_toplevel < parent->toplevel ? parent->toplevel : max_toplevel);
+        }
+        this->toplevel = 1 + max_toplevel;
+      }
+      if (this->workflow->getNumLevels() < 1 + this->toplevel) {
+        this->workflow->setNumLevels(1 + this->toplevel);
+      }
+      std::vector<WorkflowTask *> children = this->workflow->getTaskChildren(this);
+      for (auto child : children) {
+        child->updateTopLevel();
+      }
+    }
+
+    /**
+     * @brief Returns the task's top level (max number of hops on a reverse path up to an entry task. Entry
+     *        tasks have a top-leve of 0)
+     * @return
+     */
+    unsigned long WorkflowTask::getTopLevel() {
+      return this->toplevel;
+    }
 };

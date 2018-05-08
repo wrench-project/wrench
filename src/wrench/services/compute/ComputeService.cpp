@@ -33,13 +33,15 @@ namespace wrench {
 
 
     /**
-     * @brief Submit a job to the batch service
+     * @brief Submit a job to the compute service
      * @param job: the job
-     * @param service_specific_arguments: arguments specific to a compute service:
-     * @param service_specific_args: arguments specific for compute services:
-     *      - to a multicore_compute_service: {}
-     *      - to a batch service: {"-t":"<int>","-n":"<int>","-N":"<int>","-c":"<int>"}
-     *      - to a cloud service: {}
+     * @param service_specific_args: arguments specific to compute services when needed:
+     *      - to a MultihostMultiCoreComputeService: {}
+     *      - to a BatchService: {"-t":"<int>","-N":"<int>","-c":"<int>"} (SLURM-like)
+     *         - "-t": number of requested job duration in minutes
+     *         - "-N": number of requested compute hosts
+     *         - "-c": number of requested cores per compute host
+     *      - to a CloudService: {}
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -74,8 +76,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Terminate a previously-submitted job (which may or may not be running)
-     * 
+     * @brief Terminate a previously-submitted job (which may or may not be running yet)
+     *
      * @param job: the job to terminate
      * 
      * @throw std::invalid_argument
@@ -135,7 +137,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the "supports standard jobs" property
+     * @brief Get whether the compute service supports standard jobs or not
      * @return true or false
      */
     bool ComputeService::supportsStandardJobs() {
@@ -143,7 +145,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the "supports pilot jobs" property
+     * @brief Get whether the compute service supports pilot jobs or not
      * @return true or false
      */
     bool ComputeService::supportsPilotJobs() {
@@ -151,7 +153,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get host (compute node) counts for the compute service
+     * @brief Get the number of hosts that the compute service manages
      * @return the host counts
      *
      * @throw WorkflowExecutionException
@@ -235,8 +237,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the flop/sec rate of one core of the compute service's host
-    * @return  the flop rate
+    * @brief Get the per-core fop ratea of the compute service's hosts
+    * @return flop rates in flop/sec
     *
     * @throw std::runtime_error
     */
@@ -262,8 +264,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the  RAM capacities of the compute service's hosts
-    * @return the RAM capacities
+    * @brief Get the RAM capacities of the compute service's hosts
+    * @return a vector of RAM capacities
     *
     * @throw std::runtime_error
     */
@@ -290,8 +292,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the time-to-live, in seconds, of the compute service
-     * @return the ttl
+     * @brief Get the time-to-live of the compute service
+     * @return the ttl in seconds
      *
      * @throw std::runtime_error
      */
@@ -310,62 +312,6 @@ namespace wrench {
     }
 
 
-////    /**
-////     * @brief Process a submit standard job request
-////     *
-////     * @param answer_mailbox: the mailbox to which the answer message should be sent
-////     * @param job: the job
-////     * @param service_specific_arguments: arguments specific for the compute service
-////     *
-////     * @throw std::runtime_error
-////     */
-////    void ComputeService::processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-////                                                  std::map<std::string, std::string> &service_specific_args) {
-////      throw std::runtime_error("ComputeService::processSubmitStandardJob(): Not implemented here");
-////    }
-////
-////    /**
-////     * @brief Process a submit pilot job request
-////     *
-////     * @param answer_mailbox: the mailbox to which the answer message should be sent
-////     * @param job: the job
-////     *
-////     * @throw std::runtime_error
-////     */
-////    void ComputeService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) {
-////      throw std::runtime_error("ComputeService::processSubmitPilotJob(): Not implemented here");
-////    }
-////
-//    /**
-//     * @brief Process a get resource description request
-//     *
-//     * @param answer_mailbox: the mailbox to which the answer message should be sent
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void ComputeService::processGetResourceInformation(const std::string &answer_mailbox) {
-//      throw std::runtime_error("ComputeService::processGetResourceInformation(): Not implemented here");
-//    }
-//
-//    /**
-//    * @brief Terminate a standard job to the compute service (virtual)
-//    * @param job: the job
-//    *
-//    * @throw std::runtime_error
-//    */
-//    void ComputeService::terminateStandardJob(StandardJob *job) {
-//      throw std::runtime_error("ComputeService::terminateStandardJob(): Not implemented here");
-//    }
-//
-//    /**
-//     * @brief Terminate a pilot job to the compute service (virtual)
-//     * @param job: the job
-//     *
-//     * @throw std::runtime_error
-//     */
-//    void ComputeService::terminatePilotJob(PilotJob *job) {
-//      throw std::runtime_error("ComputeService::terminatePilotJob(): Not implemented here");
-//    }
 
 
     /**
@@ -377,7 +323,7 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the default StorageService for the ComputeService
+    * @brief Get the default StorageService for the compute service
     * @return a storage service
     */
     StorageService *ComputeService::getDefaultStorageService() {
@@ -409,8 +355,10 @@ namespace wrench {
       // Get the reply
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 

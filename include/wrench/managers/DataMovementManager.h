@@ -39,18 +39,17 @@ namespace wrench {
 
         void kill();
 
-        void initiateAsynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst);
+        void initiateAsynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst, FileRegistryService *file_registry_service=nullptr);
 
-        void doSynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst);
+        void doSynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst, FileRegistryService *file_registry_service=nullptr);
 
     protected:
 
         friend class WMS;
 
-        DataMovementManager(WMS *wms);
+        explicit DataMovementManager(WMS *wms);
 
     private:
-
 
         int main();
 
@@ -58,6 +57,21 @@ namespace wrench {
 
         bool processNextMessage();
 
+        struct CopyRequestSpecs {
+            WorkflowFile *file;
+            StorageService *dst;
+            FileRegistryService *file_registry_service;
+
+            CopyRequestSpecs(WorkflowFile *file,
+            StorageService *dst,
+            FileRegistryService *file_registry_service) : file(file), dst(dst), file_registry_service(file_registry_service) {}
+
+            bool operator==(const CopyRequestSpecs &rhs) const {
+              return (file == rhs.file) && (dst == rhs.dst);
+            }
+        };
+
+        std::list<std::unique_ptr<CopyRequestSpecs>> pending_file_copies;
     };
 
     /***********************/

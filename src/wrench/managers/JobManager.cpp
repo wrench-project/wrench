@@ -8,6 +8,7 @@
  */
 
 #include <string>
+#include <wrench/wms/WMS.h>
 
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
@@ -79,7 +80,8 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param tasks: a vector of tasks
+     * @param tasks: a vector of tasks (which must be either READY, or children of COMPLETED tasks or
+     *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies on which storage services input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
@@ -159,7 +161,8 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param tasks: a vector of tasks
+     * @param tasks: a vector of tasks  (which must be either READY, or children of COMPLETED tasks or
+     *                                   of tasks also included in the standard job)
      * @param file_locations: a map that specifies on which storage services input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
@@ -180,7 +183,7 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param task: a task
+     * @param task: a task (which must be ready)
      * @param file_locations: a map that specifies on which storage services input/output files should be read/written
      *         (default storage is used otherwise, provided that the job is submitted to a compute service
      *          for which that default was specified)
@@ -204,7 +207,6 @@ namespace wrench {
     /**
      * @brief Create a pilot job
      *
-     * @param workflow: a workflow
      * @param num_hosts: the number of hosts required by the pilot job
      * @param num_cores_per_host: the number of cores per host required by the pilot job
      * @param ram_per_host: the number of bytes of RAM required by the pilot job on each host
@@ -213,15 +215,14 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    PilotJob *JobManager::createPilotJob(Workflow *workflow,
-                                         unsigned long num_hosts,
+    PilotJob *JobManager::createPilotJob(unsigned long num_hosts,
                                          unsigned long num_cores_per_host,
                                          double ram_per_host,
                                          double duration) {
-      if ((workflow == nullptr) ||  (ram_per_host < 0) || (duration <= 0.0)) {
+      if ((ram_per_host < 0) || (duration <= 0.0)) {
         throw std::invalid_argument("JobManager::createPilotJob(): Invalid arguments");
       }
-      PilotJob *raw_ptr = new PilotJob(workflow, num_hosts, num_cores_per_host, ram_per_host, duration);
+      PilotJob *raw_ptr = new PilotJob(this->wms->workflow, num_hosts, num_cores_per_host, ram_per_host, duration);
       std::unique_ptr<WorkflowJob> job = std::unique_ptr<PilotJob>(raw_ptr);
       this->jobs[raw_ptr] = std::move(job);
       return raw_ptr;
@@ -434,7 +435,7 @@ namespace wrench {
      */
     int JobManager::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_YELLOW);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_YELLOW);
 
       WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
@@ -442,6 +443,7 @@ namespace wrench {
       while (keep_going) {
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
+          WRENCH_INFO("Waiting for a message");
           message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
           continue;

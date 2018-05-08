@@ -46,7 +46,7 @@ namespace wrench {
      */
     int SimpleWMS::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_GREEN);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_GREEN);
 
       // Check whether the WMS has a deferred start time
       checkDeferredStart();
@@ -129,8 +129,8 @@ namespace wrench {
      *
      * @param event: a workflow execution event
      */
-    void SimpleWMS::processEventStandardJobFailure(std::unique_ptr<WorkflowExecutionEvent> event) {
-      auto job = (StandardJob *) (event->job);
+    void SimpleWMS::processEventStandardJobFailure(std::unique_ptr<StandardJobFailedEvent> event) {
+      auto job = event->standard_job;
       WRENCH_INFO("Notified that a standard job has failed (all its tasks are back in the ready state)");
       WRENCH_INFO("CauseType: %s", event->failure_cause->toString().c_str());
       this->job_manager->forgetJob(job);

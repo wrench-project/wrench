@@ -27,7 +27,7 @@ namespace wrench {
         );
       }
       this->jobid = jobid;
-      this->time_in_minutes = time_in_minutes;
+      this->allocated_time = time_in_minutes * 60.0;
       this->num_nodes = num_nodes;
       this->cores_per_node = cores_per_node;
       this->ending_time_stamp = ending_time_stamp;
@@ -38,8 +38,12 @@ namespace wrench {
       return this->cores_per_node;
     }
 
-    unsigned long BatchJob::getAllocatedTime() {
-      return this->time_in_minutes;
+    double BatchJob::getAllocatedTime() {
+      return this->allocated_time;
+    }
+
+    void BatchJob::setAllocatedTime(double time) {
+      this->allocated_time = time;
     }
 
     double BatchJob::getMemoryRequirement() {
@@ -72,13 +76,24 @@ namespace wrench {
       return this->num_nodes;
     }
 
+
+    void BatchJob::setBeginTimeStamp(double time_stamp) {
+      this->begin_time_stamp = time_stamp;
+    }
+
+
+    double BatchJob::getBeginTimeStamp() {
+      return this->begin_time_stamp;
+    }
+
+
     double BatchJob::getEndingTimeStamp() {
       return this->ending_time_stamp;
     }
 
     void BatchJob::setEndingTimeStamp(double time_stamp) {
       if (this->ending_time_stamp > 0) {
-        throw std::invalid_argument(
+        throw std::runtime_error(
                 "BatchJob::setEndingTimeStamp(): Cannot set time stamp again for the same job"
         );
       }

@@ -73,6 +73,10 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::lookupEntry(): Invalid argument");
       }
 
+      if (this->state != Service::UP) {
+        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+      }
+
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_entry");
 
       try {
@@ -86,8 +90,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -118,6 +124,10 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::lookupEntryByProximity(): Invalid argument, no file");
       }
 
+      if (this->state != Service::UP) {
+        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+      }
+
       // check to see if the 'reference_host' is valid
       std::vector<std::string> monitored_hosts = network_proximity_service->getHostnameList();
       if(std::find(monitored_hosts.cbegin(), monitored_hosts.cend(), reference_host) == monitored_hosts.cend()) {
@@ -137,8 +147,10 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -164,6 +176,10 @@ namespace wrench {
         throw std::invalid_argument("FileRegistryService::addEntry(): Invalid  argument");
       }
 
+      if (this->state != Service::UP) {
+        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+      }
+
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("add_entry");
 
       try {
@@ -178,9 +194,11 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw (WorkflowExecutionException(cause));
       }
 
       if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
@@ -204,6 +222,11 @@ namespace wrench {
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument(" FileRegistryService::removeEntry(): Invalid input argument");
       }
+
+      if (this->state != Service::UP) {
+        throw WorkflowExecutionException(std::shared_ptr<ServiceIsDown>(new ServiceIsDown(this)));
+      }
+
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("remove_entry");
 
       try {
@@ -218,9 +241,11 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        message = S4U_Mailbox::getMessage(answer_mailbox);
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw (WorkflowExecutionException(cause));
       }
 
       if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
@@ -242,7 +267,7 @@ namespace wrench {
      */
     int FileRegistryService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
 
       WRENCH_INFO("File Registry Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 

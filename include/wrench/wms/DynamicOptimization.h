@@ -24,6 +24,11 @@ namespace wrench {
      */
     class DynamicOptimization {
     public:
+        /**
+         * @brief Method to process a workflow at runtime so as to optimize its execution (to be overridden)
+         *
+         * @param workflow: the workflow
+         */
         virtual void process(Workflow *workflow) = 0;
     };
 

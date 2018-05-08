@@ -12,25 +12,23 @@ Overview                        {#mainpage}
 <br /><br />
 
 [WRENCH](http://wrench-project.org) enables novel avenues for scientific workflow use, 
-research, development, and education in the context of large-scale scientific 
-computations and data analyses.
+research, development, and education.
 WRENCH capitalizes on recent and critical advances in the state of the art of distributed 
-platform/application simulation. 
-These advances make it possible to simulate the execution of large scale 
-workflows in a way that is accurate (via validated simulation models), scalable 
+platform/application simulationby building on top
+of the open-source [SimGrid](http://simgrid.gforge.inria.fr) simulation framework. 
+SimGrid makes it to simulate the execution of large-scale
+distributed applications in a way that is accurate (via validated simulation models), scalable 
 (low ratio of simulation time to simulated time, ability to run large simulations 
 on a single computer with low compute, memory, and energy footprints), and expressive (ability 
-to describe arbitrary platform and application configurations, ability to prototype 
-simulations quickly). More specifically, WRENCH is built on top of the open-source 
-[SimGrid](http://simgrid.gforge.inria.fr) simulation framework.
+to simulate arbitrary platform, application, and execution scenarios). 
 
-Through the use of SimGrid, WRENCH provides the ability to: 
+In a nutshell, WRENCH makes it possible to: 
 
-- Rapidly prototype implementations of Workflow Management System (WMS) components and underlying algorithms; 
+- Prototype implementations of Workflow Management System (WMS) components and underlying algorithms;
 - Quickly simulate arbitrary workflow and platform scenarios for a simulated WMS 
   implementation; and 
-- Run extensive experimental campaigns results to conclusively compare workflow, platform, and
-  WMS designs.
+- Run extensive experimental campaigns to conclusively compare workflow executions, platform 
+  architectures, and WMS algorithms and designs.
 
 
 <br />
@@ -39,50 +37,52 @@ Through the use of SimGrid, WRENCH provides the ability to:
 
 WRENCH is an _open-source library_ for developing simulators. It is neither a graphical 
 interface nor a stand-alone simulator. WRENCH exposes several high-level simulation 
-abstractions to provide the **building blocks** for developing custom simulators. 
+abstractions to provide high-level **building blocks** for developing custom simulators. 
 
-WRENCH comprises four distinct modules, each designed as a simulation component:
+WRENCH comprises four distinct layers:
 
-- **Simulation Engine:** the simulation code that provides the necessary models to simulate arbitrarily interconnected hardware resources (compute, network, and storage).
-- **Compute Services:** abstractions for the simulated infrastructure components that can execute workflow tasks (e.g., bare-metal servers, cloud platforms, batch-scheduled clusters, etc.).
-- **Other Services:** abstraction for various services usable by a WMS.
-- **Workflow Management System (WMS):** a top-level set of abstractions, the composition of which implements a simulated WMS.
+- **Simulation Core:**  All necessary simulation models and base abstractions (computing, communicating, storing), provided by [SimGrid](http://simgrid.gforge.inria.fr).
+- **Simulated Core Services:** abstractions for simulated cyberinfrastructure components that can be used by a WMS to execute workflows (compute services, storage services, network proximity services, data location services, etc.).
+- **Simulated WMS:** simulated WMS implementations (e.g., simulated existing production WMSs, simulated WMS research prototypes).
+- **Top-Level Simulation:** a top-level set of abstractions to instantiate and simulate the execution of arbitrary workflows on arbitrary platforms using a particular WMS implementation.
 
 
-![Overview of the WRENCH architecture.](images/wrench-architecture.png)
+![](images/wrench-architecture.png)
 
 
 # Classes of Users #                       {#overview-users}
 
-WRENCH is intended for three different classes of users:
+WRENCH is intended for two different classes of users:
 
-- **WMS Users:** use WRENCH to guide their choices when executing their workflows using existing software insfrastructures.
-- **WMS Developers:** use WRENCH to prototype and evaluate alternate software infrastructure designs for better supporting workflows.
-- **WMS Researchers:** use WRENCH to investigate and evaluate novel efficient algorithms to be embedded within those software infrastructures that support workflows. 
+- **WMS Users:** who use WRENCH to simulate workflow executions using existing software insfrastructures.
+- **WMS Developers/Researchers:** who use WRENCH to prototype and evaluate alternate software WMS designs and/or to investigate and evaluate novel algorithms to be implemented in WMSs. 
 
 
-## Levels of Documentation ##              {#overview-users-levels}
+## Three Levels of API Documentation ##              {#overview-users-levels}
 
-The WRENCH library provides three _incremental_ levels of documentation:
+The WRENCH library provides three _incremental_ levels of documentation, 
+each targeting an API level:
 
 **User:** targets users who who want to use WRENCH for simulation the execution of 
-scientific workflows in different simulation scenarios. _Users_ are NOT expected 
-to develop new simulation abstractions or algorithms for WRENCH. Instead, they use available 
-simulation components as high-level building blocks to build a simulator.
+scientific workflows in different simulation scenarios, using existing
+simulated WMSs already implemented using WRENCH. _Users_ are NOT expected 
+to develop new simulation abstractions or algorithms. Instead, they only use available 
+simulation components as high-level building blocks to quickly build simulators.
 @WRENCHNotUserDoc ([See User Documentation](../user/index.html)) @endWRENCHDoc
 
 
 **Developer:** targets _WMS developers_ and _WMS researchers_ that works on developing
-novel algorithms, services, or computing environments. In addition to documentation 
+novel WMS designs and algorithms. In addition to documentation 
 for all simulation components provided at the _User_ level, documentation include
-detailed documentation for all abstract classes for creating custom algorithms, 
-services, or computing environments.
+detailed documentation for interacting with simulated Core Services, as well as for obtaining
+information about the hardware platform.
 @WRENCHNotDeveloperDoc ([See Developer Documentation](../developer/index.html)) @endWRENCHDoc
 
 
 **Internal:** targets those users who want to contribute code to WRENCH. The _internal_ level
-provides, in addition to all levels above, a detailed documentation for all WRENCH classes
-including binders to SimGrid.
+provides, in addition to both levels above, a detailed documentation for all WRENCH classes
+including binders to SimGrid. This is the API needed to, for instance, implement new
+Core Services. 
 @WRENCHNotInternalDoc ([See Internal Documentation](../internal/index.html)) @endWRENCHDoc
 
 

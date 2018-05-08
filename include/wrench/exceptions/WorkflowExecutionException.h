@@ -14,8 +14,9 @@
 #include <exception>
 #include <memory>
 #include <string>
-#include "wrench/workflow/execution_events/FailureCause.h"
+#include <string.h>
 
+#include "wrench/workflow/execution_events/FailureCause.h"
 namespace wrench {
 
 		/***********************/
@@ -40,7 +41,8 @@ namespace wrench {
 				 */
 				virtual const char* what() const throw()
 				{
-					return cause->toString().c_str();
+          // Without the strdup() below, we get some valgrind warnings...
+					return strdup(cause->toString().c_str());
 				}
 
         /**

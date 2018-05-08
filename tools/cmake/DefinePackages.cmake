@@ -1,5 +1,5 @@
 ### define source packages
 
 set(CMAKEFILES_TXT
-        examples/simple-wms/CMakeLists.txt
+        examples/simple-example/CMakeLists.txt
         )

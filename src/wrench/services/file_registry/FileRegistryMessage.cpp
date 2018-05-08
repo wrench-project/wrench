@@ -79,7 +79,6 @@ namespace wrench {
 
     /**
      * @brief FileRegistryFileLookupByProximityRequestMessage class
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param file: the file to look up
      * @param reference_host: the host from which network proximity will be calculated from // 
      * @param locations: the map of locations at which the file resides in ascending order with respect to their distance (network proximity) from 'reference_host'

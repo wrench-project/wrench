@@ -476,7 +476,7 @@ private:
         double now = wrench::S4U_Simulation::getClock();
 
         // Submit a PilotJob that lasts 3600 seconds and takes 2 cores and 0 bytes per host
-        wrench::PilotJob *pilot_job = job_manager->createPilotJob(this->workflow, 2, 2, 0, 3600);
+        wrench::PilotJob *pilot_job = job_manager->createPilotJob(2, 2, 0, 3600);
 
         job_manager->submitJob(pilot_job, this->test->cs_fcfs_aggressive_maximum_maximum_flops_best_fit);
 
@@ -565,7 +565,7 @@ private:
           }
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-              if (event->job != job2) {
+              if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job2) {
                 throw std::runtime_error("Unexpected job completion (job2 should complete first!)");
               }
               // success, do nothing for now
@@ -591,7 +591,7 @@ private:
           }
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-              if (event->job != job1) {
+              if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job1) {
                 throw std::runtime_error("Unexpected job completion (job1 should complete last!)");
               }
               // success, do nothing for now

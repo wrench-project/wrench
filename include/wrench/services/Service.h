@@ -20,7 +20,7 @@
 namespace wrench {
 
     /**
-     * @brief A top-level class that defines a service
+     * @brief A simulated service that can be added to the simulation
      */
     class Service : public S4U_Daemon {
 
@@ -47,6 +47,10 @@ namespace wrench {
         std::string getPropertyValueAsString(std::string);
 
         double getPropertyValueAsDouble(std::string);
+
+        double getNetworkTimeoutValue();
+
+        void setNetworkTimeoutValue(double value);
 
         /***********************/
         /** \endcond           */
@@ -88,6 +92,11 @@ namespace wrench {
 
         /** @brief The service's name */
         std::string name;
+
+        /** @brief The time (in seconds) after which a service that doesn't send back a reply message cause
+         *  a NetworkTimeOut exception. (default: 1 second; if <0 never timeout)
+         */
+        double network_timeout = 1.0;
 
         /***********************/
         /** \endcond           */

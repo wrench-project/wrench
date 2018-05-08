@@ -34,6 +34,7 @@ namespace wrench {
         throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
       }
 
+      this->daemon_lock = simgrid::s4u::Mutex::createMutex();
       this->hostname = hostname;
       this->simulation = nullptr;
       unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
@@ -45,7 +46,8 @@ namespace wrench {
     /**
      * @brief Constructor (daemon without a mailbox)
      *
-     * @param process_name: the prefix of the name of the simulated process/actor
+     * @param hostname: the name of the host on which the daemon will run
+     * @param process_name_prefix: the prefix of the name of the simulated process/actor
      */
     S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
       if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
@@ -62,6 +64,9 @@ namespace wrench {
 //      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
     }
 
+    /**
+     * @brief Cleanup function called when the daemon terminates (for whatever reason)
+     */
     void S4U_Daemon::cleanup(){
 //      WRENCH_INFO("Cleaning Up (default: nothing to do)");
     }
@@ -88,7 +93,6 @@ namespace wrench {
     /**
      * @brief Start the daemon
      *
-     * @param hostname: the name of the host on which to start the daemon
      * @param daemonized: whether the S4U actor should be daemonized (untstart_ested)
      */
     void S4U_Daemon::startDaemon(bool daemonized) {
@@ -100,8 +104,7 @@ namespace wrench {
 
       // Check that the simulation pointer is set
       if (not this->simulation) {
-        std::cerr << "S4U_Daemon::startDaemon(): You must call setSimulation() before calling startDaemon() (" + this->getName() + ")\n";
-        throw std::runtime_error("S4U_Daemon::startDaemon(): You must call setSimulation() before calling startDaemon() (" + this->getName() + ")");
+        throw std::runtime_error("S4U_Daemon::startDaemon(): You must set the simulation field before calling startDaemon() (" + this->getName() + ")");
       }
 
       // Create the s4u_actor
@@ -137,7 +140,7 @@ namespace wrench {
           // (Actor A could have set a reference to B, and that reference
           // would be available on A's object, which then C can look at to
           // say "since I killed A, I should kill at its children as well"
-          S4U_Simulation::sleep(0.0001);
+//          S4U_Simulation::sleep(0.0001);
           this->s4u_actor->kill();
 
         } catch (xbt_ex &e) {
@@ -146,6 +149,21 @@ namespace wrench {
           throw std::shared_ptr<FatalFailure>(new FatalFailure());
         }
         this->terminated = true;
+      }
+    }
+
+    /**
+    * @brief Suspend the daemon/actor.
+    */
+    void S4U_Daemon::suspendActor() {
+      if ((this->s4u_actor != nullptr) && (not this->terminated)) {
+        try {
+          this->s4u_actor->suspend();
+        } catch (xbt_ex &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        } catch (std::exception &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        }
       }
     }
 
@@ -181,7 +199,7 @@ namespace wrench {
     }
 
     /**
-     * @brief creates a life saver for the daemon
+     * @brief Create a life saver for the daemon
      * @param reference
      */
     void S4U_Daemon::createLifeSaver(std::shared_ptr<S4U_Daemon> reference) {
@@ -192,10 +210,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Sets the reference to the simulation object
+     * @brief Lock the daemon's lock
      */
-    void S4U_Daemon::setSimulation(Simulation  *simulation) {
-      this->simulation = simulation;
+    void S4U_Daemon::acquireDaemonLock() {
+      this->daemon_lock->lock();
     }
 
+    /**
+     * @brief Unlock the daemon's lock
+     */
+    void S4U_Daemon::releaseDaemonLock() {
+      this->daemon_lock->unlock();
+    }
 };

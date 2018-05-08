@@ -51,7 +51,7 @@ namespace wrench {
         StorageService * add(StorageService *);
         NetworkProximityService * add(NetworkProximityService *);
         WMS * add(WMS *);
-        FileRegistryService * setFileRegistryService(FileRegistryService *);
+        FileRegistryService * add(FileRegistryService *);
 
         void stageFile(WorkflowFile *file, StorageService *storage_service);
 
@@ -98,7 +98,7 @@ namespace wrench {
 
         std::set<std::shared_ptr<WMS>> wmses;
 
-        std::shared_ptr<FileRegistryService> file_registry_service = nullptr;
+        std::set<std::shared_ptr<FileRegistryService>> file_registry_services;
 
         std::set<std::shared_ptr<NetworkProximityService>> network_proximity_services;
 

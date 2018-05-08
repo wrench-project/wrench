@@ -7,68 +7,75 @@ Getting Started                        {#getting-started}
 
 [TOC]
 
-The first step is to have WRENCH library installed. If it is not done yet, please 
-follow the instructions to [install it](@ref install).
+The first step is to install the WRENCH library, following the instructions
+ on the [install page](@ref install).
 
 # Running a First Example #         {#getting-started-example}
 
-The WRENCH distribution provides an example WMS implementation (`SimpleWMS`) available 
-in the `examples` folder. Note that a simple installation via `make && make install`
-compiles all examples.
+ Typing `make` in the top-level directory
+will compile the examples, and `make install` will put the examples binaries in the `/usr/local/bin` 
+folder (for MacOS and most Linux distributions). 
 
-WRENCH provides two implementations for the `SimpleWMS` example: a cloud-based 
-implementation `wrench-simple-wms-cloud`, and an implementation to run workflows 
-in a batch system (e.g., SLURM) `wrench-simple-wms-batch`.
 
-By default, a successful WRENCH installation puts the examples binaries in the `/usr/local/bin` 
-folder (for MacOS and most Linux distributions). To run the examples, simply use 
+WRENCH provides a simple example in the `examples/simple-example` directory, which 
+generates two executables: a cloud-based 
+example `wrench-simple-example-cloud`, and a 
+batch-system-based (e.g., SLURM) example `wrench-simple-example-batch`.
+To run the examples, simply use 
 one of the following commands:
 
 ~~~~~~~~~~~~~{.sh}
-# running the cloud-based implementation
-wrench-simple-wms-cloud <PATH-TO-WRENCH-SRC-FOLDER>/examples/cloud_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
+# Runs the cloud-based implementation
+wrench-simple-example-cloud <PATH-TO-WRENCH-FOLDER>/examples/simple-example/platform_files/cloud_hosts.xml <PATH-TO-WRENCH-FOLDER>/examples/simple-example/workflow_files/genome.dax
 
-# running the batch-based implementation
-wrench-simple-wms-batch <PATH-TO-WRENCH-SRC-FOLDER>/examples/batch_hosts.xml <PATH-TO-WRENCH-SRC-FOLDER>/examples/genome.dax
+# Runs the batch-based implementation
+wrench-simple-example-batch <PATH-TO-WRENCH-FOLDER>/examples/simple-example/platform_files/batch_hosts.xml <PATH-TO-WRENCH-FOLDER>/examples/simple-example/workflow_files/genome.dax
 ~~~~~~~~~~~~~
 
-## Understanding the Simple-WMS Examples      {#getting-started-example-simplewms}
 
-The `SimpleWMS` example requires two arguments: (1) a [SimGrid virtual platform 
+## Understanding the Simple Example      {#getting-started-example-simple}
+
+Both versions of the example (cloud of batch) require two command-line arguments: (1) a [SimGrid virtual platform 
 description file](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/platform.html); and
 (2) a WRENCH workflow file.
 
-**SimGrid virtual platform description file:** 
-Any [SimGrid](http://simgrid.gforge.inria.fr) simulation must be provided with the description 
-of the platform on which an application execution is to be simulates. This is done via
-a platform description file that includes definitions of compute hosts, clusters of hosts, 
+  - **SimGrid simulated platform description file:** 
+A [SimGrid](http://simgrid.gforge.inria.fr) simulation must be provided with the description 
+of the platform on which an application execution is to be simulated. This is done via
+a platform description file, in XML, that includes definitions of compute hosts, clusters of hosts, 
 storage resources, network links, routes between hosts, etc.
 A detailed description on how to create a platform description file can be found
 [here](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/platform.html).
 
-**WRENCH workflow file:**
+  - **WRENCH workflow file:**
 WRENCH provides native parsers for [DAX](http://workflowarchive.org) (DAG in XML) 
 and [JSON](http://workflowhub.org/traces/) worfklow description file formats. Refer to 
 their respective Web sites for detailed documentation.
 
-The `SimpleWMS` example implementations (either cloud or batch) are structured as follows:
+The source file for the cloud-based simulator is at `examples/simple-example/SimulatorCloud.cpp`
+ and at `examples/simple-example/SimulatorBatch.cpp` for the batch-based example. These source files, which
+ are heavily commented, and perform the following:
 
-- The first step is to read and parse the workflow and the SimGrid platform files, and
-  create a simulation object (wrench::Simulation).
-- A storage service (wrench::SimpleStorageService) is created and deployed on a host.
-- A cloud (wrench::CloudService) or a batch (wrench::BatchService) service is created and 
-  deployed on a host. Both services are seen by the simulation engine as a compute service 
-  (wrench::ComputeService) – jobs can then be scheduled to these resources. 
-- A WMS (wrench::WMS) is instantiated (in this case the `SimpleWMS`) with a reference to 
-  the workflow object (wrench::Workflow) and a scheduler (wrench::Scheduler). For the 
-  cloud example, a cloud scheduler is required to decide when to spawn VMs on hosts. The
-  batch service does not require a specific scheduler, since resources are fixed. In 
-  such cases, a regular scheduler can be used.
-- A file registry (wrench::FileRegistryService), a.k.a. a file replica catalog, which keeps track of files stored in different storage services, is deployed on a host. 
+- The first step is to read and parse the workflow and the platform files, and to
+  create a simulation object (`wrench::Simulation`).
+- A storage service (`wrench::SimpleStorageService`) is created and deployed on a host.
+- A cloud (`wrench::CloudService`) or a batch (`wrench::BatchService`) service is created and 
+  deployed on a host. Both services are seen by the simulation as compute services
+  (`wrench::ComputeService`) – jobs can then be submitted to these services. 
+- A Workflow Management System (`wrench::WMS`) is instantiated (in this case the `SimpleWMS`) with a reference to 
+  a workflow object (`wrench::Workflow`) and a scheduler (`wrench::Scheduler`). The scheduler implements the
+  decision-making algorithms inside the WMS, and are modularized (so that the same WMS implementation can be iniated
+  with various decision-making algorithms in different simulations). The source codes for the schedulers,
+  which is of interest to "Developers" (i.e., those users who use the WRENCH Developer API) is in 
+  directory `examples/scheduler`. 
+- A file registry (`wrench::FileRegistryService`), a.k.a. a file replica catalog, which keeps track of files stored in different storage services, is deployed on a host. 
 - Workflow input files are staged on the storage service
-- The simulation is launched. 
-- Timestamps can be retrieved to inspect the simulation result.
+- The simulation is launched, executes, and completes.
+- Timestamps can be retrieved to analyze the simulated execution.
 
+
+This simple example can be used as a blueprint for starting a large WRENCH-based
+simulation project. The next section provides further details about this process.
 
 # Preparing the Environment #         {#getting-started-prep}
 
@@ -89,9 +96,9 @@ include statement:
 #include <wrench-dev.h>
 ~~~~~~~~~~~~~
 
-Note that `wrench-dev.h` is the only necessary include statement to be added to your 
-experiment code. It includes all interfaces and services provided in `wrench.h` 
-([user mode](../user/getting-started.html)), and additional interfaces to develop 
+Note that `wrench-dev.h` is the only necessary include statement to use WRENCH. 
+It includes all interfaces and services provided in `wrench.h` 
+([user API](../user/getting-started.html)), as well as additional interfaces to develop 
 your own algorithms and services.
  
 @endWRENCHDoc
@@ -163,12 +170,6 @@ documentation for WRENCH functions.
 > _fork_ WRENCH's code from the [GitHub repository](http://github.com/wrench-project/wrench),
 > and create pull requests with their proposed modifications.
 
-In addition to the common [installation steps](./install.html), WRENCH's internal
-developers are strongly encouraged to install the following dependencies/tools:
-
-- [Google Test](https://github.com/google/googletest) - version 1.8 or higher (for running test cases)
-- [Doxygen](http://www.doxygen.org) - version 1.8 or higher (for generating documentation)
-    
 
 # WRENCH Directory and File Structure #         {#getting-started-structure}
 
@@ -176,7 +177,8 @@ WRENCH follows a standard C++ project directory and files structure:
 
 ~~~~~~~~~~~~~{.sh}
 .
-+-- doc                        # Documentation files
++-- doc                        # Documentation source files
++-- docs                       # Generated documentation files
 +-- examples                   # Examples folder (includes workflows, platform files, and implementations) 
 +-- include                    # WRENCH header files - .h files 
 +-- src                        # WRENCH source files - .cpp files

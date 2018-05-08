@@ -76,8 +76,8 @@ make install # try "sudo make install" if you don't have the permission to write
 In addition, several compilation targets are provided in WRENCH:
 
 ~~~~~~~~~~~~~{.sh}
-make doc               # Builds WRENCH documentation
-make unit_tests        # Builds WRENCH unit tests
+make doc               # Builds WRENCH documentation (in the ./docs directory) - Requires Doxygen
+make unit_tests        # Builds WRENCH unit tests  (run them by typing ./unit_tests) - Requires Google Test
 ~~~~~~~~~~~~~
  
 
@@ -89,12 +89,11 @@ make VERBOSE=1
 
 
 
-## Troubleshooting
+## Installation Troubleshooting ##  {#install-troubleshooting}
 
-~~~~~~~~~~~~~{.sh}
-Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE) 
-~~~~~~~~~~~~~
-
-~~~~~~~~~~~~~{.sh}
-brew install pkg-config
-~~~~~~~~~~~~~
+##### `Could NOT find PkgConfig (missing: PKG_CONFIG_EXECUTABLE)`
+    
+ - This error on MacOS is because the `pkg-config` package is not installed
+ - Solution: install this package
+    - MacPorts: `sudo port install pkg-config`
+    - Brew: `sudo brew install pkg-config`
