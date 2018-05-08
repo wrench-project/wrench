@@ -52,16 +52,16 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+
         /** @brief Task state enum */
-        enum State {
+        enum VisibleState {
             NOT_READY,
             READY,
-            RUNNING,
-            COMPLETED,
-            FAILED
+            PENDING,
+            COMPLETED
         };
 
-        static std::string stateToString(WorkflowTask::State state);
+        static std::string stateToString(WorkflowTask::VisibleState state);
 
 
         WorkflowJob *getJob() const;
@@ -80,7 +80,7 @@ namespace wrench {
 
         double getEndDate();
 
-        WorkflowTask::State getState() const;
+        WorkflowTask::VisibleState getState() const;
 
 
         /***********************/
@@ -93,11 +93,22 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
+        /** @brief Task state enum */
+        enum InternalState {
+            TASK_NOT_READY,
+            TASK_READY,
+            TASK_RUNNING,
+            TASK_COMPLETED,
+            TASK_FAILED
+        };
+
+        static std::string stateToString(WorkflowTask::InternalState state);
+
         void updateTopLevel();
 
-        void setInternalState(WorkflowTask::State);
-        void setVisibleState(WorkflowTask::State);
-        WorkflowTask::State getInternalState() const;
+        void setInternalState(WorkflowTask::InternalState);
+        void setVisibleState(WorkflowTask::VisibleState);
+        WorkflowTask::InternalState getInternalState() const;
 
         void setJob(WorkflowJob *job);
 
@@ -130,8 +141,8 @@ namespace wrench {
         double end_date = -1.0;            // Date at which task finished execution (getter?)
         unsigned int failure_count = 0;    // Number of times the tasks has failed
 
-        State visible_state;              // To be exposed to developer level
-        State internal_state;              // Not to be exposed to developer level
+        VisibleState visible_state;              // To be exposed to developer level
+        InternalState internal_state;              // Not to be exposed to developer level
         Workflow *workflow;                                    // Containing workflow
         lemon::ListDigraph *DAG;                              // Containing workflow
         lemon::ListDigraph::Node DAG_node;                    // pointer to the underlying DAG node

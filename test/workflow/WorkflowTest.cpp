@@ -152,8 +152,8 @@ TEST_F(WorkflowTest, IsDone) {
   ASSERT_FALSE(workflow->isDone());
 
   for (auto task : workflow->getTasks()) {
-    task->setInternalState(wrench::WorkflowTask::State::COMPLETED);
-    task->setVisibleState(wrench::WorkflowTask::State::COMPLETED);
+    task->setInternalState(wrench::WorkflowTask::InternalState::TASK_COMPLETED);
+    task->setVisibleState(wrench::WorkflowTask::VisibleState::COMPLETED);
   }
 
   EXPECT_TRUE(workflow->isDone());
