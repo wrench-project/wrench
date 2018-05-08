@@ -525,14 +525,13 @@ namespace wrench {
           StandardJob *job = msg->job;
           job->state = StandardJob::State::FAILED;
 
-          // update the task states
+          // update the task states and failure counts!
           for (auto t: job->getTasks()) {
             if (t->getInternalState() == WorkflowTask::COMPLETED) {
-
               t->setVisibleState(WorkflowTask::COMPLETED);
             } else {
-              t->incrementFailureCount();
               t->setVisibleState(WorkflowTask::State::READY);
+              t->incrementFailureCount();
             }
           }
 

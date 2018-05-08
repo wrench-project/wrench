@@ -614,10 +614,30 @@ namespace wrench {
 
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if (((*it).get())->getJob() == job) {
+          WRENCH_INFO("CALLING KILL");
           ((*it).get())->kill();
+          WRENCH_INFO("CALLED KILL");
+          // Make failed tasks ready again
           for (auto task : job->tasks) {
-            if (task->getInternalState() == WorkflowTask::RUNNING) {
-              task->setInternalState(WorkflowTask::READY);
+            switch (task->getInternalState()) {
+              case WorkflowTask::NOT_READY:
+              case WorkflowTask::READY:
+              case WorkflowTask::COMPLETED:
+                break;
+
+              case WorkflowTask::RUNNING:
+                throw std::runtime_error("BatchService::processStandardJobTimeout: task state shouldn't be 'RUNNING'"
+                                                 "after a StandardJobExecutor was killed!");
+              case WorkflowTask::FAILED:
+                // Making failed task READY again
+                task->setInternalState(WorkflowTask::READY);
+//                task->incrementFailureCount();
+                break;
+
+              default:
+                throw std::runtime_error(
+                        "MultihostMulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
+
             }
           }
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),

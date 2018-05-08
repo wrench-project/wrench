@@ -56,7 +56,6 @@ namespace wrench {
         enum State {
             NOT_READY,
             READY,
-            PENDING,
             RUNNING,
             COMPLETED,
             FAILED
