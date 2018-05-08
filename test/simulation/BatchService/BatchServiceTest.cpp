@@ -1678,6 +1678,12 @@ private:
           );
         } else {
           //congrats, round robin works
+          //however let's check further if the task1 hostname is equal to the task4 hostname
+          if (task1->getExecutionHost() != task4->getExecutionHost()) {
+            throw std::runtime_error(
+                    "BatchServiceTest::ROUNDROBINTEST():: The tasks did execute on the right hosts"
+            );
+          }
         }
 
         workflow->removeTask(task1);
@@ -1692,9 +1698,20 @@ private:
 
 };
 
+#ifdef ENABLE_BATSCHED
+
+TEST_F(BatchServiceTest, DISABLED_RoundRobinTaskTest) {
+  DO_TEST_WITH_FORK(do_RoundRobinTask_test);
+}
+
+#else
+
 TEST_F(BatchServiceTest, RoundRobinTaskTest) {
   DO_TEST_WITH_FORK(do_RoundRobinTask_test);
 }
+
+#endif
+
 
 void BatchServiceTest::do_RoundRobinTask_test() {
 
