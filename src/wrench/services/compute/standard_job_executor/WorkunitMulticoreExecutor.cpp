@@ -252,6 +252,7 @@ namespace wrench {
 
 
         task->setEndDate(S4U_Simulation::getClock());
+        task->setExecutionHost(this->hostname);
 
         // Generate a SimulationTimestamp
         this->simulation->output.addTimestamp<SimulationTimestampTaskCompletion>(

@@ -1665,6 +1665,11 @@ private:
           num_events++;
         }
 
+        WRENCH_INFO("Task1 completed on host %s", task1->getExecutionHost().c_str());
+        WRENCH_INFO("Task2 completed on host %s", task2->getExecutionHost().c_str());
+        WRENCH_INFO("Task3 completed on host %s", task3->getExecutionHost().c_str());
+        WRENCH_INFO("Task4 completed on host %s", task4->getExecutionHost().c_str());
+
         double EPSILON = 1.0;
         double not_expected_date = 60; //FIRSTFIT and BESTFIT would complete in ~60 seconds but ROUNDROBIN would finish, in this case, in ~90 seconds
         if (fabs(this->simulation->getCurrentSimulatedDate() - not_expected_date) <= EPSILON) {
