@@ -33,7 +33,7 @@ namespace wrench {
                                const double memory_requirement) :
             id(id), flops(flops), min_num_cores(min_num_cores), max_num_cores(max_num_cores),
             parallel_efficiency(parallel_efficiency), memory_requirement(memory_requirement),
-            visible_state(WorkflowTask::VisibleState::READY),
+            visible_state(WorkflowTask::State::READY),
             internal_state(WorkflowTask::InternalState::TASK_READY), job(nullptr) {
     }
 
@@ -159,7 +159,7 @@ namespace wrench {
      *
      * @return the task state
      */
-    WorkflowTask::VisibleState WorkflowTask::getState() const {
+    WorkflowTask::State WorkflowTask::getState() const {
       return this->visible_state;
     }
 
@@ -178,7 +178,7 @@ namespace wrench {
      * @param state: task state
      * @return a string
      */
-    std::string WorkflowTask::stateToString(WorkflowTask::VisibleState state) {
+    std::string WorkflowTask::stateToString(WorkflowTask::State state) {
       switch (state) {
         case NOT_READY:
           return "NOT READY";
@@ -239,7 +239,7 @@ namespace wrench {
     *
     * @param state: the task state
     */
-    void WorkflowTask::setVisibleState(WorkflowTask::VisibleState state) {
+    void WorkflowTask::setState(WorkflowTask::State state) {
 
       // Sanity check
       bool sane = true;
@@ -268,7 +268,7 @@ namespace wrench {
       }
 
       if (not sane) {
-        throw std::runtime_error("WorkflowTask::setVisibleState(): Cannot set " +
+        throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
                                  this->getId() +"' visible state to " +
                                  std::to_string(state) + " when its internal " +
                                  "state is " + std::to_string(this->internal_state));
