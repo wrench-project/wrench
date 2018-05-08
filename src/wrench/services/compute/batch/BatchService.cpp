@@ -620,17 +620,17 @@ namespace wrench {
           // Make failed tasks ready again
           for (auto task : job->tasks) {
             switch (task->getInternalState()) {
-              case WorkflowTask::NOT_READY:
-              case WorkflowTask::READY:
-              case WorkflowTask::COMPLETED:
+              case WorkflowTask::InternalState::TASK_NOT_READY:
+              case WorkflowTask::InternalState::TASK_READY:
+              case WorkflowTask::InternalState::TASK_COMPLETED:
                 break;
 
-              case WorkflowTask::RUNNING:
+              case WorkflowTask::InternalState::TASK_RUNNING:
                 throw std::runtime_error("BatchService::processStandardJobTimeout: task state shouldn't be 'RUNNING'"
                                                  "after a StandardJobExecutor was killed!");
-              case WorkflowTask::FAILED:
+              case WorkflowTask::InternalState::TASK_FAILED:
                 // Making failed task READY again
-                task->setInternalState(WorkflowTask::READY);
+                task->setInternalState(WorkflowTask::InternalState::TASK_READY);
 //                task->incrementFailureCount();
                 break;
 

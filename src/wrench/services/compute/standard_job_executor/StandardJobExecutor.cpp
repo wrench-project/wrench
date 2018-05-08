@@ -33,7 +33,6 @@ namespace wrench {
      * @brief Destructor
      */
     StandardJobExecutor::~StandardJobExecutor() {
-      WRENCH_INFO("IN STANDARD JOB EXECUTOR DESTRUCTOR!");
       this->default_property_values.clear();
     }
 
@@ -204,8 +203,8 @@ namespace wrench {
       for (auto wue: this->running_workunit_executors) {
         Workunit *wu = wue->workunit;
         for (auto task : wu->tasks) {
-          if (task->getInternalState() == WorkflowTask::RUNNING) {
-            task->setInternalState(WorkflowTask::FAILED);
+          if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
+            task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           }
         }
       }
@@ -626,7 +625,7 @@ namespace wrench {
           if (child->num_pending_parents == 0) {
             // Make the child's tasks ready
             for (auto task : child->tasks) {
-              if (task->getInternalState() != WorkflowTask::READY) {
+              if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                 throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
                                          std::to_string(task->getInternalState()));
               }
@@ -775,7 +774,7 @@ namespace wrench {
       for (auto const &twu : task_work_units) {
         std::set<Workunit *> parent_work_units;
         for (auto const &task : twu->tasks) {
-          if (task->getInternalState() != WorkflowTask::READY) {
+          if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
             for (auto const &input_file : task->getInputFiles()) {
               WorkflowTask *parent_task = input_file->getOutputOf();
               for (auto const &potential_parent_twu : task_work_units) {

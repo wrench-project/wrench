@@ -848,7 +848,7 @@ namespace wrench {
       WRENCH_INFO("Failing pending job %s", job->getName().c_str());
       // Set all tasks back to the READY state and wipe out output files
       for (auto failed_task: job->getTasks()) {
-        failed_task->setInternalState(WorkflowTask::READY);
+        failed_task->setInternalState(WorkflowTask::InternalState::TASK_READY);
         try {
           StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
                                       this->default_storage_service);
@@ -920,18 +920,17 @@ namespace wrench {
 
       for (auto failed_task: job->getTasks()) {
         switch (failed_task->getInternalState()) {
-          case WorkflowTask::NOT_READY:
-          case WorkflowTask::READY:
-          case WorkflowTask::COMPLETED:
+          case WorkflowTask::InternalState::TASK_NOT_READY:
+          case WorkflowTask::InternalState::TASK_READY:
+          case WorkflowTask::InternalState::TASK_COMPLETED:
             break;
 
-          case WorkflowTask::RUNNING:
+          case WorkflowTask::InternalState::TASK_RUNNING:
             throw std::runtime_error("MultihostMulticoreComputeService::terminateRunningStandardJob(): task state shouldn't be 'RUNNING'"
                                              "after a StandardJobExecutor was killed!");
-          case WorkflowTask::FAILED:
+          case WorkflowTask::InternalState::TASK_FAILED:
             // Making failed task READY again
-            failed_task->setInternalState(WorkflowTask::READY);
-//            failed_task->incrementFailureCount();
+            failed_task->setInternalState(WorkflowTask::InternalState::TASK_READY);
             break;
 
           default:

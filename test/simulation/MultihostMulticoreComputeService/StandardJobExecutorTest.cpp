@@ -1181,10 +1181,10 @@ private:
                                    std::to_string(t4->getEndDate()) + "(should be 350)");
         }
 
-        if ((t1->getInternalState() != wrench::WorkflowTask::COMPLETED) ||
-            (t2->getInternalState() != wrench::WorkflowTask::COMPLETED) ||
-            (t3->getInternalState() != wrench::WorkflowTask::COMPLETED) ||
-            (t4->getInternalState() != wrench::WorkflowTask::COMPLETED)) {
+        if ((t1->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED) ||
+            (t2->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED) ||
+            (t3->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED) ||
+            (t4->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED)) {
           throw std::runtime_error("Unexpected task states!");
         }
 

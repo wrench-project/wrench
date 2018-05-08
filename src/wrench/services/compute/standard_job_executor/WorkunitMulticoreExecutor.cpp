@@ -200,7 +200,7 @@ namespace wrench {
       /** Perform all tasks **/
       for (auto task : work->tasks) {
 
-        task->setInternalState(WorkflowTask::RUNNING);
+        task->setInternalState(WorkflowTask::InternalState::TASK_RUNNING);
 
         // Read  all input files
         WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getId().c_str());
@@ -209,7 +209,7 @@ namespace wrench {
                                     work->file_locations,
                                     this->default_storage_service);
         } catch (WorkflowExecutionException &e) {
-          task->setInternalState(WorkflowTask::FAILED);
+          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
         }
 
@@ -220,7 +220,7 @@ namespace wrench {
         try {
           runMulticoreComputation(task->getFlops(), task->getParallelEfficiency());
         } catch (WorkflowExecutionEvent &e) {
-          task->setInternalState(WorkflowTask::FAILED);
+          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
         }
 
@@ -230,24 +230,23 @@ namespace wrench {
         try {
           StorageService::writeFiles(task->getOutputFiles(), work->file_locations, this->default_storage_service);
         } catch (WorkflowExecutionException &e) {
-          task->setInternalState(WorkflowTask::FAILED);
+          task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
         }
 
-        WRENCH_INFO("SETTING INTERNAL STATE OF %s to COMPLETED", task->getId().c_str());
-        task->setInternalState(WorkflowTask::COMPLETED);
+        task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
 
         // Deal with Children
         for (auto child : task->getWorkflow()->getTaskChildren(task)) {
           bool all_parents_completed = true;
           for (auto parent : child->getWorkflow()->getTaskParents(child)) {
-            if (parent->getInternalState() != WorkflowTask::COMPLETED) {
+            if (parent->getInternalState() != WorkflowTask::InternalState::TASK_COMPLETED) {
               all_parents_completed = false;
               break;
             }
           }
           if (all_parents_completed) {
-            child->setInternalState(WorkflowTask::READY);
+            child->setInternalState(WorkflowTask::InternalState::TASK_READY);
           }
         }
 

@@ -132,9 +132,9 @@ namespace wrench {
 
         dst->updateTopLevel();
 
-        if (src->getState() != WorkflowTask::COMPLETED) {
-          dst->setInternalState(WorkflowTask::NOT_READY);
-          dst->setVisibleState(WorkflowTask::NOT_READY);
+        if (src->getState() != WorkflowTask::VisibleState::COMPLETED) {
+          dst->setInternalState(WorkflowTask::InternalState::TASK_NOT_READY);
+          dst->setVisibleState(WorkflowTask::VisibleState::NOT_READY);
         }
       }
     }
@@ -253,7 +253,7 @@ namespace wrench {
       for (auto &it : this->tasks) {
         WorkflowTask *task = it.second.get();
 
-        if (task->getState() == WorkflowTask::READY) {
+        if (task->getState() == WorkflowTask::VisibleState::READY) {
 
           if (task->getClusterId().empty()) {
             task_map[task->getId()] = {task};
@@ -268,9 +268,9 @@ namespace wrench {
           }
         } else {
           if (task_map.find(task->getClusterId()) != task_map.end()) {
-            if (task->getState() == WorkflowTask::NOT_READY) {
-              task->setInternalState(WorkflowTask::READY);
-              task->setVisibleState(WorkflowTask::READY);
+            if (task->getState() == WorkflowTask::VisibleState::NOT_READY) {
+              task->setInternalState(WorkflowTask::InternalState::TASK_READY);
+              task->setVisibleState(WorkflowTask::VisibleState::READY);
             }
             task_map[task->getClusterId()].push_back(task);
           }
@@ -287,7 +287,7 @@ namespace wrench {
     bool Workflow::isDone() {
       for (auto &it : this->tasks) {
         WorkflowTask *task = it.second.get();
-        if (task->getState() != WorkflowTask::COMPLETED) {
+        if (task->getState() != WorkflowTask::VisibleState::COMPLETED) {
           return false;
         }
       }
