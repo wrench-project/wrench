@@ -658,7 +658,9 @@ private:
       // Check that task states make sense
       if ((this->test->task1->getState() != wrench::WorkflowTask::READY) ||
           (this->test->task2->getState() != wrench::WorkflowTask::READY)) {
-        throw std::runtime_error("Tasks in a FAILED job should be in the READY state");
+        throw std::runtime_error("Tasks in a TERMINATED job should be in the READY state but instead " +
+        wrench::WorkflowTask::stateToString(this->test->task1->getState()) + " " +
+        wrench::WorkflowTask::stateToString(this->test->task2->getState()));
       }
 
       return 0;
