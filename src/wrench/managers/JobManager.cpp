@@ -303,7 +303,7 @@ namespace wrench {
         case WorkflowJob::STANDARD: {
           ((StandardJob *) job)->state = StandardJob::PENDING;
           for (auto t : ((StandardJob *) job)->tasks) {
-            t->setVisibleState(WorkflowTask::VisibleState::PENDING);
+            t->setState(WorkflowTask::State::PENDING);
           }
           this->pending_standard_jobs.insert((StandardJob *) job);
           break;
@@ -353,17 +353,17 @@ namespace wrench {
         for (auto task : ((StandardJob *)job)->tasks) {
           switch (task->getInternalState()) {
             case WorkflowTask::TASK_NOT_READY:
-              task->setVisibleState(WorkflowTask::VisibleState::NOT_READY);
+              task->setState(WorkflowTask::State::NOT_READY);
               break;
             case WorkflowTask::TASK_READY:
-              task->setVisibleState(WorkflowTask::VisibleState::READY);
+              task->setState(WorkflowTask::State::READY);
               break;
             case WorkflowTask::TASK_COMPLETED:
-              task->setVisibleState(WorkflowTask::VisibleState::COMPLETED);
+              task->setState(WorkflowTask::State::COMPLETED);
               break;
             case WorkflowTask::TASK_RUNNING:
             case WorkflowTask::TASK_FAILED:
-              task->setVisibleState(WorkflowTask::VisibleState::NOT_READY);
+              task->setState(WorkflowTask::State::NOT_READY);
               break;
           }
         }
@@ -516,7 +516,7 @@ namespace wrench {
           // Update all visible states
           for (auto task : job->tasks) {
             if (task->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
-              task->setVisibleState(WorkflowTask::VisibleState::COMPLETED);
+              task->setState(WorkflowTask::State::COMPLETED);
             } else {
               throw std::runtime_error("JobManager::main(): got a 'job done' message, but task " +
                                        task->getId() + " does not have a TASK_COMPLETED internal state");
@@ -534,7 +534,7 @@ namespace wrench {
                     // no nothing
                     break;
                   case WorkflowTask::InternalState::TASK_READY:
-                    child->setVisibleState(WorkflowTask::VisibleState::READY);
+                    child->setState(WorkflowTask::State::READY);
                     break;
                 }
               }
@@ -567,7 +567,7 @@ namespace wrench {
           // update the task states and failure counts!
           for (auto t: job->getTasks()) {
             if (t->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
-              t->setVisibleState(WorkflowTask::VisibleState::COMPLETED);
+              t->setState(WorkflowTask::State::COMPLETED);
               for (auto child : this->wms->getWorkflow()->getTaskChildren(t)) {
                 WRENCH_INFO("CHILD INTERNAL STATE = %d", child->getInternalState());
                 switch (child->getInternalState()) {
@@ -578,13 +578,13 @@ namespace wrench {
                     // no nothing
                     break;
                   case WorkflowTask::InternalState::TASK_READY:
-                    child->setVisibleState(WorkflowTask::VisibleState::READY);
+                    child->setState(WorkflowTask::State::READY);
                     break;
                 }
               }
 
             } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_READY) {
-              t->setVisibleState(WorkflowTask::VisibleState::READY);
+              t->setState(WorkflowTask::State::READY);
               t->incrementFailureCount();
             }
           }

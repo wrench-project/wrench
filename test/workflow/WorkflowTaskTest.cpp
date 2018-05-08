@@ -44,8 +44,8 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
   ASSERT_EQ(t2->getMaxNumCores(), 4);
   ASSERT_EQ(t2->getParallelEfficiency(), 0.5);
 
-  EXPECT_EQ(t1->getState(), wrench::WorkflowTask::VisibleState::READY);
-  EXPECT_EQ(t2->getState(), wrench::WorkflowTask::VisibleState::NOT_READY); // due to control dependency
+  EXPECT_EQ(t1->getState(), wrench::WorkflowTask::State::READY);
+  EXPECT_EQ(t2->getState(), wrench::WorkflowTask::State::NOT_READY); // due to control dependency
 
   EXPECT_EQ(t1->getJob(), nullptr);
   EXPECT_EQ(t2->getJob(), nullptr);
