@@ -234,6 +234,7 @@ namespace wrench {
           throw;
         }
 
+        WRENCH_INFO("Setting the internal state of %s to TASK_COMPLETED", task->getId().c_str());
         task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
 
         // Deal with Children

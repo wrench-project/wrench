@@ -301,10 +301,21 @@ namespace wrench {
       // Update the job state and insert it into the pending list
       switch (job->getType()) {
         case WorkflowJob::STANDARD: {
+          // Do a sanity check
+          for (auto t : ((StandardJob *) job)->tasks) {
+            if ((t->getState() == WorkflowTask::State::COMPLETED) or
+                (t->getState() == WorkflowTask::State::PENDING)) {
+              throw std::invalid_argument("JobManager()::submitJob(): task %s cannot be submitted "
+                                                  "as part of a standard job  standard job because its"
+                                                  "state is " + WorkflowTask::stateToString(t->getState()));
+            }
+          }
+          // Modify task states
           ((StandardJob *) job)->state = StandardJob::PENDING;
           for (auto t : ((StandardJob *) job)->tasks) {
             t->setState(WorkflowTask::State::PENDING);
           }
+
           this->pending_standard_jobs.insert((StandardJob *) job);
           break;
         }
@@ -480,33 +491,6 @@ namespace wrench {
         if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
           // There shouldn't be any need to clean any state up
           keep_going = false;
-//        } else if (auto msg = dynamic_cast<ComputeServiceJobTypeNotSupportedMessage *>(message.get())) {
-//
-//          // update job state and remove from list
-//          if (msg->job->getType() == WorkflowJob::STANDARD) {
-//            StandardJob *job = (StandardJob *) msg->job;
-//            job->state = StandardJob::State::NOT_SUBMITTED;
-//            this->pending_standard_jobs.erase(job);
-//
-//            // update the task states
-//            for (auto t: job->getTasks()) {
-//              t->setState(WorkflowTask::State::READY);
-//            }
-//          }
-//
-//          if (msg->job->getType() == WorkflowJob::STANDARD) {
-//            PilotJob *job = (PilotJob *) msg->job;
-//            job->state = PilotJob::State::NOT_SUBMITTED;
-//            this->pending_pilot_jobs.erase(job);
-//          }
-//
-//          // Forward the notification along the notification chain
-//          try {
-//            S4U_Mailbox::dputMessage(msg->job->popCallbackMailbox(),
-//                                     new ComputeServiceJobTypeNotSupportedMessage(msg->job, msg->compute_service, 0));
-//          } catch (std::shared_ptr<NetworkError> &cause) {
-//            keep_going = true;
-//          }
 
         } else if (auto msg = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
           // update job state
@@ -519,7 +503,8 @@ namespace wrench {
               task->setState(WorkflowTask::State::COMPLETED);
             } else {
               throw std::runtime_error("JobManager::main(): got a 'job done' message, but task " +
-                                       task->getId() + " does not have a TASK_COMPLETED internal state");
+                                       task->getId() + " does not have a TASK_COMPLETED internal state (" +
+                                       WorkflowTask::stateToString(task->getInternalState()) + ")");
             }
             if (task->getNumberOfChildren() > 0) {
               // TODO: Weirdly, here, if we go in here while #children = 0, then we
@@ -534,7 +519,18 @@ namespace wrench {
                     // no nothing
                     break;
                   case WorkflowTask::InternalState::TASK_READY:
-                    child->setState(WorkflowTask::State::READY);
+                    if (child->getState() == WorkflowTask::State::NOT_READY) {
+                      bool all_parents_ready = true;
+                      for (auto parent : child->getWorkflow()->getTaskParents(child)) {
+                        if (parent->getState() != WorkflowTask::State::COMPLETED) {
+                          all_parents_ready = false;
+                          break;
+                        }
+                      }
+                      if (all_parents_ready) {
+                        child->setState(WorkflowTask::State::READY);
+                      }
+                    }
                     break;
                 }
               }
@@ -569,7 +565,6 @@ namespace wrench {
             if (t->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
               t->setState(WorkflowTask::State::COMPLETED);
               for (auto child : this->wms->getWorkflow()->getTaskChildren(t)) {
-                WRENCH_INFO("CHILD INTERNAL STATE = %d", child->getInternalState());
                 switch (child->getInternalState()) {
                   case WorkflowTask::InternalState::TASK_NOT_READY:
                   case WorkflowTask::InternalState::TASK_RUNNING:
@@ -640,20 +635,6 @@ namespace wrench {
           } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;
           }
-
-//        } else if (auto msg = dynamic_cast<ComputeServiceInformationMessage *>(message.get())) {
-//
-//          // update job state
-//          WorkflowJob *job = msg->job;
-//
-//          // Forward the notification to the source
-//          WRENCH_INFO("Forwarding information to %s", job->getOriginCallbackMailbox().c_str());
-//          try {
-//            S4U_Mailbox::dputMessage(job->getOriginCallbackMailbox(),
-//                                     new ComputeServiceInformationMessage(job, msg->information, msg->payload));
-//          } catch (std::shared_ptr<NetworkError> &cause) {
-//            keep_going = true;
-//          }
 
         } else {
           throw std::runtime_error("JobManager::main(): Unexpected [" + message->getName() + "] message");
