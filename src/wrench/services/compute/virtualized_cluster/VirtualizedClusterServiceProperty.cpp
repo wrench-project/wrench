@@ -17,4 +17,6 @@ namespace wrench {
     SET_PROPERTY_NAME(VirtualizedClusterServiceProperty, GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD);
     SET_PROPERTY_NAME(VirtualizedClusterServiceProperty, CREATE_VM_REQUEST_MESSAGE_PAYLOAD);
     SET_PROPERTY_NAME(VirtualizedClusterServiceProperty, CREATE_VM_ANSWER_MESSAGE_PAYLOAD);
+    SET_PROPERTY_NAME(VirtualizedClusterServiceProperty, MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD);
+    SET_PROPERTY_NAME(VirtualizedClusterServiceProperty, MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD);
 }

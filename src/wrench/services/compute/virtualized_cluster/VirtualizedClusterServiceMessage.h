@@ -90,6 +90,32 @@ namespace wrench {
         bool success;
     };
 
+    /**
+     * @brief VirtualizedClusterServiceMigrateVMRequestMessage class
+     */
+    class VirtualizedClusterServiceMigrateVMRequestMessage : public VirtualizedClusterServiceMessage {
+    public:
+        VirtualizedClusterServiceMigrateVMRequestMessage(const std::string &answer_mailbox,
+                                                         const std::string &vm_hostname,
+                                                         const std::string &dest_pm_hostname,
+                                                         double payload);
+
+        std::string vm_hostname;
+        std::string dest_pm_hostname;
+        std::string answer_mailbox;
+    };
+
+    /**
+     * @brief VirtualizedClusterServiceMigrateVMAnswerMessage class
+     */
+    class VirtualizedClusterServiceMigrateVMAnswerMessage : public VirtualizedClusterServiceMessage {
+    public:
+        VirtualizedClusterServiceMigrateVMAnswerMessage(bool success, double payload);
+
+        /** @brief Whether the VM migration was successful or not */
+        bool success;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/

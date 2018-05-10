@@ -39,6 +39,7 @@ set(HEADER_FILES
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
         include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
+        include/wrench/simgrid_S4U_util/S4U_VirtualMachine.h
         include/wrench/logging/TerminalOutput.h
         include/wrench/wms/WMS.h
         include/wrench/wms/StaticOptimization.h
@@ -113,6 +114,7 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
+        src/wrench/simgrid_S4U_util/S4U_VirtualMachine.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/WorkflowTask.cpp
@@ -208,7 +210,7 @@ set(TEST_FILES
         test/simulation/BatchService/BatchServiceFCFSTest.cpp
         test/simulation/BatchService/BatchServiceTraceFileTest.cpp
         test/simulation/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
-        test/simulation/CloudServiceTest.cpp
+        test/simulation/VirtualizedClusterServiceTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/MultipleWMSTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
@@ -245,6 +247,7 @@ add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 
 # additional packages
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
+
 
 # build examples
 foreach (cmakefile ${CMAKEFILES_TXT})
