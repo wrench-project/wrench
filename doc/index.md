@@ -14,7 +14,7 @@ Overview                        {#mainpage}
 [WRENCH](http://wrench-project.org) enables novel avenues for scientific workflow use, 
 research, development, and education.
 WRENCH capitalizes on recent and critical advances in the state of the art of distributed 
-platform/application simulationby building on top
+platform/application simulation by building on top
 of the open-source [SimGrid](http://simgrid.gforge.inria.fr) simulation framework. 
 SimGrid makes it to simulate the execution of large-scale
 distributed applications in a way that is accurate (via validated simulation models), scalable 
@@ -63,7 +63,7 @@ WRENCH is intended for two different classes of users:
 The WRENCH library provides three _incremental_ levels of documentation, 
 each targeting an API level:
 
-**User:** targets users who who want to use WRENCH for simulation the execution of 
+**User:** targets users who want to use WRENCH for simulating the execution of 
 scientific workflows in different simulation scenarios, using existing
 simulated WMSs already implemented using WRENCH. _Users_ are NOT expected 
 to develop new simulation abstractions or algorithms. Instead, they only use available 

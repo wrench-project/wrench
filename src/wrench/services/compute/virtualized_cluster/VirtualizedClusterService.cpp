@@ -10,6 +10,7 @@
 
 #include <cfloat>
 #include <numeric>
+#include <simgrid/plugins/live_migration.h>
 #include "VirtualizedClusterServiceMessage.h"
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h"
 #include "wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h"
@@ -113,7 +114,7 @@ namespace wrench {
      * @param ram_memory: the VM RAM memory capacity (-1 means "use all memory available on the host", this can be lead to an out of memory issue)
      * @param plist: a property list ({} means "use all defaults")
      *
-     * @return Whether the VM creation succeeded
+     * @return Virtual machine hostname
      *
      * @throw WorkflowExecutionException
      */
@@ -159,6 +160,49 @@ namespace wrench {
         return nullptr;
       } else {
         throw std::runtime_error("VirtualizedClusterService::createVM(): Unexpected [" + msg->getName() + "] message");
+      }
+    }
+
+    /**
+     * @brief Synchronously migrate a VM to another physical host
+     *
+     * @param vm_hostname: virtual machine hostname
+     * @param dest_pm_hostname: the name of the destination physical machine host
+     *
+     * @return Whether the VM was successfully migrated
+     */
+    bool VirtualizedClusterService::migrateVM(const std::string &vm_hostname, const std::string &dest_pm_hostname) {
+
+      serviceSanityCheck();
+
+      // send a "migrate vm" message to the daemon's mailbox_name
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("migrate_vm");
+
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new VirtualizedClusterServiceMigrateVMRequestMessage(
+                                        answer_mailbox, vm_hostname, dest_pm_hostname,
+                                        this->getPropertyValueAsDouble(
+                                                VirtualizedClusterServiceProperty::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      // Wait for a reply
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMAnswerMessage *>(message.get())) {
+        return msg->success;
+      } else {
+        throw std::runtime_error("VirtualizedClusterService::migrateVM(): Unexpected [" + msg->getName() + "] message");
       }
     }
 
@@ -354,6 +398,10 @@ namespace wrench {
                         msg->supports_pilot_jobs, msg->num_cores, msg->ram_memory, msg->plist);
         return true;
 
+      } else if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMRequestMessage *>(message.get())) {
+        processMigrateVM(msg->answer_mailbox, msg->vm_hostname, msg->dest_pm_hostname);
+        return true;
+
       } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
         processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
@@ -432,8 +480,7 @@ namespace wrench {
           }
 
           // create a VM on the provided physical machine
-          simgrid::s4u::VirtualMachine *vm = new simgrid::s4u::VirtualMachine(
-                  vm_hostname.c_str(), simgrid::s4u::Host::by_name(pm_hostname), num_cores);
+          auto vm = std::make_shared<S4U_VirtualMachine>(vm_hostname, pm_hostname, num_cores, ram_memory);
 
           // create a multihost multicore computer service for the VM
           std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
@@ -449,7 +496,7 @@ namespace wrench {
 
           this->cs_available_ram[pm_hostname] -= ram_memory;
 
-          // start the service
+          // starting the service
           try {
             cs->start(cs, true); // Daemonize!
           } catch (std::runtime_error &e) {
@@ -471,6 +518,56 @@ namespace wrench {
                           false,
                           this->getPropertyValueAsDouble(
                                   VirtualizedClusterServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+        }
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
+
+    /**
+     * @brief Synchronously migrate a VM to another physical machine
+     *
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param vm_hostname: the name of the VM host
+     * @param dest_pm_hostname: the name of the destination physical machine host
+     *
+     * @throw std::runtime_error
+     */
+    void VirtualizedClusterService::processMigrateVM(const std::string &answer_mailbox, const std::string &vm_hostname,
+                                                     const std::string &dest_pm_hostname) {
+
+      WRENCH_INFO("Asked to migrate the VM %s to the PM %s", vm_hostname.c_str(), dest_pm_hostname.c_str());
+
+      try {
+
+        auto it = vm_list.find(vm_hostname);
+
+        if (it != vm_list.end()) {
+
+          std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>((*it).second);
+          std::shared_ptr<ComputeService> cs = std::get<1>((*it).second);
+          simgrid::s4u::Host *dest_pm = simgrid::s4u::Host::by_name_or_null(dest_pm_hostname);
+
+          double mig_sta = simgrid::s4u::Engine::getClock();
+          sg_vm_migrate(vm->get(), dest_pm);
+          double mig_end = simgrid::s4u::Engine::getClock();
+          WRENCH_INFO("%s migrated: %s to %g s", vm_hostname.c_str(), dest_pm->getName().c_str(), mig_end - mig_sta);
+
+          S4U_Mailbox::dputMessage(
+                  answer_mailbox,
+                  new VirtualizedClusterServiceMigrateVMAnswerMessage(
+                          true,
+                          this->getPropertyValueAsDouble(
+                                  VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+
+        } else {
+          S4U_Mailbox::dputMessage(
+                  answer_mailbox,
+                  new VirtualizedClusterServiceMigrateVMAnswerMessage(
+                          false,
+                          this->getPropertyValueAsDouble(
+                                  VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+
         }
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
@@ -670,10 +767,11 @@ namespace wrench {
     void VirtualizedClusterService::terminate() {
       this->setStateToDown();
 
-      WRENCH_INFO("Stopping VMs Compute Service");
+      WRENCH_INFO("Stopping Virtualized Cluster Service");
       for (auto &vm : this->vm_list) {
         this->cs_available_ram[(std::get<0>(vm.second))->getPm()->getName()] += S4U_Simulation::getHostMemoryCapacity(
                 std::get<0>(vm));
+        std::get<0>(vm.second)->stop();
         std::get<1>(vm.second)->stop();
       }
     }

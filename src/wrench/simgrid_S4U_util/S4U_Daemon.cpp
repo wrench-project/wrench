@@ -56,7 +56,7 @@ namespace wrench {
 
       this->hostname = hostname;
       this->process_name = process_name_prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
-      this->mailbox_name="";
+      this->mailbox_name = "";
       this->terminated = false;
     }
 
@@ -67,7 +67,7 @@ namespace wrench {
     /**
      * @brief Cleanup function called when the daemon terminates (for whatever reason)
      */
-    void S4U_Daemon::cleanup(){
+    void S4U_Daemon::cleanup() {
 //      WRENCH_INFO("Cleaning Up (default: nothing to do)");
     }
 
@@ -75,7 +75,7 @@ namespace wrench {
     /**
      * \cond
      */
-    static int daemon_goodbye(void *x, void* service_instance) {
+    static int daemon_goodbye(void *x, void *service_instance) {
       WRENCH_INFO("Terminating");
       if (service_instance) {
         auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
@@ -99,12 +99,15 @@ namespace wrench {
 
       // Check that there is a lifesaver
       if (not this->life_saver) {
-        throw std::runtime_error("S4U_Daemon::startDaemon(): You must call createLifeSaver() before calling startDaemon()");
+        throw std::runtime_error(
+                "S4U_Daemon::startDaemon(): You must call createLifeSaver() before calling startDaemon()");
       }
 
       // Check that the simulation pointer is set
       if (not this->simulation) {
-        throw std::runtime_error("S4U_Daemon::startDaemon(): You must set the simulation field before calling startDaemon() (" + this->getName() + ")");
+        throw std::runtime_error(
+                "S4U_Daemon::startDaemon(): You must set the simulation field before calling startDaemon() (" +
+                this->getName() + ")");
       }
 
       // Create the s4u_actor

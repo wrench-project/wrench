@@ -74,5 +74,5 @@ WRENCH's [Github Issues Track](https://github.com/wrench-project/wrench/issues).
 [release-link]:             https://github.com/wrench-project/wrench/releases
 [codacy-badge]:             https://img.shields.io/codacy/grade/aef324ea84474fff979a8ff19a4e4681.svg
 [codacy-link]:              https://www.codacy.com/app/WRENCH/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade
-[sonarcloud-badge]:         https://sonarcloud.io/api/badges/measure?key=wrench&metric=ncloc
+[sonarcloud-badge]:         https://sonarcloud.io/api/project_badges/measure?project=wrench&metric=ncloc
 [sonarcloud-link]:          https://sonarcloud.io/dashboard?id=wrench
