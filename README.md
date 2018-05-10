@@ -70,7 +70,7 @@ WRENCH's [Github Issues Track](https://github.com/wrench-project/wrench/issues).
 [license-badge]:            https://img.shields.io/badge/License-LGPL%20v3-blue.svg
 [coveralls-badge]:          https://coveralls.io/repos/github/wrench-project/wrench/badge.svg?branch=master
 [coveralls-link]:           https://coveralls.io/github/wrench-project/wrench?branch=master
-[release-badge]:            https://img.shields.io/github/release/wrench-project/wrench.svg
+[release-badge]:            https://img.shields.io/github/release/wrench-project/wrench/all.svg
 [release-link]:             https://github.com/wrench-project/wrench/releases
 [codacy-badge]:             https://img.shields.io/codacy/grade/aef324ea84474fff979a8ff19a4e4681.svg
 [codacy-link]:              https://www.codacy.com/app/WRENCH/wrench?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=wrench-project/wrench&amp;utm_campaign=Badge_Grade
