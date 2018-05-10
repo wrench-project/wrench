@@ -36,7 +36,6 @@ namespace wrench {
 
 #define WRENCH_WARN(...)  wrench::TerminalOutput::beginThisProcessColor(); XBT_WARN(__VA_ARGS__) ; wrench::TerminalOutput::endThisProcessColor()
 
-
     /***********************/
     /** \cond DEVELOPER    */
     /***********************/
