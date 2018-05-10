@@ -51,6 +51,7 @@ namespace wrench {
          *         ENABLE_BATSCHED is set of off or not set). Can be:
          *    - FIRSTFIT
          *    - BESTFIT
+         *    - ROUNDROBIN
          **/
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 
