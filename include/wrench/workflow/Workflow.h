@@ -55,6 +55,9 @@ namespace wrench {
 
         unsigned long getNumberOfTasks();
 
+        unsigned long getNumLevels();
+
+
         void exportToEPS(std::string);
 
         std::map<std::string, WorkflowFile *>getInputFiles();
@@ -64,6 +67,8 @@ namespace wrench {
         /***********************/
 
         bool isDone();
+
+        std::vector<WorkflowTask *> getTasksInTopLevelRange(unsigned long min, unsigned long max);
 
         std::map<std::string, std::vector<WorkflowTask *>> getReadyTasks();
 
@@ -89,7 +94,7 @@ namespace wrench {
 
         std::string getCallbackMailbox();
 
-        void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
+//        void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
 
 
         /***********************/
@@ -97,11 +102,17 @@ namespace wrench {
         /***********************/
 
     private:
+
+        friend class WorkflowTask;
+
+        void setNumLevels(unsigned long );
         std::unique_ptr<lemon::ListDigraph> DAG;  // Lemon DiGraph
         std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
 
         std::map<std::string, std::unique_ptr<WorkflowTask>> tasks;
         std::map<std::string, std::unique_ptr<WorkflowFile>> files;
+
+        unsigned long num_levels;
 
         bool pathExists(WorkflowTask *, WorkflowTask *);
 

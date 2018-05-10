@@ -33,12 +33,15 @@ namespace wrench {
 
 
     /**
-     * @brief Submit a job to the batch service
+     * @brief Submit a job to the compute service
      * @param job: the job
-     * @param service_specific_args: arguments specific for compute services:
-     *      - to a multicore_compute_service: {}
-     *      - to a batch service: {"-t":"<int>","-n":"<int>","-N":"<int>","-c":"<int>"}
-     *      - to a cloud service: {}
+     * @param service_specific_args: arguments specific to compute services when needed:
+     *      - to a MultihostMultiCoreComputeService: {}
+     *      - to a BatchService: {"-t":"<int>","-N":"<int>","-c":"<int>"} (SLURM-like)
+     *         - "-t": number of requested job duration in minutes
+     *         - "-N": number of requested compute hosts
+     *         - "-c": number of requested cores per compute host
+     *      - to a CloudService: {}
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -73,8 +76,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Terminate a previously-submitted job (which may or may not be running)
-     * 
+     * @brief Terminate a previously-submitted job (which may or may not be running yet)
+     *
      * @param job: the job to terminate
      * 
      * @throw std::invalid_argument
@@ -134,7 +137,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the "supports standard jobs" property
+     * @brief Get whether the compute service supports standard jobs or not
      * @return true or false
      */
     bool ComputeService::supportsStandardJobs() {
@@ -142,7 +145,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the "supports pilot jobs" property
+     * @brief Get whether the compute service supports pilot jobs or not
      * @return true or false
      */
     bool ComputeService::supportsPilotJobs() {
@@ -150,7 +153,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get host (compute node) counts for the compute service
+     * @brief Get the number of hosts that the compute service manages
      * @return the host counts
      *
      * @throw WorkflowExecutionException
@@ -234,8 +237,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the flop/sec rate of one core of the compute service's host
-    * @return  the flop rate
+    * @brief Get the per-core fop ratea of the compute service's hosts
+    * @return flop rates in flop/sec
     *
     * @throw std::runtime_error
     */
@@ -261,8 +264,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the  RAM capacities of the compute service's hosts
-    * @return the RAM capacities
+    * @brief Get the RAM capacities of the compute service's hosts
+    * @return a vector of RAM capacities
     *
     * @throw std::runtime_error
     */
@@ -289,8 +292,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the time-to-live, in seconds, of the compute service
-     * @return the ttl
+     * @brief Get the time-to-live of the compute service
+     * @return the ttl in seconds
      *
      * @throw std::runtime_error
      */
@@ -320,7 +323,7 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the default StorageService for the ComputeService
+    * @brief Get the default StorageService for the compute service
     * @return a storage service
     */
     StorageService *ComputeService::getDefaultStorageService() {

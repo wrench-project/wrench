@@ -167,7 +167,7 @@ private:
       // Send a free space request
       double free_space;
       try {
-        free_space = this->test->storage_service_100->howMuchFreeSpace();
+        free_space = this->test->storage_service_100->getFreeSpace();
       } catch (wrench::WorkflowExecutionException &e) {
         free_space = -1.0;
       }
@@ -214,7 +214,7 @@ private:
 
       // Check that the storage capacity is back to what it should be
       try {
-        free_space = this->test->storage_service_100->howMuchFreeSpace();
+        free_space = this->test->storage_service_100->getFreeSpace();
       } catch (wrench::WorkflowExecutionException &e) {
         free_space = -1.0;
       }
@@ -298,7 +298,7 @@ private:
 
       // Check that the free space has been updated at the destination
       try {
-        free_space = this->test->storage_service_100->howMuchFreeSpace();
+        free_space = this->test->storage_service_100->getFreeSpace();
       } catch (wrench::WorkflowExecutionException &e) {
         free_space = -1.0;
       }
@@ -419,7 +419,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
   // Create a file registry
   wrench::FileRegistryService *file_registry_service =
-          simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+          simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -586,7 +586,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
   EXPECT_NO_THROW(simulation->stageFiles({{file_500->getId(), file_500}}, storage_service_1000));
@@ -739,7 +739,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
   EXPECT_NO_THROW(simulation->stageFiles({{file_500->getId(), file_500}}, storage_service_1000));
@@ -959,7 +959,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
   EXPECT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
@@ -1192,7 +1192,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
   EXPECT_NO_THROW(simulation->stageFiles({{file_500->getId(), file_500}}, storage_service_1000));

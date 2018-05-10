@@ -13,6 +13,7 @@
 #include <pugixml.hpp>
 #include <json.hpp>
 #include <wrench/util/UnitParser.h>
+#include <wrench/workflow/WorkflowTask.h>
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simulation/SimulationMessage.h"
@@ -61,6 +62,7 @@ namespace wrench {
       task->workflow = this;
       task->DAG = this->DAG.get();
       task->DAG_node = DAG->addNode();
+      task->toplevel = 0; // upon creation, a task is an entry task
       // Add it to the DAG node's metadata
       (*DAG_node_map)[task->DAG_node] = task;
       // Add it to the set of workflow tasks
@@ -128,11 +130,15 @@ namespace wrench {
         WRENCH_DEBUG("Adding control dependency %s-->%s", src->getId().c_str(), dst->getId().c_str());
         DAG->addArc(src->DAG_node, dst->DAG_node);
 
-        if (src->getState() != WorkflowTask::COMPLETED) {
-          updateTaskState(dst, WorkflowTask::NOT_READY);
+        dst->updateTopLevel();
+
+        if (src->getState() != WorkflowTask::State::COMPLETED) {
+          dst->setInternalState(WorkflowTask::InternalState::TASK_NOT_READY);
+          dst->setState(WorkflowTask::State::NOT_READY);
         }
       }
     }
+
 
 
     /**
@@ -189,8 +195,13 @@ namespace wrench {
      *
      */
     void Workflow::exportToEPS(std::string eps_filename) {
-      graphToEps(*DAG, eps_filename).run();
-      WRENCH_INFO("Export to EPS broken / not implemented at the moment");
+//      typedef lemon::dim2::Point<int> Point;
+//      lemon::ListDigraph::NodeMap<Point> coords(*DAG);
+
+//      graphToEps(*DAG, eps_filename).
+//              coords(coords).             // Doesn't compute coordinates!
+//              run();
+      throw std::runtime_error("Export to EPS broken / not implemented at the moment");
     }
 
     /**
@@ -225,6 +236,7 @@ namespace wrench {
       DAG = std::unique_ptr<lemon::ListDigraph>(new lemon::ListDigraph());
       DAG_node_map = std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>>(
               new lemon::ListDigraph::NodeMap<WorkflowTask *>(*DAG));
+      this->num_levels = 0;
       this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
     };
 
@@ -241,7 +253,7 @@ namespace wrench {
       for (auto &it : this->tasks) {
         WorkflowTask *task = it.second.get();
 
-        if (task->getState() == WorkflowTask::READY) {
+        if (task->getState() == WorkflowTask::State::READY) {
 
           if (task->getClusterId().empty()) {
             task_map[task->getId()] = {task};
@@ -256,8 +268,9 @@ namespace wrench {
           }
         } else {
           if (task_map.find(task->getClusterId()) != task_map.end()) {
-            if (task->getState() == WorkflowTask::NOT_READY) {
-              task->setState(WorkflowTask::READY);
+            if (task->getState() == WorkflowTask::State::NOT_READY) {
+              task->setInternalState(WorkflowTask::InternalState::TASK_READY);
+              task->setState(WorkflowTask::State::READY);
             }
             task_map[task->getClusterId()].push_back(task);
           }
@@ -274,7 +287,7 @@ namespace wrench {
     bool Workflow::isDone() {
       for (auto &it : this->tasks) {
         WorkflowTask *task = it.second.get();
-        if (task->getState() != WorkflowTask::COMPLETED) {
+        if (task->getState() != WorkflowTask::State::COMPLETED) {
           return false;
         }
       }
@@ -361,74 +374,74 @@ namespace wrench {
       return this->callback_mailbox;
     }
 
-    /**
-     * @brief Update the state of a task, and propagate the change
-     *        to other tasks if necessary. WARNING: This method
-     *        doesn't do ANY CHECK about whether the state change makes sense
-     *
-     * @param task: a workflow task
-     * @param state: the new task state
-     *
-     * @throw std::invalid_argument
-     * @throw std::runtime_error
-     */
-    void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state) {
-      if (task == nullptr) {
-        throw std::invalid_argument("Workflow::updateTaskState(): Invalid arguments");
-      }
-
-      if (task->getState() == state) {
-        return;
-      }
-
-//      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
-//                  task->getId().c_str(),
-//                  WorkflowTask::stateToString(task->state).c_str(),
-//                  WorkflowTask::stateToString(state).c_str());
-
-      switch (state) {
-        // Make a task completed, which may failure_cause its children to become ready
-        case WorkflowTask::COMPLETED: {
-          task->setState(WorkflowTask::COMPLETED);
-
-          // Go through the children and make them ready if possible
-          for (lemon::ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
-            WorkflowTask *child = (*DAG_node_map)[(*DAG).target(a)];
-            updateTaskState(child, WorkflowTask::READY);
-          }
-          break;
-        }
-        case WorkflowTask::READY: {
-          // Go through the parent and check whether they are all completed
-          for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
-            WorkflowTask *parent = (*DAG_node_map)[(*DAG).source(a)];
-            if (parent->getState() != WorkflowTask::COMPLETED) {
-              // At least one parent is not in the COMPLETED state
-              return;
-            }
-          }
-          task->setState(WorkflowTask::READY);
-
-          break;
-        }
-        case WorkflowTask::RUNNING: {
-          task->setState(WorkflowTask::RUNNING);
-          break;
-        }
-        case WorkflowTask::NOT_READY: {
-          task->setState(WorkflowTask::NOT_READY);
-          break;
-        }
-        case WorkflowTask::FAILED: {
-          task->setState(WorkflowTask::FAILED);
-          break;
-        }
-        default: {
-          throw std::invalid_argument("Workflow::updateTaskState(): Unknown task state '" +
-                                      std::to_string(state) + "'");
-        }
-      }
-    }
+//    /**
+//     * @brief Update the state of a task, and propagate the change
+//     *        to other tasks if necessary. WARNING: This method
+//     *        doesn't do ANY CHECK about whether the state change makes sense
+//     *
+//     * @param task: a workflow task
+//     * @param state: the new task state
+//     *
+//     * @throw std::invalid_argument
+//     * @throw std::runtime_error
+//     */
+//    void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state) {
+//      if (task == nullptr) {
+//        throw std::invalid_argument("Workflow::updateTaskState(): Invalid arguments");
+//      }
+//
+//      if (task->getState() == state) {
+//        return;
+//      }
+//
+////      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
+////                  task->getId().c_str(),
+////                  WorkflowTask::stateToString(task->state).c_str(),
+////                  WorkflowTask::stateToString(state).c_str());
+//
+//      switch (state) {
+//        // Make a task completed, which may failure_cause its children to become ready
+//        case WorkflowTask::COMPLETED: {
+//          task->setState(WorkflowTask::COMPLETED);
+//
+//          // Go through the children and make them ready if possible
+//          for (lemon::ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
+//            WorkflowTask *child = (*DAG_node_map)[(*DAG).target(a)];
+//            updateTaskState(child, WorkflowTask::READY);
+//          }
+//          break;
+//        }
+//        case WorkflowTask::READY: {
+//          // Go through the parent and check whether they are all completed
+//          for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
+//            WorkflowTask *parent = (*DAG_node_map)[(*DAG).source(a)];
+//            if (parent->getState() != WorkflowTask::COMPLETED) {
+//              // At least one parent is not in the COMPLETED state
+//              return;
+//            }
+//          }
+//          task->setState(WorkflowTask::READY);
+//
+//          break;
+//        }
+//        case WorkflowTask::RUNNING: {
+//          task->setState(WorkflowTask::RUNNING);
+//          break;
+//        }
+//        case WorkflowTask::NOT_READY: {
+//          task->setState(WorkflowTask::NOT_READY);
+//          break;
+//        }
+//        case WorkflowTask::FAILED: {
+//          task->setState(WorkflowTask::FAILED);
+//          break;
+//        }
+//        default: {
+//          throw std::invalid_argument("Workflow::updateTaskState(): Unknown task state '" +
+//                                      std::to_string(state) + "'");
+//        }
+//      }
+//    }
 
     /**
      * @brief Retrieve a map (indexed by file id) of input files for a workflow (i.e., those files
@@ -668,6 +681,38 @@ namespace wrench {
       file.close();
     }
 
+    /**
+     * @brief Returns all tasks with top-levels in a range
+     * @param min: the low end of the range (inclusive)
+     * @param max: the high end of the range (exclusive)
+     * @return a vector of tasks
+     */
+    std::vector<WorkflowTask *> Workflow::getTasksInTopLevelRange(unsigned long min, unsigned long max) {
+      std::vector<WorkflowTask *> to_return;
+      for (auto t : this->getTasks()) {
+        if ((t->getTopLevel() >= min)  and (t->getTopLevel() <= max)) {
+          to_return.push_back(t);
+        }
+      }
+      return to_return;
+    }
+
+    /**
+     * @brief Returns the number of levels in the workflow
+     * @return the number of levels
+     */
+    unsigned long Workflow::getNumLevels() {
+      return this->num_levels;
+    }
+
+
+    /**
+     * @brief Sets the number of levels in the workflow
+     * @param num_levels: the number of levels
+     */
+    void Workflow::setNumLevels(unsigned long num_levels) {
+      this->num_levels = num_levels;
+    }
 
 
 };

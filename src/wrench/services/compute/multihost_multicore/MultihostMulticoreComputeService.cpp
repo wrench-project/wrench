@@ -357,7 +357,7 @@ namespace wrench {
  */
     int MultihostMulticoreComputeService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_RED);
 
       WRENCH_INFO("New Multicore Job Executor starting (%s) on %ld hosts with a total of %ld cores",
                   this->mailbox_name.c_str(), this->compute_resources.size(), this->total_num_cores);
@@ -455,7 +455,7 @@ namespace wrench {
     std::set<std::tuple<std::string, unsigned long, double>>
     MultihostMulticoreComputeService::computeResourceAllocationAggressive(StandardJob *job) {
 
-      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION: %ld", this->core_and_ram_availabilities.size());
+//      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION");
       // Make a copy of core_and_ram_availabilities
       std::map<std::string, std::pair<unsigned long, double>> tentative_core_and_ram_availabilities;
       for (auto r : this->core_and_ram_availabilities) {
@@ -469,10 +469,12 @@ namespace wrench {
         tasks.insert(t);
       }
 
+      std::map<std::string, std::tuple<unsigned long, double>> allocation;
+
+
       // Find the task that can use the most cores somewhere, update availabilities, repeat
       bool keep_going = true;
       while (keep_going) {
-        keep_going = false;
 
         WorkflowTask *picked_task = nullptr;
         std::string picked_picked_host;
@@ -513,13 +515,10 @@ namespace wrench {
           }
 
           if (picked_num_cores == 0) {
-//            WRENCH_INFO("NOPE");
             continue;
           }
 
           if (picked_num_cores > picked_picked_num_cores) {
-//            WRENCH_INFO("PICKED TASK %s on HOST %s with %ld cores",
-//                        t->getId().c_str(), picked_host.c_str(), picked_num_cores);
             picked_task = t;
             picked_picked_num_cores = picked_num_cores;
             picked_picked_ram = picked_ram;
@@ -527,35 +526,42 @@ namespace wrench {
           }
         }
 
-        if (picked_picked_num_cores != 0) {
+
+        if (picked_picked_num_cores > 0) {
+//          WRENCH_INFO("ALLOCATION %s/%ld-%.2lf for task %s", picked_picked_host.c_str(),
+//                      picked_picked_num_cores, picked_picked_ram, picked_task->getId().c_str());
+
+          if (allocation.find(picked_picked_host) != allocation.end()) {
+            std::get<0>(allocation[picked_picked_host]) += picked_picked_num_cores;
+            std::get<1>(allocation[picked_picked_host]) += picked_picked_ram;
+          } else {
+            allocation.insert(
+                    std::make_pair(picked_picked_host,
+                                   std::make_tuple(picked_picked_num_cores,
+                                                   picked_picked_ram)));
+          }
+
           // Update availabilities
           std::get<0>(tentative_core_and_ram_availabilities[picked_picked_host]) -= picked_picked_num_cores;
           std::get<1>(tentative_core_and_ram_availabilities[picked_picked_host]) -= picked_picked_ram;
+
           // Remove the task
           tasks.erase(picked_task);
+
           // We should keep trying!
-          keep_going = true;
+          keep_going = not tasks.empty();
+        } else {
+          keep_going = false;
         }
       }
 
 
-      // Come up with allocation based on tentative availabilities!
-      std::set<std::tuple<std::string, unsigned long, double>> allocation;
-      for (auto r : tentative_core_and_ram_availabilities) {
-        std::string hostname = r.first;
-        unsigned long num_cores = std::get<0>(r.second);
-        double ram = std::get<1>(r.second);
-
-        if ((num_cores <= std::get<0>(this->core_and_ram_availabilities[hostname])) and
-            (ram <= std::get<1>(this->core_and_ram_availabilities[hostname]))) {
-//          WRENCH_INFO("ALLOCATION %s/%ld-%.2lf", hostname.c_str(), std::get<0>(this->core_and_ram_availabilities[hostname]) - num_cores, std::get<1>(this->core_and_ram_availabilities[hostname]) - ram);
-          allocation.insert(
-                  std::make_tuple(hostname, std::get<0>(this->core_and_ram_availabilities[hostname]) - num_cores,
-                                  std::get<1>(this->core_and_ram_availabilities[hostname]) - ram));
-        }
+      // Convert back to a set, which is lame
+      std::set<std::tuple<std::string, unsigned long, double>> to_return;
+      for (auto h : allocation) {
+        to_return.insert(std::make_tuple(h.first, std::get<0>(h.second), std::get<1>(h.second)));
       }
-
-      return allocation;
+      return to_return;
     }
 
 /**
@@ -614,6 +620,8 @@ namespace wrench {
       std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
       compute_resources = computeResourceAllocation(job);
 
+
+
       // Update core availabilities (and compute total number of cores for printing)
       unsigned long total_cores = 0;
       double total_ram = 0.0;
@@ -626,7 +634,7 @@ namespace wrench {
 
 
       WRENCH_INFO(
-              "Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2lf bytes of RAM) for a standard job",
+              "Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2ef bytes of RAM) for a standard job",
               compute_resources.size(), total_cores, total_ram);
       // Create and start a standard job executor
       std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(new StandardJobExecutor(
@@ -840,7 +848,7 @@ namespace wrench {
       WRENCH_INFO("Failing pending job %s", job->getName().c_str());
       // Set all tasks back to the READY state and wipe out output files
       for (auto failed_task: job->getTasks()) {
-        failed_task->setReady();
+        failed_task->setInternalState(WorkflowTask::InternalState::TASK_READY);
         try {
           StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
                                       this->default_storage_service);
@@ -910,37 +918,25 @@ namespace wrench {
       WRENCH_INFO("Terminating a standard job executor");
       executor->kill();
 
-      // Set all non-COMPLETED tasks back to the READY state and wipe out output files
-      // TODO: At some point we'll have to think hard about the task life cycle and make it better/coherent
       for (auto failed_task: job->getTasks()) {
-//        WRENCH_INFO("====> %s %s", failed_task->getId().c_str(), WorkflowTask::stateToString(failed_task->getState()).c_str());
-        switch (failed_task->getState()) {
-          case WorkflowTask::NOT_READY: {
+        switch (failed_task->getInternalState()) {
+          case WorkflowTask::InternalState::TASK_NOT_READY:
+          case WorkflowTask::InternalState::TASK_READY:
+          case WorkflowTask::InternalState::TASK_COMPLETED:
             break;
-          }
-          case WorkflowTask::READY: {
+
+          case WorkflowTask::InternalState::TASK_RUNNING:
+            throw std::runtime_error("MultihostMulticoreComputeService::terminateRunningStandardJob(): task state shouldn't be 'RUNNING'"
+                                             "after a StandardJobExecutor was killed!");
+          case WorkflowTask::InternalState::TASK_FAILED:
+            // Making failed task READY again
+            failed_task->setInternalState(WorkflowTask::InternalState::TASK_READY);
             break;
-          }
-          case WorkflowTask::PENDING: {
-            failed_task->setReady();
-            break;
-          }
-          case WorkflowTask::RUNNING: {
-            failed_task->setFailed();
-            failed_task->setReady();
-            break;
-          }
-          case WorkflowTask::COMPLETED: {
-            break;
-          }
-          case WorkflowTask::FAILED: {
-            failed_task->setReady();
-            break;
-          }
-          default: {
+
+          default:
             throw std::runtime_error(
                     "MultihostMulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
-          }
+
         }
       }
     }
@@ -985,9 +981,10 @@ namespace wrench {
       for (auto workflow_job : this->running_jobs) {
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto job = (StandardJob *) workflow_job;
-          this->failRunningStandardJob(job, std::move(cause));
+          this->failRunningStandardJob(job, cause);
         }
       }
+
 
       while (not this->pending_jobs.empty()) {
         WorkflowJob *workflow_job = this->pending_jobs.front();
@@ -1473,7 +1470,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void MultihostMulticoreComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-                                                                  PilotJob *job) {
+                                                                 PilotJob *job) {
       WRENCH_INFO("Asked to run a pilot job with %ld hosts and %ld cores per host for %lf seconds",
                   job->getNumHosts(), job->getNumCoresPerHost(), job->getDuration());
 

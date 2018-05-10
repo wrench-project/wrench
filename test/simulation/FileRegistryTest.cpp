@@ -236,8 +236,7 @@ void FileRegistryTest::do_FileRegistry_Test() {
 
   // Create a file registry service
   wrench::FileRegistryService *file_registry_service = nullptr;
-  EXPECT_THROW(simulation->setFileRegistryService(nullptr), std::invalid_argument);
-  EXPECT_NO_THROW(file_registry_service = simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
+  EXPECT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -385,7 +384,7 @@ void FileRegistryTest::do_lookupEntry_Test() {
   wrench::FileRegistryService *file_registry_service(
           new wrench::FileRegistryService(host1));
 
-  simulation->setFileRegistryService(file_registry_service);
+  simulation->add(file_registry_service);
 
   wrench::WMS *wms = nullptr;
   wms = simulation->add(

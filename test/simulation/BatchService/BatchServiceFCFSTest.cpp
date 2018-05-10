@@ -226,7 +226,7 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
                                    nullptr,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -415,7 +415,7 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
                                    nullptr,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

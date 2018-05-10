@@ -28,9 +28,8 @@ namespace wrench {
     class Alarm;
 
     /**
-     * @brief A simulated compute service that provides direct
-     *        access to a set of multi-core compute hosts and implements
-     *        various scheduling strategies. 
+     * @brief A compute service that manages a set of multi-core compute hosts and
+     *        controls access to their resources using various scheduling strategies.
      */
     class MultihostMulticoreComputeService : public ComputeService {
 

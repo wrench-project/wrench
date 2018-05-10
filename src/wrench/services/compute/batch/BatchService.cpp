@@ -50,7 +50,12 @@ namespace wrench {
 
     /**
      * @brief Retrieve queue wait time estimates for a set of job configurations
-     * @param set_of_jobs: the set of job configurations, each of them with an id
+     * @param set_of_jobs: the set of job configurations, each of them with an id. Each configuration
+     *         is a tuple as follows:
+     *             - a configurat id (std::string)
+     *             - a number of hosts (unsigned int)
+     *             - a number of cores per host (unsigned int)
+     *             - a duration in seconds (double)
      * @return queue wait time predictions in seconds (as a map of ids). A prediction that's negative
      *         means that the job configuration can not run on the service (e.g., not enough hosts,
      *         not enough cores per host)
@@ -66,7 +71,7 @@ namespace wrench {
       }
 #else
       if ((this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) == "FCFS") and
-              (this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM) == "FIRSTFIT")) {
+          (this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM) == "FIRSTFIT")) {
         return getQueueWaitingTimeEstimateForFCFS(set_of_jobs);
       } else {
         throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(
@@ -80,9 +85,14 @@ namespace wrench {
      * @param hostname: the hostname on which to start the service
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param compute_hosts: the hosts running in the network
-     * @param default_storage_service: the default storage service (or nullptr)
-     * @param plist: a property list ({} means "use all defaults")
+     * @param compute_hosts: the available compute hosts
+     *                 - the hosts must be homogeneous (speed, number of cores, RAM size)
+     *                 - all cores are used by the batch service on each host
+     *                 - all RAM is used by the batch service on each host
+     * @param default_storage_service: a default storage service on which workflow tasks executed
+     *                  by this service can read/write input/ouput file if no specific storage service
+     *                  is not specified by the WMS  (nullptr means "no default storage service is specified")
+     * @param plist: a property list that specifies BatchServiceProperty values ({} means "use all defaults")
      */
     BatchService::BatchService(std::string &hostname,
                                bool supports_standard_jobs,
@@ -92,7 +102,8 @@ namespace wrench {
                                std::map<std::string, std::string> plist) :
             BatchService(hostname, supports_standard_jobs,
                          supports_pilot_jobs, std::move(compute_hosts),
-                         default_storage_service, ComputeService::ALL_CORES, std::move(plist), "") {
+                         default_storage_service, ComputeService::ALL_CORES,
+                         ComputeService::ALL_RAM, std::move(plist), "") {
 
     }
 
@@ -106,6 +117,8 @@ namespace wrench {
      * @param default_storage_service: the default storage service (or nullptr)
      * @param cores_per_host: number of cores used per host
      *              - ComputeService::ALL_CORES to use all cores
+     * @param ram_per_host: RAM per host
+     *              - ComputeService::ALL_RAM to use all RAM
      * @param plist: a property list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
      *
@@ -117,6 +130,7 @@ namespace wrench {
                                std::vector<std::string> compute_hosts,
                                StorageService *default_storage_service,
                                unsigned long cores_per_host,
+                               double ram_per_host,
                                std::map<std::string, std::string> plist, std::string suffix) :
             ComputeService(hostname,
                            "batch" + suffix,
@@ -128,8 +142,13 @@ namespace wrench {
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(plist));
 
+      // Basic checks
       if (cores_per_host == 0) {
         throw std::invalid_argument("BatchService::BatchService(): compute hosts should have at least one core");
+      }
+
+      if (ram_per_host <= 0) {
+        throw std::invalid_argument("BatchService::BatchService(): compute hosts should have at least some RAM");
       }
 
       if (compute_hosts.empty()) {
@@ -137,9 +156,9 @@ namespace wrench {
       }
 
       // Check Platform homogeneity
-      double num_cores = Simulation::getHostNumCores(*(compute_hosts.begin()));
+      double num_cores_available = Simulation::getHostNumCores(*(compute_hosts.begin()));
       double speed = Simulation::getHostFlopRate(*(compute_hosts.begin()));
-      double ram = Simulation::getHostMemoryCapacity(*(compute_hosts.begin()));
+      double ram_available = Simulation::getHostMemoryCapacity(*(compute_hosts.begin()));
 
       for (auto const &h : compute_hosts) {
         // Compute speed
@@ -148,39 +167,37 @@ namespace wrench {
                   "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different flop rates detected)");
         }
         // RAM
-        if (fabs(ram - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
+        if (fabs(ram_available - Simulation::getHostMemoryCapacity(h)) > DBL_EPSILON) {
 
           throw std::invalid_argument(
                   "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different RAM capacities detected)");
         }
         // Num cores
-        if (cores_per_host == ComputeService::ALL_CORES) {
-          if (Simulation::getHostNumCores(h) != num_cores) {
-            throw std::invalid_argument(
-                    "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different numbers of cores detected");
-          }
-        } else {
-          if (Simulation::getHostNumCores(h) < cores_per_host) {
-            throw std::invalid_argument(
-                    "BatchService::BatchService(): Compute host has less thatn the specified number of cores (" +
-                    std::to_string(cores_per_host) + "'");
-          }
+
+        if (Simulation::getHostNumCores(h) != num_cores_available) {
+          throw std::invalid_argument(
+                  "BatchService::BatchService(): Compute hosts for a batch service need to be homogeneous (different RAM capacities detected)");
+
         }
+      }
+
+      // Check that ALL_CORES and ALL_RAM, or actual maximum values, were passed
+      // (this may change one day...)
+      if (((cores_per_host != ComputeService::ALL_CORES) and (cores_per_host != num_cores_available)) or
+          ((ram_per_host != ComputeService::ALL_RAM) and (ram_per_host != ram_available))) {
+        throw std::invalid_argument(
+                "BatchService::BatchService(): A Batch Service must be given ALL core and RAM resources of hosts "
+                        "(e.g., passing ComputeService::ALL_CORES and ComputeService::ALL_RAM)");
       }
 
       //create a map for host to cores
       int i = 0;
       for (auto h : compute_hosts) {
-        // TODO: Why do we have the "not this->supports_pilot_jobs" below?
-        if (cores_per_host < ComputeService::ALL_CORES && not this->supports_pilot_jobs) {
-          this->nodes_to_cores_map.insert({h, cores_per_host});
-          this->available_nodes_to_cores.insert({h, cores_per_host});
-        } else {
-          this->nodes_to_cores_map.insert({h, S4U_Simulation::getNumCores(h)});
-          this->available_nodes_to_cores.insert({h, S4U_Simulation::getNumCores(h)});
-        }
+        this->nodes_to_cores_map.insert({h, num_cores_available});
+        this->available_nodes_to_cores.insert({h, num_cores_available});
         this->host_id_to_names[i++] = h;
       }
+      this->compute_hosts = compute_hosts;
 
       this->num_cores_per_node = this->nodes_to_cores_map.begin()->second;
       this->total_num_of_nodes = compute_hosts.size();
@@ -202,12 +219,10 @@ namespace wrench {
           unsigned int num_nodes = std::get<5>(j);
 
           if (num_nodes > this->total_num_of_nodes) {
-//          throw std::invalid_argument("Workload trace file contains a job that requires too many compute nodes");
             std::get<5>(j) = this->total_num_of_nodes;
           }
-          if (requested_ram > ram) {
-//          throw std::invalid_argument("Workload trace file contains a job that requires too much ram per compute nodes");
-            std::get<4>(j) = ram;
+          if (requested_ram > ram_available) {
+            std::get<4>(j) = ram_available;
           }
         }
       }
@@ -272,6 +287,7 @@ namespace wrench {
                 "BatchService::submitStandardJob(): Batch Service requires -c (number of cores per host) to be specified "
         );
       }
+
 
       //get job time
       unsigned long time_asked_for = 0;
@@ -447,7 +463,7 @@ namespace wrench {
      */
     int BatchService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
 
       WRENCH_INFO("Batch Service starting");
 
@@ -604,7 +620,31 @@ namespace wrench {
 
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if (((*it).get())->getJob() == job) {
+          WRENCH_INFO("CALLING KILL");
           ((*it).get())->kill();
+          WRENCH_INFO("CALLED KILL");
+          // Make failed tasks ready again
+          for (auto task : job->tasks) {
+            switch (task->getInternalState()) {
+              case WorkflowTask::InternalState::TASK_NOT_READY:
+              case WorkflowTask::InternalState::TASK_READY:
+              case WorkflowTask::InternalState::TASK_COMPLETED:
+                break;
+
+              case WorkflowTask::InternalState::TASK_RUNNING:
+                throw std::runtime_error("BatchService::processStandardJobTimeout: task state shouldn't be 'RUNNING'"
+                                                 "after a StandardJobExecutor was killed!");
+              case WorkflowTask::InternalState::TASK_FAILED:
+                // Making failed task READY again
+                task->setInternalState(WorkflowTask::InternalState::TASK_READY);
+                break;
+
+              default:
+                throw std::runtime_error(
+                        "MultihostMulticoreComputeService::terminateRunningStandardJob(): unexpected task state");
+
+            }
+          }
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->running_standard_job_executors),
                                                  &(this->finished_standard_job_executors));
           break;
@@ -715,7 +755,35 @@ namespace wrench {
           }
           this->available_nodes_to_cores[target_host] -= cores_per_node;
           hosts_assigned.push_back(target_host);
-          resources.insert(std::make_tuple(target_host, cores_per_node, 0)); // TODO: RAM is set to 0 for now
+          resources.insert(std::make_tuple(target_host, cores_per_node, ComputeService::ALL_RAM));
+        }
+      } else if (host_selection_algorithm == "ROUNDROBIN") {
+        static int round_robin_host_selector_idx = 0;
+        int cur_host_idx = round_robin_host_selector_idx;
+        int host_count = 0;
+        do {
+            cur_host_idx = (cur_host_idx + 1) % available_nodes_to_cores.size();
+            std::vector<std::string>::iterator it = this->compute_hosts.begin();
+            it = it + cur_host_idx;
+            std::string cur_host_name = *it;
+            unsigned long num_available_cores = available_nodes_to_cores[cur_host_name];
+            if (num_available_cores >= cores_per_node) {
+              available_nodes_to_cores[cur_host_name] -= cores_per_node;
+              hosts_assigned.push_back(cur_host_name);
+              resources.insert(std::make_tuple(cur_host_name, cores_per_node, ram_per_node));
+              if (++host_count >= num_nodes) {
+                break;
+              }
+            }
+        } while (cur_host_idx != round_robin_host_selector_idx);
+        if (resources.size() < num_nodes) {
+          resources = {};
+          std::vector<std::string>::iterator it;
+          for (it = hosts_assigned.begin(); it != hosts_assigned.end(); it++) {
+            available_nodes_to_cores[*it] += cores_per_node;
+          }
+        } else {
+          round_robin_host_selector_idx = cur_host_idx;
         }
       } else {
         throw std::invalid_argument(
@@ -763,7 +831,9 @@ namespace wrench {
       unsigned long num_nodes_asked_for = batch_job->getNumNodes();
       double allocated_time = batch_job->getAllocatedTime();
 
-      WRENCH_INFO("Trying to see if I can run job %s", workflow_job->getName().c_str());
+//      WRENCH_INFO("Trying to see if I can run job (batch_job = %ld)(%s)",
+//                  (unsigned long)batch_job,
+//                  workflow_job->getName().c_str());
 
       //Try to schedule hosts based on FIRSTFIT OR BESTFIT
       // Asking for the FULL RAM (TODO: Change this?)
@@ -773,11 +843,11 @@ namespace wrench {
 
 
       if (resources.empty()) {
-        WRENCH_INFO("Can't run job %s", workflow_job->getName().c_str());
+        WRENCH_INFO("Can't run job %s right now", workflow_job->getName().c_str());
         return false;
       }
 
-      WRENCH_INFO("RUNNING job %s", workflow_job->getName().c_str());
+      WRENCH_INFO("Running job %s", workflow_job->getName().c_str());
 
       // Remove it from the pending list
       for (auto it = this->pending_jobs.begin(); it != this->pending_jobs.end(); it++) {
@@ -832,7 +902,6 @@ namespace wrench {
         }
       }
     }
-
 
     /**
     * @brief Synchronously terminate a pilot job to the compute service
@@ -980,13 +1049,22 @@ namespace wrench {
         return true;
 
       } else if (auto msg = dynamic_cast<AlarmJobTimeOutMessage *>(message.get())) {
+        if (this->running_jobs.find(msg->job) == this->running_jobs.end()) {
+          WRENCH_INFO("Received a time out message (%ld) for an unknown batch job (%ld)... ignoring",
+                      (unsigned long)(message.get()),
+                      (unsigned long) msg->job);
+//          WRENCH_INFO("----> %ld", (unsigned long) msg->job->getWorkflowJob());
+          return true;
+        }
         if (msg->job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-          this->processStandardJobTimeout((StandardJob *)(msg->job->getWorkflowJob()));
+          this->processStandardJobTimeout((StandardJob *) (msg->job->getWorkflowJob()));
           this->removeJobFromRunningList(msg->job);
           this->freeUpResources(msg->job->getResourcesAllocated());
-          this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob(), std::to_string(msg->job->getJobID()));
+          this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob(),
+                                                   std::to_string(msg->job->getJobID()));
           return true;
         } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
+          WRENCH_INFO("Terminating pilot job %s", msg->job->getWorkflowJob()->getName().c_str());
           auto *pilot_job = (PilotJob *) msg->job->getWorkflowJob();
           ComputeService *cs = pilot_job->getComputeService();
           try {
@@ -1000,9 +1078,11 @@ namespace wrench {
           return true;
         } else {
           throw std::runtime_error(
-                  "BatchService::processNextMessage(): Alarm about unknown job type"
+                  "BatchService::processNextMessage(): Alarm about unknown job type " +
+                  std::to_string(msg->job->getWorkflowJob()->getType())
           );
         }
+
 #ifdef ENABLE_BATSCHED
         } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
         is_bat_sched_ready = true;
@@ -1277,10 +1357,12 @@ namespace wrench {
             return;
           }
           //this is the list of raw pointers
+
+          BatchJob *to_erase = *it1;
           this->running_jobs.erase(it1);
 
           //this is the list of unique pointers
-          this->freeJobFromJobsList(*it1);
+          this->freeJobFromJobsList(to_erase);
           //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
           this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "");
@@ -1543,6 +1625,7 @@ namespace wrench {
 
           SimulationMessage *msg =
                   new AlarmJobTimeOutMessage(batch_job, 0);
+
           std::shared_ptr<Alarm> alarm_ptr = Alarm::createAndStartAlarm(this->simulation,
                                                                         batch_job->getEndingTimeStamp(), host_to_run_on,
                                                                         this->mailbox_name, msg,
@@ -1656,7 +1739,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns queue wait time estimages for the FCFS (non-batsched) algorithm
+     * @brief Returns queue wait time estimates for the FCFS (non-batsched) algorithm
      * @param set_of_jobs: a set of job specifications (<id, num hosts, time>)
      *
      * @return a map of queue wait time predictions
@@ -2203,7 +2286,6 @@ namespace wrench {
                cores_per_node_asked_for);
 
     }
-
 
 #endif  // ENABLE_BATSCHED
 

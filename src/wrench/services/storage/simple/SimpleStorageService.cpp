@@ -90,7 +90,7 @@ namespace wrench {
      */
     int SimpleStorageService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(WRENCH_LOGGING_COLOR_CYAN);
+      TerminalOutput::setThisProcessLoggingColor(COLOR_CYAN);
 
       WRENCH_INFO("Simple Storage Service %s starting on host %s (capacity: %lf, holding %ld files, listening on %s)",
                   this->getName().c_str(),

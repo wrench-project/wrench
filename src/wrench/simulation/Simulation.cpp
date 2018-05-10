@@ -234,7 +234,6 @@ namespace wrench {
           bool one_storage_service_running = false;
           for (const auto &storage_service : this->storage_services) {
             if (not this->hostExists(storage_service->getHostname())) {
-              WRENCH_INFO("HOST DOES NOT EXIST: %s", storage_service->getHostname().c_str());
               throw std::runtime_error(
                       "A StorageService cannot be started on host '" + storage_service->getHostname() + "'");
             }
@@ -251,22 +250,27 @@ namespace wrench {
 
         // Check that a FileRegistryService is running if needed, and is on a valid host
         if (not wms->workflow->getInputFiles().empty()) {
-          if (not this->file_registry_service) {
+          if (this->file_registry_services.empty()) {
             throw std::runtime_error(
-                    "A FileRegistryService should have been instantiated and passed to Simulation.setFileRegistryService()"
+                    "At least one FileRegistryService should have been instantiated and passed to Simulation.add()"
                             "because there are workflow input files to be staged.");
           }
-          if (not this->hostExists(file_registry_service->getHostname())) {
-            throw std::runtime_error(
-                    "A FileRegistry service cannot be started on host '" + file_registry_service->getHostname() + "'");
+          for (auto frs : this->file_registry_services) {
+            if (not this->hostExists(frs->getHostname())) {
+              throw std::runtime_error(
+                      "A FileRegistry service cannot be started on host '" + frs->getHostname() +
+                      "'");
+            }
           }
         }
 
-        // Check that each input file is staged somewhere
+        // Check that each input file is staged on the file registry services
         for (auto f : wms->workflow->getInputFiles()) {
-          if (this->file_registry_service->entries.find(f.second) == this->file_registry_service->entries.end()) {
-            throw std::runtime_error(
-                    "Workflow input file " + f.second->getId() + " is not staged on any storage service!");
+          for (auto frs : this->file_registry_services) {
+            if (frs->entries.find(f.second) == frs->entries.end()) {
+              throw std::runtime_error(
+                      "Workflow input file " + f.second->getId() + " is not staged on any storage service!");
+            }
           }
         }
       }
@@ -300,9 +304,9 @@ namespace wrench {
           network_proximity_service->start(network_proximity_service, true);
         }
 
-        // Start the file registry service
-        if (this->file_registry_service) {
-          this->file_registry_service->start(this->file_registry_service, true);
+        // Start the file registry services
+        for (auto frs : this->file_registry_services) {
+          frs->start(frs, true);
         }
 
       } catch (std::runtime_error &e) {
@@ -323,7 +327,7 @@ namespace wrench {
      */
     ComputeService * Simulation::add(ComputeService *service) {
       if (service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid arguments");
+        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
@@ -346,7 +350,7 @@ namespace wrench {
      */
     NetworkProximityService * Simulation::add(NetworkProximityService *service) {
       if (service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid arguments");
+        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
@@ -370,7 +374,7 @@ namespace wrench {
     */
     StorageService * Simulation::add(StorageService *service) {
       if (service == nullptr) {
-        throw std::invalid_argument("Simulation::add(): invalid arguments");
+        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
       if (not this->s4u_simulation->isInitialized()) {
         throw std::runtime_error("Simulation::add(): Simulation is not initialized");
@@ -393,10 +397,10 @@ namespace wrench {
      */
     WMS * Simulation::add(WMS *wms) {
       if (wms == nullptr) {
-        throw std::invalid_argument("Simulation::addWMS(): invalid arguments");
+        throw std::invalid_argument("Simulation::add(): invalid argument (nullptr wms)");
       }
       if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation::setWMS(): Simulation is not initialized");
+        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
       wms->simulation = this;
       this->wmses.insert(std::shared_ptr<WMS>(wms));
@@ -413,12 +417,15 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    FileRegistryService * Simulation::setFileRegistryService(FileRegistryService *file_registry_service) {
+    FileRegistryService * Simulation::add(FileRegistryService *file_registry_service) {
       if (file_registry_service == nullptr) {
-        throw std::invalid_argument("Simulation::setFileRegistryService(): invalid arguments");
+        throw std::invalid_argument("Simulation::add(): invalid arguments");
       }
-      this->file_registry_service = std::shared_ptr<FileRegistryService>(file_registry_service);
-      this->file_registry_service->simulation = this;
+      if (not this->s4u_simulation->isInitialized()) {
+        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
+      }
+      file_registry_service->simulation = this;
+      this->file_registry_services.insert(std::shared_ptr<FileRegistryService>(file_registry_service));
       return file_registry_service;
     }
 
@@ -438,9 +445,9 @@ namespace wrench {
       }
 
       // Check that a FileRegistryService has been set
-      if (not this->file_registry_service) {
+      if (this->file_registry_services.empty()) {
         throw std::runtime_error(
-                "Simulation::stageFile(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+                "Simulation::stageFile(): At least one FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
       }
 
       // Check that the file is not the output of anything
@@ -457,8 +464,10 @@ namespace wrench {
         throw;
       }
 
-      // Update the file registry
-      this->file_registry_service->addEntryToDatabase(file, storage_service);
+      // Update all file registry services
+      for (auto frs : this->file_registry_services) {
+        frs->addEntryToDatabase(file, storage_service);
+      }
     }
 
     /**
@@ -476,10 +485,10 @@ namespace wrench {
         throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
       }
 
-      // Check that a FileRegistryService has been set
-      if (not this->file_registry_service) {
+      // Check that at least one  FileRegistryService has been set
+      if (this->file_registry_services.empty()) {
         throw std::runtime_error(
-                "Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.setFileRegistryService() before files can be staged on storage services");
+                "Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
       }
 
       try {

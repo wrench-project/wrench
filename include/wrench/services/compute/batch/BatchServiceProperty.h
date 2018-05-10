@@ -64,10 +64,10 @@ namespace wrench {
 
 
         /**
-         * @brief Number of seconds that the Batch Scheduler adds to each incoming
-         *        (standard) job. This is something production batch systems do (e.g.,
-         *        if I say that I want to run a job that lasts at most 60 seconds, the system
-         *        will actually assume it runs at most 65 seconds).
+         * @brief Number of seconds that the Batch Scheduler adds to the runtime of each incoming
+         *        job. This is something production batch systems do. For instance,
+         *        if a job says it wants to run for (at most) 60 seconds, the system
+         *        will actually assume the job want to run for (at most) 60 + 5 seconds.
          */
         DECLARE_PROPERTY_NAME(BATCH_RJMS_DELAY);
 

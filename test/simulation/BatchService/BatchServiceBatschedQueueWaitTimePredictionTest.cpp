@@ -256,7 +256,7 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
 //  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
 //          new wrench::FileRegistryService(hostname));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -471,7 +471,7 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
 //  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
 //          new wrench::FileRegistryService(hostname));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -708,7 +708,7 @@ void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
                                            {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"}
                                    })));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1002,7 +1002,7 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
 //  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
 //          new wrench::FileRegistryService(hostname));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);

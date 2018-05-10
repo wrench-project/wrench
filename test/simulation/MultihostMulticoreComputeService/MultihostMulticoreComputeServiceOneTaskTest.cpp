@@ -284,7 +284,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_Noop_test() {
   ASSERT_THROW(simulation->launch(), std::runtime_error);
   ASSERT_THROW(simulation->stageFiles({{input_file->getId(),input_file}}, storage_service1), std::runtime_error);
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   ASSERT_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, nullptr), std::invalid_argument);
   ASSERT_THROW(simulation->stageFiles({{"foo", nullptr}}, storage_service1), std::invalid_argument);
@@ -584,7 +584,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_StandardJobConstructor_test
           new wrench::SimpleStorageService(hostname1, 10000000000000.0));
 
   // Start a file registry service
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname1));
+  simulation->add(new wrench::FileRegistryService(hostname1));
 
   // Create a WMS
   wrench::WMS *wms = simulation->add(
@@ -691,7 +691,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_HostMemory_test() {
           new wrench::SimpleStorageService(hostname1, 10000000000000.0));
 
   // Start a file registry service
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname1));
+  simulation->add(new wrench::FileRegistryService(hostname1));
 
   // Create a WMS
   wrench::WMS *wms = simulation->add(
@@ -837,7 +837,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithLocationMap_te
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a File Registry Service
-  EXPECT_NO_THROW(simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
+  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -969,7 +969,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDefaultStorage
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a File Registry Service
-  EXPECT_NO_THROW(simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
+  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
   EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1));
@@ -1118,7 +1118,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithPrePostCopies_
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a File Registry Service
-  EXPECT_NO_THROW(simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
+  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on storage service #1
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -1260,7 +1260,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithMissingFile_te
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a File Registry Service
-  EXPECT_NO_THROW(simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
+  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on storage service #1
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -1387,7 +1387,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a File Registry Service
-  EXPECT_NO_THROW(simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
+  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on storage service #1
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -1514,7 +1514,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_t
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a File Registry Service
-  EXPECT_NO_THROW(simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
+  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on storage service #1
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -1624,7 +1624,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDownService_te
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a File Registry Service
-  EXPECT_NO_THROW(simulation->setFileRegistryService(new wrench::FileRegistryService(hostname)));
+  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
