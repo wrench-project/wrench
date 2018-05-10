@@ -51,8 +51,8 @@ namespace wrench {
       // Check that this is a ready sub-graph
       for (auto t : tasks) {
         if (t->getState() != WorkflowTask::State::READY) {
-          for (auto input_file : t->getInputFiles()) {
-            auto parent = input_file->getOutputOf();
+          std::vector<WorkflowTask *> parents = t->getWorkflow()->getTaskParents(t);
+          for (auto parent : parents) {
             if (parent->getState() != WorkflowTask::State::COMPLETED) {
               if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
                 throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getId() + "' has non-completed parents not included in the job");
