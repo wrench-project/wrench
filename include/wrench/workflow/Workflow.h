@@ -57,6 +57,8 @@ namespace wrench {
 
         unsigned long getNumLevels();
 
+        double getCompletionDate();
+
 
         void exportToEPS(std::string);
 
