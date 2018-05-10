@@ -1681,7 +1681,7 @@ private:
           //however let's check further if the task1 hostname is equal to the task4 hostname
           if (task1->getExecutionHost() != task4->getExecutionHost()) {
             throw std::runtime_error(
-                    "BatchServiceTest::ROUNDROBINTEST():: The tasks did execute on the right hosts"
+                    "BatchServiceTest::ROUNDROBINTEST():: The tasks did not execute on the right hosts"
             );
           }
         }
@@ -1690,6 +1690,63 @@ private:
         workflow->removeTask(task2);
         workflow->removeTask(task3);
         workflow->removeTask(task4);
+      }
+
+      {
+        int num_tasks = 20;
+        std::vector<wrench::WorkflowTask*> tasks = {};
+        std::vector<wrench::StandardJob*> jobs = {};
+        for (int i = 0;i<num_tasks;i++) {
+          tasks.push_back(this->workflow->addTask("task"+std::to_string(i),59,1,1,1.0));
+          jobs.push_back(job_manager->createStandardJob(
+                  {tasks[i]}, {}, {}, {}, {}));
+          std::map<std::string, std::string> args;
+          args["-N"] = "1";
+          args["-t"] = "1";
+          args["-c"] = "1";
+          try {
+            job_manager->submitJob(jobs[i], this->test->compute_service, args);
+          } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error(
+                    "Got some exception"
+            );
+          }
+        }
+
+
+        //wait for two standard job completion events
+        int num_events = 0;
+        while (num_events < num_tasks) {
+          std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+          try {
+            event = workflow->waitForNextExecutionEvent();
+          } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+          }
+          switch (event->type) {
+            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+              break;
+            }
+            default: {
+              throw std::runtime_error(
+                      "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+            }
+          }
+          num_events++;
+        }
+
+        int num_hosts = this->simulation->getHostnameList().size();
+        for (int i = 0;i<num_tasks;i++) {
+          if (tasks[i]->getExecutionHost() != tasks[(i+num_hosts)%num_hosts]->getExecutionHost()) {
+            throw std::runtime_error(
+                    "BatchServiceTest::ROUNDROBINTEST():: The tasks in the second test did not execute on the right hosts"
+            );
+          }
+        }
+
+        for (int i = 0;i<num_tasks;i++) {
+          workflow->removeTask(tasks[i]);
+        }
       }
 
       return 0;
