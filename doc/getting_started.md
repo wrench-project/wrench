@@ -8,7 +8,7 @@ Getting Started                        {#getting-started}
 [TOC]
 
 The first step is to install the WRENCH library, following the instructions
- on the [install page](@ref install).
+ on the [installation page](@ref install).
 
 # Running a First Example #         {#getting-started-example}
 
@@ -26,10 +26,14 @@ one of the following commands:
 
 ~~~~~~~~~~~~~{.sh}
 # Runs the cloud-based implementation
-wrench-simple-example-cloud <PATH-TO-WRENCH-FOLDER>/examples/simple-example/platform_files/cloud_hosts.xml <PATH-TO-WRENCH-FOLDER>/examples/simple-example/workflow_files/genome.dax
+wrench-simple-example-cloud \
+    <PATH-TO-WRENCH-FOLDER>/examples/simple-example/platform_files/cloud_hosts.xml \
+    <PATH-TO-WRENCH-FOLDER>/examples/simple-example/workflow_files/genome.dax
 
 # Runs the batch-based implementation
-wrench-simple-example-batch <PATH-TO-WRENCH-FOLDER>/examples/simple-example/platform_files/batch_hosts.xml <PATH-TO-WRENCH-FOLDER>/examples/simple-example/workflow_files/genome.dax
+wrench-simple-example-batch \
+    <PATH-TO-WRENCH-FOLDER>/examples/simple-example/platform_files/batch_hosts.xml \
+    <PATH-TO-WRENCH-FOLDER>/examples/simple-example/workflow_files/genome.dax
 ~~~~~~~~~~~~~
 
 
