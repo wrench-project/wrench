@@ -480,9 +480,7 @@ namespace wrench {
           }
 
           // create a VM on the provided physical machine
-          simgrid::s4u::VirtualMachine *vm = new simgrid::s4u::VirtualMachine(
-                  vm_hostname.c_str(), simgrid::s4u::Host::by_name(pm_hostname), num_cores);
-          vm->setRamsize(ram_memory);
+          auto vm = std::make_shared<S4U_VirtualMachine>(vm_hostname, pm_hostname, num_cores, ram_memory);
 
           // create a multihost multicore computer service for the VM
           std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
@@ -498,9 +496,8 @@ namespace wrench {
 
           this->cs_available_ram[pm_hostname] -= ram_memory;
 
-          // starting the VM and service
+          // starting the service
           try {
-            vm->start();
             cs->start(cs, true); // Daemonize!
           } catch (std::runtime_error &e) {
             throw;
@@ -547,38 +544,18 @@ namespace wrench {
 
         if (it != vm_list.end()) {
 
-          simgrid::s4u::VirtualMachine *vm = std::get<0>((*it).second);
+          std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>((*it).second);
+          std::shared_ptr<ComputeService> cs = std::get<1>((*it).second);
           simgrid::s4u::Host *dest_pm = simgrid::s4u::Host::by_name_or_null(dest_pm_hostname);
 
           double mig_sta = simgrid::s4u::Engine::getClock();
-          std::cerr << "STARTING MIGRATION: " << vm->getName() << std::endl;
-          std::cerr << "DEST: " << dest_pm->isOn() << " - " << dest_pm->getName() << std::endl;
-          std::cerr << "SRC: " << vm->getPm()->getName() << std::endl;
-
-          simgrid::s4u::Host* pm0 = simgrid::s4u::Host::by_name("Fafard");
-          simgrid::s4u::Host* pm1 = simgrid::s4u::Host::by_name("Tremblay");
-          simgrid::s4u::Host* pm2 = simgrid::s4u::Host::by_name("Jupiter");
-
-          simgrid::s4u::VirtualMachine* vm0 = new simgrid::s4u::VirtualMachine("VM0", pm0, 1);
-          vm0->setRamsize(1e9); // 1Gbytes
-          vm0->start();
-          sg_vm_migrate(vm0, pm2);
-
-          vm0->destroy();
-
-
-//          auto vm0 = new simgrid::s4u::VirtualMachine("VM0", vm->getPm(), 1);
-//          vm0->setRamsize(1e9);
-//          vm0->start();
-//          simgrid::s4u::Host* pm0 = simgrid::s4u::Host::by_name("Fafard");
-//          sg_vm_migrate(vm0, pm0);
-//          std::cerr <<  "END MIGRATION" << std::endl;
-//          double mig_end = simgrid::s4u::Engine::getClock();
-//          WRENCH_INFO("%s migrated: %s to %g s", vm_hostname.c_str(), dest_pm->getName().c_str(), mig_end - mig_sta);
+          sg_vm_migrate(vm->get(), dest_pm);
+          double mig_end = simgrid::s4u::Engine::getClock();
+          WRENCH_INFO("%s migrated: %s to %g s", vm_hostname.c_str(), dest_pm->getName().c_str(), mig_end - mig_sta);
 
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
-                  new VirtualizedClusterServiceCreateVMAnswerMessage(
+                  new VirtualizedClusterServiceMigrateVMAnswerMessage(
                           true,
                           this->getPropertyValueAsDouble(
                                   VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD)));
@@ -592,7 +569,6 @@ namespace wrench {
                                   VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD)));
 
         }
-
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -791,10 +767,11 @@ namespace wrench {
     void VirtualizedClusterService::terminate() {
       this->setStateToDown();
 
-      WRENCH_INFO("Stopping VMs Compute Service");
+      WRENCH_INFO("Stopping Virtualized Cluster Service");
       for (auto &vm : this->vm_list) {
         this->cs_available_ram[(std::get<0>(vm.second))->getPm()->getName()] += S4U_Simulation::getHostMemoryCapacity(
                 std::get<0>(vm));
+        std::get<0>(vm.second)->stop();
         std::get<1>(vm.second)->stop();
       }
     }

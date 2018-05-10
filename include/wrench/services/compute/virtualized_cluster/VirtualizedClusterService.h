@@ -12,11 +12,11 @@
 #define WRENCH_VIRTUALIZEDCLUSTERSERVICE_H
 
 #include <map>
-#include <simgrid/s4u/VirtualMachine.hpp>
 
+#include "VirtualizedClusterServiceProperty.h"
 #include "wrench/services/Service.h"
 #include "wrench/services/compute/ComputeService.h"
-#include "VirtualizedClusterServiceProperty.h"
+#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/workflow/job/PilotJob.h"
 
@@ -42,8 +42,8 @@ namespace wrench {
                  {VirtualizedClusterServiceProperty::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                  {VirtualizedClusterServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
                  {VirtualizedClusterServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
-                 {VirtualizedClusterServiceProperty::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
-                 {VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                 {VirtualizedClusterServiceProperty::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                 {VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
                  {VirtualizedClusterServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
                  {VirtualizedClusterServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                  {VirtualizedClusterServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
@@ -130,7 +130,7 @@ namespace wrench {
         std::map<std::string, double> cs_available_ram;
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
-        std::map<std::string, std::tuple<simgrid::s4u::VirtualMachine *, std::shared_ptr<ComputeService>, unsigned long>> vm_list;
+        std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>, unsigned long>> vm_list;
     };
 
 }

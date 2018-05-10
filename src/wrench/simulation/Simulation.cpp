@@ -9,6 +9,7 @@
  */
 
 #include <csignal>
+#include <simgrid/plugins/live_migration.h>
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/Service.h"
@@ -92,6 +93,9 @@ namespace wrench {
       *argc = i - skip;
 
       this->s4u_simulation->initialize(argc, argv);
+
+      // activate VM migration plugin
+      sg_vm_live_migration_plugin_init();
     }
 
     /**
