@@ -1681,7 +1681,7 @@ private:
           //however let's check further if the task1 hostname is equal to the task4 hostname
           if (task1->getExecutionHost() != task4->getExecutionHost()) {
             throw std::runtime_error(
-                    "BatchServiceTest::ROUNDROBINTEST():: The tasks did execute on the right hosts"
+                    "BatchServiceTest::ROUNDROBINTEST():: The tasks did not execute on the right hosts"
             );
           }
         }
@@ -1739,7 +1739,7 @@ private:
         for (int i = 0;i<num_tasks;i++) {
           if (tasks[i]->getExecutionHost() != tasks[(i+num_hosts)%num_hosts]->getExecutionHost()) {
             throw std::runtime_error(
-                    "BatchServiceTest::ROUNDROBINTEST():: The tasks in the second test did execute on the right hosts"
+                    "BatchServiceTest::ROUNDROBINTEST():: The tasks in the second test did not execute on the right hosts"
             );
           }
         }
