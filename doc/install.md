@@ -7,6 +7,18 @@ Installing WRENCH                  {#install}
 
 [TOC]
 
+# Docker Containers #             {#install-docker}
+
+WRENCH is also distributed in Docker containers. Please, visit the
+[WRENCH's Repository on Docker Hub](https://hub.docker.com/r/wrenchproject/wrench/)
+to pull WRENCH's Docker images.
+
+The `latest` tag provides a container with the latest 
+[WRENCH's release](https://github.com/wrench-project/wrench/releases), while the 
+`unstable` tag provides a container with the current code in the GitHub's `master` 
+branch. Additional tags are available for all WRENCH releases.  
+
+
 # Prerequisites #                 {#install-prerequisites}
 
 WRENCH is developed in `C++`. The code follows the C++11 standard, and thus older 
@@ -45,7 +57,7 @@ tar xf @WRENCHRelease.tar.gz
 cd @WRENCHRelease
 cmake .
 make
-make install # try "sudo make install" if you don't have the permission to write
+make install # try "sudo make install" if you do not have write privileges
 ~~~~~~~~~~~~~
 
 To enable the use of Batsched (provided you have installed that package, see above):
@@ -70,7 +82,7 @@ In most cases, compiling and installing WRENCH is enough:
 
 ~~~~~~~~~~~~~{.sh}
 make
-make install # try "sudo make install" if you don't have the permission to write
+make install # try "sudo make install" if you do not have write privileges
 ~~~~~~~~~~~~~
 
 In addition, several compilation targets are provided in WRENCH:

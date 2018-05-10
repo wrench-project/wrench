@@ -15,8 +15,12 @@
 
 namespace wrench {
 
+    /***********************/
+    /** \cond INTERNAL     */
+    /***********************/
+
     /**
-     * @brief
+     * @brief A wrapper for the simgrid::s4u::VirtualMachine class
      */
     class S4U_VirtualMachine {
 
@@ -33,8 +37,13 @@ namespace wrench {
         void stop();
 
     private:
+        /** @brief a pointer to the simgrid::s4u::VirtualMachine object */
         simgrid::s4u::VirtualMachine *vm;
     };
+
+    /***********************/
+    /** \endcond           */
+    /***********************/
 }
 
 #endif //WRENCH_S4U_VIRTUALMACHINE_H
