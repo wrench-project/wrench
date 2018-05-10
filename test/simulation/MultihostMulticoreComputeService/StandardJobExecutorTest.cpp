@@ -38,6 +38,8 @@ public:
 
     void do_OneMultiCoreTaskTest_test();
 
+    void do_DependentTasksTest_test();
+
     void do_TwoMultiCoreTasksTest_test();
 
     void do_MultiHostTest_test();
@@ -98,9 +100,9 @@ class StandardJobExecutorConstructorTestWMS : public wrench::WMS {
 
 public:
     StandardJobExecutorConstructorTestWMS(StandardJobExecutorTest *test,
-                       const std::set<wrench::ComputeService *> &compute_services,
-                       const std::set<wrench::StorageService *> &storage_services,
-                       std::string hostname) :
+                                          const std::set<wrench::ComputeService *> &compute_services,
+                                          const std::set<wrench::StorageService *> &storage_services,
+                                          std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
@@ -298,7 +300,7 @@ private:
       task_too_many_cores->addOutputFile(workflow->getFileById("output_file"));
 
 //        // Forget the previous job!
-        job_manager->forgetJob(job);
+      job_manager->forgetJob(job);
 
       // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
       job = job_manager->createStandardJob(
@@ -463,18 +465,18 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create another Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -484,7 +486,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -652,18 +654,18 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create another Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -673,7 +675,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -831,18 +833,18 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create another Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -852,7 +854,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -1010,17 +1012,17 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service = nullptr;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create another Storage Service
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1030,7 +1032,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000000.0);
@@ -1043,6 +1045,199 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+
+/**********************************************************************/
+/**  STANDARD JOB WITH DEPENDENT TASKS                               **/
+/**********************************************************************/
+
+class DependentTasksTestWMS : public wrench::WMS {
+
+public:
+    DependentTasksTestWMS(StandardJobExecutorTest *test,
+                          const std::set<wrench::ComputeService *> &compute_services,
+                          const std::set<wrench::StorageService *> &storage_services,
+                          std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    StandardJobExecutorTest *test;
+
+    int main() {
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+
+      {
+
+        //   t1 -> f1 -> t2 -> f2 -> t4
+        //         f1 -> t3 -> f3 -> t4
+
+        // Create two workflow files
+        wrench::WorkflowFile *f1 = this->workflow->addFile("f1", 1.0);
+        wrench::WorkflowFile *f2 = this->workflow->addFile("f2", 1.0);
+        wrench::WorkflowFile *f3 = this->workflow->addFile("f3", 1.0);
+
+        // Create sequential tasks
+        wrench::WorkflowTask *t1 = this->workflow->addTask("t1", 100, 1, 1, 1.0);
+        wrench::WorkflowTask *t2 = this->workflow->addTask("t2", 100, 1, 1, 1.0);
+        wrench::WorkflowTask *t3 = this->workflow->addTask("t3", 150, 1, 1, 1.0);
+        wrench::WorkflowTask *t4 = this->workflow->addTask("t4", 100, 1, 1, 1.0);
+
+        t1->addOutputFile(f1);
+        t2->addInputFile(f1);
+        t3->addInputFile(f1);
+        t2->addOutputFile(f2);
+        t3->addOutputFile(f3);
+        t4->addInputFile(f2);
+        t4->addInputFile(f3);
+
+        // Create a BOGUS StandardJob (just for testing)
+        bool success = true;
+        try {
+          wrench::StandardJob *job = job_manager->createStandardJob(
+                  {t1, t2, t4},
+                  {},
+                  {},
+                  {},
+                  {});
+        } catch (std::invalid_argument &e) {
+          success = false;
+        }
+        if (success) {
+          throw std::runtime_error("Should not be able to create a standard job with t1, t2, t3 only");
+        }
+
+
+        // Create a StandardJob
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                {t1, t2, t3, t4},
+                {},
+                {},
+                {},
+                {});
+
+        std::string my_mailbox = "test_callback_mailbox";
+
+        double before = wrench::S4U_Simulation::getClock();
+        double thread_startup_overhead = 0.0;
+
+        // Create a StandardJobExecutor that will run stuff on one host and 2 cores
+        std::shared_ptr<wrench::StandardJobExecutor> executor = std::shared_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[0],
+                        job,
+                        {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
+                        this->test->storage_service1,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+                ));
+        executor->start(executor, true);
+
+        // Wait for a message on my mailbox_name
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+          message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        if (!msg) {
+          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        if (!StandardJobExecutorTest::isJustABitGreater(100, t1->getEndDate())) {
+          throw std::runtime_error("Unexpected completion time for t1: " +
+                                   std::to_string(t1->getEndDate()) + "(should be 100)");
+        }
+        if (!StandardJobExecutorTest::isJustABitGreater(200, t2->getEndDate())) {
+          throw std::runtime_error("Unexpected completion time for t2: " +
+                                   std::to_string(t2->getEndDate()) + "(should be 200)");
+        }
+        if (!StandardJobExecutorTest::isJustABitGreater(250, t3->getEndDate())) {
+          throw std::runtime_error("Unexpected completion time for t3: " +
+                                   std::to_string(t3->getEndDate()) + "(should be 250)");
+        }
+        if (!StandardJobExecutorTest::isJustABitGreater(350, t4->getEndDate())) {
+          throw std::runtime_error("Unexpected completion time for t4: " +
+                                   std::to_string(t4->getEndDate()) + "(should be 350)");
+        }
+
+        if ((t1->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED) ||
+            (t2->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED) ||
+            (t3->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED) ||
+            (t4->getInternalState() != wrench::WorkflowTask::InternalState::TASK_COMPLETED)) {
+          throw std::runtime_error("Unexpected task states!");
+        }
+
+        workflow->removeTask(t1);
+        workflow->removeTask(t2);
+        workflow->removeTask(t3);
+        workflow->removeTask(t4);
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(StandardJobExecutorTest, DependentTasksTest) {
+  DO_TEST_WITH_FORK(do_DependentTasksTest_test);
+}
+
+void StandardJobExecutorTest::do_DependentTasksTest_test() {
+
+  // Create and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+  // Create a Compute Service
+  wrench::ComputeService *compute_service;
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       storage_service1,
+                                                       {})));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          new DependentTasksTestWMS(
+                  this,  {compute_service}, {storage_service1}, hostname)));
+
+  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+
   EXPECT_NO_THROW(simulation->launch());
 
   delete simulation;
@@ -1304,13 +1499,13 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1320,7 +1515,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1657,17 +1852,17 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create another Storage Services
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1677,7 +1872,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -1931,17 +2126,17 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create another Storage Services
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1951,7 +2146,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService(hostname));
+  simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2085,17 +2280,17 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("Host3", true, true,
-                                                               {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService("Host3", true, true,
+                                                       {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService("Host4", 10000000000000.0)));
+          new wrench::SimpleStorageService("Host4", 10000000000000.0)));
 
   // Create another Storage Services
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService("Host4", 10000000000000.0)));
+          new wrench::SimpleStorageService("Host4", 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -2105,7 +2300,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService("Host3"));
+  simulation->add(new wrench::FileRegistryService("Host3"));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2236,17 +2431,17 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("Host3", true, true,
-                                                               {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService("Host3", true, true,
+                                                       {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService("Host4", 10000000000000.0)));
+          new wrench::SimpleStorageService("Host4", 10000000000000.0)));
 
   // Create another Storage Services
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService("Host4", 10000000000000.0)));
+          new wrench::SimpleStorageService("Host4", 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -2256,7 +2451,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService("Host3"));
+  simulation->add(new wrench::FileRegistryService("Host3"));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2406,17 +2601,17 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service = nullptr;
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("Host3", true, true,
-                                                               {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr,
-                                                               {})));
+          new wrench::MultihostMulticoreComputeService("Host3", true, true,
+                                                       {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       nullptr,
+                                                       {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
-                  new wrench::SimpleStorageService("Host4", 10000000000000.0)));
+          new wrench::SimpleStorageService("Host4", 10000000000000.0)));
 
   // Create another Storage Services
   EXPECT_NO_THROW(storage_service2 = simulation->add(
-                  new wrench::SimpleStorageService("Host4", 10000000000000.0)));
+          new wrench::SimpleStorageService("Host4", 10000000000000.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -2426,7 +2621,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
 
   EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  simulation->setFileRegistryService(new wrench::FileRegistryService("Host3"));
+  simulation->add(new wrench::FileRegistryService("Host3"));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
@@ -2447,155 +2642,3 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   free(argv);
 }
 
-
-/**********************************************************************/
-/**  DEBUG                    **/
-/**********************************************************************/
-
-class DEBUGWMS : public wrench::WMS {
-
-public:
-    DEBUGWMS(StandardJobExecutorTest *test,
-                                            const std::set<wrench::ComputeService *> &compute_services,
-                                            const std::set<wrench::StorageService *> &storage_services,
-                                            std::string hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test") {
-      this->test = test;
-    }
-
-
-private:
-
-    StandardJobExecutorTest *test;
-
-    int main() {
-
-      // Create a job manager
-//      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
-
-
-
-
-      /**  Create a 4-task job and kill it **/
-      {
-      this->test->storage_service1->readFile(workflow->getFileById("input_file"));
-
-//        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-//        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
-//        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
-//        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
-//        task1->addInputFile(workflow->getFileById("input_file"));
-//        task1->addOutputFile(workflow->getFileById("output_file"));
-//        task2->addInputFile(workflow->getFileById("input_file"));
-//        task2->addOutputFile(workflow->getFileById("output_file"));
-//
-//        // Create a StandardJob with both tasks
-//        wrench::StandardJob *job = job_manager->createStandardJob(
-////                {task1, task2, task3, task4},
-//                {task1},
-//                {
-//                        {workflow->getFileById("input_file"),  this->test->storage_service1},
-//                        {workflow->getFileById("output_file"), this->test->storage_service1}
-//                },
-//                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-//                        workflow->getFileById("input_file"), this->test->storage_service1,
-//                        this->test->storage_service2)},
-//                {},
-//                {}
-////                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"), this->test->storage_service2)}
-//        );
-//
-//        std::string my_mailbox = "test_callback_mailbox";
-//
-//        double before = wrench::S4U_Simulation::getClock();
-//
-//        // Create a StandardJobExecutor that will run stuff on one host and all 10 cores
-//        std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
-//                new wrench::StandardJobExecutor(
-//                        test->simulation,
-//                        my_mailbox,
-//                        "Host3",
-//                        job,
-//                        {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
-//                         std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
-//                        nullptr,
-//                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
-//                ));
-//        executor->start(executor, true);
-//
-//        // Sleep 1 second
-//        wrench::Simulation::sleep(80);
-//
-//        // We should be good now, with nothing running
-//
-//        workflow->removeTask(task1);
-//        workflow->removeTask(task2);
-//        workflow->removeTask(task3);
-//        workflow->removeTask(task4);
-
-      }
-
-      return 0;
-    }
-};
-
-TEST_F(StandardJobExecutorTest, DEBUG) {
-  DO_TEST_WITH_FORK(do_DEBUG_test);
-}
-
-void StandardJobExecutorTest::do_DEBUG_test() {
-
-  // Create and initialize a simulation
-  simulation = new wrench::Simulation();
-  int argc = 1;
-  char **argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("one_task_test");
-
-  simulation->init(&argc, argv);
-
-  // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
-
-  // Create a Compute Service (we don't use it)
-  wrench::ComputeService *compute_service;
-  EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host3", true, true,
-                                                       {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
-                                                       {})));
-  // Create a Storage Services
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
-          new wrench::SimpleStorageService("Host4", 10000000000000.0)));
-
-//  // Create another Storage Services
-//  EXPECT_NO_THROW(storage_service2 = simulation->add(
-//          new wrench::SimpleStorageService("Host4", 10000000000000.0)));
-
-  // Create a WMS
-  wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
-          new DEBUGWMS(
-                  this,  {compute_service}, {storage_service1}, "Host3")));
-
-  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
-
-  simulation->setFileRegistryService(new wrench::FileRegistryService("Host3"));
-
-  // Create two workflow files
-  wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-  wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
-
-  // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
-
-
-  // Running a "run a single task" simulation
-  // Note that in these tests the WMS creates workflow tasks, which a user would
-  // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
-
-  delete simulation;
-
-  free(argv[0]);
-  free(argv);
-}

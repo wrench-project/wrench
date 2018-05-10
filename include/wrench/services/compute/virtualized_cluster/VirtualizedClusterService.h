@@ -12,6 +12,7 @@
 #define WRENCH_VIRTUALIZEDCLUSTERSERVICE_H
 
 #include <map>
+#include <simgrid/s4u/VirtualMachine.hpp>
 
 #include "VirtualizedClusterServiceProperty.h"
 #include "wrench/services/Service.h"
@@ -95,6 +96,11 @@ namespace wrench {
 
 
     protected:
+
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+
         friend class Simulation;
 
         int main() override;
@@ -131,6 +137,10 @@ namespace wrench {
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
         std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>, unsigned long>> vm_list;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 
 }

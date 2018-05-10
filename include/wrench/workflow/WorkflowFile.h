@@ -31,6 +31,7 @@ namespace wrench {
 
         std::string getId();
 
+        WorkflowTask *getOutputOf();
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -54,8 +55,6 @@ namespace wrench {
         double size; // in bytes
 
         void setOutputOf(WorkflowTask * task);
-
-        WorkflowTask *getOutputOf();
 
         void setInputOf(WorkflowTask *task);
 

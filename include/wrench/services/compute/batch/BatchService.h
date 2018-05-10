@@ -29,7 +29,16 @@ namespace wrench {
     class WorkloadTraceFileReplayer; // forward
 
     /**
-     * @brief A simulated batch-scheduled compute service
+     * @brief A batch-scheduled compute service that manages a set of compute hosts and
+     *        controls access to their resource via a batch queue.
+     *
+     *        In the current implementation of
+     *        this service, like for many of its real-world counterparts, it does not handle memory
+     *        partitioning among jobs on the same host. It also does not simulate effects
+     *        of memory sharing (e.g., swapping). When multiple jobs share hosts,
+     *        which can happen when jobs require only a few cores per host and can thus
+     *        be co-located on the same hosts in a non-exclusive fashion, each job simply runs as if it had access to the
+     *        full RAM of each compute host it is scheduled on.
      */
     class BatchService : public ComputeService {
 
@@ -97,6 +106,7 @@ namespace wrench {
                      std::vector<std::string> compute_hosts,
                      StorageService *default_storage_service,
                      unsigned long cores_per_host,
+                     double ram_per_host,
                      std::map<std::string, std::string> plist,
                      std::string suffix);
 
@@ -136,6 +146,7 @@ namespace wrench {
         std::vector<double> timeslots;
         std::map<std::string, unsigned long> available_nodes_to_cores;
         std::map<unsigned long, std::string> host_id_to_names;
+        std::vector<std::string> compute_hosts;
         /*End Resources information in Batchservice */
 
         // Vector of standard job executors
@@ -186,7 +197,6 @@ namespace wrench {
 
         //Is sched ready?
         bool is_bat_sched_ready;
-
 
         unsigned long generateUniqueJobId();
 
@@ -255,6 +265,7 @@ namespace wrench {
         //start a job
         void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
                               BatchJob *, unsigned long, double, unsigned long);
+
 
 
         //vector of network listeners (only useful when ENABLE_BATSCHED == on)

@@ -198,8 +198,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
-          new wrench::FileRegistryService(hostname)));
+  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
@@ -318,7 +317,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
@@ -442,7 +441,7 @@ void VirtualizedClusterServiceTest::do_PilotJobTaskTest_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
@@ -560,7 +559,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service

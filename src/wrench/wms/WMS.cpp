@@ -29,7 +29,7 @@ namespace wrench {
      * @param compute_services: a set of compute services available to run jobs (if {} then none is available)
      * @param storage_services: a set of storage services available to the WMS (if {} then none is available)
      * @param network_proximity_services: a set of network proximity services available to the WMS (if {} then none is available)
-     * @param file_registry_service: the file registry services available to the WMS (if nullptr then none is available)
+     * @param file_registry_service: a file registry services available to the WMS (if nullptr then none is available)
      * @param hostname: the name of the host on which to run the WMS
      * @param suffix: a string to append to the WMS process name (useful for debug output)
      *

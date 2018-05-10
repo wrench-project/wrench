@@ -116,7 +116,7 @@ namespace wrench {
      * @throw std::runtime_error
      *
      */
-    double StorageService::howMuchFreeSpace() {
+    double StorageService::getFreeSpace() {
       if (this->state == DOWN) {
         throw WorkflowExecutionException(new ServiceIsDown(this));
       }

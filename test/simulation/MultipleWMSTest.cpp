@@ -181,7 +181,7 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
   EXPECT_NO_THROW(wms->addWorkflow(workflow, 100));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
@@ -239,7 +239,7 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
   EXPECT_NO_THROW(wms2->addWorkflow(workflow2, 10000));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->setFileRegistryService(
+  EXPECT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service

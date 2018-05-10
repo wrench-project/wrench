@@ -32,7 +32,7 @@ namespace wrench {
          * @brief Retrieve a copy of a simulation trace (which should be filled in with timestamps)
          *        once the simulation has completed
          *
-         * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @tparam T   a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          * @return a vector pointers to SimulationTimestampXXXX instances
          */
         template <class T> std::vector<SimulationTimestamp<T> *> getTrace() {

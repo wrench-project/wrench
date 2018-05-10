@@ -190,7 +190,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   wms->addWorkflow(this->workflow);
 
   // Create a file registry
-  simulation->setFileRegistryService(new wrench::FileRegistryService("WMSHost"));
+  simulation->add(new wrench::FileRegistryService("WMSHost"));
 
   // Staging all files on the Src storage service
   EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(), file_1}, {file_2->getId(), file_2}, {file_3->getId(), file_3}}, storage_service_1));
