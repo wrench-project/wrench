@@ -63,6 +63,10 @@ namespace wrench {
       task->DAG = this->DAG.get();
       task->DAG_node = DAG->addNode();
       task->toplevel = 0; // upon creation, a task is an entry task
+      if (this->getNumLevels() < 1 + task->toplevel) {
+        this->setNumLevels(1 + task->toplevel);
+      }
+
       // Add it to the DAG node's metadata
       (*DAG_node_map)[task->DAG_node] = task;
       // Add it to the set of workflow tasks
