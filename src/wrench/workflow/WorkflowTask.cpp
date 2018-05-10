@@ -206,6 +206,7 @@ namespace wrench {
      * @return the state as a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::InternalState state) {
+
       switch (state) {
         case TASK_NOT_READY:
           return "NOT READY";
@@ -236,6 +237,8 @@ namespace wrench {
      * @param state: the task state
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
+      WRENCH_INFO("Setting %s's internal state to %s",
+                  this->getId().c_str(), WorkflowTask::stateToString(state).c_str());
       this->internal_state = state;
     }
 

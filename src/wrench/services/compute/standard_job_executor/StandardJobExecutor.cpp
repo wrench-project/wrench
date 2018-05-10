@@ -775,10 +775,10 @@ namespace wrench {
         std::set<Workunit *> parent_work_units;
         for (auto const &task : twu->tasks) {
           if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
-            for (auto const &input_file : task->getInputFiles()) {
-              WorkflowTask *parent_task = input_file->getOutputOf();
+            std::vector<WorkflowTask *> parents = task->getWorkflow()->getTaskParents(task);
               for (auto const &potential_parent_twu : task_work_units) {
-                if (std::find(potential_parent_twu->tasks.begin(), potential_parent_twu->tasks.end(), parent_task) != potential_parent_twu->tasks.end()) {
+                for (auto const &t : potential_parent_twu->tasks) {
+                if (std::find(parents.begin(), parents.end(), t) != parents.end()) {
                   Workunit::addDependency(potential_parent_twu, twu);
                   break;
                 }
@@ -838,6 +838,7 @@ namespace wrench {
       }
 
       all_work_units.clear();
+
     }
 
 
