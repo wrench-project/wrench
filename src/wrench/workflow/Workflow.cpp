@@ -63,6 +63,8 @@ namespace wrench {
       task->DAG = this->DAG.get();
       task->DAG_node = DAG->addNode();
       task->toplevel = 0; // upon creation, a task is an entry task
+
+      // Update the workflow's number of levels
       if (this->getNumLevels() < 1 + task->toplevel) {
         this->setNumLevels(1 + task->toplevel);
       }
@@ -716,6 +718,26 @@ namespace wrench {
      */
     void Workflow::setNumLevels(unsigned long num_levels) {
       this->num_levels = num_levels;
+    }
+
+    /**
+     * @brief Returns the workflow's completion date, or a negative value
+     *        If the workflow has not completed
+     * @return a date in seconds
+     */
+    double Workflow::getCompletionDate() {
+      double makespan = -1.0;
+      // Get te last level
+      std::vector<WorkflowTask *> last_tasks = this->getTasksInTopLevelRange(this->getNumLevels()-1, this->getNumLevels()-1);
+      for (auto task : last_tasks) {
+        if (task->getState() != WorkflowTask::State::COMPLETED) {
+          makespan = -1.0;
+          break;
+        } else {
+          makespan = MAX(makespan, task->getEndDate());
+        }
+      }
+      return makespan;
     }
 
 
