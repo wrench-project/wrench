@@ -39,6 +39,7 @@ set(HEADER_FILES
         include/wrench/simgrid_S4U_util/S4U_Daemon.h
         include/wrench/simgrid_S4U_util/S4U_Mailbox.h
         include/wrench/simgrid_S4U_util/S4U_PendingCommunication.h
+        include/wrench/simgrid_S4U_util/S4U_VirtualMachine.h
         include/wrench/logging/TerminalOutput.h
         include/wrench/wms/WMS.h
         include/wrench/wms/StaticOptimization.h
@@ -113,6 +114,7 @@ set(SOURCE_FILES
         src/wrench/simgrid_S4U_util/S4U_Simulation.cpp
         src/wrench/simgrid_S4U_util/S4U_Mailbox.cpp
         src/wrench/simgrid_S4U_util/S4U_PendingCommunication.cpp
+        src/wrench/simgrid_S4U_util/S4U_VirtualMachine.cpp
         src/wrench/logging/TerminalOutput.cpp
         src/wrench/workflow/Workflow.cpp
         src/wrench/workflow/WorkflowTask.cpp
@@ -214,7 +216,9 @@ set(TEST_FILES
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-wms/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        test/simulation/JobManagerTest.cpp test/simulation/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp)
+        test/simulation/JobManagerTest.cpp
+        test/simulation/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
+        )
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
