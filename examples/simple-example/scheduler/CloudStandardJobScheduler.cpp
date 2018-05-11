@@ -25,7 +25,7 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void CloudStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
-                                                  const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
+                                                  const std::vector<WorkflowTask *> &tasks) {
 
       // Check that the right compute_services is passed
       if (compute_services.size() != 1) {
@@ -46,7 +46,7 @@ namespace wrench {
 
       WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());
 
-      for (auto itc : tasks) {
+      for (auto task : tasks) {
         //TODO add support to pilot jobs
 
         unsigned long sum_num_idle_cores = 0;
@@ -61,17 +61,13 @@ namespace wrench {
         }
 
         // Decision making
-        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(itc.second, {});
+        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(task, {});
         unsigned long mim_num_cores = ((StandardJob *) (job))->getMinimumRequiredNumCores();
-        double mim_mem = 0;
-        for (auto task : itc.second) {
-          mim_mem = std::max(mim_mem, task->getMemoryRequirement());
-        }
 
         if (sum_num_idle_cores < mim_num_cores) {
           try {
             std::string pm_host = choosePMHostname();
-            std::string vm_host = cloud_service->createVM(pm_host, mim_num_cores, mim_mem);
+            std::string vm_host = cloud_service->createVM(pm_host, mim_num_cores, task->getMemoryRequirement());
 
             if (not vm_host.empty()) {
               this->vm_list[pm_host].push_back(vm_host);

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ namespace wrench {
 
       int count = 0;
 
-      for (auto task_map : workflow->getReadyTasks()) {
+      for (auto task_map : workflow->getReadyClusters()) {
         if (task_map.second.size() > 1) {
           for (auto task : task_map.second) {
             if (not task->getClusterId().empty() && task->getFailureCount() > 0) {

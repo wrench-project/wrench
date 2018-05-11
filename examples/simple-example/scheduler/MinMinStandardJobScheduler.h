@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,13 +30,11 @@ namespace wrench {
         /***********************/
 
         virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
-                           const std::map<std::string, std::vector<WorkflowTask *>> &ready_tasks
-        ) override;
+                                   const std::vector<WorkflowTask *> &ready_tasks);
 
     private:
         struct MinMinComparator {
-            bool operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
-                            std::pair<std::string, std::vector<WorkflowTask *>> &rhs);
+            bool operator()(WorkflowTask *&lhs, WorkflowTask *&rhs);
         };
 
         JobManager *job_manager;

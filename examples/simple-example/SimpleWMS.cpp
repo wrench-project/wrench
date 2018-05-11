@@ -69,7 +69,7 @@ namespace wrench {
       while (true) {
 
         // Get the ready tasks
-        std::map<std::string, std::vector<WorkflowTask *>> ready_tasks = this->workflow->getReadyTasks();
+        std::vector<WorkflowTask *> ready_tasks = this->workflow->getReadyTasks();
 
         // Get the available compute services
         std::set<ComputeService *> compute_services = this->getAvailableComputeServices();

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,9 @@ namespace wrench {
      *
      * @return whether the number of flops from the left-hand-side workflow tasks is smaller
      */
-    bool MinMinStandardJobScheduler::MinMinComparator::operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
-                                                                  std::pair<std::string, std::vector<WorkflowTask *>> &rhs) {
-
-      return Workflow::getSumFlops(lhs.second) < Workflow::getSumFlops(rhs.second);
+    bool MinMinStandardJobScheduler::MinMinComparator::operator()(WorkflowTask *&lhs,
+                                                                  WorkflowTask *&rhs) {
+      return lhs->getFlops() < rhs->getFlops();
     }
 
     /**
@@ -38,23 +37,21 @@ namespace wrench {
      * @param ready_tasks: a vector of ready workflow tasks
      * @param compute_services: a set of compute services available to run jobs
      */
-    void MinMinStandardJobScheduler::scheduleTasks(
-            const std::set<ComputeService *> &compute_services,
-            const std::map<std::string, std::vector<WorkflowTask *>> &ready_tasks
-    ) {
+    void MinMinStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
+                                                   const std::vector<WorkflowTask *> &ready_tasks) {
 
       WRENCH_INFO("There are %ld ready tasks to schedule", ready_tasks.size());
 
       // Sorting tasks
-      std::vector<std::pair<std::string, std::vector<WorkflowTask *>>> min_vector(ready_tasks.begin(),
+      std::vector<WorkflowTask *> min_vector(ready_tasks.begin(),
                                                                                   ready_tasks.end());
       std::sort(min_vector.begin(), min_vector.end(), MinMinComparator());
 
-      for (auto itc : min_vector) {
+      for (auto task : min_vector) {
         bool successfully_scheduled = false;
 
         // Second: attempt to run the task on a compute resource
-        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", itc.first.c_str());
+        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", task->getId().c_str());
 
         for (auto cs : compute_services) {
           WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
@@ -68,7 +65,7 @@ namespace wrench {
           unsigned long sum_num_idle_cores;
           try {
             std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
-            sum_num_idle_cores = (unsigned long)std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+            sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
 
           } catch (WorkflowExecutionException &e) {
             // The service has some problem, forget it
@@ -80,8 +77,8 @@ namespace wrench {
             continue;
           }
 
-          WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
-          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
+          WRENCH_INFO("Submitting task %s for execution as a standard job", task->getId().c_str());
+          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(task, {});
           job_manager->submitJob(job, cs);
           successfully_scheduled = true;
           break;
