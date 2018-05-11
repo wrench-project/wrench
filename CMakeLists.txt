@@ -248,13 +248,8 @@ add_custom_command(TARGET unit_tests COMMAND find . -name *.gcda -delete)
 # additional packages
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/DefinePackages.cmake)
 
-
 # build examples
-foreach (cmakefile ${CMAKEFILES_TXT})
-    string(REPLACE "/CMakeLists.txt" "" repository ${cmakefile})
-    add_subdirectory("${CMAKE_HOME_DIRECTORY}/${repository}")
-endforeach ()
-
+include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Examples.cmake)
 
 # build documentation
 include(${CMAKE_HOME_DIRECTORY}/tools/cmake/Documentation.cmake)
