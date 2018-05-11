@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,8 +18,11 @@
 namespace wrench {
 
     class ComputeService;
+
     class DataMovementManager;
+
     class JobManager;
+
     class WorkflowTask;
 
     /**
@@ -38,13 +41,24 @@ namespace wrench {
         }
 
         /**
-         * @brief Method that schedules a set of tasks a standard jobs, according to whatever decision algorithm
+         * @brief Schedules a set of tasks a standard jobs, according to whatever decision algorithm
          *        it implements, over a set of compute services
          * @param compute_services: the set of compute services
          * @param tasks: the set of tasks
          */
         virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
-                                   const std::map<std::string, std::vector<WorkflowTask *>> &tasks) = 0;
+                                   const std::vector<WorkflowTask *> &tasks) = 0;
+
+        /**
+         * @brief Schedules a set of clustered tasks a standard jobs, according to whatever decision
+         *        algorithm it implements, over a set of compute services
+         * @param compute_services: the set of compute services
+         * @param tasks: the map of clustered tasks
+         */
+//        virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
+//                                   const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
+//          throw std::runtime_error("StandardJobScheduler::scheduleTasks(): Not implemented yet!");
+//        }
 
         /**
          * @brief Set a reference to the data manager to be used by this scheduler (nullptr: none is used)

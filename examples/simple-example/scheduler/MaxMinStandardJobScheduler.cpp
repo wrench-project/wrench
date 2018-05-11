@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,17 +18,17 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(maxmin_scheduler, "Log category for Max-Min Schedul
 namespace wrench {
 
     /**
-    * @brief: Compare the number of flops between two lists of workflow tasks
+    * @brief: Compare the number of flops between two workflow tasks
     *
     * @param lhs: a pair of a task ID and a list of workflow tasks
     * @param rhs: a pair of a task ID and a list of workflow tasks
      *
     * @return whether the number of flops from the left-hand-side workflow tasks is larger
     */
-    bool MaxMinStandardJobScheduler::MaxMinComparator::operator()(std::pair<std::string, std::vector<WorkflowTask *>> &lhs,
-                                                       std::pair<std::string, std::vector<WorkflowTask *>> &rhs) {
-
-      return Workflow::getSumFlops(lhs.second) > Workflow::getSumFlops(rhs.second);
+    bool
+    MaxMinStandardJobScheduler::MaxMinComparator::operator()(WorkflowTask *&lhs,
+                                                             WorkflowTask *&rhs) {
+      return lhs->getFlops() > rhs->getFlops();
     }
 
     /**
@@ -37,24 +37,23 @@ namespace wrench {
      * @param compute_services: a set of compute services available to run jobs
      * @param tasks: a vector of (ready) workflow tasks
      */
-    void MaxMinStandardJobScheduler::scheduleTasks(
-                                        const std::set<ComputeService *> &compute_services, 
-                                        const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
+    void MaxMinStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
+                                                   const std::vector<WorkflowTask *> &tasks) {
 
       WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());
 
       // Sorting tasks
-      std::vector<std::pair<std::string, std::vector<WorkflowTask *>>> max_vector(tasks.begin(),
-                                                                                  tasks.end());
+      std::vector<WorkflowTask *> max_vector(tasks.begin(),
+                                             tasks.end());
       std::sort(max_vector.begin(), max_vector.end(), MaxMinComparator());
 
-      for (auto itc : max_vector) {
+      for (auto task : max_vector) {
         bool successfully_scheduled = false;
 
         // TODO: add pilot job support
 
         // Second: attempt to run the task on a compute resource
-        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", itc.first.c_str());
+        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", task->getId().c_str());
 
         for (auto cs : compute_services) {
           WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
@@ -68,7 +67,7 @@ namespace wrench {
           unsigned long sum_num_idle_cores;
           try {
             std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
-            sum_num_idle_cores = (unsigned long)std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+            sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
           } catch (WorkflowExecutionException &e) {
             // The service has some problem, forget it
             continue;
@@ -79,8 +78,8 @@ namespace wrench {
             continue;
           }
 
-          WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
-          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
+          WRENCH_INFO("Submitting task %s for execution as a standard job", task->getId().c_str());
+          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(task, {});
           job_manager->submitJob(job, cs);
           successfully_scheduled = true;
           break;

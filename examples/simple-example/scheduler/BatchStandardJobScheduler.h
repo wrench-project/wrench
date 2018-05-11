@@ -28,7 +28,7 @@ namespace wrench {
         /***********************/
 
         void scheduleTasks(const std::set<ComputeService *> &compute_services,
-                           const std::map<std::string, std::vector<WorkflowTask *>> &tasks) override;
+                           const std::vector<WorkflowTask *> &tasks);
 
 
         /***********************/
