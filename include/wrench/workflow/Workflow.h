@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,13 +37,13 @@ namespace wrench {
 
         void removeTask(WorkflowTask *task);
 
-        WorkflowTask *getWorkflowTaskByID(const std::string);
+        WorkflowTask *getWorkflowTaskByID(std::string);
 
-        WorkflowFile *addFile(const std::string, double);
+        WorkflowFile *addFile(std::string, double);
 
-        WorkflowFile *getFileById(const std::string id);
+        WorkflowFile *getFileById(std::string id);
 
-        WorkflowFile *getWorkflowFileByID(const std::string);
+        WorkflowFile *getWorkflowFileByID(std::string);
 
         static double getSumFlops(std::vector<WorkflowTask *> tasks);
 
@@ -62,7 +62,7 @@ namespace wrench {
 
         void exportToEPS(std::string);
 
-        std::map<std::string, WorkflowFile *>getInputFiles();
+        std::map<std::string, WorkflowFile *> getInputFiles();
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -72,12 +72,13 @@ namespace wrench {
 
         std::vector<WorkflowTask *> getTasksInTopLevelRange(unsigned long min, unsigned long max);
 
-        std::map<std::string, std::vector<WorkflowTask *>> getReadyTasks();
+        std::vector<WorkflowTask *> getReadyTasks();
+
+        std::map<std::string, std::vector<WorkflowTask *>> getReadyClusters();
 
         std::vector<WorkflowTask *> getTasks();
 
         std::vector<WorkflowFile *> getFiles();
-
 
         std::vector<WorkflowTask *> getTaskParents(const WorkflowTask *task);
 
@@ -98,16 +99,15 @@ namespace wrench {
 
 //        void updateTaskState(WorkflowTask *task, WorkflowTask::State state);
 
-
         /***********************/
         /** \endcond           */
         /***********************/
 
     private:
-
         friend class WorkflowTask;
 
-        void setNumLevels(unsigned long );
+        void setNumLevels(unsigned long);
+
         std::unique_ptr<lemon::ListDigraph> DAG;  // Lemon DiGraph
         std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>> DAG_node_map;  // Lemon map
 

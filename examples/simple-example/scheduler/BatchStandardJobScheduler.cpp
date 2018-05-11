@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@ namespace wrench {
      * @brief Schedule and run a set of ready tasks on the batch service
      *
      * @param compute_services: a set of compute services available to run jobs
-     * @param ready_tasks: a map of (ready) workflow tasks
+     * @param ready_tasks: a set of (ready) workflow tasks
      *
      * @throw std::runtime_error
      */
     void BatchStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
-                                                  const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
+                                                  const std::vector<WorkflowTask *> &tasks) {
 
       // Check that the right compute_services is passed
       if (compute_services.size() != 1) {
@@ -39,10 +39,10 @@ namespace wrench {
 
       WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());
 
-      for (auto itc : tasks) {
+      for (auto task : tasks) {
         //TODO add support to pilot jobs
 
-        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(itc.second, {});
+        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(task, {});
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
         batch_job_args["-t"] = "2000000"; //time in minutes
@@ -51,6 +51,5 @@ namespace wrench {
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }
-
 
 }
