@@ -88,7 +88,7 @@ namespace wrench {
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
-        std::map<std::string,double> getQueueWaitingTimeEstimate(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
+        std::map<std::string,double> getStartTimeEstimates(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
 
         /***********************/
         /** \endcond          **/
@@ -271,13 +271,13 @@ namespace wrench {
         //vector of network listeners (only useful when ENABLE_BATSCHED == on)
         std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
 
-        std::map<std::string,double> getQueueWaitingTimeEstimateForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
+        std::map<std::string,double> getStartTimeEstimatesForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
 
 #ifdef ENABLE_BATSCHED
 
         void startBatsched();
         void stopBatsched();
-        std::map<std::string,double> getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
+        std::map<std::string,double> getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
 
         void startBatschedNetworkListener();
 

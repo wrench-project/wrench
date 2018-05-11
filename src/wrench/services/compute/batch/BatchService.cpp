@@ -49,33 +49,33 @@ namespace wrench {
 
 
     /**
-     * @brief Retrieve queue wait time estimates for a set of job configurations
+     * @brief Retrievestart time estimates for a set of job configurations
      * @param set_of_jobs: the set of job configurations, each of them with an id. Each configuration
      *         is a tuple as follows:
-     *             - a configurat id (std::string)
+     *             - a configuration id (std::string)
      *             - a number of hosts (unsigned int)
      *             - a number of cores per host (unsigned int)
      *             - a duration in seconds (double)
-     * @return queue wait time predictions in seconds (as a map of ids). A prediction that's negative
+     * @return start date predictions in seconds (as a map of ids). A prediction that's negative
      *         means that the job configuration can not run on the service (e.g., not enough hosts,
      *         not enough cores per host)
      */
     std::map<std::string, double>
-    BatchService::getQueueWaitingTimeEstimate(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
+    BatchService::getStartTimeEstimates(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
 
 #ifdef ENABLE_BATSCHED
       try {
-        return getQueueWaitingTimeEstimateFromBatsched(set_of_jobs);
+        return getStartTimeEstimatesFromBatsched(set_of_jobs);
       } catch (std::runtime_error &e) {
         throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(new FunctionalityNotAvailable(this, "queue wait time prediction")));
       }
 #else
       if ((this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) == "FCFS") and
           (this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM) == "FIRSTFIT")) {
-        return getQueueWaitingTimeEstimateForFCFS(set_of_jobs);
+        return getStartTimeEstimatesForFCFS(set_of_jobs);
       } else {
         throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(
-                new FunctionalityNotAvailable(this, "queue wait time prediction")));
+                new FunctionalityNotAvailable(this, "start time estimates")));
       }
 #endif
     }
@@ -1745,7 +1745,9 @@ namespace wrench {
      * @return a map of queue wait time predictions
      */
     std::map<std::string, double>
-    BatchService::getQueueWaitingTimeEstimateForFCFS(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
+    BatchService::getStartTimeEstimatesForFCFS(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
+
+      // Assumes time origin is zero for simplicity!
 
       // Set the available time of each code to zero (i.e., now)
       // (invariant: for each host, core availabilities are sorted by
@@ -1894,6 +1896,11 @@ namespace wrench {
           earliest_job_start_time = (*(earliest_start_times.begin() + num_hosts - 1)).second;
         }
 
+
+        // Note that below we translate predictions back to actual start dates given the current time
+        if (earliest_job_start_time > 0) {
+          earliest_job_start_time = this->simulation->getCurrentSimulatedDate() + earliest_job_start_time;
+        }
         predictions.insert(std::make_pair(id, earliest_job_start_time));
 
       }
@@ -2049,7 +2056,7 @@ namespace wrench {
 
 
     std::map<std::string, double>
-    BatchService::getQueueWaitingTimeEstimateFromBatsched(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
+    BatchService::getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
           nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
 

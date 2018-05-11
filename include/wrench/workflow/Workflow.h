@@ -59,7 +59,6 @@ namespace wrench {
 
         double getCompletionDate();
 
-
         void exportToEPS(std::string);
 
         std::map<std::string, WorkflowFile *>getInputFiles();

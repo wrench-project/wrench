@@ -48,8 +48,8 @@ namespace wrench {
 
         /**
          * @brief The host selection algorithm (only used if
-         *         ENABLE_BATSCHED is set of off or not set). Can be:
-         *    - FIRSTFIT
+         *         ENABLE_BATSCHED is set to off or not set). Can be:
+         *    - FIRSTFIT  (default)
          *    - BESTFIT
          *    - ROUNDROBIN
          **/
