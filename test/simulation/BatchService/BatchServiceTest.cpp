@@ -44,6 +44,8 @@ public:
 
     void do_BestFitTaskTest_test();
 
+    void do_FirstFitTaskTest_test();
+
     void do_RoundRobinTask_test();
 
     void do_noArgumentsJobSubmissionTest_test();
@@ -1467,6 +1469,13 @@ private:
           }
           num_events++;
         }
+
+        if (task1->getExecutionHost() != task2->getExecutionHost()) {
+          throw std::runtime_error(
+                  "BatchServiceTest::BestFitStandardJobSubmissionTest():: BestFit did not pick the right hosts"
+          );
+        }
+
         workflow->removeTask(task);
         workflow->removeTask(task1);
         workflow->removeTask(task2);
@@ -1476,9 +1485,19 @@ private:
     }
 };
 
+#ifdef ENABLE_BATSCHED
+
 TEST_F(BatchServiceTest, DISABLED_BestFitStandardJobSubmissionTest) {
   DO_TEST_WITH_FORK(do_BestFitTaskTest_test);
 }
+
+#else
+
+TEST_F(BatchServiceTest, BestFitStandardJobSubmissionTest) {
+  DO_TEST_WITH_FORK(do_BestFitTaskTest_test);
+}
+
+#endif
 
 void BatchServiceTest::do_BestFitTaskTest_test() {
 
@@ -1515,6 +1534,181 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
           new BestFitStandardJobSubmissionTestWMS(
+                  this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
+
+  EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
+
+  simulation->add(new wrench::FileRegistryService(hostname));
+
+  // Create two workflow files
+  wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+  wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+  wrench::WorkflowFile *input_file_1 = this->workflow->addFile("input_file_1", 10000.0);
+  wrench::WorkflowFile *output_file_1 = this->workflow->addFile("output_file_1", 20000.0);
+  wrench::WorkflowFile *input_file_2 = this->workflow->addFile("input_file_2", 10000.0);
+  wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file},
+                                          {input_file_1->getId(), input_file_1},
+                                          {input_file_2->getId(), input_file_2}}, storage_service1));
+
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+/**********************************************************************/
+/**  FIRST FIT STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE-ONE HOST                **/
+/**********************************************************************/
+
+class FirstFitStandardJobSubmissionTestWMS : public wrench::WMS {
+
+public:
+    FirstFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
+                                        const std::set<wrench::ComputeService *> &compute_services,
+                                        const std::set<wrench::StorageService *> &storage_services,
+                                        std::string hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      {
+        //In this test, we create 40 tasks, each task uses one core. There are 4 hosts with 10 cores.
+        //So the first 10 tasks should run on first host, next 10 tasks should run on second host,
+        //next 10 tasks should run on third and last 10 tasks should run on fourth host
+        //using first fit host selection scheduling
+
+        int num_tasks = 40;
+        int num_cores_in_each_task = 1;
+        int num_hosts_in_platform = this->simulation->getHostnameList().size();
+        int repetition = num_tasks/(num_cores_in_each_task*num_hosts_in_platform);
+        std::vector<wrench::WorkflowTask*> tasks = {};
+        std::vector<wrench::StandardJob*> jobs = {};
+        for (int i = 0;i<num_tasks;i++) {
+          tasks.push_back(this->workflow->addTask("task"+std::to_string(i),59,num_cores_in_each_task,num_cores_in_each_task,1.0));
+          jobs.push_back(job_manager->createStandardJob(
+                  {tasks[i]}, {}, {}, {}, {}));
+          std::map<std::string, std::string> args;
+          args["-N"] = "1";
+          args["-t"] = "1";
+          args["-c"] = std::to_string(num_cores_in_each_task);
+          try {
+            job_manager->submitJob(jobs[i], this->test->compute_service, args);
+          } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error(
+                    "Got some exception"
+            );
+          }
+        }
+
+
+        //wait for two standard job completion events
+        int num_events = 0;
+        while (num_events < num_tasks) {
+          std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+          try {
+            event = workflow->waitForNextExecutionEvent();
+          } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+          }
+          switch (event->type) {
+            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+              break;
+            }
+            default: {
+              throw std::runtime_error(
+                      "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+            }
+          }
+          num_events++;
+        }
+
+
+        for (int i = 0;i<num_hosts_in_platform;i++) {
+          for (int j = i*repetition;j<(((i+1)*repetition)-1);j++) {
+            if (tasks[j]->getExecutionHost() != tasks[j+1]->getExecutionHost()) {
+              throw std::runtime_error(
+                      "BatchServiceTest::FirstFitStandardJobSubmissionTest():: The tasks did not execute on the right hosts"
+              );
+            }
+          }
+        }
+
+        for (int i = 0;i<num_tasks;i++) {
+          workflow->removeTask(tasks[i]);
+        }
+      }
+
+      return 0;
+    }
+};
+
+#ifdef ENABLE_BATSCHED
+
+TEST_F(BatchServiceTest, DISABLED_FirstFitStandardJobSubmissionTest) {
+  DO_TEST_WITH_FORK(do_FirstFitTaskTest_test);
+}
+
+#else
+
+TEST_F(BatchServiceTest, FirstFitStandardJobSubmissionTest) {
+  DO_TEST_WITH_FORK(do_FirstFitTaskTest_test);
+}
+
+#endif
+
+void BatchServiceTest::do_FirstFitTaskTest_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("batch_service_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service2 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+  // Create a Batch Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true,
+                                   simulation->getHostnameList(),
+                                   storage_service1,
+                                   {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          new FirstFitStandardJobSubmissionTestWMS(
                   this,  {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow( workflow.get()));
