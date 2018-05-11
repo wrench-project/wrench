@@ -57,7 +57,6 @@ protected:
       task3->setClusterId("ID1");
       task4->setClusterId("ID2");
       task5->setClusterId("ID2");
-      task6->setClusterId("ID2");
 
       // Add file-task dependencies
       task1->addInputFile(input_file);
@@ -73,6 +72,8 @@ protected:
       task4->addOutputFile(output_file4);
       task5->addOutputFile(output_file3);
       task6->addOutputFile(output_file4);
+
+      workflow->addControlDependency(task4, task5);
 
       // Create a platform file
       std::string xml = "<?xml version='1.0'?>"
@@ -123,13 +124,13 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
-      if (tasks.size() != 6) {
-        throw std::runtime_error("Should have all tasks ready to run, since there is no dependencies");
+      if (tasks.size() != 5) {
+        throw std::runtime_error("Should have five tasks ready to run, due to dependencies");
       }
 
       std::map<std::string, std::vector<wrench::WorkflowTask *>> clustered_tasks = this->test->workflow->getReadyClusters();
-      if (clustered_tasks.size() != 2) {
-        throw std::runtime_error("Should have only two clusters");
+      if (clustered_tasks.size() != 3) {
+        throw std::runtime_error("Should have exactly three clusters");
       }
 
       for (auto task : tasks) {
