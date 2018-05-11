@@ -69,7 +69,6 @@ protected:
       task5->addInputFile(input_file);
       task6->addInputFile(input_file);
 
-
       task1->addOutputFile(output_file1);
       task2->addOutputFile(output_file2);
       task3->addOutputFile(output_file3);
