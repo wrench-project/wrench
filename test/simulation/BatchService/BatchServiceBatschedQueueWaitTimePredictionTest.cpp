@@ -144,11 +144,11 @@ private:
         std::tuple<std::string,unsigned int,unsigned int, double> my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
 
-        std::map<std::string,double> jobs_estimated_waiting_time;
+        std::map<std::string,double> jobs_estimated_start_times;
 
         bool success = true;
         try {
-          jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+          jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
         } catch (wrench::WorkflowExecutionException &e) {
           success = false;
           if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
@@ -347,24 +347,24 @@ private:
         std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
 
-          std::map<std::string,double> jobs_estimated_waiting_time;
+          std::map<std::string,double> jobs_estimated_start_times;
 //        #ifdef ENABLE_BATSCHED
         try {
-          jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+          jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
         } catch (std::runtime_error &e) {
           throw std::runtime_error("Exception while getting queue waiting time estimate: " + std::string(e.what()));
         }
         double expected_wait_time = 300 - first_job_running;
         double tolerance = 1; // in seconds
-        double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - tolerance));
+        double delta = fabs(expected_wait_time - (jobs_estimated_start_times[job_id] - tolerance));
         if (delta > 1) {
-          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+          throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
 
 //        #else
 //        bool success = true;
 //        try {
-//          jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+//          jobs_estimated_start_times = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
 //        } catch (wrench::WorkflowExecutionException &e) {
 //          success = false;
 //          if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
@@ -561,11 +561,11 @@ private:
         double walltime_seconds = 1000;
         std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,unsigned int,double>> set_of_jobs = {my_job};
-        std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
-        double expected_wait_time = 300 - first_job_running; // in seconds
-        double delta = fabs(expected_wait_time - (jobs_estimated_waiting_time[job_id] - 1));
+        std::map<std::string,double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
+        double expected_start_time = 300 - first_job_running; // in seconds
+        double delta = fabs(expected_start_time - (jobs_estimated_start_times[job_id] - 1));
         if (delta > 1) { // 1 second accuracy threshold
-          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+          throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(expected_start_time) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
 
 
@@ -633,7 +633,7 @@ private:
           std::tuple<std::string, unsigned int, unsigned int, double> my_job = std::make_tuple(job_id, nodes,1, walltime_seconds);
           set_of_jobs.insert(my_job);
         }
-        std::map<std::string, double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(
+        std::map<std::string, double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(
                 set_of_jobs);
 
         // Wait for a workflow execution event
@@ -872,10 +872,10 @@ private:
         double walltime_seconds = 400;
         std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
-        std::map<std::string,double> jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+        std::map<std::string,double> jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-        if ((jobs_estimated_waiting_time[job_id] - 900) > 1) {
-          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+        if ((jobs_estimated_start_times[job_id] - 900) > 1) {
+          throw std::runtime_error("Estimated queue start time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
 
         job_id = "my_job2";
@@ -883,10 +883,10 @@ private:
         walltime_seconds = 299;
         my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
         set_of_jobs = {my_job};
-        jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+        jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-        if (fabs(jobs_estimated_waiting_time[job_id] - 300) > 1) {
-          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+        if (fabs(jobs_estimated_start_times[job_id] - 300) > 1) {
+          throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
 
 
@@ -895,10 +895,10 @@ private:
         walltime_seconds = 299;
         my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
         set_of_jobs = {my_job};
-        jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+        jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-        if (fabs(jobs_estimated_waiting_time[job_id] - 300) > 1) {
-          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+        if (fabs(jobs_estimated_start_times[job_id] - 300) > 1) {
+          throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(300) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
 
 
@@ -907,10 +907,10 @@ private:
         walltime_seconds = 299;
         my_job = std::make_tuple(job_id,nodes,1, walltime_seconds);
         set_of_jobs = {my_job};
-        jobs_estimated_waiting_time = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
+        jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
 
-        if (fabs(jobs_estimated_waiting_time[job_id] - 900) > 1) {
-          throw std::runtime_error("Estimated queue wait time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_waiting_time[job_id]) + ")");
+        if (fabs(jobs_estimated_start_times[job_id] - 900) > 1) {
+          throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(900) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
 
 

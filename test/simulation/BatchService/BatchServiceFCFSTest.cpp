@@ -351,24 +351,24 @@ private:
       // Expectations
       // TODO: COMPUTE THOSE ANALYTICALLY
       std::map<std::string, double> expectations;
-      expectations.insert(std::make_pair("job1", 470));
+      expectations.insert(std::make_pair("job1", 480));
       expectations.insert(std::make_pair("job2", -1));
-      expectations.insert(std::make_pair("job3", 590));
-      expectations.insert(std::make_pair("job4", 470));
-      expectations.insert(std::make_pair("job5", 470));
-      expectations.insert(std::make_pair("job6", 470));
-      expectations.insert(std::make_pair("job7", 590));
-      expectations.insert(std::make_pair("job8", 530));
-      expectations.insert(std::make_pair("job9", 470));
-      expectations.insert(std::make_pair("job10", 530));
+      expectations.insert(std::make_pair("job3", 600));
+      expectations.insert(std::make_pair("job4", 480));
+      expectations.insert(std::make_pair("job5", 480));
+      expectations.insert(std::make_pair("job6", 480));
+      expectations.insert(std::make_pair("job7", 600));
+      expectations.insert(std::make_pair("job8", 540));
+      expectations.insert(std::make_pair("job9", 480));
+      expectations.insert(std::make_pair("job10", 480));
 
-      std::map<std::string,double> jobs_estimated_waiting_time =
-              ((wrench::BatchService *)this->test->compute_service)->getQueueWaitingTimeEstimate(set_of_jobs);
+      std::map<std::string,double> jobs_estimated_start_times =
+              ((wrench::BatchService *)this->test->compute_service)->getStartTimeEstimates(set_of_jobs);
 
       for (auto job : set_of_jobs) {
         std::string id = std::get<0>(job);
-        double estimated = jobs_estimated_waiting_time[id];
-        double expected = jobs_estimated_waiting_time[id];
+        double estimated = jobs_estimated_start_times[id];
+        double expected = expectations[id];
         if (fabs(estimated - expected) > 1.0) {
           throw std::runtime_error("invalid prediction for job '" + id + "': got " +
                                    std::to_string(estimated) + " but expected is " + std::to_string(expected));
