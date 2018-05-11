@@ -40,3 +40,11 @@ else()
     target_link_libraries(wrench-simple-example-batch wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
 endif()
 install(TARGETS wrench-simple-example-batch DESTINATION bin)
+
+add_custom_command(TARGET wrench-simple-example-cloud POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/examples/simple-example/platform_files $<TARGET_FILE_DIR:wrench-simple-example-cloud>/platform_files)
+
+add_custom_command(TARGET wrench-simple-example-cloud POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/examples/simple-example/workflow_files $<TARGET_FILE_DIR:wrench-simple-example-cloud>/workflow_files)
