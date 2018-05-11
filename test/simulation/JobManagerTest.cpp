@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,9 @@ public:
     wrench::Simulation *simulation;
 
     void do_JobManagerConstructorTest_test();
+
     void do_JobManagerCreateJobTest_test();
+
     void do_JobManagerSubmitJobTest_test();
 
 
@@ -40,22 +42,22 @@ protected:
       workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
       std::string xml = "<?xml version='1.0'?>"
-              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-              "<platform version=\"4.1\"> "
-              "   <zone id=\"AS0\" routing=\"Full\"> "
-              "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-              "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-              "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-              "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
-              "         <prop id=\"ram\" value=\"1024\"/> "
-              "       </host>  "
-              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-              "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
-              "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
-              "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
-              "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
-              "   </zone> "
-              "</platform>";
+                        "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                        "<platform version=\"4.1\"> "
+                        "   <zone id=\"AS0\" routing=\"Full\"> "
+                        "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
+                        "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
+                        "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
+                        "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
+                        "         <prop id=\"ram\" value=\"1024\"/> "
+                        "       </host>  "
+                        "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                        "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
+                        "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
+                        "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+                        "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
+                        "   </zone> "
+                        "</platform>";
       // Create a four-host 10-core platform file
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
@@ -73,16 +75,16 @@ protected:
 /**  DO CONSTRUCTOR TEST                                             **/
 /**********************************************************************/
 
-class BogusStandardJobScheduler: public wrench::StandardJobScheduler {
+class BogusStandardJobScheduler : public wrench::StandardJobScheduler {
     void scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,
-                       const std::map<std::string, std::vector<wrench::WorkflowTask *>> &tasks) override;
+                       const std::vector<wrench::WorkflowTask *> &tasks);
 
 };
 
 void BogusStandardJobScheduler::scheduleTasks(const std::set<wrench::ComputeService *> &compute_services,
-                                              const std::map<std::string, std::vector<wrench::WorkflowTask *>> &tasks) {}
+                                              const std::vector<wrench::WorkflowTask *> &tasks) {}
 
-class BogusPilotJobScheduler: public wrench::PilotJobScheduler {
+class BogusPilotJobScheduler : public wrench::PilotJobScheduler {
     void schedulePilotJobs(const std::set<wrench::ComputeService *> &compute_services) override;
 };
 
@@ -161,7 +163,7 @@ class JobManagerCreateJobTestWMS : public wrench::WMS {
 
 public:
     JobManagerCreateJobTestWMS(JobManagerTest *test,
-                                 std::string hostname) :
+                               std::string hostname) :
             wrench::WMS(nullptr, nullptr,
                         {}, {}, {}, nullptr, hostname, "test") {
       this->test = test;
@@ -182,7 +184,7 @@ private:
 
       success = true;
       try {
-        job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>){nullptr}, {});
+        job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr}, {});
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -240,7 +242,7 @@ private:
       // Create a "not ok" job
       success = true;
       try {
-        job_manager->createStandardJob((std::vector<wrench::WorkflowTask*>){t2}, {});
+        job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {t2}, {});
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -317,7 +319,7 @@ private:
 
       success = true;
       try {
-        job_manager->submitJob(nullptr, (wrench::ComputeService *)(1234), {});
+        job_manager->submitJob(nullptr, (wrench::ComputeService *) (1234), {});
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -327,7 +329,7 @@ private:
 
       success = true;
       try {
-        job_manager->submitJob((wrench::WorkflowJob *)(1234), nullptr, {});
+        job_manager->submitJob((wrench::WorkflowJob *) (1234), nullptr, {});
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -354,8 +356,6 @@ private:
       if (success) {
         throw std::runtime_error("Should not be able to forget a nullptr job");
       }
-
-
 
 
       return 0;

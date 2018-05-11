@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -146,7 +146,6 @@ namespace wrench {
     }
 
 
-
     /**
      * @brief Add a new file to the workflow
      *
@@ -217,17 +216,16 @@ namespace wrench {
      */
     unsigned long Workflow::getNumberOfTasks() {
       return this->tasks.size();
-
     }
 
     /**
- * @brief Determine whether one source is an ancestor of a destination task
- *
- * @param src: the soure workflow task
- * @param dst: the destination task
- *
- * @return true if there is a path from src to dst, false otherwise
- */
+     * @brief Determine whether one source is an ancestor of a destination task
+     *
+     * @param src: the soure workflow task
+     * @param dst: the destination task
+     *
+     * @return true if there is a path from src to dst, false otherwise
+     */
     bool Workflow::pathExists(WorkflowTask *src, WorkflowTask *dst) {
       lemon::Bfs<lemon::ListDigraph> bfs(*DAG);
 
@@ -247,12 +245,31 @@ namespace wrench {
     };
 
     /**
-     * @brief Get a vector of the ready tasks
+     * @brief Get a vector of ready tasks
      *
      * @return vector of workflow tasks
      */
+    std::vector<WorkflowTask *> Workflow::getReadyTasks() {
+
+      std::vector<WorkflowTask *> tasks_list;
+
+      for (auto &it : this->tasks) {
+        WorkflowTask *task = it.second.get();
+
+        if (task->getState() == WorkflowTask::State::READY) {
+          tasks_list.push_back(task);
+        }
+      }
+      return tasks_list;
+    }
+
+    /**
+     * @brief Get a map of clusters composed of ready tasks
+     *
+     * @return map of workflow cluster tasks
+     */
     // TODO: Implement this more efficiently
-    std::map<std::string, std::vector<WorkflowTask *>> Workflow::getReadyTasks() {
+    std::map<std::string, std::vector<WorkflowTask *>> Workflow::getReadyClusters() {
 
       std::map<std::string, std::vector<WorkflowTask *>> task_map;
 
@@ -494,8 +511,6 @@ namespace wrench {
     }
 
 
-
-
     /**
      * @brief Create a workflow based on a DAX file
      *
@@ -696,7 +711,7 @@ namespace wrench {
     std::vector<WorkflowTask *> Workflow::getTasksInTopLevelRange(unsigned long min, unsigned long max) {
       std::vector<WorkflowTask *> to_return;
       for (auto t : this->getTasks()) {
-        if ((t->getTopLevel() >= min)  and (t->getTopLevel() <= max)) {
+        if ((t->getTopLevel() >= min) and (t->getTopLevel() <= max)) {
           to_return.push_back(t);
         }
       }
@@ -728,7 +743,8 @@ namespace wrench {
     double Workflow::getCompletionDate() {
       double makespan = -1.0;
       // Get te last level
-      std::vector<WorkflowTask *> last_tasks = this->getTasksInTopLevelRange(this->getNumLevels()-1, this->getNumLevels()-1);
+      std::vector<WorkflowTask *> last_tasks = this->getTasksInTopLevelRange(this->getNumLevels() - 1,
+                                                                             this->getNumLevels() - 1);
       for (auto task : last_tasks) {
         if (task->getState() != WorkflowTask::State::COMPLETED) {
           makespan = -1.0;
@@ -739,6 +755,5 @@ namespace wrench {
       }
       return makespan;
     }
-
 
 };
