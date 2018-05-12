@@ -105,10 +105,10 @@ namespace wrench{
      */
     class BatchQueryAnswerMessage : public BatchServiceMessage {
     public:
-        BatchQueryAnswerMessage(double batsched_job_estimated_time, double payload);
+        BatchQueryAnswerMessage(double batsched_job_estimated_start_time, double payload);
 
-        /** @brief The estimated time to run the job done by batsched */
-        double estimated_waiting_time;
+        /** @brief The estimated job start time */
+        double estimated_start_time;
     };
 
 //    /**

@@ -120,14 +120,20 @@ namespace wrench {
         std::abort();
       }
 
-      if (daemonized) {
-        this->s4u_actor->daemonize();
-      }
-      this->s4u_actor->onExit(daemon_goodbye, (void *) (this));
+      // This test here is critical. It's possible that the created actor above returns
+      // right away, in which case calling daemonize() on it cases the calling actor to
+      // terminate immediately. This is a weird simgrid::s4u behavior/bug, that may be
+      // fixed at some point, but this test saves us for now.
+      if (not this->terminated) {
+        if (daemonized) {
+          this->s4u_actor->daemonize();
+        }
+        this->s4u_actor->onExit(daemon_goodbye, (void *) (this));
 
-      // Set the mailbox_name receiver
-      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
-      mailbox->setReceiver(this->s4u_actor);
+        // Set the mailbox_name receiver
+        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
+        mailbox->setReceiver(this->s4u_actor);
+      }
     }
 
     /**

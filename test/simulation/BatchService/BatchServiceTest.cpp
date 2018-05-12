@@ -149,7 +149,7 @@ private:
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -476,7 +476,7 @@ private:
           job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception " + std::string(e.what())
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -638,7 +638,7 @@ private:
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
         // Wait for a workflow execution event
@@ -674,7 +674,7 @@ private:
           job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception " + std::string(e.what())
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1097,7 +1097,7 @@ private:
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1226,7 +1226,7 @@ private:
           job_manager->submitJob((wrench::WorkflowJob *) pilot_job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception " + std::string(e.what())
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1392,7 +1392,7 @@ private:
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1417,7 +1417,7 @@ private:
           job_manager->submitJob(job1, this->test->compute_service, task1_batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1442,7 +1442,7 @@ private:
           job_manager->submitJob(job2, this->test->compute_service, task2_batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1603,7 +1603,7 @@ private:
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1615,7 +1615,7 @@ private:
           job_manager->submitJob(job2, this->test->compute_service, task2_batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1627,7 +1627,7 @@ private:
           job_manager->submitJob(job3, this->test->compute_service, task3_batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1639,7 +1639,7 @@ private:
           job_manager->submitJob(job4, this->test->compute_service, task4_batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -1708,7 +1708,7 @@ private:
             job_manager->submitJob(jobs[i], this->test->compute_service, args);
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(
-                    "Got some exception"
+                    "Exception: " + std::string(e.what())
             );
           }
         }
@@ -1914,7 +1914,7 @@ private:
           job_manager->submitJob(job, pilot_job->getComputeService(), standard_batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -2107,7 +2107,7 @@ private:
           job_manager->submitJob(job, pilot_job->getComputeService(), standard_batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
@@ -2421,7 +2421,7 @@ private:
             job_manager->submitJob(standard_jobs, this->test->compute_service, batch_job_args);
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(
-                    "Got some exception"
+                    "Exception: " + std::string(e.what())
             );
           }
         }
@@ -2574,7 +2574,7 @@ private:
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
-                  "Got some exception"
+                  "Exception: " + std::string(e.what())
           );
         }
 
