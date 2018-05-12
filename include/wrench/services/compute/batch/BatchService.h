@@ -68,7 +68,7 @@ namespace wrench {
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
                  {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
                 #else
-                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "FCFS"},
+                        {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "FCFS"},
                 #endif
                  {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
                  {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""}
@@ -193,10 +193,6 @@ namespace wrench {
 #endif
 
 
-        pid_t pid;
-
-        //Is sched ready?
-        bool is_bat_sched_ready;
 
         unsigned long generateUniqueJobId();
 
@@ -264,7 +260,7 @@ namespace wrench {
 
         //start a job
         void startJob(std::set<std::tuple<std::string, unsigned long, double>>, WorkflowJob *,
-                              BatchJob *, unsigned long, double, unsigned long);
+                      BatchJob *, unsigned long, double, unsigned long);
 
 
 
@@ -275,8 +271,17 @@ namespace wrench {
 
 #ifdef ENABLE_BATSCHED
 
+        friend class BatschedNetworkListener;
+
+        pid_t pid;
+
+        bool is_bat_sched_ready;
+
         void startBatsched();
         void stopBatsched();
+        void setBatschedReady(bool v);
+        bool isBatschedReady();
+
         std::map<std::string,double> getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
 
         void startBatschedNetworkListener();

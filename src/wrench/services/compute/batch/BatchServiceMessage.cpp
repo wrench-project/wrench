@@ -92,9 +92,9 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_waiting_time, double payload)
+    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double batsched_job_estimated_start_time, double payload)
             : BatchServiceMessage("BATCH_QUERY_ANSWER", payload) {
-      this->estimated_waiting_time = estimated_waiting_time;
+      this->estimated_start_time = batsched_job_estimated_start_time;
     }
 
     /**

@@ -64,9 +64,9 @@ namespace wrench {
     BatchService::getStartTimeEstimates(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
 
 #ifdef ENABLE_BATSCHED
-      try {
+      if (this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) == "conservative_bf") {
         return getStartTimeEstimatesFromBatsched(set_of_jobs);
-      } catch (std::runtime_error &e) {
+      } else {
         throw WorkflowExecutionException(std::shared_ptr<FunctionalityNotAvailable>(new FunctionalityNotAvailable(this, "queue wait time prediction")));
       }
 #else
@@ -513,7 +513,7 @@ namespace wrench {
 //        }
 
 #ifdef ENABLE_BATSCHED
-        if (keep_going && is_bat_sched_ready) {
+        if (keep_going && this->isBatschedReady()) {
           this->sendAllQueuedJobsToBatsched();
         }
 #else
@@ -620,9 +620,7 @@ namespace wrench {
 
       for (it = this->running_standard_job_executors.begin(); it != this->running_standard_job_executors.end(); it++) {
         if (((*it).get())->getJob() == job) {
-          WRENCH_INFO("CALLING KILL");
           ((*it).get())->kill();
-          WRENCH_INFO("CALLED KILL");
           // Make failed tasks ready again
           for (auto task : job->tasks) {
             switch (task->getInternalState()) {
@@ -762,19 +760,19 @@ namespace wrench {
         int cur_host_idx = round_robin_host_selector_idx;
         int host_count = 0;
         do {
-            cur_host_idx = (cur_host_idx + 1) % available_nodes_to_cores.size();
-            std::vector<std::string>::iterator it = this->compute_hosts.begin();
-            it = it + cur_host_idx;
-            std::string cur_host_name = *it;
-            unsigned long num_available_cores = available_nodes_to_cores[cur_host_name];
-            if (num_available_cores >= cores_per_node) {
-              available_nodes_to_cores[cur_host_name] -= cores_per_node;
-              hosts_assigned.push_back(cur_host_name);
-              resources.insert(std::make_tuple(cur_host_name, cores_per_node, ram_per_node));
-              if (++host_count >= num_nodes) {
-                break;
-              }
+          cur_host_idx = (cur_host_idx + 1) % available_nodes_to_cores.size();
+          std::vector<std::string>::iterator it = this->compute_hosts.begin();
+          it = it + cur_host_idx;
+          std::string cur_host_name = *it;
+          unsigned long num_available_cores = available_nodes_to_cores[cur_host_name];
+          if (num_available_cores >= cores_per_node) {
+            available_nodes_to_cores[cur_host_name] -= cores_per_node;
+            hosts_assigned.push_back(cur_host_name);
+            resources.insert(std::make_tuple(cur_host_name, cores_per_node, ram_per_node));
+            if (++host_count >= num_nodes) {
+              break;
             }
+          }
         } while (cur_host_idx != round_robin_host_selector_idx);
         if (resources.size() < num_nodes) {
           resources = {};
@@ -1084,9 +1082,9 @@ namespace wrench {
         }
 
 #ifdef ENABLE_BATSCHED
-        } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
-        is_bat_sched_ready = true;
-        return true;
+//      } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
+//        is_bat_sched_ready = true;
+//        return true;
 
       } else if (auto msg = dynamic_cast<BatchExecuteJobFromBatSchedMessage *>(message.get())) {
         processExecuteJobFromBatSched(msg->batsched_decision_reply);
@@ -1962,12 +1960,12 @@ namespace wrench {
       } else if (top_pid > 0) {
         // parent process
         sleep(1); // Wait one second to let batsched the time to start (this is pretty ugly)
-        int exit_code = 0; 
+        int exit_code = 0;
         int status = waitpid(top_pid, &exit_code, WNOHANG);
         if (status == 0) {
-                   exit_code = 0;
+          exit_code = 0;
         } else {
-           exit_code = WIFEXITED(exit_code);
+          exit_code = WIFEXITED(exit_code);
         }
         switch (exit_code) {
           case 0: {
@@ -2027,7 +2025,7 @@ namespace wrench {
      * @brief: Stop the batsched process
      */
     void BatchService::stopBatsched() {
-       // Stop Batsched
+      // Stop Batsched
       zmq::context_t context(1);
       zmq::socket_t socket(context, ZMQ_REQ);
       socket.connect("tcp://localhost:" + std::to_string(this->batsched_port));
@@ -2057,8 +2055,13 @@ namespace wrench {
 
     std::map<std::string, double>
     BatchService::getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs) {
-          nlohmann::json batch_submission_data;
+      nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
+
+      if (not this->isBatschedReady()) {
+        throw std::runtime_error("BatchService::getStartTimeEstimatesFromBatsched(): "
+                                         "BATSCHED is not ready, which should not happen");
+      }
 
       // TODO: THIS IGNORES THE NUMBER OF CORES (IS THIS A LIMITATION OF BATSCHED?)
 
@@ -2076,21 +2079,20 @@ namespace wrench {
                 job);
       }
 
+      std::string data = batch_submission_data.dump();
 
       std::string batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailboxName("batchsched_query_mailbox");
-      std::string data = batch_submission_data.dump();
+
       std::shared_ptr<BatschedNetworkListener> network_listener =
-              std::unique_ptr<BatschedNetworkListener>(new BatschedNetworkListener(this->hostname, batchsched_query_mailbox,
-                                                                             std::to_string(this->batsched_port),
-                                                                             BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
-                                                                             data));
+              std::unique_ptr<BatschedNetworkListener>(new BatschedNetworkListener(this->hostname, this, batchsched_query_mailbox,
+                                                                                   std::to_string(this->batsched_port),
+                                                                                   BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                                                   data));
       network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
       network_listeners.push_back(std::move(network_listener));
-      this->is_bat_sched_ready = false;
 
-
-      std::map<std::string, double> jobs_estimated_waiting_time = {};
+      std::map<std::string, double> job_estimated_start_times= {};
       for (auto job : set_of_jobs) {
         // Get the answer
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -2100,28 +2102,35 @@ namespace wrench {
           throw WorkflowExecutionException(cause);
         }
 
+
         if (auto *msg = dynamic_cast<BatchQueryAnswerMessage *>(message.get())) {
-          jobs_estimated_waiting_time[std::get<0>(job)] = msg->estimated_waiting_time;
+          job_estimated_start_times[std::get<0>(job)] = msg->estimated_start_time;
         } else {
           throw std::runtime_error(
                   "BatchService::getQueueWaitingTimeEstimate(): Received an unexpected [" + message->getName() +
                   "] message.\nThis likely means that the scheduling algorithm that Batsched was configured to use (" +
-                   this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
-                   ") does not support queue waiting time predictions!");
+                  this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM) +
+                  ") does not support queue waiting time predictions!");
         }
       }
-      return jobs_estimated_waiting_time;
+      return job_estimated_start_times;
     }
 
-      /**
-     * @brief Notify a job even to BATSCHED (BATSCHED ONLY)
-     * @param job_id
-     * @param status
-     * @param job_state
-     * @param kill_reason
-     */
+    /**
+   * @brief Notify a job even to BATSCHED (BATSCHED ONLY)
+   * @param job_id
+   * @param status
+   * @param job_state
+   * @param kill_reason
+   */
     void BatchService::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                                  std::string kill_reason) {
+
+      if (not this->isBatschedReady()) {
+        throw std::runtime_error("BatchService::notifyJobEventsToBatSched(): "
+                                         "BATSCHED is not ready, which should not happen");
+      }
+
       nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
       batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
@@ -2133,10 +2142,10 @@ namespace wrench {
 
       std::string data = batch_submission_data.dump();
       std::shared_ptr<BatschedNetworkListener> network_listener =
-              std::shared_ptr<BatschedNetworkListener>(new BatschedNetworkListener(this->hostname, this->mailbox_name,
-                                                                             std::to_string(this->batsched_port),
-                                                                             BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
-                                                                             data));
+              std::shared_ptr<BatschedNetworkListener>(new BatschedNetworkListener(this->hostname, this, this->mailbox_name,
+                                                                                   std::to_string(this->batsched_port),
+                                                                                   BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                                                   data));
       network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
       network_listeners.push_back(network_listener);
@@ -2167,10 +2176,10 @@ namespace wrench {
 
       try {
         std::shared_ptr<BatschedNetworkListener> network_listener =
-                std::shared_ptr<BatschedNetworkListener>(new BatschedNetworkListener(this->hostname, this->mailbox_name,
-                                                                               std::to_string(this->batsched_port),
-                                                                               BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
-                                                                               data));
+                std::shared_ptr<BatschedNetworkListener>(new BatschedNetworkListener(this->hostname, this, this->mailbox_name,
+                                                                                     std::to_string(this->batsched_port),
+                                                                                     BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                                                     data));
         network_listener->simulation = this->simulation;
         network_listener->start(network_listener, true);
         this->network_listeners.push_back(std::move(network_listener));
@@ -2179,7 +2188,7 @@ namespace wrench {
       }
     }
 
-   void BatchService::sendAllQueuedJobsToBatsched() {
+    void BatchService::sendAllQueuedJobsToBatsched() {
       if (this->pending_jobs.empty()) {
         return;
       }
@@ -2210,20 +2219,17 @@ namespace wrench {
         batch_submission_data["events"][i]["data"]["job"]["walltime"] = allocated_time;
         this->pending_jobs.erase(it);
         this->waiting_jobs.insert(*it);
-//        PointerUtil::moveUniquePtrFromDequeToSet(it, &(this->pending_jobs),
-//                                                 &(this->waiting_jobs));
 
       }
       std::string data = batch_submission_data.dump();
       std::shared_ptr<BatschedNetworkListener> network_listener =
-              std::unique_ptr<BatschedNetworkListener>(new BatschedNetworkListener(this->hostname, this->mailbox_name,
-                                                                             std::to_string(this->batsched_port),
-                                                                             BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
-                                                                             data));
+              std::unique_ptr<BatschedNetworkListener>(new BatschedNetworkListener(this->hostname, this, this->mailbox_name,
+                                                                                   std::to_string(this->batsched_port),
+                                                                                   BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                                                   data));
       network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
       network_listeners.push_back(std::move(network_listener));
-      this->is_bat_sched_ready = false;
 
     }
 
@@ -2292,6 +2298,15 @@ namespace wrench {
       startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_minutes,
                cores_per_node_asked_for);
 
+    }
+
+
+    void BatchService::setBatschedReady(bool v) {
+      this->is_bat_sched_ready = v;
+    }
+
+    bool BatchService::isBatschedReady() {
+      return this->is_bat_sched_ready;
     }
 
 #endif  // ENABLE_BATSCHED
