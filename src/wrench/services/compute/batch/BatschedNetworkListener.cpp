@@ -31,6 +31,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
+    * @param batch_service: the batch service
     * @param batch_service_mailbox: the name of the mailbox of the batch_service
     * @param sched_port the port to send messages to Batsched
     * @param MY_TYPE: the type of this listener
@@ -49,6 +50,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
+    * @param batch_service: the batch service
     * @param batch_service_mailbox: the name of the mailbox of the batch_service
     * @param sched_port the port to send messages to Batsched
     * @param MY_TYPE: the type of this listener

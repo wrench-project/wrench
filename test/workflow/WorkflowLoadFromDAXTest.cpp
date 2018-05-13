@@ -343,6 +343,14 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
   ASSERT_EQ(workflow->getWorkflowTaskByID("ID00000")->getMinNumCores(), 1);
   ASSERT_EQ(workflow->getWorkflowTaskByID("ID00000")->getMaxNumCores(), 3);
 
+  ASSERT_EQ(workflow->getNumLevels(), 8);
+  ASSERT_EQ(workflow->getTasksInTopLevelRange(0,0).size(), 1);
+  ASSERT_EQ(workflow->getTasksInTopLevelRange(1,1).size(), 8);
+  ASSERT_EQ(workflow->getTasksInTopLevelRange(2,2).size(), 8);
+  ASSERT_EQ(workflow->getTasksInTopLevelRange(0,2).size(), 17);
+  ASSERT_EQ(workflow->getTasksInTopLevelRange(5,7).size(), 3);
+
+  ASSERT_LT(workflow->getCompletionDate(), 0.0);
 
 }
 
