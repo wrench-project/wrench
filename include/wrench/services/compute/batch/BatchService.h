@@ -275,12 +275,12 @@ namespace wrench {
 
         pid_t pid;
 
-        bool is_bat_sched_ready;
+//        bool is_bat_sched_ready;
 
         void startBatsched();
         void stopBatsched();
-        void setBatschedReady(bool v);
-        bool isBatschedReady();
+//        void setBatschedReady(bool v);
+//        bool isBatschedReady();
 
         std::map<std::string,double> getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
 

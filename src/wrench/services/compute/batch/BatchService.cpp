@@ -229,6 +229,7 @@ namespace wrench {
 
 #ifdef ENABLE_BATSCHED
       this->startBatsched();
+//      this->setBatschedReady(true);
 #else
       if (this->scheduling_algorithms.find(this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM))
           == this->scheduling_algorithms.end()) {
@@ -490,30 +491,9 @@ namespace wrench {
       while (keep_going) {
         keep_going = processNextMessage();
 
-        // Process running jobs
-        // TODO: Why do we have to check this? Do we set alarms to do this and we just react to them?
-        // TODO: For now, commented out, perhaps useful? We'll see when we add more tests
-//        std::set<std::unique_ptr<BatchJob>>::iterator it;
-//        for (it = this->running_jobs.begin(); it != this->running_jobs.end();) {
-//          if ((*it)->getEndingTimeStamp() <= S4U_Simulation::getClock()) {
-//            if ((*it)->getWorkflowJob()->getType() == WorkflowJob::STANDARD) {
-//              this->processStandardJobTimeout(
-//                      (StandardJob *) (*it)->getWorkflowJob());
-//              this->freeUpResources((*it)->getResourcesAllocated());
-//              it = this->running_jobs.erase(it);
-//            } else if ((*it)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-//            } else {
-//              throw std::runtime_error(
-//                      "BatchService::main(): Running a job of type other than Standard and Pilot jobs - Fatal error"
-//              );
-//            }
-//          } else {
-//            ++it;
-//          }
-//        }
-
 #ifdef ENABLE_BATSCHED
-        if (keep_going && this->isBatschedReady()) {
+//        if (keep_going && this->isBatschedReady()) {
+        if (keep_going) {
           this->sendAllQueuedJobsToBatsched();
         }
 #else
@@ -572,7 +552,10 @@ namespace wrench {
 
     /**
      * @brief Increase resource availabilities based on freed resources
-     * @param resources
+     * @param resources: a set of tuples as follows:
+     *              - hostname (string)
+     *              - number of cores (unsigned long)
+     *              - bytes of RAM (double)
      */
     void BatchService::freeUpResources(std::set<std::tuple<std::string, unsigned long, double>> resources) {
       for (auto r : resources) {
@@ -580,7 +563,10 @@ namespace wrench {
       }
     }
 
-
+    /**
+     * @brief ...
+     * @param job
+     */
     void BatchService::removeJobFromRunningList(BatchJob *job) {
       if (this->running_jobs.find(job) == this->running_jobs.end()) {
         throw std::runtime_error("BatchService::removeJobFromRunningList(): Cannot find job!");
@@ -756,12 +742,12 @@ namespace wrench {
           resources.insert(std::make_tuple(target_host, cores_per_node, ComputeService::ALL_RAM));
         }
       } else if (host_selection_algorithm == "ROUNDROBIN") {
-        static int round_robin_host_selector_idx = 0;
-        int cur_host_idx = round_robin_host_selector_idx;
+        static unsigned long round_robin_host_selector_idx = 0;
+        unsigned long cur_host_idx = round_robin_host_selector_idx;
         int host_count = 0;
         do {
           cur_host_idx = (cur_host_idx + 1) % available_nodes_to_cores.size();
-          std::vector<std::string>::iterator it = this->compute_hosts.begin();
+          auto it = this->compute_hosts.begin();
           it = it + cur_host_idx;
           std::string cur_host_name = *it;
           unsigned long num_available_cores = available_nodes_to_cores[cur_host_name];
@@ -833,7 +819,7 @@ namespace wrench {
 //                  (unsigned long)batch_job,
 //                  workflow_job->getName().c_str());
 
-      //Try to schedule hosts based on FIRSTFIT OR BESTFIT
+      //Try to schedule hosts based on host selection algorithm
       // Asking for the FULL RAM (TODO: Change this?)
       std::set<std::tuple<std::string, unsigned long, double>> resources = this->scheduleOnHosts(
               this->getPropertyValueAsString(BatchServiceProperty::HOST_SELECTION_ALGORITHM),
@@ -2046,10 +2032,17 @@ namespace wrench {
       zmq::message_t reply;
       socket.recv(&reply);
 
-      // TODO: Is this below useful?
+      // Process the reply
       std::string reply_data;
       reply_data = std::string(static_cast<char *>(reply.data()), reply.size());
 
+      nlohmann::json reply_decisions;
+      nlohmann::json decision_events;
+      reply_decisions = nlohmann::json::parse(reply_data);
+      decision_events = reply_decisions["events"];
+      if (decision_events.size() > 0) {
+        throw std::runtime_error("BatchService::stopBatsched(): Upon termination BATSCHED returned a non-empty event set, which is unexpected");
+      }
     }
 
 
@@ -2058,10 +2051,10 @@ namespace wrench {
       nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
 
-      if (not this->isBatschedReady()) {
-        throw std::runtime_error("BatchService::getStartTimeEstimatesFromBatsched(): "
-                                         "BATSCHED is not ready, which should not happen");
-      }
+//      if (not this->isBatschedReady()) {
+//        throw std::runtime_error("BatchService::getStartTimeEstimatesFromBatsched(): "
+//                                         "BATSCHED is not ready, which should not happen");
+//      }
 
       // TODO: THIS IGNORES THE NUMBER OF CORES (IS THIS A LIMITATION OF BATSCHED?)
 
@@ -2126,10 +2119,10 @@ namespace wrench {
     void BatchService::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                                  std::string kill_reason) {
 
-      if (not this->isBatschedReady()) {
-        throw std::runtime_error("BatchService::notifyJobEventsToBatSched(): "
-                                         "BATSCHED is not ready, which should not happen");
-      }
+//      if (not this->isBatschedReady()) {
+//        throw std::runtime_error("BatchService::notifyJobEventsToBatSched(): "
+//                                         "BATSCHED is not ready, which should not happen");
+//      }
 
       nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
@@ -2186,6 +2179,7 @@ namespace wrench {
       } catch (std::runtime_error &e) {
         throw;
       }
+
     }
 
     void BatchService::sendAllQueuedJobsToBatsched() {
@@ -2301,13 +2295,13 @@ namespace wrench {
     }
 
 
-    void BatchService::setBatschedReady(bool v) {
-      this->is_bat_sched_ready = v;
-    }
-
-    bool BatchService::isBatschedReady() {
-      return this->is_bat_sched_ready;
-    }
+//    void BatchService::setBatschedReady(bool v) {
+//      this->is_bat_sched_ready = v;
+//    }
+//
+//    bool BatchService::isBatschedReady() {
+//      return this->is_bat_sched_ready;
+//    }
 
 #endif  // ENABLE_BATSCHED
 
