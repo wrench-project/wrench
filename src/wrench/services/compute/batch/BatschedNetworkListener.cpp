@@ -158,8 +158,11 @@ namespace wrench {
     void BatschedNetworkListener::send_receive() {
       #ifdef ENABLE_BATSCHED
 
+//      if (not this->batch_service->isBatschedReady()) {
+//        throw std::runtime_error("BatschedNetworkListener::send_receive(): Batsched is not ready, which shouldn't happen");
+//      }0
 
-      this->batch_service->setBatschedReady(false);
+//      this->batch_service->setBatschedReady(false);
       zmq::context_t context(1);
       zmq::socket_t socket(context, ZMQ_REQ);
       socket.connect("tcp://localhost:" + this->sched_port);
@@ -172,7 +175,7 @@ namespace wrench {
       zmq::message_t reply;
       socket.recv(&reply);
 
-      this->batch_service->setBatschedReady(true);
+//      this->batch_service->setBatschedReady(true);
 
 
 //      try {
