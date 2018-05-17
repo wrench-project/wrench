@@ -44,13 +44,15 @@ namespace wrench {
         WorkunitExecutorDoneMessage(
                 WorkunitMulticoreExecutor *workunit_executor,
                 Workunit *workunit,
+                std::set<WorkflowFile*> files_in_scratch,
                 double payload);
 
         /** @brief The worker thread that performed the work */
         WorkunitMulticoreExecutor *workunit_executor;
         /** @brief The work that was performed */
         Workunit *workunit;
-
+        /** @brief The set of files stored in scratch space by this work unit executor */
+        std::set<WorkflowFile*> files_in_scratch;
     };
 
     /**
@@ -61,6 +63,7 @@ namespace wrench {
         WorkunitExecutorFailedMessage(
                 WorkunitMulticoreExecutor *workunit_executor,
                 Workunit *workunit,
+                std::set<WorkflowFile*> files_in_scratch,
                 std::shared_ptr<FailureCause> cause,
                 double payload);
 
@@ -70,6 +73,8 @@ namespace wrench {
         Workunit *workunit;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
+        /** @brief The set of files stored in scratch space by this work unit executor */
+        std::set<WorkflowFile*> files_in_scratch;
     };
 
 
@@ -108,6 +113,18 @@ namespace wrench {
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
 
+    };
+
+    /**
+     * @brief FilesInScratchMessageByStandardJobExecutor class
+     */
+    class FilesInScratchMessageByStandardJobExecutor : public StandardJobExecutorMessage {
+    public:
+        FilesInScratchMessageByStandardJobExecutor(
+                std::set<WorkflowFile*> scratch_files,
+                double payload);
+        /** @brief The set of files stored in scratch because of the execution of a standardjob */
+        std::set<WorkflowFile*> scratch_files;
     };
 
     /**

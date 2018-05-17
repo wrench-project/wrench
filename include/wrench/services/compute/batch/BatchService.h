@@ -80,10 +80,12 @@ namespace wrench {
                      bool supports_pilot_jobs,
                      std::vector<std::string> compute_hosts,
                      StorageService *default_storage_service,
-                     std::map<std::string, std::string> plist = {});
+                     std::map<std::string, std::string> plist = {},
+                     int scratch_size = 0);
 
         //returns jobid,started time, running time
 //        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
+
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -108,7 +110,8 @@ namespace wrench {
                      unsigned long cores_per_host,
                      double ram_per_host,
                      std::map<std::string, std::string> plist,
-                     std::string suffix);
+                     std::string suffix,
+                     int scratch_size = 0);
 
         unsigned int batsched_port; // ONLY USED FOR BATSCHED
 

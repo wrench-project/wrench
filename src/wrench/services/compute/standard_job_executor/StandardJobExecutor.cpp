@@ -23,6 +23,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "StandardJobExecutorMessage.h"
+#include <exception>
 
 #include "wrench/util/PointerUtil.h"
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard Job Executor");
@@ -59,7 +60,9 @@ namespace wrench {
                                              StandardJob *job,
                                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                              StorageService *default_storage_service,
-                                             std::map<std::string, std::string> plist) :
+                                             std::map<std::string, std::string> plist,
+                                             StorageService* scratch_space,
+                                             bool part_of_pilot_job) :
             Service(hostname, "standard_job_executor", "standard_job_executor") {
 
       if ((job == nullptr) || (compute_resources.empty())) {
@@ -157,6 +160,9 @@ namespace wrench {
       this->callback_mailbox = callback_mailbox;
       this->job = job;
       this->default_storage_service = default_storage_service;
+      this->scratch_space = scratch_space;
+      this->files_stored_in_scratch = {};
+      this->part_of_pilot_job = part_of_pilot_job;
 
 
       // set properties
@@ -269,6 +275,15 @@ namespace wrench {
           break;
         }
 
+      }
+
+      if (not this->part_of_pilot_job) {
+        /*** Clean up everything in the scratch space ***/
+        WRENCH_INFO("CLEANING UP SCRATCH IN STRANDARDJOBEXECUTOR ITSELF");
+        cleanUpScratch();
+      } else {
+        WRENCH_INFO("SEDNING FILES STORED IN SCRATCH SPACE TO THE UPPER LEVEL PILOT JOB BY THE STANDARD JOBS INSIDE THE PILOT JOB");
+        sendFilesInScratch();
       }
 
       WRENCH_INFO("Standard Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
@@ -475,7 +490,7 @@ namespace wrench {
                                               wu,
                                               this->default_storage_service,
                                               this->getPropertyValueAsDouble(
-                                                      StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD)));
+                                                      StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD), this->scratch_space));
 
         workunit_executor->simulation = this->simulation;
         workunit_executor->start(workunit_executor, true);
@@ -538,11 +553,11 @@ namespace wrench {
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
       if (WorkunitExecutorDoneMessage *msg = dynamic_cast<WorkunitExecutorDoneMessage *>(message.get())) {
-        processWorkunitExecutorCompletion(msg->workunit_executor, msg->workunit);
+        processWorkunitExecutorCompletion(msg->workunit_executor, msg->workunit, msg->files_in_scratch);
         return true;
 
       } else if (WorkunitExecutorFailedMessage *msg = dynamic_cast<WorkunitExecutorFailedMessage *>(message.get())) {
-        processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
+        processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->files_in_scratch, msg->cause);
         return true;
 
       } else {
@@ -561,7 +576,8 @@ namespace wrench {
  */
     void StandardJobExecutor::processWorkunitExecutorCompletion(
             WorkunitMulticoreExecutor *workunit_executor,
-            Workunit *workunit) {
+            Workunit *workunit,
+            std::set<WorkflowFile*> files_in_scratch) {
 
       // Don't kill me while I am doing this
       this->acquireDaemonLock();
@@ -570,6 +586,12 @@ namespace wrench {
       this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
       // Update RAM availabilities
       this->ram_availabilities[workunit_executor->getHostname()] += workunit_executor->getMemoryUtilization();
+
+      // Add the files stored in scratch by this workunit to the set of all files stored in scratch by all the workunits of this job
+      if (files_in_scratch.size() > 0) {
+        this->files_stored_in_scratch.insert(files_in_scratch.begin(),
+                                             files_in_scratch.end());
+      }
 
       // Remove the workunit executor from the workunit executor list
       for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
@@ -671,7 +693,7 @@ namespace wrench {
 
     void StandardJobExecutor::processWorkunitExecutorFailure(
             WorkunitMulticoreExecutor *workunit_executor,
-            Workunit *workunit,
+            Workunit *workunit, std::set<WorkflowFile*> files_in_scratch,
             std::shared_ptr<FailureCause> cause) {
 
 
@@ -684,6 +706,12 @@ namespace wrench {
       this->core_availabilities[workunit_executor->getHostname()] += workunit_executor->getNumCores();
       // Update RAM availabilities
       this->ram_availabilities[workunit_executor->getHostname()] += workunit_executor->getMemoryUtilization();
+
+      // Add the files stored in scratch by this workunit to the set of all files stored in scratch by all the workunits of this job
+      if (files_in_scratch.size() > 0) {
+        this->files_stored_in_scratch.insert(files_in_scratch.begin(),
+                                             files_in_scratch.end());
+      }
 
       // Remove the workunit executor from the workunit executor list and put it in the failed list
       for (auto it = this->running_workunit_executors.begin(); it != this->running_workunit_executors.end(); it++) {
@@ -902,11 +930,43 @@ namespace wrench {
       return sorted_workunits;
     }
 
+    /**
+     * @brief Clears the scratch space
+     */
 
-/**
- * @brief Retrieve the executor's job
- * @return a standard job
- */
+    void StandardJobExecutor::cleanUpScratch() {
+      if (this->scratch_space != nullptr) {
+        /** Perform scratch cleanup */
+        for (auto scratch_cleanup_file : files_stored_in_scratch) {
+          try {
+            this->scratch_space->deleteFile(scratch_cleanup_file);
+          } catch (WorkflowExecutionException &e) {
+            throw;
+          }
+        }
+      }
+    }
+
+    /**
+     * @brief Sends the files stored in scratch to the upper level pilot job
+     */
+    void StandardJobExecutor::sendFilesInScratch() {
+      try {
+        S4U_Mailbox::putMessage(this->callback_mailbox,
+                                new FilesInScratchMessageByStandardJobExecutor(this->files_stored_in_scratch,
+                                                                   this->getPropertyValueAsDouble(
+                                                                           StandardJobExecutorProperty::STANDARD_JOB_FILES_STORED_IN_SCRATCH)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        WRENCH_INFO("Failed to send the callback... oh well");
+        return;
+      }
+    }
+
+
+  /**
+   * @brief Retrieve the executor's job
+   * @return a standard job
+   */
     StandardJob *StandardJobExecutor::getJob() {
       return this->job;
     }

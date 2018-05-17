@@ -924,7 +924,7 @@ private:
     }
 };
 
-TEST_F(MultihostMulticoreComputeServiceOneTaskTest, ExecutionWithDefaultStorageService) {
+TEST_F(MultihostMulticoreComputeServiceOneTaskTest, DISABLED_ExecutionWithDefaultStorageService) {
 
   DO_TEST_WITH_FORK(do_ExecutionWithDefaultStorageService_test);
 }
@@ -1026,7 +1026,7 @@ private:
 
       // Create a job
       wrench::StandardJob *job = job_manager->createStandardJob({test->task},
-                                                                {},
+                                                                {{test->input_file,test->storage_service1},{test->output_file,test->storage_service2}}, //changed this since we don't have default storage now
                                                                 {std::make_tuple(test->input_file, test->storage_service1, test->storage_service2)},
                                                                 {std::make_tuple(test->output_file, test->storage_service2, test->storage_service1)},
                                                                 {std::make_tuple(test->input_file, test->storage_service2),

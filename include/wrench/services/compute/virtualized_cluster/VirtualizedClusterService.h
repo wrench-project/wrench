@@ -57,7 +57,8 @@ namespace wrench {
                                   bool supports_pilot_jobs,
                                   std::vector<std::string> &execution_hosts,
                                   StorageService *default_storage_service,
-                                  std::map<std::string, std::string> plist = {});
+                                  std::map<std::string, std::string> plist = {},
+                                  int scratch_size = 0);
 
         /***********************/
         /** \cond DEVELOPER    */
