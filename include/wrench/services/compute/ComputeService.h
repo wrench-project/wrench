@@ -118,7 +118,7 @@ namespace wrench {
                        std::string mailbox_name_prefix,
                        bool supports_standard_jobs,
                        bool supports_pilot_jobs,
-                       int sratch_size = 0);
+                       double sratch_size = 0);
 
     protected:
 

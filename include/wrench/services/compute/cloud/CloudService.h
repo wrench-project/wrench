@@ -49,7 +49,7 @@ namespace wrench {
                      bool supports_pilot_jobs,
                      std::vector<std::string> &execution_hosts,
                      std::map<std::string, std::string> plist = {},
-                     int scratch_size = 0);
+                     double scratch_size = 0);
 
     private:
         friend class Simulation;

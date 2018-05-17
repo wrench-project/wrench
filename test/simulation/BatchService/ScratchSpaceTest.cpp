@@ -92,57 +92,41 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
-//        // Create a sequential task that lasts one min and requires 2 cores
-//        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
-//        task->addInputFile(this->workflow->getFileById("input_file"));
-//        task->addOutputFile(this->workflow->getFileById("output_file"));
-//
-//
-//        // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
-//
-//        wrench::StandardJob *job = job_manager->createStandardJob(
-//                {task},
-//                {
-//                        {*(task->getInputFiles().begin()),  this->test->storage_service1},
-//                        {*(task->getOutputFiles().begin()), this->test->storage_service1}
-//                },
-//                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-//                        this->workflow->getFileById("input_file"), this->test->storage_service1,
-//                        this->test->storage_service2)},
-//                {},
-//                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
-//                                                                              this->test->storage_service2)});
-//
-//        std::map<std::string, std::string> batch_job_args;
-//        batch_job_args["-N"] = "2";
-//        batch_job_args["-t"] = "5"; //time in minutes
-//        batch_job_args["-c"] = "4"; //number of cores per node
-//        try {
-//          job_manager->submitJob(job, this->test->compute_service, batch_job_args);
-//        } catch (wrench::WorkflowExecutionException &e) {
-//          throw std::runtime_error(
-//                  "Exception: " + std::string(e.what())
-//          );
-//        }
-//
-//
-//        // Wait for a workflow execution event
-//        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
-//        try {
-//          event = this->workflow->waitForNextExecutionEvent();
-//        } catch (wrench::WorkflowExecutionException &e) {
-//          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
-//        }
-//        switch (event->type) {
-//          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-//            // success, do nothing for now
-//            break;
-//          }
-//          default: {
-//            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-//          }
-//        }
-//        this->workflow->removeTask(task);
+        // Create a sequential task that lasts one min and requires 2 cores
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
+        task->addInputFile(this->workflow->getFileById("input_file"));
+        task->addOutputFile(this->workflow->getFileById("output_file"));
+
+        // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                {task},
+                {},
+                {std::make_tuple(this->workflow->getFileById("input_file"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {},
+                {});
+
+        // Submit the 2-task job for execution
+        job_manager->submitJob(job, this->test->compute_service);
+
+        // Wait for a workflow execution event
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = workflow->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        }
+        switch (event->type) {
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+            if (this->test->compute_service->getScratchSize() < 10000000000000.0) {
+              throw std::runtime_error("ScratchSpaceTest::do_SimpleScratchSpace_test():File was not deleted from scratch" );
+            }
+            break;
+          }
+          default: {
+            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+          }
+        }
       }
 
       return 0;
@@ -161,7 +145,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
   auto simulation = new wrench::Simulation();
   int argc = 1;
   auto argv = (char **) calloc(1, sizeof(char *));
-  argv[0] = strdup("batch_service_test");
+  argv[0] = strdup("scratch_space_test");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -180,15 +164,11 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
 
-  // Create a Batch Service with a bogus scheduling algorithm
-  ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}})), std::invalid_argument);
-
-
-  // Create a Batch Service
-  ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(), {})));
+  // Create a Compute Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {}, 10000000000000.0)));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 

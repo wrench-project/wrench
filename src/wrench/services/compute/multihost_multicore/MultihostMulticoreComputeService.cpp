@@ -159,7 +159,7 @@ namespace wrench {
             bool supports_pilot_jobs,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
             std::map<std::string, std::string> plist,
-            int scratch_size) :
+            double scratch_size) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
@@ -189,7 +189,7 @@ namespace wrench {
                                                                        const bool supports_pilot_jobs,
                                                                        const std::set<std::string> compute_hosts,
                                                                        std::map<std::string, std::string> plist,
-                                                                       int scratch_size) :
+                                                                       double scratch_size) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",

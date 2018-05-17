@@ -35,7 +35,7 @@ namespace wrench {
                                bool supports_pilot_jobs,
                                std::vector<std::string> &execution_hosts,
                                std::map<std::string, std::string> plist,
-                               int scratch_size) :
+                               double scratch_size) :
             VirtualizedClusterService(hostname, supports_standard_jobs, supports_pilot_jobs, execution_hosts,
                                       plist, scratch_size) {}
 
