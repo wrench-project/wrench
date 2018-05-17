@@ -183,14 +183,12 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
   // Create a Batch Service with a bogus scheduling algorithm
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                   storage_service1,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}})), std::invalid_argument);
 
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                   storage_service1, {})));
+          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(), {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 

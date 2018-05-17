@@ -34,11 +34,10 @@ namespace wrench {
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
                                std::vector<std::string> &execution_hosts,
-                               StorageService *default_storage_service,
                                std::map<std::string, std::string> plist,
                                int scratch_size) :
             VirtualizedClusterService(hostname, supports_standard_jobs, supports_pilot_jobs, execution_hosts,
-                                      default_storage_service, plist, scratch_size) {}
+                                      plist, scratch_size) {}
 
     /**
      * @brief Main method of the daemon

@@ -196,7 +196,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, true, false, execution_hosts, nullptr, {}, 100.0)));
+          new wrench::CloudService(hostname, true, false, execution_hosts, {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

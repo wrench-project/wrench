@@ -98,12 +98,10 @@ namespace wrench {
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
                                std::vector<std::string> compute_hosts,
-                               StorageService *default_storage_service,
                                std::map<std::string, std::string> plist,
                                int scratch_size) :
             BatchService(hostname, supports_standard_jobs,
-                         supports_pilot_jobs, std::move(compute_hosts),
-                         default_storage_service, ComputeService::ALL_CORES,
+                         supports_pilot_jobs, std::move(compute_hosts), ComputeService::ALL_CORES,
                          ComputeService::ALL_RAM, std::move(plist), "", scratch_size) {
 
     }
@@ -129,7 +127,6 @@ namespace wrench {
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
                                std::vector<std::string> compute_hosts,
-                               StorageService *default_storage_service,
                                unsigned long cores_per_host,
                                double ram_per_host,
                                std::map<std::string, std::string> plist, std::string suffix, int scratch_size) :
