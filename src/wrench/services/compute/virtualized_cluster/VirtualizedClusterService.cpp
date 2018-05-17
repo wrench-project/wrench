@@ -43,10 +43,12 @@ namespace wrench {
                                                          bool supports_pilot_jobs,
                                                          std::vector<std::string> &execution_hosts,
                                                          StorageService *default_storage_service,
-                                                         std::map<std::string, std::string> plist) :
+                                                         std::map<std::string, std::string> plist,
+                                                         int scratch_size) :
             ComputeService(hostname, "virtualized_cluster_service", "virtualized_cluster_service",
                            supports_standard_jobs, supports_pilot_jobs,
-                           default_storage_service) {
+                           default_storage_service,
+                           scratch_size) {
 
       if (execution_hosts.empty()) {
         throw std::runtime_error("At least one execution host should be provided");
@@ -491,7 +493,8 @@ namespace wrench {
                                                        supports_standard_jobs,
                                                        supports_pilot_jobs,
                                                        compute_resources,
-                                                       default_storage_service, plist));
+                                                       default_storage_service, plist,
+                                                       getScratch()));
           cs->simulation = this->simulation;
 
           this->cs_available_ram[pm_hostname] -= ram_memory;

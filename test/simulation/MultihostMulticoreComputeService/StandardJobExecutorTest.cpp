@@ -1146,7 +1146,9 @@ private:
                         {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
                         this->test->storage_service1,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
-                                thread_startup_overhead)}}
+                                thread_startup_overhead)}},
+                        this->test->storage_service1 // This should be a scratch space of a compute service, but since this
+                        //standard job executor is being created direclty (not by any Compute Service), we pass a dummy storage as a scratch space
                 ));
         executor->start(executor, true);
 

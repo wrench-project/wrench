@@ -53,7 +53,9 @@ namespace wrench {
                 StandardJob *job,
                 std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                 StorageService *default_storage_service,
-                std::map<std::string, std::string> plist = {});
+                std::map<std::string, std::string> plist = {},
+                StorageService* scratch_space = nullptr,
+                bool part_of_pilot_job = false);
 
         void kill();
 
@@ -71,6 +73,12 @@ namespace wrench {
         int total_num_cores;
         double total_ram;
         StorageService *default_storage_service;
+        StorageService *scratch_space;
+
+        bool part_of_pilot_job;
+
+        // Files stored in scratch
+        std::set<WorkflowFile*> files_stored_in_scratch;
 
         // Core availabilities (for each hosts, how many cores are currently available on it)
         std::map<std::string, unsigned long> core_availabilities;
@@ -95,6 +103,7 @@ namespace wrench {
                 {StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"},
                 {StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
                 {StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
+                {StandardJobExecutorProperty::STANDARD_JOB_FILES_STORED_IN_SCRATCH, "1024"},
                 {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, "maximum"},
                 {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM, "maximum_flops"},
                 {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "best_fit"},
@@ -107,10 +116,10 @@ namespace wrench {
 //        double getPropertyValueAsDouble(std::string property);
 
         void processWorkunitExecutorCompletion(WorkunitMulticoreExecutor *workunit_executor,
-                                               Workunit *workunit);
+                                               Workunit *workunit, std::set<WorkflowFile*> files_in_scratch);
 
         void processWorkunitExecutorFailure(WorkunitMulticoreExecutor *workunit_executor,
-                                            Workunit *workunit,
+                                            Workunit *workunit, std::set<WorkflowFile*> files_in_scratch,
                                             std::shared_ptr<FailureCause> cause);
 
         bool processNextMessage();
@@ -124,6 +133,12 @@ namespace wrench {
         void createWorkunits();
 
         std::vector<Workunit*> sortReadyWorkunits();
+
+        //Clean up scratch
+        void cleanUpScratch();
+
+        //Send files in scratch to the upper level pilot job
+        void sendFilesInScratch();
 
     };
 

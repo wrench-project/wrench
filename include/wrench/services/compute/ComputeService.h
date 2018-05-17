@@ -34,6 +34,18 @@ namespace wrench {
      */
     class ComputeService : public Service {
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
+        friend  class StandardJobExecutorTest;
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
+        friend  class Simulation;
+
     public:
 
         /** @brief A convenient constant to mean "use all cores on the physical host" whenever a number of cores
@@ -45,6 +57,9 @@ namespace wrench {
          *  is needed when instantiating services
          */
         static constexpr double ALL_RAM = DBL_MAX;
+
+        /** A static StorageService pointer to the SCRATCH space inside the compute service **/
+        static StorageService* SCRATCH;
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -58,9 +73,13 @@ namespace wrench {
 
         void terminateJob(WorkflowJob *job);
 
+        void setLocalScratch();
+
         bool supportsStandardJobs();
 
         bool supportsPilotJobs();
+
+        bool hasScratch();
 
         unsigned long getNumHosts();
 
@@ -73,6 +92,8 @@ namespace wrench {
         std::vector<double> getCoreFlopRate();
 
         double getTTL();
+
+        double getScratchSize();
 
         void setDefaultStorageService(StorageService *storage_service);
 
@@ -97,9 +118,18 @@ namespace wrench {
                        std::string mailbox_name_prefix,
                        bool supports_standard_jobs,
                        bool supports_pilot_jobs,
-                       StorageService *default_storage_service);
+                       StorageService *default_storage_service,
+                       int sratch_size = 0);
 
     protected:
+
+        ComputeService(std::string hostname,
+                       std::string service_name,
+                       std::string mailbox_name_prefix,
+                       bool supports_standard_jobs,
+                       bool supports_pilot_jobs,
+                       StorageService *default_storage_service,
+                       StorageService* scratch_space = nullptr);
 
 //        virtual void processGetResourceInformation(const std::string &answer_mailbox) = 0;
 
@@ -114,6 +144,14 @@ namespace wrench {
         bool supports_standard_jobs;
         /** @brief The default storage service associated to the compute service (nullptr if none) */
         StorageService *default_storage_service;
+
+        /** @brief A scratch storage service associated to the compute service */
+        StorageService* scratch_space_storage_service;
+
+        /** @brief Total size of the scratch storage service */
+        int scratch_space_size;
+
+        StorageService* getScratch();
 
     private:
 

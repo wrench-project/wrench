@@ -99,11 +99,12 @@ namespace wrench {
                                bool supports_pilot_jobs,
                                std::vector<std::string> compute_hosts,
                                StorageService *default_storage_service,
-                               std::map<std::string, std::string> plist) :
+                               std::map<std::string, std::string> plist,
+                               int scratch_size) :
             BatchService(hostname, supports_standard_jobs,
                          supports_pilot_jobs, std::move(compute_hosts),
                          default_storage_service, ComputeService::ALL_CORES,
-                         ComputeService::ALL_RAM, std::move(plist), "") {
+                         ComputeService::ALL_RAM, std::move(plist), "", scratch_size) {
 
     }
 
@@ -131,13 +132,14 @@ namespace wrench {
                                StorageService *default_storage_service,
                                unsigned long cores_per_host,
                                double ram_per_host,
-                               std::map<std::string, std::string> plist, std::string suffix) :
+                               std::map<std::string, std::string> plist, std::string suffix, int scratch_size) :
             ComputeService(hostname,
                            "batch" + suffix,
                            "batch" + suffix,
                            supports_standard_jobs,
                            supports_pilot_jobs,
-                           default_storage_service) {
+                           default_storage_service,
+                           scratch_size) {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(plist));
@@ -1544,7 +1546,8 @@ namespace wrench {
                           this->default_storage_service,
                           {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                                    this->getPropertyValueAsString(
-                                           BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}}));
+                                           BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}},
+                          this->getScratch()));
           executor->start(executor, true);
           batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + allocated_time);
@@ -1587,7 +1590,7 @@ namespace wrench {
                   new MultihostMulticoreComputeService(host_to_run_on,
                                                        true, false,
                                                        resources,
-                                                       this->default_storage_service
+                                                       this->default_storage_service, {}, getScratch()
                   ));
           cs->simulation = this->simulation;
           job->setComputeService(cs);

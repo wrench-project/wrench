@@ -13,6 +13,7 @@
 
 
 #include "wrench/services/Service.h"
+#include <set>
 
 namespace wrench {
 
@@ -45,12 +46,14 @@ namespace wrench {
                      std::string callback_mailbox,
                      Workunit *workunit,
                      StorageService *default_storage_service,
-                     double thread_startup_overhead = 0.0);
+                     double thread_startup_overhead = 0.0,
+                     StorageService* scratch_space = nullptr);
 
         void kill();
 
         unsigned long getNumCores();
         double getMemoryUtilization();
+        std::set<WorkflowFile*> getFilesStoredInScratch();
 
         /** @brief The Workunit this WorkunitExecutor is supposed to perform */
         Workunit *workunit;
@@ -69,7 +72,9 @@ namespace wrench {
         double thread_startup_overhead;
 
         StorageService *default_storage_service;
+        StorageService* scratch_space;
 
+        std::set<WorkflowFile* > files_stored_in_scratch;
         std::vector<std::shared_ptr<ComputeThread>> compute_threads;
 
     };

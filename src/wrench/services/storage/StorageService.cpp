@@ -353,9 +353,10 @@ namespace wrench {
      */
     void StorageService::readFiles(std::set<WorkflowFile *> files,
                                    std::map<WorkflowFile *, StorageService *> file_locations,
-                                   StorageService *default_storage_service) {
+                                   StorageService *default_storage_service,
+                                   std::set<WorkflowFile*>& files_in_scratch) {
       try {
-        StorageService::writeOrReadFiles(READ, std::move(files), std::move(file_locations), default_storage_service);
+        StorageService::writeOrReadFiles(READ, std::move(files), std::move(file_locations), default_storage_service, files_in_scratch);
       } catch (std::runtime_error &e) {
         throw;
       } catch (WorkflowExecutionException &e) {
@@ -376,9 +377,10 @@ namespace wrench {
      */
     void StorageService::writeFiles(std::set<WorkflowFile *> files,
                                     std::map<WorkflowFile *, StorageService *> file_locations,
-                                    StorageService *default_storage_service) {
+                                    StorageService *default_storage_service,
+                                    std::set<WorkflowFile*>& files_in_scratch) {
       try {
-        StorageService::writeOrReadFiles(WRITE, std::move(files), std::move(file_locations), default_storage_service);
+        StorageService::writeOrReadFiles(WRITE, std::move(files), std::move(file_locations), default_storage_service, files_in_scratch);
       } catch (std::runtime_error &e) {
         throw;
       } catch (WorkflowExecutionException &e) {
@@ -400,7 +402,8 @@ namespace wrench {
     void StorageService::writeOrReadFiles(FileOperation action,
                                           std::set<WorkflowFile *> files,
                                           std::map<WorkflowFile *, StorageService *> file_locations,
-                                          StorageService *default_storage_service) {
+                                          StorageService *default_storage_service,
+                                          std::set<WorkflowFile*>& files_in_scratch) {
 
       for (auto const &f : files) {
         if (f == nullptr) {
@@ -422,6 +425,7 @@ namespace wrench {
         if (storage_service == nullptr) {
           throw WorkflowExecutionException(new NoStorageServiceForFile(f));
         }
+
         if (action == READ) {
           try {
             WRENCH_INFO("Reading file %s from storage service %s", f->getId().c_str(), storage_service->getName().c_str());
@@ -434,6 +438,9 @@ namespace wrench {
           }
         } else {
           // Write the file
+          if (storage_service == default_storage_service) {
+            files_in_scratch.insert(f);
+          }
           try {
             WRENCH_INFO("Writing file %s to storage service %s", f->getId().c_str(), storage_service->getName().c_str());
             storage_service->writeFile(f);

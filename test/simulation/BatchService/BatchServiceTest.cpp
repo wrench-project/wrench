@@ -2061,8 +2061,10 @@ private:
 
         // Create a sequential task that lasts one min and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
+        wrench::WorkflowFile* file1 = workflow->getFileById("input_file");
+        wrench::WorkflowFile* file2 = workflow->getFileById("output_file");
+        task->addInputFile(file1);
+        task->addOutputFile(file2);
 
         std::map<std::string, std::string> pilot_batch_job_args;
         pilot_batch_job_args["-N"] = "1";
@@ -2095,10 +2097,9 @@ private:
           }
         }
 
-
         // Create a StandardJob with some pre-copies and post-deletions
         wrench::StandardJob *job = job_manager->createStandardJob(
-                {task}, {}, {}, {}, {});
+                {task}, {{file1,this->test->storage_service1}}, {}, {}, {});
 
         std::map<std::string, std::string> standard_batch_job_args;
         standard_batch_job_args["-N"] = "1";
