@@ -151,7 +151,6 @@ namespace wrench {
      *        the compute resources available to this service.
      *          - num_cores = ComputeService::ALL_CORES: use all cores available on the host
      *          - memory = ComputeService::ALL_RAM: use all RAM available on the host
-     * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
@@ -159,7 +158,6 @@ namespace wrench {
             bool supports_standard_jobs,
             bool supports_pilot_jobs,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-            StorageService *default_storage_service,
             std::map<std::string, std::string> plist,
             int scratch_size) :
             ComputeService(hostname,
@@ -167,15 +165,13 @@ namespace wrench {
                            "multihost_multicore",
                            supports_standard_jobs,
                            supports_pilot_jobs,
-                           default_storage_service,
                            scratch_size) {
 
       initiateInstance(hostname,
                        supports_standard_jobs,
                        supports_pilot_jobs,
                        std::move(compute_resources),
-                       plist, -1, nullptr,
-                       default_storage_service);
+                       plist, -1, nullptr);
     }
 
     /**
@@ -186,14 +182,12 @@ namespace wrench {
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
-     * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
                                                                        const bool supports_standard_jobs,
                                                                        const bool supports_pilot_jobs,
                                                                        const std::set<std::string> compute_hosts,
-                                                                       StorageService *default_storage_service,
                                                                        std::map<std::string, std::string> plist,
                                                                        int scratch_size) :
             ComputeService(hostname,
@@ -201,7 +195,6 @@ namespace wrench {
                            "multihost_multicore",
                            supports_standard_jobs,
                            supports_pilot_jobs,
-                           default_storage_service,
                            scratch_size) {
 
       std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
@@ -213,8 +206,7 @@ namespace wrench {
                        supports_standard_jobs,
                        supports_pilot_jobs,
                        compute_resources,
-                       std::move(plist), -1, nullptr,
-                       default_storage_service);
+                       std::move(plist), -1, nullptr);
     }
 
 /**
@@ -229,7 +221,6 @@ namespace wrench {
      * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
-     * @param default_storage_service: a storage service
      *
      * @throw std::invalid_argument
      */
@@ -241,13 +232,11 @@ namespace wrench {
             std::map<std::string, std::string> plist,
             double ttl,
             PilotJob *pj,
-            std::string suffix,
-            StorageService *default_storage_service, StorageService* scratch_space) : ComputeService(hostname,
+            std::string suffix, StorageService* scratch_space) : ComputeService(hostname,
                                                                       "multihost_multicore" + suffix,
                                                                       "multihost_multicore" + suffix,
                                                                       supports_standard_jobs,
                                                                       supports_pilot_jobs,
-                                                                      default_storage_service,
                                                                       scratch_space) {
 
       initiateInstance(hostname,
@@ -256,8 +245,7 @@ namespace wrench {
                        std::move(compute_resources),
                        std::move(plist),
                        ttl,
-                       pj,
-                       default_storage_service);
+                       pj);
     }
 
     /**
@@ -268,7 +256,6 @@ namespace wrench {
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
-     * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      * @param scratch_space: the scratch space for this compute service
      */
@@ -276,7 +263,6 @@ namespace wrench {
                                                                        const bool supports_standard_jobs,
                                                                        const bool supports_pilot_jobs,
                                                                        const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                                                       StorageService *default_storage_service,
                                                                        std::map<std::string, std::string> plist,
                                                                        StorageService *scratch_space):
             ComputeService(hostname,
@@ -284,15 +270,13 @@ namespace wrench {
                            "multihost_multicore",
                            supports_standard_jobs,
                            supports_pilot_jobs,
-                           default_storage_service,
                            scratch_space) {
 
       initiateInstance(hostname,
                        supports_standard_jobs,
                        supports_pilot_jobs,
                        compute_resources,
-                       std::move(plist), -1, nullptr,
-                       default_storage_service);
+                       std::move(plist), -1, nullptr);
 
     }
 
@@ -307,7 +291,6 @@ namespace wrench {
  * @param plist: a property list
  * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
  * @param pj: a containing PilotJob  (nullptr if none)
- * @param default_storage_service: a storage service
  *
  * @throw std::invalid_argument
  */
@@ -318,8 +301,7 @@ namespace wrench {
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
             std::map<std::string, std::string> plist,
             double ttl,
-            PilotJob *pj,
-            StorageService *default_storage_service) {
+            PilotJob *pj) {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
@@ -696,7 +678,6 @@ namespace wrench {
               this->hostname,
               job,
               compute_resources,
-              this->default_storage_service,
               {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,   this->getPropertyValueAsString(
                       MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
                {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, this->getPropertyValueAsString(
@@ -723,7 +704,6 @@ namespace wrench {
 //                this->hostname,
 //                job,
 //                compute_resources,
-//                this->default_storage_service,
 //                {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,   this->getPropertyValueAsString(
 //                        MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
 //                 {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, this->getPropertyValueAsString(
@@ -791,7 +771,6 @@ namespace wrench {
                                                    job->getDuration(),
                                                    job,
                                                    "_pilot_job",
-                                                   this->default_storage_service,
                                                    getScratch()));
       cs->simulation = this->simulation;
       job->setComputeService(cs);
@@ -935,7 +914,7 @@ namespace wrench {
         failed_task->setInternalState(WorkflowTask::InternalState::TASK_READY);
         try {
           StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
-                                      this->default_storage_service);
+                                      getScratch());
         } catch (WorkflowExecutionException &e) {
           WRENCH_WARN("Warning: %s", e.getCause()->toString().c_str());
         }

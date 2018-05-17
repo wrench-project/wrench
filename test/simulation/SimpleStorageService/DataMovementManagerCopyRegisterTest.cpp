@@ -287,8 +287,7 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService("WMSHost", true, true,
                                                        {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
-                                                       nullptr, {})));
+                                                                        wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create src and dst storage services
   EXPECT_NO_THROW(src_storage_service = simulation->add(

@@ -130,9 +130,6 @@ private:
                                                                          {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
-      if (this->test->compute_service->hasScratch()) {
-        std::cerr << "This has a scratch but\n";
-      }
 
       // Submit the 2-task job for execution
       try {

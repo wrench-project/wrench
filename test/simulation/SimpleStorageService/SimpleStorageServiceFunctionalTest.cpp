@@ -402,8 +402,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
-                                                       nullptr, {})));
+                                                                        wrench::ComputeService::ALL_RAM)}, {})));
   // Create a bad Storage Service
   EXPECT_THROW(storage_service_100 = simulation->add(
           new wrench::SimpleStorageService(hostname, -100.0)), std::invalid_argument);
@@ -565,8 +564,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   // Create a  Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                       {std::make_tuple(hostname, 1, 0)},
-                                                       nullptr, {})));
+                                                       {std::make_tuple(hostname, 1, 0)}, {})));
 
   // Create 2 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
@@ -719,8 +717,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
-                                                       nullptr, {})));
+                                                                        wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create 2 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
@@ -932,8 +929,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
-                                                       nullptr, {})));
+                                                                        wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create 3 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(
@@ -1165,8 +1161,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
-                                                                        wrench::ComputeService::ALL_RAM)},
-                                                       nullptr, {})));
+                                                                        wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create 3 Storage Services
   EXPECT_NO_THROW(storage_service_1000 = simulation->add(

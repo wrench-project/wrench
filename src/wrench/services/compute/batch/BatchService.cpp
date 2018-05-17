@@ -138,7 +138,6 @@ namespace wrench {
                            "batch" + suffix,
                            supports_standard_jobs,
                            supports_pilot_jobs,
-                           default_storage_service,
                            scratch_size) {
 
       // Set default and specified properties
@@ -1543,7 +1542,6 @@ namespace wrench {
                           std::get<0>(*resources.begin()),
                           (StandardJob *) workflow_job,
                           resources,
-                          this->default_storage_service,
                           {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                                    this->getPropertyValueAsString(
                                            BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}},
@@ -1589,8 +1587,7 @@ namespace wrench {
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(host_to_run_on,
                                                        true, false,
-                                                       resources,
-                                                       this->default_storage_service, {}, getScratch()
+                                                       resources, {}, getScratch()
                   ));
           cs->simulation = this->simulation;
           job->setComputeService(cs);

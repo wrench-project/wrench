@@ -59,7 +59,6 @@ namespace wrench {
                                              std::string hostname,
                                              StandardJob *job,
                                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                             StorageService *default_storage_service,
                                              std::map<std::string, std::string> plist,
                                              StorageService* scratch_space,
                                              bool part_of_pilot_job) :

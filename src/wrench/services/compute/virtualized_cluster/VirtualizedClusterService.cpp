@@ -47,7 +47,6 @@ namespace wrench {
                                                          int scratch_size) :
             ComputeService(hostname, "virtualized_cluster_service", "virtualized_cluster_service",
                            supports_standard_jobs, supports_pilot_jobs,
-                           default_storage_service,
                            scratch_size) {
 
       if (execution_hosts.empty()) {
@@ -492,8 +491,7 @@ namespace wrench {
                   new MultihostMulticoreComputeService(vm_hostname,
                                                        supports_standard_jobs,
                                                        supports_pilot_jobs,
-                                                       compute_resources,
-                                                       default_storage_service, plist,
+                                                       compute_resources, plist,
                                                        getScratch()));
           cs->simulation = this->simulation;
 
