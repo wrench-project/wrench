@@ -130,7 +130,7 @@ namespace wrench {
                                    std::string mailbox_name_prefix,
                                    bool supports_standard_jobs,
                                    bool supports_pilot_jobs,
-                                   int scratch_size) :
+                                   double scratch_size) :
             Service(hostname, service_name, mailbox_name_prefix),
             supports_pilot_jobs(supports_pilot_jobs),
             supports_standard_jobs(supports_standard_jobs) {
