@@ -388,7 +388,6 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
           new wrench::MultihostMulticoreComputeService(
                   "Host1", true, true,
                   (std::set<std::string>){"Host1", "Host2"},
-                  nullptr,
                   {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
                    {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
                    {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "maximum"},
@@ -402,7 +401,6 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
           new wrench::MultihostMulticoreComputeService(
                   "Host1", true, true,
                   (std::set<std::string>){"Host1","Host2"},
-                  nullptr,
                   {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
                    {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
                    {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "minimum"},
@@ -416,7 +414,6 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
           new wrench::MultihostMulticoreComputeService(
                   "Host1", true, true,
                   (std::set<std::string>){"Host1", "Host2"},
-                  nullptr,
                   {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
                    {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
                    {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "maximum"},
@@ -639,7 +636,6 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
   EXPECT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
           new wrench::MultihostMulticoreComputeService("Host1", true, true,
                                                        (std::set<std::string>){"Host1", "Host2"},
-                                                       nullptr,
                                                        {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
                                                         {wrench::MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                "aggressive"},
                                                         {wrench::MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM, "maximum"},

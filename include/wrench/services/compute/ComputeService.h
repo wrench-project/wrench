@@ -118,7 +118,6 @@ namespace wrench {
                        std::string mailbox_name_prefix,
                        bool supports_standard_jobs,
                        bool supports_pilot_jobs,
-                       StorageService *default_storage_service,
                        int sratch_size = 0);
 
     protected:
@@ -128,7 +127,6 @@ namespace wrench {
                        std::string mailbox_name_prefix,
                        bool supports_standard_jobs,
                        bool supports_pilot_jobs,
-                       StorageService *default_storage_service,
                        StorageService* scratch_space = nullptr);
 
 //        virtual void processGetResourceInformation(const std::string &answer_mailbox) = 0;
@@ -142,8 +140,6 @@ namespace wrench {
         bool supports_pilot_jobs;
         /** @brief Whether the compute service supports standard jobs */
         bool supports_standard_jobs;
-        /** @brief The default storage service associated to the compute service (nullptr if none) */
-        StorageService *default_storage_service;
 
         /** @brief A scratch storage service associated to the compute service */
         StorageService* scratch_space_storage_service;

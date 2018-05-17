@@ -203,7 +203,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -328,7 +328,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr, {}, 100.0))); //scratch space of size 100
+                                                               {}, 100.0))); //scratch space of size 100
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -454,7 +454,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr, {}, 100.0)));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms;
@@ -584,7 +584,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr, {}, 100.0)));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -699,7 +699,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr, {}, 100.0)));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -828,7 +828,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -967,8 +967,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr, {}, 100.0)));
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, {},
+                                                               100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1109,7 +1109,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               nullptr, {}, 100.0)));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1248,7 +1248,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

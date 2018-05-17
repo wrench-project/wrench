@@ -130,12 +130,10 @@ namespace wrench {
                                    std::string mailbox_name_prefix,
                                    bool supports_standard_jobs,
                                    bool supports_pilot_jobs,
-                                   StorageService *default_storage_service,
                                    int scratch_size) :
             Service(hostname, service_name, mailbox_name_prefix),
             supports_pilot_jobs(supports_pilot_jobs),
-            supports_standard_jobs(supports_standard_jobs),
-            default_storage_service(default_storage_service) {
+            supports_standard_jobs(supports_standard_jobs) {
 
       this->state = ComputeService::UP;
       if (scratch_size > 0) {
@@ -164,11 +162,11 @@ namespace wrench {
      * @param scratch_space: scratch space of the compute service
      */
     ComputeService::ComputeService(std::string hostname, std::string service_name, std::string mailbox_name_prefix,
-                                   bool supports_standard_jobs, bool supports_pilot_jobs,
-                                   StorageService *default_storage_service, StorageService *scratch_space): Service(hostname, service_name, mailbox_name_prefix),
+                                   bool supports_standard_jobs,
+                                   bool supports_pilot_jobs,
+                                   StorageService *scratch_space): Service(hostname, service_name, mailbox_name_prefix),
                                     supports_pilot_jobs(supports_pilot_jobs),
-                                    supports_standard_jobs(supports_standard_jobs),
-                                    default_storage_service(default_storage_service){
+                                    supports_standard_jobs(supports_standard_jobs) {
 
       this->state = ComputeService::UP;
       if (scratch_space != nullptr) {
@@ -360,21 +358,21 @@ namespace wrench {
 
 
 
-    /**
-     * @brief Set the default StorageService for the ComputeService
-     * @param storage_service: a storage service
-     */
-    void ComputeService::setDefaultStorageService(StorageService *storage_service) {
-      this->default_storage_service = storage_service;
-    }
-
-    /**
-    * @brief Get the default StorageService for the compute service
-    * @return a storage service
-    */
-    StorageService *ComputeService::getDefaultStorageService() {
-      return this->default_storage_service;
-    }
+//    /**
+//     * @brief Set the default StorageService for the ComputeService
+//     * @param storage_service: a storage service
+//     */
+//    void ComputeService::setDefaultStorageService(StorageService *storage_service) {
+//      this->default_storage_service = storage_service;
+//    }
+//
+//    /**
+//    * @brief Get the default StorageService for the compute service
+//    * @return a storage service
+//    */
+//    StorageService *ComputeService::getDefaultStorageService() {
+//      return this->default_storage_service;
+//    }
 
     /**
      * @brief Get information about the compute service as a dictionary of vectors

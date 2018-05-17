@@ -75,7 +75,6 @@ namespace wrench {
                                          const bool supports_standard_jobs,
                                          const bool supports_pilot_jobs,
                                          const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                         StorageService *default_storage_service,
                                          std::map<std::string, std::string> plist = {},
                                          int scratch_size = 0);
 
@@ -84,7 +83,6 @@ namespace wrench {
                                          bool supports_standard_jobs,
                                          bool supports_pilot_jobs,
                                          const std::set<std::string> compute_hosts,
-                                         StorageService *default_storage_service,
                                          std::map<std::string, std::string> plist = {},
                                          int scratch_size = 0);
 
@@ -127,7 +125,6 @@ namespace wrench {
                                          std::map<std::string, std::string> plist,
                                          double ttl,
                                          PilotJob *pj, std::string suffix,
-                                         StorageService *default_storage_service,
                                          StorageService* scratch_space); // reference to upper level scratch space
 
         // Private Constructor
@@ -135,7 +132,6 @@ namespace wrench {
                                          const bool supports_standard_jobs,
                                          const bool supports_pilot_jobs,
                                          const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                         StorageService *default_storage_service,
                                          std::map<std::string, std::string> plist,
                                          StorageService* scratch_space);
 
@@ -146,8 +142,7 @@ namespace wrench {
                               std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                               std::map<std::string, std::string> plist,
                               double ttl,
-                              PilotJob *pj,
-                              StorageService *default_storage_service);
+                              PilotJob *pj);
 
         std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
 
