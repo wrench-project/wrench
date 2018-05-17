@@ -79,7 +79,6 @@ namespace wrench {
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
                      std::vector<std::string> compute_hosts,
-                     StorageService *default_storage_service,
                      std::map<std::string, std::string> plist = {},
                      int scratch_size = 0);
 
@@ -106,7 +105,6 @@ namespace wrench {
                      bool supports_standard_jobs,
                      bool supports_pilot_jobs,
                      std::vector<std::string> compute_hosts,
-                     StorageService *default_storage_service,
                      unsigned long cores_per_host,
                      double ram_per_host,
                      std::map<std::string, std::string> plist,

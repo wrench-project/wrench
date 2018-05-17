@@ -42,7 +42,6 @@ namespace wrench {
                                                          bool supports_standard_jobs,
                                                          bool supports_pilot_jobs,
                                                          std::vector<std::string> &execution_hosts,
-                                                         StorageService *default_storage_service,
                                                          std::map<std::string, std::string> plist,
                                                          int scratch_size) :
             ComputeService(hostname, "virtualized_cluster_service", "virtualized_cluster_service",
