@@ -28,39 +28,32 @@ namespace wrench {
      * @brief Constructor
      * @param workunit_executor: the work unit executor  on which the work unit was performed
      * @param workunit: the work unit that was performed
-     * @param files_in_scratch: the set of files stored in scratch space of the compute service while executing this workunit
      * @param payload: the message size in bytes
      */
     WorkunitExecutorDoneMessage::WorkunitExecutorDoneMessage(
             WorkunitMulticoreExecutor *workunit_executor,
             Workunit *workunit,
-            std::set<WorkflowFile*> files_in_scratch,
             double payload) :
             StandardJobExecutorMessage("WORK_UNIT_EXECUTOR_DONE", payload) {
       this->workunit_executor = workunit_executor;
       this->workunit = workunit;
-      this->files_in_scratch = files_in_scratch;
-
     }
 
     /**
      * @brief Constructor
      * @param workunit_executor: the work unit executor on which the work was performed
      * @param workunit: the work unit that was performed (and failed)
-     * @param files_in_scratch: the set of files stored in scratch space of the compute service while executing this workunit
      * @param cause: the cause of the failure
      * @param payload: the message size in bytes
      */
     WorkunitExecutorFailedMessage::WorkunitExecutorFailedMessage(
             WorkunitMulticoreExecutor *workunit_executor,
             Workunit *workunit,
-            std::set<WorkflowFile*> files_in_scratch,
             std::shared_ptr<FailureCause> cause,
             double payload):
             StandardJobExecutorMessage("WORK_UNIT_EXECUTOR_FAILED", payload) {
       this->workunit_executor = workunit_executor;
       this->workunit = workunit;
-      this->files_in_scratch = files_in_scratch;
       this->cause = cause;
     }
 
@@ -98,20 +91,6 @@ namespace wrench {
 
     }
 
-    /**
-     * @brief Constructor
-     * @param scratch_files: the files stored in scratch space because of the execution of a standardjob
-     * @param executor: the executor on which the job failed
-     * @param cause: the cause of the failure
-     * @param payload: the message size in bytes
-     */
-    FilesInScratchMessageByStandardJobExecutor::FilesInScratchMessageByStandardJobExecutor(
-            std::set<WorkflowFile*> scratch_files,
-            double payload) :
-            StandardJobExecutorMessage("FILES_IN_SCRATCH", payload) {
-      this->scratch_files = scratch_files;
-
-    }
 
     /**
      * @brief Constructor

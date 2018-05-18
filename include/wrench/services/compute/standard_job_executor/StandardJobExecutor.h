@@ -61,6 +61,9 @@ namespace wrench {
         StandardJob *getJob();
         std::set<std::tuple<std::string, unsigned long, double>> getComputeResources();
 
+        // Get the set of files stored in scratch space by a standardjob job
+        std::set<WorkflowFile*> getFilesInScratch();
+
     private:
 
         friend class Simulation;
@@ -71,7 +74,6 @@ namespace wrench {
         std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
         int total_num_cores;
         double total_ram;
-        StorageService *default_storage_service;
         StorageService *scratch_space;
 
         bool part_of_pilot_job;
@@ -115,10 +117,10 @@ namespace wrench {
 //        double getPropertyValueAsDouble(std::string property);
 
         void processWorkunitExecutorCompletion(WorkunitMulticoreExecutor *workunit_executor,
-                                               Workunit *workunit, std::set<WorkflowFile*> files_in_scratch);
+                                               Workunit *workunit);
 
         void processWorkunitExecutorFailure(WorkunitMulticoreExecutor *workunit_executor,
-                                            Workunit *workunit, std::set<WorkflowFile*> files_in_scratch,
+                                            Workunit *workunit,
                                             std::shared_ptr<FailureCause> cause);
 
         bool processNextMessage();
@@ -136,8 +138,6 @@ namespace wrench {
         //Clean up scratch
         void cleanUpScratch();
 
-        //Send files in scratch to the upper level pilot job
-        void sendFilesInScratch();
 
     };
 

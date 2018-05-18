@@ -45,9 +45,8 @@ namespace wrench {
                      double ram_utilization,
                      std::string callback_mailbox,
                      Workunit *workunit,
-                     StorageService *default_storage_service,
-                     double thread_startup_overhead = 0.0,
-                     StorageService* scratch_space = nullptr);
+                     StorageService *scratch_space,
+                     double thread_startup_overhead = 0.0);
 
         void kill();
 
@@ -71,7 +70,6 @@ namespace wrench {
         double ram_utilization;
         double thread_startup_overhead;
 
-        StorageService *default_storage_service;
         StorageService* scratch_space;
 
         std::set<WorkflowFile* > files_stored_in_scratch;
