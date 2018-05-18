@@ -140,13 +140,11 @@ namespace wrench {
         try {
           this->scratch_space_storage_service =
                   new SimpleStorageService(hostname, scratch_size);
-          this->scratch_space_size = scratch_size;
         } catch (std::runtime_error &e) {
           throw;
         }
       } else {
         this->scratch_space_storage_service = nullptr;
-        this->scratch_space_size = 0;
       }
     }
 
@@ -171,11 +169,8 @@ namespace wrench {
       this->state = ComputeService::UP;
       if (scratch_space != nullptr) {
         this->scratch_space_storage_service = scratch_space;
-        //TODO: This call should not be here, because it causes unncessary increase in simulation time, but we need to find the size of the scratch space
-        this->scratch_space_size = scratch_space->getFreeSpace();
       } else {
         this->scratch_space_storage_service = nullptr;
-        this->scratch_space_size = 0;
       }
 
     }
@@ -421,7 +416,7 @@ namespace wrench {
      * @return return size (double)
      */
     double ComputeService::getScratchSize() {
-      return this->scratch_space_size;
+      return this->scratch_space_storage_service->getTotalSpace();
     }
 
 
@@ -430,10 +425,7 @@ namespace wrench {
     * @return returns a pointer to the shared scratch space
     */
     StorageService* ComputeService::getScratch() {
-      if (this->scratch_space_storage_service != nullptr) {
-        return this->scratch_space_storage_service;
-      }
-      return nullptr;
+      return this->scratch_space_storage_service;
     }
 
     /**
@@ -441,10 +433,7 @@ namespace wrench {
     * @return returns TRUE/FALSE (compute service has some scratch space or not)
     */
     bool ComputeService::hasScratch() {
-      if (this->scratch_space_storage_service != nullptr) {
-        return this->scratch_space_size > 0;
-      }
-      return false;
+      return (this->scratch_space_storage_service != nullptr);
     }
 
 };

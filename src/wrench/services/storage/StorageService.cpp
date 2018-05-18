@@ -711,4 +711,13 @@ namespace wrench {
       // At this point, the file should show up at some point on the mailbox_that_should_receive_file_content
 
     }
+
+    /**
+     * @brief Get the total capacity of the storage service (no simulation time consumption)
+     * @return capcacity of the storage service (double)
+     */
+
+    double StorageService::getTotalSpace() {
+      return this->capacity;
+    }
 };

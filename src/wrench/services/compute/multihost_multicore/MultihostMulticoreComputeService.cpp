@@ -879,10 +879,6 @@ namespace wrench {
         processStandardJobFailure(msg->executor, msg->job, msg->cause);
         return true;
 
-      } else if (auto msg = dynamic_cast<FilesInScratchMessageByStandardJobExecutor *>(message.get())) {
-        storeFilesStoredInScratch(msg->scratch_files);
-        return true;
-
       } else {
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");
       }
@@ -1655,7 +1651,7 @@ namespace wrench {
 
     /**
      * @brief Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
-     * @param scratch_files: the mailbox to which the description message should be sent
+     * @param scratch_files:
      */
     void MultihostMulticoreComputeService::storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files) {
       this->files_in_scratch.insert(scratch_files.begin(),scratch_files.end());
@@ -1665,6 +1661,14 @@ namespace wrench {
      * @brief Cleans up the scratch as I am a pilot job and I need clean the files stored by the standard jobs executed inside me
      */
     void MultihostMulticoreComputeService::cleanUpScratch() {
+      // First fetch all the files stored in scratch by all the workunit executors running inside a standardjob
+      // Files in scratch by finished workunit executors
+      for (auto it = this->completed_job_executors.begin(); it != this->completed_job_executors.end(); it++) {
+        std::set<WorkflowFile*> files_in_scratch_by_single_workunit = (*it)->getFilesInScratch();
+        this->files_in_scratch.insert(files_in_scratch_by_single_workunit.begin(),
+                                             files_in_scratch_by_single_workunit.end());
+      }
+
       for (auto scratch_cleanup_file : this->files_in_scratch) {
         try {
           getScratch()->deleteFile(scratch_cleanup_file);

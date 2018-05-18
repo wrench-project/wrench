@@ -93,7 +93,7 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 1, 1, 1.0);
         task->addInputFile(this->workflow->getFileById("input_file"));
         task->addOutputFile(this->workflow->getFileById("output_file"));
 

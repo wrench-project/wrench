@@ -53,9 +53,8 @@ namespace wrench {
             double ram_utilization,
             std::string callback_mailbox,
             Workunit *workunit,
-            StorageService *default_storage_service,
-            double thread_startup_overhead,
-            StorageService* scratch_space) :
+            StorageService *scratch_space,
+            double thread_startup_overhead) :
             Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
 
       if (thread_startup_overhead < 0) {
@@ -71,7 +70,6 @@ namespace wrench {
       this->thread_startup_overhead = thread_startup_overhead;
       this->num_cores = num_cores;
       this->ram_utilization = ram_utilization;
-      this->default_storage_service = default_storage_service;
       this->scratch_space = scratch_space;
       this->files_stored_in_scratch = {};
 
@@ -128,7 +126,6 @@ namespace wrench {
         msg_to_send_back = new WorkunitExecutorDoneMessage(
                 this,
                 this->workunit,
-                this->files_stored_in_scratch,
                 0.0);
 
       } catch (WorkflowExecutionException &e) {
@@ -139,7 +136,6 @@ namespace wrench {
         msg_to_send_back = new WorkunitExecutorFailedMessage(
                 this,
                 this->workunit,
-                this->files_stored_in_scratch,
                 e.getCause(),
                 0.0);
       }

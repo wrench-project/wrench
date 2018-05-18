@@ -43,6 +43,8 @@ namespace wrench {
 
         virtual double getFreeSpace();
 
+        double getTotalSpace();
+
         virtual bool lookupFile(WorkflowFile *file);
 
         virtual void deleteFile(WorkflowFile *file, FileRegistryService *file_registry_service=nullptr);
