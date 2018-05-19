@@ -138,6 +138,9 @@ namespace wrench {
         //Clean up scratch
         void cleanUpScratch();
 
+        //Store the list of files available in scratch
+        void StoreListOfFilesInScratch();
+
 
     };
 

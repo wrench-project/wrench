@@ -95,6 +95,8 @@ namespace wrench {
 
         double getScratchSize();
 
+        double getFreeRemainingScratchSpace();
+
         void setDefaultStorageService(StorageService *storage_service);
 
         StorageService *getDefaultStorageService();
