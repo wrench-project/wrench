@@ -653,4 +653,3 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
   free(argv[0]);
   free(argv);
 }
-

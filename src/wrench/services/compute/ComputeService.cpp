@@ -416,7 +416,11 @@ namespace wrench {
      * @return return size (double)
      */
     double ComputeService::getScratchSize() {
-      return this->scratch_space_storage_service->getTotalSpace();
+      if (this->scratch_space_storage_service) {
+        return this->scratch_space_storage_service->getTotalSpace();
+      } else {
+        return 0.0;
+      }
     }
 
     /**
@@ -424,7 +428,11 @@ namespace wrench {
      * @return return size (double)
      */
     double ComputeService::getFreeRemainingScratchSpace() {
-      return this->scratch_space_storage_service->getFreeSpace();
+      if (this->scratch_space_storage_service) {
+        return this->scratch_space_storage_service->getFreeSpace();
+      } else {
+        return 0.0;
+      }
     }
 
 

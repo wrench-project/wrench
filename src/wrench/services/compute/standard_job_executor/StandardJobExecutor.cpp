@@ -642,7 +642,7 @@ namespace wrench {
               std::cerr << "The name is " << task->getId() << "\n";
               if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                 throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
-                                         std::to_string(task->getInternalState()));
+                                         std::to_string(task->getInternalState()) + " for task " + task->getId());
               }
             }
 
