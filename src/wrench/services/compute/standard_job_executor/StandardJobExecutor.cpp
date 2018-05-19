@@ -275,6 +275,8 @@ namespace wrench {
 
       }
 
+      StoreListOfFilesInScratch();
+
       if (not this->part_of_pilot_job) {
         /*** Clean up everything in the scratch space ***/
         WRENCH_INFO("CLEANING UP SCRATCH IN STRANDARDJOBEXECUTOR ITSELF");
@@ -613,6 +615,8 @@ namespace wrench {
       }
 
 
+      std::cerr << "ready/non-ready work units " << ready_workunits.size() << " " << non_ready_workunits.size() << "\n";
+
       // Send the callback to the originator if the job has completed
       if ((this->non_ready_workunits.empty()) &&
           (this->ready_workunits.empty()) &&
@@ -635,6 +639,7 @@ namespace wrench {
           if (child->num_pending_parents == 0) {
             // Make the child's tasks ready
             for (auto task : child->tasks) {
+              std::cerr << "The name is " << task->getId() << "\n";
               if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                 throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
                                          std::to_string(task->getInternalState()));
@@ -916,6 +921,22 @@ namespace wrench {
      * @brief Clears the scratch space
      */
     void StandardJobExecutor::cleanUpScratch() {
+      if (this->scratch_space != nullptr) {
+        /** Perform scratch cleanup */
+        for (auto scratch_cleanup_file : files_stored_in_scratch) {
+          try {
+            this->scratch_space->deleteFile(scratch_cleanup_file);
+          } catch (WorkflowExecutionException &e) {
+            throw;
+          }
+        }
+      }
+    }
+
+    /**
+     * @brief Store the list of files available in scratch
+     */
+    void StandardJobExecutor::StoreListOfFilesInScratch() {
       // First fetch all the files stored in scratch by all the workunit executors running inside a standardjob
       // Files in scratch by finished workunit executors
       for (auto it = this->finished_workunit_executors.begin(); it != this->finished_workunit_executors.end(); it++) {
@@ -928,17 +949,6 @@ namespace wrench {
         std::set<WorkflowFile*> files_in_scratch_by_single_workunit = (*it)->getFilesStoredInScratch();
         this->files_stored_in_scratch.insert(files_in_scratch_by_single_workunit.begin(),
                                              files_in_scratch_by_single_workunit.end());
-      }
-
-      if (this->scratch_space != nullptr) {
-        /** Perform scratch cleanup */
-        for (auto scratch_cleanup_file : files_stored_in_scratch) {
-          try {
-            this->scratch_space->deleteFile(scratch_cleanup_file);
-          } catch (WorkflowExecutionException &e) {
-            throw;
-          }
-        }
       }
     }
 

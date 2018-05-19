@@ -665,6 +665,8 @@ namespace wrench {
       WRENCH_INFO(
               "Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2ef bytes of RAM) for a standard job",
               compute_resources.size(), total_cores, total_ram);
+
+      std::cerr << "The job being dispatched is "<< job->getName() << "\n";
       // Create and start a standard job executor
       // If this is itself NOT a pilot job
       bool part_of_pilot_job = false;
@@ -1457,6 +1459,7 @@ namespace wrench {
             const std::string &answer_mailbox, StandardJob *job,
             std::map<std::string, std::string> &service_specific_arguments) {
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
+      std::cerr << "the job name is "<<job->getName() << "\n";
 
       // Do we support standard jobs?
       if (not this->supportsStandardJobs()) {
@@ -1671,6 +1674,7 @@ namespace wrench {
 
       for (auto scratch_cleanup_file : this->files_in_scratch) {
         try {
+          std::cerr << "File being deleted  " << scratch_cleanup_file->getId() << "\n";
           getScratch()->deleteFile(scratch_cleanup_file);
         } catch (WorkflowExecutionException &e) {
           throw;

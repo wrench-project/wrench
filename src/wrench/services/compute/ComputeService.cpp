@@ -419,6 +419,14 @@ namespace wrench {
       return this->scratch_space_storage_service->getTotalSpace();
     }
 
+    /**
+     * @brief Get the free space of the scratch service
+     * @return return size (double)
+     */
+    double ComputeService::getFreeRemainingScratchSpace() {
+      return this->scratch_space_storage_service->getFreeSpace();
+    }
+
 
     /**
     * @brief Get a shared pointer to the scratch space

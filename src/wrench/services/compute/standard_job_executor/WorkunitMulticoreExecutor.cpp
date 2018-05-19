@@ -184,26 +184,20 @@ namespace wrench {
         StorageService *src = std::get<1>(file_copy);
         if (src == ComputeService::SCRATCH) {
           if (this->scratch_space == nullptr) {
-            throw std::runtime_error(
-                    "WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as source but is null"
-            );
+            throw WorkflowExecutionException(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as source but is null"));
           }
           src = this->scratch_space;
         }
         StorageService *dst = std::get<2>(file_copy);
         if (dst == ComputeService::SCRATCH) {
           if (this->scratch_space == nullptr) {
-            throw std::runtime_error(
-                    "WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as destination but is null"
-            );
+            throw WorkflowExecutionException(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as destination but is null"));
           }
           if (this->scratch_space->getFreeSpace() > 0) {
             dst = this->scratch_space;
             files_stored_in_scratch.insert(file);
           } else {
-            throw std::runtime_error(
-                    "WorkunitMulticoreExecutor::performWork(): Do not have enough space available in local scratch space"
-            );
+            throw WorkflowExecutionException(new StorageServiceNotEnoughSpace(file,dst));
           }
         }
 
