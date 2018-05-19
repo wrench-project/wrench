@@ -396,17 +396,16 @@ namespace wrench {
         return false;
       }
 
-      WorkflowJob *picked_job = nullptr;
-
       std::string job_selection_policy =
               this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY);
-      if (job_selection_policy == "FCFS") {
-        picked_job = this->pending_jobs.front();
-      } else {
+      if (job_selection_policy != "FCFS") {
         throw std::runtime_error(
                 "MultihostMulticoreComputeService::dispatchNextPendingJob(): Unsupported JOB_SELECTION_POLICY '" +
                 job_selection_policy + "'");
       }
+
+      WorkflowJob *picked_job = nullptr;
+      picked_job = this->pending_jobs.back();
 
       bool dispatched = false;
       switch (picked_job->getType()) {
