@@ -233,11 +233,11 @@ namespace wrench {
             double ttl,
             PilotJob *pj,
             std::string suffix, StorageService* scratch_space) : ComputeService(hostname,
-                                                                      "multihost_multicore" + suffix,
-                                                                      "multihost_multicore" + suffix,
-                                                                      supports_standard_jobs,
-                                                                      supports_pilot_jobs,
-                                                                      scratch_space) {
+                                                                                "multihost_multicore" + suffix,
+                                                                                "multihost_multicore" + suffix,
+                                                                                supports_standard_jobs,
+                                                                                supports_pilot_jobs,
+                                                                                scratch_space) {
 
       initiateInstance(hostname,
                        supports_standard_jobs,
@@ -425,17 +425,18 @@ namespace wrench {
         return false;
       }
 
-      WorkflowJob *picked_job = nullptr;
-
       std::string job_selection_policy =
               this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY);
-      if (job_selection_policy == "FCFS") {
-        picked_job = this->pending_jobs.front();
-      } else {
+
+      if (job_selection_policy != "FCFS") {
         throw std::runtime_error(
                 "MultihostMulticoreComputeService::dispatchNextPendingJob(): Unsupported JOB_SELECTION_POLICY '" +
                 job_selection_policy + "'");
       }
+
+      WorkflowJob *picked_job = nullptr;
+
+      picked_job = this->pending_jobs.back();
 
       bool dispatched = false;
       switch (picked_job->getType()) {
@@ -1669,7 +1670,7 @@ namespace wrench {
       for (auto it = this->completed_job_executors.begin(); it != this->completed_job_executors.end(); it++) {
         std::set<WorkflowFile*> files_in_scratch_by_single_workunit = (*it)->getFilesInScratch();
         this->files_in_scratch.insert(files_in_scratch_by_single_workunit.begin(),
-                                             files_in_scratch_by_single_workunit.end());
+                                      files_in_scratch_by_single_workunit.end());
       }
 
       for (auto scratch_cleanup_file : this->files_in_scratch) {
