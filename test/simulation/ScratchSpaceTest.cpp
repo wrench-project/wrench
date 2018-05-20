@@ -542,7 +542,6 @@ private:
           }
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-              std::cerr << "The task state is completed\n";
               // success, check if the scratch space size is not full again or not, it should not be
               if (pilot_job->getComputeService()->getFreeRemainingScratchSpace() == 3000.0) {
                 throw std::runtime_error(
@@ -567,7 +566,7 @@ private:
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
             // success, check if the scratch space size is full again or not, it should be full
-            std::cerr << "The free space is " << pilot_job->getComputeService()->getFreeRemainingScratchSpace() << "\n";
+            wrench::S4U_Simulation::sleep(10); //sleep for some time to ensure everything is deleted
             if (pilot_job->getComputeService()->getFreeRemainingScratchSpace() != 3000.0) {
               throw std::runtime_error(
                       "Scratch space should be full after this pilot job expires but it is not now");

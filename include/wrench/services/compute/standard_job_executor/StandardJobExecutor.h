@@ -52,9 +52,9 @@ namespace wrench {
                 std::string hostname,
                 StandardJob *job,
                 std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                std::map<std::string, std::string> plist = {},
                 StorageService* scratch_space = nullptr,
-                bool part_of_pilot_job = false);
+                bool part_of_pilot_job = false,
+                std::map<std::string, std::string> plist = {});
 
         void kill();
 
