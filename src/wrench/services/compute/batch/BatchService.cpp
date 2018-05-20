@@ -1539,10 +1539,11 @@ namespace wrench {
                           std::get<0>(*resources.begin()),
                           (StandardJob *) workflow_job,
                           resources,
+                          this->getScratch(),
+                          false,
                           {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                                    this->getPropertyValueAsString(
-                                           BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}},
-                          this->getScratch()));
+                                           BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}}));
           executor->start(executor, true);
           batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
           batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + allocated_time);

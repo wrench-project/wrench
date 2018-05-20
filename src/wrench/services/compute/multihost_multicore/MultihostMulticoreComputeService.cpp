@@ -667,20 +667,20 @@ namespace wrench {
               "Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2ef bytes of RAM) for a standard job",
               compute_resources.size(), total_cores, total_ram);
 
-      std::cerr << "The job being dispatched is "<< job->getName() << "\n";
       // Create and start a standard job executor
       // If this is itself NOT a pilot job
       bool part_of_pilot_job = false;
       if (this->containing_pilot_job != nullptr) {
         part_of_pilot_job = true;
       }
-//      if (this->containing_pilot_job == nullptr) {
       std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(new StandardJobExecutor(
               this->simulation,
               this->mailbox_name,
               this->hostname,
               job,
               compute_resources,
+              getScratch(),
+              part_of_pilot_job,
               {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,   this->getPropertyValueAsString(
                       MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
                {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, this->getPropertyValueAsString(
@@ -688,38 +688,11 @@ namespace wrench {
                {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM)},
                {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
-                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}},
-              getScratch(),
-              part_of_pilot_job));
+                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}}));
 
       executor->start(executor, true);
       this->standard_job_executors.insert(executor);
       this->running_jobs.insert(job);
-//      } else {
-//        // If this is a Pilot Job itself, we have to make sure that we use the scratch space of the upper MultihostMultiCoreComputeService
-//        MultihostMulticoreComputeService* upper_level_multihost_compute_service = (MultihostMulticoreComputeService*)this->containing_pilot_job->getComputeService();
-//        if (upper_level_multihost_compute_service->getScratch() == nullptr) {
-//          std::cerr << "Toit it's null\n";
-//        }
-//        std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(new StandardJobExecutor(
-//                this->simulation,
-//                this->mailbox_name,
-//                this->hostname,
-//                job,
-//                compute_resources,
-//                {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,   this->getPropertyValueAsString(
-//                        MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
-//                 {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, this->getPropertyValueAsString(
-//                         MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM)},
-//                 {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
-//                         MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM)},
-//                 {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
-//                         MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}},
-//                getScratch())); //this line is the difference between here and upper code
-//        executor->start(executor, true);
-//        this->standard_job_executors.insert(executor);
-//        this->running_jobs.insert(job);
-//      }
 
       // Tell the caller that a job was dispatched!
       return true;
@@ -1460,7 +1433,6 @@ namespace wrench {
             const std::string &answer_mailbox, StandardJob *job,
             std::map<std::string, std::string> &service_specific_arguments) {
       WRENCH_INFO("Asked to run a standard job with %ld tasks", job->getNumTasks());
-      std::cerr << "the job name is "<<job->getName() << "\n";
 
       // Do we support standard jobs?
       if (not this->supportsStandardJobs()) {
@@ -1675,7 +1647,6 @@ namespace wrench {
 
       for (auto scratch_cleanup_file : this->files_in_scratch) {
         try {
-          std::cerr << "File being deleted  " << scratch_cleanup_file->getId() << "\n";
           getScratch()->deleteFile(scratch_cleanup_file);
         } catch (WorkflowExecutionException &e) {
           throw;

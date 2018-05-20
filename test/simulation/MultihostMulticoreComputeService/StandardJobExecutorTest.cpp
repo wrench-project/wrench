@@ -155,6 +155,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple("bogus", 2, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -175,6 +177,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         nullptr,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -195,6 +199,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -215,6 +221,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 0, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -235,6 +243,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 100, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -256,6 +266,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], wrench::ComputeService::ALL_CORES, -1)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -276,6 +288,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple("Host4", wrench::ComputeService::ALL_CORES, 2048)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -318,6 +332,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple("Host4", wrench::ComputeService::ALL_CORES, 100.00)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -362,6 +378,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple("Host4", wrench::ComputeService::ALL_CORES, 100.00)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -400,6 +418,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple("Host1", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -557,6 +577,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -750,6 +772,8 @@ private:
                   test->simulation->getHostnameList()[0],
                   job,
                   {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
+                  nullptr,
+                  false,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
           ));
@@ -927,6 +951,8 @@ private:
                   test->simulation->getHostnameList()[1],
                   job,
                   {std::make_tuple(test->simulation->getHostnameList()[1], 2, wrench::ComputeService::ALL_RAM)},
+                  nullptr,
+                  false,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
           ));
@@ -1127,10 +1153,12 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
-                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
-                                thread_startup_overhead)}},
-                        this->test->storage_service1 // This should be a scratch space of a compute service, but since this
+                        this->test->storage_service1 , // This should be a scratch space of a compute service, but since this
                         //standard job executor is being created direclty (not by any Compute Service), we pass a dummy storage as a scratch space
+                        false,
+                        {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
+                                thread_startup_overhead)}}
+
                 ));
         executor->start(executor, true);
 
@@ -1284,6 +1312,8 @@ private:
                         test->simulation->getHostnameList()[1],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[1], 6, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1346,6 +1376,8 @@ private:
                         test->simulation->getHostnameList()[1],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1412,6 +1444,8 @@ private:
                         test->simulation->getHostnameList()[1],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -1579,6 +1613,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1663,6 +1699,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1748,6 +1786,8 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1935,6 +1975,8 @@ public:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM),
                          std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -2020,6 +2062,8 @@ public:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM),
                          std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -2208,6 +2252,8 @@ private:
                         job,
                         {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
                          std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -2358,6 +2404,8 @@ private:
                         job,
                         {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
                          std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -2523,6 +2571,8 @@ private:
                           job,
                           {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
                            std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
+                          nullptr,
+                          false,
                           {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                   ));
           executor->start(executor, true);

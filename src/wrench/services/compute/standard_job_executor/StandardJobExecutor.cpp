@@ -59,9 +59,9 @@ namespace wrench {
                                              std::string hostname,
                                              StandardJob *job,
                                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                             std::map<std::string, std::string> plist,
                                              StorageService* scratch_space,
-                                             bool part_of_pilot_job) :
+                                             bool part_of_pilot_job,
+                                             std::map<std::string, std::string> plist) :
             Service(hostname, "standard_job_executor", "standard_job_executor") {
 
       if ((job == nullptr) || (compute_resources.empty())) {
@@ -615,8 +615,6 @@ namespace wrench {
       }
 
 
-      std::cerr << "ready/non-ready work units " << ready_workunits.size() << " " << non_ready_workunits.size() << "\n";
-
       // Send the callback to the originator if the job has completed
       if ((this->non_ready_workunits.empty()) &&
           (this->ready_workunits.empty()) &&
@@ -639,7 +637,6 @@ namespace wrench {
           if (child->num_pending_parents == 0) {
             // Make the child's tasks ready
             for (auto task : child->tasks) {
-              std::cerr << "The name is " << task->getId() << "\n";
               if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                 throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
                                          std::to_string(task->getInternalState()) + " for task " + task->getId());
