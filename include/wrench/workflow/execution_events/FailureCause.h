@@ -42,6 +42,8 @@ namespace wrench {
                     FATAL_FAILURE,
             /** @brief The file cannot be found anywhere */
                     NO_STORAGE_SERVICE_FOR_FILE,
+            /** @brief No Scratch Space available */
+                    NO_SCRATCH_SPACE,
             /** @brief The file was not found where it was supposed to be found */
                     FILE_NOT_FOUND,
             /** @brief The file to be written was already there */
@@ -103,6 +105,19 @@ namespace wrench {
 
     private:
         WorkflowFile *file;
+    };
+
+
+    /**
+     * @brief No Scratch Space failure cause
+     */
+    class NoScratchSpace : public FailureCause {
+
+    public:
+        NoScratchSpace(std::string error);
+        std::string toString();
+    private:
+        std::string error;
     };
 
     /**

@@ -98,12 +98,11 @@ namespace wrench {
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
                                std::vector<std::string> compute_hosts,
-                               StorageService *default_storage_service,
-                               std::map<std::string, std::string> plist) :
+                               std::map<std::string, std::string> plist,
+                               double scratch_size) :
             BatchService(hostname, supports_standard_jobs,
-                         supports_pilot_jobs, std::move(compute_hosts),
-                         default_storage_service, ComputeService::ALL_CORES,
-                         ComputeService::ALL_RAM, std::move(plist), "") {
+                         supports_pilot_jobs, std::move(compute_hosts), ComputeService::ALL_CORES,
+                         ComputeService::ALL_RAM, std::move(plist), "", scratch_size) {
 
     }
 
@@ -128,16 +127,15 @@ namespace wrench {
                                bool supports_standard_jobs,
                                bool supports_pilot_jobs,
                                std::vector<std::string> compute_hosts,
-                               StorageService *default_storage_service,
                                unsigned long cores_per_host,
                                double ram_per_host,
-                               std::map<std::string, std::string> plist, std::string suffix) :
+                               std::map<std::string, std::string> plist, std::string suffix, double scratch_size) :
             ComputeService(hostname,
                            "batch" + suffix,
                            "batch" + suffix,
                            supports_standard_jobs,
                            supports_pilot_jobs,
-                           default_storage_service) {
+                           scratch_size) {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(plist));
@@ -1527,7 +1525,8 @@ namespace wrench {
                           std::get<0>(*resources.begin()),
                           (StandardJob *) workflow_job,
                           resources,
-                          this->default_storage_service,
+                          this->getScratch(),
+                          false,
                           {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                                    this->getPropertyValueAsString(
                                            BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}}));
@@ -1572,8 +1571,7 @@ namespace wrench {
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(host_to_run_on,
                                                        true, false,
-                                                       resources,
-                                                       this->default_storage_service
+                                                       resources, {}, getScratch()
                   ));
           cs->simulation = this->simulation;
           job->setComputeService(cs);

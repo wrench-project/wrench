@@ -156,6 +156,7 @@ private:
                         job,
                         {std::make_tuple("bogus", 2, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -177,6 +178,7 @@ private:
                         nullptr,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -198,6 +200,7 @@ private:
                         job,
                         {},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -219,6 +222,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 0, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -240,6 +244,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 100, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -262,6 +267,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], wrench::ComputeService::ALL_CORES, -1)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -283,6 +289,7 @@ private:
                         job,
                         {std::make_tuple("Host4", wrench::ComputeService::ALL_CORES, 2048)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -326,6 +333,7 @@ private:
                         job,
                         {std::make_tuple("Host4", wrench::ComputeService::ALL_CORES, 100.00)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -371,6 +379,7 @@ private:
                         job,
                         {std::make_tuple("Host4", wrench::ComputeService::ALL_CORES, 100.00)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -410,6 +419,7 @@ private:
                         job,
                         {std::make_tuple("Host1", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -467,7 +477,6 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
 
   // Create a Storage Service
@@ -569,6 +578,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -656,7 +666,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
 
   // Create a Storage Service
@@ -764,6 +773,7 @@ private:
                   job,
                   {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
                   nullptr,
+                  false,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
           ));
@@ -835,7 +845,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
 
   // Create a Storage Service
@@ -943,6 +952,7 @@ private:
                   job,
                   {std::make_tuple(test->simulation->getHostnameList()[1], 2, wrench::ComputeService::ALL_RAM)},
                   nullptr,
+                  false,
                   {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                           thread_startup_overhead)}}
           ));
@@ -1014,7 +1024,6 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -1144,9 +1153,12 @@ private:
                         test->simulation->getHostnameList()[0],
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 2, wrench::ComputeService::ALL_RAM)},
-                        this->test->storage_service1,
+                        this->test->storage_service1 , // This should be a scratch space of a compute service, but since this
+                        //standard job executor is being created direclty (not by any Compute Service), we pass a dummy storage as a scratch space
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
+
                 ));
         executor->start(executor, true);
 
@@ -1227,7 +1239,6 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       storage_service1,
                                                        {})));
 
   // Create a WMS
@@ -1302,6 +1313,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[1], 6, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1365,6 +1377,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1432,6 +1445,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, std::to_string(
                                 thread_startup_overhead)}}
                 ));
@@ -1501,7 +1515,6 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -1601,6 +1614,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1686,6 +1700,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1772,6 +1787,7 @@ private:
                         job,
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -1854,7 +1870,6 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -1961,6 +1976,7 @@ public:
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM),
                          std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -2047,6 +2063,7 @@ public:
                         {std::make_tuple(test->simulation->getHostnameList()[0], 10, wrench::ComputeService::ALL_RAM),
                          std::make_tuple(test->simulation->getHostnameList()[1], 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -2128,7 +2145,6 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -2237,6 +2253,7 @@ private:
                         {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
                          std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -2282,7 +2299,6 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService("Host3", true, true,
                                                        {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -2389,6 +2405,7 @@ private:
                         {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
                          std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
                         nullptr,
+                        false,
                         {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                 ));
         executor->start(executor, true);
@@ -2433,7 +2450,6 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService("Host3", true, true,
                                                        {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -2556,6 +2572,7 @@ private:
                           {std::make_tuple("Host3", 10, wrench::ComputeService::ALL_RAM),
                            std::make_tuple("Host4", 10, wrench::ComputeService::ALL_RAM)},
                           nullptr,
+                          false,
                           {{wrench::StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"}}
                   ));
           executor->start(executor, true);
@@ -2603,7 +2620,6 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService("Host3", true, true,
                                                        {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
   // Create a Storage Services
   EXPECT_NO_THROW(storage_service1 = simulation->add(

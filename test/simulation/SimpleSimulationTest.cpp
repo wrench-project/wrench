@@ -135,7 +135,9 @@ private:
 
       for (auto task : tasks) {
         try {
-          wrench::StandardJob *two_task_job = job_manager->createStandardJob(task, {});
+          wrench::StandardJob *two_task_job = job_manager->createStandardJob({task}, {},
+                                                                             {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                             {}, {});
           auto cs = (wrench::CloudService *) this->test->compute_service;
           std::string execution_host = cs->getExecutionHosts()[0];
           cs->createVM(execution_host, 2, 10);
@@ -194,7 +196,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {})));
+          new wrench::CloudService(hostname, true, false, execution_hosts, {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

@@ -41,6 +41,22 @@ namespace wrench {
     }
 
     /**
+     * @brief Constructor
+     */
+    NoScratchSpace::NoScratchSpace(std::string error) : FailureCause(
+            NO_SCRATCH_SPACE) {
+      this->error = error;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string NoScratchSpace::toString() {
+      return error;
+    }
+
+    /**
      * @brief Getter
      * @return the file
      */

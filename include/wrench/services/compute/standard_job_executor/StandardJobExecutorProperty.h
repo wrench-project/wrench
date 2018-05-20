@@ -33,6 +33,9 @@ namespace wrench {
         /** @brief The number of bytes in the control message sent by the executor to state that a job has failed **/
         DECLARE_PROPERTY_NAME(STANDARD_JOB_FAILED_MESSAGE_PAYLOAD);
 
+        /** @brief The number of bytes in the control message sent by the executor to provide the set of files stored in the scratch **/
+        DECLARE_PROPERTY_NAME(STANDARD_JOB_FILES_STORED_IN_SCRATCH);
+
 
         /** @brief The algorithm that decides how many cores are given to
          *         a computational task. Possible values are:

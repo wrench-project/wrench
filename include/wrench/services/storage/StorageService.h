@@ -43,6 +43,8 @@ namespace wrench {
 
         virtual double getFreeSpace();
 
+        double getTotalSpace();
+
         virtual bool lookupFile(WorkflowFile *file);
 
         virtual void deleteFile(WorkflowFile *file, FileRegistryService *file_registry_service=nullptr);
@@ -65,11 +67,13 @@ namespace wrench {
 
         static void readFiles(std::set<WorkflowFile *> files,
                               std::map<WorkflowFile *, StorageService *> file_locations,
-                              StorageService *default_storage_service);
+                              StorageService *default_storage_service,
+                              std::set<WorkflowFile*>& files_in_scratch);
 
         static void writeFiles(std::set<WorkflowFile *> files,
                                std::map<WorkflowFile *, StorageService *> file_locations,
-                               StorageService *default_storage_service);
+                               StorageService *default_storage_service,
+                               std::set<WorkflowFile*>& files_in_scratch);
 
         static void deleteFiles(std::set<WorkflowFile *> files,
                                 std::map<WorkflowFile *, StorageService *> file_locations,
@@ -110,7 +114,7 @@ namespace wrench {
 
         static void writeOrReadFiles(FileOperation action, std::set<WorkflowFile *> files,
                                      std::map<WorkflowFile *, StorageService *> file_locations,
-                                     StorageService *default_storage_service);
+                                     StorageService *default_storage_service, std::set<WorkflowFile*>& files_in_scratch);
 
 
     };

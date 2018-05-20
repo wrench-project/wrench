@@ -42,11 +42,11 @@ namespace wrench {
                                                          bool supports_standard_jobs,
                                                          bool supports_pilot_jobs,
                                                          std::vector<std::string> &execution_hosts,
-                                                         StorageService *default_storage_service,
-                                                         std::map<std::string, std::string> plist) :
+                                                         std::map<std::string, std::string> plist,
+                                                         double scratch_size) :
             ComputeService(hostname, "virtualized_cluster_service", "virtualized_cluster_service",
                            supports_standard_jobs, supports_pilot_jobs,
-                           default_storage_service) {
+                           scratch_size) {
 
       if (execution_hosts.empty()) {
         throw std::runtime_error("At least one execution host should be provided");
@@ -490,8 +490,8 @@ namespace wrench {
                   new MultihostMulticoreComputeService(vm_hostname,
                                                        supports_standard_jobs,
                                                        supports_pilot_jobs,
-                                                       compute_resources,
-                                                       default_storage_service, plist));
+                                                       compute_resources, plist,
+                                                       getScratch()));
           cs->simulation = this->simulation;
 
           this->cs_available_ram[pm_hostname] -= ram_memory;

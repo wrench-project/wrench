@@ -52,13 +52,17 @@ namespace wrench {
                 std::string hostname,
                 StandardJob *job,
                 std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                StorageService *default_storage_service,
+                StorageService* scratch_space = nullptr,
+                bool part_of_pilot_job = false,
                 std::map<std::string, std::string> plist = {});
 
         void kill();
 
         StandardJob *getJob();
         std::set<std::tuple<std::string, unsigned long, double>> getComputeResources();
+
+        // Get the set of files stored in scratch space by a standardjob job
+        std::set<WorkflowFile*> getFilesInScratch();
 
     private:
 
@@ -70,7 +74,12 @@ namespace wrench {
         std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
         int total_num_cores;
         double total_ram;
-        StorageService *default_storage_service;
+        StorageService *scratch_space;
+
+        bool part_of_pilot_job;
+
+        // Files stored in scratch
+        std::set<WorkflowFile*> files_stored_in_scratch;
 
         // Core availabilities (for each hosts, how many cores are currently available on it)
         std::map<std::string, unsigned long> core_availabilities;
@@ -95,6 +104,7 @@ namespace wrench {
                 {StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"},
                 {StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
                 {StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
+                {StandardJobExecutorProperty::STANDARD_JOB_FILES_STORED_IN_SCRATCH, "1024"},
                 {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, "maximum"},
                 {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM, "maximum_flops"},
                 {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "best_fit"},
@@ -124,6 +134,13 @@ namespace wrench {
         void createWorkunits();
 
         std::vector<Workunit*> sortReadyWorkunits();
+
+        //Clean up scratch
+        void cleanUpScratch();
+
+        //Store the list of files available in scratch
+        void StoreListOfFilesInScratch();
+
 
     };
 

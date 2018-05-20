@@ -23,6 +23,7 @@
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "StandardJobExecutorMessage.h"
+#include <exception>
 
 #include "wrench/util/PointerUtil.h"
 XBT_LOG_NEW_DEFAULT_CATEGORY(standard_job_executor, "Log category for Standard Job Executor");
@@ -58,7 +59,8 @@ namespace wrench {
                                              std::string hostname,
                                              StandardJob *job,
                                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                             StorageService *default_storage_service,
+                                             StorageService* scratch_space,
+                                             bool part_of_pilot_job,
                                              std::map<std::string, std::string> plist) :
             Service(hostname, "standard_job_executor", "standard_job_executor") {
 
@@ -156,7 +158,9 @@ namespace wrench {
       this->simulation = simulation;
       this->callback_mailbox = callback_mailbox;
       this->job = job;
-      this->default_storage_service = default_storage_service;
+      this->scratch_space = scratch_space;
+      this->files_stored_in_scratch = {};
+      this->part_of_pilot_job = part_of_pilot_job;
 
 
       // set properties
@@ -269,6 +273,14 @@ namespace wrench {
           break;
         }
 
+      }
+
+      StoreListOfFilesInScratch();
+
+      if (not this->part_of_pilot_job) {
+        /*** Clean up everything in the scratch space ***/
+        WRENCH_INFO("CLEANING UP SCRATCH IN STRANDARDJOBEXECUTOR ITSELF");
+        cleanUpScratch();
       }
 
       WRENCH_INFO("Standard Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
@@ -473,7 +485,7 @@ namespace wrench {
                                               required_ram,
                                               this->mailbox_name,
                                               wu,
-                                              this->default_storage_service,
+                                              this->scratch_space,
                                               this->getPropertyValueAsDouble(
                                                       StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD)));
 
@@ -627,7 +639,7 @@ namespace wrench {
             for (auto task : child->tasks) {
               if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                 throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
-                                         std::to_string(task->getInternalState()));
+                                         std::to_string(task->getInternalState()) + " for task " + task->getId());
               }
             }
 
@@ -902,11 +914,53 @@ namespace wrench {
       return sorted_workunits;
     }
 
+    /**
+     * @brief Clears the scratch space
+     */
+    void StandardJobExecutor::cleanUpScratch() {
+      if (this->scratch_space != nullptr) {
+        /** Perform scratch cleanup */
+        for (auto scratch_cleanup_file : files_stored_in_scratch) {
+          try {
+            this->scratch_space->deleteFile(scratch_cleanup_file);
+          } catch (WorkflowExecutionException &e) {
+            throw;
+          }
+        }
+      }
+    }
 
-/**
- * @brief Retrieve the executor's job
- * @return a standard job
- */
+    /**
+     * @brief Store the list of files available in scratch
+     */
+    void StandardJobExecutor::StoreListOfFilesInScratch() {
+      // First fetch all the files stored in scratch by all the workunit executors running inside a standardjob
+      // Files in scratch by finished workunit executors
+      for (auto it = this->finished_workunit_executors.begin(); it != this->finished_workunit_executors.end(); it++) {
+        std::set<WorkflowFile*> files_in_scratch_by_single_workunit = (*it)->getFilesStoredInScratch();
+        this->files_stored_in_scratch.insert(files_in_scratch_by_single_workunit.begin(),
+                                             files_in_scratch_by_single_workunit.end());
+      }
+      // Files in scratch by failed workunit executors
+      for (auto it = this->failed_workunit_executors.begin(); it != this->failed_workunit_executors.end(); it++) {
+        std::set<WorkflowFile*> files_in_scratch_by_single_workunit = (*it)->getFilesStoredInScratch();
+        this->files_stored_in_scratch.insert(files_in_scratch_by_single_workunit.begin(),
+                                             files_in_scratch_by_single_workunit.end());
+      }
+    }
+
+    /**
+     * @brief Get the set of files stored in scratch space by a standardjob job
+     */
+    std::set<WorkflowFile*> StandardJobExecutor::getFilesInScratch() {
+      return this->files_stored_in_scratch;
+    }
+
+
+  /**
+   * @brief Retrieve the executor's job
+   * @return a standard job
+   */
     StandardJob *StandardJobExecutor::getJob() {
       return this->job;
     }
