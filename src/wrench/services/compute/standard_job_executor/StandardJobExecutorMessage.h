@@ -50,7 +50,6 @@ namespace wrench {
         WorkunitMulticoreExecutor *workunit_executor;
         /** @brief The work that was performed */
         Workunit *workunit;
-
     };
 
     /**
@@ -109,6 +108,7 @@ namespace wrench {
         std::shared_ptr<FailureCause> cause;
 
     };
+
 
     /**
      * @brief ComputeThreadDoneMessage class

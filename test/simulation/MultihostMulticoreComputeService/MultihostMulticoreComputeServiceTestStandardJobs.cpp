@@ -203,7 +203,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -258,7 +258,8 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
       // Submit the 2-task job for execution
@@ -327,7 +328,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {}, 100.0))); //scratch space of size 100
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -382,7 +383,8 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task3, this->test->task4}, {}, {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task3, this->test->task4}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
       // Submit the 2-task job for execution
@@ -452,7 +454,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms;
@@ -507,7 +509,8 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6}, {}, {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task5, this->test->task6}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
       // Submit the 2-task job for execution
@@ -581,7 +584,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -637,7 +640,8 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
       // Submit the 2-task job for execution
@@ -695,7 +699,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -824,7 +828,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -897,7 +901,8 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
       // Submit the 2-task job for execution
@@ -962,8 +967,8 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, {},
+                                                               100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1037,7 +1042,8 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
       // Submit the 2-task job for execution
@@ -1103,7 +1109,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -1242,7 +1248,7 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

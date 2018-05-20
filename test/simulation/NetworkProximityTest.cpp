@@ -164,7 +164,6 @@ void NetworkProximityTest::do_NetworkProximity_Test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -340,7 +339,6 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
 
   // Create a Storage Service
@@ -486,7 +484,6 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       nullptr,
                                                        {})));
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -595,7 +592,6 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
     EXPECT_NO_THROW(compute_service = simulation->add(
             new wrench::MultihostMulticoreComputeService(hostname, true, true,
                                                          {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                         nullptr,
                                                          {})));
     // Create a Storage Service
     EXPECT_NO_THROW(storage_service1 = simulation->add(

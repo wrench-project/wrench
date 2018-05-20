@@ -223,7 +223,6 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
   // Create a Batch Service with a FCFS scheduling algorithm
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                   nullptr,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -412,7 +411,6 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
   // Create a Batch Service with a FCFS scheduling algorithm
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                   nullptr,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
   simulation->add(new wrench::FileRegistryService(hostname));

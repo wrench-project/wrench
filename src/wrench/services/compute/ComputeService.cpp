@@ -7,6 +7,7 @@
  * (at your option) any later version.
  */
 
+#include <wrench/services/storage/simple/SimpleStorageService.h>
 #include "wrench/exceptions/WorkflowExecutionException.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/ComputeService.h"
@@ -30,6 +31,7 @@ namespace wrench {
       Service::stop();
     }
 
+    StorageService* ComputeService::SCRATCH = (StorageService*)(new int(553453));
 
     /**
      * @brief Submit a job to the compute service
@@ -120,19 +122,56 @@ namespace wrench {
      * @param supports_standard_jobs: true if the job executor should support standard jobs
      * @param supports_pilot_jobs: true if the job executor should support pilot jobs
      * @param default_storage_service: a storage service
+     * @param scratch_size: the size for the scratch space of the compute service
      */
     ComputeService::ComputeService(std::string hostname,
                                    std::string service_name,
                                    std::string mailbox_name_prefix,
                                    bool supports_standard_jobs,
                                    bool supports_pilot_jobs,
-                                   StorageService *default_storage_service) :
+                                   double scratch_size) :
             Service(hostname, service_name, mailbox_name_prefix),
             supports_pilot_jobs(supports_pilot_jobs),
-            supports_standard_jobs(supports_standard_jobs),
-            default_storage_service(default_storage_service) {
+            supports_standard_jobs(supports_standard_jobs) {
 
       this->state = ComputeService::UP;
+      if (scratch_size > 0) {
+        try {
+          this->scratch_space_storage_service =
+                  new SimpleStorageService(hostname, scratch_size);
+        } catch (std::runtime_error &e) {
+          throw;
+        }
+      } else {
+        this->scratch_space_storage_service = nullptr;
+      }
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param hostname: the name of the host on which the service runs
+     * @param service_name: the name of the compute service
+     * @param mailbox_name_prefix: the mailbox name prefix
+     * @param supports_standard_jobs: true if the job executor should support standard jobs
+     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
+     * @param default_storage_service: a storage service
+     * @param scratch_space: scratch space of the compute service
+     */
+    ComputeService::ComputeService(std::string hostname, std::string service_name, std::string mailbox_name_prefix,
+                                   bool supports_standard_jobs,
+                                   bool supports_pilot_jobs,
+                                   StorageService *scratch_space): Service(hostname, service_name, mailbox_name_prefix),
+                                    supports_pilot_jobs(supports_pilot_jobs),
+                                    supports_standard_jobs(supports_standard_jobs) {
+
+      this->state = ComputeService::UP;
+      if (scratch_space != nullptr) {
+        this->scratch_space_storage_service = scratch_space;
+      } else {
+        this->scratch_space_storage_service = nullptr;
+      }
+
     }
 
     /**
@@ -313,21 +352,21 @@ namespace wrench {
 
 
 
-    /**
-     * @brief Set the default StorageService for the ComputeService
-     * @param storage_service: a storage service
-     */
-    void ComputeService::setDefaultStorageService(StorageService *storage_service) {
-      this->default_storage_service = storage_service;
-    }
-
-    /**
-    * @brief Get the default StorageService for the compute service
-    * @return a storage service
-    */
-    StorageService *ComputeService::getDefaultStorageService() {
-      return this->default_storage_service;
-    }
+//    /**
+//     * @brief Set the default StorageService for the ComputeService
+//     * @param storage_service: a storage service
+//     */
+//    void ComputeService::setDefaultStorageService(StorageService *storage_service) {
+//      this->default_storage_service = storage_service;
+//    }
+//
+//    /**
+//    * @brief Get the default StorageService for the compute service
+//    * @return a storage service
+//    */
+//    StorageService *ComputeService::getDefaultStorageService() {
+//      return this->default_storage_service;
+//    }
 
     /**
      * @brief Get information about the compute service as a dictionary of vectors
@@ -369,4 +408,47 @@ namespace wrench {
                 "MultihostMulticoreComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() + "] message");
       }
     }
+
+
+    /**
+     * @brief Get the total size of the scratch space (not the remaining free space on the scratch space)
+     * @return return size (double)
+     */
+    double ComputeService::getScratchSize() {
+      if (this->scratch_space_storage_service) {
+        return this->scratch_space_storage_service->getTotalSpace();
+      } else {
+        return 0.0;
+      }
+    }
+
+    /**
+     * @brief Get the free space of the scratch service
+     * @return return size (double)
+     */
+    double ComputeService::getFreeRemainingScratchSpace() {
+      if (this->scratch_space_storage_service) {
+        return this->scratch_space_storage_service->getFreeSpace();
+      } else {
+        return 0.0;
+      }
+    }
+
+
+    /**
+    * @brief Get a shared pointer to the scratch space
+    * @return returns a pointer to the shared scratch space
+    */
+    StorageService* ComputeService::getScratch() {
+      return this->scratch_space_storage_service;
+    }
+
+    /**
+    * @brief Checks if the compute service has a scratch space
+    * @return returns TRUE/FALSE (compute service has some scratch space or not)
+    */
+    bool ComputeService::hasScratch() {
+      return (this->scratch_space_storage_service != nullptr);
+    }
+
 };

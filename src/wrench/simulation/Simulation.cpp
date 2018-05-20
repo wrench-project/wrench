@@ -299,6 +299,14 @@ namespace wrench {
           storage_service->start(storage_service, true);
         }
 
+        // Start the scratch services
+        for (const auto &compute_service : this->compute_services) {
+          if (compute_service->hasScratch()) {
+            compute_service->getScratch()->simulation = this;
+            compute_service->getScratch()->start(std::shared_ptr<StorageService>(compute_service->getScratch()), true);
+          }
+        }
+
         // Start the network proximity services
         for (const auto &network_proximity_service : this->network_proximity_services) {
           network_proximity_service->start(network_proximity_service, true);

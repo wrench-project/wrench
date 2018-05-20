@@ -27,11 +27,15 @@ namespace wrench {
 
     class Alarm;
 
+
     /**
      * @brief A compute service that manages a set of multi-core compute hosts and
      *        controls access to their resources using various scheduling strategies.
      */
     class MultihostMulticoreComputeService : public ComputeService {
+
+        friend class VirtualizedClusterService;
+        friend class BatchService;
 
     private:
 
@@ -71,16 +75,16 @@ namespace wrench {
                                          const bool supports_standard_jobs,
                                          const bool supports_pilot_jobs,
                                          const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                         StorageService *default_storage_service,
-                                         std::map<std::string, std::string> plist = {});
+                                         std::map<std::string, std::string> plist = {},
+                                         double scratch_size = 0);
 
         // Public Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
                                          bool supports_standard_jobs,
                                          bool supports_pilot_jobs,
                                          const std::set<std::string> compute_hosts,
-                                         StorageService *default_storage_service,
-                                         std::map<std::string, std::string> plist = {});
+                                         std::map<std::string, std::string> plist = {},
+                                         double scratch_size = 0);
 
 
         /***********************/
@@ -121,7 +125,15 @@ namespace wrench {
                                          std::map<std::string, std::string> plist,
                                          double ttl,
                                          PilotJob *pj, std::string suffix,
-                                         StorageService *default_storage_service);
+                                         StorageService* scratch_space); // reference to upper level scratch space
+
+        // Private Constructor
+        MultihostMulticoreComputeService(const std::string &hostname,
+                                         const bool supports_standard_jobs,
+                                         const bool supports_pilot_jobs,
+                                         const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                         std::map<std::string, std::string> plist,
+                                         StorageService* scratch_space);
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
@@ -130,8 +142,7 @@ namespace wrench {
                               std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                               std::map<std::string, std::string> plist,
                               double ttl,
-                              PilotJob *pj,
-                              StorageService *default_storage_service);
+                              PilotJob *pj);
 
         std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
 
@@ -145,6 +156,7 @@ namespace wrench {
         std::shared_ptr<Alarm> death_alarm = nullptr;
 
         PilotJob *containing_pilot_job; // In case this service is in fact a pilot job
+        std::set<WorkflowFile*> files_in_scratch; // Files stored in scratch, here only used by a pilot job, because for standard jobs, they will be deleted inside standardjobs
 
         // Set of current standard job executors
         std::set<std::shared_ptr<StandardJobExecutor>> standard_job_executors;
@@ -156,6 +168,12 @@ namespace wrench {
 
         // Queue of pending jobs (standard or pilot) that haven't begun executing
         std::deque<WorkflowJob *> pending_jobs;
+
+        // Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
+        void storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files);
+
+        // Cleanup the scratch if I am a pilot job
+        void cleanUpScratch();
 
         int main() override;
 

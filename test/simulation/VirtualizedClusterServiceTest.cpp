@@ -126,8 +126,10 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
+
 
       // Submit the 2-task job for execution
       try {
@@ -187,7 +189,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {})));
+          new wrench::CloudService(hostname, true, false, execution_hosts, {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -240,7 +242,8 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {}, {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob({this->test->task1, this->test->task2}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
                                                                          {}, {});
 
       // Submit the 2-task job for execution
@@ -306,7 +309,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
   // Create a Virtualized Cluster Service
   std::vector<std::string> execution_hosts = simulation->getHostnameList();
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::VirtualizedClusterService(hostname, true, false, execution_hosts, storage_service, {})));
+          new wrench::VirtualizedClusterService(hostname, true, false, execution_hosts, {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -430,7 +433,7 @@ void VirtualizedClusterServiceTest::do_PilotJobTaskTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, false, true, execution_hosts, storage_service, {})));
+          new wrench::CloudService(hostname, false, true, execution_hosts, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -548,7 +551,7 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, true, false, execution_hosts, storage_service, {})));
+          new wrench::CloudService(hostname, true, false, execution_hosts, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

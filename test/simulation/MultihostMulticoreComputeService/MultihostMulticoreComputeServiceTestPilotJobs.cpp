@@ -165,7 +165,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, true, false,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {})));
 
   // Create a WMS
   wrench::WMS *wms;
@@ -284,7 +284,9 @@ private:
       }
 
       // Create a 1-task standard job
-      wrench::StandardJob *one_task_job = job_manager->createStandardJob({this->test->task1}, {}, {}, {}, {});
+      wrench::StandardJob *one_task_job = job_manager->createStandardJob({this->test->task1}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                         {}, {});
 
       // Submit the standard job for execution
       try {
@@ -367,7 +369,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -453,7 +455,9 @@ private:
       }
 
       // Create a 1-task standard job
-      wrench::StandardJob *one_task_job = job_manager->createStandardJob({this->test->task1}, {}, {}, {}, {});
+      wrench::StandardJob *one_task_job = job_manager->createStandardJob({this->test->task1}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                         {}, {});
 
       // Submit the standard job for execution
       try {
@@ -517,7 +521,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -627,7 +631,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -714,7 +718,9 @@ private:
       }
 
       // Create a 1-task standard job
-      wrench::StandardJob *one_task_job = job_manager->createStandardJob({this->test->task1}, {}, {}, {}, {});
+      wrench::StandardJob *one_task_job = job_manager->createStandardJob({this->test->task1}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                         {}, {});
 
       // Submit the standard job for execution
       try {
@@ -785,7 +791,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -868,7 +874,9 @@ private:
       }
 
       // Create a 1-task standard job
-      wrench::StandardJob *one_task_job = job_manager->createStandardJob({this->test->task1}, {}, {}, {}, {});
+      wrench::StandardJob *one_task_job = job_manager->createStandardJob({this->test->task1}, {},
+                                                                         {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
+                                                                         {}, {});
 
       // Submit the standard job for execution
       try {
@@ -946,7 +954,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
   EXPECT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService(hostname, false, true,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               storage_service, {})));
+                                                               {}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

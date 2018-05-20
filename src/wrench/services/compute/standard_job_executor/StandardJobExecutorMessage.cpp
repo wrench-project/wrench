@@ -37,7 +37,6 @@ namespace wrench {
             StandardJobExecutorMessage("WORK_UNIT_EXECUTOR_DONE", payload) {
       this->workunit_executor = workunit_executor;
       this->workunit = workunit;
-
     }
 
     /**
@@ -91,6 +90,7 @@ namespace wrench {
       this->cause = cause;
 
     }
+
 
     /**
      * @brief Constructor

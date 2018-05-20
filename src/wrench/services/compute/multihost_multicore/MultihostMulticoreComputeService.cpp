@@ -151,7 +151,6 @@ namespace wrench {
      *        the compute resources available to this service.
      *          - num_cores = ComputeService::ALL_CORES: use all cores available on the host
      *          - memory = ComputeService::ALL_RAM: use all RAM available on the host
-     * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
@@ -159,21 +158,20 @@ namespace wrench {
             bool supports_standard_jobs,
             bool supports_pilot_jobs,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-            StorageService *default_storage_service,
-            std::map<std::string, std::string> plist) :
+            std::map<std::string, std::string> plist,
+            double scratch_size) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
                            supports_standard_jobs,
                            supports_pilot_jobs,
-                           default_storage_service) {
+                           scratch_size) {
 
       initiateInstance(hostname,
                        supports_standard_jobs,
                        supports_pilot_jobs,
                        std::move(compute_resources),
-                       plist, -1, nullptr,
-                       default_storage_service);
+                       plist, -1, nullptr);
     }
 
     /**
@@ -184,21 +182,20 @@ namespace wrench {
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
-     * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
                                                                        const bool supports_standard_jobs,
                                                                        const bool supports_pilot_jobs,
                                                                        const std::set<std::string> compute_hosts,
-                                                                       StorageService *default_storage_service,
-                                                                       std::map<std::string, std::string> plist) :
+                                                                       std::map<std::string, std::string> plist,
+                                                                       double scratch_size) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
                            supports_standard_jobs,
                            supports_pilot_jobs,
-                           default_storage_service) {
+                           scratch_size) {
 
       std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
       for (auto h : compute_hosts) {
@@ -209,8 +206,7 @@ namespace wrench {
                        supports_standard_jobs,
                        supports_pilot_jobs,
                        compute_resources,
-                       std::move(plist), -1, nullptr,
-                       default_storage_service);
+                       std::move(plist), -1, nullptr);
     }
 
 /**
@@ -225,7 +221,6 @@ namespace wrench {
      * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
-     * @param default_storage_service: a storage service
      *
      * @throw std::invalid_argument
      */
@@ -237,13 +232,12 @@ namespace wrench {
             std::map<std::string, std::string> plist,
             double ttl,
             PilotJob *pj,
-            std::string suffix,
-            StorageService *default_storage_service) : ComputeService(hostname,
-                                                                      "multihost_multicore" + suffix,
-                                                                      "multihost_multicore" + suffix,
-                                                                      supports_standard_jobs,
-                                                                      supports_pilot_jobs,
-                                                                      default_storage_service) {
+            std::string suffix, StorageService* scratch_space) : ComputeService(hostname,
+                                                                                "multihost_multicore" + suffix,
+                                                                                "multihost_multicore" + suffix,
+                                                                                supports_standard_jobs,
+                                                                                supports_pilot_jobs,
+                                                                                scratch_space) {
 
       initiateInstance(hostname,
                        supports_standard_jobs,
@@ -251,8 +245,39 @@ namespace wrench {
                        std::move(compute_resources),
                        std::move(plist),
                        ttl,
-                       pj,
-                       default_storage_service);
+                       pj);
+    }
+
+    /**
+     * @brief Internal constructor
+     *
+     * @param hostname: the name of the host on which the job executor should be started
+     * @param supports_standard_jobs: true if the compute service should support standard jobs
+     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
+     * @param compute_hosts:: a set of hostnames (the service
+     *        will use all the cores and all the RAM of each host)
+     * @param plist: a property list ({} means "use all defaults")
+     * @param scratch_space: the scratch space for this compute service
+     */
+    MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
+                                                                       const bool supports_standard_jobs,
+                                                                       const bool supports_pilot_jobs,
+                                                                       const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                                                       std::map<std::string, std::string> plist,
+                                                                       StorageService *scratch_space):
+            ComputeService(hostname,
+                           "multihost_multicore",
+                           "multihost_multicore",
+                           supports_standard_jobs,
+                           supports_pilot_jobs,
+                           scratch_space) {
+
+      initiateInstance(hostname,
+                       supports_standard_jobs,
+                       supports_pilot_jobs,
+                       compute_resources,
+                       std::move(plist), -1, nullptr);
+
     }
 
 /**
@@ -266,7 +291,6 @@ namespace wrench {
  * @param plist: a property list
  * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
  * @param pj: a containing PilotJob  (nullptr if none)
- * @param default_storage_service: a storage service
  *
  * @throw std::invalid_argument
  */
@@ -277,8 +301,7 @@ namespace wrench {
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
             std::map<std::string, std::string> plist,
             double ttl,
-            PilotJob *pj,
-            StorageService *default_storage_service) {
+            PilotJob *pj) {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
@@ -380,6 +403,12 @@ namespace wrench {
 
         /** Dispatch jobs **/
         while (this->dispatchNextPendingJob());
+      }
+
+      if (this->containing_pilot_job != nullptr) {
+        /*** Clean up everything in the scratch space ***/
+        WRENCH_INFO("CLEANING UP SCRATCH IN MULTIHOSTMULTICORECOMPUTE SERVICE");
+        cleanUpScratch();
       }
 
       WRENCH_INFO("Multicore Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
@@ -635,14 +664,21 @@ namespace wrench {
       WRENCH_INFO(
               "Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2ef bytes of RAM) for a standard job",
               compute_resources.size(), total_cores, total_ram);
+
       // Create and start a standard job executor
+      // If this is itself NOT a pilot job
+      bool part_of_pilot_job = false;
+      if (this->containing_pilot_job != nullptr) {
+        part_of_pilot_job = true;
+      }
       std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(new StandardJobExecutor(
               this->simulation,
               this->mailbox_name,
               this->hostname,
               job,
               compute_resources,
-              this->default_storage_service,
+              getScratch(),
+              part_of_pilot_job,
               {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,   this->getPropertyValueAsString(
                       MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
                {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, this->getPropertyValueAsString(
@@ -652,9 +688,7 @@ namespace wrench {
                {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}}));
 
-
       executor->start(executor, true);
-
       this->standard_job_executors.insert(executor);
       this->running_jobs.insert(job);
 
@@ -711,7 +745,7 @@ namespace wrench {
                                                    job->getDuration(),
                                                    job,
                                                    "_pilot_job",
-                                                   this->default_storage_service));
+                                                   getScratch()));
       cs->simulation = this->simulation;
       job->setComputeService(cs);
 
@@ -850,7 +884,7 @@ namespace wrench {
         failed_task->setInternalState(WorkflowTask::InternalState::TASK_READY);
         try {
           StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
-                                      this->default_storage_service);
+                                      getScratch());
         } catch (WorkflowExecutionException &e) {
           WRENCH_WARN("Warning: %s", e.getCause()->toString().c_str());
         }
@@ -1020,7 +1054,6 @@ namespace wrench {
       for (auto it = this->standard_job_executors.begin();
            it != this->standard_job_executors.end(); it++) {
         if ((*it).get() == executor) {
-
           PointerUtil::moveSharedPtrFromSetToSet(it, &(this->standard_job_executors), &(this->completed_job_executors));
           found_it = true;
           break;
@@ -1587,6 +1620,35 @@ namespace wrench {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
+      }
+    }
+
+    /**
+     * @brief Add the scratch files of one standardjob to the list of all the scratch files of all the standard jobs inside the pilot job
+     * @param scratch_files:
+     */
+    void MultihostMulticoreComputeService::storeFilesStoredInScratch(std::set<WorkflowFile*> scratch_files) {
+      this->files_in_scratch.insert(scratch_files.begin(),scratch_files.end());
+    }
+
+    /**
+     * @brief Cleans up the scratch as I am a pilot job and I need clean the files stored by the standard jobs executed inside me
+     */
+    void MultihostMulticoreComputeService::cleanUpScratch() {
+      // First fetch all the files stored in scratch by all the workunit executors running inside a standardjob
+      // Files in scratch by finished workunit executors
+      for (auto it = this->completed_job_executors.begin(); it != this->completed_job_executors.end(); it++) {
+        std::set<WorkflowFile*> files_in_scratch_by_single_workunit = (*it)->getFilesInScratch();
+        this->files_in_scratch.insert(files_in_scratch_by_single_workunit.begin(),
+                                      files_in_scratch_by_single_workunit.end());
+      }
+
+      for (auto scratch_cleanup_file : this->files_in_scratch) {
+        try {
+          getScratch()->deleteFile(scratch_cleanup_file);
+        } catch (WorkflowExecutionException &e) {
+          throw;
+        }
       }
     }
 
