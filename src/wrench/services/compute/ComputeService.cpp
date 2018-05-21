@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ namespace wrench {
       Service::stop();
     }
 
-    StorageService* ComputeService::SCRATCH = (StorageService*)(new int(553453));
+    StorageService *ComputeService::SCRATCH = (StorageService *) (new int(553453));
 
     /**
      * @brief Submit a job to the compute service
@@ -124,9 +124,9 @@ namespace wrench {
      * @param default_storage_service: a storage service
      * @param scratch_size: the size for the scratch space of the compute service
      */
-    ComputeService::ComputeService(std::string hostname,
-                                   std::string service_name,
-                                   std::string mailbox_name_prefix,
+    ComputeService::ComputeService(std::string &hostname,
+                                   std::string &service_name,
+                                   std::string &mailbox_name_prefix,
                                    bool supports_standard_jobs,
                                    bool supports_pilot_jobs,
                                    double scratch_size) :
@@ -158,20 +158,18 @@ namespace wrench {
      * @param default_storage_service: a storage service
      * @param scratch_space: scratch space of the compute service
      */
-    ComputeService::ComputeService(std::string hostname, std::string service_name, std::string mailbox_name_prefix,
+    ComputeService::ComputeService(std::string &hostname,
+                                   std::string &service_name,
+                                   std::string &mailbox_name_prefix,
                                    bool supports_standard_jobs,
                                    bool supports_pilot_jobs,
-                                   StorageService *scratch_space): Service(hostname, service_name, mailbox_name_prefix),
-                                    supports_pilot_jobs(supports_pilot_jobs),
-                                    supports_standard_jobs(supports_standard_jobs) {
+                                   StorageService *scratch_space) :
+            Service(hostname, service_name, mailbox_name_prefix),
+            supports_pilot_jobs(supports_pilot_jobs),
+            supports_standard_jobs(supports_standard_jobs) {
 
       this->state = ComputeService::UP;
-      if (scratch_space != nullptr) {
-        this->scratch_space_storage_service = scratch_space;
-      } else {
-        this->scratch_space_storage_service = nullptr;
-      }
-
+      this->scratch_space_storage_service = scratch_space;
     }
 
     /**
@@ -209,7 +207,7 @@ namespace wrench {
       }
 
       if (dict.find("num_hosts") != dict.end()) {
-        return (unsigned long)(*(dict["num_hosts"].begin()));
+        return (unsigned long) (*(dict["num_hosts"].begin()));
       } else {
         return 0;
       }
@@ -238,7 +236,7 @@ namespace wrench {
 
       if (dict.find("num_cores") != dict.end()) {
         for (auto x : dict["num_cores"]) {
-          to_return.push_back((unsigned long)x);
+          to_return.push_back((unsigned long) x);
         }
       }
 
@@ -267,7 +265,7 @@ namespace wrench {
 
       if (dict.find("num_idle_cores") != dict.end()) {
         for (auto x : dict["num_idle_cores"]) {
-          to_return.push_back((unsigned long)x);
+          to_return.push_back((unsigned long) x);
         }
       }
 
@@ -349,25 +347,6 @@ namespace wrench {
       return dict["ttl"][0];
     }
 
-
-
-
-//    /**
-//     * @brief Set the default StorageService for the ComputeService
-//     * @param storage_service: a storage service
-//     */
-//    void ComputeService::setDefaultStorageService(StorageService *storage_service) {
-//      this->default_storage_service = storage_service;
-//    }
-//
-//    /**
-//    * @brief Get the default StorageService for the compute service
-//    * @return a storage service
-//    */
-//    StorageService *ComputeService::getDefaultStorageService() {
-//      return this->default_storage_service;
-//    }
-
     /**
      * @brief Get information about the compute service as a dictionary of vectors
      * @return service information
@@ -405,21 +384,17 @@ namespace wrench {
 
       } else {
         throw std::runtime_error(
-                "MultihostMulticoreComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() + "] message");
+                "MultihostMulticoreComputeService::getServiceResourceInformation(): unexpected [" + msg->getName() +
+                "] message");
       }
     }
-
 
     /**
      * @brief Get the total size of the scratch space (not the remaining free space on the scratch space)
      * @return return size (double)
      */
     double ComputeService::getScratchSize() {
-      if (this->scratch_space_storage_service) {
-        return this->scratch_space_storage_service->getTotalSpace();
-      } else {
-        return 0.0;
-      }
+      return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
     }
 
     /**
@@ -427,19 +402,14 @@ namespace wrench {
      * @return return size (double)
      */
     double ComputeService::getFreeRemainingScratchSpace() {
-      if (this->scratch_space_storage_service) {
-        return this->scratch_space_storage_service->getFreeSpace();
-      } else {
-        return 0.0;
-      }
+      return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace() : 0.0;
     }
-
 
     /**
     * @brief Get a shared pointer to the scratch space
     * @return returns a pointer to the shared scratch space
     */
-    StorageService* ComputeService::getScratch() {
+    StorageService *ComputeService::getScratch() {
       return this->scratch_space_storage_service;
     }
 

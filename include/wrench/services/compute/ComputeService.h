@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,13 +38,13 @@ namespace wrench {
         /** \cond INTERNAL    **/
         /***********************/
 
-        friend  class StandardJobExecutorTest;
+        friend class StandardJobExecutorTest;
 
         /***********************/
         /** \endcond          **/
         /***********************/
 
-        friend  class Simulation;
+        friend class Simulation;
 
     public:
 
@@ -59,21 +59,19 @@ namespace wrench {
         static constexpr double ALL_RAM = DBL_MAX;
 
         /** A static StorageService pointer to the SCRATCH space inside the compute service **/
-        static StorageService* SCRATCH;
+        static StorageService *SCRATCH;
 
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
 
-        virtual ~ComputeService(){}
+        virtual ~ComputeService() {}
 
         void stop() override;
 
         void submitJob(WorkflowJob *job, std::map<std::string, std::string> = {});
 
         void terminateJob(WorkflowJob *job);
-
-        void setLocalScratch();
 
         bool supportsStandardJobs();
 
@@ -97,10 +95,6 @@ namespace wrench {
 
         double getFreeRemainingScratchSpace();
 
-        void setDefaultStorageService(StorageService *storage_service);
-
-        StorageService *getDefaultStorageService();
-
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
@@ -110,33 +104,25 @@ namespace wrench {
 
         virtual void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_arguments) = 0;
 
-
         virtual void terminateStandardJob(StandardJob *job) = 0;
 
         virtual void terminatePilotJob(PilotJob *job) = 0;
 
-        ComputeService(std::string hostname,
-                       std::string service_name,
-                       std::string mailbox_name_prefix,
+        ComputeService(std::string &hostname,
+                       std::string &service_name,
+                       std::string &mailbox_name_prefix,
                        bool supports_standard_jobs,
                        bool supports_pilot_jobs,
                        double sratch_size = 0);
 
     protected:
 
-        ComputeService(std::string hostname,
-                       std::string service_name,
-                       std::string mailbox_name_prefix,
+        ComputeService(std::string &hostname,
+                       std::string &service_name,
+                       std::string &mailbox_name_prefix,
                        bool supports_standard_jobs,
                        bool supports_pilot_jobs,
-                       StorageService* scratch_space = nullptr);
-
-//        virtual void processGetResourceInformation(const std::string &answer_mailbox) = 0;
-
-//        virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
-//                                              std::map<std::string, std::string> &service_specific_args) = 0;
-//
-//        virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) = 0;
+                       StorageService *scratch_space = nullptr);
 
         /** @brief Whether the compute service supports pilot jobs */
         bool supports_pilot_jobs;
@@ -144,9 +130,9 @@ namespace wrench {
         bool supports_standard_jobs;
 
         /** @brief A scratch storage service associated to the compute service */
-        StorageService* scratch_space_storage_service;
+        StorageService *scratch_space_storage_service;
 
-        StorageService* getScratch();
+        StorageService *getScratch();
 
     private:
 
