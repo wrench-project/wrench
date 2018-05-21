@@ -121,12 +121,11 @@ namespace wrench {
      * @param mailbox_name_prefix: the mailbox name prefix
      * @param supports_standard_jobs: true if the job executor should support standard jobs
      * @param supports_pilot_jobs: true if the job executor should support pilot jobs
-     * @param default_storage_service: a storage service
      * @param scratch_size: the size for the scratch space of the compute service
      */
-    ComputeService::ComputeService(std::string &hostname,
-                                   std::string &service_name,
-                                   std::string &mailbox_name_prefix,
+    ComputeService::ComputeService(const std::string &hostname,
+                                   const std::string service_name,
+                                   const std::string mailbox_name_prefix,
                                    bool supports_standard_jobs,
                                    bool supports_pilot_jobs,
                                    double scratch_size) :
@@ -158,9 +157,9 @@ namespace wrench {
      * @param default_storage_service: a storage service
      * @param scratch_space: scratch space of the compute service
      */
-    ComputeService::ComputeService(std::string &hostname,
-                                   std::string &service_name,
-                                   std::string &mailbox_name_prefix,
+    ComputeService::ComputeService(const std::string &hostname,
+                                   const std::string service_name,
+                                   const std::string mailbox_name_prefix,
                                    bool supports_standard_jobs,
                                    bool supports_pilot_jobs,
                                    StorageService *scratch_space) :
