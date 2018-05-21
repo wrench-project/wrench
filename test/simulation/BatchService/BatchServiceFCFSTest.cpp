@@ -194,14 +194,13 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceFCFSTest, DISABLED_SimpleFCFSTest) {
-  DO_TEST_WITH_FORK(do_SimpleFCFS_test);
-}
+TEST_F(BatchServiceFCFSTest, DISABLED_SimpleFCFSTest)
 #else
-TEST_F(BatchServiceFCFSTest, SimpleFCFSTest) {
+TEST_F(BatchServiceFCFSTest, SimpleFCFSTest)
+#endif
+{
   DO_TEST_WITH_FORK(do_SimpleFCFS_test);
 }
-#endif
 
 
 void BatchServiceFCFSTest::do_SimpleFCFS_test() {
@@ -380,14 +379,13 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceFCFSTest, DISABLED_SimpleFCFSQueueWaitTimePrediction) {
-  DO_TEST_WITH_FORK(do_SimpleFCFSQueueWaitTimePrediction_test);
-}
+TEST_F(BatchServiceFCFSTest, DISABLED_SimpleFCFSQueueWaitTimePrediction)
 #else
-TEST_F(BatchServiceFCFSTest, SimpleFCFSQueueWaitTimePrediction) {
+TEST_F(BatchServiceFCFSTest, SimpleFCFSQueueWaitTimePrediction)
+#endif
+{
   DO_TEST_WITH_FORK(do_SimpleFCFSQueueWaitTimePrediction_test);
 }
-#endif
 
 
 void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {

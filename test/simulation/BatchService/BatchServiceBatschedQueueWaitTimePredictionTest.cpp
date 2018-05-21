@@ -32,7 +32,7 @@ public:
 
 
     void do_BatchJobBrokenEstimateWaitingTimeTest_test();
-    
+
     void do_BatchJobBasicEstimateWaitingTimeTest_test();
 
     void do_BatchJobEstimateWaitingTimeTest_test();
@@ -84,9 +84,9 @@ class BatchJobBrokenEstimateWaitingTimeTestWMS : public wrench::WMS {
 
 public:
     BatchJobBrokenEstimateWaitingTimeTestWMS(BatchServiceTest *test,
-                                            const std::set<wrench::ComputeService *> &compute_services,
-                                            const std::set<wrench::StorageService *> &storage_services,
-                                            std::string hostname) :
+                                             const std::set<wrench::ComputeService *> &compute_services,
+                                             const std::set<wrench::StorageService *> &storage_services,
+                                             std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
       this->test = test;
@@ -190,15 +190,13 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceTest, BatchJobBrokenEstimateWaitingTimeTest) {
-  DO_TEST_WITH_FORK(do_BatchJobBrokenEstimateWaitingTimeTest_test);
-}
-
+TEST_F(BatchServiceTest, BatchJobBrokenEstimateWaitingTimeTest)
 #else
-TEST_F(BatchServiceTest, DISABLED_BatchJobBrokenEstimateWaitingTimeTest) {
+TEST_F(BatchServiceTest, DISABLED_BatchJobBrokenEstimateWaitingTimeTest)
+#endif
+{
   DO_TEST_WITH_FORK(do_BatchJobBrokenEstimateWaitingTimeTest_test);
 }
-#endif
 
 
 void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
@@ -339,7 +337,7 @@ private:
         std::tuple<std::string,unsigned int,unsigned int,double> my_job = std::make_tuple(job_id,nodes,1,walltime_seconds);
         std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
 
-          std::map<std::string,double> jobs_estimated_start_times;
+        std::map<std::string,double> jobs_estimated_start_times;
 //        #ifdef ENABLE_BATSCHED
         try {
           jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
@@ -399,18 +397,14 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-
-TEST_F(BatchServiceTest, BatchJobBasicEstimateWaitingTimeTest) {
-  DO_TEST_WITH_FORK(do_BatchJobBasicEstimateWaitingTimeTest_test);
-}
-
+TEST_F(BatchServiceTest, BatchJobBasicEstimateWaitingTimeTest)
 #else
-
-TEST_F(BatchServiceTest, DISABLED_BatchJobBasicEstimateWaitingTimeTest) {
+TEST_F(BatchServiceTest, DISABLED_BatchJobBasicEstimateWaitingTimeTest)
+#endif
+{
   DO_TEST_WITH_FORK(do_BatchJobBasicEstimateWaitingTimeTest_test);
 }
 
-#endif
 
 
 void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
@@ -653,18 +647,13 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-
-TEST_F(BatchServiceTest, BatchJobEstimateWaitingTimeTest) {
-  DO_TEST_WITH_FORK(do_BatchJobEstimateWaitingTimeTest_test);
-}
-
+TEST_F(BatchServiceTest, BatchJobEstimateWaitingTimeTest)
 #else
-
-TEST_F(BatchServiceTest, DISABLED_BatchJobEstimateWaitingTimeTest) {
+TEST_F(BatchServiceTest, DISABLED_BatchJobEstimateWaitingTimeTest)
+#endif
+{
   DO_TEST_WITH_FORK(do_BatchJobEstimateWaitingTimeTest_test);
 }
-
-#endif
 
 
 void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
@@ -938,18 +927,14 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-
-TEST_F(BatchServiceTest, BatchJobLittleComplexEstimateWaitingTimeTest) {
-  DO_TEST_WITH_FORK(do_BatchJobLittleComplexEstimateWaitingTimeTest_test);
-}
-
+TEST_F(BatchServiceTest, BatchJobLittleComplexEstimateWaitingTimeTest)
 #else
-
-TEST_F(BatchServiceTest, DISABLED_BatchJobLittleComplexEstimateWaitingTimeTest) {
+TEST_F(BatchServiceTest, DISABLED_BatchJobLittleComplexEstimateWaitingTimeTest)
+#endif
+{
   DO_TEST_WITH_FORK(do_BatchJobLittleComplexEstimateWaitingTimeTest_test);
 }
 
-#endif
 
 
 void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {

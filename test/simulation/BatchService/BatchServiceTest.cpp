@@ -31,35 +31,20 @@ public:
 
 
     void do_OneStandardJobTaskTest_test();
-
     void do_TwoStandardJobSubmissionTest_test();
-
     void do_MultipleStandardTaskTest_test();
-
     void do_PilotJobTaskTest_test();
-
     void do_StandardPlusPilotJobTaskTest_test();
-
     void do_InsufficientCoresTaskTest_test();
-
     void do_BestFitTaskTest_test();
-
     void do_FirstFitTaskTest_test();
-
     void do_RoundRobinTask_test();
-
     void do_noArgumentsJobSubmissionTest_test();
-
     void do_StandardJobTimeOutTaskTest_test();
-
     void do_PilotJobTimeOutTaskTest_test();
-
     void do_StandardJobInsidePilotJobTimeOutTaskTest_test();
-
     void do_StandardJobInsidePilotJobSucessTaskTest_test();
-
     void do_InsufficientCoresInsidePilotJobTaskTest_test();
-
     void do_DifferentBatchAlgorithmsSubmissionTest_test();
 
 protected:
@@ -1485,18 +1470,15 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-
-TEST_F(BatchServiceTest, DISABLED_BestFitStandardJobSubmissionTest) {
-  DO_TEST_WITH_FORK(do_BestFitTaskTest_test);
-}
-
+TEST_F(BatchServiceTest, DISABLED_BestFitStandardJobSubmissionTest)
 #else
-
-TEST_F(BatchServiceTest, BestFitStandardJobSubmissionTest) {
+TEST_F(BatchServiceTest, BestFitStandardJobSubmissionTest)
+#endif
+{
   DO_TEST_WITH_FORK(do_BestFitTaskTest_test);
 }
 
-#endif
+
 
 void BatchServiceTest::do_BestFitTaskTest_test() {
 
@@ -1572,9 +1554,9 @@ class FirstFitStandardJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     FirstFitStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                        const std::set<wrench::ComputeService *> &compute_services,
-                                        const std::set<wrench::StorageService *> &storage_services,
-                                        std::string hostname) :
+                                         const std::set<wrench::ComputeService *> &compute_services,
+                                         const std::set<wrench::StorageService *> &storage_services,
+                                         std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
@@ -1659,18 +1641,14 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-
-TEST_F(BatchServiceTest, DISABLED_FirstFitStandardJobSubmissionTest) {
-  DO_TEST_WITH_FORK(do_FirstFitTaskTest_test);
-}
-
+TEST_F(BatchServiceTest, DISABLED_FirstFitStandardJobSubmissionTest)
 #else
-
-TEST_F(BatchServiceTest, FirstFitStandardJobSubmissionTest) {
+TEST_F(BatchServiceTest, FirstFitStandardJobSubmissionTest)
+#endif
+{
   DO_TEST_WITH_FORK(do_FirstFitTaskTest_test);
 }
 
-#endif
 
 void BatchServiceTest::do_FirstFitTaskTest_test() {
 
@@ -1747,9 +1725,9 @@ class RoundRobinStandardJobSubmissionTestWMS : public wrench::WMS {
 
 public:
     RoundRobinStandardJobSubmissionTestWMS(BatchServiceTest *test,
-                                        const std::set<wrench::ComputeService *> &compute_services,
-                                        const std::set<wrench::StorageService *> &storage_services,
-                                        std::string hostname) :
+                                           const std::set<wrench::ComputeService *> &compute_services,
+                                           const std::set<wrench::StorageService *> &storage_services,
+                                           std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
       this->test = test;
     }
@@ -1947,18 +1925,13 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-
-TEST_F(BatchServiceTest, DISABLED_RoundRobinTaskTest) {
-  DO_TEST_WITH_FORK(do_RoundRobinTask_test);
-}
-
+TEST_F(BatchServiceTest, DISABLED_RoundRobinTaskTest)
 #else
-
-TEST_F(BatchServiceTest, RoundRobinTaskTest) {
+TEST_F(BatchServiceTest, RoundRobinTaskTest)
+#endif
+{
   DO_TEST_WITH_FORK(do_RoundRobinTask_test);
 }
-
-#endif
 
 
 void BatchServiceTest::do_RoundRobinTask_test() {
@@ -2530,7 +2503,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
                                    simulation->getHostnameList(),
-                                    {})));
+                                   {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -2794,18 +2767,13 @@ private:
 
 
 #ifdef ENABLE_BATSCHED
-
-TEST_F(BatchServiceTest, DifferentBatchAlgorithmsSubmissionTest) {
-  DO_TEST_WITH_FORK(do_DifferentBatchAlgorithmsSubmissionTest_test);
-}
-
+TEST_F(BatchServiceTest, DifferentBatchAlgorithmsSubmissionTest)
 #else
-
-TEST_F(BatchServiceTest, DISABLED_DifferentBatchAlgorithmsSubmissionTest) {
+TEST_F(BatchServiceTest, DISABLED_DifferentBatchAlgorithmsSubmissionTest)
+#endif
+{
   DO_TEST_WITH_FORK(do_DifferentBatchAlgorithmsSubmissionTest_test);
 }
-
-#endif
 
 
 void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
