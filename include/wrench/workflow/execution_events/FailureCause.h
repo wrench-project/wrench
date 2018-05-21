@@ -226,6 +226,7 @@ namespace wrench {
     public:
         FunctionalityNotAvailable(Service *service, std::string functionality_name);
         Service *getService();
+        std::string getFunctionalityName();
         std::string toString();
 
     private:
