@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,11 @@
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
 
 #ifdef ENABLE_BATSCHED
-#include <json.hpp>
+
+#include <nlohmann/json.hpp>
 #include <zmq.hpp>
 #include <zmq.h>
+
 #endif
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_network_listener_service, "Log category for Batch Network Listener Service");
@@ -38,12 +40,13 @@ namespace wrench {
     * @param data_to_send: data to send
     * @param plist: property list
     */
-    BatschedNetworkListener::BatschedNetworkListener(std::string hostname, BatchService *batch_service, std::string batch_service_mailbox,
-                                               std::string sched_port,
-                                               NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send,
-                                               std::map<std::string, std::string> plist) :
+    BatschedNetworkListener::BatschedNetworkListener(std::string hostname, BatchService *batch_service,
+                                                     std::string batch_service_mailbox,
+                                                     std::string sched_port,
+                                                     NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send,
+                                                     std::map<std::string, std::string> plist) :
             BatschedNetworkListener(hostname, batch_service, batch_service_mailbox,
-                                 sched_port, MY_TYPE, data_to_send, plist, "") {
+                                    sched_port, MY_TYPE, data_to_send, plist, "") {
     }
 
 
@@ -59,7 +62,8 @@ namespace wrench {
     * @param suffix the suffix to append
     */
     BatschedNetworkListener::BatschedNetworkListener(
-            std::string hostname, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,
+            std::string hostname, BatchService *batch_service, std::string batch_service_mailbox,
+            std::string sched_port,
             NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send, std::map<std::string, std::string> plist,
             std::string suffix = "") :
             Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
@@ -112,13 +116,13 @@ namespace wrench {
       #endif
     }
 
-
     /**
      * @brief An an "execute" message to the batch service
      * @param answer_mailbox: mailbox on which ack will be received
      * @param execute_job_reply_data: message to send
      */
-    void BatschedNetworkListener::sendExecuteMessageToBatchService(std::string answer_mailbox, std::string execute_job_reply_data) {
+    void BatschedNetworkListener::sendExecuteMessageToBatchService(std::string answer_mailbox,
+                                                                   std::string execute_job_reply_data) {
       #ifdef ENABLE_BATSCHED
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
@@ -142,8 +146,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
                                 new BatchQueryAnswerMessage(estimated_waiting_time,
-                                                                       this->getPropertyValueAsDouble(
-                                                                               BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD)));
+                                                            this->getPropertyValueAsDouble(
+                                                                    BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -226,5 +230,3 @@ namespace wrench {
     }
 
 }
-
-
