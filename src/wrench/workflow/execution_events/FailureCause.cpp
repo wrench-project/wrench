@@ -519,6 +519,15 @@ namespace wrench {
     }
 
     /**
+     * @brief Getter
+     * @return the functionality name
+     */
+    std::string FunctionalityNotAvailable::getFunctionalityName() {
+      return this->functionality_name;
+    }
+
+
+    /**
      * @brief Get the human-readable failure message
      * @return the message
      */

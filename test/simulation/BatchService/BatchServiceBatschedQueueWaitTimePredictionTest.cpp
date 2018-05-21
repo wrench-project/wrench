@@ -237,14 +237,6 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
                                    simulation->getHostnameList(), {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}
                                    })));
-//  #else
-//  EXPECT_NO_THROW(compute_service = simulation->add(
-//          new wrench::BatchService(hostname, true, true,
-//                                   simulation->getHostnameList(), storage_service1, {
-//                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}
-//                                   })));
-//  #endif
-
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

@@ -30,6 +30,7 @@ public:
 
     void do_SimpleFCFS_test();
     void do_SimpleFCFSQueueWaitTimePrediction_test();
+    void do_BrokenQueueWaitTimePrediction_test();
 
 protected:
     BatchServiceFCFSTest() {
@@ -254,8 +255,8 @@ class SimpleFCFSQueueWaitTimePredictionWMS : public wrench::WMS {
 
 public:
     SimpleFCFSQueueWaitTimePredictionWMS(BatchServiceFCFSTest *test,
-                      const std::set<wrench::ComputeService *> &compute_services,
-                      std::string hostname) :
+                                         const std::set<wrench::ComputeService *> &compute_services,
+                                         std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
       this->test = test;
@@ -333,7 +334,6 @@ private:
       wrench::Simulation::sleep(10);
 
       // Get Predictions
-      // TODO: ADD TESTS
       std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {
               (std::tuple<std::string,unsigned int,unsigned int, double>){"job1", 1, 1, 400},
               (std::tuple<std::string,unsigned int,unsigned int, double>){"job2", 5, 1, 400},
@@ -348,7 +348,6 @@ private:
       };
 
       // Expectations
-      // TODO: COMPUTE THOSE ANALYTICALLY
       std::map<std::string, double> expectations;
       expectations.insert(std::make_pair("job1", 480));
       expectations.insert(std::make_pair("job2", -1));
@@ -431,3 +430,113 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
   free(argv);
 }
 
+
+/**********************************************************************/
+/**  BROKEN TEST WITH QUEUE PREDICTION                               **/
+/**********************************************************************/
+
+class BrokenQueueWaitTimePredictionWMS : public wrench::WMS {
+
+public:
+    BrokenQueueWaitTimePredictionWMS(BatchServiceFCFSTest *test,
+                                     const std::set<wrench::ComputeService *> &compute_services,
+                                     std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+                        "test") {
+      this->test = test;
+    }
+
+private:
+
+    BatchServiceFCFSTest *test;
+
+    int main() {
+
+      // Sleep for 10 seconds
+      wrench::Simulation::sleep(10);
+
+      // Get Predictions
+      std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {
+              (std::tuple<std::string,unsigned int,unsigned int, double>){"job1", 1, 1, 400}
+      };
+
+
+      bool success = true;
+      try {
+        std::map<std::string,double> jobs_estimated_start_times =
+                ((wrench::BatchService *)this->test->compute_service)->getStartTimeEstimates(set_of_jobs);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
+          throw std::runtime_error("Got expected exception, but failure cause type of wrong (" +
+                                   std::to_string(e.getCause()->getCauseType()) + ")");
+        }
+        auto real_cause = (wrench::FunctionalityNotAvailable *) e.getCause().get();
+        if (real_cause->getService() != this->test->compute_service) {
+          throw std::runtime_error("Got expected exception and cause type, but compute service is wrong");
+        }
+        if (real_cause->getFunctionalityName() != "start time estimates") {
+          throw std::runtime_error("Got expected exception and cause type, but functionality name is wrong (" +
+          real_cause->getFunctionalityName() + ")");
+        }
+
+      }
+
+      if (success) {
+        throw std::runtime_error("Should not have been able to get prediction for BESTFIT algorithm");
+      }
+
+      return 0;
+    }
+};
+
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchServiceFCFSTest, DISABLED_BrokenQueueWaitTimePrediction)
+#else
+TEST_F(BatchServiceFCFSTest, BrokenQueueWaitTimePrediction)
+#endif
+{
+  DO_TEST_WITH_FORK(do_BrokenQueueWaitTimePrediction_test);
+}
+
+
+void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
+
+
+  // Create and initialize a simulation
+  auto simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("batch_service_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Batch Service with a FCFS scheduling algorithm
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"},
+                                    {wrench::BatchServiceProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
+
+  simulation->add(new wrench::FileRegistryService(hostname));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          new BrokenQueueWaitTimePredictionWMS(
+                  this,  {compute_service}, hostname)));
+
+  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
