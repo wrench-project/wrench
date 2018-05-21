@@ -164,6 +164,48 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
   // Get a hostname
   auto hostname = simulation->getHostnameList()[0];
 
+  // Bad resource hostname
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple("bogus",
+                                                                        wrench::ComputeService::ALL_CORES,
+                                                                        wrench::ComputeService::ALL_RAM)},
+                                                       {})), std::invalid_argument);
+
+  // Bad number of cores
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname,
+                                                                        0,
+                                                                        wrench::ComputeService::ALL_RAM)},
+                                                       {})), std::invalid_argument);
+
+  // Bad number of cores
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple(hostname,
+                                                                        100,
+                                                                        wrench::ComputeService::ALL_RAM)},
+                                                       {})), std::invalid_argument);
+
+  // Bad RAM
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple("RAMHost",
+                                                                        wrench::ComputeService::ALL_CORES,
+                                                                        -1.0)},
+                                                       {})), std::invalid_argument);
+
+  // Bad RAM
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+                                                       {std::make_tuple("RAMHost",
+                                                                        wrench::ComputeService::ALL_CORES,
+                                                                        100000.0)},
+                                                       {})), std::invalid_argument);
+
+
+
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(new BadSetupTestWMS(this,
@@ -175,9 +217,6 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
 
   // Running a "run a single task" simulation
   EXPECT_THROW(simulation->launch(), std::runtime_error);
-
-  // At this point, we should have a clean exit without complaints
-  // from the SimGrid maestro
 
   delete simulation;
 
