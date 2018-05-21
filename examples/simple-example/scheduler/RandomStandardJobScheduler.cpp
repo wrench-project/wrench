@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,16 +29,16 @@ namespace wrench {
      */
 
     void RandomStandardJobScheduler::scheduleTasks(const std::set<ComputeService *> &compute_services,
-                       const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
+                                                   const std::vector<WorkflowTask *> &tasks) {
 
       WRENCH_INFO("There are %ld ready tasks to schedule", tasks.size());
-      for (auto itc : tasks) {
+      for (auto task : tasks) {
         bool successfully_scheduled = false;
 
         // First: attempt to run the task on a running pilot job
-        WRENCH_INFO("Trying to submit task '%s' to a pilot job...", itc.first.c_str());
+        WRENCH_INFO("Trying to submit task '%s' to a pilot job...", task->getId().c_str());
 
-        double total_flops = Workflow::getSumFlops((*tasks.begin()).second);
+        double total_flops = Workflow::getSumFlops({task});
 
         std::set<PilotJob *> running_pilot_jobs = this->job_manager->getRunningPilotJobs();
         for (auto pj : running_pilot_jobs) {
@@ -82,8 +82,8 @@ namespace wrench {
           }
 
           // We can submit!
-          WRENCH_INFO("Submitting task %s for execution to a pilot job", itc.first.c_str());
-          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
+          WRENCH_INFO("Submitting task %s for execution to a pilot job", task->getId().c_str());
+          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(task, {});
           job_manager->submitJob(job, cs);
           successfully_scheduled = true;
           break;
@@ -96,7 +96,7 @@ namespace wrench {
         }
 
         // Second: attempt to run the task on a compute resource
-        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", itc.first.c_str());
+        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", task->getId().c_str());
 
         for (auto cs : compute_services) {
           WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
@@ -112,7 +112,7 @@ namespace wrench {
           // Check that it can run it right now in terms of idle cores
           try {
             std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
-            sum_num_idle_cores = (unsigned  long)std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
+            sum_num_idle_cores = (unsigned long) std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0);
           } catch (WorkflowExecutionException &e) {
             // The service has some problem, forget it
             continue;
@@ -124,18 +124,16 @@ namespace wrench {
           }
 
           std::map<WorkflowFile *, StorageService *> file_locations;
-          for (auto t : itc.second) {
-            for (auto f : t->getInputFiles()) {
-              file_locations.insert(std::make_pair(f, default_storage_service));
-            }
-            for (auto f : t->getOutputFiles()) {
-              file_locations.insert(std::make_pair(f, default_storage_service));
-            }
+          for (auto f : task->getInputFiles()) {
+            file_locations.insert(std::make_pair(f, default_storage_service));
+          }
+          for (auto f : task->getOutputFiles()) {
+            file_locations.insert(std::make_pair(f, default_storage_service));
           }
 
           // We can submit!
-          WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
-          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, file_locations);
+          WRENCH_INFO("Submitting task %s for execution as a standard job", task->getId().c_str());
+          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(task, file_locations);
           job_manager->submitJob(job, cs);
           successfully_scheduled = true;
           break;
@@ -149,6 +147,5 @@ namespace wrench {
       }
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }
-
 
 }
