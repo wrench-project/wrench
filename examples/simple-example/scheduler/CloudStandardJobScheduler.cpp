@@ -60,8 +60,16 @@ namespace wrench {
           throw std::runtime_error("Unable to get the number of idle cores.");
         }
 
+        std::map<WorkflowFile *, StorageService *> file_locations;
+        for (auto f : task->getInputFiles()) {
+          file_locations.insert(std::make_pair(f, default_storage_service));
+        }
+        for (auto f : task->getOutputFiles()) {
+          file_locations.insert(std::make_pair(f, default_storage_service));
+        }
+
         // Decision making
-        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(task, {});
+        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(task, file_locations);
         unsigned long mim_num_cores = ((StandardJob *) (job))->getMinimumRequiredNumCores();
 
         if (sum_num_idle_cores < mim_num_cores) {

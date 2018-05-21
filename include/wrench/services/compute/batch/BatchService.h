@@ -68,7 +68,7 @@ namespace wrench {
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
                  {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
                 #else
-                        {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "FCFS"},
+                        {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
                 #endif
                  {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
                  {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""}

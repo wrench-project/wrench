@@ -24,7 +24,8 @@ namespace wrench {
 
 
     public:
-        CloudStandardJobScheduler() {}
+        CloudStandardJobScheduler(StorageService *default_storage_service) :
+                default_storage_service(default_storage_service) {}
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -43,6 +44,7 @@ namespace wrench {
         std::vector<std::string> execution_hosts;
         std::map<std::string, std::vector<std::string>> vm_list;
         Simulation *simulation;
+        StorageService *default_storage_service;
     };
 }
 

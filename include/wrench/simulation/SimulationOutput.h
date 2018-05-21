@@ -36,7 +36,7 @@ namespace wrench {
          * @return a vector pointers to SimulationTimestampXXXX instances
          */
         template <class T> std::vector<SimulationTimestamp<T> *> getTrace() {
-          std::type_index type_index = std::type_index(typeid(T));
+          std::type_index type_index  = std::type_index(typeid(T));
 
           std::vector<SimulationTimestamp<T> *> non_generic_vector;
           SimulationTrace<T> *trace = (SimulationTrace<T> *)(this->traces[type_index]);

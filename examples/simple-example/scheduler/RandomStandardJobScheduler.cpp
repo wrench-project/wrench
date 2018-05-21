@@ -123,9 +123,19 @@ namespace wrench {
             continue;
           }
 
+          std::map<WorkflowFile *, StorageService *> file_locations;
+          for (auto t : itc.second) {
+            for (auto f : t->getInputFiles()) {
+              file_locations.insert(std::make_pair(f, default_storage_service));
+            }
+            for (auto f : t->getOutputFiles()) {
+              file_locations.insert(std::make_pair(f, default_storage_service));
+            }
+          }
+
           // We can submit!
           WRENCH_INFO("Submitting task %s for execution as a standard job", itc.first.c_str());
-          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, {});
+          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(itc.second, file_locations);
           job_manager->submitJob(job, cs);
           successfully_scheduled = true;
           break;
