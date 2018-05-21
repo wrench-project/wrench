@@ -213,6 +213,7 @@ set(TEST_FILES
         test/simulation/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
         test/simulation/VirtualizedClusterServiceTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
+        test/simulation/WMSTest.cpp
         test/simulation/MultipleWMSTest.cpp
         test/simulation/JobManagerTest.cpp
         test/simulation/SimpleSimulationTest.cpp
