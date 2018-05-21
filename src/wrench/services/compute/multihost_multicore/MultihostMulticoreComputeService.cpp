@@ -335,7 +335,6 @@ namespace wrench {
                   std::to_string(requested_cores) + " are requested");
         }
 
-
         double requested_ram = std::get<2>(host);
         double available_ram = S4U_Simulation::getHostMemoryCapacity(hname);
         if (requested_ram < 0) {
