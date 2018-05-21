@@ -31,9 +31,15 @@ namespace wrench {
                            const std::vector<WorkflowTask *> &tasks);
 
 
+        BatchStandardJobScheduler(StorageService *default_storage_service) :
+                StandardJobScheduler(), default_storage_service(default_storage_service) {}
+
         /***********************/
         /** \endcond           */
         /***********************/
+
+    private:
+        StorageService *default_storage_service;
 
     };
 }

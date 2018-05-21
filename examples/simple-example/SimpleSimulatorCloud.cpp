@@ -123,7 +123,7 @@ int main(int argc, char **argv) {
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
   wrench::WMS *wms = simulation.add(
                   new wrench::SimpleWMS(std::unique_ptr<wrench::CloudStandardJobScheduler>(
-                                                new wrench::CloudStandardJobScheduler()),
+                                                new wrench::CloudStandardJobScheduler(storage_service)),
                                         nullptr, compute_services, storage_services, wms_host));
 
   wms->addWorkflow(&workflow);

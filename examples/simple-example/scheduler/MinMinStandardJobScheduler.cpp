@@ -77,8 +77,16 @@ namespace wrench {
             continue;
           }
 
+          std::map<WorkflowFile *, StorageService *> file_locations;
+          for (auto f : task->getInputFiles()) {
+            file_locations.insert(std::make_pair(f, default_storage_service));
+          }
+          for (auto f : task->getOutputFiles()) {
+            file_locations.insert(std::make_pair(f, default_storage_service));
+          }
+
           WRENCH_INFO("Submitting task %s for execution as a standard job", task->getId().c_str());
-          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(task, {});
+          WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(task, file_locations);
           job_manager->submitJob(job, cs);
           successfully_scheduled = true;
           break;

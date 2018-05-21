@@ -406,7 +406,7 @@ namespace wrench {
 
       if (this->containing_pilot_job != nullptr) {
         /*** Clean up everything in the scratch space ***/
-        WRENCH_INFO("CLEANING UP SCRATCH IN MULTIHOSTMULTICORECOMPUTE SERVICE");
+//        WRENCH_INFO("CLEANING UP SCRATCH IN MULTIHOSTMULTICORECOMPUTE SERVICE");
         cleanUpScratch();
       }
 

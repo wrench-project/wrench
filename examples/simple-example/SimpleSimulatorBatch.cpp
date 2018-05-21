@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
   std::cerr << "Instantiating a WMS on " << wms_host << "..." << std::endl;
   wrench::WMS *wms = simulation.add(
           new wrench::SimpleWMS(std::unique_ptr<wrench::BatchStandardJobScheduler>(
-                  new wrench::BatchStandardJobScheduler()),
+                  new wrench::BatchStandardJobScheduler(storage_service)),
                                 nullptr,
                                 compute_services, storage_services, wms_host));
 
@@ -135,6 +135,9 @@ int main(int argc, char **argv) {
    */
   std::cerr << "Staging input files..." << std::endl;
   std::map<std::string, wrench::WorkflowFile *> input_files = workflow.getInputFiles();
+  for (auto f : input_files) {
+    std::cerr << "---> " << f.second->getId() << "\n";
+  }
   try {
     simulation.stageFiles(input_files, storage_service);
   } catch (std::runtime_error &e) {

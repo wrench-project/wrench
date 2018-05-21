@@ -22,7 +22,9 @@ namespace wrench {
 
     public:
 
-        RandomStandardJobScheduler(JobManager *job_manager) : job_manager(job_manager) {}
+        RandomStandardJobScheduler(JobManager *job_manager,
+                                   StorageService *default_storage_service) : job_manager(job_manager),
+        default_storage_service(default_storage_service) {}
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -33,6 +35,7 @@ namespace wrench {
 
     private:
         JobManager *job_manager;
+        StorageService *default_storage_service;
 
         /***********************/
         /** \endcond           */

@@ -24,7 +24,9 @@ namespace wrench {
 
     public:
 
-        MaxMinStandardJobScheduler(JobManager *job_manager) : job_manager(job_manager) {}
+        MaxMinStandardJobScheduler(JobManager *job_manager,
+                                   StorageService *default_storage_service) : job_manager(job_manager),
+                                                                              default_storage_service(default_storage_service) {}
 
         /***********************/
         /** \cond DEVELOPER    */
@@ -39,6 +41,7 @@ namespace wrench {
         };
 
         JobManager *job_manager;
+        StorageService *default_storage_service;
         /***********************/
         /** \endcond           */
         /***********************/

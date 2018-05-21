@@ -279,7 +279,7 @@ namespace wrench {
 
       if (not this->part_of_pilot_job) {
         /*** Clean up everything in the scratch space ***/
-        WRENCH_INFO("CLEANING UP SCRATCH IN STRANDARDJOBEXECUTOR ITSELF");
+//        WRENCH_INFO("CLEANING UP SCRATCH IN STRANDARDJOBEXECUTOR ITSELF");
         cleanUpScratch();
       }
 

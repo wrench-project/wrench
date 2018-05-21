@@ -42,7 +42,15 @@ namespace wrench {
       for (auto task : tasks) {
         //TODO add support to pilot jobs
 
-        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(task, {});
+        std::map<WorkflowFile *, StorageService *> file_locations;
+        for (auto f : task->getInputFiles()) {
+          file_locations.insert(std::make_pair(f, default_storage_service));
+        }
+        for (auto f : task->getOutputFiles()) {
+          file_locations.insert(std::make_pair(f, default_storage_service));
+        }
+
+        WorkflowJob *job = (WorkflowJob *) this->getJobManager()->createStandardJob(task, file_locations);
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = "1";
         batch_job_args["-t"] = "2000000"; //time in minutes
