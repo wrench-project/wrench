@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,14 +24,15 @@ namespace wrench {
 
         RandomStandardJobScheduler(JobManager *job_manager,
                                    StorageService *default_storage_service) : job_manager(job_manager),
-        default_storage_service(default_storage_service) {}
+                                                                              default_storage_service(
+                                                                                      default_storage_service) {}
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
         void scheduleTasks(const std::set<ComputeService *> &compute_services,
-                           const std::map<std::string, std::vector<WorkflowTask *>> &tasks);
+                           const std::vector<WorkflowTask *> &tasks) override;
 
     private:
         JobManager *job_manager;

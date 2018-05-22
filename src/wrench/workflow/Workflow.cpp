@@ -11,7 +11,7 @@
 #include <lemon/graph_to_eps.h>
 #include <lemon/bfs.h>
 #include <pugixml.hpp>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <wrench/util/UnitParser.h>
 #include <wrench/workflow/WorkflowTask.h>
 
