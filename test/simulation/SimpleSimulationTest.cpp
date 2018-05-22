@@ -189,9 +189,18 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a Storage Service
+  // Create a Storage Service (note the BOGUS property, which is for testing puposes
+  //  and doesn't matter because we do not stop the service)
   EXPECT_NO_THROW(storage_service = simulation->add(
-          new wrench::SimpleStorageService(hostname, 100.0)));
+          new wrench::SimpleStorageService(hostname, 100.0,
+                                   {{wrench::SimpleStorageServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "BOGUS"}})));
+
+  // Try to get a bogus property as string or double
+  EXPECT_THROW(storage_service->getPropertyValueAsString("BOGUS"), std::invalid_argument);
+  EXPECT_THROW(storage_service->getPropertyValueAsDouble("BOGUS"), std::invalid_argument);
+  // Try to get a non-double double property (property value is "infinity", which is not a number)
+  EXPECT_THROW(storage_service->getPropertyValueAsDouble(wrench::SimpleStorageServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD),
+               std::invalid_argument);
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};

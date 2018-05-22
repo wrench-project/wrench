@@ -446,6 +446,9 @@ private:
         // Shutdown the compute service, for testing purposes
         this->test->compute_service->stop();
 
+        // Shutdown the compute service, for testing purposes, which should do nothing
+        this->test->compute_service->stop();
+
 
       }
 
