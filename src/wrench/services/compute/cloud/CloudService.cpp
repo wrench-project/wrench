@@ -25,8 +25,8 @@ namespace wrench {
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param execution_hosts: the hosts available for running virtual machines
-     * @param default_storage_service: a storage service (or nullptr)
      * @param plist: a property list ({} means "use all defaults")
+     * @param scratch_size: the size for the scratch space of the cloud service
      *
      * @throw std::runtime_error
      */
