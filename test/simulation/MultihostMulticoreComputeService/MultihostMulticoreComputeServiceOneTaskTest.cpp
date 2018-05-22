@@ -20,7 +20,6 @@ public:
     wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *output_file;
     wrench::WorkflowTask *task;
-    wrench::WorkflowTask *task_big;
     wrench::StorageService *storage_service1 = nullptr;
     wrench::StorageService *storage_service2 = nullptr;
     wrench::ComputeService *compute_service = nullptr;
@@ -60,7 +59,6 @@ protected:
 
       // Create one task
       task = workflow->addTask("task", 3600);
-      task_big = workflow->addTask("task2", 3600, 2, 2, 2048);
       task->addInputFile(input_file);
       task->addOutputFile(output_file);
 
@@ -413,10 +411,14 @@ private:
         throw std::runtime_error("Should not be able to create a job with a vector of empty tasks");
       }
 
+      // Create another task
+        wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 2048);
+
       // Create a job with nullptrs in file locations
       success = true;
       try {
-        job = job_manager->createStandardJob({test->task, test->task_big},
+
+        job = job_manager->createStandardJob({test->task, task_big},
                                              {{nullptr,  test->storage_service1},
                                               {test->output_file, test->storage_service1}});
       } catch (std::invalid_argument &e) {
@@ -429,7 +431,7 @@ private:
       // Create a job with nullptrs in file locations
       success = true;
       try {
-        job = job_manager->createStandardJob({test->task, test->task_big},
+        job = job_manager->createStandardJob({test->task, task_big},
                                              {{test->input_file,  nullptr},
                                               {test->output_file, test->storage_service1}});
       } catch (std::invalid_argument &e) {
@@ -897,6 +899,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithLocationMap_te
   ASSERT_GT(task->getStartDate(), 0.0);
   ASSERT_GT(task->getEndDate(), 0.0);
   ASSERT_GT(task->getEndDate(), task->getStartDate());
+  ASSERT_EQ(workflow->getCompletionDate(), task->getEndDate());
 
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
           simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>();
@@ -905,6 +908,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithLocationMap_te
             task->getEndDate());
   ASSERT_EQ(simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
             task);
+
 
   delete simulation;
 
@@ -1335,8 +1339,11 @@ private:
 
       bool success;
 
+      // Create another task
+      wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 2048);
+
       // Create a job
-      wrench::StandardJob *job = job_manager->createStandardJob({test->task_big},
+      wrench::StandardJob *job = job_manager->createStandardJob({task_big},
                                                                 {},
                                                                 {}, {}, {});
       // Submit the job
@@ -1461,8 +1468,10 @@ private:
 
       bool success;
 
+      wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 2048);
+
       // Create a job
-      wrench::StandardJob *job = job_manager->createStandardJob({test->task_big},
+      wrench::StandardJob *job = job_manager->createStandardJob({task_big},
                                                                 {},
                                                                 {}, {}, {});
       // Submit the job
