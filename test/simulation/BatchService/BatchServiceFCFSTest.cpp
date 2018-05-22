@@ -218,11 +218,11 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Batch Service with a FCFS scheduling algorithm
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -403,11 +403,11 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Batch Service with a FCFS scheduling algorithm
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -513,11 +513,11 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Batch Service with a FCFS scheduling algorithm
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"},
                                     {wrench::BatchServiceProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 

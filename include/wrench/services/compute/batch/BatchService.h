@@ -56,6 +56,8 @@ namespace wrench {
                  {BatchServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           "1024"},
                  {BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
                  {BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {BatchServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                 {BatchServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
                  {BatchServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
                  {BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
                  {BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         "1024"},
@@ -236,6 +238,10 @@ namespace wrench {
 
         //Process standardjob timeout
         void processStandardJobTimeout(StandardJob *job);
+
+        //process standard job termination request
+        void processStandardJobTerminationRequest(StandardJob *job, std::string answer_mailbox);
+
 
         //process pilot job termination request
         void processPilotJobTerminationRequest(PilotJob *job, std::string answer_mailbox);

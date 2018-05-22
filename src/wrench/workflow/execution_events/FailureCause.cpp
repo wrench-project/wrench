@@ -113,7 +113,7 @@ namespace wrench {
      * @param storage_service:  the storage service that ran out of spacee
      */
     StorageServiceNotEnoughSpace::StorageServiceNotEnoughSpace(WorkflowFile *file, StorageService *storage_service)
-            : FailureCause(STORAGE_NO_ENOUGH_SPACE) {
+            : FailureCause(STORAGE_NOT_ENOUGH_SPACE) {
       this->file = file;
       this->storage_service = storage_service;
     }

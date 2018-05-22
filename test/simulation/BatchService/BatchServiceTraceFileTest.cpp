@@ -197,13 +197,12 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), {
-                                   })));
+                                   {"Host1", "Host2", "Host3", "Host4"}, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -374,12 +373,12 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there"}}
           )), std::invalid_argument);
 
@@ -395,7 +394,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
@@ -408,7 +407,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
@@ -422,7 +421,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
@@ -436,7 +435,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
@@ -451,7 +450,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   // Create a Batch Service with a non-existing workload trace file, which should throw
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )));
 

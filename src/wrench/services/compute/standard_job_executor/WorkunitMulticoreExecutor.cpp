@@ -197,6 +197,10 @@ namespace wrench {
             dst = this->scratch_space;
             files_stored_in_scratch.insert(file);
           } else {
+            // TODO: Here we are returning a pointer to the scratch storage service, meaning
+            // TODO: that the "developer" level can do whatever it wants with that pointer, e.g.,
+            // TODO: Use the scratch storage service as any storage service... something we probably
+            // TODO: don't want in the long term...
             throw WorkflowExecutionException(new StorageServiceNotEnoughSpace(file,dst));
           }
         }
@@ -226,15 +230,9 @@ namespace wrench {
         // Read  all input files
         WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getId().c_str());
         try {
-//          if (this->scratch_space != nullptr) {
             StorageService::readFiles(task->getInputFiles(),
                                       work->file_locations,
                                       this->scratch_space, files_stored_in_scratch);
-//          } else {
-//            StorageService::readFiles(task->getInputFiles(),
-//                                      work->file_locations,
-//                                      this->default_storage_service, files_stored_in_scratch);
-//          }
         } catch (WorkflowExecutionException &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
@@ -255,13 +253,8 @@ namespace wrench {
 
         // Write all output files
         try {
-//          if (this->scratch_space != nullptr) {
-
             StorageService::writeFiles(task->getOutputFiles(), work->file_locations, this->scratch_space,
                                        files_stored_in_scratch);
-//          } else {
-//            StorageService::writeFiles(task->getOutputFiles(), work->file_locations, this->default_storage_service, files_stored_in_scratch);
-//          }
         } catch (WorkflowExecutionException &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
@@ -446,6 +439,10 @@ namespace wrench {
       return this->ram_utilization;
     }
 
+    /**
+     * @brief XXX
+     * @return  XXX
+     */
     std::set<WorkflowFile *> WorkunitMulticoreExecutor::getFilesStoredInScratch() {
       return this->files_stored_in_scratch;
     }

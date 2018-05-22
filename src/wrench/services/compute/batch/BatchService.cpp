@@ -446,11 +446,59 @@ namespace wrench {
     }
 
     /**
-     * @brief Terminate a standard job submitted to the compute service
+     * @brief Terminate a standard job submitted to the compute service. Will throw a
+     *        std::runtime_error exception if the job cannot be terminated, including
+     *        if the cause is that the job is neither pending not running (perhaps alread
+     *        terminated)
+     *
      * @param job: the job
+     *
+     * @throw std::runtime_error
      */
     void BatchService::terminateStandardJob(StandardJob *job) {
-      throw std::runtime_error("BatchService::terminateStandardJob(): Not implemented in WRENCH yet!");
+
+      if (this->state == Service::DOWN) {
+        throw WorkflowExecutionException(new ServiceIsDown(this));
+      }
+
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_standard_job");
+
+      // Send a "terminate a pilot job" message to the daemon's mailbox_name
+      try {
+        S4U_Mailbox::putMessage(this->mailbox_name,
+                                new ComputeServiceTerminateStandardJobRequestMessage(answer_mailbox, job,
+                                                                                  this->getPropertyValueAsDouble(
+                                                                                          BatchServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      // Get the answer
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobAnswerMessage *>(message.get())) {
+        // If no success, throw an exception
+        if (not msg->success) {
+          throw WorkflowExecutionException(msg->failure_cause);
+        }
+
+      } else {
+        throw std::runtime_error(
+                "BatchService::terminateStandardJob(): Received an unexpected [" +
+                message->getName() +
+                "] message!");
+      }
+
+
+
     }
 
 
@@ -490,7 +538,7 @@ namespace wrench {
         keep_going = processNextMessage();
 
 #ifdef ENABLE_BATSCHED
-//        if (keep_going && this->isBatschedReady()) {
+        //        if (keep_going && this->isBatschedReady()) {
         if (keep_going) {
           this->sendAllQueuedJobsToBatsched();
         }
@@ -934,6 +982,7 @@ namespace wrench {
                 message->getName() +
                 "] message!");
       }
+
     }
 
 
@@ -943,7 +992,9 @@ namespace wrench {
     void BatchService::cleanup() {
 
 #ifdef ENABLE_BATSCHED
-      this->stopBatsched();
+      if (this->isUp()) {  // the service hasn't already been stopped via stop()
+        this->stopBatsched();
+      }
 #endif
 
 
@@ -1023,9 +1074,14 @@ namespace wrench {
         processStandardJobFailure(msg->executor, msg->job, msg->cause);
         return true;
 
+      } else if (auto msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage *>(message.get())) {
+        processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
+        return true;
+
       } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
         processPilotJobCompletion(msg->job);
         return true;
+
       } else if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
         processPilotJobTerminationRequest(msg->job, msg->answer_mailbox);
         return true;
@@ -1066,7 +1122,7 @@ namespace wrench {
         }
 
 #ifdef ENABLE_BATSCHED
-//      } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
+        //      } else if (auto msg = dynamic_cast<BatchSchedReadyMessage *>(message.get())) {
 //        is_bat_sched_ready = true;
 //        return true;
 
@@ -1891,6 +1947,93 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Process a "terminate standard job message"
+     *
+     * @param job: the job to terminate
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     */
+    void BatchService::processStandardJobTerminationRequest(StandardJob *job,
+                                                            std::string answer_mailbox) {
+
+
+      // TODO: Implement this for BATSCHED
+
+#ifdef ENABLE_BATSCHED
+      throw std::runtime_error("BatchService::processStandardJobTerminationRequest(): Not implemented for BATSCHED yet");
+#else
+
+      // Is it running?
+      for (auto const & j : this->running_jobs) {
+        WorkflowJob *workflow_job = j->getWorkflowJob();
+        if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+          terminateRunningStandardJob(job);
+          this->running_jobs.erase(j);
+          this->freeJobFromJobsList(j);
+          // Send reply
+          ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
+                  new ComputeServiceTerminateStandardJobAnswerMessage(
+                  job, this, true, nullptr,
+                  this->getPropertyValueAsDouble(
+                          BatchServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+          try {
+            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+          } catch (std::shared_ptr<NetworkError> &cause) {
+            return;
+          }
+          return;
+        }
+      }
+
+      // Is it pending?
+      for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); it1++) {
+        WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
+        if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+          this->pending_jobs.erase(it1);
+          this->freeJobFromJobsList(*it1);
+          // Send reply
+          // Send reply
+          ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
+                  new ComputeServiceTerminateStandardJobAnswerMessage(
+                          job, this, true, nullptr,
+                          this->getPropertyValueAsDouble(
+                                  BatchServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+          try {
+            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+          } catch (std::shared_ptr<NetworkError> &cause) {
+            return;
+          }
+          return;
+        }
+      }
+
+      // Send reply
+      ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
+              new ComputeServiceTerminateStandardJobAnswerMessage(
+                      job, this, false, std::shared_ptr<FailureCause>(
+                              new JobCannotBeTerminated(
+                                      job)),
+                      this->getPropertyValueAsDouble(
+                              BatchServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+      try {
+        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+//      // Is it waiting?
+//      for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
+//        WorkflowJob *workflow_job = (*it2)->getWorkflowJob();
+//        if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+//          this->sendStandardJobFailureNotification(job, std::to_string((*it2)->getJobID()));
+//          this->waiting_jobs.erase(it2);
+//          this->freeJobFromJobsList(*it2);
+//          return;
+//        }
+//      }
+
+#endif
+    }
+
 
     /********************************************************************************************/
     /** BATSCHED INTERFACE METHODS BELOW                                                        */
@@ -2009,6 +2152,7 @@ namespace wrench {
      * @brief: Stop the batsched process
      */
     void BatchService::stopBatsched() {
+
       // Stop Batsched
       zmq::context_t context(1);
       zmq::socket_t socket(context, ZMQ_REQ);
@@ -2041,6 +2185,7 @@ namespace wrench {
       if (decision_events.size() > 0) {
         throw std::runtime_error("BatchService::stopBatsched(): Upon termination BATSCHED returned a non-empty event set, which is unexpected");
       }
+
     }
 
 

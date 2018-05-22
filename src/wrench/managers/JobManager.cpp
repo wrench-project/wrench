@@ -378,6 +378,20 @@ namespace wrench {
               break;
           }
         }
+        // Make second pass to fix NOT_READY states
+        for (auto task : ((StandardJob *)job)->tasks) {
+          if (task->getState() == WorkflowTask::State::NOT_READY) {
+            bool ready = true;
+            for (auto parent : task->getWorkflow()->getTaskParents(task)) {
+              if (parent->getState() != WorkflowTask::State::COMPLETED) {
+                ready = false;
+              }
+            }
+            if (ready) {
+              task->setState(WorkflowTask::State::READY);
+            }
+          }
+        }
       } else if (job->getType() == WorkflowJob::PILOT) {
         ((PilotJob *) job)->state = PilotJob::State::TERMINATED;
       }
@@ -581,6 +595,19 @@ namespace wrench {
             } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_READY) {
               t->setState(WorkflowTask::State::READY);
               t->incrementFailureCount();
+
+            } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_FAILED) {
+              bool ready = true;
+              for (auto parent : this->wms->getWorkflow()->getTaskParents(t)) {
+                if (parent->getInternalState() != WorkflowTask::InternalState::TASK_COMPLETED) {
+                  ready = false;
+                }
+              }
+              if (ready) {
+                t->setState(WorkflowTask::State::READY);
+              } else {
+                t->setState(WorkflowTask::State::NOT_READY);
+              }
             }
           }
 

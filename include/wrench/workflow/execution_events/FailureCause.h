@@ -51,7 +51,7 @@ namespace wrench {
             /** @brief The file is already being copied there */
                     FILE_ALREADY_BEING_COPIED,
             /** @brief The storage service does not have enough space to support operation */
-                    STORAGE_NO_ENOUGH_SPACE,
+                    STORAGE_NOT_ENOUGH_SPACE,
             /** @brief The service cannot be used because it is down (likely was terminated) */
                     SERVICE_DOWN,
             /** @brief The compute service does not support this job type */
