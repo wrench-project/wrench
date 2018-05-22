@@ -91,7 +91,7 @@ namespace wrench {
         throw std::invalid_argument("Workflow::removeTask(): Invalid arguments");
       }
 
-      // check that task exists
+      // check that task exists (this should never happen)
       if (tasks.find(task->id) == tasks.end()) {
         throw std::invalid_argument("Workflow::removeTask(): Task '" + task->id + "' does not exist");
       }
