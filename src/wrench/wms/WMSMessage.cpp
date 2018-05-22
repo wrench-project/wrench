@@ -34,8 +34,7 @@ namespace wrench {
                                                                                  start_time(start_time) {
       if (start_time < S4U_Simulation::getClock()) {
         throw std::invalid_argument(
-                "AlarmWMSDeferredStartMessage::AlarmWMSDeferredStartMessage(): Start time is earlier than "
-                        "current simulation time");
+                "AlarmWMSDeferredStartMessage::AlarmWMSDeferredStartMessage(): Start time is earlier than current simulation time");
       }
     }
 

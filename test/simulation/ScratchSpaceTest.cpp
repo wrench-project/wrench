@@ -285,7 +285,7 @@ private:
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-            if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
+            if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NOT_ENOUGH_SPACE) {
               throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
             }
             break;

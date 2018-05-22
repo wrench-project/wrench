@@ -30,7 +30,9 @@ public:
     wrench::Simulation *simulation;
 
 
+    void do_BogusSetupTest_test();
     void do_OneStandardJobTaskTest_test();
+    void do_TerminateStandardJobsTest_test();
     void do_TwoStandardJobSubmissionTest_test();
     void do_MultipleStandardTaskTest_test();
     void do_PilotJobTaskTest_test();
@@ -62,6 +64,11 @@ protected:
               "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
               "       <host id=\"Host4\" speed=\"1f\" core=\"10\"/> "
+              "       <host id=\"HostFast\" speed=\"100f\" core=\"10\"/> "
+              "       <host id=\"HostManyCores\" speed=\"1f\" core=\"100\"/> "
+              "       <host id=\"RAMHost\" speed=\"1f\" core=\"10\" > "
+              "         <prop id=\"ram\" value=\"1024\" />"
+              "       </host> "
               "       <link id=\"1\" bandwidth=\"50000GBps\" latency=\"0us\"/>"
               "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
               "       <link id=\"3\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
@@ -82,6 +89,283 @@ protected:
     std::unique_ptr<wrench::Workflow> workflow;
 
 };
+
+
+/**********************************************************************/
+/**  BOGUS SETUP TEST                                                **/
+/**********************************************************************/
+
+class BogusSetupTestWMS : public wrench::WMS {
+
+public:
+    BogusSetupTestWMS(BatchServiceTest *test,
+                      const std::set<wrench::ComputeService *> &compute_services,
+                      std::string hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, {}, {}, nullptr, hostname,
+                        "test") {
+      this->test = test;
+    }
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+
+      // Do nothing
+      return 0;
+    }
+};
+
+TEST_F(BatchServiceTest, BogusSetupTest) {
+  DO_TEST_WITH_FORK(do_BogusSetupTest_test);
+}
+
+void BatchServiceTest::do_BogusSetupTest_test() {
+
+
+  // Create and initialize a simulation
+  auto simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("batch_service_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = "Host1";
+
+  // Create a Batch Service with a bogus scheduling algorithm
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
+                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}})),
+               std::invalid_argument);
+
+  // Create a Batch Service with a bogus host list
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true, {},
+                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+               std::invalid_argument);
+
+  // Create a Batch Service with a non-homogeneous (speed) host list
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true, {"Host1", "HostFast"},
+                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+               std::invalid_argument);
+
+
+  // Create a Batch Service with a non-homogeneous (#cores) host list
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true, {"Host1", "HostManyCores"},
+                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+               std::invalid_argument);
+
+  // Create a Batch Service with a non-homogeneous (RAM) host list
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true, {"Host1", "RAMHost"},
+                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
+               std::invalid_argument);
+
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+/**********************************************************************/
+/**  STANDARD JOB TERMINATION TEST                                   **/
+/**********************************************************************/
+
+class TerminateOneStandardJobSubmissionTestWMS : public wrench::WMS {
+
+public:
+    TerminateOneStandardJobSubmissionTestWMS(BatchServiceTest *test,
+                                             const std::set<wrench::ComputeService *> &compute_services,
+                                             std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+                        "test") {
+      this->test = test;
+    }
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      wrench::WorkflowTask *task1;
+      wrench::WorkflowTask *task2;
+      wrench::StandardJob *job1;
+      wrench::StandardJob *job2;
+
+      // Submit job1 that should start right away
+      {
+        // Create a sequential task that lasts one min and requires 2 cores
+        task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0);
+        task1->addInputFile(this->workflow->getFileById("input_file"));
+
+
+        // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+
+        job1 = job_manager->createStandardJob(
+                {task1},
+                {
+                        {*(task1->getInputFiles().begin()),  this->test->storage_service1}
+                },
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                        this->workflow->getFileById("input_file"), this->test->storage_service1,
+                        this->test->storage_service2)},
+                {},
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
+                                                                              this->test->storage_service2)});
+
+        std::map<std::string, std::string> batch_job_args;
+        batch_job_args["-N"] = "4";
+        batch_job_args["-t"] = "5"; //time in minutes
+        batch_job_args["-c"] = "10"; //number of cores per node
+        try {
+          job_manager->submitJob(job1, this->test->compute_service, batch_job_args);
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error(
+                  "Exception: " + std::string(e.what())
+          );
+        }
+
+      }
+
+      // Submit job2 that will be stuck in the queue
+      {
+        // Create a sequential task that lasts one min and requires 2 cores
+        task2 = this->workflow->addTask("task2", 60, 1, 1, 1.0);
+        task2->addInputFile(this->workflow->getFileById("input_file"));
+
+        // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
+
+        job2 = job_manager->createStandardJob(
+                {task2},
+                {
+                        {*(task2->getInputFiles().begin()),  this->test->storage_service1},
+                },
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
+                        this->workflow->getFileById("input_file"), this->test->storage_service1,
+                        this->test->storage_service2)},
+                {},
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
+                                                                              this->test->storage_service2)});
+
+        std::map<std::string, std::string> batch_job_args;
+        batch_job_args["-N"] = "4";
+        batch_job_args["-t"] = "5"; //time in minutes
+        batch_job_args["-c"] = "10"; //number of cores per node
+        try {
+          job_manager->submitJob(job2, this->test->compute_service, batch_job_args);
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error(
+                  "Exception: " + std::string(e.what())
+          );
+        }
+
+      }
+
+      this->simulation->sleep(1);
+
+      // Terminate job2 (which is pending)
+      job_manager->terminateJob(job2);
+
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+
+      // Terminate job1 (which is running)
+      job_manager->terminateJob(job1);
+
+      // Check task states
+      if (task1->getState() != wrench::WorkflowTask::State::READY) {
+        throw std::runtime_error("Unexpected task1 state: " + wrench::WorkflowTask::stateToString(task1->getState()));
+      }
+
+      if (task2->getState() != wrench::WorkflowTask::State::READY) {
+        throw std::runtime_error("Unexpected task2 state: " + wrench::WorkflowTask::stateToString(task1->getState()));
+      }
+
+      return 0;
+    }
+};
+
+#ifdef ENABLE_BATSCHED
+TEST_F(BatchServiceTest, DISABLED_TerminateStandardJobsTest)
+#else
+TEST_F(BatchServiceTest, TerminateStandardJobsTest)
+#endif
+{
+  DO_TEST_WITH_FORK(do_TerminateStandardJobsTest_test);
+}
+
+void BatchServiceTest::do_TerminateStandardJobsTest_test() {
+
+
+  // Create and initialize a simulation
+  auto simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("batch_service_test");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = "Host1";
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service2 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+
+  // Create a Batch Service
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
+                                   {})));
+
+  simulation->add(new wrench::FileRegistryService(hostname));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          new TerminateOneStandardJobSubmissionTestWMS(
+                  this,  {compute_service}, hostname)));
+
+  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+
+  // Create two workflow files
+  wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+  wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
 
 /**********************************************************************/
 /**  ONE STANDARD JOB SUBMISSION TASK SIMULATION TEST ON ONE HOST    **/
@@ -158,6 +442,11 @@ private:
           }
         }
         this->workflow->removeTask(task);
+
+        // Shutdown the compute service, for testing purposes
+        this->test->compute_service->stop();
+
+
       }
 
       return 0;
@@ -167,7 +456,6 @@ private:
 TEST_F(BatchServiceTest, OneStandardJobSubmissionTest) {
   DO_TEST_WITH_FORK(do_OneStandardJobTaskTest_test);
 }
-
 
 void BatchServiceTest::do_OneStandardJobTaskTest_test() {
 
@@ -184,7 +472,7 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -195,15 +483,9 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
 
-  // Create a Batch Service with a bogus scheduling algorithm
-  ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
-                                   {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}})), std::invalid_argument);
-
-
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -234,7 +516,6 @@ void BatchServiceTest::do_OneStandardJobTaskTest_test() {
   free(argv[0]);
   free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -381,7 +662,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -393,7 +674,7 @@ void BatchServiceTest::do_TwoStandardJobSubmissionTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
@@ -522,7 +803,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -534,7 +815,7 @@ void BatchServiceTest::do_PilotJobTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, simulation->getHostnameList(),
+          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a File Registry Service
@@ -719,7 +1000,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -732,7 +1013,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
@@ -855,7 +1136,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -868,7 +1149,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
@@ -983,7 +1264,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -996,7 +1277,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
@@ -1128,7 +1409,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -1141,7 +1422,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
@@ -1172,7 +1453,6 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
   free(argv[0]);
   free(argv);
 }
-
 
 
 /**********************************************************************/
@@ -1271,7 +1551,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -1284,7 +1564,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
@@ -1494,7 +1774,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -1507,7 +1787,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
   // Create a WMS
@@ -1577,8 +1857,8 @@ private:
 
         int num_tasks = 40;
         int num_cores_in_each_task = 1;
-        int num_hosts_in_platform = this->simulation->getHostnameList().size();
-        int repetition = num_tasks/(num_cores_in_each_task*num_hosts_in_platform);
+        unsigned long num_hosts_in_platform = 4;
+        unsigned long repetition = num_tasks/(num_cores_in_each_task*num_hosts_in_platform);
         std::vector<wrench::WorkflowTask*> tasks = {};
         std::vector<wrench::StandardJob*> jobs = {};
         for (int i = 0;i<num_tasks;i++) {
@@ -1664,7 +1944,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -1677,7 +1957,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
   // Create a WMS
@@ -1904,7 +2184,7 @@ private:
           num_events++;
         }
 
-        int num_hosts = this->simulation->getHostnameList().size();
+        unsigned long num_hosts = 4;
         for (int i = 0;i<num_tasks;i++) {
           if (tasks[i]->getExecutionHost() != tasks[(i+num_hosts)%num_hosts]->getExecutionHost()) {
             throw std::runtime_error(
@@ -1948,7 +2228,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -1961,7 +2241,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "ROUNDROBIN"}})));
 
   // Create a WMS
@@ -2001,9 +2281,9 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 
 
 
-/**********************************************************************/
+/***********************************************************************************************/
 /**  STANDARDJOB INSIDE PILOT JOB FAILURE TASK SIMULATION TEST ON ONE-ONE HOST                **/
-/**********************************************************************/
+/***********************************************************************************************/
 
 class StandardJobInsidePilotJobTimeoutSubmissionTestWMS : public wrench::WMS {
 
@@ -2139,7 +2419,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -2152,7 +2432,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), {})));
+                                   {"Host1", "Host2", "Host3", "Host4"}, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -2322,7 +2602,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -2335,7 +2615,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
@@ -2489,7 +2769,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -2502,7 +2782,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
@@ -2638,7 +2918,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -2651,7 +2931,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(),
+                                   {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
   // Create a WMS
@@ -2790,7 +3070,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -2804,7 +3084,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname,
                                    true, true,
-                                   simulation->getHostnameList(),  {
+                                   {"Host1", "Host2", "Host3", "Host4"},  {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "filler"},
                                            {wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"}
                                    })));

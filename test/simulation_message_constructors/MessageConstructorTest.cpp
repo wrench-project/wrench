@@ -200,6 +200,11 @@ TEST_F(MessageConstructorTest, CloudServiceMessages) {
   EXPECT_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("", "host", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("mailbox", "", "host", true, true, 42, 0, plist, 666), std::invalid_argument);
   EXPECT_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("mailbox", "host", "", true, true, 42, 0, plist, 666), std::invalid_argument);
+
+  EXPECT_NO_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "host", 666));
+  EXPECT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("", "host", "host", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "", "host", 666), std::invalid_argument);
+  EXPECT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "", 666), std::invalid_argument);
 }
 
 

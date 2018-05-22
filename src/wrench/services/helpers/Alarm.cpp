@@ -20,7 +20,8 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param date: the date at this the message should be sent
+     * @param date: the date at this the message should be sent. If date is in the past
+     *              message will be sent immediately.
      * @param hostname: the name of the host on which the Alarm daemon should run
      * @param reply_mailbox_name: the mailbox to which the message should be sent
      * @param msg: the message to send
@@ -31,10 +32,10 @@ namespace wrench {
                                                                        "alarm_service_" + suffix) {
 
       this->date = date;
-      if (this->date <= S4U_Simulation::getClock()) {
-        WRENCH_INFO(
-                "Alarm is being started but the date to notify is less than current timestamp. will be notified immediately");
-      }
+//      if (this->date <= S4U_Simulation::getClock()) {
+//        WRENCH_INFO(
+//                "Alarm is being started but notification date is in the past. Notification will be sent immediately.");
+//      }
       this->reply_mailbox_name = reply_mailbox_name;
       this->msg = std::unique_ptr<SimulationMessage>(msg);
     }

@@ -325,7 +325,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
+          if (dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NOT_ENOUGH_SPACE) {
             throw std::runtime_error("Should have gotten a 'out of space' failure cause");
           }
           break;
@@ -784,7 +784,7 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
-        if (e.getCause()->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::STORAGE_NOT_ENOUGH_SPACE) {
           throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
                                    std::to_string(e.getCause()->getCauseType()));
         }
@@ -1015,7 +1015,7 @@ private:
 
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
-          if (dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NO_ENOUGH_SPACE) {
+          if (dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::STORAGE_NOT_ENOUGH_SPACE) {
             throw std::runtime_error("Got an expected exception, but an incorrect failure cause type " +
                                      std::to_string(dynamic_cast<wrench::FileCopyFailedEvent*>(event.get())->failure_cause->getCauseType()));
           }

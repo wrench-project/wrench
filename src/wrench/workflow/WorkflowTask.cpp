@@ -247,16 +247,19 @@ namespace wrench {
     */
     void WorkflowTask::setState(WorkflowTask::State state) {
 
+//      WRENCH_INFO("SETTING %s's STATE TO %s", this->getId().c_str(), WorkflowTask::stateToString(state).c_str());
       // Sanity check
       bool sane = true;
       switch(state) {
         case NOT_READY:
-          if (this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) {
+          if ((this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
+              (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
             sane = false;
           }
           break;
         case READY:
-          if (this->internal_state != WorkflowTask::InternalState::TASK_READY) {
+          if ((this->internal_state != WorkflowTask::InternalState::TASK_READY) and
+              (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
             sane = false;
           }
           break;
@@ -276,7 +279,7 @@ namespace wrench {
 
       if (not sane) {
         throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
-                                 this->getId() +"' visible state to " +
+                                 this->getId() +"'s visible state to " +
                                  stateToString(state) + " when its internal " +
                                  "state is " + stateToString(this->internal_state));
       }

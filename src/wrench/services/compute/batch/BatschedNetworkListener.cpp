@@ -98,7 +98,6 @@ namespace wrench {
           );
         }
         this->send_receive();
-        WRENCH_INFO("HERE");
       } else {
         throw std::runtime_error(
                 "BatschedNetworkListener::BatschedNetworkListener():Invalid Network Listener type given"

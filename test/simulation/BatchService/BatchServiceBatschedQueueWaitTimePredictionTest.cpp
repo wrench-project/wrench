@@ -213,7 +213,7 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -227,12 +227,12 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
 //  #ifdef ENABLE_BATSCHED
   EXPECT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), {
+                                   {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}
                                    })), std::invalid_argument);
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), {
+                                   {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}
                                    })));
 
@@ -421,7 +421,7 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -432,20 +432,11 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
-//  #ifdef ENABLE_BATSCHED
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), {
+                                   {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
                                    })));
-//  #else
-//  EXPECT_NO_THROW(compute_service = simulation->add(
-//          new wrench::BatchService(hostname, true, true,
-//                                   simulation->getHostnameList(), storage_service1, {
-//                                           {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}
-//                                   })));
-//  #endif
-
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -670,7 +661,7 @@ void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -684,7 +675,7 @@ void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), {
+                                   {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                            {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"}
                                    })));
@@ -951,7 +942,7 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
   EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "Host1";
 
   // Create a Storage Service
   EXPECT_NO_THROW(storage_service1 = simulation->add(
@@ -964,7 +955,7 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, true, true,
-                                   simulation->getHostnameList(), {
+                                   {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                            {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"}
                                    })));
