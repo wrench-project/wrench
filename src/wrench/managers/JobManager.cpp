@@ -110,43 +110,53 @@ namespace wrench {
 
       for (auto fl : file_locations) {
         if (fl.first == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the file_locations map");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr workflow file in the file_locations map");
         }
         if (fl.second == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the file_locations map");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr storage service in the file_locations map");
         }
       }
 
       for (auto fc : pre_file_copies) {
         if (std::get<0>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the pre_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr workflow file in the pre_file_copies set");
         }
         if (std::get<1>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr src storage service in the pre_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr src storage service in the pre_file_copies set");
         }
         if (std::get<2>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr dst storage service in the pre_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr dst storage service in the pre_file_copies set");
         }
       }
 
       for (auto fc : post_file_copies) {
         if (std::get<0>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the post_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr workflow file in the post_file_copies set");
         }
         if (std::get<1>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr src storage service in the post_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr src storage service in the post_file_copies set");
         }
         if (std::get<2>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr dst storage service in the post_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr dst storage service in the post_file_copies set");
         }
       }
 
       for (auto fd : cleanup_file_deletions) {
         if (std::get<0>(fd) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the cleanup_file_deletions set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr workflow file in the cleanup_file_deletions set");
         }
         if (std::get<1>(fd) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the cleanup_file_deletions set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr storage service in the cleanup_file_deletions set");
         }
       }
 
@@ -305,9 +315,9 @@ namespace wrench {
           for (auto t : ((StandardJob *) job)->tasks) {
             if ((t->getState() == WorkflowTask::State::COMPLETED) or
                 (t->getState() == WorkflowTask::State::PENDING)) {
-              throw std::invalid_argument("JobManager()::submitJob(): task %s cannot be submitted "
-                                                  "as part of a standard job  standard job because its"
-                                                  "state is " + WorkflowTask::stateToString(t->getState()));
+              throw std::invalid_argument("JobManager()::submitJob(): task " + t->getId() +
+                                          " cannot be submitted as part of a standard job because its state is " +
+                                          WorkflowTask::stateToString(t->getState()));
             }
           }
           // Modify task states
@@ -360,8 +370,8 @@ namespace wrench {
       }
 
       if (job->getType() == WorkflowJob::STANDARD) {
-        ((StandardJob *)job)->state = StandardJob::State::TERMINATED;
-        for (auto task : ((StandardJob *)job)->tasks) {
+        ((StandardJob *) job)->state = StandardJob::State::TERMINATED;
+        for (auto task : ((StandardJob *) job)->tasks) {
           switch (task->getInternalState()) {
             case WorkflowTask::TASK_NOT_READY:
               task->setState(WorkflowTask::State::NOT_READY);
@@ -379,7 +389,7 @@ namespace wrench {
           }
         }
         // Make second pass to fix NOT_READY states
-        for (auto task : ((StandardJob *)job)->tasks) {
+        for (auto task : ((StandardJob *) job)->tasks) {
           if (task->getState() == WorkflowTask::State::NOT_READY) {
             bool ready = true;
             for (auto parent : task->getWorkflow()->getTaskParents(task)) {
@@ -619,7 +629,8 @@ namespace wrench {
           // Forward the notification along the notification chain
           try {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                     new ComputeServiceStandardJobFailedMessage(job, msg->compute_service, std::move(msg->cause),
+                                     new ComputeServiceStandardJobFailedMessage(job, msg->compute_service,
+                                                                                std::move(msg->cause),
                                                                                 0.0));
           } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;
