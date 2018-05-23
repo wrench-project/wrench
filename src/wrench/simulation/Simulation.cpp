@@ -17,6 +17,7 @@
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/storage/StorageService.h"
 #include "wrench/simulation/Simulation.h"
+#include "simgrid/plugins/energy.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(simulation, "Log category for Simulation");
 
@@ -91,6 +92,13 @@ namespace wrench {
         argv[i] = argv[i + skip];
       }
       *argc = i - skip;
+
+      //activate energy plugin
+      if (*argc >= 2) {
+        if (strcmp(argv[1], "--activate_energy") == 0) {
+          sg_host_energy_plugin_init();
+        }
+      }
 
       this->s4u_simulation->initialize(argc, argv);
 

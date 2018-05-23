@@ -14,6 +14,7 @@
 #include <cfloat>
 #include <wrench/services/compute/ComputeService.h>
 #include <wrench/util/UnitParser.h>
+#include <simgrid/plugins/energy.h>
 
 
 #include "wrench/simgrid_S4U_util/S4U_Simulation.h"
@@ -170,7 +171,7 @@ namespace wrench {
     double S4U_Simulation::getFlopRate(std::string hostname) {
       double flop_rate = 0;
       try {
-        flop_rate = simgrid::s4u::Host::by_name(hostname)->getPstateSpeed(0);
+        flop_rate = simgrid::s4u::Host::by_name(hostname)->getSpeed(); // changed it to speed of the current pstate
       } catch (std::out_of_range &e) {
         throw std::invalid_argument("Unknown hostname " + hostname);
       }
@@ -249,5 +250,76 @@ namespace wrench {
       }
       return capacity_value;
     }
+
+    /**
+     * @brief Get the property associated to the host specified in the platform file
+     * @return a string relating to the property specified in the platform file
+     */
+    std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
+      std::cerr << "The host is " << hostname << " and the property to look for is " << property_name << "\n";
+      return simgrid::s4u::Host::by_name(hostname)->getProperty(property_name.c_str());
+    }
+
+    /**
+     * @brief Get the energy consumed by the host
+     * @return a double referring to the energy consumed by the host
+     */
+    double S4U_Simulation::getEnergyConsumedByHost(std::string hostname) {
+      return  sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
+    }
+
+    /**
+     * @brief Get the total energy consumed by all the provided hosts
+     * @return a double referring to the total energy consumed by all the provided hosts
+     */
+    double S4U_Simulation::getTotalEnergyConsumed(std::vector<std::string> hostnames) {
+      double total_energy = 0;
+      for (auto hostname: hostnames) {
+        total_energy+=sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
+      }
+      return total_energy;
+    }
+
+    /**
+     * @brief Set the power state of the host specified in the platform xml
+     */
+    void S4U_Simulation::setPstate(std::string hostname, int pstate ) {
+      simgrid::s4u::Host::by_name(hostname)->setPstate(pstate);
+    }
+
+    /**
+     * @brief Get the total number of pstates of a host specified in the platform xml
+     * @return an int referring to the number of power states available to the current host as specified in the platform xml
+     */
+    int S4U_Simulation::getNumberofPstates(std::string hostname) {
+      return simgrid::s4u::Host::by_name(hostname)->getPstatesCount();
+    }
+
+    /**
+     * @brief Get the current pstate of a host
+     * @return an int referring to the current pstate of the current host
+     */
+    int S4U_Simulation::getCurrentPstate(std::string hostname) {
+      return simgrid::s4u::Host::by_name(hostname)->getPstate();
+    }
+
+    /**
+     * @brief Get the minimum power available to the host as specified in the platform xml
+     * @return an double referring to the minimum power available to the host as specified in the platform xml
+     */
+    double S4U_Simulation::getMinPowerAvailable(std::string hostname) {
+      return sg_host_get_wattmin_at(simgrid::s4u::Host::by_name(hostname), (simgrid::s4u::Host::by_name(hostname))->getPstate());
+    }
+
+    /**
+     * @brief Get the maximum power possible for the host to consume as specified in the platform xml
+     * @return an double referring to the maximum power possible for the host to consume as specified in the platform xml
+     */
+    double S4U_Simulation::getMaxPowerPossible(std::string hostname) {
+      return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname), (simgrid::s4u::Host::by_name(hostname))->getPstate());
+    }
+
+
+
 
 };
