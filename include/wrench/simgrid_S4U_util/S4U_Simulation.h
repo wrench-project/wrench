@@ -13,6 +13,7 @@
 
 #include <simgrid/s4u.hpp>
 #include <simgrid/kernel/routing/ClusterZone.hpp>
+#include "S4U_Host.h"
 
 namespace wrench {
 
@@ -38,6 +39,14 @@ namespace wrench {
 				static double getMemoryCapacity();
 				static void compute(double);
 				static void sleep(double);
+				static std::string getHostProperty(std::string hostname, std::string property_name);
+				static double getEnergyConsumedByHost(std::string hostname);
+				static double getTotalEnergyConsumed(std::vector<std::string> hostnames);
+				static void setPstate(std::string hostname, int pstate);
+				static int getNumberofPstates(std::string hostname);
+				static int getCurrentPstate(std::string hostname);
+				static double getMinPowerAvailable(std::string hostname);
+				static double getMaxPowerPossible(std::string hostname);
 				bool isInitialized();
         bool isPlatformSetup();
         std::vector<std::string> getAllHostnames();
