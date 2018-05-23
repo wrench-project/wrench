@@ -13,7 +13,6 @@
 
 #include <simgrid/s4u.hpp>
 #include <simgrid/kernel/routing/ClusterZone.hpp>
-#include "S4U_Host.h"
 
 namespace wrench {
 
