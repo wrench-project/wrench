@@ -13,7 +13,6 @@
 
 #include <string>
 #include <vector>
-#include <wrench/simgrid_S4U_util/S4U_Host.h>
 
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"
