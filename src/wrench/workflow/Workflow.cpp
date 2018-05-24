@@ -33,6 +33,7 @@ namespace wrench {
      * @param max_num_cores: the maximum number of cores that can be used by the task (0 means infinity)
      * @param parallel_efficiency: the multi-core parallel efficiency (number between 0.0 and 1.0)
      * @param memory_requirement: memory requirement (in bytes)
+     * @param type: workflow task type (WorkflowTask::TaskType)
      *
      * @return the WorkflowTask instance
      *
@@ -43,7 +44,8 @@ namespace wrench {
                                     int min_num_cores,
                                     int max_num_cores,
                                     double parallel_efficiency,
-                                    double memory_requirement) {
+                                    double memory_requirement,
+                                    const WorkflowTask::TaskType type) {
 
       if ((flops < 0.0) || (min_num_cores < 1) || (max_num_cores < 0) ||
           ((max_num_cores > 0) && (min_num_cores > max_num_cores))) {
@@ -57,7 +59,7 @@ namespace wrench {
 
       // Create the WorkflowTask object
       WorkflowTask *task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency,
-                                            memory_requirement);
+                                            memory_requirement, type);
       // Create a DAG node for it
       task->workflow = this;
       task->DAG = this->DAG.get();
@@ -510,7 +512,6 @@ namespace wrench {
       return total_flops;
     }
 
-
     /**
      * @brief Create a workflow based on a DAX file
      *
@@ -518,8 +519,8 @@ namespace wrench {
      * @param reference_flop_rate: the compute speed (in flops/sec, assuming a task's computation is purely flops).
      *                             The DAX file specified task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
-     *                             apply reasonable scaling. (Because the XML platform description specifies host compute
-     *                             speeds in flops/sec).
+     *                             apply reasonable scaling. (Because the XML platform description specifies host
+     *                             compute speeds in flops/sec).
      *
      * @throw std::invalid_argument
      */
@@ -617,8 +618,8 @@ namespace wrench {
      * @param reference_flop_rate: the compute speed (in flops/sec, assuming a task's computation is purely flops).
      *                             The JSON file specified task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
-     *                             apply reasonable scaling. (Because the XML platform description specifies host compute
-     *                             speeds in flops/sec)
+     *                             apply reasonable scaling. (Because the XML platform description specifies host
+     *                             compute speeds in flops/sec)
      *
      * @throw std::invalid_argument
      */
@@ -658,42 +659,58 @@ namespace wrench {
           std::vector<nlohmann::json> jobs = it.value();
 
           for (auto &job : jobs) {
-            if (job.at("type") == "compute") {
-              std::string name = job.at("name");
-              double runtime = job.at("runtime");
-              int num_procs = 1;
-              task = this->addTask(name, runtime * flop_rate, num_procs);
-              std::vector<nlohmann::json> files = job.at("files");
+            std::string name = job.at("name");
+            double runtime = job.at("runtime");
+            int num_procs = 1;
+            task = this->addTask(name, runtime * flop_rate, num_procs);
 
-              // task files
-              for (auto &f : files) {
-                double size = f.at("size");
-                std::string link = f.at("link");
-                std::string id = f.at("name");
-                wrench::WorkflowFile *workflow_file = nullptr;
-                try {
-                  workflow_file = this->getWorkflowFileByID(id);
-                } catch (const std::invalid_argument &ia) {
-                  // making a new file
-                  workflow_file = this->addFile(id, size);
-                }
-                if (link == "input") {
-                  task->addInputFile(workflow_file);
-                }
-                if (link == "output") {
-                  task->addOutputFile(workflow_file);
-                }
+            // task type
+            std::string type = job.at("type");
+            if (type == "transfer_in") {
+              task->setTaskType(WorkflowTask::TaskType::TRANSFER_IN);
+            } else if (type == "transfer_out") {
+              task->setTaskType(WorkflowTask::TaskType::TRANSFER_OUT);
+            } else if (type == "auxiliary") {
+              task->setTaskType(WorkflowTask::TaskType::AUXILIARY);
+            }
+
+            // task files
+            std::vector<nlohmann::json> files = job.at("files");
+
+            for (auto &f : files) {
+              double size = f.at("size");
+              std::string link = f.at("link");
+              std::string id = f.at("name");
+              wrench::WorkflowFile *workflow_file = nullptr;
+              try {
+                workflow_file = this->getWorkflowFileByID(id);
+              } catch (const std::invalid_argument &ia) {
+                // making a new file
+                workflow_file = this->addFile(id, size);
               }
+              if (link == "input") {
+                task->addInputFile(workflow_file);
+              }
+              if (link == "output") {
+                task->addOutputFile(workflow_file);
+              }
+              if (type == "transfer_in" || type == "transfer_out") {
+                task->addSrcDest(workflow_file, f.at("src"), f.at("dest"));
+              }
+            }
+          }
 
-              std::vector<nlohmann::json> parents = job.at("parents");
-              // task dependencies
-              for (auto &parent : parents) {
-                try {
-                  WorkflowTask *parent_task = this->getWorkflowTaskByID(parent);
-                  this->addControlDependency(parent_task, task);
-                } catch (std::invalid_argument &e) {
-                  // do nothing
-                }
+          // since tasks may not be ordered in the JSON file, we need to iterate over all tasks again
+          for (auto &job : jobs) {
+            task = this->getWorkflowTaskByID(job.at("name"));
+            std::vector<nlohmann::json> parents = job.at("parents");
+            // task dependencies
+            for (auto &parent : parents) {
+              try {
+                WorkflowTask *parent_task = this->getWorkflowTaskByID(parent);
+                this->addControlDependency(parent_task, task);
+              } catch (std::invalid_argument &e) {
+                // do nothing
               }
             }
           }

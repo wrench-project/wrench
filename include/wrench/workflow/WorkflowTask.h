@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,13 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+        /** @brief Task type */
+        enum TaskType {
+            COMPUTE,
+            AUXILIARY,
+            TRANSFER_IN,
+            TRANSFER_OUT
+        };
 
         /** @brief Task state enum */
         enum State {
@@ -63,7 +70,6 @@ namespace wrench {
 
         static std::string stateToString(WorkflowTask::State state);
 
-
         WorkflowJob *getJob() const;
 
         Workflow *getWorkflow() const;
@@ -72,8 +78,14 @@ namespace wrench {
 
         void setClusterId(std::string);
 
+        void setTaskType(TaskType);
+
+        TaskType getTaskType() const;
+
         std::set<WorkflowFile *> getInputFiles();
+
         std::set<WorkflowFile *> getOutputFiles();
+
         unsigned long getTopLevel();
 
         double getStartDate();
@@ -84,11 +96,13 @@ namespace wrench {
 
         WorkflowTask::State getState() const;
 
+        void addSrcDest(WorkflowFile *, const std::string &, const std::string &);
+
+        std::map<WorkflowFile *, std::pair<std::string, std::string>> getFileTransfers() const;
 
         /***********************/
         /** \endcond           */
         /***********************/
-
 
 
         /***********************/
@@ -109,7 +123,9 @@ namespace wrench {
         void updateTopLevel();
 
         void setInternalState(WorkflowTask::InternalState);
+
         void setState(WorkflowTask::State);
+
         WorkflowTask::InternalState getInternalState() const;
 
         void setJob(WorkflowJob *job);
@@ -126,13 +142,13 @@ namespace wrench {
         /** \endcond           */
         /***********************/
 
-
     private:
 
         friend class Workflow;
 
         std::string id;                    // Task ID
         std::string cluster_id;            // ID for clustered task
+        TaskType task_type;                // Task type
         double flops;                      // Number of flops
         unsigned long min_num_cores;
         unsigned long max_num_cores;
@@ -153,14 +169,16 @@ namespace wrench {
         lemon::ListDigraph::Node DAG_node;                    // pointer to the underlying DAG node
         std::map<std::string, WorkflowFile *> output_files;    // List of output files
         std::map<std::string, WorkflowFile *> input_files;    // List of input files
+        std::map<WorkflowFile *, std::pair<std::string, std::string>> fileTransfers;  // Map of transfer files and hosts
 
         // Private constructor (called by Workflow)
-        WorkflowTask(const std::string id,
-                     const double t,
-                     const unsigned long min_num_cores,
-                     const unsigned long max_num_cores,
-                     const double parallel_efficiency,
-                     const double memory_requirement);
+        WorkflowTask(std::string id,
+                     double t,
+                     unsigned long min_num_cores,
+                     unsigned long max_num_cores,
+                     double parallel_efficiency,
+                     double memory_requirement,
+                     TaskType type);
 
         // Containing job
         WorkflowJob *job;

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,13 +90,12 @@ namespace wrench {
     private:
         friend class JobManager;
 
-        StandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations,
-                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-                    std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
+        StandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> &file_locations,
+                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &pre_file_copies,
+                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &post_file_copies,
+                    std::set<std::tuple<WorkflowFile *, StorageService *>> &cleanup_file_deletions);
 
         State state;
-
 
     };
 
@@ -105,6 +104,5 @@ namespace wrench {
     /***********************/
 
 };
-
 
 #endif //WRENCH_MULTITASKJOB_H
