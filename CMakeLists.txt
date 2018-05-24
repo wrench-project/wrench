@@ -194,6 +194,7 @@ set(TEST_FILES
         test/workflow/WorkflowFileTest.cpp
         test/workflow/WorkflowTaskTest.cpp
         test/workflow/WorkflowLoadFromDAXTest.cpp
+        test/workflow/WorkflowLoadFromJSONTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceOneTaskTest.cpp
         test/simulation/SimpleStorageService/InternalNetworkConnectionTest.cpp
         test/simulation/SimpleStorageService/SimpleStorageServiceFunctionalTest.cpp
@@ -217,10 +218,11 @@ set(TEST_FILES
         test/simulation/MultipleWMSTest.cpp
         test/simulation/JobManagerTest.cpp
         test/simulation/SimpleSimulationTest.cpp
+        test/simulation/ScratchSpaceTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        test/simulation/ScratchSpaceTest.cpp)
+        )
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)

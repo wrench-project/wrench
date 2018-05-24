@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,11 +27,12 @@ namespace wrench {
      * @param max_cores: the maximum number of cores that the task can use (infinity: ComputeService::ALL_CORES)
      * @param parallel_efficiency: the multi-core parallel efficiency
      * @param memory_requirement: memory requirement in bytes
+     * @param type: the type of the task (WorkflowTask::TaskType)
      */
     WorkflowTask::WorkflowTask(const std::string id, const double flops, const unsigned long min_num_cores,
                                const unsigned long max_num_cores, const double parallel_efficiency,
-                               const double memory_requirement) :
-            id(id), flops(flops),
+                               const double memory_requirement, const TaskType type) :
+            id(id), task_type(type), flops(flops),
             min_num_cores(min_num_cores),
             max_num_cores(max_num_cores),
             parallel_efficiency(parallel_efficiency),
@@ -241,16 +242,16 @@ namespace wrench {
     }
 
     /**
-    * @brief Set the visible state of the task
-    *
-    * @param state: the task state
-    */
+     * @brief Set the visible state of the task
+     *
+     * @param state: the task state
+     */
     void WorkflowTask::setState(WorkflowTask::State state) {
 
 //      WRENCH_INFO("SETTING %s's STATE TO %s", this->getId().c_str(), WorkflowTask::stateToString(state).c_str());
       // Sanity check
       bool sane = true;
-      switch(state) {
+      switch (state) {
         case NOT_READY:
           if ((this->internal_state != WorkflowTask::InternalState::TASK_NOT_READY) and
               (this->internal_state != WorkflowTask::InternalState::TASK_FAILED)) {
@@ -279,84 +280,97 @@ namespace wrench {
 
       if (not sane) {
         throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
-                                 this->getId() +"'s visible state to " +
+                                 this->getId() + "'s visible state to " +
                                  stateToString(state) + " when its internal " +
                                  "state is " + stateToString(this->internal_state));
       }
       this->visible_state = state;
     }
 
-
-/**
- * @brief Set the task's containing job
- *
- * @param job: the job
- */
+    /**
+     * @brief Set the task's containing job
+     *
+     * @param job: the job
+     */
     void WorkflowTask::setJob(WorkflowJob *job) {
       this->job = job;
     }
 
-/**
- * @brief Get the task's containing job
- *
- * @return job: the job
- */
+    /**
+     * @brief Get the task's containing job
+     * @return job: the job
+     */
     WorkflowJob *WorkflowTask::getJob() const {
       return this->job;
     }
 
-
-/**
- * @brief Get the cluster Id for the task
- *
- * @return the cluster id, or an empty string
- */
+    /**
+     * @brief Get the cluster Id for the task
+     * @return the cluster id, or an empty string
+     */
     std::string WorkflowTask::getClusterId() const {
       return this->cluster_id;
     }
 
-/**
- * Set the cluster id for the task
- *
- * @param id: cluster id the task belongs to
- */
+    /**
+     * @brief Set the cluster id for the task
+     *
+     * @param id: cluster id the task belongs to
+     */
     void WorkflowTask::setClusterId(std::string id) {
       this->cluster_id = id;
     }
 
-/**
- * @brief Set the task's start date
- *
- * @param date: the end date
- */
+    /**
+     * @brief Get the workflow task type
+     * @return workflow task type
+     */
+    WorkflowTask::TaskType WorkflowTask::getTaskType() const {
+      return this->task_type;
+    }
+
+    /**
+     * @brief Set the task type
+     * @param taskType task type
+     */
+    void WorkflowTask::setTaskType(wrench::WorkflowTask::TaskType task_type) {
+      this->task_type = task_type;
+    }
+
+    /**
+     * @brief Set the task's start date
+     *
+     * @param date: the end date
+     */
     void WorkflowTask::setStartDate(double date) {
       this->start_date = date;
     }
 
-/**
- * @brief Set the task's end date
- *
- * @param date: the end date
- */
+    /**
+     * @brief Set the task's end date
+     *
+     * @param date: the end date
+     */
     void WorkflowTask::setEndDate(double date) {
       this->end_date = date;
     }
 
-/**
- * @brief Helper method to add a file to a map if necessary
- *
- * @param map_to_insert: the map of workflow files to insert
- * @param map_to_check: the map of workflow files to check
- * @param f: a workflow file
- *
- * @throw std::invalid_argument
- */
+    /**
+     * @brief Helper method to add a file to a map if necessary
+     *
+     * @param map_to_insert: the map of workflow files to insert
+     * @param map_to_check: the map of workflow files to check
+     * @param f: a workflow file
+     *
+     * @throw std::invalid_argument
+     */
     void WorkflowTask::addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
                                     std::map<std::string, WorkflowFile *> &map_to_check,
                                     WorkflowFile *f) {
 
       if (map_to_check.find(f->id) != map_to_check.end()) {
-        throw std::invalid_argument("WorkflowTask::addFileToMap(): File ID '" + f->id + "' is already used as input or output file");
+        throw std::invalid_argument(
+                "WorkflowTask::addFileToMap(): File ID '" + f->id + "' is already used as input or output file");
       }
 
       if (map_to_insert.find(f->id) != map_to_insert.end()) {
@@ -365,25 +379,25 @@ namespace wrench {
       map_to_insert[f->id] = f;
     }
 
-/**
- * @brief Retrieve the number of times a task has failed
- * @return the failure count
- */
+    /**
+     * @brief Retrieve the number of times a task has failed
+     * @return the failure count
+     */
     unsigned int WorkflowTask::getFailureCount() {
       return this->failure_count;
     }
 
-/**
- * @brief Increment the failure count of a task
- */
+    /**
+     * @brief Increment the failure count of a task
+     */
     void WorkflowTask::incrementFailureCount() {
       this->failure_count++;
     }
 
-/**
- * @brief Retrieves the set of input WorkflowFile objects for the task
- * @return a set workflow files
- */
+    /**
+     * @brief Retrieves the set of input WorkflowFile objects for the task
+     * @return a set workflow files
+     */
     std::set<WorkflowFile *> WorkflowTask::getInputFiles() {
       std::set<WorkflowFile *> input;
 
@@ -393,10 +407,10 @@ namespace wrench {
       return input;
     }
 
-/**
- * @brief Retrieves the set of output WorkflowFile objects for the task
- * @return a set of workflow files
- */
+    /**
+     * @brief Retrieves the set of output WorkflowFile objects for the task
+     * @return a set of workflow files
+     */
     std::set<WorkflowFile *> WorkflowTask::getOutputFiles() {
       std::set<WorkflowFile *> output;
 
@@ -406,25 +420,25 @@ namespace wrench {
       return output;
     }
 
-/**
- * @brief Get the task's start date
- * @return the start date
- */
+    /**
+     * @brief Get the task's start date
+     * @return the start date
+     */
     double WorkflowTask::getStartDate() {
       return this->start_date;
     }
 
-/**
- * @brief Get the task's end date
- * @return the start date
- */
+    /**
+     * @brief Get the task's end date
+     * @return the start date
+     */
     double WorkflowTask::getEndDate() {
       return this->end_date;
     }
 
-/**
- * @brief Update the task's top level (looking only at the parents)
- */
+    /**
+     * @brief Update the task's top level (looking only at the parents)
+     */
     void WorkflowTask::updateTopLevel() {
       std::vector<WorkflowTask *> parents = this->workflow->getTaskParents(this);
       if (parents.empty()) {
@@ -472,5 +486,27 @@ namespace wrench {
       this->execution_host = hostname;
     }
 
+    /**
+     * @brief Get a map of src and dest hosts for file transfers
+     *        (only available for WorkflowTask::TaskType::TRANSFER_IN or WorkflowTask::TaskType::TRANSFER_OUT tasks)
+     * @return transfer src and dest pair
+     */
+    std::map<WorkflowFile *, std::pair<std::string, std::string>> WorkflowTask::getFileTransfers() const {
+      return this->fileTransfers;
+    }
+
+    /**
+     * @brief Set a pair of src and dest hosts for transfers (it is only effective for
+     *        WorkflowTask::TaskType::TRANSFER tasks)
+     *
+     * @param workflow_file: a pointer to a WorkflowFile object
+     * @param src: source hostname
+     * @param dest: destination hostname
+     */
+    void WorkflowTask::addSrcDest(WorkflowFile *workflow_file, const std::string &src, const std::string &dest) {
+      if (this->fileTransfers.find(workflow_file) == this->fileTransfers.end()) {
+        this->fileTransfers.insert(std::make_pair(workflow_file, std::make_pair(src, dest)));
+      }
+    }
 
 };

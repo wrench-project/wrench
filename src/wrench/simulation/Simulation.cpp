@@ -208,8 +208,7 @@ namespace wrench {
                 "A WMS should have been instantiated and passed to Simulation.setWMS()");
       }
 
-      for (const auto &wmse : this->wmses) {
-        auto wms = wmse.get();
+      for (const auto &wms : this->wmses) {
         if (not this->hostExists(wms->getHostname())) {
           throw std::runtime_error("A WMS cannot be started on host '" + wms->getHostname() + "'");
         }
@@ -226,8 +225,7 @@ namespace wrench {
         }
       }
 
-      for (auto wms : this->wmses) {
-
+      for (auto &wms : this->wmses) {
         // Check that at least one StorageService is running (only needed if there are files in the workflow),
         // and that each StorageService is on a valid host
         if (not wms->workflow->getFiles().empty()) {
