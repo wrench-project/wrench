@@ -56,8 +56,7 @@ namespace wrench {
         enum TaskType {
             COMPUTE,
             AUXILIARY,
-            TRANSFER_IN,
-            TRANSFER_OUT
+            TRANSFER
         };
 
         /** @brief Task state enum */
