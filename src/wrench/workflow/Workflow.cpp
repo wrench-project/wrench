@@ -666,10 +666,8 @@ namespace wrench {
 
             // task type
             std::string type = job.at("type");
-            if (type == "transfer_in") {
-              task->setTaskType(WorkflowTask::TaskType::TRANSFER_IN);
-            } else if (type == "transfer_out") {
-              task->setTaskType(WorkflowTask::TaskType::TRANSFER_OUT);
+            if (type == "transfer") {
+              task->setTaskType(WorkflowTask::TaskType::TRANSFER);
             } else if (type == "auxiliary") {
               task->setTaskType(WorkflowTask::TaskType::AUXILIARY);
             }
@@ -690,11 +688,10 @@ namespace wrench {
               }
               if (link == "input") {
                 task->addInputFile(workflow_file);
-              }
-              if (link == "output") {
+              } else if (link == "output") {
                 task->addOutputFile(workflow_file);
               }
-              if (type == "transfer_in" || type == "transfer_out") {
+              if (type == "transfer") {
                 task->addSrcDest(workflow_file, f.at("src"), f.at("dest"));
               }
             }
