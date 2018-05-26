@@ -97,6 +97,7 @@ namespace wrench {
       this->estimated_start_time = estimated_job_start_time;
     }
 
+    #if 0
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
@@ -125,6 +126,7 @@ namespace wrench {
       this->answer_mailbox = answer_mailbox;
       this->job = job;
     }
+    #endif
 
 
 #if 0
