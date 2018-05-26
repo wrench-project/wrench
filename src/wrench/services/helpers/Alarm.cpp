@@ -20,7 +20,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param date: the date at this the message should be sent. If date is in the past
+     * @param date: the date at which the message should be sent. If date is in the past
      *              message will be sent immediately.
      * @param hostname: the name of the host on which the Alarm daemon should run
      * @param reply_mailbox_name: the mailbox to which the message should be sent
@@ -69,9 +69,10 @@ namespace wrench {
 
 
     /**
-     * @brief Creates and start an alarm service
+     * @brief Create and start an alarm service
      * @param simulation: a pointer to the simulation object
-     * @param date: the simulation date at this the alarm service should send a message
+     * @param date: the date at which the message should be sent (if date is in the past
+     *              then the message will be sent immediately)
      * @param hostname: the name of the host on which to start the alarm service
      * @param reply_mailbox_name: the mailbox to which the alarm service will send a message
      * @param msg: the message to send
@@ -95,7 +96,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Immediately terminate the alarm's actor, meaning that it will never send its alarm message
+     * @brief Immediately (i.e., brutally) terminate the alarm service
      */
     void Alarm::kill() {
       this->killActor();

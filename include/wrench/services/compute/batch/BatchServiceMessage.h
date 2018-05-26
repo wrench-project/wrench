@@ -41,7 +41,8 @@ namespace wrench{
     };
 
     /**
-     * @brief AlarmJobTimeOutMessage class
+     * @brief A message sent by an alarm when a job goes over its
+     *        requested execution time
      */
     class AlarmJobTimeOutMessage : public ServiceMessage {
     public:
@@ -50,15 +51,17 @@ namespace wrench{
         BatchJob* job;
     };
 
+    #if 0
     /**
      * @brief AlarmNotifyBatschedMessage class
      */
     class AlarmNotifyBatschedMessage : public ServiceMessage {
     public:
-        AlarmNotifyBatschedMessage(std::string job_id,double payload);
+        AlarmNotifyBatschedMessage(std::string job_id, double payload);
         /** @brief the batch job's id */
         std::string job_id;
     };
+    #endif
 
 
     /**
@@ -74,6 +77,7 @@ namespace wrench{
         std::string job_args_to_scheduler;
     };
 
+    #if 0
     /**
      * @brief BatchSchedReadyMessage class
      */
@@ -84,10 +88,13 @@ namespace wrench{
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
     };
+    #endif
 
 
     /**
-     * @brief BatchExecuteJobFromBatschedMessage class
+     * @brief A message sent by a BatschedNetworkListener to a Batsched-enabled
+     *        BatchService to tell it to start a job execution, passing it the JSON
+     *        reply received from Batsched
      */
     class BatchExecuteJobFromBatSchedMessage : public BatchServiceMessage {
     public:
@@ -96,21 +103,23 @@ namespace wrench{
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
 
-        /** @brief The decisions reply by batsched to the batchservice */
+        /** @brief The decision reply from Batsched */
         std::string batsched_decision_reply;
     };
 
     /**
-     * @brief BatchQueryAnswerMessage class
+     * @brief A message send by a BatschedNetworkListener to a Batsched-enabled BatchService
+     *        with a job start time estimate obtained from Batsched
      */
     class BatchQueryAnswerMessage : public BatchServiceMessage {
     public:
-        BatchQueryAnswerMessage(double batsched_job_estimated_start_time, double payload);
+        BatchQueryAnswerMessage(double estimated_job_start_time, double payload);
 
         /** @brief The estimated job start time */
         double estimated_start_time;
     };
 
+    #if 0
 //    /**
 //     * @brief BatchFakeReplyMessage class
 //     */
@@ -121,8 +130,10 @@ namespace wrench{
 //        /** @brief The resources info in json data string */
 //        std::string json_data_string;
 //    };
+    #endif
 
 
+    #if 0
     /**
      * @brief BatchJobSubmissionToSchedulerMessage class
      */
@@ -137,7 +148,9 @@ namespace wrench{
         /** @brief JSON data arguments to the scheduler */
         std::string job_args_to_scheduler;
     };
+    #endif
 
+    #if 0
     /**
      * @brief BatchJobReplyFromSchedulerMessage class
      */
@@ -148,6 +161,7 @@ namespace wrench{
         /** @brief The message replied by the scheduler */
         std::string reply;
     };
+    #endif
 
     /***********************/
     /** \endcond           */

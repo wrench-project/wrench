@@ -139,7 +139,7 @@ applications, include decision-making for optimizing various objectives (the mos
 common one between to minimize workflow execution time).  By default,
 WRENCH does not provide a WMS implementation as part of its core components, however a
 simple implementation (`wrench::SimpleWMS`) is available in the `examples/simple-example` folder. Please,
-refer to the [Creating your own WMS](@ref wrench-101-wms) section for further information
+refer to the [Developer 101 Guide](../developer/wrench-101.html) section for further information
 on how to develop a WMS.  At least **one** WMS should be provided for running a simulation.
 
 

@@ -458,6 +458,8 @@ namespace wrench {
      * @brief Synchronously asks the storage service to delete a file copy
      *
      * @param file: the file
+     * @param file_registry_service: a file registry service that should be updated once the
+     *         file deletion has (successfully) completed (none if nullptr)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -579,6 +581,7 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 src,
+                nullptr,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -638,6 +641,7 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 src,
+                nullptr,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);

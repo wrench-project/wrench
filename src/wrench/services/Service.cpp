@@ -166,7 +166,7 @@ namespace wrench {
     }
 
     /**
-		 * @brief Set the state of the compute service to DOWN
+		 * @brief Set the state of the service to DOWN
 		 */
     void Service::setStateToDown() {
       this->state = Service::DOWN;

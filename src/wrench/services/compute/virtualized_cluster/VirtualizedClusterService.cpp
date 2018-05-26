@@ -24,7 +24,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(virtualized_cluster_service, "Log category for Virt
 
 namespace wrench {
 
+    /** \cond */
     static unsigned long VM_ID = 1;
+    /** \endcond */
 
     /**
      * @brief Constructor

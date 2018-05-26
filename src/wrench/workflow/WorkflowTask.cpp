@@ -331,7 +331,7 @@ namespace wrench {
 
     /**
      * @brief Set the task type
-     * @param taskType task type
+     * @param task_type: task type
      */
     void WorkflowTask::setTaskType(wrench::WorkflowTask::TaskType task_type) {
       this->task_type = task_type;

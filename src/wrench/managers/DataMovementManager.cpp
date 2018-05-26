@@ -79,6 +79,7 @@ namespace wrench {
      * @param file: the file to copy
      * @param src: the source data storage
      * @param dst: the destination data storage
+     * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
@@ -117,6 +118,7 @@ namespace wrench {
      * @param file: the file to copy
      * @param src: the source data storage
      * @param dst: the destination data storage
+     * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
