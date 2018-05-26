@@ -5,7 +5,19 @@ if (DOXYGEN_FOUND)
     foreach (SECTION USER DEVELOPER INTERNAL)
         string(TOLOWER ${SECTION} SECTION_LOWER)
         set(DOXYGEN_OUT ${CMAKE_HOME_DIRECTORY}/docs/logs/Doxyfile_${SECTION})
-        set(WRENCH_SECTIONS ${SECTION})
+
+        if (${SECTION} STREQUAL "INTERNAL")
+            set(WRENCH_SECTIONS "INTERNAL DEVELOPER USER")
+        elseif (${SECTION} STREQUAL "DEVELOPER")
+            set(WRENCH_SECTIONS "DEVELOPER USER")
+        elseif (${SECTION} STREQUAL "USER")
+            set(WRENCH_SECTIONS "USER")
+        else ()
+            set(WRENCH_SECTIONS "NODICE")
+        endif ()
+
+#        set(WRENCH_SECTIONS "DEVELOPER USER")
+
         set(WRENCH_SECTIONS_OUTPUT ${SECTION_LOWER})
         configure_file(${CMAKE_HOME_DIRECTORY}/tools/doxygen/Doxyfile.in ${DOXYGEN_OUT} @ONLY)
 

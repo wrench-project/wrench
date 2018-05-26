@@ -33,11 +33,13 @@ namespace wrench {
      *        controls access to their resource via a batch queue.
      *
      *        In the current implementation of
-     *        this service, like for many of its real-world counterparts, it does not handle memory
-     *        partitioning among jobs on the same host. It also does not simulate effects
+     *        this service, like for many of its real-world counterparts, memory
+     *        partitioning among jobs on the same host is not handled. Also, there is no simulation
+     *        of the effects
      *        of memory sharing (e.g., swapping). When multiple jobs share hosts,
      *        which can happen when jobs require only a few cores per host and can thus
-     *        be co-located on the same hosts in a non-exclusive fashion, each job simply runs as if it had access to the
+     *        be co-located on the same hosts in a non-exclusive fashion,
+     *        each job simply runs as if it had access to the
      *        full RAM of each compute host it is scheduled on.
      */
     class BatchService : public ComputeService {
@@ -84,10 +86,6 @@ namespace wrench {
                      std::map<std::string, std::string> plist = {},
                      double scratch_size = 0);
 
-        //returns jobid,started time, running time
-//        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
-
-
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
@@ -97,7 +95,13 @@ namespace wrench {
         /** \endcond          **/
         /***********************/
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
         ~BatchService() override;
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
 
     private:

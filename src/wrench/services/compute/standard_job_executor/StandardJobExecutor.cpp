@@ -48,7 +48,8 @@ namespace wrench {
      *           the compute resources the job should execute on
      *              - If num_cores == ComputeService::ALL_CORES, then ALL the cores of the host are used
      *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
-     * @param default_storage_service: a storage service (or nullptr)
+     * @param scratch_space: the usable scratch storage space  (or nullptr if none)
+     * @param part_of_pilot_job: try if the job executor is running within a pilot job
      * @param plist: a property list
      *
      * @throw std::invalid_argument
@@ -951,6 +952,8 @@ namespace wrench {
 
     /**
      * @brief Get the set of files stored in scratch space by a standardjob job
+     *
+     * @return a set of files
      */
     std::set<WorkflowFile*> StandardJobExecutor::getFilesInScratch() {
       return this->files_stored_in_scratch;

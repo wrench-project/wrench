@@ -25,7 +25,7 @@ namespace wrench {
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -45,10 +45,11 @@ namespace wrench {
       this->job_args_to_scheduler = job_args_to_scheduler;
     }
 
+    #if 0
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -60,12 +61,13 @@ namespace wrench {
       }
       this->answer_mailbox = answer_mailbox;
     }
+    #endif
 
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
-     * @param batsched_decision_reply: the decision replied by batsched (a batsim process)
-     * @param payload: message size in bytes
+     * @param batsched_decision_reply: the decision reply from Batsched
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -87,22 +89,23 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param estimated_waiting_time: the estimated time to run the job done by batsched
-     * @param payload: message size in bytes
+     * @param estimated_job_start_time: the estimated job start time
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
-    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double batsched_job_estimated_start_time, double payload)
+    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_job_start_time, double payload)
             : BatchServiceMessage("BATCH_QUERY_ANSWER", payload) {
-      this->estimated_start_time = batsched_job_estimated_start_time;
+      this->estimated_start_time = estimated_job_start_time;
     }
 
+    #if 0
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
      * @param job: the batch job
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -125,24 +128,27 @@ namespace wrench {
       this->answer_mailbox = answer_mailbox;
       this->job = job;
     }
+    #endif
 
 
-
+#if 0
     /**
      * @brief Constructor
      * @param reply: the replied answer by scheduler
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
     BatchJobReplyFromSchedulerMessage::BatchJobReplyFromSchedulerMessage(std::string reply, double payload)
             : BatchServiceMessage("BATCH_JOB_REPLY_FROM_SCHEDULER", payload), reply(reply) {}
 
+#endif
+
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @param job: the job
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -163,8 +169,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a workflow job
-     * @param payload: message size in bytes
+     * @param job: a batch job
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_arguments
      */
@@ -177,14 +183,16 @@ namespace wrench {
       this->job = job;
     }
 
+    #if 0
     /**
      * @brief Constructor
      * @param job_id: the id of a batch job
-     * @param payload: message size in bytes
+     * @param payload:the message size in bytes
      *
      * @throw std::invalid_arguments
      */
     AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id, double payload)
             : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload), job_id(job_id) {}
+    #endif
 
 }

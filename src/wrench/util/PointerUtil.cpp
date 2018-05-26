@@ -35,6 +35,12 @@ namespace wrench {
 
     };
 
+    /**
+     * An internal helper method to move a unique_ptr from a StandardJobExecutor set to another
+     * @param ptr: unique pointer to an object of class StandardJobExecutor that's in a set
+     * @param from: pointer to the set in which the object is
+     * @param to: pointer to the set to which the object should be moved
+     */
     template void PointerUtil::moveSingleSeparateUniquePtrFromSetToSet<StandardJobExecutor>(std::unique_ptr<StandardJobExecutor> *ptr,
                                                                                            std::set<std::unique_ptr<StandardJobExecutor>> *from,
                                                                                            std::set<std::unique_ptr<StandardJobExecutor>> *to);

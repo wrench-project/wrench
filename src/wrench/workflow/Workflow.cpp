@@ -399,6 +399,7 @@ namespace wrench {
       return this->callback_mailbox;
     }
 
+#if 0
 //    /**
 //     * @brief Update the state of a task, and propagate the change
 //     *        to other tasks if necessary. WARNING: This method
@@ -467,6 +468,7 @@ namespace wrench {
 //        }
 //      }
 //    }
+#endif
 
     /**
      * @brief Retrieve a map (indexed by file id) of input files for a workflow (i.e., those files

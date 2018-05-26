@@ -17,7 +17,6 @@
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 #include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/workflow/Workflow.h"
-#include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
 
 namespace wrench {
 

@@ -152,6 +152,7 @@ namespace wrench {
      *          - num_cores = ComputeService::ALL_CORES: use all cores available on the host
      *          - memory = ComputeService::ALL_RAM: use all RAM available on the host
      * @param plist: a property list ({} means "use all defaults")
+     * @param scratch_size: size (in bytes) of the compute service's scratch storage paste
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
             const std::string &hostname,
@@ -183,6 +184,7 @@ namespace wrench {
      * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
      * @param plist: a property list ({} means "use all defaults")
+     * @param scratch_size: size (in bytes) of the compute service's scratch storage paste
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
                                                                        const bool supports_standard_jobs,
