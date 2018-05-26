@@ -25,7 +25,7 @@ namespace wrench {
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -45,10 +45,11 @@ namespace wrench {
       this->job_args_to_scheduler = job_args_to_scheduler;
     }
 
+    #if 0
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -60,12 +61,13 @@ namespace wrench {
       }
       this->answer_mailbox = answer_mailbox;
     }
+    #endif
 
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
      * @param batsched_decision_reply: the decision reply from Batsched
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -88,7 +90,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param estimated_job_start_time: the estimated job start time
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -103,7 +105,7 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to reply to
      * @param job: the batch job
      * @param job_args_to_scheduler: the arguments required by batscheduler of batsim
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -133,7 +135,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param reply: the replied answer by scheduler
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -146,7 +148,7 @@ namespace wrench {
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer should be sent
      * @param job: the job
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -168,7 +170,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param job: a batch job
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_arguments
      */
@@ -185,7 +187,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param job_id: the id of a batch job
-     * @param payload: message size in bytes
+     * @param payload:the message size in bytes
      *
      * @throw std::invalid_arguments
      */

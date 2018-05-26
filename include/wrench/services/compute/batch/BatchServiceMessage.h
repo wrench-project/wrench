@@ -77,6 +77,7 @@ namespace wrench{
         std::string job_args_to_scheduler;
     };
 
+    #if 0
     /**
      * @brief BatchSchedReadyMessage class
      */
@@ -87,6 +88,7 @@ namespace wrench{
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
     };
+    #endif
 
 
     /**
@@ -106,7 +108,8 @@ namespace wrench{
     };
 
     /**
-     * @brief BatchQueryAnswerMessage class
+     * @brief A message send by a BatschedNetworkListener to a Batsched-enabled BatchService
+     *        with a job start time estimate obtained from Batsched
      */
     class BatchQueryAnswerMessage : public BatchServiceMessage {
     public:
