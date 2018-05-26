@@ -41,7 +41,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service, "Log category for Batch Service");
 namespace wrench {
 
     /**
-     * @brief Constructor
+     * @brief Destructor
      */
     BatchService::~BatchService() {
       MessageManager::cleanUpMessages(this->mailbox_name);
@@ -92,7 +92,7 @@ namespace wrench {
      *                 - all cores are used by the batch service on each host
      *                 - all RAM is used by the batch service on each host
      * @param plist: a property list that specifies BatchServiceProperty values ({} means "use all defaults")
-     * @param scratch_size: the size for the scratch space of the cloud service
+     * @param scratch_size: the size for the scratch space for the service
      */
     BatchService::BatchService(std::string &hostname,
                                bool supports_standard_jobs,
@@ -116,7 +116,7 @@ namespace wrench {
      *              - ComputeService::ALL_RAM to use all RAM
      * @param plist: a property list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
-     * @param scratch_size: the size for the scratch space of the cloud service
+     * @param scratch_size: the size for the scratch space for the
      *
      * @throw std::invalid_argument
      */
