@@ -318,8 +318,8 @@ TEST_F(MessageConstructorTest, BatchServiceMessages) {
 
 //  EXPECT_NO_THROW(new wrench::BatchJobReplyFromSchedulerMessage("reply", 666));
 
-  EXPECT_NO_THROW(new wrench::BatchSchedReadyMessage("mailbox", 666));
-  EXPECT_THROW(new wrench::BatchSchedReadyMessage("", 666), std::invalid_argument);
+//  EXPECT_NO_THROW(new wrench::BatchSchedReadyMessage("mailbox", 666));
+//  EXPECT_THROW(new wrench::BatchSchedReadyMessage("", 666), std::invalid_argument);
 
 //  EXPECT_NO_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("mailbox", "string", 666));
 //  EXPECT_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("", "string", 666), std::invalid_argument);
