@@ -127,7 +127,7 @@ namespace wrench {
     }
 
 
-
+#if 0
     /**
      * @brief Constructor
      * @param reply: the replied answer by scheduler
@@ -137,6 +137,8 @@ namespace wrench {
      */
     BatchJobReplyFromSchedulerMessage::BatchJobReplyFromSchedulerMessage(std::string reply, double payload)
             : BatchServiceMessage("BATCH_JOB_REPLY_FROM_SCHEDULER", payload), reply(reply) {}
+
+#endif
 
     /**
      * @brief Constructor

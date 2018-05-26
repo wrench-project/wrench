@@ -145,6 +145,7 @@ namespace wrench{
         std::string job_args_to_scheduler;
     };
 
+    #if 0
     /**
      * @brief BatchJobReplyFromSchedulerMessage class
      */
@@ -155,6 +156,7 @@ namespace wrench{
         /** @brief The message replied by the scheduler */
         std::string reply;
     };
+    #endif
 
     /***********************/
     /** \endcond           */
