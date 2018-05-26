@@ -298,7 +298,7 @@ namespace wrench {
         void startBatschedNetworkListener();
 
         void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
-                                       std::string kill_reason);
+                                       std::string kill_reason, std::string even_type);
         void sendAllQueuedJobsToBatsched();
 
         //process execute events from batsched
