@@ -41,7 +41,8 @@ namespace wrench{
     };
 
     /**
-     * @brief AlarmJobTimeOutMessage class
+     * @brief A message sent by an alarm when a job goes over its
+     *        requested execution time
      */
     class AlarmJobTimeOutMessage : public ServiceMessage {
     public:
@@ -50,6 +51,7 @@ namespace wrench{
         BatchJob* job;
     };
 
+    #if 0
     /**
      * @brief AlarmNotifyBatschedMessage class
      */
@@ -59,6 +61,7 @@ namespace wrench{
         /** @brief the batch job's id */
         std::string job_id;
     };
+    #endif
 
 
     /**
