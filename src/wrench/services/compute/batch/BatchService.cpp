@@ -1980,10 +1980,80 @@ namespace wrench {
                                                             std::string answer_mailbox) {
 
 
-      // TODO: Implement this for BATSCHED
+      BatchJob* batch_job = nullptr;
+      // Is it running?
+      for (auto const & j : this->running_jobs) {
+        WorkflowJob *workflow_job = j->getWorkflowJob();
+        if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+          batch_job = j;
+        }
+      }
+
+      if (batch_job == nullptr) {
+        // Is it pending?
+        for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); it1++) {
+          WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
+          if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+            batch_job = *it1;
+          }
+        }
+      }
+
+      if (batch_job == nullptr) {
+        // Send a failure reply
+        ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
+                new ComputeServiceTerminateStandardJobAnswerMessage(
+                        job, this, false, std::shared_ptr<FailureCause>(
+                                new JobCannotBeTerminated(
+                                        job)),
+                        this->getPropertyValueAsDouble(
+                                BatchServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+        try {
+          S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          return;
+        }
+      }
 
 #ifdef ENABLE_BATSCHED
-      throw std::runtime_error("BatchService::processStandardJobTerminationRequest(): Not implemented for BATSCHED yet");
+//      throw std::runtime_error("BatchService::processStandardJobTerminationRequest(): Not implemented for BATSCHED yet");
+
+      nlohmann::json batch_submission_data;
+      batch_submission_data["now"] = S4U_Simulation::getClock();
+      batch_submission_data["events"] = nlohmann::json::array();
+      size_t i;
+      std::deque<BatchJob *>::iterator it;
+      for (i = 0, it = this->pending_jobs.begin(); i < this->pending_jobs.size(); i++, it++) {
+
+        BatchJob *batch_job = *it;
+
+        /* Get the nodes and cores per nodes asked for */
+        unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
+        unsigned long num_nodes_asked_for = batch_job->getNumNodes();
+        unsigned long allocated_time = batch_job->getAllocatedTime();
+
+        batch_submission_data["events"][i]["timestamp"] = batch_job->getAppearedTimeStamp();
+        batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
+        batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
+        batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());
+        batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
+        batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
+        batch_submission_data["events"][i]["data"]["job"]["walltime"] = allocated_time;
+        this->pending_jobs.erase(it);
+        this->waiting_jobs.insert(*it);
+
+      }
+      std::string data = batch_submission_data.dump();
+      std::shared_ptr<BatschedNetworkListener> network_listener =
+              std::unique_ptr<BatschedNetworkListener>(
+                      new BatschedNetworkListener(this->hostname, this, this->mailbox_name,
+                                                  std::to_string(this->batsched_port),
+                                                  BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
+                                                  data));
+      network_listener->simulation = this->simulation;
+      network_listener->start(network_listener, true);
+      network_listeners.push_back(std::move(network_listener));
+
 #else
 
       // Is it running?
