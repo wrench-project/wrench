@@ -15,13 +15,13 @@ namespace wrench {
 
     /**
      * @brief A batch job, which encapsulates a WorkflowJob and additional information
-     *        used be a BatchService
+     *        used by a BatchService
      */
     class BatchJob {
     public:
         //job, jobid, -t, -N, -c, ending s4u_timestamp (-1 as undetermined)
         BatchJob(WorkflowJob* job, unsigned long jobid, unsigned long time_in_minutes, unsigned long number_nodes,
-                 unsigned long cores_per_node,double ending_time_stamp, double appeared_time_stamp);
+                 unsigned long cores_per_node,double ending_time_stamp, double arrival_time_stamp);
 
 
         unsigned long getJobID();
@@ -32,7 +32,7 @@ namespace wrench {
         double getBeginTimeStamp();
         void setBeginTimeStamp(double);
         double getEndingTimeStamp();
-        double getAppearedTimeStamp();
+        double getArrivalTimeStamp();
         unsigned long getNumNodes();
         WorkflowJob* getWorkflowJob();
         void setEndingTimeStamp(double);
@@ -47,7 +47,7 @@ namespace wrench {
         unsigned long cores_per_node;
         double begin_time_stamp;
         double ending_time_stamp;
-        double appeared_time_stamp;
+        double arrival_time_stamp;
         std::set<std::tuple<std::string,unsigned long, double>> resources_allocated;
     };
 
