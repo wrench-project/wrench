@@ -123,7 +123,8 @@ namespace wrench {
     class StorageServiceFileCopyRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
-                                             double payload, FileRegistryService *file_registry_service=nullptr);
+                                             FileRegistryService *file_registry_service,
+                                             double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;

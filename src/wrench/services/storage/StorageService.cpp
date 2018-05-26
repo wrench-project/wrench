@@ -581,6 +581,7 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 src,
+                nullptr,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -640,6 +641,7 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 src,
+                nullptr,
                 this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);

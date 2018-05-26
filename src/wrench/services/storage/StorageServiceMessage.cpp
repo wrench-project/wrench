@@ -149,6 +149,7 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
     * @param src: the source storage service
+    * @param file_registry_service: the file registry service to update (nullptr if none)
     * @param payload: message size in bytes
     *
     * @throw std::invalid_argument
@@ -156,7 +157,8 @@ namespace wrench {
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
                                                                                WorkflowFile *file,
                                                                                StorageService *src,
-                                                                               double payload, FileRegistryService *file_registry_service) : StorageServiceMessage(
+                                                                               FileRegistryService *file_registry_service,
+                                                                               double payload) : StorageServiceMessage(
             "FILE_COPY_REQUEST", payload) {
       if ((answer_mailbox == "") || (file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(): Invalid arguments");
@@ -171,6 +173,8 @@ namespace wrench {
      * @brief Constructor
      * @param file: the file
      * @param storage_service: the storage service
+     * @param file_registry_service: the file registry service to update (nullptr if none)
+     * @param file_registry_service_updated: whetre the file registry service was updated
      * @param success: true on success, false otherwise
      * @param failure_cause: the cause of a failure (nullptr if success==true)
      * @param payload: message size in bytes

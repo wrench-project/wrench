@@ -93,14 +93,10 @@ private:
 
     int main() {
 
-//        std::cerr << ::getpid() << std::endl;
-//        std::chrono::seconds timespan(15);
-//        std::this_thread::sleep_for(timespan);
 
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
-      #if 0
       // try synchronous copy and register
       bool success = true;
       bool is_registered_at_dst = true;
@@ -235,7 +231,6 @@ private:
         throw std::runtime_error("File was not registered after Asynchronous copy completed.");
       }
 
-      #endif
       // try 1 asynchronous copy and then kill the file registry service right after the copy is instantiated
       std::unique_ptr<wrench::WorkflowExecutionEvent> async_copy_event2;
 
