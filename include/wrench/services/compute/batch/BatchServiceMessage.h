@@ -90,7 +90,9 @@ namespace wrench{
 
 
     /**
-     * @brief BatchExecuteJobFromBatschedMessage class
+     * @brief A message sent by a BatschedNetworkListener to a Batsched-enabled
+     *        BatchService to tell it to start a job execution, passing it the JSON
+     *        reply received from Batsched
      */
     class BatchExecuteJobFromBatSchedMessage : public BatchServiceMessage {
     public:
@@ -99,7 +101,7 @@ namespace wrench{
         /** @brief The mailbox to answer to */
         std::string answer_mailbox;
 
-        /** @brief The decisions reply by batsched to the batchservice */
+        /** @brief The decision reply from Batsched */
         std::string batsched_decision_reply;
     };
 

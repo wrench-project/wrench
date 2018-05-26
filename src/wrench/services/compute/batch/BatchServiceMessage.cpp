@@ -64,7 +64,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
-     * @param batsched_decision_reply: the decision replied by batsched (a batsim process)
+     * @param batsched_decision_reply: the decision reply from Batsched
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument

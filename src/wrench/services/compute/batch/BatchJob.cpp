@@ -13,7 +13,7 @@
 
 namespace wrench {
     BatchJob::BatchJob(WorkflowJob *job, unsigned long jobid, unsigned long time_in_minutes, unsigned long num_nodes,
-                       unsigned long cores_per_node, double ending_time_stamp, double appeared_time_stamp) {
+                       unsigned long cores_per_node, double ending_time_stamp, double arrival_time_stamp) {
       if (job == nullptr) {
         throw std::invalid_argument(
                 "BatchJob::BatchJob(): StandardJob cannot be null"
@@ -31,7 +31,7 @@ namespace wrench {
       this->num_nodes = num_nodes;
       this->cores_per_node = cores_per_node;
       this->ending_time_stamp = ending_time_stamp;
-      this->appeared_time_stamp = appeared_time_stamp;
+      this->arrival_time_stamp = arrival_time_stamp;
     }
 
     unsigned long BatchJob::getAllocatedCoresPerNode() {
@@ -60,8 +60,8 @@ namespace wrench {
 
     }
 
-    double BatchJob::getAppearedTimeStamp() {
-      return this->appeared_time_stamp;
+    double BatchJob::getArrivalTimeStamp() {
+      return this->arrival_time_stamp;
     }
 
     WorkflowJob *BatchJob::getWorkflowJob() {
