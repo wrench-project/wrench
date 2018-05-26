@@ -177,6 +177,7 @@ namespace wrench {
       this->job = job;
     }
 
+    #if 0
     /**
      * @brief Constructor
      * @param job_id: the id of a batch job
@@ -186,5 +187,6 @@ namespace wrench {
      */
     AlarmNotifyBatschedMessage::AlarmNotifyBatschedMessage(std::string job_id, double payload)
             : ServiceMessage("ALARM_NOTIFY_BATSCHED", payload), job_id(job_id) {}
+    #endif
 
 }

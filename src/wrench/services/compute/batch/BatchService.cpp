@@ -1148,10 +1148,10 @@ namespace wrench {
       } else if (auto msg = dynamic_cast<BatchExecuteJobFromBatSchedMessage *>(message.get())) {
         processExecuteJobFromBatSched(msg->batsched_decision_reply);
         return true;
-      } else if (auto msg = dynamic_cast<AlarmNotifyBatschedMessage *>(message.get())) {
-        //first forward this notification to the batsched
-        this->notifyJobEventsToBatSched(msg->job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
-        return true;
+//      } else if (auto msg = dynamic_cast<AlarmNotifyBatschedMessage *>(message.get())) {
+//        //first forward this notification to the batsched
+//        this->notifyJobEventsToBatSched(msg->job_id, "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
+//        return true;
 #endif
       } else {
         throw std::runtime_error(

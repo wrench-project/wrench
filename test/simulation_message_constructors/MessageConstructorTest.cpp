@@ -332,6 +332,6 @@ TEST_F(MessageConstructorTest, BatchServiceMessages) {
   EXPECT_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job, 666));
   EXPECT_THROW(new wrench::AlarmJobTimeOutMessage(nullptr, 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::AlarmNotifyBatschedMessage("job_id", 666));
+//  EXPECT_NO_THROW(new wrench::AlarmNotifyBatschedMessage("job_id", 666));
 }
 
