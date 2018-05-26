@@ -11,31 +11,30 @@
 #ifndef WRENCH_WORKFLOWEXECUTIONEVENT_H
 #define WRENCH_WORKFLOWEXECUTIONEVENT_H
 
-
 #include <string>
 #include "FailureCause.h"
 
-namespace wrench {
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
+namespace wrench {
 
     class WorkflowTask;
 
     class WorkflowFile;
 
     class StandardJob;
+
     class PilotJob;
 
     class ComputeService;
+
     class StorageService;
-    class FileRegistryService;
 
     class FileRegistryService;
 
-    class FailureCause;
-
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+    class FileRegistryService;
 
     /**
      * @brief A class to represent the various execution events that
@@ -91,6 +90,7 @@ namespace wrench {
         /***********************/
 
     };
+
 
     /**
      * @brief A "standard job has completed" WorkflowExecutionEvent
@@ -273,14 +273,12 @@ namespace wrench {
 
     };
 
-
-
+};
 
 /***********************/
 /** \endcond           */
 /***********************/
 
-};
 
 
 #endif //WRENCH_WORKFLOWEXECUTIONEVENT_H

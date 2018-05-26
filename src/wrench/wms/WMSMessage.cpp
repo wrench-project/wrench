@@ -22,20 +22,10 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_mailbox: the WMS
-     * @param start_time: the simulation start time
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
      */
-    AlarmWMSDeferredStartMessage::AlarmWMSDeferredStartMessage(std::string &answer_mailbox, double start_time,
-                                                               double payload) : WMSMessage("WMS_START_TIME", payload),
-                                                                                 answer_mailbox(answer_mailbox),
-                                                                                 start_time(start_time) {
-      if (start_time < S4U_Simulation::getClock()) {
-        throw std::invalid_argument(
-                "AlarmWMSDeferredStartMessage::AlarmWMSDeferredStartMessage(): Start time is earlier than current simulation time");
-      }
-    }
+    AlarmWMSDeferredStartMessage::AlarmWMSDeferredStartMessage(double payload) : WMSMessage("WMS_START_TIME", payload) {}
 
-}
+};

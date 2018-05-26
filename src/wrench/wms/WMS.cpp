@@ -84,7 +84,7 @@ namespace wrench {
       if (S4U_Simulation::getClock() < this->start_time) {
 
         Alarm::createAndStartAlarm(this->simulation, this->start_time, this->hostname, this->mailbox_name,
-                                   new AlarmWMSDeferredStartMessage(this->mailbox_name, this->start_time, 0), "wms_start");
+                                   new AlarmWMSDeferredStartMessage(0), "wms_start");
 
         // Wait for a message
         std::unique_ptr<SimulationMessage> message = nullptr;

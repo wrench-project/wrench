@@ -54,6 +54,7 @@ set(HEADER_FILES
         include/wrench/workflow/job/PilotJob.h
         include/wrench/workflow/execution_events/FailureCause.h
         include/wrench/workflow/execution_events/WorkflowExecutionEvent.h
+        include/wrench/workflow/execution_events/StandardJobFailedEvent.h
         include/wrench/managers/JobManager.h
         include/wrench/managers/DataMovementManager.h
         include/wrench/services/Service.h
