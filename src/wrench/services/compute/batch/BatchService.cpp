@@ -2372,7 +2372,7 @@ namespace wrench {
         unsigned long num_nodes_asked_for = batch_job->getNumNodes();
         unsigned long allocated_time = batch_job->getAllocatedTime();
 
-        batch_submission_data["events"][i]["timestamp"] = batch_job->getAppearedTimeStamp();
+        batch_submission_data["events"][i]["timestamp"] = batch_job->getArrivalTimeStamp();
         batch_submission_data["events"][i]["type"] = "JOB_SUBMITTED";
         batch_submission_data["events"][i]["data"]["job_id"] = std::to_string(batch_job->getJobID());
         batch_submission_data["events"][i]["data"]["job"]["id"] = std::to_string(batch_job->getJobID());

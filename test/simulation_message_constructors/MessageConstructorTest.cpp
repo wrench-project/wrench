@@ -316,14 +316,14 @@ TEST_F(MessageConstructorTest, BatchServiceMessages) {
   EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox", nullptr, "foo", 666), std::invalid_argument);
   EXPECT_THROW(new wrench::BatchJobSubmissionToSchedulerMessage("mailbox", workflow_job, "", 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::BatchJobReplyFromSchedulerMessage("reply", 666));
+//  EXPECT_NO_THROW(new wrench::BatchJobReplyFromSchedulerMessage("reply", 666));
 
   EXPECT_NO_THROW(new wrench::BatchSchedReadyMessage("mailbox", 666));
   EXPECT_THROW(new wrench::BatchSchedReadyMessage("", 666), std::invalid_argument);
 
-  EXPECT_NO_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("mailbox", "string", 666));
-  EXPECT_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("", "string", 666), std::invalid_argument);
-  EXPECT_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("mailbox", "", 666), std::invalid_argument);
+//  EXPECT_NO_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("mailbox", "string", 666));
+//  EXPECT_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("", "string", 666), std::invalid_argument);
+//  EXPECT_THROW(new wrench::BatchExecuteJobFromBatSchedMessage("mailbox", "", 666), std::invalid_argument);
 
   EXPECT_NO_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", batch_job, 666));
   EXPECT_THROW(new wrench::BatchServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
