@@ -55,7 +55,7 @@ namespace wrench{
      */
     class AlarmNotifyBatschedMessage : public ServiceMessage {
     public:
-        AlarmNotifyBatschedMessage(std::string job_id,double payload);
+        AlarmNotifyBatschedMessage(std::string job_id, double payload);
         /** @brief the batch job's id */
         std::string job_id;
     };

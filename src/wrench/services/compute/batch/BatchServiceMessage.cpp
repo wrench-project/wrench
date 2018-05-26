@@ -163,7 +163,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a workflow job
+     * @param job: a batch job
      * @param payload: message size in bytes
      *
      * @throw std::invalid_arguments

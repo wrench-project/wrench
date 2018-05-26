@@ -27,16 +27,17 @@ namespace wrench {
     };
 
     /**
-     * @brief AlarmJobTimeOutMessage class
+     * @brief AlarmWMSDeferredStartMessage class
      */
     class AlarmWMSDeferredStartMessage : public WMSMessage {
     public:
-        AlarmWMSDeferredStartMessage(std::string &answer_mailbox, double start_time, double payload);
+        AlarmWMSDeferredStartMessage(double payload);
+//        AlarmWMSDeferredStartMessage(std::string &answer_mailbox, double start_time, double payload);
 
-        /** @brief The mailbox to answer to */
-        std::string answer_mailbox;
-        /** @brief The simulation time to start the workflow execution */
-        double start_time;
+//        /** @brief The mailbox to which the "go ahead" message should be sent to */
+//        std::string answer_mailbox;
+//        /** @brief The simulation time to start the workflow execution */
+//        double start_time;
     };
 
     /***********************/
