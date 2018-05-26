@@ -69,14 +69,23 @@ namespace wrench {
                                                         std::map<std::string, std::string> &plist,
                                                         double payload);
 
-        std::string pm_hostname;
-        std::string vm_hostname;
-        bool supports_standard_jobs;
-        bool supports_pilot_jobs;
-        unsigned long num_cores;
-        double ram_memory;
-        std::map<std::string, std::string> plist;
+    public:
+        /** @brief the mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief the name of the physical machine host */
+        std::string pm_hostname;
+        /** @brief the name of the new VM host */
+        std::string vm_hostname;
+        /** @brief  true if the compute service should support standard jobs */
+        bool supports_standard_jobs;
+        /** @brief  true if the compute service should support pilot jobs */
+        bool supports_pilot_jobs;
+        /** @brief the number of cores the service can use (0 means "use as many as there are cores on the host") */
+        unsigned long num_cores;
+        /** @brief the VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue) */
+        double ram_memory;
+        /** @brief a property list ({} means "use all defaults") */
+        std::map<std::string, std::string> plist;
     };
 
     /**
@@ -100,8 +109,11 @@ namespace wrench {
                                                          const std::string &dest_pm_hostname,
                                                          double payload);
 
+        /** @brief name of the host on which the VM is to executed */
         std::string vm_hostname;
+        /** @brief name of the host to which the VM should be migrated */
         std::string dest_pm_hostname;
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
     };
 

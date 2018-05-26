@@ -87,14 +87,14 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param estimated_waiting_time: the estimated time to run the job done by batsched
+     * @param estimated_job_start_time: the estimated job start time
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
      */
-    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double batsched_job_estimated_start_time, double payload)
+    BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_job_start_time, double payload)
             : BatchServiceMessage("BATCH_QUERY_ANSWER", payload) {
-      this->estimated_start_time = batsched_job_estimated_start_time;
+      this->estimated_start_time = estimated_job_start_time;
     }
 
     /**

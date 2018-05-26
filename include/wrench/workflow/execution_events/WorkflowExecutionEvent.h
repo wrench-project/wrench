@@ -81,6 +81,10 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+        /** @brief Constructor
+         *
+         * @param type: event type
+         */
         WorkflowExecutionEvent(EventType type) : type(type) {}
         /***********************/
         /** \endcond           */

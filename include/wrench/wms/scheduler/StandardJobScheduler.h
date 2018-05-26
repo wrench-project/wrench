@@ -49,16 +49,18 @@ namespace wrench {
         virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
                                    const std::vector<WorkflowTask *> &tasks) = 0;
 
-        /**
-         * @brief Schedules a set of clustered tasks a standard jobs, according to whatever decision
-         *        algorithm it implements, over a set of compute services
-         * @param compute_services: the set of compute services
-         * @param tasks: the map of clustered tasks
-         */
+#if 0
+//        /**
+//         * @brief Schedules a set of clustered tasks a standard jobs, according to whatever decision
+//         *        algorithm it implements, over a set of compute services
+//         * @param compute_services: the set of compute services
+//         * @param tasks: the map of clustered tasks
+//         */
 //        virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
 //                                   const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
 //          throw std::runtime_error("StandardJobScheduler::scheduleTasks(): Not implemented yet!");
 //        }
+#endif
 
         /**
          * @brief Set a reference to the data manager to be used by this scheduler (nullptr: none is used)
