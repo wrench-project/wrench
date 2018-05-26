@@ -25,7 +25,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief A tiny service that sends a message to a mailbox after some specified amount of time and then terminates
+     * @brief A one-shot service that sends a message to a mailbox after some specified amount of time and terminates
      */
     class Alarm : public Service {
 

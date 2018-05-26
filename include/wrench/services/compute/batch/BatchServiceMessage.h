@@ -105,12 +105,13 @@ namespace wrench{
      */
     class BatchQueryAnswerMessage : public BatchServiceMessage {
     public:
-        BatchQueryAnswerMessage(double batsched_job_estimated_start_time, double payload);
+        BatchQueryAnswerMessage(double estimated_job_start_time, double payload);
 
         /** @brief The estimated job start time */
         double estimated_start_time;
     };
 
+    #if 0
 //    /**
 //     * @brief BatchFakeReplyMessage class
 //     */
@@ -121,6 +122,7 @@ namespace wrench{
 //        /** @brief The resources info in json data string */
 //        std::string json_data_string;
 //    };
+    #endif
 
 
     /**

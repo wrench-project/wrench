@@ -20,7 +20,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param date: the date at this the message should be sent. If date is in the past
+     * @param date: the date at which the message should be sent. If date is in the past
      *              message will be sent immediately.
      * @param hostname: the name of the host on which the Alarm daemon should run
      * @param reply_mailbox_name: the mailbox to which the message should be sent

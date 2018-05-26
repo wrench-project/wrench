@@ -43,7 +43,7 @@ namespace wrench {
      * @param callback_mailbox: the callback mailbox to which the worker
      *        thread can send "work done" messages
      * @param workunit: the workunit to perform
-     * @param default_storage_service: the default storage service from which to read/write data (if any)
+     * @param scratch_space: the service's scratch storage service (nullptr if none)
      * @param thread_startup_overhead: the thread_startup overhead, in seconds
      */
     WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(

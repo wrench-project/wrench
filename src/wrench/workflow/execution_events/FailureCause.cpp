@@ -42,6 +42,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param error: error message
      */
     NoScratchSpace::NoScratchSpace(std::string error) : FailureCause(
             NO_SCRATCH_SPACE) {

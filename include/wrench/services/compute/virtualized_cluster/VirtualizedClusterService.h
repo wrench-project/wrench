@@ -131,8 +131,10 @@ namespace wrench {
 
         virtual void terminate();
 
+        /** @brief List of execution host names */
         std::vector<std::string> execution_hosts;
 
+        /** @brief Map of available RAM at hosts */
         std::map<std::string, double> cs_available_ram;
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
