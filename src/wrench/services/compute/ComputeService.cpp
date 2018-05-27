@@ -22,6 +22,8 @@ namespace wrench {
 
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
+//    StorageService *ComputeService::SCRATCH = (StorageService *) ULONG_MAX;
+    StorageService *ComputeService::SCRATCH = (StorageService *)ULONG_MAX;
 
     /**
      * @brief Stop the compute service - must be called by the stop()
@@ -31,7 +33,6 @@ namespace wrench {
       Service::stop();
     }
 
-    StorageService *ComputeService::SCRATCH = (StorageService *) (new int(553453));
 
     /**
      * @brief Submit a job to the compute service
@@ -390,7 +391,7 @@ namespace wrench {
 
     /**
      * @brief Get the total size of the scratch space (not the remaining free space on the scratch space)
-     * @return return size (double)
+     * @return return a size (in bytes)
      */
     double ComputeService::getScratchSize() {
       return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
@@ -398,14 +399,14 @@ namespace wrench {
 
     /**
      * @brief Get the free space of the scratch service
-     * @return return size (double)
+     * @return returns a size (in bytes)
      */
     double ComputeService::getFreeRemainingScratchSpace() {
       return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace() : 0.0;
     }
 
     /**
-    * @brief Get a shared pointer to the scratch space
+    * @brief Get the compute service's scratch storage space
     * @return returns a pointer to the shared scratch space
     */
     StorageService *ComputeService::getScratch() {
