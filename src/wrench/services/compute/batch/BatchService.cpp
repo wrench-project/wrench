@@ -49,7 +49,7 @@ namespace wrench {
 
 
     /**
-     * @brief Retrievestart time estimates for a set of job configurations
+     * @brief Retrieve start time estimates for a set of job configurations
      * @param set_of_jobs: the set of job configurations, each of them with an id. Each configuration
      *         is a tuple as follows:
      *             - a configuration id (std::string)
@@ -87,12 +87,12 @@ namespace wrench {
      * @param hostname: the hostname on which to start the service
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param compute_hosts: the available compute hosts
-     *                 - the hosts must be homogeneous (speed, number of cores, RAM size)
-     *                 - all cores are used by the batch service on each host
-     *                 - all RAM is used by the batch service on each host
+     * @param compute_hosts: the list of names of the available compute hosts
+     *                 - the hosts must be homogeneous (speed, number of cores, and RAM size)
+     *                 - all cores are usable by the batch service on each host
+     *                 - all RAM is usable by the batch service on each host
      * @param plist: a property list that specifies BatchServiceProperty values ({} means "use all defaults")
-     * @param scratch_size: the size for the scratch space for the service
+     * @param scratch_size: the size for the scratch storage space for the service (0 means "no scratch space")
      */
     BatchService::BatchService(std::string &hostname,
                                bool supports_standard_jobs,
@@ -109,14 +109,14 @@ namespace wrench {
      * @param hostname: the hostname on which to start the service
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param compute_hosts: the hosts running in the network
+     * @param compute_hosts: the list of names of the available compute hosts
      * @param cores_per_host: number of cores used per host
      *              - ComputeService::ALL_CORES to use all cores
      * @param ram_per_host: RAM per host
      *              - ComputeService::ALL_RAM to use all RAM
      * @param plist: a property list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
-     * @param scratch_size: the size for the scratch space for the
+     * @param scratch_size: the size for the scratch storage space for the service (0 means "no scratch space")
      *
      * @throw std::invalid_argument
      */
