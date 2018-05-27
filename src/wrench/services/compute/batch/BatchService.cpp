@@ -2246,7 +2246,6 @@ namespace wrench {
               std::unique_ptr<BatschedNetworkListener>(
                       new BatschedNetworkListener(this->hostname, this, batchsched_query_mailbox,
                                                   std::to_string(this->batsched_port),
-                                                  BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                   data));
       network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
@@ -2304,7 +2303,6 @@ namespace wrench {
               std::shared_ptr<BatschedNetworkListener>(
                       new BatschedNetworkListener(this->hostname, this, this->mailbox_name,
                                                   std::to_string(this->batsched_port),
-                                                  BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                   data));
       network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
@@ -2339,7 +2337,6 @@ namespace wrench {
                 std::shared_ptr<BatschedNetworkListener>(
                         new BatschedNetworkListener(this->hostname, this, this->mailbox_name,
                                                     std::to_string(this->batsched_port),
-                                                    BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                     data));
         network_listener->simulation = this->simulation;
         network_listener->start(network_listener, true);
@@ -2388,7 +2385,6 @@ namespace wrench {
               std::unique_ptr<BatschedNetworkListener>(
                       new BatschedNetworkListener(this->hostname, this, this->mailbox_name,
                                                   std::to_string(this->batsched_port),
-                                                  BatschedNetworkListener::NETWORK_LISTENER_TYPE::SENDER_RECEIVER,
                                                   data));
       network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);

@@ -29,15 +29,8 @@ namespace wrench {
 
     public:
 
-        /** @brief Enumerated type to specified the type of the BatschedNetworkListener */
-        enum NETWORK_LISTENER_TYPE{
-            LISTENER,
-            SENDER,
-            SENDER_RECEIVER
-        };
-
         BatschedNetworkListener(std::string hostname, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,
-                             NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send,std::map<std::string, std::string> plist = {});
+                             std::string data_to_send,std::map<std::string, std::string> plist = {});
 
 
     private:
@@ -49,7 +42,7 @@ namespace wrench {
                 };
 
         BatschedNetworkListener(std::string, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,
-                             NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send, std::map<std::string, std::string> plist, std::string suffix);
+                             std::string data_to_send, std::map<std::string, std::string> plist, std::string suffix);
 
 
         int main() override;
@@ -59,8 +52,6 @@ namespace wrench {
         std::string reply_received;
         BatchService *batch_service;
         std::string batch_service_mailbox;
-
-        NETWORK_LISTENER_TYPE MY_LISTENER_TYPE;
 
         void send_receive();
 
