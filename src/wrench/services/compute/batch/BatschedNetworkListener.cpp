@@ -37,7 +37,7 @@ namespace wrench {
     * @param batch_service_mailbox: the name of the mailbox of the BatchService
     * @param sched_port the port for sending messages to Batsched
     * @param data_to_send: the data to send (as a JSON string)
-    * @param plist: property list
+    * @param plist: property list ({} means "use all defaults")
     */
     BatschedNetworkListener::BatschedNetworkListener(std::string hostname, BatchService *batch_service,
                                                      std::string batch_service_mailbox,
@@ -56,7 +56,7 @@ namespace wrench {
     * @param batch_service_mailbox: the name of the mailbox of the batch_service
     * @param sched_port the port to send messages to Batsched
     * @param data_to_send: data to send
-    * @param plist: property list
+    * @param plist: property list ({} means "use all defaults")
     * @param suffix the suffix to append
     */
     BatschedNetworkListener::BatschedNetworkListener(
