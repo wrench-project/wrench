@@ -117,12 +117,12 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the name of the host on which the service runs
+     * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
      * @param supports_standard_jobs: true if the job executor should support standard jobs
      * @param supports_pilot_jobs: true if the job executor should support pilot jobs
-     * @param scratch_size: the size for the scratch space of the compute service
+     * @param scratch_size: the size for the scratch storage space of the compute service (0 if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
@@ -150,13 +150,12 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the name of the host on which the service runs
+     * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
      * @param supports_standard_jobs: true if the job executor should support standard jobs
      * @param supports_pilot_jobs: true if the job executor should support pilot jobs
-     * @param default_storage_service: a storage service
-     * @param scratch_space: scratch space of the compute service
+     * @param scratch_space: scratch storage space of the compute service (nullptr if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
@@ -190,7 +189,7 @@ namespace wrench {
 
     /**
      * @brief Get the number of hosts that the compute service manages
-     * @return the host counts
+     * @return the host count
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -273,8 +272,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the per-core fop ratea of the compute service's hosts
-    * @return flop rates in flop/sec
+    * @brief Get the per-core flop rate of the compute service's hosts
+    * @return a list of flop rates in flop/sec
     *
     * @throw std::runtime_error
     */
@@ -300,7 +299,7 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the RAM capacities of the compute service's hosts
+    * @brief Get the RAM capacities for each of the compute service's hosts
     * @return a vector of RAM capacities
     *
     * @throw std::runtime_error
@@ -390,24 +389,24 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the total size of the scratch space (not the remaining free space on the scratch space)
-     * @return return a size (in bytes)
+     * @brief Get the total capacity of the compute service's scratch storage space
+     * @return a size (in bytes)
      */
-    double ComputeService::getScratchSize() {
+    double ComputeService::getTotalScratchSpaceSize() {
       return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
     }
 
     /**
-     * @brief Get the free space of the scratch service
-     * @return returns a size (in bytes)
+     * @brief Get the free space on the compute service's scratch storage space
+     * @return a size (in bytes)
      */
-    double ComputeService::getFreeRemainingScratchSpace() {
+    double ComputeService::getFreeScratchSpaceSize() {
       return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace() : 0.0;
     }
 
     /**
     * @brief Get the compute service's scratch storage space
-    * @return returns a pointer to the shared scratch space
+    * @return a pointer to the shared scratch space
     */
     StorageService *ComputeService::getScratch() {
       return this->scratch_space_storage_service;
@@ -415,7 +414,7 @@ namespace wrench {
 
     /**
     * @brief Checks if the compute service has a scratch space
-    * @return returns TRUE/FALSE (compute service has some scratch space or not)
+    * @return true if the compute service has some scratch storage space, false otherwise
     */
     bool ComputeService::hasScratch() {
       return (this->scratch_space_storage_service != nullptr);
