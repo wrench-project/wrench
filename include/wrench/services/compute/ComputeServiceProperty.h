@@ -22,7 +22,7 @@ namespace wrench {
     public:
         /** @brief The number of bytes in the control message sent by the daemon to state that it does not support the type of a submitted job **/
         DECLARE_PROPERTY_NAME(JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the daemon to submit a standard job to it **/
+        /** @brief The number of bytes in the control message sent to the daemon to submit a standard job **/
         DECLARE_PROPERTY_NAME(SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to acknowledge a standard job submission **/
         DECLARE_PROPERTY_NAME(SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD);
@@ -30,11 +30,11 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(STANDARD_JOB_DONE_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state that a running standard job has failed **/
         DECLARE_PROPERTY_NAME(STANDARD_JOB_FAILED_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the daemon to terminate a standard job to it **/
+        /** @brief The number of bytes in the control message sent to the daemon to terminate a standard job **/
         DECLARE_PROPERTY_NAME(TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to acknowledge a standard job termination **/
         DECLARE_PROPERTY_NAME(TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the daemon to submit a pilot job to it **/
+        /** @brief The number of bytes in the control message sent to the daemon to submit a pilot job **/
         DECLARE_PROPERTY_NAME(SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent from the daemon to acknowledge a pilot job submission **/
         DECLARE_PROPERTY_NAME(SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD);
@@ -48,18 +48,10 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(TTL_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state its time-to-live **/
         DECLARE_PROPERTY_NAME(TTL_ANSWER_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the daemon to terminate a pilot job to it **/
+        /** @brief The number of bytes in the control message sent to the daemon to terminate a pilot job **/
         DECLARE_PROPERTY_NAME(TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to acknowledge a pilot job termination **/
         DECLARE_PROPERTY_NAME(TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD);
-//        /** @brief The number of bytes in the control message sent to the daemon to ask it for its number of cores **/
-//        DECLARE_PROPERTY_NAME(NUM_CORES_REQUEST_MESSAGE_PAYLOAD);
-//        /** @brief The number of bytes in the control message sent by the daemon to state how many cores it has **/
-//        DECLARE_PROPERTY_NAME(NUM_CORES_ANSWER_MESSAGE_PAYLOAD);
-//        /** @brief The number of bytes in the control message sent to the daemon to ask it for its number of idle cores **/
-//        DECLARE_PROPERTY_NAME(NUM_IDLE_CORES_REQUEST_MESSAGE_PAYLOAD);
-//        /** @brief The number of bytes in the control message sent by the daemon to state how many idle cores it has **/
-//        DECLARE_PROPERTY_NAME(NUM_IDLE_CORES_ANSWER_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent to the daemon to ask it for information on its resources **/
         DECLARE_PROPERTY_NAME(RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the daemon to state information on its resources **/
