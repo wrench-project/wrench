@@ -63,7 +63,7 @@ namespace wrench{
     };
     #endif
 
-
+#if 0
     /**
      * @brief BatchSimulationBeginsToSchedulerMessage class
      */
@@ -76,6 +76,7 @@ namespace wrench{
         /** @brief JSON data arguments to the scheduler */
         std::string job_args_to_scheduler;
     };
+#endif
 
     #if 0
     /**

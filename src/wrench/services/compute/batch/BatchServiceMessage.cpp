@@ -21,6 +21,7 @@ namespace wrench {
             ComputeServiceMessage("BatchServiceMessage::" + name, payload) {
     }
 
+    #if 0
     /**
      * @brief Constructor
      * @param answer_mailbox: the mailbox to reply to
@@ -44,6 +45,7 @@ namespace wrench {
       this->answer_mailbox = answer_mailbox;
       this->job_args_to_scheduler = job_args_to_scheduler;
     }
+    #endif
 
     #if 0
     /**
