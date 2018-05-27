@@ -93,9 +93,9 @@ namespace wrench {
 
         double getTTL();
 
-        double getScratchSize();
+        double getTotalScratchSpaceSize();
 
-        double getFreeRemainingScratchSpace();
+        double getFreeScratchSpaceSize();
 
         /***********************/
         /** \endcond          **/
