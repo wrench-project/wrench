@@ -29,7 +29,7 @@ public:
     wrench::ComputeService *compute_service = nullptr;
     wrench::ComputeService *compute_service1 = nullptr;
     wrench::ComputeService *compute_service2 = nullptr;
-    wrench::Simulation *simulation;
+    wrench::Simulation *simulation = nullptr;
 
     void do_EnergyConsumption_test();
 
@@ -42,7 +42,7 @@ protected:
       // Create the simplest workflow
       workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
-      // Create a four-host 10-core platform file
+      // Create a four-host 1-core platform file along with different pstates
       std::string xml = "<?xml version='1.0'?>"
       "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
       "<platform version=\"4.1\">"
@@ -96,7 +96,7 @@ class EnergyConsumptionTestWMS : public wrench::WMS {
 public:
     EnergyConsumptionTestWMS(EnergyConsumptionTest *test,
                               const std::set<wrench::ComputeService *> &compute_services,
-                              std::string hostname) :
+                              std::string& hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
       this->test = test;
@@ -112,7 +112,6 @@ private:
 
       {
         std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
-        double default_speed = wrench::S4U_Simulation::getFlopRate(simulation_hosts[1]); //100MF
 
         //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
         wrench::WorkflowTask *task = this->workflow->addTask("task1", 10000000000, 1, 1, 1.0);
@@ -147,7 +146,6 @@ private:
         try {
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
-          std::string error_msg = cause->toString();
           throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
         }
 
@@ -225,7 +223,6 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-  wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
@@ -251,7 +248,7 @@ class EnergyConsumptionPStateChangeTestWMS : public wrench::WMS {
 public:
     EnergyConsumptionPStateChangeTestWMS(EnergyConsumptionTest *test,
                              const std::set<wrench::ComputeService *> &compute_services,
-                             std::string hostname) :
+                             std::string& hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
       this->test = test;
@@ -295,7 +292,7 @@ private:
         //let's execute the job, this should take ~100 sec based on the 100MF speed
         std::string my_mailbox = "test_callback_mailbox";
 
-        // Create a StandardJobExecutor that will run stuff on one host and 6 core
+        // Create a StandardJobExecutor
         std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
                         test->simulation,
@@ -343,13 +340,13 @@ private:
         //let's execute the job, this should take ~100 sec based on the 100MF speed
         my_mailbox = "test_callback_mailbox";
 
-        // Create a StandardJobExecutor that will run stuff on one host and 6 core
+        // Create a StandardJobExecutor
         executor = std::unique_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
                         test->simulation,
                         my_mailbox,
                         test->simulation->getHostnameList()[1],
-                        job1,
+                        job2,
                         {std::make_tuple(test->simulation->getHostnameList()[1], 1, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         false,
