@@ -20,7 +20,7 @@ namespace wrench{
     /***********************/
 
     /**
-     * @brief Top-level class for message received/sent by a BatchService
+     * @brief Top-level class for messages received/sent by a BatchService
      */
     class BatchServiceMessage : public ComputeServiceMessage {
     protected:
