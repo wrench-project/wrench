@@ -33,20 +33,19 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param hostname: the hostname on which to start the service
-    * @param batch_service: the batch service
-    * @param batch_service_mailbox: the name of the mailbox of the batch_service
-    * @param sched_port the port to send messages to Batsched
-    * @param MY_TYPE: the type of this listener
-    * @param data_to_send: data to send
+    * @param batch_service: the BatchService that this service reports to
+    * @param batch_service_mailbox: the name of the mailbox of the BatchService
+    * @param sched_port the port for sending messages to Batsched
+    * @param data_to_send: the data to send (as a JSON string)
     * @param plist: property list
     */
     BatschedNetworkListener::BatschedNetworkListener(std::string hostname, BatchService *batch_service,
                                                      std::string batch_service_mailbox,
                                                      std::string sched_port,
-                                                     NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send,
+                                                     std::string data_to_send,
                                                      std::map<std::string, std::string> plist) :
             BatschedNetworkListener(hostname, batch_service, batch_service_mailbox,
-                                    sched_port, MY_TYPE, data_to_send, plist, "") {
+                                    sched_port, data_to_send, plist, "") {
     }
 
 
@@ -56,7 +55,6 @@ namespace wrench {
     * @param batch_service: the batch service
     * @param batch_service_mailbox: the name of the mailbox of the batch_service
     * @param sched_port the port to send messages to Batsched
-    * @param MY_TYPE: the type of this listener
     * @param data_to_send: data to send
     * @param plist: property list
     * @param suffix the suffix to append
@@ -64,14 +62,13 @@ namespace wrench {
     BatschedNetworkListener::BatschedNetworkListener(
             std::string hostname, BatchService *batch_service, std::string batch_service_mailbox,
             std::string sched_port,
-            NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send, std::map<std::string, std::string> plist,
+            std::string data_to_send, std::map<std::string, std::string> plist,
             std::string suffix = "") :
             Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
 
       #ifdef ENABLE_BATSCHED
       // Start the daemon on the same host
       this->sched_port = sched_port;
-      this->MY_LISTENER_TYPE = MY_TYPE;
       this->data_to_send = data_to_send;
       this->batch_service = batch_service;
       this->batch_service_mailbox = batch_service_mailbox;
@@ -95,18 +92,12 @@ namespace wrench {
       WRENCH_INFO("Starting");
 
       /** Main loop **/
-      if (MY_LISTENER_TYPE == NETWORK_LISTENER_TYPE::SENDER_RECEIVER) {
-        if (this->data_to_send.empty()) {
-          throw std::runtime_error(
-                  "BatschedNetworkListener::BatschedNetworkListener():Network sending process has no data to send"
-          );
-        }
-        this->send_receive();
-      } else {
+      if (this->data_to_send.empty()) {
         throw std::runtime_error(
-                "BatschedNetworkListener::BatschedNetworkListener():Invalid Network Listener type given"
+                "BatschedNetworkListener::BatschedNetworkListener():Network sending process has no data to send"
         );
       }
+      this->send_receive();
 
       WRENCH_INFO("Batch Network Listener Service on host %s terminating!", S4U_Simulation::getHostName().c_str());
       return 0;

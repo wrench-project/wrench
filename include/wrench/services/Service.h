@@ -32,7 +32,9 @@ namespace wrench {
 
         /** @brief Service states */
         enum State {
+            /** @brief UP state: the service has been started and is still running */
             UP,
+            /** @brief DOWN state: the service has been shutdown and/or has terminated */
             DOWN,
         };
 
