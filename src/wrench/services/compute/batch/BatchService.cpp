@@ -85,8 +85,8 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
+     * @param supports_standard_jobs: true if the batch service should support standard jobs
+     * @param supports_pilot_jobs: true if the batch service should support pilot jobs
      * @param compute_hosts: the list of names of the available compute hosts
      *                 - the hosts must be homogeneous (speed, number of cores, and RAM size)
      *                 - all cores are usable by the batch service on each host
