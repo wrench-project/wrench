@@ -118,7 +118,6 @@ namespace wrench {
                      std::string suffix,
                      double scratch_size = 0);
 
-        unsigned int batsched_port; // ONLY USED FOR BATSCHED
 
         //submits a standard job
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) override;
@@ -177,6 +176,8 @@ namespace wrench {
 
         //Batch scheduling supported algorithms
 #ifdef ENABLE_BATSCHED
+        unsigned long batsched_port; // ONLY USED FOR BATSCHED
+
         std::set<std::string> scheduling_algorithms = {"easy_bf", "conservative_bf", "easy_bf_plot_liquid_load_horizon",
                                                        "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
                                                        "energy_bf_monitoring",
