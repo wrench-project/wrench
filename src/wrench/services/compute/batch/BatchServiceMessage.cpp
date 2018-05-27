@@ -146,8 +146,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to which the answer should be sent
-     * @param job: the job
+     * @param answer_mailbox: the mailbox to which the answer should be sent back
+     * @param job: the batch job
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument

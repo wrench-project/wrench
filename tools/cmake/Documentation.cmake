@@ -16,8 +16,6 @@ if (DOXYGEN_FOUND)
             set(WRENCH_SECTIONS "NODICE")
         endif ()
 
-#        set(WRENCH_SECTIONS "DEVELOPER USER")
-
         set(WRENCH_SECTIONS_OUTPUT ${SECTION_LOWER})
         configure_file(${CMAKE_HOME_DIRECTORY}/tools/doxygen/Doxyfile.in ${DOXYGEN_OUT} @ONLY)
 

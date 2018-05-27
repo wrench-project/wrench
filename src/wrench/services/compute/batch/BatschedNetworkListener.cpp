@@ -125,9 +125,7 @@ namespace wrench {
       #ifdef ENABLE_BATSCHED
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
-                                new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data,
-                                                                       this->getPropertyValueAsDouble(
-                                                                               BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD)));
+                                new BatchExecuteJobFromBatSchedMessage(answer_mailbox, execute_job_reply_data, 0));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -138,15 +136,13 @@ namespace wrench {
 
     /**
      * @brief An an "query answer" message to the batch service
-     * @param estimated_waiting_time: queue waitint time estimate
+     * @param estimated_waiting_time: batch queue wait time estimate
      */
     void BatschedNetworkListener::sendQueryAnswerMessageToBatchService(double estimated_waiting_time) {
       #ifdef ENABLE_BATSCHED
       try {
         S4U_Mailbox::putMessage(this->batch_service_mailbox,
-                                new BatchQueryAnswerMessage(estimated_waiting_time,
-                                                            this->getPropertyValueAsDouble(
-                                                                    BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD)));
+                                new BatchQueryAnswerMessage(estimated_waiting_time,0));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
