@@ -17,7 +17,7 @@
 namespace wrench {
 
     /**
-     * @brief Configurable properties for a StorageService
+     * @brief Configurable message payloads for a StorageService
      */
     class StorageServiceMessagePayload : public ServiceMessagePayload {
 

@@ -15,7 +15,7 @@
 namespace wrench {
 
     /**
-     * @brief Configurable properties for a NetworkProximityService
+     * @brief Configurable message payloads for a NetworkProximityService
      */
 
     class NetworkProximityServiceMessagePayload:public ServiceMessagePayload {
