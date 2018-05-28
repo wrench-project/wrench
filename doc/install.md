@@ -14,9 +14,25 @@ WRENCH is also distributed in Docker containers. Please, visit the
 to pull WRENCH's Docker images.
 
 The `latest` tag provides a container with the latest 
-[WRENCH's release](https://github.com/wrench-project/wrench/releases), while the 
-`unstable` tag provides a container with the current code in the GitHub's `master` 
-branch. Additional tags are available for all WRENCH releases.  
+[WRENCH's release](https://github.com/wrench-project/wrench/releases):
+
+~~~~~~~~~~~~~{.sh}
+docker pull wrenchproject/wrench 
+# or
+docker run -it wrenchproject/wrench /bin/bash
+~~~~~~~~~~~~~
+
+ The `unstable` tag provides a container with the current code in the GitHub's `master` 
+branch:
+
+~~~~~~~~~~~~~{.sh}
+docker pull wrenchproject/wrench:unstable
+# or
+docker run -it wrenchproject/wrench:unstable /bin/bash
+~~~~~~~~~~~~~ 
+
+Additional tags are available for all WRENCH releases. 
+
 
 
 # Prerequisites #                 {#install-prerequisites}
