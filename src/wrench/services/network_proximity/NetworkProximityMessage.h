@@ -105,30 +105,30 @@ namespace wrench {
     };
 
     /**
-     * @brief CoordinateLookupRequestMessage class
+     * @brief A message sent to a NetworkProximityService to request a coordinate lookup
      */
     class CoordinateLookupRequestMessage: public NetworkProximityMessage {
     public:
         CoordinateLookupRequestMessage(std::string answer_mailbox, std::string requested_host, double payload);
 
-        /** @brief The mailbox to return the answer to */
+        /** @brief The mailbox to which the answer should be sent back */
         std::string answer_mailbox;
 
-        /** @brief The host who's coordinates is being requested */
+        /** @brief The name of the host whose coordinates are being requested */
         std::string requested_host;
     };
 
     /**
-     * @brief CoordinateLookupAnswerMessage class
+     * @brief A message sent by a NetworkProximityService in answer to a coordinate lookup request
      */
     class CoordinateLookupAnswerMessage: public NetworkProximityMessage {
     public:
         CoordinateLookupAnswerMessage(std::string requested_host, std::pair<double, double> xy_coordinate, double payload);
 
-        /** @brief The host whose current coordinates were requested for */
+        /** @brief The name of the host whose coordinates were requested  */
         std::string requested_host;
 
-        /** @brief The current (x,y) coordinate corresponding to the requested_host */
+        /** @brief The current (x,y) coordinates of the requested host */
         std::pair<double, double> xy_coordinate;
     };
 

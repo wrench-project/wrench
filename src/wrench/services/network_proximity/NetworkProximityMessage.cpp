@@ -112,9 +112,9 @@ namespace wrench {
     }
 
     /**
-     * @brief CoordinateLookupRequestMessage class
+     * @brief Constructor
      * @param answer_mailbox: the mailbox to return the answer to
-     * @param requested_host: the host whose coordinates are being requested
+     * @param requested_host: the naje of the host whose coordinates are being requested
      * @param payload: the message size in bytes
      */
     CoordinateLookupRequestMessage::CoordinateLookupRequestMessage(std::string answer_mailbox,
@@ -129,9 +129,9 @@ namespace wrench {
     }
 
     /**
-     * @brief CoordinateLookupAnswerMessage class
-     * @param requested_host: the host whose coordinates are being requested
-     * @param xy_coordinate: the (x,y) coordinate corresponding to the requested_host
+     * @brief Constructor
+     * @param requested_host: the name of the host whose coordinates are being requested
+     * @param xy_coordinate: the (x,y) coordinate of the host
      * @param payload: the message size in bytes
      */
     CoordinateLookupAnswerMessage::CoordinateLookupAnswerMessage(std::string requested_host,
