@@ -82,8 +82,8 @@ int main(int argc, char **argv) {
    * configurable properties for each kind of service.
    */
   wrench::ComputeService *batch_service = new wrench::BatchService(
-          wms_host, hostname_list, 0,
-          {{wrench::BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "2048"}});
+          wms_host, hostname_list, 0, {},
+          {{wrench::BatchServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "2048"}});
 
   /* Add the batch service to the simulation, catching a possible exception */
   try {

@@ -37,15 +37,15 @@ namespace wrench {
     * @param batch_service_mailbox: the name of the mailbox of the BatchService
     * @param sched_port the port for sending messages to Batsched
     * @param data_to_send: the data to send (as a JSON string)
-    * @param plist: property list ({} means "use all defaults")
+    * @param property_list: property list ({} means "use all defaults")
     */
     BatschedNetworkListener::BatschedNetworkListener(std::string hostname, BatchService *batch_service,
                                                      std::string batch_service_mailbox,
                                                      std::string sched_port,
                                                      std::string data_to_send,
-                                                     std::map<std::string, std::string> plist) :
+                                                     std::map<std::string, std::string> property_list) :
             BatschedNetworkListener(hostname, batch_service, batch_service_mailbox,
-                                    sched_port, data_to_send, plist, "") {
+                                    sched_port, data_to_send, property_list, "") {
     }
 
 
@@ -56,13 +56,13 @@ namespace wrench {
     * @param batch_service_mailbox: the name of the mailbox of the batch_service
     * @param sched_port the port to send messages to Batsched
     * @param data_to_send: data to send
-    * @param plist: property list ({} means "use all defaults")
+    * @param property_list: property list ({} means "use all defaults")
     * @param suffix the suffix to append
     */
     BatschedNetworkListener::BatschedNetworkListener(
             std::string hostname, BatchService *batch_service, std::string batch_service_mailbox,
             std::string sched_port,
-            std::string data_to_send, std::map<std::string, std::string> plist,
+            std::string data_to_send, std::map<std::string, std::string> property_list,
             std::string suffix = "") :
             Service(hostname, "batch_network_listener" + suffix, "batch_network_listener" + suffix) {
 
@@ -73,7 +73,7 @@ namespace wrench {
       this->batch_service = batch_service;
       this->batch_service_mailbox = batch_service_mailbox;
       // Set default and specified properties
-      this->setProperties(this->default_property_values, plist);
+      this->setProperties(this->default_property_values, property_list);
       #else
       throw std::runtime_error("BatschedNetworkListener::BatschedNetworkListener(): This should not be called unless ENABLE_BATSCHED is set to on!");
       #endif
@@ -164,18 +164,6 @@ namespace wrench {
       //  Get the reply.
       zmq::message_t reply;
       socket.recv(&reply);
-
-//      this->batch_service->setBatschedReady(true);
-
-
-//      try {
-//        S4U_Mailbox::putMessage(this->batch_service_mailbox,
-//                                new BatchSchedReadyMessage(answer_mailbox,
-//                                                           this->getPropertyValueAsDouble(
-//                                                                   BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD)));
-//      } catch (std::shared_ptr<NetworkError> &cause) {
-//        throw WorkflowExecutionException(cause);
-//      }
 
       std::string reply_data;
       reply_data = std::string(static_cast<char *>(reply.data()), reply.size());

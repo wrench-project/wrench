@@ -11,7 +11,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/storage/StorageService.h"
 #include "services/storage/StorageServiceMessage.h"
-#include "wrench/services/storage/StorageServiceProperty.h"
+#include "wrench/services/storage/StorageServiceMessagePayload.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
 #include "wrench/simulation/Simulation.h"
 
@@ -126,7 +126,7 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFreeSpaceRequestMessage(
                 answer_mailbox,
-                this->getPropertyValueAsDouble(StorageServiceProperty::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
       }
@@ -175,7 +175,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileLookupRequestMessage(
                 answer_mailbox,
                 file,
-                this->getPropertyValueAsDouble(StorageServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
       }
@@ -223,8 +223,8 @@ namespace wrench {
                                 new StorageServiceFileReadRequestMessage(answer_mailbox,
                                                                          answer_mailbox,
                                                                          file,
-                                                                         this->getPropertyValueAsDouble(
-                                                                                 StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+                                                                         this->getMessagePayloadValueAsDouble(
+                                                                                 StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<FatalFailure> &cause) {
@@ -301,8 +301,8 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new StorageServiceFileWriteRequestMessage(answer_mailbox,
                                                                           file,
-                                                                          this->getPropertyValueAsDouble(
-                                                                                  StorageServiceProperty::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+                                                                          this->getMessagePayloadValueAsDouble(
+                                                                                  StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
       } catch (std::exception &e) {
@@ -483,7 +483,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileDeleteRequestMessage(
                 answer_mailbox,
                 file,
-                this->getPropertyValueAsDouble(StorageServiceProperty::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
       }
@@ -582,7 +582,7 @@ namespace wrench {
                 file,
                 src,
                 nullptr,
-                this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<FatalFailure> &cause) {
@@ -642,7 +642,7 @@ namespace wrench {
                 file,
                 src,
                 nullptr,
-                this->getPropertyValueAsDouble(StorageServiceProperty::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       } catch (std::shared_ptr<FatalFailure> &cause) {
@@ -682,8 +682,8 @@ namespace wrench {
                                 new StorageServiceFileReadRequestMessage(request_answer_mailbox,
                                                                          mailbox_that_should_receive_file_content,
                                                                          file,
-                                                                         this->getPropertyValueAsDouble(
-                                                                                 StorageServiceProperty::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+                                                                         this->getMessagePayloadValueAsDouble(
+                                                                                 StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (FailureCause &cause) {
         throw WorkflowExecutionException(&cause);
       }

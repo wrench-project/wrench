@@ -11,9 +11,6 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, NOT_ENOUGH_CORES_MESSAGE_PAYLOAD);
-    SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, FLOP_RATE_REQUEST_MESSAGE_PAYLOAD);
-    SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, FLOP_RATE_ANSWER_MESSAGE_PAYLOAD);
 
     SET_PROPERTY_NAME(MultihostMulticoreComputeServiceProperty, THREAD_STARTUP_OVERHEAD);
 

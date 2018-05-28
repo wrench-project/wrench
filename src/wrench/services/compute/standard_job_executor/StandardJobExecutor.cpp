@@ -50,7 +50,8 @@ namespace wrench {
      *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
      * @param scratch_space: the usable scratch storage space  (or nullptr if none)
      * @param part_of_pilot_job: try if the job executor is running within a pilot job
-     * @param plist: a property list
+     * @param property_list: a property list
+     * @param messagepayload_list: a message payload list
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
@@ -62,7 +63,9 @@ namespace wrench {
                                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                              StorageService* scratch_space,
                                              bool part_of_pilot_job,
-                                             std::map<std::string, std::string> plist) :
+                                             std::map<std::string, std::string> property_list,
+                                             std::map<std::string, std::string> messagepayload_list
+    ) :
             Service(hostname, "standard_job_executor", "standard_job_executor") {
 
       if ((job == nullptr) || (compute_resources.empty())) {
@@ -165,7 +168,8 @@ namespace wrench {
 
 
       // set properties
-      this->setProperties(this->default_property_values, plist);
+      this->setProperties(this->default_property_values, property_list);
+      this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
       // Compute the total number of cores and set initial core availabilities
       this->total_num_cores = 0;
@@ -624,8 +628,8 @@ namespace wrench {
         try {
           S4U_Mailbox::putMessage(this->callback_mailbox,
                                   new StandardJobExecutorDoneMessage(this->job, this,
-                                                                     this->getPropertyValueAsDouble(
-                                                                             StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+                                                                     this->getMessagePayloadValueAsDouble(
+                                                                             StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           WRENCH_INFO("Failed to send the callback... oh well");
           this->releaseDaemonLock();
@@ -740,8 +744,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox,
                                 new StandardJobExecutorFailedMessage(this->job, this, cause,
-                                                                     this->getPropertyValueAsDouble(
-                                                                             StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                                                     this->getMessagePayloadValueAsDouble(
+                                                                             StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         // do nothing
       }

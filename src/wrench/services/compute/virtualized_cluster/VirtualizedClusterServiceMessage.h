@@ -66,7 +66,7 @@ namespace wrench {
                                                         bool supports_pilot_jobs,
                                                         unsigned long num_cores,
                                                         double ram_memory,
-                                                        std::map<std::string, std::string> &plist,
+                                                        std::map<std::string, std::string> &property_list,
                                                         double payload);
 
     public:
@@ -85,7 +85,7 @@ namespace wrench {
         /** @brief the VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue) */
         double ram_memory;
         /** @brief a property list ({} means "use all defaults") */
-        std::map<std::string, std::string> plist;
+        std::map<std::string, std::string> property_list;
     };
 
     /**

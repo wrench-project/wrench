@@ -48,8 +48,8 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceSubmitStandardJobRequestMessage(
                                         answer_mailbox, job, service_specific_args,
-                                        this->getPropertyValueAsDouble(
-                                                ComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                        this->getMessagePayloadValueAsDouble(
+                                                ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -108,8 +108,8 @@ namespace wrench {
         S4U_Mailbox::putMessage(
                 this->mailbox_name,
                 new ComputeServiceSubmitPilotJobRequestMessage(
-                        answer_mailbox, job, this->getPropertyValueAsDouble(
-                                MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                        answer_mailbox, job, this->getMessagePayloadValueAsDouble(
+                                MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -150,13 +150,16 @@ namespace wrench {
      *          - num_cores = ComputeService::ALL_CORES: use all cores available on the host
      *          - memory = ComputeService::ALL_RAM: use all RAM available on the host
      * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
-     * @param plist: a property list ({} means "use all defaults")
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
             const std::string &hostname,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
             double scratch_space_size,
-            std::map<std::string, std::string> plist) :
+            std::map<std::string, std::string> property_list,
+            std::map<std::string, std::string> messagepayload_list
+    ) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
@@ -164,7 +167,7 @@ namespace wrench {
 
       initiateInstance(hostname,
                        std::move(compute_resources),
-                       plist, -1, nullptr);
+                       property_list, messagepayload_list, -1, nullptr);
     }
 
     /**
@@ -174,12 +177,14 @@ namespace wrench {
      * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
      * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
-     * @param plist: a property list ({} means "use all defaults")
+     * @param property_list: a property list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
                                                                        const std::set<std::string> compute_hosts,
                                                                        double scratch_space_size,
-                                                                       std::map<std::string, std::string> plist) :
+                                                                       std::map<std::string, std::string> property_list,
+                                                                       std::map<std::string, std::string> messagepayload_list
+    ) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
@@ -192,7 +197,7 @@ namespace wrench {
 
       initiateInstance(hostname,
                        compute_resources,
-                       std::move(plist), -1, nullptr);
+                       std::move(property_list), std::move(messagepayload_list), -1, nullptr);
     }
 
     /**
@@ -201,7 +206,8 @@ namespace wrench {
      * @param hostname: the name of the host
      * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
      *        the compute resources available to this service
-     * @param plist: a property list
+     * @param property_list: a property list
+     * @param messagepayload_list: a message payload list
      * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
@@ -211,7 +217,8 @@ namespace wrench {
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
             const std::string &hostname,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-            std::map<std::string, std::string> plist,
+            std::map<std::string, std::string> property_list,
+            std::map<std::string, std::string> messagepayload_list,
             double ttl,
             PilotJob *pj,
             std::string suffix, StorageService* scratch_space) : ComputeService(hostname,
@@ -221,7 +228,8 @@ namespace wrench {
 
       initiateInstance(hostname,
                        std::move(compute_resources),
-                       std::move(plist),
+                       std::move(property_list),
+                       std::move(messagepayload_list),
                        ttl,
                        pj);
     }
@@ -232,12 +240,14 @@ namespace wrench {
      * @param hostname: the name of the host on which the job executor should be started
      * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
-     * @param plist: a property list ({} means "use all defaults")
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param scratch_space: the scratch space for this compute service
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
                                                                        const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                                                       std::map<std::string, std::string> plist,
+                                                                       std::map<std::string, std::string> property_list,
+                                                                       std::map<std::string, std::string> messagepayload_list,
                                                                        StorageService *scratch_space):
             ComputeService(hostname,
                            "multihost_multicore",
@@ -246,7 +256,7 @@ namespace wrench {
 
       initiateInstance(hostname,
                        compute_resources,
-                       std::move(plist), -1, nullptr);
+                       std::move(property_list), std::move(messagepayload_list), -1, nullptr);
 
     }
 
@@ -256,7 +266,8 @@ namespace wrench {
  * @param hostname: the name of the host
  * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
  *        the compute resources available to this service
- * @param plist: a property list
+ * @param property_list: a property list
+ * @param messagepayload_list: a message payload list
  * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
  * @param pj: a containing PilotJob  (nullptr if none)
  *
@@ -265,12 +276,16 @@ namespace wrench {
     void MultihostMulticoreComputeService::initiateInstance(
             const std::string &hostname,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-            std::map<std::string, std::string> plist,
+            std::map<std::string, std::string> property_list,
+            std::map<std::string, std::string> messagepayload_list,
             double ttl,
             PilotJob *pj) {
 
       // Set default and specified properties
-      this->setProperties(this->default_property_values, plist);
+      this->setProperties(this->default_property_values, property_list);
+
+      // Set default and specified message payloads
+      this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
       // Check that there is at least one core per host and that hosts have enough cores
       for (auto host : compute_resources) {
@@ -647,7 +662,8 @@ namespace wrench {
                {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
                        MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM)},
                {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
-                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}}));
+                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}},
+              {}));
 
       executor->start(executor, true);
       this->standard_job_executors.insert(executor);
@@ -717,6 +733,7 @@ namespace wrench {
               new MultihostMulticoreComputeService(this->hostname,
                                                    compute_resources,
                                                    cs_properties,
+                                                   this->messagepayload_list,
                                                    job->getDuration(),
                                                    job,
                                                    "_pilot_job",
@@ -740,8 +757,8 @@ namespace wrench {
       try {
         S4U_Mailbox::dputMessage(job->getCallbackMailbox(),
                                  new ComputeServicePilotJobStartedMessage(
-                                         job, this, this->getPropertyValueAsDouble(
-                                                 MultihostMulticoreComputeServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
+                                         job, this, this->getMessagePayloadValueAsDouble(
+                                                 MultihostMulticoreComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -789,8 +806,8 @@ namespace wrench {
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                  new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                          MultihostMulticoreComputeServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                  new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                          MultihostMulticoreComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
@@ -871,8 +888,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                 new ComputeServiceStandardJobFailedMessage(
-                                        job, this, cause, this->getPropertyValueAsDouble(
-                                                MultihostMulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                        job, this, cause, this->getMessagePayloadValueAsDouble(
+                                                MultihostMulticoreComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -896,8 +913,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                 new ComputeServiceStandardJobFailedMessage(
-                                        job, this, cause, this->getPropertyValueAsDouble(
-                                                MultihostMulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                        job, this, cause, this->getMessagePayloadValueAsDouble(
+                                                MultihostMulticoreComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -1054,8 +1071,8 @@ namespace wrench {
       try {
         S4U_Mailbox::dputMessage(
                 job->popCallbackMailbox(), new ComputeServiceStandardJobDoneMessage(
-                        job, this, this->getPropertyValueAsDouble(
-                                MultihostMulticoreComputeServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+                        job, this, this->getMessagePayloadValueAsDouble(
+                                MultihostMulticoreComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -1139,8 +1156,8 @@ namespace wrench {
           S4U_Mailbox::putMessage(this->containing_pilot_job->popCallbackMailbox(),
                                   new ComputeServicePilotJobExpiredMessage(
                                           this->containing_pilot_job, this,
-                                          this->getPropertyValueAsDouble(
-                                                  MultihostMulticoreComputeServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+                                          this->getMessagePayloadValueAsDouble(
+                                                  MultihostMulticoreComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -1172,8 +1189,8 @@ namespace wrench {
       // Forward the notification
       try {
         S4U_Mailbox::dputMessage(job->popCallbackMailbox(), new ComputeServicePilotJobExpiredMessage(
-                job, this, this->getPropertyValueAsDouble(
-                        MultihostMulticoreComputeServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
+                job, this, this->getMessagePayloadValueAsDouble(
+                        MultihostMulticoreComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -1199,8 +1216,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceTerminateStandardJobRequestMessage(
-                                        answer_mailbox, job, this->getPropertyValueAsDouble(
-                                                MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                        answer_mailbox, job, this->getMessagePayloadValueAsDouble(
+                                                MultihostMulticoreComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -1247,8 +1264,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceTerminatePilotJobRequestMessage(
-                                        answer_mailbox, job, this->getPropertyValueAsDouble(
-                                                MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                        answer_mailbox, job, this->getMessagePayloadValueAsDouble(
+                                                MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -1292,8 +1309,8 @@ namespace wrench {
           this->pending_jobs.erase(it);
           ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                   job, this, true, nullptr,
-                  this->getPropertyValueAsDouble(
-                          MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+                  this->getMessagePayloadValueAsDouble(
+                          MultihostMulticoreComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
           try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
           } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1312,8 +1329,8 @@ namespace wrench {
         // reply
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                 job, this, true, nullptr,
-                this->getPropertyValueAsDouble(
-                        MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+                this->getMessagePayloadValueAsDouble(
+                        MultihostMulticoreComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
           S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1326,8 +1343,8 @@ namespace wrench {
       WRENCH_INFO("Trying to terminate a standard job that's neither pending nor running!");
       ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
               job, this, false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
-              this->getPropertyValueAsDouble(
-                      MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+              this->getMessagePayloadValueAsDouble(
+                      MultihostMulticoreComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1351,8 +1368,8 @@ namespace wrench {
           this->pending_jobs.erase(it);
           ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                   job, this, true, nullptr,
-                  this->getPropertyValueAsDouble(
-                          MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
+                  this->getMessagePayloadValueAsDouble(
+                          MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
           try {
             S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
           } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1368,8 +1385,8 @@ namespace wrench {
         terminateRunningPilotJob(job);
         ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
                 job, this, true, nullptr,
-                this->getPropertyValueAsDouble(
-                        MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
+                this->getMessagePayloadValueAsDouble(
+                        MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
         try {
           S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1382,8 +1399,8 @@ namespace wrench {
       WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
       ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
               job, this, false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
-              this->getPropertyValueAsDouble(
-                      MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
+              this->getMessagePayloadValueAsDouble(
+                      MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1414,8 +1431,8 @@ namespace wrench {
                   answer_mailbox,
                   new ComputeServiceSubmitStandardJobAnswerMessage(
                           job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
-                          this->getPropertyValueAsDouble(
-                                  ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -1445,8 +1462,8 @@ namespace wrench {
                   answer_mailbox,
                   new ComputeServiceSubmitStandardJobAnswerMessage(
                           job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
-                          this->getPropertyValueAsDouble(
-                                  MultihostMulticoreComputeServiceProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  MultihostMulticoreComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -1461,8 +1478,8 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
-                        job, this, true, nullptr, this->getPropertyValueAsDouble(
-                                ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                        job, this, true, nullptr, this->getMessagePayloadValueAsDouble(
+                                ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -1486,8 +1503,8 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
                           job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
-                          this->getPropertyValueAsDouble(
-                                  MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -1508,8 +1525,8 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
                           job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
-                          this->getPropertyValueAsDouble(
-                                  MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -1522,8 +1539,8 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
                         job, this, true, nullptr,
-                        this->getPropertyValueAsDouble(
-                                MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                        this->getMessagePayloadValueAsDouble(
+                                MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -1589,8 +1606,8 @@ namespace wrench {
       // Send the reply
       ComputeServiceResourceInformationAnswerMessage *answer_message = new ComputeServiceResourceInformationAnswerMessage(
               dict,
-              this->getPropertyValueAsDouble(
-                      ComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
+              this->getMessagePayloadValueAsDouble(
+                      ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {

@@ -16,6 +16,7 @@
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
 #include "MultihostMulticoreComputeServiceProperty.h"
+#include "MultihostMulticoreComputeServiceMessagePayload.h"
 
 namespace wrench {
 
@@ -42,25 +43,6 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {
                 {MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "true"},
                 {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "true"},
-                {MultihostMulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                    "1024"},
-                {MultihostMulticoreComputeServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,                 "1024"},
-                {MultihostMulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
-                {MultihostMulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
-                {MultihostMulticoreComputeServiceProperty::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,         "1024"},
-                {MultihostMulticoreComputeServiceProperty::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,               "1024"},
-                {MultihostMulticoreComputeServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,              "1024"},
-                {MultihostMulticoreComputeServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,            "1024"},
-                {MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                {MultihostMulticoreComputeServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                {MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,       "1024"},
-                {MultihostMulticoreComputeServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,        "1024"},
-                {MultihostMulticoreComputeServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,              "1024"},
-                {MultihostMulticoreComputeServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,              "1024"},
-                {MultihostMulticoreComputeServiceProperty::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,               "1024"},
-                {MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
-                {MultihostMulticoreComputeServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
-                {MultihostMulticoreComputeServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,     "1024"},
-                {MultihostMulticoreComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,      "1024"},
                 {MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD,                        "0.0"},
                 {MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                           "FCFS"},
                 {MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY,                     "aggressive"},
@@ -69,6 +51,27 @@ namespace wrench {
                 {MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM,       "best_fit"},
         };
 
+        std::map<std::string, std::string> default_messagepayload_values = {
+                {MultihostMulticoreComputeServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                    "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,                 "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD,         "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD,               "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,              "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,            "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,       "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,        "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,              "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,              "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::PILOT_JOB_FAILED_MESSAGE_PAYLOAD,               "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,     "1024"},
+                {MultihostMulticoreComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,      "1024"},
+        };
 
     public:
 
@@ -76,13 +79,17 @@ namespace wrench {
         MultihostMulticoreComputeService(const std::string &hostname,
                                          const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                          double scratch_space_size,
-                                         std::map<std::string, std::string> plist = {});
+                                         std::map<std::string, std::string> property_list = {},
+                                         std::map<std::string, std::string> messagepayload_list = {}
+        );
 
         // Public Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
                                          const std::set<std::string> compute_hosts,
                                          double scratch_space_size,
-                                         std::map<std::string, std::string> plist = {});
+                                         std::map<std::string, std::string> property_list = {},
+                                         std::map<std::string, std::string> messagepayload_list = {}
+        );
 
 
         /***********************/
@@ -118,7 +125,8 @@ namespace wrench {
         // Low-level Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
                                          std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                         std::map<std::string, std::string> plist,
+                                         std::map<std::string, std::string> property_list,
+                                         std::map<std::string, std::string> messagepayload_list,
                                          double ttl,
                                          PilotJob *pj, std::string suffix,
                                          StorageService* scratch_space); // reference to upper level scratch space
@@ -126,13 +134,15 @@ namespace wrench {
         // Private Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
                                          const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                         std::map<std::string, std::string> plist,
+                                         std::map<std::string, std::string> property_list,
+                                         std::map<std::string, std::string> messagepayload_list,
                                          StorageService* scratch_space);
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
                               std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                              std::map<std::string, std::string> plist,
+                              std::map<std::string, std::string> property_list,
+                              std::map<std::string, std::string> messagepayload_list,
                               double ttl,
                               PilotJob *pj);
 

@@ -34,14 +34,15 @@ namespace wrench {
      * @param hostname: the hostname on which to start the service
      * @param execution_hosts: the hosts available for running virtual machines
      * @param scratch_space_size: the size for the scratch space of the cloud service
-     * @param plist: a property list ({} means "use all defaults")
+     * @param property_list: a property list ({} means "use all defaults")
      *
      * @throw std::runtime_error
      */
     VirtualizedClusterService::VirtualizedClusterService(const std::string &hostname,
                                                          std::vector<std::string> &execution_hosts,
                                                          double scratch_space_size,
-                                                         std::map<std::string, std::string> plist
+                                                         std::map<std::string, std::string> property_list,
+                                                         std::map<std::string, std::string> messagepayload_list
     ) :
             ComputeService(hostname, "virtualized_cluster_service", "virtualized_cluster_service",
                            scratch_space_size) {
@@ -52,7 +53,10 @@ namespace wrench {
       this->execution_hosts = execution_hosts;
 
       // Set default and specified properties
-      this->setProperties(this->default_property_values, plist);
+      this->setProperties(this->default_property_values, property_list);
+      // Set default and specified message payloads
+      this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
+
     }
 
     /**
@@ -80,8 +84,8 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new VirtualizedClusterServiceGetExecutionHostsRequestMessage(
                                         answer_mailbox,
-                                        this->getPropertyValueAsDouble(
-                                                VirtualizedClusterServiceProperty::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
+                                        this->getMessagePayloadValueAsDouble(
+                                                VirtualizedClusterServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -110,7 +114,7 @@ namespace wrench {
      * @param pm_hostname: the name of the physical machine host
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
      * @param ram_memory: the VM RAM memory capacity (-1 means "use all memory available on the host", this can be lead to an out of memory issue)
-     * @param plist: a property list ({} means "use all defaults")
+     * @param property_list: a property list ({} means "use all defaults")
      *
      * @return Virtual machine hostname
      *
@@ -119,7 +123,7 @@ namespace wrench {
     std::string VirtualizedClusterService::createVM(const std::string &pm_hostname,
                                                     unsigned long num_cores,
                                                     double ram_memory,
-                                                    std::map<std::string, std::string> plist) {
+                                                    std::map<std::string, std::string> property_list) {
 
       serviceSanityCheck();
 
@@ -135,9 +139,9 @@ namespace wrench {
                                         answer_mailbox, pm_hostname, vm_hostname,
                                         getPropertyValueAsBoolean(VirtualizedClusterServiceProperty::SUPPORTS_STANDARD_JOBS),
                                         getPropertyValueAsBoolean(VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS),
-                                        num_cores, ram_memory, plist,
-                                        this->getPropertyValueAsDouble(
-                                                VirtualizedClusterServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
+                                        num_cores, ram_memory, property_list,
+                                        this->getMessagePayloadValueAsDouble(
+                                                VirtualizedClusterServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -182,8 +186,8 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new VirtualizedClusterServiceMigrateVMRequestMessage(
                                         answer_mailbox, vm_hostname, dest_pm_hostname,
-                                        this->getPropertyValueAsDouble(
-                                                VirtualizedClusterServiceProperty::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
+                                        this->getMessagePayloadValueAsDouble(
+                                                VirtualizedClusterServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -227,8 +231,8 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceSubmitStandardJobRequestMessage(
                                         answer_mailbox, job, service_specific_args,
-                                        this->getPropertyValueAsDouble(
-                                                ComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                        this->getMessagePayloadValueAsDouble(
+                                                ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -275,8 +279,8 @@ namespace wrench {
         S4U_Mailbox::putMessage(
                 this->mailbox_name,
                 new ComputeServiceSubmitPilotJobRequestMessage(
-                        answer_mailbox, job, this->getPropertyValueAsDouble(
-                                VirtualizedClusterServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                        answer_mailbox, job, this->getMessagePayloadValueAsDouble(
+                                VirtualizedClusterServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -378,8 +382,8 @@ namespace wrench {
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                  new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                          VirtualizedClusterServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                  new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                          VirtualizedClusterServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
@@ -395,7 +399,7 @@ namespace wrench {
 
       } else if (auto msg = dynamic_cast<VirtualizedClusterServiceCreateVMRequestMessage *>(message.get())) {
         processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->supports_standard_jobs,
-                        msg->supports_pilot_jobs, msg->num_cores, msg->ram_memory, msg->plist);
+                        msg->supports_pilot_jobs, msg->num_cores, msg->ram_memory, msg->property_list);
         return true;
 
       } else if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMRequestMessage *>(message.get())) {
@@ -427,8 +431,8 @@ namespace wrench {
                 answer_mailbox,
                 new VirtualizedClusterServiceGetExecutionHostsAnswerMessage(
                         this->execution_hosts,
-                        this->getPropertyValueAsDouble(
-                                VirtualizedClusterServiceProperty::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD)));
+                        this->getMessagePayloadValueAsDouble(
+                                VirtualizedClusterServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -444,7 +448,7 @@ namespace wrench {
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
      * @param ram_memory: the VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue)
-     * @param plist: a property list ({} means "use all defaults")
+     * @param property_list: a property list ({} means "use all defaults")
      *
      * @throw std::runtime_error
      */
@@ -455,7 +459,7 @@ namespace wrench {
                                                     bool supports_pilot_jobs,
                                                     unsigned long num_cores,
                                                     double ram_memory,
-                                                    std::map<std::string, std::string> plist) {
+                                                    std::map<std::string, std::string> property_list) {
 
       WRENCH_INFO("Asked to create a VM on %s with %d cores", pm_hostname.c_str(), (int) num_cores);
 
@@ -487,22 +491,23 @@ namespace wrench {
                   std::make_tuple(vm_hostname, num_cores, ram_memory)};
 
           // Create the compute service property list
-          std::map<std::string, std::string> cs_plist = plist;
-          if (cs_plist.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != cs_plist.end()) {
-            cs_plist[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] = (supports_pilot_jobs ? "true" : "false");
+          std::map<std::string, std::string> cs_property_list = property_list;
+          if (cs_property_list.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != cs_property_list.end()) {
+            cs_property_list[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] = (supports_pilot_jobs ? "true" : "false");
           } else {
             // This shouldn't happen, but let's be paranoid
-            cs_plist.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_PILOT_JOBS, (supports_pilot_jobs ? "true" : "false")));
+            cs_property_list.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_PILOT_JOBS, (supports_pilot_jobs ? "true" : "false")));
           }
-          if (cs_plist.find(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS) != cs_plist.end()) {
-            cs_plist[ComputeServiceProperty::SUPPORTS_STANDARD_JOBS] = (supports_standard_jobs ? "true" : "false");
+          if (cs_property_list.find(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS) != cs_property_list.end()) {
+            cs_property_list[ComputeServiceProperty::SUPPORTS_STANDARD_JOBS] = (supports_standard_jobs ? "true" : "false");
           } else {
             // This shouldn't happen, but let's be paranoid
-            cs_plist.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, (supports_standard_jobs ? "true" : "false")));
+            cs_property_list.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, (supports_standard_jobs ? "true" : "false")));
           }          
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(vm_hostname,
-                                                       compute_resources, cs_plist,
+                                                       compute_resources, cs_property_list,
+                                                       this->messagepayload_list,
                                                        getScratch()));
           cs->simulation = this->simulation;
 
@@ -521,15 +526,15 @@ namespace wrench {
                   answer_mailbox,
                   new VirtualizedClusterServiceCreateVMAnswerMessage(
                           true,
-                          this->getPropertyValueAsDouble(
-                                  VirtualizedClusterServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  VirtualizedClusterServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
         } else {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new VirtualizedClusterServiceCreateVMAnswerMessage(
                           false,
-                          this->getPropertyValueAsDouble(
-                                  VirtualizedClusterServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  VirtualizedClusterServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
         }
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
@@ -569,16 +574,16 @@ namespace wrench {
                   answer_mailbox,
                   new VirtualizedClusterServiceMigrateVMAnswerMessage(
                           true,
-                          this->getPropertyValueAsDouble(
-                                  VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  VirtualizedClusterServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD)));
 
         } else {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new VirtualizedClusterServiceMigrateVMAnswerMessage(
                           false,
-                          this->getPropertyValueAsDouble(
-                                  VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  VirtualizedClusterServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD)));
 
         }
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -605,8 +610,8 @@ namespace wrench {
                   answer_mailbox,
                   new ComputeServiceSubmitStandardJobAnswerMessage(
                           job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
-                          this->getPropertyValueAsDouble(
-                                  ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -625,8 +630,8 @@ namespace wrench {
             S4U_Mailbox::dputMessage(
                     answer_mailbox,
                     new ComputeServiceSubmitStandardJobAnswerMessage(
-                            job, this, true, nullptr, this->getPropertyValueAsDouble(
-                                    ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                            job, this, true, nullptr, this->getMessagePayloadValueAsDouble(
+                                    ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
             return;
           } catch (std::shared_ptr<NetworkError> &cause) {
             return;
@@ -640,8 +645,8 @@ namespace wrench {
                 answer_mailbox,
                 new ComputeServiceSubmitStandardJobAnswerMessage(
                         job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
-                        this->getPropertyValueAsDouble(
-                                ComputeServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                        this->getMessagePayloadValueAsDouble(
+                                ComputeServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -665,8 +670,8 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
                           job, this, false, std::shared_ptr<FailureCause>(new JobTypeNotSupported(job, this)),
-                          this->getPropertyValueAsDouble(
-                                  VirtualizedClusterServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  VirtualizedClusterServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -693,8 +698,8 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
                           job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
-                          this->getPropertyValueAsDouble(
-                                  VirtualizedClusterServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                          this->getMessagePayloadValueAsDouble(
+                                  VirtualizedClusterServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
@@ -706,8 +711,8 @@ namespace wrench {
         S4U_Mailbox::dputMessage(
                 answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
                         job, this, true, nullptr,
-                        this->getPropertyValueAsDouble(
-                                VirtualizedClusterServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
+                        this->getMessagePayloadValueAsDouble(
+                                VirtualizedClusterServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
@@ -764,8 +769,8 @@ namespace wrench {
       // Send the reply
       ComputeServiceResourceInformationAnswerMessage *answer_message = new ComputeServiceResourceInformationAnswerMessage(
               dict,
-              this->getPropertyValueAsDouble(
-                      ComputeServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
+              this->getMessagePayloadValueAsDouble(
+                      ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD));
       try {
         S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
       } catch (std::shared_ptr<NetworkError> &cause) {

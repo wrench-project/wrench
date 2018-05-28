@@ -59,27 +59,37 @@ set(HEADER_FILES
         include/wrench/services/Service.h
         include/wrench/services/ServiceMessage.h
         include/wrench/services/ServiceProperty.h
+        include/wrench/services/ServiceMessagePayload.h
         include/wrench/services/compute/ComputeService.h
         include/wrench/services/compute/ComputeServiceProperty.h
+        include/wrench/services/compute/ComputeServiceMessagePayload.h
         include/wrench/services/compute/ComputeServiceMessage.h
         include/wrench/services/compute/standard_job_executor/Workunit.h
         include/wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h
+        include/wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.h
         include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeService.h
         include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.h
+        include/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceMessagePayload.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h
         include/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceProperty.h
+        include/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessagePayload.h
         include/wrench/services/compute/cloud/CloudService.h
         include/wrench/services/compute/cloud/CloudServiceProperty.h
+        include/wrench/services/compute/cloud/CloudServiceMessagePayload.h
         include/wrench/services/storage/StorageService.h
         include/wrench/services/storage/StorageServiceProperty.h
+        include/wrench/services/storage/StorageServiceMessagePayload.h
         include/wrench/services/storage/simple/SimpleStorageService.h
         include/wrench/services/storage/simple/SimpleStorageServiceProperty.h
+        include/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.h
         include/wrench/services/file_registry/FileRegistryService.h
         include/wrench/services/file_registry/FileRegistryServiceProperty.h
+        include/wrench/services/file_registry/FileRegistryServiceMessagePayload.h
         include/wrench/services/network_proximity/NetworkProximityService.h
         include/wrench/services/network_proximity/NetworkProximityServiceProperty.h
+        include/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h
         include/wrench/services/network_proximity/NetworkProximityDaemon.h
         include/wrench/simulation/Simulation.h
         include/wrench/simulation/SimulationTimestampTypes.h
@@ -92,6 +102,7 @@ set(HEADER_FILES
         include/wrench/services/compute/batch/BatchServiceMessage.h
         include/wrench/services/compute/batch/BatchService.h
         include/wrench/services/compute/batch/BatchServiceProperty.h
+        include/wrench/services/compute/batch/BatchServiceMessagePayload.h
         include/wrench/services/compute/batch/BatschedNetworkListener.h
         include/wrench/services/helpers/Alarm.h
         include/wrench/util/PointerUtil.h
@@ -138,11 +149,17 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/SimpleStorageService.cpp
         src/wrench/services/Service.cpp
         src/wrench/services/ServiceProperty.cpp
+        src/wrench/services/ServiceMessagePayload.cpp
         src/wrench/services/compute/ComputeServiceProperty.cpp
+        src/wrench/services/compute/ComputeServiceMessagePayload.cpp
         src/wrench/services/storage/StorageServiceProperty.cpp
+        src/wrench/services/storage/StorageServiceMessagePayload.cpp
         src/wrench/services/file_registry/FileRegistryServiceProperty.cpp
+        src/wrench/services/file_registry/FileRegistryServiceMessagePayload.cpp
         src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceProperty.cpp
+        src/wrench/services/compute/multihost_multicore/MultihostMulticoreComputeServiceMessagePayload.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
+        src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/compute/ComputeServiceMessage.cpp
@@ -152,10 +169,12 @@ set(SOURCE_FILES
         src/wrench/services/file_registry/FileRegistryMessage.h
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterService.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceProperty.cpp
+        src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessagePayload.cpp
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.h
         src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.cpp
         src/wrench/services/compute/cloud/CloudService.cpp
         src/wrench/services/compute/cloud/CloudServiceProperty.cpp
+        src/wrench/services/compute/cloud/CloudServiceMessagePayload.cpp
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp
@@ -164,8 +183,10 @@ set(SOURCE_FILES
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutor.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.cpp
+        src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.cpp
         src/wrench/services/network_proximity/NetworkProximityService.cpp
         src/wrench/services/network_proximity/NetworkProximityServiceProperty.cpp
+        src/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.cpp
         src/wrench/services/network_proximity/NetworkProximityMessage.h
         src/wrench/services/network_proximity/NetworkProximityDaemon.cpp
@@ -175,6 +196,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/WorkloadTraceFileReplayer.cpp
         src/wrench/services/compute/batch/OneJobWMS.cpp
         src/wrench/services/compute/batch/BatchServiceProperty.cpp
+        src/wrench/services/compute/batch/BatchServiceMessagePayload.cpp
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
         src/wrench/services/helpers/Alarm.cpp
         src/wrench/util/PointerUtil.cpp

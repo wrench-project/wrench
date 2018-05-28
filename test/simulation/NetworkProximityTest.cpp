@@ -402,7 +402,7 @@ public:
                        std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
-        this->test = test;
+      this->test = test;
     }
 
 private:
@@ -423,8 +423,8 @@ private:
       wrench::NetworkProximityService* alltoall_service;
       wrench::NetworkProximityService* vivaldi_service;
 
-        for (auto  &nps : network_proximity_services) {
-            std::string type = nps->getNetworkProximityServiceType();
+      for (auto  &nps : network_proximity_services) {
+        std::string type = nps->getNetworkProximityServiceType();
 
         if (boost::iequals(type, "alltoall")) {
           alltoall_service = nps;
@@ -450,7 +450,7 @@ private:
       if (fabs(vivaldi_proximity - alltoall_proximity) > epsilon) {
         throw std::runtime_error("Vivaldi algorithm did not converge");
       }
-      
+
       std::string target_host = "Host3";
       std::pair<double,double> coordinates = vivaldi_service->getCoordinate(target_host);
 
@@ -551,13 +551,13 @@ void NetworkProximityTest::do_VivaldiConverge_Test() {
 class ValidatePropertiesWMS : public wrench::WMS {
 public:
     ValidatePropertiesWMS(NetworkProximityTest *test,
-                       std::set<wrench::ComputeService *> compute_services,
-                       std::set<wrench::StorageService *> storage_services,
-                       std::set<wrench::NetworkProximityService *> network_proximity_services,
-                       std::string hostname) :
+                          std::set<wrench::ComputeService *> compute_services,
+                          std::set<wrench::StorageService *> storage_services,
+                          std::set<wrench::NetworkProximityService *> network_proximity_services,
+                          std::string hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services,
                         network_proximity_services, nullptr, hostname, "test") {
-        this->test = test;
+      this->test = test;
     }
 
 private:
@@ -565,126 +565,128 @@ private:
 
     int main() {
 
-        return 0;
+      return 0;
     }
 };
 
 TEST_F(NetworkProximityTest, NetworkProximityValidatePropertiesTest) {
-    DO_TEST_WITH_FORK(do_ValidateProperties_Test);
+  DO_TEST_WITH_FORK(do_ValidateProperties_Test);
 }
 
 void NetworkProximityTest::do_ValidateProperties_Test() {
-    // Create and initialize a simulation
-    wrench::Simulation *simulation = new wrench::Simulation();
-    int argc = 1;
-    char **argv = (char **) calloc(1, sizeof(char *));
-    argv[0] = strdup("validate_properties_test");
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("validate_properties_test");
 
-    simulation->init(&argc, argv);
+  simulation->init(&argc, argv);
 
-    // Setting up the platform
-    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
-    // Get a hostname
-    std::string hostname = simulation->getHostnameList()[0];
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
 
-    // Create a Compute Service
-    EXPECT_NO_THROW(compute_service = simulation->add(
-            new wrench::MultihostMulticoreComputeService(hostname,
-                                                         {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                         {})));
-    // Create a Storage Service
-    EXPECT_NO_THROW(storage_service1 = simulation->add(
-            new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+  // Create a Compute Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {})));
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
-    // Create a file registry service
-    simulation->add(new wrench::FileRegistryService(hostname));
+  // Create a file registry service
+  simulation->add(new wrench::FileRegistryService(hostname));
 
-    // Staging the input_file on the storage service
-    EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
-    // Get a host for network proximity host
-    std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
+  // Get a host for network proximity host
+  std::string network_proximity_db_hostname = simulation->getHostnameList()[1];
 
-    //Get two hosts to communicate with each other for proximity value
-    std::string host1 = simulation->getHostnameList()[0];
-    std::string host2 = simulation->getHostnameList()[1];
-    std::vector<std::string> hosts_in_network = {host1, host2};
+  //Get two hosts to communicate with each other for proximity value
+  std::string host1 = simulation->getHostnameList()[0];
+  std::string host2 = simulation->getHostnameList()[1];
+  std::vector<std::string> hosts_in_network = {host1, host2};
 
-    wrench::NetworkProximityService* nps;
-    EXPECT_NO_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                                {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}}));
+  wrench::NetworkProximityService* nps;
+  EXPECT_NO_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                            {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}}));
 
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-                                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.5"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                                          {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.5"}}), std::invalid_argument);
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.1"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
+                                                          {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.1"}}), std::invalid_argument);
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "-1.1"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
+                                                          {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "-1.1"}}), std::invalid_argument);
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-                                                            {wrench::NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
+                                                         {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, "-1.0"}}), std::invalid_argument);
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
+                                                         {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD, "-1.0"}}), std::invalid_argument);
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "-1.0"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
+                                                         {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "-1.0"}}), std::invalid_argument);
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-                                                            {wrench::NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "-1.0"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                                          {wrench::NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "-1.0"}}), std::invalid_argument);
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "-1.0"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                                          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "-1.0"}}), std::invalid_argument);
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "-1.0"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                                          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "-1.0"}}), std::invalid_argument);
 
-    EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "-1.0"}}), std::invalid_argument);
+  EXPECT_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                         {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                                          {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "-1.0"}}), std::invalid_argument);
 
-    EXPECT_NO_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-                                                           {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.01"},
-                                                            {wrench::NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD, "1"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD, "2"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "3.1"},
-                                                            {wrench::NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "4.0"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "20.1"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "0.01"},
-                                                            {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}}));
+  EXPECT_NO_THROW(nps = new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                            {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
+                                                             {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.01"},
+                                                             {wrench::NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "4.0"},
+                                                             {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "20.1"},
+                                                             {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "0.01"},
+                                                             {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}},
+                                                            {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, "1"},
+                                                             {wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD, "2"},
+                                                             {wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "3.1"}}
 
-    EXPECT_NO_THROW(simulation->add(nps));
-    // Create a WMS
-    wrench::WMS *wms = nullptr;
-    EXPECT_NO_THROW(wms = simulation->add(
-            new ValidatePropertiesWMS(
-                    this,
-                    (std::set<wrench::ComputeService *>){compute_service},
-                    (std::set<wrench::StorageService *>){storage_service1},
-                    (std::set<wrench::NetworkProximityService *>){nps},
-                    hostname)));
+  ));
 
-    EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  EXPECT_NO_THROW(simulation->add(nps));
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          new ValidatePropertiesWMS(
+                  this,
+                  (std::set<wrench::ComputeService *>){compute_service},
+                  (std::set<wrench::StorageService *>){storage_service1},
+                  (std::set<wrench::NetworkProximityService *>){nps},
+                  hostname)));
 
-    // Running a "run a single task" simulation
-    EXPECT_NO_THROW(simulation->launch());
+  EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
-    delete simulation;
+  // Running a "run a single task" simulation
+  EXPECT_NO_THROW(simulation->launch());
 
-    free(argv[0]);
-    free(argv);
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
 }

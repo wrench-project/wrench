@@ -30,19 +30,18 @@ namespace wrench {
     public:
 
         BatschedNetworkListener(std::string hostname, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,
-                             std::string data_to_send,std::map<std::string, std::string> plist = {});
+                             std::string data_to_send,std::map<std::string, std::string> property_list = {});
 
 
     private:
-        std::map<std::string, std::string> default_property_values =
-                {{BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,          "1024"},
-                 {BatchServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
-//                 {BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD,           "0"},
-//                 {BatchServiceProperty::BATCH_EXECUTE_JOB_PAYLOAD,           "0"}
+        std::map<std::string, std::string> default_property_values = {
+                };
+
+        std::map<std::string, std::string> default_messagepayload_values = {
                 };
 
         BatschedNetworkListener(std::string, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,
-                             std::string data_to_send, std::map<std::string, std::string> plist, std::string suffix);
+                             std::string data_to_send, std::map<std::string, std::string> property_list, std::string suffix);
 
 
         int main() override;

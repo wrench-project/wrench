@@ -28,10 +28,6 @@ namespace wrench {
 
         /** @brief The number of seconds to start a thread **/
         DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
-        /** @brief The number of bytes in the control message sent by the executor to state that it has completed a job **/
-        DECLARE_PROPERTY_NAME(STANDARD_JOB_DONE_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the executor to state that a job has failed **/
-        DECLARE_PROPERTY_NAME(STANDARD_JOB_FAILED_MESSAGE_PAYLOAD);
 
         /** @brief The number of bytes in the control message sent by the executor to provide the set of files stored in the scratch **/
         DECLARE_PROPERTY_NAME(STANDARD_JOB_FILES_STORED_IN_SCRATCH);
