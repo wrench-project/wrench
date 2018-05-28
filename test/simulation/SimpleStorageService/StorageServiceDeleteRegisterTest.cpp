@@ -127,7 +127,7 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
     // Create a (unused) Compute Service
     EXPECT_NO_THROW(compute_service = simulation->add(
-            new wrench::MultihostMulticoreComputeService("WMSHost", true, true,
+            new wrench::MultihostMulticoreComputeService("WMSHost",
                                                          {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES,
                                                                           wrench::ComputeService::ALL_RAM)}, {})));
 

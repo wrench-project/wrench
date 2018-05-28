@@ -141,7 +141,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
   // Create a Compute Service
   std::set<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname1, true, true, execution_hosts, {}, 100.0)));
+          new wrench::MultihostMulticoreComputeService(hostname1, execution_hosts, {}, 100.0)));
 
   // Create a WMS
   auto *workflow = new wrench::Workflow();
@@ -313,7 +313,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
   // Create a Compute Service
   std::set<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname1, true, true, execution_hosts, {}, 100.0)));
+          new wrench::MultihostMulticoreComputeService(hostname1, execution_hosts, {}, 100.0)));
 
   // Create a WMS
   auto *workflow = new wrench::Workflow();
