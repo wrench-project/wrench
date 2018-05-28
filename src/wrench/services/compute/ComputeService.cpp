@@ -120,23 +120,22 @@ namespace wrench {
      * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
-     * @param scratch_size: the size for the scratch storage space of the compute service (0 if none)
+     * @param scratch_space_size: the size for the scratch storage space of the compute service (0 if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
                                    const std::string mailbox_name_prefix,
-                                   double scratch_size) :
+                                   double scratch_space_size) :
             Service(hostname, service_name, mailbox_name_prefix)
             {
 
       this->state = ComputeService::UP;
               // Set default and specified properties
 
-WRENCH_INFO("THERE");
-      if (scratch_size > 0) {
+      if (scratch_space_size > 0) {
         try {
           this->scratch_space_storage_service =
-                  new SimpleStorageService(hostname, scratch_size);
+                  new SimpleStorageService(hostname, scratch_space_size);
         } catch (std::runtime_error &e) {
           throw;
         }

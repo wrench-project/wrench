@@ -178,8 +178,8 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::CloudService(hostname, execution_hosts,
-                                           {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}, 100.0)));
+                  new wrench::CloudService(hostname, execution_hosts, 100.0,
+                                           {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();
@@ -229,8 +229,8 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::CloudService(hostname, execution_hosts,
-                                           {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}, 100.0)));
+                  new wrench::CloudService(hostname, execution_hosts, 100.0,
+                                           {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();

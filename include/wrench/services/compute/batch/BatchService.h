@@ -84,8 +84,8 @@ namespace wrench {
     public:
         BatchService(std::string &hostname,
                      std::vector<std::string> compute_hosts,
-                     std::map<std::string, std::string> plist = {},
-                     double scratch_size = 0);
+                     double scratch_space_size,
+                     std::map<std::string, std::string> plist = {});
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -112,9 +112,10 @@ namespace wrench {
                      std::vector<std::string> compute_hosts,
                      unsigned long cores_per_host,
                      double ram_per_host,
+                     double scratch_space_size,
                      std::map<std::string, std::string> plist,
-                     std::string suffix,
-                     double scratch_size = 0);
+                     std::string suffix
+        );
 
 
         //submits a standard job

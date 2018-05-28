@@ -33,17 +33,18 @@ namespace wrench {
      *
      * @param hostname: the hostname on which to start the service
      * @param execution_hosts: the hosts available for running virtual machines
+     * @param scratch_space_size: the size for the scratch space of the cloud service
      * @param plist: a property list ({} means "use all defaults")
-     * @param scratch_size: the size for the scratch space of the cloud service
      *
      * @throw std::runtime_error
      */
     VirtualizedClusterService::VirtualizedClusterService(const std::string &hostname,
                                                          std::vector<std::string> &execution_hosts,
-                                                         std::map<std::string, std::string> plist,
-                                                         double scratch_size) :
+                                                         double scratch_space_size,
+                                                         std::map<std::string, std::string> plist
+    ) :
             ComputeService(hostname, "virtualized_cluster_service", "virtualized_cluster_service",
-                           scratch_size) {
+                           scratch_space_size) {
 
       if (execution_hosts.empty()) {
         throw std::runtime_error("At least one execution host should be provided");

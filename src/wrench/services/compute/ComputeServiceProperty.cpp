@@ -11,7 +11,6 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(ComputeServiceProperty, SCRATCH_STORAGE_SIZE);
     SET_PROPERTY_NAME(ComputeServiceProperty, SUPPORTS_STANDARD_JOBS);
     SET_PROPERTY_NAME(ComputeServiceProperty, SUPPORTS_PILOT_JOBS);
     SET_PROPERTY_NAME(ComputeServiceProperty, JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD);

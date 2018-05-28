@@ -140,32 +140,32 @@ void BatchServiceTest::do_BogusSetupTest_test() {
 
   // Create a Batch Service with a bogus scheduling algorithm
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}})),
                std::invalid_argument);
 
   // Create a Batch Service with a bogus host list
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {},
+          new wrench::BatchService(hostname, {}, 0,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
                std::invalid_argument);
 
   // Create a Batch Service with a non-homogeneous (speed) host list
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "HostFast"},
+          new wrench::BatchService(hostname, {"Host1", "HostFast"}, 0,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
                std::invalid_argument);
 
 
   // Create a Batch Service with a non-homogeneous (#cores) host list
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "HostManyCores"},
+          new wrench::BatchService(hostname, {"Host1", "HostManyCores"}, 0,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
                std::invalid_argument);
 
   // Create a Batch Service with a non-homogeneous (RAM) host list
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, {"Host1", "RAMHost"},
+          new wrench::BatchService(hostname, {"Host1", "RAMHost"}, 0,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})),
                std::invalid_argument);
 
@@ -1790,7 +1790,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
-                                   {"Host1", "Host2", "Host3", "Host4"},
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
   // Create a WMS
@@ -1960,7 +1960,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
-                                   {"Host1", "Host2", "Host3", "Host4"},
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
   // Create a WMS
@@ -2244,7 +2244,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
-                                   {"Host1", "Host2", "Host3", "Host4"},
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "ROUNDROBIN"}})));
 
   // Create a WMS
@@ -3087,7 +3087,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
   EXPECT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname,
                                    
-                                   {"Host1", "Host2", "Host3", "Host4"},  {
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,  {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "filler"},
                                            {wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"}
                                    })));
