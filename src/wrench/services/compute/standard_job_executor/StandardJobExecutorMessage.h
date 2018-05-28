@@ -111,7 +111,7 @@ namespace wrench {
 
 
     /**
-     * @brief ComputeThreadDoneMessage class
+     * @brief A message sent by a ComputeThread once it's done performing its computation
      */
     class ComputeThreadDoneMessage : public StandardJobExecutorMessage {
     public:
