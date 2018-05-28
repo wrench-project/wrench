@@ -298,7 +298,7 @@ private:
 };
 
 #ifdef ENABLE_BATSCHED
-TEST_F(BatchServiceTest, DISABLED_TerminateStandardJobsTest)
+TEST_F(BatchServiceTest, TerminateStandardJobsTest)
 #else
 TEST_F(BatchServiceTest, TerminateStandardJobsTest)
 #endif

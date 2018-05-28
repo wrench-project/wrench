@@ -573,7 +573,7 @@ namespace wrench {
       WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
 
 #ifdef ENABLE_BATSCHED
-      this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "");
+      this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
 #endif
 
       try {
@@ -1329,7 +1329,7 @@ namespace wrench {
 
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-      this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
+      this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
 #endif
 
       // Forward the notification
@@ -1366,7 +1366,7 @@ namespace wrench {
           this->freeJobFromJobsList(*it);
           //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-          this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "");
+          this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
 #endif
           return;
         }
@@ -1388,7 +1388,7 @@ namespace wrench {
           this->freeJobFromJobsList(*it2);
           //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-          this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "");
+          this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
 #endif
           return;
         }
@@ -1421,7 +1421,7 @@ namespace wrench {
           this->freeJobFromJobsList(to_erase);
           //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-          this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "");
+          this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
 #endif
           return;
         } else {
@@ -1492,7 +1492,7 @@ namespace wrench {
 
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-      this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "");
+      this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
 #endif
 
       // Send the callback to the originator
@@ -1561,7 +1561,7 @@ namespace wrench {
 
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-      this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "");
+      this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
 #endif
 
       this->sendStandardJobFailureNotification(job, std::to_string((batch_job->getJobID())));
@@ -1983,63 +1983,84 @@ namespace wrench {
     void BatchService::processStandardJobTerminationRequest(StandardJob *job,
                                                             std::string answer_mailbox) {
 
-
-      // TODO: Implement this for BATSCHED
-
-#ifdef ENABLE_BATSCHED
-      throw std::runtime_error("BatchService::processStandardJobTerminationRequest(): Not implemented for BATSCHED yet");
-#else
-
+      BatchJob* batch_job = nullptr;
+      std::string job_id = "";
       // Is it running?
+      bool is_running = false;
       for (auto const & j : this->running_jobs) {
         WorkflowJob *workflow_job = j->getWorkflowJob();
         if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
-          terminateRunningStandardJob(job);
-          this->running_jobs.erase(j);
-          this->freeJobFromJobsList(j);
-          // Send reply
-          ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
-                  new ComputeServiceTerminateStandardJobAnswerMessage(
-                  job, this, true, nullptr,
-                  this->getMessagePayloadValueAsDouble(
-                          BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
-          try {
-            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
+          batch_job = j;
+          job_id = std::to_string(j->getJobID());
+          is_running = true;
+        }
+      }
+
+      bool is_pending = false;
+      std::deque<BatchJob *>::iterator batch_pending_it = this->pending_jobs.end();
+      if (batch_job == nullptr) {
+        // Is it pending?
+        for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); it1++) {
+          WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
+          if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+            batch_pending_it = it1;
+            job_id = std::to_string((*it1)->getJobID());
+            is_pending = true;
           }
+        }
+      }
+
+      bool is_waiting = false;
+      if (batch_job == nullptr && batch_pending_it == this->pending_jobs.end()) {
+        // Is it waiting?
+        for (auto const & j : this->waiting_jobs) {
+          WorkflowJob *workflow_job = j->getWorkflowJob();
+          if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
+            batch_job = j;
+            job_id = std::to_string(j->getJobID());
+            is_waiting = true;
+          }
+        }
+      }
+
+      if (is_pending == false && is_running == false && is_waiting == false) {
+        // Send a failure reply
+        ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
+                new ComputeServiceTerminateStandardJobAnswerMessage(
+                        job, this, false, std::shared_ptr<FailureCause>(
+                                new JobCannotBeTerminated(
+                                        job)),
+                        this->getMessagePayloadValueAsDouble(
+                                BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
+        try {
+          S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
+        } catch (std::shared_ptr<NetworkError> &cause) {
           return;
         }
       }
 
-      // Is it pending?
-      for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); it1++) {
-        WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
-        if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
-          this->pending_jobs.erase(it1);
-          this->freeJobFromJobsList(*it1);
-          // Send reply
-          // Send reply
-          ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
-                  new ComputeServiceTerminateStandardJobAnswerMessage(
-                          job, this, true, nullptr,
-                          this->getMessagePayloadValueAsDouble(
-                                  BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
-          try {
-            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-          }
-          return;
-        }
-      }
 
-      // Send reply
+#ifdef ENABLE_BATSCHED
+//      throw std::runtime_error("BatchService::processStandardJobTerminationRequest(): Not implemented for BATSCHED yet");
+      notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
+#endif
+      // Is it running?
+      if (is_running) {
+        terminateRunningStandardJob(job);
+        this->running_jobs.erase(batch_job);
+        this->freeJobFromJobsList(batch_job);
+      }
+      if (is_pending) {
+        this->pending_jobs.erase(batch_pending_it);
+        this->freeJobFromJobsList(*batch_pending_it);
+      }
+      if (is_waiting) {
+        this->waiting_jobs.erase(batch_job);
+        this->freeJobFromJobsList(batch_job);
+      }
       ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
               new ComputeServiceTerminateStandardJobAnswerMessage(
-                      job, this, false, std::shared_ptr<FailureCause>(
-                              new JobCannotBeTerminated(
-                                      job)),
+                      job, this, true, nullptr,
                       this->getMessagePayloadValueAsDouble(
                               BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD));
       try {
@@ -2047,18 +2068,7 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }
-//      // Is it waiting?
-//      for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
-//        WorkflowJob *workflow_job = (*it2)->getWorkflowJob();
-//        if ((workflow_job->getType() == WorkflowJob::STANDARD) and ((StandardJob *)workflow_job == job)) {
-//          this->sendStandardJobFailureNotification(job, std::to_string((*it2)->getJobID()));
-//          this->waiting_jobs.erase(it2);
-//          this->freeJobFromJobsList(*it2);
-//          return;
-//        }
-//      }
 
-#endif
     }
 
 
@@ -2280,13 +2290,14 @@ namespace wrench {
 
     /**
    * @brief Notify a job even to BATSCHED (BATSCHED ONLY)
-   * @param job_id
-   * @param status
-   * @param job_state
-   * @param kill_reason
+   * @param job_id the id of the job to be processed
+   * @param status the status of the job
+   * @param job_state current state of the job
+   * @param kill_reason the reason to be killed ("" if not being killed)
+   * @param event_type the type of event (JOB_COMPLETED/JOB_KILLED..)
    */
     void BatchService::notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
-                                                 std::string kill_reason) {
+                                                 std::string kill_reason, std::string event_type) {
 
 //      if (not this->isBatschedReady()) {
 //        throw std::runtime_error("BatchService::notifyJobEventsToBatSched(): "
@@ -2296,7 +2307,7 @@ namespace wrench {
       nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
       batch_submission_data["events"][0]["timestamp"] = S4U_Simulation::getClock();
-      batch_submission_data["events"][0]["type"] = "JOB_COMPLETED";
+      batch_submission_data["events"][0]["type"] = event_type;
       batch_submission_data["events"][0]["data"]["job_id"] = job_id;
       batch_submission_data["events"][0]["data"]["status"] = status;
       batch_submission_data["events"][0]["data"]["job_state"] = job_state;
