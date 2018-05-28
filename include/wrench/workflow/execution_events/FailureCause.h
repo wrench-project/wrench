@@ -121,7 +121,7 @@ namespace wrench {
     };
 
     /**
-     * @brief A "file is not found" failure cause
+     * @brief A "file was not found" failure cause
      */
     class FileNotFound : public FailureCause {
 
