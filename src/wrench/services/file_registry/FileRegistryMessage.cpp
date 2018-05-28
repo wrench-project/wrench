@@ -23,7 +23,7 @@ namespace wrench {
     }
 
     /**
-     * @brief FileRegistryFileLookupRequestMessage class
+     * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param file: the file to look up
      * @param payload: the message size in bytes
@@ -40,7 +40,7 @@ namespace wrench {
     }
 
     /**
-     * @brief FileRegistryFileLookupAnswerMessage class
+     * @brief Constructor
      * @param file: the file that was looked up
      * @param locations: the set of storage services where the file is located
      * @param payload: the message size in bytes
@@ -57,7 +57,7 @@ namespace wrench {
     }
 
     /**
-     * @brief FileRegistryFileLookupByProximityRequestMessage class
+     * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param file: the file to look up
      * @param reference_host: the host from which network proximity will be calculated from //
@@ -78,7 +78,7 @@ namespace wrench {
     }
 
     /**
-     * @brief FileRegistryFileLookupByProximityRequestMessage class
+     * @brief Constructor
      * @param file: the file to look up
      * @param reference_host: the host from which network proximity will be calculated from // 
      * @param locations: the map of locations at which the file resides in ascending order with respect to their distance (network proximity) from 'reference_host'
@@ -98,10 +98,10 @@ namespace wrench {
         this->locations = locations;
     }
     /**
-     * @brief FileRegistryRemoveEntryRequestMessage class
+     * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param file: the file in the entry to remove
-     * @param storage_service: the storage service in the entry to remove
+     * @param file: the file for which an entry should be removed
+     * @param storage_service: the storage service of that entry
      * @param payload: the message size in bytes
      */
     FileRegistryRemoveEntryRequestMessage::FileRegistryRemoveEntryRequestMessage(std::string answer_mailbox,
@@ -119,7 +119,7 @@ namespace wrench {
 
 
     /**
-     * @brief FileRegistryRemoveEntryAnswerMessage class
+     * @brief Constructor
      * @param success: whether the entry removal was successful
      * @param payload: the message size in bytes
      */
@@ -130,10 +130,10 @@ namespace wrench {
     }
 
     /**
-     * @brief FileRegistryAddEntryRequestMessage class
+     * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param file: the file in the entry to add
-     * @param storage_service: the storage service in the entry to add
+     * @param file: the file for which an entry should be added
+     * @param storage_service: the storage service in that entry
      * @param payload: the message size in bytes
      */
     FileRegistryAddEntryRequestMessage::FileRegistryAddEntryRequestMessage(std::string answer_mailbox,
@@ -151,7 +151,7 @@ namespace wrench {
     }
 
     /**
-     * @brief FileRegistryAddEntryAnswerMessage class
+     * @brief Constructor
      * @param payload: the message size in bytes
      */
     FileRegistryAddEntryAnswerMessage::FileRegistryAddEntryAnswerMessage(double payload) :

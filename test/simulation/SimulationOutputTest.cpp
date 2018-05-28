@@ -156,6 +156,7 @@ void SimulationOutputTest::do_emptyTrace_test() {
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
   trace = simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>();
   ASSERT_EQ(0, trace.size());
+
   delete simulation;
   free(argv[0]);
   free(argv);
