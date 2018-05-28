@@ -192,16 +192,8 @@ namespace wrench {
         if (dst == ComputeService::SCRATCH) {
           if (this->scratch_space == nullptr) {
             throw WorkflowExecutionException(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as destination but is null"));
-          }
-          if (this->scratch_space->getFreeSpace() > 0) {
-            dst = this->scratch_space;
-            files_stored_in_scratch.insert(file);
           } else {
-            // TODO: Here we are returning a pointer to the scratch storage service, meaning
-            // TODO: that the "developer" level can do whatever it wants with that pointer, e.g.,
-            // TODO: Use the scratch storage service as any storage service... something we probably
-            // TODO: don't want in the long term...
-            throw WorkflowExecutionException(new StorageServiceNotEnoughSpace(file,dst));
+            dst = this->scratch_space;
           }
         }
 
@@ -219,6 +211,10 @@ namespace wrench {
           dst->copyFile(file, src);
         } catch (WorkflowExecutionException &e) {
           throw;
+        }
+
+        if (dst == this->scratch_space) {
+          files_stored_in_scratch.insert(file);
         }
       }
 

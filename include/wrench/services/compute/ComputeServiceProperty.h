@@ -20,6 +20,10 @@ namespace wrench {
      */
     class ComputeServiceProperty : public ServiceProperty {
     public:
+        /** @brief Whether the compute service supports standard jobs (true or false) **/
+        DECLARE_PROPERTY_NAME(SUPPORTS_STANDARD_JOBS);
+        /** @brief Whether the compute service supports pilot jobs (true or false) **/
+        DECLARE_PROPERTY_NAME(SUPPORTS_PILOT_JOBS);
         /** @brief The number of bytes in the control message sent by the daemon to state that it does not support the type of a submitted job **/
         DECLARE_PROPERTY_NAME(JOB_TYPE_NOT_SUPPORTED_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent to the daemon to submit a standard job **/

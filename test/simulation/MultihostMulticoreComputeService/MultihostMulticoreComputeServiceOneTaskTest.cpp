@@ -153,7 +153,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
 
   // Bad hostname
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService("bogus", true, true,
+          new wrench::MultihostMulticoreComputeService("bogus",
                                                        {std::make_tuple("bogus",
                                                                         wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM)},
@@ -164,7 +164,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
 
   // Bad resource hostname
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple("bogus",
                                                                         wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM)},
@@ -172,7 +172,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
 
   // Bad number of cores
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname,
                                                                         0,
                                                                         wrench::ComputeService::ALL_RAM)},
@@ -180,7 +180,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
 
   // Bad number of cores
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname,
                                                                         100,
                                                                         wrench::ComputeService::ALL_RAM)},
@@ -188,7 +188,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
 
   // Bad RAM
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple("RAMHost",
                                                                         wrench::ComputeService::ALL_CORES,
                                                                         -1.0)},
@@ -196,7 +196,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
 
   // Bad RAM
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple("RAMHost",
                                                                         wrench::ComputeService::ALL_CORES,
                                                                         100000.0)},
@@ -294,7 +294,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_Noop_test() {
   // Create a Compute Service
   ASSERT_THROW(simulation->launch(), std::runtime_error);
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -613,7 +613,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_StandardJobConstructor_test
 
   // Create a Compute Service
   compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname1, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname1,
                                                        {std::make_tuple(hostname1, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {}));
 
@@ -719,7 +719,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_HostMemory_test() {
 
   // Create a Compute Service
   compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname1, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname1,
                                                        {std::make_tuple(hostname1, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {}));
 
@@ -864,7 +864,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithLocationMap_te
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -992,7 +992,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDefaultStorage
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -1139,7 +1139,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithPrePostCopies_
 
   // Create a Compute Service with default Storage Service #2
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -1281,7 +1281,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithMissingFile_te
 
   // Create a Compute Service with no default Storage Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -1410,7 +1410,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithNotEnoughCores
 
   // Create a Compute Service with no default Storage Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService("OneCoreHost", true, true,
+          new wrench::MultihostMulticoreComputeService("OneCoreHost",
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -1538,7 +1538,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithNotEnoughRAM_t
 
   // Create a Compute Service with no default Storage Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService("RAMHost", true, true,
+          new wrench::MultihostMulticoreComputeService("RAMHost",
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -1652,7 +1652,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDownService_te
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 

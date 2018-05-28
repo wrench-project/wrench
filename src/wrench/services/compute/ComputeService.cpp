@@ -120,25 +120,22 @@ namespace wrench {
      * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
-     * @param supports_standard_jobs: true if the job executor should support standard jobs
-     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
-     * @param scratch_size: the size for the scratch storage space of the compute service (0 if none)
+     * @param scratch_space_size: the size for the scratch storage space of the compute service (0 if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
                                    const std::string mailbox_name_prefix,
-                                   bool supports_standard_jobs,
-                                   bool supports_pilot_jobs,
-                                   double scratch_size) :
-            Service(hostname, service_name, mailbox_name_prefix),
-            supports_pilot_jobs(supports_pilot_jobs),
-            supports_standard_jobs(supports_standard_jobs) {
+                                   double scratch_space_size) :
+            Service(hostname, service_name, mailbox_name_prefix)
+            {
 
       this->state = ComputeService::UP;
-      if (scratch_size > 0) {
+              // Set default and specified properties
+
+      if (scratch_space_size > 0) {
         try {
           this->scratch_space_storage_service =
-                  new SimpleStorageService(hostname, scratch_size);
+                  new SimpleStorageService(hostname, scratch_space_size);
         } catch (std::runtime_error &e) {
           throw;
         }
@@ -153,19 +150,13 @@ namespace wrench {
      * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
-     * @param supports_standard_jobs: true if the job executor should support standard jobs
-     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
      * @param scratch_space: scratch storage space of the compute service (nullptr if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
                                    const std::string mailbox_name_prefix,
-                                   bool supports_standard_jobs,
-                                   bool supports_pilot_jobs,
                                    StorageService *scratch_space) :
-            Service(hostname, service_name, mailbox_name_prefix),
-            supports_pilot_jobs(supports_pilot_jobs),
-            supports_standard_jobs(supports_standard_jobs) {
+            Service(hostname, service_name, mailbox_name_prefix) {
 
       this->state = ComputeService::UP;
       this->scratch_space_storage_service = scratch_space;
@@ -176,7 +167,7 @@ namespace wrench {
      * @return true or false
      */
     bool ComputeService::supportsStandardJobs() {
-      return this->supports_standard_jobs;
+      return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS);
     }
 
     /**
@@ -184,7 +175,7 @@ namespace wrench {
      * @return true or false
      */
     bool ComputeService::supportsPilotJobs() {
-      return this->supports_pilot_jobs;
+      return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_PILOT_JOBS);
     }
 
     /**

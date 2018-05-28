@@ -50,6 +50,8 @@ namespace wrench {
 
         double getPropertyValueAsDouble(std::string);
 
+        bool getPropertyValueAsBoolean(std::string);
+
         double getNetworkTimeoutValue();
 
         void setNetworkTimeoutValue(double value);

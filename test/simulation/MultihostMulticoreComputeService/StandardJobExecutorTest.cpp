@@ -475,7 +475,7 @@ void StandardJobExecutorTest::do_StandardJobExecutorConstructorTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -664,7 +664,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -843,7 +843,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskBogusPreFileCopyTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -1022,7 +1022,7 @@ void StandardJobExecutorTest::do_OneSingleCoreTaskMissingFileTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service = nullptr;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a Storage Service
@@ -1237,7 +1237,7 @@ void StandardJobExecutorTest::do_DependentTasksTest_test() {
   // Create a Compute Service
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
 
@@ -1513,7 +1513,7 @@ void StandardJobExecutorTest::do_OneMultiCoreTaskTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a Storage Service
@@ -1868,7 +1868,7 @@ void StandardJobExecutorTest::do_TwoMultiCoreTasksTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a Storage Services
@@ -2143,7 +2143,7 @@ void StandardJobExecutorTest::do_MultiHostTest_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a Storage Services
@@ -2297,7 +2297,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringAComputation_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host3", true, true,
+          new wrench::MultihostMulticoreComputeService("Host3",
                                                        {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a Storage Services
@@ -2448,7 +2448,7 @@ void StandardJobExecutorTest::do_JobTerminationTestDuringATransfer_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host3", true, true,
+          new wrench::MultihostMulticoreComputeService("Host3",
                                                        {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a Storage Services
@@ -2618,7 +2618,7 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   // Create a Compute Service (we don't use it)
   wrench::ComputeService *compute_service = nullptr;
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService("Host3", true, true,
+          new wrench::MultihostMulticoreComputeService("Host3",
                                                        {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a Storage Services

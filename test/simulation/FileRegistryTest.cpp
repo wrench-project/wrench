@@ -222,7 +222,7 @@ void FileRegistryTest::do_FileRegistry_Test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a Storage Service

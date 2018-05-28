@@ -45,11 +45,9 @@ namespace wrench {
 
     public:
         CloudService(const std::string &hostname,
-                     bool supports_standard_jobs,
-                     bool supports_pilot_jobs,
                      std::vector<std::string> &execution_hosts,
-                     std::map<std::string, std::string> plist = {},
-                     double scratch_size = 0);
+                     double scratch_space_size,
+                     std::map<std::string, std::string> plist = {});
 
     private:
         friend class Simulation;
