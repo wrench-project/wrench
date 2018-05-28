@@ -240,6 +240,7 @@ set(TEST_FILES
         test/simulation/MultipleWMSTest.cpp
         test/simulation/JobManagerTest.cpp
         test/simulation/SimpleSimulationTest.cpp
+        test/simulation/SimulationOutputTest.cpp
         test/simulation/ScratchSpaceTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
