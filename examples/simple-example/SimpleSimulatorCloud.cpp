@@ -83,9 +83,8 @@ int main(int argc, char **argv) {
   /* Instantiate a cloud service, to be started on some host in the simulation platform.
    * A cloud service is an abstraction of a compute service that corresponds to a
    * Cloud platform that provides access to virtualized compute resources.
-   * In this example, this particular cloud service supports both standard jobs and pilot jobs.
-   * Unless otherwise specified, tasks running on the service will read/write workflow files
-   * from the storage service instantiated above. Finally, the last argument to the constructor
+   * In this example, this particular cloud service has no scratch storage space (size = 0).
+   * The last argument to the constructor
    * shows how to configure particular simulated behaviors of the compute service via a property
    * list. In this example, one specified that the message that will be send to the service to
    * terminate it will by 1024 bytes. See the documentation to find out all available
@@ -93,7 +92,7 @@ int main(int argc, char **argv) {
    */
   std::string wms_host = hostname_list[0];
   wrench::CloudService *cloud_service = new wrench::CloudService(
-          wms_host, true, true, execution_hosts,
+          wms_host, execution_hosts, 0,
           {{wrench::CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "1024"}});
 
   /* Add the cloud service to the simulation, catching a possible exception */

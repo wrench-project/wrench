@@ -23,17 +23,17 @@ namespace wrench {
      *
      * @param hostname: the hostname on which to start the service
      * @param execution_hosts: the list of the names of the hosts available for running virtual machines
+     * @param scratch_space_size: the size for the scratch storage pace of the cloud service
      * @param plist: a property list ({} means "use all defaults")
-     * @param scratch_size: the size for the scratch storage pace of the cloud service
      *
      * @throw std::runtime_error
      */
     CloudService::CloudService(const std::string &hostname,
                                std::vector<std::string> &execution_hosts,
-                               std::map<std::string, std::string> plist,
-                               double scratch_size) :
+                               double scratch_space_size,
+                               std::map<std::string, std::string> plist) :
             VirtualizedClusterService(hostname, execution_hosts,
-                                      plist, scratch_size) {}
+                                      scratch_space_size, plist) {}
 
     /**
      * @brief Main method of the daemon

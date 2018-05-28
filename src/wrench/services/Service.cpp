@@ -208,7 +208,6 @@ namespace wrench {
                                 std::map<std::string, std::string> overridden_poperty_values) {
       // Set default properties
       for (auto const &p : default_property_values) {
-        WRENCH_INFO("SETTING %s to %s", p.first.c_str(), p.second.c_str());
         this->setProperty(p.first, p.second);
       }
 

@@ -89,15 +89,16 @@ namespace wrench {
      *                 - the hosts must be homogeneous (speed, number of cores, and RAM size)
      *                 - all cores are usable by the batch service on each host
      *                 - all RAM is usable by the batch service on each host
+     * @param scratch_space_size: the size for the scratch storage space for the service (0 means "no scratch space")
      * @param plist: a property list that specifies BatchServiceProperty values ({} means "use all defaults")
-     * @param scratch_size: the size for the scratch storage space for the service (0 means "no scratch space")
      */
     BatchService::BatchService(std::string &hostname,
                                std::vector<std::string> compute_hosts,
-                               std::map<std::string, std::string> plist,
-                               double scratch_size) :
+                               double scratch_space_size,
+                               std::map<std::string, std::string> plist
+                               ) :
             BatchService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
-                         ComputeService::ALL_RAM, std::move(plist), "", scratch_size) {}
+                         ComputeService::ALL_RAM, scratch_space_size, std::move(plist), "") {}
 
     /**
      * @brief Constructor
@@ -107,9 +108,9 @@ namespace wrench {
      *              - ComputeService::ALL_CORES to use all cores
      * @param ram_per_host: RAM per host
      *              - ComputeService::ALL_RAM to use all RAM
+     * @param scratch_space_size: the size for the scratch storage space for the service (0 means "no scratch space")
      * @param plist: a property list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
-     * @param scratch_size: the size for the scratch storage space for the service (0 means "no scratch space")
      *
      * @throw std::invalid_argument
      */
@@ -117,11 +118,12 @@ namespace wrench {
                                std::vector<std::string> compute_hosts,
                                unsigned long cores_per_host,
                                double ram_per_host,
-                               std::map<std::string, std::string> plist, std::string suffix, double scratch_size) :
+                               double scratch_space_size,
+                               std::map<std::string, std::string> plist, std::string suffix) :
             ComputeService(hostname,
                            "batch" + suffix,
                            "batch" + suffix,
-                           scratch_size) {
+                           scratch_space_size) {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(plist));

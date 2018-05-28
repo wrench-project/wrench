@@ -117,7 +117,7 @@ namespace wrench {
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
-                       double sratch_size = 0);
+                       double scratch_space_size);
 
 
 
@@ -126,7 +126,7 @@ namespace wrench {
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
-                       StorageService *scratch_space = nullptr);
+                       StorageService *scratch_space);
 
         /** @brief A scratch storage service associated to the compute service */
         StorageService *scratch_space_storage_service;

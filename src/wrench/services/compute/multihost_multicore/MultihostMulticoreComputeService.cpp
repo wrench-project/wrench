@@ -145,24 +145,22 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
      *        the compute resources available to this service.
      *          - num_cores = ComputeService::ALL_CORES: use all cores available on the host
      *          - memory = ComputeService::ALL_RAM: use all RAM available on the host
+     * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
      * @param plist: a property list ({} means "use all defaults")
-     * @param scratch_size: size (in bytes) of the compute service's scratch storage paste
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
             const std::string &hostname,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-            std::map<std::string, std::string> plist,
-            double scratch_size) :
+            double scratch_space_size,
+            std::map<std::string, std::string> plist) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
-                           scratch_size) {
+                           scratch_space_size) {
 
       initiateInstance(hostname,
                        std::move(compute_resources),
@@ -175,17 +173,17 @@ namespace wrench {
      * @param hostname: the name of the host on which the job executor should be started
      * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
+     * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
      * @param plist: a property list ({} means "use all defaults")
-     * @param scratch_size: size (in bytes) of the compute service's scratch storage paste
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
                                                                        const std::set<std::string> compute_hosts,
-                                                                       std::map<std::string, std::string> plist,
-                                                                       double scratch_size) :
+                                                                       double scratch_space_size,
+                                                                       std::map<std::string, std::string> plist) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
-                           scratch_size) {
+                           scratch_space_size) {
 
       std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
       for (auto h : compute_hosts) {
@@ -272,7 +270,6 @@ namespace wrench {
             PilotJob *pj) {
 
       // Set default and specified properties
-      WRENCH_INFO("IN INITIATE INSTANCE: SETTING PROPERTIES");
       this->setProperties(this->default_property_values, plist);
 
       // Check that there is at least one core per host and that hosts have enough cores

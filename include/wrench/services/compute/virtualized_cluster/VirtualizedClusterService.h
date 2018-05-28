@@ -56,8 +56,8 @@ namespace wrench {
     public:
         VirtualizedClusterService(const std::string &hostname,
                                   std::vector<std::string> &execution_hosts,
-                                  std::map<std::string, std::string> plist = {},
-                                  double scratch_size = 0);
+                                  double scratch_space_size,
+                                  std::map<std::string, std::string> plist = {});
 
         /***********************/
         /** \cond DEVELOPER    */

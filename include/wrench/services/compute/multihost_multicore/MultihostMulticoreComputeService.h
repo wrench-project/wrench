@@ -75,14 +75,14 @@ namespace wrench {
         // Public Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
                                          const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                         std::map<std::string, std::string> plist = {},
-                                         double scratch_size = 0);
+                                         double scratch_space_size,
+                                         std::map<std::string, std::string> plist = {});
 
         // Public Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
                                          const std::set<std::string> compute_hosts,
-                                         std::map<std::string, std::string> plist = {},
-                                         double scratch_size = 0);
+                                         double scratch_space_size,
+                                         std::map<std::string, std::string> plist = {});
 
 
         /***********************/
