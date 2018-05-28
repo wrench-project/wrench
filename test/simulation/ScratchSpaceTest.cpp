@@ -170,9 +170,9 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       {}, 10000000000000.0)));
+                                                       10000000000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -244,7 +244,7 @@ private:
                 {},
                 {});
 
-        // Create a StandardJob with NO pre-copies from public storage to scrach
+        // Create a StandardJob with NO pre-copies from public storage to scratch
         wrench::StandardJob *job2 = job_manager->createStandardJob(
                 {task2},
                 {},
@@ -252,7 +252,7 @@ private:
                 {},
                 {});
 
-        // Submit the job for execution to the compute service with NO scratch, thus expecting an exception
+        // Submit the job for execution to the compute service with NO scratch, thus expecting an error
         job_manager->submitJob(job1, this->test->compute_service);
 
         // Wait for a workflow execution event
@@ -339,7 +339,7 @@ private:
         }
 
         if (num_events != 2) {
-          throw std::runtime_error("Did not get enough expected execution events");
+          throw std::runtime_error("Did not get enough execution events");
         }
       }
 
@@ -380,21 +380,21 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
   // Create a Compute Service that does not have scratch space
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       {})));
+                                                       0)));
 
   // Create a Compute Service that has smaller scratch space than the files to be stored
   EXPECT_NO_THROW(compute_service1 = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       {}, 100.0)));
+                                                       100)));
 
   // Create a Compute Service that has enough scratch space to store the files
   EXPECT_NO_THROW(compute_service2 = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       {}, 10000.0)));
+                                                       10000)));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -617,9 +617,9 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
   // Create a Compute Service that does not have scratch space
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       {}, 3000.0)));
+                                                       3000, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 

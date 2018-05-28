@@ -40,6 +40,8 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values = {
+                {MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS,                         "true"},
+                {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS,                            "true"},
                 {MultihostMulticoreComputeServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                    "1024"},
                 {MultihostMulticoreComputeServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,                 "1024"},
                 {MultihostMulticoreComputeServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
@@ -72,19 +74,15 @@ namespace wrench {
 
         // Public Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
-                                         const bool supports_standard_jobs,
-                                         const bool supports_pilot_jobs,
                                          const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                                         std::map<std::string, std::string> plist = {},
-                                         double scratch_size = 0);
+                                         double scratch_space_size,
+                                         std::map<std::string, std::string> plist = {});
 
         // Public Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
-                                         bool supports_standard_jobs,
-                                         bool supports_pilot_jobs,
                                          const std::set<std::string> compute_hosts,
-                                         std::map<std::string, std::string> plist = {},
-                                         double scratch_size = 0);
+                                         double scratch_space_size,
+                                         std::map<std::string, std::string> plist = {});
 
 
         /***********************/
@@ -119,8 +117,6 @@ namespace wrench {
 
         // Low-level Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
-                                         bool supports_standard_jobs,
-                                         bool supports_pilot_jobs,
                                          std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                          std::map<std::string, std::string> plist,
                                          double ttl,
@@ -129,16 +125,12 @@ namespace wrench {
 
         // Private Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
-                                         const bool supports_standard_jobs,
-                                         const bool supports_pilot_jobs,
                                          const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                          std::map<std::string, std::string> plist,
                                          StorageService* scratch_space);
 
         // Low-level constructor helper method
         void initiateInstance(const std::string &hostname,
-                              bool supports_standard_jobs,
-                              bool supports_pilot_jobs,
                               std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                               std::map<std::string, std::string> plist,
                               double ttl,

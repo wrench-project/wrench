@@ -15,16 +15,9 @@
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(compute_thread, "Log category for ComputeThread");
 
-//#define S4U_KILL_JOIN_WORKS
 
 namespace wrench {
 
-    /**
-     * @brief Destructor
-     */
-    ComputeThread::~ComputeThread() {
-//      WRENCH_INFO("In COMPUTETHREAD DESTRUCTOR");
-    }
 
     /**
      * @brief Constructor
@@ -52,7 +45,6 @@ namespace wrench {
         WRENCH_INFO("Probably got killed while I was computing");
         return 0;
       }
-      #ifndef S4U_KILL_JOIN_WORKS
       try {
         S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
       } catch (std::shared_ptr<NetworkError> &e) {
@@ -60,30 +52,18 @@ namespace wrench {
       } catch (std::shared_ptr<FatalFailure> &e) {
         WRENCH_INFO("Couldn't report on my completion to my parent");
       }
-      #endif
 
       return 0;
     }
 
     /**
-     * kill()
+     * @brief Terminate (brutally) the compute thread
      */
     void ComputeThread::kill() {
       try {
         this->killActor();
       } catch (std::shared_ptr<FatalFailure> &e) {
         WRENCH_INFO("Failed to kill a compute thread.. .perhaps it's already dead... nevermind");
-      }
-    }
-
-    /**
-    * join()
-    */
-    void ComputeThread::join() {
-      try {
-        this->joinActor();
-      } catch (std::shared_ptr<FatalFailure> &e) {
-        throw;
       }
     }
 

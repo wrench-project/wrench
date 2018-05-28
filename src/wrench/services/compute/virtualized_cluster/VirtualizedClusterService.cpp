@@ -32,23 +32,19 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the hostname on which to start the service
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param execution_hosts: the hosts available for running virtual machines
+     * @param scratch_space_size: the size for the scratch space of the cloud service
      * @param plist: a property list ({} means "use all defaults")
-     * @param scratch_size: the size for the scratch space of the cloud service
      *
      * @throw std::runtime_error
      */
     VirtualizedClusterService::VirtualizedClusterService(const std::string &hostname,
-                                                         bool supports_standard_jobs,
-                                                         bool supports_pilot_jobs,
                                                          std::vector<std::string> &execution_hosts,
-                                                         std::map<std::string, std::string> plist,
-                                                         double scratch_size) :
+                                                         double scratch_space_size,
+                                                         std::map<std::string, std::string> plist
+    ) :
             ComputeService(hostname, "virtualized_cluster_service", "virtualized_cluster_service",
-                           supports_standard_jobs, supports_pilot_jobs,
-                           scratch_size) {
+                           scratch_space_size) {
 
       if (execution_hosts.empty()) {
         throw std::runtime_error("At least one execution host should be provided");
@@ -136,8 +132,10 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new VirtualizedClusterServiceCreateVMRequestMessage(
-                                        answer_mailbox, pm_hostname, vm_hostname, supports_standard_jobs,
-                                        supports_pilot_jobs, num_cores, ram_memory, plist,
+                                        answer_mailbox, pm_hostname, vm_hostname,
+                                        getPropertyValueAsBoolean(VirtualizedClusterServiceProperty::SUPPORTS_STANDARD_JOBS),
+                                        getPropertyValueAsBoolean(VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS),
+                                        num_cores, ram_memory, plist,
                                         this->getPropertyValueAsDouble(
                                                 VirtualizedClusterServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -484,15 +482,27 @@ namespace wrench {
           // create a VM on the provided physical machine
           auto vm = std::make_shared<S4U_VirtualMachine>(vm_hostname, pm_hostname, num_cores, ram_memory);
 
-          // create a multihost multicore computer service for the VM
+          // create a multihost multicore compute service for the VM
           std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
                   std::make_tuple(vm_hostname, num_cores, ram_memory)};
 
+          // Create the compute service property list
+          std::map<std::string, std::string> cs_plist = plist;
+          if (cs_plist.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != cs_plist.end()) {
+            cs_plist[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] = (supports_pilot_jobs ? "true" : "false");
+          } else {
+            // This shouldn't happen, but let's be paranoid
+            cs_plist.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_PILOT_JOBS, (supports_pilot_jobs ? "true" : "false")));
+          }
+          if (cs_plist.find(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS) != cs_plist.end()) {
+            cs_plist[ComputeServiceProperty::SUPPORTS_STANDARD_JOBS] = (supports_standard_jobs ? "true" : "false");
+          } else {
+            // This shouldn't happen, but let's be paranoid
+            cs_plist.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, (supports_standard_jobs ? "true" : "false")));
+          }          
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(vm_hostname,
-                                                       supports_standard_jobs,
-                                                       supports_pilot_jobs,
-                                                       compute_resources, plist,
+                                                       compute_resources, cs_plist,
                                                        getScratch()));
           cs->simulation = this->simulation;
 

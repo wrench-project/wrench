@@ -145,32 +145,24 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
      *        the compute resources available to this service.
      *          - num_cores = ComputeService::ALL_CORES: use all cores available on the host
      *          - memory = ComputeService::ALL_RAM: use all RAM available on the host
+     * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
      * @param plist: a property list ({} means "use all defaults")
-     * @param scratch_size: size (in bytes) of the compute service's scratch storage paste
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
             const std::string &hostname,
-            bool supports_standard_jobs,
-            bool supports_pilot_jobs,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-            std::map<std::string, std::string> plist,
-            double scratch_size) :
+            double scratch_space_size,
+            std::map<std::string, std::string> plist) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
-                           supports_standard_jobs,
-                           supports_pilot_jobs,
-                           scratch_size) {
+                           scratch_space_size) {
 
       initiateInstance(hostname,
-                       supports_standard_jobs,
-                       supports_pilot_jobs,
                        std::move(compute_resources),
                        plist, -1, nullptr);
     }
@@ -179,25 +171,19 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
+     * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
      * @param plist: a property list ({} means "use all defaults")
-     * @param scratch_size: size (in bytes) of the compute service's scratch storage paste
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
-                                                                       const bool supports_standard_jobs,
-                                                                       const bool supports_pilot_jobs,
                                                                        const std::set<std::string> compute_hosts,
-                                                                       std::map<std::string, std::string> plist,
-                                                                       double scratch_size) :
+                                                                       double scratch_space_size,
+                                                                       std::map<std::string, std::string> plist) :
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
-                           supports_standard_jobs,
-                           supports_pilot_jobs,
-                           scratch_size) {
+                           scratch_space_size) {
 
       std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
       for (auto h : compute_hosts) {
@@ -205,18 +191,14 @@ namespace wrench {
       }
 
       initiateInstance(hostname,
-                       supports_standard_jobs,
-                       supports_pilot_jobs,
                        compute_resources,
                        std::move(plist), -1, nullptr);
     }
 
-/**
+    /**
      * @brief Internal constructor
      *
      * @param hostname: the name of the host
-     * @param supports_standard_jobs: true if the job executor should support standard jobs
-     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
      * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
      *        the compute resources available to this service
      * @param plist: a property list
@@ -228,8 +210,6 @@ namespace wrench {
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
             const std::string &hostname,
-            bool supports_standard_jobs,
-            bool supports_pilot_jobs,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
             std::map<std::string, std::string> plist,
             double ttl,
@@ -237,13 +217,9 @@ namespace wrench {
             std::string suffix, StorageService* scratch_space) : ComputeService(hostname,
                                                                                 "multihost_multicore" + suffix,
                                                                                 "multihost_multicore" + suffix,
-                                                                                supports_standard_jobs,
-                                                                                supports_pilot_jobs,
                                                                                 scratch_space) {
 
       initiateInstance(hostname,
-                       supports_standard_jobs,
-                       supports_pilot_jobs,
                        std::move(compute_resources),
                        std::move(plist),
                        ttl,
@@ -254,29 +230,21 @@ namespace wrench {
      * @brief Internal constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_hosts:: a set of hostnames (the service
      *        will use all the cores and all the RAM of each host)
      * @param plist: a property list ({} means "use all defaults")
      * @param scratch_space: the scratch space for this compute service
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
-                                                                       const bool supports_standard_jobs,
-                                                                       const bool supports_pilot_jobs,
                                                                        const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                                                        std::map<std::string, std::string> plist,
                                                                        StorageService *scratch_space):
             ComputeService(hostname,
                            "multihost_multicore",
                            "multihost_multicore",
-                           supports_standard_jobs,
-                           supports_pilot_jobs,
                            scratch_space) {
 
       initiateInstance(hostname,
-                       supports_standard_jobs,
-                       supports_pilot_jobs,
                        compute_resources,
                        std::move(plist), -1, nullptr);
 
@@ -286,8 +254,6 @@ namespace wrench {
  * @brief Internal method called by all constructors to initiate instance
  *
  * @param hostname: the name of the host
- * @param supports_standard_jobs: true if the job executor should support standard jobs
- * @param supports_pilot_jobs: true if the job executor should support pilot jobs
  * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
  *        the compute resources available to this service
  * @param plist: a property list
@@ -298,8 +264,6 @@ namespace wrench {
  */
     void MultihostMulticoreComputeService::initiateInstance(
             const std::string &hostname,
-            bool supports_standard_jobs,
-            bool supports_pilot_jobs,
             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
             std::map<std::string, std::string> plist,
             double ttl,
@@ -307,10 +271,6 @@ namespace wrench {
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, plist);
-
-      this->supports_pilot_jobs = supports_pilot_jobs;
-      this->supports_standard_jobs = supports_standard_jobs;
-
 
       // Check that there is at least one core per host and that hosts have enough cores
       for (auto host : compute_resources) {
@@ -738,11 +698,25 @@ namespace wrench {
         compute_resources.insert(std::make_tuple(h, job->getNumCoresPerHost(), job->getMemoryPerHost()));
       }
 
+      // Create the properties for the new compute service
+      std::map<std::string, std::string> cs_properties = this->property_list;
+      if (cs_properties.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != cs_properties.end()) {
+        cs_properties[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] = "false";
+      } else {
+        // This shouldn't happen, but let's be paranoid
+        cs_properties.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"));
+      }
+      if (cs_properties.find(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS) != cs_properties.end()) {
+        cs_properties[ComputeServiceProperty::SUPPORTS_STANDARD_JOBS] = "true";
+      } else {
+        // This shouldn't happen, but let's be paranoid
+        cs_properties.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"));
+      }
+
       std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
               new MultihostMulticoreComputeService(this->hostname,
-                                                   true, false,
                                                    compute_resources,
-                                                   this->property_list,
+                                                   cs_properties,
                                                    job->getDuration(),
                                                    job,
                                                    "_pilot_job",

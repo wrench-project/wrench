@@ -201,7 +201,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
+          new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, {})));
 
   // Create a WMS
@@ -377,8 +377,8 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
-                                   {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, 
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there"}}
           )), std::invalid_argument);
 
@@ -393,8 +393,8 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
-                                   {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, 
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
@@ -406,8 +406,8 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
-                                   {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, 
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
@@ -420,8 +420,8 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
-                                   {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, 
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
@@ -434,8 +434,8 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
-                                   {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, 
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0, 
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
@@ -449,8 +449,8 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
-                                   {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, 
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )));
 
