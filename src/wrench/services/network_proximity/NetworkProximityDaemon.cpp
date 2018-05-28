@@ -69,6 +69,8 @@ namespace wrench {
 
       // Set properties
       this->setProperties(this->default_property_values,
+                          {});
+      this->setMessagePayloads(this->default_messagepayload_values,
                           {std::make_pair("NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD", std::to_string(message_size))});
 
     }
@@ -93,8 +95,8 @@ namespace wrench {
 
       S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                new NextContactDaemonRequestMessage(this,
-                                                                   this->getPropertyValueAsDouble(
-                                                                           NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+                                                                   this->getMessagePayloadValueAsDouble(
+                                                                           NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
 
 
       bool life = true;
@@ -113,8 +115,8 @@ namespace wrench {
                           this->next_mailbox_to_send.c_str());
               S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                       new NetworkProximityTransferMessage(
-                                              this->getPropertyValueAsDouble(
-                                                      NetworkProximityServiceProperty::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD)));
+                                              this->getMessagePayloadValueAsDouble(
+                                                      NetworkProximityServiceMessagePayload::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD)));
 
 
             } catch (std::shared_ptr<NetworkError> cause) {
@@ -132,8 +134,8 @@ namespace wrench {
 
             S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                      new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
-                                                                              this->getPropertyValueAsDouble(
-                                                                                      NetworkProximityServiceProperty::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD)));
+                                                                              this->getMessagePayloadValueAsDouble(
+                                                                                      NetworkProximityServiceMessagePayload::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD)));
             next_host_to_send = "";
             next_mailbox_to_send = "";
 
@@ -145,8 +147,8 @@ namespace wrench {
 
             S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                      new NextContactDaemonRequestMessage(this,
-                                                                         this->getPropertyValueAsDouble(
-                                                                                 NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+                                                                         this->getMessagePayloadValueAsDouble(
+                                                                                 NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
           }
 
         }
@@ -185,8 +187,8 @@ namespace wrench {
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                  new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                          NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                  new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                          NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }

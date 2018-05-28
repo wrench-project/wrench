@@ -49,8 +49,12 @@ namespace wrench {
         std::string getPropertyValueAsString(std::string);
 
         double getPropertyValueAsDouble(std::string);
-
+        
         bool getPropertyValueAsBoolean(std::string);
+
+        std::string getMessagePayloadValueAsString(std::string);
+
+        double getMessagePayloadValueAsDouble(std::string);
 
         double getNetworkTimeoutValue();
 
@@ -84,12 +88,23 @@ namespace wrench {
         void setProperty(std::string, std::string);
 
         void setProperties(std::map<std::string, std::string> default_property_values,
-                           std::map<std::string, std::string> overriden_poperty_values);
+                           std::map<std::string, std::string> overriden_property_values);
+
+        // MessagePayload stuff
+        void setMessagePayload(std::string, std::string);
+
+        void setMessagePayloads(std::map<std::string, std::string> default_messagepayload_values,
+                           std::map<std::string, std::string> overriden_messagepayload_values);
+
 
         void serviceSanityCheck();
 
         /** @brief The service's property list */
         std::map<std::string, std::string> property_list;
+
+        /** @brief The service's messagepayload list */
+        std::map<std::string, std::string> messagepayload_list;
+
 
         /** @brief The service's state */
         State state;

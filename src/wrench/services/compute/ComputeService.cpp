@@ -12,6 +12,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/ComputeServiceProperty.h"
+#include "wrench/services/compute/ComputeServiceMessagePayload.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
@@ -353,8 +354,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceInformationRequestMessage(
                 answer_mailbox,
-                this->getPropertyValueAsDouble(
-                        ComputeServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(
+                        ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }

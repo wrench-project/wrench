@@ -17,6 +17,7 @@
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h"
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h"
+#include "wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.h"
 #include "wrench/services/compute/standard_job_executor/Workunit.h"
 
 
@@ -52,9 +53,11 @@ namespace wrench {
                 std::string hostname,
                 StandardJob *job,
                 std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
-                StorageService* scratch_space = nullptr,
-                bool part_of_pilot_job = false,
-                std::map<std::string, std::string> plist = {});
+                StorageService* scratch_space,
+                bool part_of_pilot_job,
+                std::map<std::string, std::string> property_list,
+                std::map<std::string, std::string> messagepayload_list
+        );
 
         void kill();
 
@@ -102,12 +105,14 @@ namespace wrench {
 
         std::map<std::string, std::string> default_property_values = {
                 {StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD, "0"},
-                {StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
-                {StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
-                {StandardJobExecutorProperty::STANDARD_JOB_FILES_STORED_IN_SCRATCH, "1024"},
                 {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, "maximum"},
                 {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM, "maximum_flops"},
                 {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "best_fit"},
+        };
+
+        std::map<std::string, std::string> default_messagepayload_values = {
+                {StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD, "1024"},
+                {StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD, "1024"},
         };
 
         int main() override;

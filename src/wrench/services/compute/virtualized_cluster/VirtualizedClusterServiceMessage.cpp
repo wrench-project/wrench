@@ -63,7 +63,7 @@ namespace wrench {
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
      * @param ram_memory: the VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue)
-     * @param plist: a property list ({} means "use all defaults")
+     * @param property_list: a property list ({} means "use all defaults")
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -76,11 +76,11 @@ namespace wrench {
             bool supports_pilot_jobs,
             unsigned long num_cores,
             double ram_memory,
-            std::map<std::string, std::string> &plist,
+            std::map<std::string, std::string> &property_list,
             double payload) :
             VirtualizedClusterServiceMessage("CREATE_VM_REQUEST", payload),
             supports_standard_jobs(supports_standard_jobs),
-            supports_pilot_jobs(supports_pilot_jobs), num_cores(num_cores), ram_memory(ram_memory), plist(plist) {
+            supports_pilot_jobs(supports_pilot_jobs), num_cores(num_cores), ram_memory(ram_memory), property_list(property_list) {
 
       if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty()) {
         throw std::invalid_argument(

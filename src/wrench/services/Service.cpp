@@ -15,7 +15,7 @@
 #include "wrench/services/Service.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/services/ServiceProperty.h"
+#include "wrench/services/ServiceMessagePayload.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
 
@@ -48,6 +48,18 @@ namespace wrench {
     }
 
     /**
+    * @brief Set a message payload of the Service
+    * @param messagepayload: the message payload
+    * @param value: the message payload value
+    */
+    void Service::setMessagePayload(std::string messagepayload, std::string value) {
+      if (this->messagepayload_list.find(messagepayload) != this->messagepayload_list.end()) {
+        this->messagepayload_list[messagepayload] = value;
+      } else {
+        this->messagepayload_list.insert(std::make_pair(messagepayload, value));
+      }
+    }
+    /**
      * @brief Get a property of the Service as a string
      * @param property: the property
      * @return the property value as a string
@@ -56,13 +68,28 @@ namespace wrench {
      */
     std::string Service::getPropertyValueAsString(std::string property) {
       if (this->property_list.find(property) == this->property_list.end()) {
-        WRENCH_INFO("CANNOT FINF PROPERTY %s", property.c_str());
         throw std::invalid_argument("Service::getPropertyValueAsString(): Cannot find value for property " + property +
                                  " (perhaps a derived service class does not provide a default value?)");
       }
       return this->property_list[property];
     }
 
+    /**
+     * @brief Get a message_payload of the Service as a string
+     * @param message_payload: the message payload
+     * @return the message payload value as a string
+     *
+     * @throw std::invalid_argument
+     */
+    std::string Service::getMessagePayloadValueAsString(std::string message_payload) {
+      if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
+        throw std::invalid_argument("Service::getMessagePayloadValueAsString(): Cannot find value for message_payload " + message_payload +
+                                    " (perhaps a derived service class does not provide a default value?)");
+      }
+      return this->messagepayload_list[message_payload];
+    }
+
+    
     /**
      * @brief Get a property of the Service as a double
      * @param property: the property
@@ -85,6 +112,31 @@ namespace wrench {
       }
       return value;
     }
+
+    /**
+     * @brief Get a message payload of the Service as a double
+     * @param message_payload: the message payload
+     * @return the message payload value as a double
+     *
+     * @throw std::invalid_argument
+     */
+    double Service::getMessagePayloadValueAsDouble(std::string message_payload) {
+      double value;
+      std::string string_value;
+      try {
+        string_value = this->getMessagePayloadValueAsString(message_payload);
+      } catch (std::invalid_argument &e) {
+        throw;
+      }
+      if ((sscanf(string_value.c_str(), "%lf", &value) != 1) || (value < 0)) {
+        throw std::invalid_argument(
+                "Service::getMessagePayloadValueAsDouble(): Invalid double message payload value " + message_payload + " " +
+                this->getMessagePayloadValueAsString(message_payload));
+      }
+      return value;
+    }
+
+
 
     /**
      * @brief Get a property of the Service as a boolean
@@ -150,7 +202,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ServiceStopDaemonMessage(
                                         ack_mailbox,
-                                        this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
+                                        this->getMessagePayloadValueAsDouble(ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -214,6 +266,24 @@ namespace wrench {
       // Set specified properties (possible overwriting default ones)
       for (auto const &p : overridden_poperty_values) {
         this->setProperty(p.first, p.second);
+      }
+    }
+
+    /**
+     * @brief Set default and user defined messagepayloads
+     * @param default_messagepayload_values: list of default messagepayloads
+     * @param overridden_poperty_values: list of overridden messagepayloads (override the default)
+     */
+    void Service::setMessagePayloads(std::map<std::string, std::string> default_messagepayload_values,
+                                std::map<std::string, std::string> overridden_messagepayload_values) {
+      // Set default messagepayloads
+      for (auto const &p : default_messagepayload_values) {
+        this->setMessagePayload(p.first, p.second);
+      }
+
+      // Set specified messagepayloads (possible overwriting default ones)
+      for (auto const &p : overridden_messagepayload_values) {
+        this->setMessagePayload(p.first, p.second);
       }
     }
 

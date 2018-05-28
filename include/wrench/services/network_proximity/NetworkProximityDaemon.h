@@ -12,6 +12,7 @@
 
 #include "wrench/services/Service.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
+#include "wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h"
 
 namespace wrench {
 
@@ -33,14 +34,17 @@ namespace wrench {
         double noise);
 
     private:
-        std::map<std::string, std::string> default_property_values =
-                {{NetworkProximityServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,          "1024"},
-                 {NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD,    "1024"},
+        std::map<std::string, std::string> default_property_values = {
                  {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                      "0.0"},
+                };
+
+        std::map<std::string, std::string> default_messagepayload_values =
+                {{NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,          "1024"},
+                 {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
+                 {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD,    "1024"},
+                 {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,    "1024"},
+                 {NetworkProximityServiceMessagePayload::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD,    "1024"},
+                 {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD,    "1024"},
                 };
 
 
