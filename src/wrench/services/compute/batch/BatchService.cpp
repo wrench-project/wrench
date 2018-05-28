@@ -85,8 +85,6 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
-     * @param supports_standard_jobs: true if the batch service should support standard jobs
-     * @param supports_pilot_jobs: true if the batch service should support pilot jobs
      * @param compute_hosts: the list of names of the available compute hosts
      *                 - the hosts must be homogeneous (speed, number of cores, and RAM size)
      *                 - all cores are usable by the batch service on each host
@@ -95,20 +93,15 @@ namespace wrench {
      * @param scratch_size: the size for the scratch storage space for the service (0 means "no scratch space")
      */
     BatchService::BatchService(std::string &hostname,
-                               bool supports_standard_jobs,
-                               bool supports_pilot_jobs,
                                std::vector<std::string> compute_hosts,
                                std::map<std::string, std::string> plist,
                                double scratch_size) :
-            BatchService(hostname, supports_standard_jobs,
-                         supports_pilot_jobs, std::move(compute_hosts), ComputeService::ALL_CORES,
+            BatchService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
                          ComputeService::ALL_RAM, std::move(plist), "", scratch_size) {}
 
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param compute_hosts: the list of names of the available compute hosts
      * @param cores_per_host: number of cores used per host
      *              - ComputeService::ALL_CORES to use all cores
@@ -121,8 +114,6 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchService::BatchService(std::string hostname,
-                               bool supports_standard_jobs,
-                               bool supports_pilot_jobs,
                                std::vector<std::string> compute_hosts,
                                unsigned long cores_per_host,
                                double ram_per_host,
@@ -130,8 +121,6 @@ namespace wrench {
             ComputeService(hostname,
                            "batch" + suffix,
                            "batch" + suffix,
-                           supports_standard_jobs,
-                           supports_pilot_jobs,
                            scratch_size) {
 
       // Set default and specified properties
@@ -1019,7 +1008,7 @@ namespace wrench {
      * @brief
      */
     void BatchService::terminateRunningPilotJobs() {
-      if (this->supports_pilot_jobs) {
+      if (getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_PILOT_JOBS)) {
         WRENCH_INFO("Failing running pilot jobs");
         for (auto &job : this->running_jobs) {
           if ((job)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
@@ -1172,7 +1161,7 @@ namespace wrench {
       WRENCH_INFO("Asked to run a batch job with id %ld", job->getJobID());
 
       // Check whether the job type is supported
-      if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and (not this->supports_standard_jobs)) {
+      if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and (not getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_STANDARD_JOBS))) {
         try {
           S4U_Mailbox::dputMessage(answer_mailbox,
                                    new ComputeServiceSubmitStandardJobAnswerMessage(
@@ -1189,7 +1178,8 @@ namespace wrench {
           return;
         }
         return;
-      } else if ((job->getWorkflowJob()->getType() == WorkflowJob::PILOT) and (not this->supports_pilot_jobs)) {
+      } else if ((job->getWorkflowJob()->getType() == WorkflowJob::PILOT) and (not getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_PILOT_JOBS)
+                                                                                                                                                                                                                                       )) {
         try {
           S4U_Mailbox::dputMessage(answer_mailbox,
                                    new ComputeServiceSubmitPilotJobAnswerMessage(
@@ -1651,8 +1641,9 @@ namespace wrench {
           // Create and launch a compute service for the pilot job
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(host_to_run_on,
-                                                       true, false,
-                                                       resources, {}, getScratch()
+                                                       resources,
+                                                       {{MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                                                        {MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}, getScratch()
                   ));
           cs->simulation = this->simulation;
           job->setComputeService(cs);

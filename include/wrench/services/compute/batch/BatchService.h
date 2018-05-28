@@ -51,7 +51,9 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values =
-                {{BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
+                {{BatchServiceProperty::SUPPORTS_PILOT_JOBS,                         "true"},
+                 {BatchServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
+                 {BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
                  {BatchServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,"1024"},
                  {BatchServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, "1024"},
                  {BatchServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,              "1024"},
@@ -81,8 +83,6 @@ namespace wrench {
 
     public:
         BatchService(std::string &hostname,
-                     bool supports_standard_jobs,
-                     bool supports_pilot_jobs,
                      std::vector<std::string> compute_hosts,
                      std::map<std::string, std::string> plist = {},
                      double scratch_size = 0);
@@ -109,8 +109,6 @@ namespace wrench {
         friend class WorkloadTraceFileReplayer;
 
         BatchService(std::string hostname,
-                     bool supports_standard_jobs,
-                     bool supports_pilot_jobs,
                      std::vector<std::string> compute_hosts,
                      unsigned long cores_per_host,
                      double ram_per_host,

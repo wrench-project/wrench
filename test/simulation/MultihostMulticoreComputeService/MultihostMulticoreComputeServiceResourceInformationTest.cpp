@@ -201,14 +201,14 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
 
   // Create 1 Compute Service that manages Host1 and Host2
   EXPECT_NO_THROW(compute_service1 = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("Host1", true, true,
+                  new wrench::MultihostMulticoreComputeService("Host1",
                                                                {{std::make_tuple("Host1", 4, wrench::ComputeService::ALL_RAM)},
                                                                 {std::make_tuple("Host2", 4, wrench::ComputeService::ALL_RAM)}}
                   )));
 
   // Create 1 Compute Service that manages Host3 and Host4
   EXPECT_NO_THROW(compute_service2 = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("Host1", true, true,
+                  new wrench::MultihostMulticoreComputeService("Host1",
                                                                {{std::make_tuple("Host3", 8, wrench::ComputeService::ALL_RAM)},
                                                                 {std::make_tuple("Host4", 8, wrench::ComputeService::ALL_RAM)}}
                   )));

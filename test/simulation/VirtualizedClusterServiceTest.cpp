@@ -189,7 +189,7 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, true, false, execution_hosts, {}, 100.0)));
+          new wrench::CloudService(hostname, execution_hosts, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -309,7 +309,8 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
   // Create a Virtualized Cluster Service
   std::vector<std::string> execution_hosts = simulation->getHostnameList();
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::VirtualizedClusterService(hostname, true, false, execution_hosts, {}, 100.0)));
+          new wrench::VirtualizedClusterService(hostname, execution_hosts,
+                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -433,7 +434,8 @@ void VirtualizedClusterServiceTest::do_PilotJobTaskTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, false, true, execution_hosts, {})));
+          new wrench::CloudService(hostname, execution_hosts,
+                                   {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -551,7 +553,8 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, true, false, execution_hosts, {})));
+          new wrench::CloudService(hostname, execution_hosts,
+                                   {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

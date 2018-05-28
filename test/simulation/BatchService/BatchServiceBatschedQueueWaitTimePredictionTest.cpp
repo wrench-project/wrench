@@ -226,12 +226,12 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
   // Create a Batch Service
 //  #ifdef ENABLE_BATSCHED
   EXPECT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
+          new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}
                                    })), std::invalid_argument);
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
+          new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}
                                    })));
@@ -433,7 +433,7 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
+          new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
                                    })));
@@ -674,7 +674,7 @@ void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
+          new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                            {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"}
@@ -954,7 +954,7 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
 
   // Create a Batch Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true,
+          new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
                                            {wrench::BatchServiceProperty::BATCH_RJMS_DELAY, "0"}

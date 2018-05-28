@@ -56,6 +56,7 @@ namespace wrench {
      */
     std::string Service::getPropertyValueAsString(std::string property) {
       if (this->property_list.find(property) == this->property_list.end()) {
+        WRENCH_INFO("CANNOT FINF PROPERTY %s", property.c_str());
         throw std::invalid_argument("Service::getPropertyValueAsString(): Cannot find value for property " + property +
                                  " (perhaps a derived service class does not provide a default value?)");
       }
@@ -83,6 +84,32 @@ namespace wrench {
                 this->getPropertyValueAsString(property));
       }
       return value;
+    }
+
+    /**
+     * @brief Get a property of the Service as a boolean
+     * @param property: the property
+     * @return the property value as a boolean
+     *
+     * @throw std::invalid_argument
+     */
+    bool Service::getPropertyValueAsBoolean(std::string property) {
+      bool value;
+      std::string string_value;
+      try {
+        string_value = this->getPropertyValueAsString(property);
+      } catch (std::invalid_argument &e) {
+        throw;
+      }
+      if (string_value == "true") {
+        return true;
+      } else if (string_value == "false") {
+        return false;
+      } else {
+        throw std::invalid_argument(
+                "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + property + " " +
+                this->getPropertyValueAsString(property));
+      }
     }
 
     /**
@@ -181,6 +208,7 @@ namespace wrench {
                                 std::map<std::string, std::string> overridden_poperty_values) {
       // Set default properties
       for (auto const &p : default_property_values) {
+        WRENCH_INFO("SETTING %s to %s", p.first.c_str(), p.second.c_str());
         this->setProperty(p.first, p.second);
       }
 

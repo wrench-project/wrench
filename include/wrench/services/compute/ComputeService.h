@@ -117,8 +117,6 @@ namespace wrench {
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
-                       bool supports_standard_jobs,
-                       bool supports_pilot_jobs,
                        double sratch_size = 0);
 
 
@@ -128,14 +126,7 @@ namespace wrench {
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
-                       bool supports_standard_jobs,
-                       bool supports_pilot_jobs,
                        StorageService *scratch_space = nullptr);
-
-        /** @brief Whether the compute service supports pilot jobs */
-        bool supports_pilot_jobs;
-        /** @brief Whether the compute service supports standard jobs */
-        bool supports_standard_jobs;
 
         /** @brief A scratch storage service associated to the compute service */
         StorageService *scratch_space_storage_service;
