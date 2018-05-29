@@ -104,8 +104,8 @@ private:
       {
         // Create a sequential task that lasts one min and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0);
-        task->addInputFile(this->workflow->getFileById("input_file"));
-        task->addOutputFile(this->workflow->getFileById("output_file"));
+        task->addInputFile(this->workflow->getFileByID("input_file"));
+        task->addOutputFile(this->workflow->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -117,10 +117,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileById("input_file"), this->test->storage_service1,
+                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -297,8 +297,8 @@ private:
 
         // Create a sequential task that lasts one min and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0);
-        task->addInputFile(this->workflow->getFileById("input_file"));
-        task->addOutputFile(this->workflow->getFileById("output_file"));
+        task->addInputFile(this->workflow->getFileByID("input_file"));
+        task->addOutputFile(this->workflow->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -310,10 +310,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileById("input_file"), this->test->storage_service1,
+                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -499,8 +499,8 @@ private:
 
         // Create a sequential task that lasts 5 minutes and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0);
-        task->addInputFile(this->workflow->getFileById("input_file"));
-        task->addOutputFile(this->workflow->getFileById("output_file"));
+        task->addInputFile(this->workflow->getFileByID("input_file"));
+        task->addOutputFile(this->workflow->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -512,10 +512,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileById("input_file"), this->test->storage_service1,
+                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -570,8 +570,8 @@ private:
 
         // Create a sequential task that lasts one min and requires 2 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
-        task->addInputFile(this->workflow->getFileById("input_file"));
-        task->addOutputFile(this->workflow->getFileById("output_file"));
+        task->addInputFile(this->workflow->getFileByID("input_file"));
+        task->addOutputFile(this->workflow->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -583,10 +583,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileById("input_file"), this->test->storage_service1,
+                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -737,8 +737,8 @@ private:
 
         // Submit the first job for 300 seconds and using 4 full cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0);
-        task->addInputFile(this->workflow->getFileById("input_file"));
-        task->addOutputFile(this->workflow->getFileById("output_file"));
+        task->addInputFile(this->workflow->getFileByID("input_file"));
+        task->addOutputFile(this->workflow->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -750,10 +750,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileById("input_file"), this->test->storage_service1,
+                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
 
@@ -772,8 +772,8 @@ private:
 
         // Submit the second job for next 300 seconds and using 2 cores
         wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 299, 1, 1, 1.0);
-        task1->addInputFile(this->workflow->getFileById("input_file"));
-        task1->addOutputFile(this->workflow->getFileById("output_file"));
+        task1->addInputFile(this->workflow->getFileByID("input_file"));
+        task1->addOutputFile(this->workflow->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -785,10 +785,10 @@ private:
                         {*(task1->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileById("input_file"), this->test->storage_service1,
+                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args1;
@@ -806,8 +806,8 @@ private:
 
         // Submit the third job for next 300 seconds and using 4 cores
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 299, 1, 1, 1.0);
-        task2->addInputFile(this->workflow->getFileById("input_file"));
-        task2->addOutputFile(this->workflow->getFileById("output_file"));
+        task2->addInputFile(this->workflow->getFileByID("input_file"));
+        task2->addOutputFile(this->workflow->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -819,10 +819,10 @@ private:
                         {*(task2->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileById("input_file"), this->test->storage_service1,
+                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args2;

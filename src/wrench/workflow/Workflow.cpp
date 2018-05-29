@@ -111,9 +111,9 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    WorkflowTask *Workflow::getWorkflowTaskByID(const std::string id) {
+    WorkflowTask *Workflow::getTaskByID(const std::string id) {
       if (tasks.find(id) == tasks.end()) {
-        throw std::invalid_argument("Workflow::getWorkflowTaskByID(): Unknown WorkflowTask ID " + id);
+        throw std::invalid_argument("Workflow::getTaskByID(): Unknown WorkflowTask ID " + id);
       }
       return tasks[id].get();
     }
@@ -187,9 +187,9 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    WorkflowFile *Workflow::getWorkflowFileByID(const std::string id) {
+    WorkflowFile *Workflow::getFileByID(const std::string id) {
       if (files.find(id) == files.end()) {
-        throw std::invalid_argument("Workflow::getWorkflowFileByID(): Unknown WorkflowFile ID " + id);
+        throw std::invalid_argument("Workflow::getFileByID(): Unknown WorkflowFile ID " + id);
       } else {
         return files[id].get();
       }
@@ -485,20 +485,7 @@ namespace wrench {
       }
       return input_files;
     }
-
-    /**
-     * @brief Retrieve a file by its id
-     * @param id: the file id
-     * @return the file, or nullptr if not found
-     */
-    WorkflowFile *Workflow::getFileById(const std::string id) {
-      if (this->files.find(id) != this->files.end()) {
-        return this->files[id].get();
-      } else {
-        return nullptr;
-      }
-    }
-
+    
     /**
      * @brief Get the total number of flops for a list of tasks
      *
@@ -584,7 +571,7 @@ namespace wrench {
           WorkflowFile *file = nullptr;
 
           try {
-            file = this->getWorkflowFileByID(id);
+            file = this->getFileByID(id);
           } catch (std::invalid_argument &e) {
             file = this->addFile(id, size);
           }
@@ -601,13 +588,13 @@ namespace wrench {
       // Iterate through the "child" nodes to handle control dependencies
       for (pugi::xml_node child = dag.child("child"); child; child = child.next_sibling("child")) {
 
-        WorkflowTask *child_task = this->getWorkflowTaskByID(child.attribute("ref").value());
+        WorkflowTask *child_task = this->getTaskByID(child.attribute("ref").value());
 
         // Go through the children "parent" nodes
         for (pugi::xml_node parent = child.child("parent"); parent; parent = parent.next_sibling("parent")) {
           std::string parent_id = parent.attribute("ref").value();
 
-          WorkflowTask *parent_task = this->getWorkflowTaskByID(parent_id);
+          WorkflowTask *parent_task = this->getTaskByID(parent_id);
           this->addControlDependency(parent_task, child_task);
         }
       }
@@ -683,7 +670,7 @@ namespace wrench {
               std::string id = f.at("name");
               wrench::WorkflowFile *workflow_file = nullptr;
               try {
-                workflow_file = this->getWorkflowFileByID(id);
+                workflow_file = this->getFileByID(id);
               } catch (const std::invalid_argument &ia) {
                 // making a new file
                 workflow_file = this->addFile(id, size);
@@ -701,12 +688,12 @@ namespace wrench {
 
           // since tasks may not be ordered in the JSON file, we need to iterate over all tasks again
           for (auto &job : jobs) {
-            task = this->getWorkflowTaskByID(job.at("name"));
+            task = this->getTaskByID(job.at("name"));
             std::vector<nlohmann::json> parents = job.at("parents");
             // task dependencies
             for (auto &parent : parents) {
               try {
-                WorkflowTask *parent_task = this->getWorkflowTaskByID(parent);
+                WorkflowTask *parent_task = this->getTaskByID(parent);
                 this->addControlDependency(parent_task, task);
               } catch (std::invalid_argument &e) {
                 // do nothing
