@@ -42,7 +42,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the compute service on which the pilot job is running
+     * @brief Get the compute service provided by the (running) pilot job
      * @return a compute service
      */
     ComputeService *PilotJob::getComputeService() {
@@ -51,7 +51,6 @@ namespace wrench {
 
     /**
      * @brief Set the compute service on which the pilot job is running
-     *        (this class will take case of memory deallocation)
      * @param cs: a compute service
      */
     void PilotJob::setComputeService(std::shared_ptr<ComputeService> cs) {

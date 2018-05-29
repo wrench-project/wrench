@@ -19,12 +19,9 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_data_connection, "Log catego
 
 namespace wrench {
 
-//    constexpr unsigned char NetworkConnection::INCOMING_DATA;
-//    constexpr unsigned char NetworkConnection::OUTGOING_DATA;
-//    constexpr unsigned char NetworkConnection::INCOMING_CONTROL;
 
     /**
-     * @brief: Constructor
+     * @brief Constructor
      * @param type: the type of connection
      *              - NetworkConnection::INCOMING_DATA
      *              - NetworkConnection::OUTGOING_DATA
@@ -103,8 +100,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Determine whether the connection has failed
-     * @return true if failed
+     * @brief Returns true if the connection has failed, false otherwise
+     * @return true or false
      */
     bool NetworkConnection::hasFailed() {
       try {
@@ -124,7 +121,7 @@ namespace wrench {
 
     /**
      * @brief Retrieve the message for a communication
-     * @return  the message, or nullptr if the connection has failed
+     * @return the message, or nullptr if the connection has failed
      */
     std::unique_ptr<SimulationMessage> NetworkConnection::getMessage() {
 
