@@ -1904,8 +1904,8 @@ private:
         }
 
 
-        for (int i = 0;i<num_hosts_in_platform;i++) {
-          for (int j = i*repetition;j<(((i+1)*repetition)-1);j++) {
+        for (unsigned long i = 0;i<num_hosts_in_platform;i++) {
+          for (unsigned long j = i*repetition;j<(((i+1)*repetition)-1);j++) {
             if (tasks[j]->getExecutionHost() != tasks[j+1]->getExecutionHost()) {
               throw std::runtime_error(
                       "BatchServiceTest::FirstFitStandardJobSubmissionTest():: The tasks did not execute on the right hosts"
