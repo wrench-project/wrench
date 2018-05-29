@@ -64,8 +64,8 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
-        void setComputeService(std::shared_ptr<ComputeService> cs);
 
+        void setComputeService(std::shared_ptr<ComputeService> cs);
 
         /***********************/
         /** \endcond           */

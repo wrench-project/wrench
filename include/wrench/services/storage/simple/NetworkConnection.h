@@ -25,8 +25,8 @@ namespace wrench {
 
     /**
      * @brief A helper class that implements a network connection abstraction to
-     *        be used by a service, e.g., that needs to limit its number of concurrent
-     *        connections
+     *        be used by a service, e.g., when the service needs to limit its number of concurrent
+     *        connections.
      */
     class NetworkConnection {
 
