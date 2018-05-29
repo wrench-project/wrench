@@ -26,7 +26,8 @@ namespace wrench {
 
     /**
      * @brief A file registry service (a.k.a. replica catalog) that holds a database
-     *        of which files are available at which storage services. A WMS can add,
+     *        of which files are available at which storage services. More specifically,
+     *        the database holds a set of <file, storage service> entries. A WMS can add,
      *        lookup, and remove entries at will from this database.
      */
     class FileRegistryService : public Service {
@@ -37,7 +38,7 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values = {
-                 {FileRegistryServiceProperty::LOOKUP_OVERHEAD,                      "0.0"},
+                 {FileRegistryServiceProperty::LOOKUP_COMPUTE_COST,                      "0.0"},
                 };
 
         std::map<std::string, std::string> default_messagepayload_values = {

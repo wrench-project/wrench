@@ -35,6 +35,7 @@ namespace wrench {
      * @param execution_hosts: the hosts available for running virtual machines
      * @param scratch_space_size: the size for the scratch space of the cloud service
      * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
      * @throw std::runtime_error
      */

@@ -272,7 +272,7 @@ namespace wrench {
     /**
      * @brief Set default and user defined messagepayloads
      * @param default_messagepayload_values: list of default messagepayloads
-     * @param overridden_poperty_values: list of overridden messagepayloads (override the default)
+     * @param overridden_messagepayload_values: list of overridden messagepayloads (override the default)
      */
     void Service::setMessagePayloads(std::map<std::string, std::string> default_messagepayload_values,
                                 std::map<std::string, std::string> overridden_messagepayload_values) {

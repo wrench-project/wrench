@@ -65,9 +65,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Lookup an entry for a file
+     * @brief Lookup entries for a file
      * @param file: the file to lookup
-     * @return The storage services that hold a copy of the file
+     * @return The list of storage services that hold a copy of the file
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -115,10 +115,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve a list of storage services that hold a file, sorted by increasing network distance from a reference host, according to a network proximity service
-     * @param file: the file of interest
-     * @param reference_host: reference host from which network proximity values will be measured
-     * @param network_proximity_service: the network proximity service
+     * @brief Lookup entries for a file, including for each entry a network distance from a reference host (as determined by a network proximity service)
+     * @param file: the file to lookup
+     * @param reference_host: reference host from which network proximity values are to be measured
+     * @param network_proximity_service: the network proximity service to use
      *
      * @return a map of <distance , storage service> pairs
      */
@@ -326,7 +326,7 @@ namespace wrench {
           locations = this->entries[msg->file];
         }
         // Simulate a lookup overhead
-        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_OVERHEAD));
+        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new FileRegistryFileLookupAnswerMessage(msg->file, locations,
@@ -355,7 +355,7 @@ namespace wrench {
           locations_itr = locations.insert(locations_itr, std::make_pair(proximity, storage_service));
         }
 
-        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_OVERHEAD));
+        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox, new FileRegistryFileLookupByProximityAnswerMessage(msg->file,
                                                                                                            msg->reference_host, locations, 

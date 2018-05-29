@@ -346,6 +346,7 @@ namespace wrench {
      * @param files: the set of files to read
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
+     * @param files_in_scratch: the set of files that have been writted to the default storage service (which must be a compute service's scratch storage)
      * @return nullptr on success, or a workflow execution failure cause on failure
      *
      * @throw std::runtime_error
@@ -370,6 +371,7 @@ namespace wrench {
      * @param files: the set of files to write
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
+     * @param files_in_scratch: the set of files that have been writted to the default storage service (which must be a compute service's scratch storage)
      * @return nullptr on success, or a workflow execution failure cause on failure
      *
      * @throw std::runtime_error
@@ -395,6 +397,7 @@ namespace wrench {
      * @param files: the set of files to read/write
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
+     * @param files_in_scratch: the set of files that have been writted to the default storage service (which must be a compute service's scratch storage)
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -654,7 +657,7 @@ namespace wrench {
     /**
      * @brief Asynchrously read a file from the storage service
      *
-     * @param answer_mailbox: the mailbox to which the file should be sent
+     * @param mailbox_that_should_receive_file_content: the mailbox to which the file should be sent
      * @param file: the file
      *
      * @throw WorkflowExecutionException
