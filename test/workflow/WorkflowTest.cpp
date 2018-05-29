@@ -17,10 +17,10 @@ protected:
       workflow = new wrench::Workflow();
 
       // create simple diamond workflow
-      t1 = workflow->addTask("task-test-01", 1);
-      t2 = workflow->addTask("task-test-02", 1);
-      t3 = workflow->addTask("task-test-03", 1);
-      t4 = workflow->addTask("task-test-04", 1);
+      t1 = workflow->addTask("task-test-01", 1, 1, 1, 1.0, 0);
+      t2 = workflow->addTask("task-test-02", 1, 1, 1, 1.0, 0);
+      t3 = workflow->addTask("task-test-03", 1, 1, 1, 1.0, 0);
+      t4 = workflow->addTask("task-test-04", 1, 1, 1, 1.0, 0);
 
       t2->setClusterId("cluster-01");
       t3->setClusterId("cluster-01");
@@ -101,18 +101,18 @@ TEST_F(WorkflowTest, ControlDependency) {
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {
   // testing invalid task creation
-  EXPECT_THROW(workflow->addTask("task-error", -100), std::invalid_argument);
-  EXPECT_THROW(workflow->addTask("task-error", 100, -4), std::invalid_argument);
+  EXPECT_THROW(workflow->addTask("task-error", -100, 1, 1, 1.0, 0), std::invalid_argument);
+  EXPECT_THROW(workflow->addTask("task-error", 100, 2, 1, 1.0, 0), std::invalid_argument);
+  EXPECT_THROW(workflow->addTask("task-error", 100, 1, 1, -2.0, 0), std::invalid_argument);
+  EXPECT_THROW(workflow->addTask("task-error", 100, 1, 1, 2.0, 0), std::invalid_argument);
+  EXPECT_THROW(workflow->addTask("task-error", 100, 1, 1, 1.0, -1.0), std::invalid_argument);
 
   // testing whether a task id exists
   EXPECT_THROW(workflow->getTaskByID("task-test-00"), std::invalid_argument);
   EXPECT_TRUE(workflow->getTaskByID("task-test-01")->getId() == t1->getId());
 
   // testing whether a task already exists (check via task id)
-  EXPECT_THROW(workflow->addTask("task-test-01", 1), std::invalid_argument);
-  EXPECT_THROW(workflow->addTask("task-test-01", 1, 1), std::invalid_argument);
-  EXPECT_THROW(workflow->addTask("task-test-01", 1, 10), std::invalid_argument);
-  EXPECT_THROW(workflow->addTask("task-test-01", 10000, 1), std::invalid_argument);
+  EXPECT_THROW(workflow->addTask("task-test-01", 1, 1, 1, 1.0, 0), std::invalid_argument);
 
   // remove tasks
   EXPECT_THROW(workflow->removeTask(nullptr), std::invalid_argument);

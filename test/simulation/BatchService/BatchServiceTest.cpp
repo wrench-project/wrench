@@ -208,7 +208,7 @@ private:
       // Submit job1 that should start right away
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0);
+        task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0, 0);
         task1->addInputFile(this->workflow->getFileByID("input_file"));
 
 
@@ -243,7 +243,7 @@ private:
       // Submit job2 that will be stuck in the queue
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        task2 = this->workflow->addTask("task2", 60, 1, 1, 1.0);
+        task2 = this->workflow->addTask("task2", 60, 1, 1, 1.0, 0);
         task2->addInputFile(this->workflow->getFileByID("input_file"));
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -392,7 +392,7 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0, 0);
         task->addInputFile(this->workflow->getFileByID("input_file"));
         task->addOutputFile(this->workflow->getFileByID("output_file"));
 
@@ -881,7 +881,7 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 50, 2, 2, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 50, 2, 2, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -1075,7 +1075,7 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 50, 2, 12, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 50, 2, 12, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -1211,7 +1211,7 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 50, 2, 2, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 50, 2, 2, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -1339,7 +1339,7 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 65, 1, 1, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 65, 1, 1, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -1625,17 +1625,17 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 8 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 50, 8, 8, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 50, 8, 8, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
         //Create another sequential task that lasts one min and requires 9 cores
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 50, 9, 9, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 50, 9, 9, 1.0, 0);
         task1->addInputFile(workflow->getFileByID("input_file_1"));
         task1->addOutputFile(workflow->getFileByID("output_file_1"));
 
         //Create another sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 50, 1, 1, 1.0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 50, 1, 1, 1.0, 0);
         task2->addInputFile(workflow->getFileByID("input_file_2"));
         task2->addOutputFile(workflow->getFileByID("output_file_2"));
 
@@ -1865,7 +1865,7 @@ private:
         std::vector<wrench::WorkflowTask*> tasks = {};
         std::vector<wrench::StandardJob*> jobs = {};
         for (int i = 0;i<num_tasks;i++) {
-          tasks.push_back(this->workflow->addTask("task"+std::to_string(i),59,num_cores_in_each_task,num_cores_in_each_task,1.0));
+          tasks.push_back(this->workflow->addTask("task"+std::to_string(i),59,num_cores_in_each_task,num_cores_in_each_task,1.0, 0));
           jobs.push_back(job_manager->createStandardJob(
                   {tasks[i]}, {}, {}, {}, {}));
           std::map<std::string, std::string> args;
@@ -2024,16 +2024,16 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 2, 2, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 2, 2, 1.0, 0);
 
         //Create another sequential task that lasts one min and requires 9 cores
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 360, 9, 9, 1.0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 360, 9, 9, 1.0, 0);
 
         //Create another sequential task that lasts one min and requires 1 core
-        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 59, 1, 1, 1.0);
+        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 59, 1, 1, 1.0, 0);
 
         //Create another sequential task that lasts one min and requires 10 cores
-        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 10, 10, 1.0);
+        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 10, 10, 1.0, 0);
 
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task1}, {}, {}, {}, {});
@@ -2149,7 +2149,7 @@ private:
         std::vector<wrench::WorkflowTask*> tasks = {};
         std::vector<wrench::StandardJob*> jobs = {};
         for (int i = 0;i<num_tasks;i++) {
-          tasks.push_back(this->workflow->addTask("task"+std::to_string(i),59,1,1,1.0));
+          tasks.push_back(this->workflow->addTask("task"+std::to_string(i),59,1,1,1.0, 0));
           jobs.push_back(job_manager->createStandardJob(
                   {tasks[i]}, {}, {}, {}, {}));
           std::map<std::string, std::string> args;
@@ -2312,7 +2312,7 @@ private:
         wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 90);
 
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0, 0);
         wrench::WorkflowFile* file1 = workflow->getFileByID("input_file");
         wrench::WorkflowFile* file2 = workflow->getFileByID("output_file");
         task->addInputFile(file1);
@@ -2495,7 +2495,7 @@ private:
         wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 90);
 
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -2680,7 +2680,7 @@ private:
         wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0, 90);
 
         // Create a sequential task that lasts one min and requires 5 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 5, 5, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 5, 5, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -2850,7 +2850,7 @@ private:
         std::vector<wrench::WorkflowTask *> tasks;
         for (int i = 0; i < num_standard_jobs; i++) {
           // Create a sequential task that lasts for random minutes and requires 2 cores
-          wrench::WorkflowTask *task = this->workflow->addTask("task" + std::to_string(i), each_task_time, 2, 2, 1.0);
+          wrench::WorkflowTask *task = this->workflow->addTask("task" + std::to_string(i), each_task_time, 2, 2, 1.0, 0);
           wrench::StandardJob *job = job_manager->createStandardJob(
                   {task}, {}, {}, {}, {});
           tasks.push_back(std::move(task));
@@ -2992,7 +2992,7 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0, 0);
         task->addInputFile(this->workflow->getFileByID("input_file"));
         task->addOutputFile(this->workflow->getFileByID("output_file"));
 

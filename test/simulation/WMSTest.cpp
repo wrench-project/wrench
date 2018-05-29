@@ -79,7 +79,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
-      wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 10.0, 1, 1, 1.0);
+      wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
       job_manager->submitJob(job1, this->test->compute_service);
       this->waitForAndProcessNextEvent();
@@ -90,7 +90,7 @@ private:
       this->waitForAndProcessNextEvent();
 
       // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-      wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 100.0, 1, 1, 1.0);
+      wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 100.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job3 = job_manager->createStandardJob(task2, {});
       job_manager->submitJob(job3, job2->getComputeService());
       this->waitForAndProcessNextEvent();
@@ -208,7 +208,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Get a "STANDARD JOB COMPLETION" event (default handler)
-      wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 10.0, 1, 1, 1.0);
+      wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 10.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job1 = job_manager->createStandardJob(task1, {});
       job_manager->submitJob(job1, this->test->compute_service);
       this->waitForAndProcessNextEvent();
@@ -225,7 +225,7 @@ private:
       }
 
       // Get a "STANDARD JOB FAILED" and "PILOT JOB EXPIRED" event (default handler)
-      wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 100.0, 1, 1, 1.0);
+      wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 100.0, 1, 1, 1.0, 0);
       wrench::StandardJob *job3 = job_manager->createStandardJob(task2, {});
       job_manager->submitJob(job3, job2->getComputeService());
       this->waitForAndProcessNextEvent();
