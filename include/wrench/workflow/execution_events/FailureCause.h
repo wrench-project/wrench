@@ -29,7 +29,7 @@ namespace wrench {
 
     /**
      * @brief A top-level class to describe all simulation-valid failures that can occur during
-     *        workflow execution
+     *        workflow execution (and should/could be handled by a WMS)
      *
      */
     class FailureCause {
@@ -42,17 +42,17 @@ namespace wrench {
                     FATAL_FAILURE,
             /** @brief The file cannot be found anywhere */
                     NO_STORAGE_SERVICE_FOR_FILE,
-            /** @brief No Scratch Space available */
+            /** @brief No Scratch Space is available */
                     NO_SCRATCH_SPACE,
             /** @brief The file was not found where it was supposed to be found */
                     FILE_NOT_FOUND,
-            /** @brief The file to be written was already there */
+            /** @brief The file to be written is already there */
                     FILE_ALREADY_THERE,
             /** @brief The file is already being copied there */
                     FILE_ALREADY_BEING_COPIED,
-            /** @brief The storage service does not have enough space to support operation */
+            /** @brief The storage service does not have enough space to support the requested operation */
                     STORAGE_NOT_ENOUGH_SPACE,
-            /** @brief The service cannot be used because it is down (likely was terminated) */
+            /** @brief The service cannot be used because it is down (likely it was terminated) */
                     SERVICE_DOWN,
             /** @brief The compute service does not support this job type */
                     JOB_TYPE_NOT_SUPPORTED,
@@ -62,9 +62,9 @@ namespace wrench {
                     NETWORK_ERROR,
             /** @brief There was a network timeout (for a "with timeout" network operation) */
                     NETWORK_TIMEOUT,
-            /** @brief The job cannot be terminated because it's neither pending nor running */
+            /** @brief The job cannot be terminated because it is neither pending nor running */
                     JOB_CANNOT_BE_TERMINATED,
-            /** @brief The job cannot be forgotten because it's not completed */
+            /** @brief The job cannot be forgotten because it is not completed */
                     JOB_CANNOT_BE_FORGOTTEN,
             /** @brief A compute thread has died */
                     COMPUTE_THREAD_HAS_DIED,
@@ -79,7 +79,7 @@ namespace wrench {
 
 
         /**
-         * @brief Return an error message that describes the failure cause (to be overriden)
+         * @brief Return an error message that describes the failure cause (to be overridden)
          *
          * @return an error message
          */
@@ -98,7 +98,13 @@ namespace wrench {
     class NoStorageServiceForFile : public FailureCause {
 
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         NoStorageServiceForFile(WorkflowFile *file);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
         WorkflowFile *getFile();
         std::string toString();
@@ -109,12 +115,19 @@ namespace wrench {
 
 
     /**
-     * @brief No Scratch Space failure cause
+     * @brief A "no scratch space" failure cause
      */
     class NoScratchSpace : public FailureCause {
 
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         NoScratchSpace(std::string error);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         std::string toString();
     private:
         std::string error;
@@ -126,7 +139,13 @@ namespace wrench {
     class FileNotFound : public FailureCause {
 
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         FileNotFound(WorkflowFile *file, StorageService *storage_service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
         WorkflowFile *getFile();
         StorageService *getStorageService();
@@ -144,7 +163,13 @@ namespace wrench {
     class StorageServiceNotEnoughSpace : public FailureCause {
 
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         StorageServiceNotEnoughSpace(WorkflowFile *file, StorageService *storage_service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
         WorkflowFile *getFile();
         StorageService *getStorageService();
@@ -157,12 +182,18 @@ namespace wrench {
     };
 
     /**
-     * @brief A "file already there" failure cause
+     * @brief A "file is already there" failure cause
      */
     class StorageServiceFileAlreadyThere : public FailureCause {
 
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         StorageServiceFileAlreadyThere(WorkflowFile *file, StorageService *storage_service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
         WorkflowFile *getFile();
         StorageService *getStorageService();
@@ -180,7 +211,13 @@ namespace wrench {
     class FileAlreadyBeingCopied : public FailureCause {
 
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         FileAlreadyBeingCopied(WorkflowFile *file, StorageService *dst);
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
         WorkflowFile *getFile();
         StorageService *getStorageService();
@@ -196,7 +233,14 @@ namespace wrench {
      */
     class ServiceIsDown : public FailureCause {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         ServiceIsDown(Service *service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         Service *getService();
         std::string toString();
 
@@ -209,7 +253,14 @@ namespace wrench {
      */
     class JobTypeNotSupported : public FailureCause {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         JobTypeNotSupported(WorkflowJob *job, ComputeService *compute_service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         WorkflowJob *getJob();
         ComputeService *getComputeService();
         std::string toString();
@@ -220,11 +271,18 @@ namespace wrench {
     };
 
     /**
-     * @brief A requested functionality is not available on that service
+     * @brief A "requested functionality is not available on that service" failure cause
      */
     class FunctionalityNotAvailable : public FailureCause {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         FunctionalityNotAvailable(Service *service, std::string functionality_name);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         Service *getService();
         std::string getFunctionalityName();
         std::string toString();
@@ -240,7 +298,14 @@ namespace wrench {
      */
     class NotEnoughComputeResources : public FailureCause {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         NotEnoughComputeResources(WorkflowJob *job, ComputeService *compute_service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         WorkflowJob *getJob();
         ComputeService *getComputeService();
         std::string toString();
@@ -263,7 +328,14 @@ namespace wrench {
             RECEIVING
         };
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         NetworkError(NetworkError::OperationType, std::string mailbox);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         std::string toString();
         bool whileReceiving();
         bool whileSending();
@@ -286,7 +358,14 @@ namespace wrench {
             RECEIVING
         };
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         NetworkTimeout(NetworkTimeout::OperationType, std::string mailbox);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         std::string toString();
         bool whileReceiving();
         bool whileSending();
@@ -303,7 +382,14 @@ namespace wrench {
      */
     class JobCannotBeTerminated : public FailureCause {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         JobCannotBeTerminated(WorkflowJob *job);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         WorkflowJob *getJob();
         std::string toString();
 
@@ -316,7 +402,14 @@ namespace wrench {
     */
     class JobCannotBeForgotten : public FailureCause {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         JobCannotBeForgotten(WorkflowJob *job);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         WorkflowJob *getJob();
         std::string toString();
 
@@ -329,18 +422,32 @@ namespace wrench {
    */
     class ComputeThreadHasDied : public FailureCause {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         ComputeThreadHasDied();
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         std::string toString();
 
     private:
     };
 
     /**
-   * @brief Unknown failure cause
-   */
+    * @brief An "Unknown" failure cause (should not happen)
+    */
     class FatalFailure : public FailureCause {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         FatalFailure();
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         std::string toString();
 
     private:
@@ -352,7 +459,14 @@ namespace wrench {
     */
     class JobTimeout : public FailureCause {
     public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         JobTimeout(WorkflowJob *job);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
         WorkflowJob *getJob();
         std::string toString();
 

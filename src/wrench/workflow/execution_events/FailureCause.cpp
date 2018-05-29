@@ -33,7 +33,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param file: the file that cannot be find on any storage service
+     * @param file: the file that could not be found on any storage service
      */
     NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) : FailureCause(
             NO_STORAGE_SERVICE_FOR_FILE) {

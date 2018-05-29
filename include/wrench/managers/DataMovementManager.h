@@ -32,9 +32,6 @@ namespace wrench {
 
     public:
 
-
-        ~DataMovementManager();
-
         void stop();
 
         void kill();
@@ -45,9 +42,18 @@ namespace wrench {
 
     protected:
 
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+
+
         friend class WMS;
 
         explicit DataMovementManager(WMS *wms);
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     private:
 

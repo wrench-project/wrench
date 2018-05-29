@@ -19,10 +19,10 @@ namespace wrench {
 
 
     /***********************/
-    /** \cond INTERNAL    */
+    /** \cond              */
     /***********************/
 
-    /** @brief A dummy top-level class */
+    /** @brief A dummy top-level class derived by simulation output traces */
     class GenericSimulationTrace {
 
     public:
