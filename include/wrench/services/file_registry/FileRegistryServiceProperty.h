@@ -23,7 +23,7 @@ namespace wrench {
     public:
 
         /** @brief The computational cost, in flops, of looking up entries for a file **/
-        DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
+        DECLARE_PROPERTY_NAME(LOOKUP_COMPUTE_COST);
         
     };
 

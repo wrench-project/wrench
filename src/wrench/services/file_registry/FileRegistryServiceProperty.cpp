@@ -11,6 +11,6 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(FileRegistryServiceProperty, LOOKUP_OVERHEAD);
+    SET_PROPERTY_NAME(FileRegistryServiceProperty, LOOKUP_COMPUTE_COST);
 };
 

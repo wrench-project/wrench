@@ -178,6 +178,7 @@ namespace wrench {
      *        will use all the cores and all the RAM of each host)
      * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
      * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
                                                                        const std::set<std::string> compute_hosts,

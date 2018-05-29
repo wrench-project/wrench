@@ -26,7 +26,7 @@ namespace wrench {
 
     public:
 
-        /** @brief The number of seconds to start a thread **/
+        /** @brief The number of seconds to start a thread (default = 0) **/
         DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
 
         /** @brief The number of bytes in the control message sent by the executor to provide the set of files stored in the scratch **/
