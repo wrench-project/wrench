@@ -121,8 +121,8 @@ private:
 
       // Create a sequential task that lasts one hour
       wrench::WorkflowTask *task = this->workflow->addTask("task", 3600);
-      task->addInputFile(workflow->getFileById("input_file"));
-      task->addOutputFile(workflow->getFileById("output_file"));
+      task->addInputFile(workflow->getFileByID("input_file"));
+      task->addOutputFile(workflow->getFileByID("output_file"));
 
       // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
       wrench::StandardJob *job = job_manager->createStandardJob(
@@ -133,9 +133,9 @@ private:
               },
               {},
               {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                      workflow->getFileById("output_file"), this->test->storage_service2,
+                      workflow->getFileByID("output_file"), this->test->storage_service2,
                       this->test->storage_service1)},
-              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("output_file"),
                                                                             this->test->storage_service2)});
 
       std::string my_mailbox = "test_callback_mailbox";
@@ -303,8 +303,8 @@ private:
 
       // Create a bogus StandardJobExecutor (not enough Cores specified)
       wrench::WorkflowTask *task_too_many_cores = this->workflow->addTask("task_too_many_cores", 3600, 20, 20, 1.0);
-      task_too_many_cores->addInputFile(workflow->getFileById("input_file"));
-      task_too_many_cores->addOutputFile(workflow->getFileById("output_file"));
+      task_too_many_cores->addInputFile(workflow->getFileByID("input_file"));
+      task_too_many_cores->addOutputFile(workflow->getFileByID("output_file"));
 
 //        // Forget the previous job!
       job_manager->forgetJob(job);
@@ -318,9 +318,9 @@ private:
               },
               {},
               {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                      workflow->getFileById("output_file"), this->test->storage_service2,
+                      workflow->getFileByID("output_file"), this->test->storage_service2,
                       this->test->storage_service1)},
-              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("output_file"),
                                                                             this->test->storage_service2)});
 
       success = true;
@@ -350,8 +350,8 @@ private:
       success = true;
 
       wrench::WorkflowTask *task_too_much_ram = this->workflow->addTask("task_too_much_ram", 3600, 1, 1, 1.0, 500.00);
-      task_too_much_ram->addInputFile(workflow->getFileById("input_file"));
-      task_too_much_ram->addOutputFile(workflow->getFileById("output_file"));
+      task_too_much_ram->addInputFile(workflow->getFileByID("input_file"));
+      task_too_much_ram->addOutputFile(workflow->getFileByID("output_file"));
 
       // Forget the previous job!
       job_manager->forgetJob(job);
@@ -365,9 +365,9 @@ private:
               },
               {},
               {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                      workflow->getFileById("output_file"), this->test->storage_service2,
+                      workflow->getFileByID("output_file"), this->test->storage_service2,
                       this->test->storage_service1)},
-              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("output_file"),
                                                                             this->test->storage_service2)});
 
       try {
@@ -404,9 +404,9 @@ private:
               },
               {},
               {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                      workflow->getFileById("output_file"), this->test->storage_service2,
+                      workflow->getFileByID("output_file"), this->test->storage_service2,
                       this->test->storage_service1)},
-              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+              {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("output_file"),
                                                                             this->test->storage_service2)});
 
       success = true;
@@ -546,8 +546,8 @@ private:
       {
         // Create a sequential task that lasts one hour
         wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
+        task->addInputFile(workflow->getFileByID("input_file"));
+        task->addOutputFile(workflow->getFileByID("output_file"));
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
         wrench::StandardJob *job = job_manager->createStandardJob(
@@ -558,9 +558,9 @@ private:
                 },
                 {},
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("output_file"), this->test->storage_service2,
+                        workflow->getFileByID("output_file"), this->test->storage_service2,
                         this->test->storage_service1)},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("output_file"),
                                                                               this->test->storage_service2)});
 
         std::string my_mailbox = "test_callback_mailbox";
@@ -625,12 +625,12 @@ private:
         }
 
         // Has the output file been copied back to storage_service1?
-        if (!this->test->storage_service1->lookupFile(workflow->getFileById("output_file"))) {
+        if (!this->test->storage_service1->lookupFile(workflow->getFileByID("output_file"))) {
           throw std::runtime_error("The output file has not been copied back to the specified storage service");
         }
 
         // Has the output file been erased from storage_service2?
-        if (this->test->storage_service2->lookupFile(workflow->getFileById("output_file"))) {
+        if (this->test->storage_service2->lookupFile(workflow->getFileByID("output_file"))) {
           throw std::runtime_error("The output file has not been erased from the specified storage service");
         }
 
@@ -740,8 +740,8 @@ private:
       {
         // Create a sequential task that lasts one hour and requires 1 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
+        task->addInputFile(workflow->getFileByID("input_file"));
+        task->addOutputFile(workflow->getFileByID("output_file"));
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
@@ -752,10 +752,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service2}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service2,
+                        workflow->getFileByID("input_file"), this->test->storage_service2,
                         this->test->storage_service1)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("output_file"),
                                                                               this->test->storage_service2)});
 
 
@@ -802,7 +802,7 @@ private:
         }
 
         auto real_cause = (wrench::StorageServiceFileAlreadyThere *) msg->cause.get();
-        if (real_cause->getFile() != workflow->getFileById("input_file")) {
+        if (real_cause->getFile() != workflow->getFileByID("input_file")) {
           throw std::runtime_error(
                   "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
         }
@@ -811,7 +811,7 @@ private:
                   "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
         }
 
-//        this->test->storage_service2->deleteFile(workflow->getFileById("input_file"));
+//        this->test->storage_service2->deleteFile(workflow->getFileByID("input_file"));
         workflow->removeTask(task);
 
       }
@@ -921,8 +921,8 @@ private:
       {
         // Create a sequential task that lasts one hour and requires 1 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
+        task->addInputFile(workflow->getFileByID("input_file"));
+        task->addOutputFile(workflow->getFileByID("output_file"));
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
 
@@ -934,7 +934,7 @@ private:
                 },
                 {},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("output_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("output_file"),
                                                                               this->test->storage_service2)});
 
 
@@ -982,7 +982,7 @@ private:
 
         wrench::FileNotFound *real_cause = (wrench::FileNotFound *) msg->cause.get();
         std::string error_msg = real_cause->toString();
-        if (real_cause->getFile() != workflow->getFileById("input_file")) {
+        if (real_cause->getFile() != workflow->getFileByID("input_file")) {
           throw std::runtime_error(
                   "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
         }
@@ -1289,8 +1289,8 @@ private:
       /** Case 1: Create a multicore task with perfect parallel efficiency that lasts one hour **/
       {
         wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 1.0);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
+        task->addInputFile(workflow->getFileByID("input_file"));
+        task->addOutputFile(workflow->getFileByID("output_file"));
 
         // Create a StandardJob
         wrench::StandardJob *job = job_manager->createStandardJob(
@@ -1345,7 +1345,7 @@ private:
                   std::to_string(observed_duration) + ")");
         }
 
-        this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+        this->test->storage_service1->deleteFile(workflow->getFileByID("output_file"));
 
         workflow->removeTask(task);
       }
@@ -1353,8 +1353,8 @@ private:
       /** Case 2: Create a multicore task with 50% parallel efficiency that lasts one hour **/
       {
         wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
+        task->addInputFile(workflow->getFileByID("input_file"));
+        task->addOutputFile(workflow->getFileByID("output_file"));
 
         // Create a StandardJob
         wrench::StandardJob *job = job_manager->createStandardJob(
@@ -1414,14 +1414,14 @@ private:
 
         workflow->removeTask(task);
 
-        this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+        this->test->storage_service1->deleteFile(workflow->getFileByID("output_file"));
       }
 
       /** Case 3: Create a multicore task with 50% parallel efficiency and include thread startup overhead **/
       {
         wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
-        task->addInputFile(workflow->getFileById("input_file"));
-        task->addOutputFile(workflow->getFileById("output_file"));
+        task->addInputFile(workflow->getFileByID("input_file"));
+        task->addOutputFile(workflow->getFileByID("output_file"));
 
         // Create a StandardJob
         wrench::StandardJob *job = job_manager->createStandardJob(
@@ -1483,7 +1483,7 @@ private:
 
         workflow->removeTask(task);
 
-        this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+        this->test->storage_service1->deleteFile(workflow->getFileByID("output_file"));
       }
 
       return 0;
@@ -1582,22 +1582,22 @@ private:
       {
         wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 2, 6, 1.0);
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 300, 6, 6, 1.0);
-        task1->addInputFile(workflow->getFileById("input_file"));
-        task1->addOutputFile(workflow->getFileById("output_file"));
-        task2->addInputFile(workflow->getFileById("input_file"));
+        task1->addInputFile(workflow->getFileByID("input_file"));
+        task1->addOutputFile(workflow->getFileByID("output_file"));
+        task2->addInputFile(workflow->getFileByID("input_file"));
 
         // Create a StandardJob with both tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task1, task2},
                 {
-                        {workflow->getFileById("input_file"),  this->test->storage_service1},
-                        {workflow->getFileById("output_file"), this->test->storage_service1}
+                        {workflow->getFileByID("input_file"),  this->test->storage_service1},
+                        {workflow->getFileByID("output_file"), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service1,
+                        workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)}
         );
 
@@ -1660,7 +1660,7 @@ private:
         workflow->removeTask(task1);
         workflow->removeTask(task2);
 
-        this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+        this->test->storage_service1->deleteFile(workflow->getFileByID("output_file"));
       }
 
 
@@ -1668,22 +1668,22 @@ private:
       {
         wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 300, 2, 6, 1.0);
-        task1->addInputFile(workflow->getFileById("input_file"));
-        task1->addOutputFile(workflow->getFileById("output_file"));
-        task2->addInputFile(workflow->getFileById("input_file"));
+        task1->addInputFile(workflow->getFileByID("input_file"));
+        task1->addOutputFile(workflow->getFileByID("output_file"));
+        task2->addInputFile(workflow->getFileByID("input_file"));
 
         // Create a StandardJob with both tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task1, task2},
                 {
-                        {workflow->getFileById("input_file"),  this->test->storage_service1},
-                        {workflow->getFileById("output_file"), this->test->storage_service1}
+                        {workflow->getFileByID("input_file"),  this->test->storage_service1},
+                        {workflow->getFileByID("output_file"), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service1,
+                        workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)}
         );
 
@@ -1744,7 +1744,7 @@ private:
 
         workflow->removeTask(task1);
         workflow->removeTask(task2);
-        this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+        this->test->storage_service1->deleteFile(workflow->getFileByID("output_file"));
 
       }
 
@@ -1754,23 +1754,23 @@ private:
         wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 400, 2, 6, 1.0);
         wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 300, 10, 10, 0.6);
-        task1->addInputFile(workflow->getFileById("input_file"));
-        task1->addOutputFile(workflow->getFileById("output_file"));
-        task2->addInputFile(workflow->getFileById("input_file"));
-        task3->addInputFile(workflow->getFileById("input_file"));
+        task1->addInputFile(workflow->getFileByID("input_file"));
+        task1->addOutputFile(workflow->getFileByID("output_file"));
+        task2->addInputFile(workflow->getFileByID("input_file"));
+        task3->addInputFile(workflow->getFileByID("input_file"));
 
         // Create a StandardJob with all three tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task1, task2, task3},
                 {
-                        {workflow->getFileById("input_file"),  this->test->storage_service1},
-                        {workflow->getFileById("output_file"), this->test->storage_service1}
+                        {workflow->getFileByID("input_file"),  this->test->storage_service1},
+                        {workflow->getFileByID("output_file"), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service1,
+                        workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)}
         );
 
@@ -1837,7 +1837,7 @@ private:
         workflow->removeTask(task1);
         workflow->removeTask(task2);
         workflow->removeTask(task3);
-        this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+        this->test->storage_service1->deleteFile(workflow->getFileByID("output_file"));
 
       }
 
@@ -1943,22 +1943,22 @@ public:
       {
         wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 3600, 6, 6, 1.0);
-        task1->addInputFile(workflow->getFileById("input_file"));
-        task1->addOutputFile(workflow->getFileById("output_file"));
-        task2->addInputFile(workflow->getFileById("input_file"));
+        task1->addInputFile(workflow->getFileByID("input_file"));
+        task1->addOutputFile(workflow->getFileByID("output_file"));
+        task2->addInputFile(workflow->getFileByID("input_file"));
 
         // Create a StandardJob with both tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task1, task2},
                 {
-                        {workflow->getFileById("input_file"),  this->test->storage_service1},
-                        {workflow->getFileById("output_file"), this->test->storage_service1}
+                        {workflow->getFileByID("input_file"),  this->test->storage_service1},
+                        {workflow->getFileByID("output_file"), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service1,
+                        workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)}
         );
 
@@ -2020,7 +2020,7 @@ public:
 
         workflow->removeTask(task1);
         workflow->removeTask(task2);
-        this->test->storage_service1->deleteFile(workflow->getFileById("output_file"));
+        this->test->storage_service1->deleteFile(workflow->getFileByID("output_file"));
 
       }
 
@@ -2030,22 +2030,22 @@ public:
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
         wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
         wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
-        task1->addInputFile(workflow->getFileById("input_file"));
-        task1->addOutputFile(workflow->getFileById("output_file"));
-        task2->addInputFile(workflow->getFileById("input_file"));
+        task1->addInputFile(workflow->getFileByID("input_file"));
+        task1->addOutputFile(workflow->getFileByID("output_file"));
+        task2->addInputFile(workflow->getFileByID("input_file"));
 
         // Create a StandardJob with both tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task1, task2, task3, task4},
                 {
-                        {workflow->getFileById("input_file"),  this->test->storage_service1},
-                        {workflow->getFileById("output_file"), this->test->storage_service1}
+                        {workflow->getFileByID("input_file"),  this->test->storage_service1},
+                        {workflow->getFileByID("output_file"), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service1,
+                        workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)}
         );
 
@@ -2218,24 +2218,24 @@ private:
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
         wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
         wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
-        task1->addInputFile(workflow->getFileById("input_file"));
-        task1->addOutputFile(workflow->getFileById("output_file"));
-        task2->addInputFile(workflow->getFileById("input_file"));
-        task2->addOutputFile(workflow->getFileById("output_file"));
+        task1->addInputFile(workflow->getFileByID("input_file"));
+        task1->addOutputFile(workflow->getFileByID("output_file"));
+        task2->addInputFile(workflow->getFileByID("input_file"));
+        task2->addOutputFile(workflow->getFileByID("output_file"));
 
         // Create a StandardJob with both tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task1, task2, task3, task4},
 //                {task1},
                 {
-                        {workflow->getFileById("input_file"),  this->test->storage_service1},
-                        {workflow->getFileById("output_file"), this->test->storage_service1}
+                        {workflow->getFileByID("input_file"),  this->test->storage_service1},
+                        {workflow->getFileByID("output_file"), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service1,
+                        workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)}
         );
 
@@ -2371,23 +2371,23 @@ private:
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
         wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
         wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
-        task1->addInputFile(workflow->getFileById("input_file"));
-        task1->addOutputFile(workflow->getFileById("output_file"));
-        task2->addInputFile(workflow->getFileById("input_file"));
-        task2->addOutputFile(workflow->getFileById("output_file"));
+        task1->addInputFile(workflow->getFileByID("input_file"));
+        task1->addOutputFile(workflow->getFileByID("output_file"));
+        task2->addInputFile(workflow->getFileByID("input_file"));
+        task2->addOutputFile(workflow->getFileByID("output_file"));
 
         // Create a StandardJob with both tasks
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task1, task2, task3, task4},
                 {
-                        {workflow->getFileById("input_file"),  this->test->storage_service1},
-                        {workflow->getFileById("output_file"), this->test->storage_service1}
+                        {workflow->getFileByID("input_file"),  this->test->storage_service1},
+                        {workflow->getFileByID("output_file"), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        workflow->getFileById("input_file"), this->test->storage_service1,
+                        workflow->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileById("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(workflow->getFileByID("input_file"),
                                                                               this->test->storage_service2)}
         );
 
@@ -2530,8 +2530,8 @@ private:
           wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
           wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
 
-          task1->addInputFile(workflow->getFileById("input_file"));
-//          task1->addOutputFile(workflow->getFileById("output_file"));
+          task1->addInputFile(workflow->getFileByID("input_file"));
+//          task1->addOutputFile(workflow->getFileByID("output_file"));
 
           // Create a StandardJob with both tasks
           wrench::StandardJob *job = job_manager->createStandardJob(
@@ -2539,20 +2539,20 @@ private:
                   {task1, task3},
 //                {task1},
                   {
-                          {workflow->getFileById("input_file"), this->test->storage_service1},
-//                          {workflow->getFileById("output_file"), this->test->storage_service1}
+                          {workflow->getFileByID("input_file"), this->test->storage_service1},
+//                          {workflow->getFileByID("output_file"), this->test->storage_service1}
                   },
                   {
-                          std::make_tuple(workflow->getFileById("input_file"), this->test->storage_service1,
+                          std::make_tuple(workflow->getFileByID("input_file"), this->test->storage_service1,
                                           this->test->storage_service2)
 //                        std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-//                          workflow->getFileById("input_file"), this->test->storage_service1,
+//                          workflow->getFileByID("input_file"), this->test->storage_service1,
 //                          this->test->storage_service2)
                   },
                   {},
                   {
                           std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(
-                                  workflow->getFileById("input_file"),
+                                  workflow->getFileByID("input_file"),
                                   this->test->storage_service2)
                   }
           );

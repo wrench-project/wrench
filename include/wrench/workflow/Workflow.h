@@ -38,13 +38,11 @@ namespace wrench {
 
         void removeTask(WorkflowTask *task);
 
-        WorkflowTask *getWorkflowTaskByID(std::string);
+        WorkflowTask *getTaskByID(std::string);
 
         WorkflowFile *addFile(std::string, double);
 
-        WorkflowFile *getFileById(std::string id);
-
-        WorkflowFile *getWorkflowFileByID(std::string);
+        WorkflowFile *getFileByID(std::string);
 
         static double getSumFlops(std::vector<WorkflowTask *> tasks);
 
@@ -64,11 +62,11 @@ namespace wrench {
 
         std::map<std::string, WorkflowFile *> getInputFiles();
 
+        bool isDone();
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
-
-        bool isDone();
 
         std::vector<WorkflowTask *> getTasksInTopLevelRange(unsigned long min, unsigned long max);
 

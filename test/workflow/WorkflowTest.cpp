@@ -105,8 +105,8 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
   EXPECT_THROW(workflow->addTask("task-error", 100, -4), std::invalid_argument);
 
   // testing whether a task id exists
-  EXPECT_THROW(workflow->getWorkflowTaskByID("task-test-00"), std::invalid_argument);
-  EXPECT_TRUE(workflow->getWorkflowTaskByID("task-test-01")->getId() == t1->getId());
+  EXPECT_THROW(workflow->getTaskByID("task-test-00"), std::invalid_argument);
+  EXPECT_TRUE(workflow->getTaskByID("task-test-01")->getId() == t1->getId());
 
   // testing whether a task already exists (check via task id)
   EXPECT_THROW(workflow->addTask("task-test-01", 1), std::invalid_argument);
@@ -128,8 +128,8 @@ TEST_F(WorkflowTest, WorkflowFile) {
   EXPECT_THROW(workflow->addFile("file-error-00", -1), std::invalid_argument);
   EXPECT_THROW(workflow->addFile("file-01", 10), std::invalid_argument);
 
-  EXPECT_THROW(workflow->getWorkflowFileByID("file-nonexist"), std::invalid_argument);
-  EXPECT_EQ(workflow->getWorkflowFileByID("file-01")->getId(), "file-01");
+  EXPECT_THROW(workflow->getFileByID("file-nonexist"), std::invalid_argument);
+  EXPECT_EQ(workflow->getFileByID("file-01")->getId(), "file-01");
 
   EXPECT_EQ(workflow->getInputFiles().size(), 1);
 }

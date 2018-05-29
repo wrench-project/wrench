@@ -99,14 +99,14 @@ private:
       {
         // Create a sequential task that lasts one min and requires 1 cores
         wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 1, 1, 1.0);
-        task->addInputFile(this->workflow->getFileById("input_file"));
-        task->addOutputFile(this->workflow->getFileById("output_file"));
+        task->addInputFile(this->workflow->getFileByID("input_file"));
+        task->addOutputFile(this->workflow->getFileByID("output_file"));
 
         // Create a StandardJob with some pre-copies
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task},
                 {},
-                {std::make_tuple(this->workflow->getFileById("input_file"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->workflow->getFileByID("input_file"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -230,17 +230,17 @@ private:
       {
         // Create a sequential task that lasts one min and requires 1 cores
         wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0);
-        task1->addInputFile(this->workflow->getFileById("input_file1"));
+        task1->addInputFile(this->workflow->getFileByID("input_file1"));
 
         // Create a sequential task that lasts one min and requires 1 cores
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 60, 1, 1, 1.0);
-        task2->addInputFile(this->workflow->getFileById("input_file2"));
+        task2->addInputFile(this->workflow->getFileByID("input_file2"));
 
         // Create a StandardJob with SOME pre-copies from public storage to scratch
         wrench::StandardJob *job1 = job_manager->createStandardJob(
                 {task1},
                 {},
-                {std::make_tuple(this->workflow->getFileById("input_file1"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->workflow->getFileByID("input_file1"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -248,7 +248,7 @@ private:
         wrench::StandardJob *job2 = job_manager->createStandardJob(
                 {task2},
                 {},
-                {std::make_tuple(this->workflow->getFileById("input_file2"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->workflow->getFileByID("input_file2"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -486,21 +486,21 @@ private:
 
         // Create a sequential task that lasts one min and requires 1 cores
         wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0);
-        task1->addInputFile(this->workflow->getFileById("input_file1"));
+        task1->addInputFile(this->workflow->getFileByID("input_file1"));
 
         // Create a sequential task that lasts one min and requires 1 cores
         wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 360, 1, 1, 1.0);
-        task2->addInputFile(this->workflow->getFileById("input_file2"));
+        task2->addInputFile(this->workflow->getFileByID("input_file2"));
 
         // Create a sequential task that lasts one min and requires 1 cores
         wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 600, 1, 1, 1.0);
-        task3->addInputFile(this->workflow->getFileById("input_file3"));
+        task3->addInputFile(this->workflow->getFileByID("input_file3"));
 
         // Create a StandardJob with SOME pre-copies from public storage to scratch
         wrench::StandardJob *job1 = job_manager->createStandardJob(
                 {task1},
                 {},
-                {std::make_tuple(this->workflow->getFileById("input_file1"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->workflow->getFileByID("input_file1"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -508,7 +508,7 @@ private:
         wrench::StandardJob *job2 = job_manager->createStandardJob(
                 {task2},
                 {},
-                {std::make_tuple(this->workflow->getFileById("input_file2"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->workflow->getFileByID("input_file2"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -516,7 +516,7 @@ private:
         wrench::StandardJob *job3 = job_manager->createStandardJob(
                 {task3},
                 {},
-                {std::make_tuple(this->workflow->getFileById("input_file3"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->workflow->getFileByID("input_file3"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 

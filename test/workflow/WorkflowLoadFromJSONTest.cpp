@@ -3191,15 +3191,15 @@ TEST_F(WorkflowLoadFromJSONTest, LoadValidJSON) {
   ASSERT_EQ(workflow->getNumberOfTasks(), 71);
   ASSERT_EQ(workflow->getFiles().size(), 69);
 
-  unsigned long num_input_files = workflow->getWorkflowTaskByID("individuals_ID0000001")->getInputFiles().size();
-  unsigned long num_output_files = workflow->getWorkflowTaskByID("individuals_ID0000001")->getOutputFiles().size();
+  unsigned long num_input_files = workflow->getTaskByID("individuals_ID0000001")->getInputFiles().size();
+  unsigned long num_output_files = workflow->getTaskByID("individuals_ID0000001")->getOutputFiles().size();
 
   ASSERT_EQ(num_input_files, 1);
   ASSERT_EQ(num_output_files, 2);
 
-  ASSERT_NEAR(workflow->getWorkflowTaskByID("individuals_ID0000001")->getFlops(), 588.914, 0.001);
-  ASSERT_EQ(workflow->getWorkflowTaskByID("individuals_ID0000001")->getMinNumCores(), 1);
-  ASSERT_EQ(workflow->getWorkflowTaskByID("individuals_ID0000001")->getMaxNumCores(), 1);
+  ASSERT_NEAR(workflow->getTaskByID("individuals_ID0000001")->getFlops(), 588.914, 0.001);
+  ASSERT_EQ(workflow->getTaskByID("individuals_ID0000001")->getMinNumCores(), 1);
+  ASSERT_EQ(workflow->getTaskByID("individuals_ID0000001")->getMaxNumCores(), 1);
 
   ASSERT_EQ(workflow->getNumLevels(), 7);
   ASSERT_EQ(workflow->getTasksInTopLevelRange(0, 0).size(), 1);
