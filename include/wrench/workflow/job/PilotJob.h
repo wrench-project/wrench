@@ -23,7 +23,8 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A pilot WorkflowJob
+     * @brief A pilot (i.e., non-standard) workflow job that can be submitted to a ComputeService
+     * by a WMS (via a JobManager)
      */
     class PilotJob : public WorkflowJob {
 

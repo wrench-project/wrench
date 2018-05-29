@@ -72,13 +72,8 @@ namespace wrench {
     };
 
     /**
-     * @brief Destructor
-     */
-    StandardJob::~StandardJob() {
-    }
-
-    /**
-     * @brief Returns the minimum number of cores that the job needs to run
+     * @brief Returns the minimum number of cores required, over all tasks in the job (i.e., at least
+     *        one task in the job cannot run if fewer cores than this minimum are available)
      * @return the number of cores
      */
     unsigned long StandardJob::getMinimumRequiredNumCores() {
