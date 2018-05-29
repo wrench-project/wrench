@@ -16,8 +16,8 @@ protected:
     WorkflowTaskTest() {
       workflow = new wrench::Workflow();
 
-      t1 = workflow->addTask("task-01", 100000);
-      t2 = workflow->addTask("task-02", 100, 2, 4, 0.5);
+      t1 = workflow->addTask("task-01", 100000, 1, 1, 1.0, 0);
+      t2 = workflow->addTask("task-02", 100, 2, 4, 0.5, 0);
 
       workflow->addControlDependency(t1, t2);
     }
@@ -99,7 +99,7 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
   ASSERT_THROW(t1->addInputFile(f2), std::invalid_argument);
   ASSERT_THROW(t1->addOutputFile(f1), std::invalid_argument);
 
-  wrench::WorkflowTask* t3 = workflow->addTask("task-03", 50, 2, 4, 1.0);
+  wrench::WorkflowTask* t3 = workflow->addTask("task-03", 50, 2, 4, 1.0, 0);
   t3->addInputFile(f2);
 
   EXPECT_EQ(t3->getNumberOfParents(), 1);

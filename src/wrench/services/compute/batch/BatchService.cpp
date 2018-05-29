@@ -802,7 +802,7 @@ namespace wrench {
       } else if (host_selection_algorithm == "ROUNDROBIN") {
         static unsigned long round_robin_host_selector_idx = 0;
         unsigned long cur_host_idx = round_robin_host_selector_idx;
-        int host_count = 0;
+        unsigned long host_count = 0;
         do {
           cur_host_idx = (cur_host_idx + 1) % available_nodes_to_cores.size();
           auto it = this->compute_hosts.begin();

@@ -129,8 +129,9 @@ private:
             continue;
           }
 //          std::cerr << "SUBMITTING " << "sub="<< sub_time << "num_nodes=" << num_nodes << " id="<<id << " flops="<<flops << " rflops="<<requested_flops << " ram="<<requested_ram << "\n";
+          // TODO: Should we use the "requested_ram" instead of 0 below?
           wrench::WorkflowTask *task = this->workflow->addTask(id, flops, min_num_cores, max_num_cores,
-                                                               parallel_efficiency);
+                                                               parallel_efficiency, 0);
 
           wrench::StandardJob *standard_job = job_manager->createStandardJob(
                   {task},

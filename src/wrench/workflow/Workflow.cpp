@@ -559,7 +559,7 @@ namespace wrench {
 
         // Create the task
         // If the DAX says num_procs = x, then we set min_cores=1, max_cores=x, efficiency=1.0
-        task = this->addTask(id, runtime * flop_rate, 1, num_procs, 1.0);
+        task = this->addTask(id, runtime * flop_rate, 1, num_procs, 1.0, 0.0);
 
         // Go through the children "uses" nodes
         for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
@@ -653,8 +653,8 @@ namespace wrench {
           for (auto &job : jobs) {
             std::string name = job.at("name");
             double runtime = job.at("runtime");
-            int num_procs = 1;
-            task = this->addTask(name, runtime * flop_rate, num_procs);
+            unsigned long num_procs = 1;
+            task = this->addTask(name, runtime * flop_rate, num_procs, num_procs, 1.0, 0.0);
 
             // task type
             std::string type = job.at("type");

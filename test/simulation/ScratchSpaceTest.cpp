@@ -98,7 +98,7 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 1, 1, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 1, 1, 1.0, 0);
         task->addInputFile(this->workflow->getFileByID("input_file"));
         task->addOutputFile(this->workflow->getFileByID("output_file"));
 
@@ -229,11 +229,11 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0, 0);
         task1->addInputFile(this->workflow->getFileByID("input_file1"));
 
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 60, 1, 1, 1.0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 60, 1, 1, 1.0, 0);
         task2->addInputFile(this->workflow->getFileByID("input_file2"));
 
         // Create a StandardJob with SOME pre-copies from public storage to scratch
@@ -485,15 +485,15 @@ private:
         }
 
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0, 0);
         task1->addInputFile(this->workflow->getFileByID("input_file1"));
 
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 360, 1, 1, 1.0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 360, 1, 1, 1.0, 0);
         task2->addInputFile(this->workflow->getFileByID("input_file2"));
 
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 600, 1, 1, 1.0);
+        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 600, 1, 1, 1.0, 0);
         task3->addInputFile(this->workflow->getFileByID("input_file3"));
 
         // Create a StandardJob with SOME pre-copies from public storage to scratch

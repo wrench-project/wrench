@@ -23,7 +23,7 @@ class MessageConstructorTest : public ::testing::Test {
 protected:
     MessageConstructorTest() {
       workflow = new wrench::Workflow();
-      task = workflow->addTask("task", 1);
+      task = workflow->addTask("task", 1, 1, 1, 1.0, 0);
       file = workflow->addFile("file", 1);
       storage_service = (wrench::StorageService *)(1234);
       compute_service = (wrench::ComputeService *)(1234);

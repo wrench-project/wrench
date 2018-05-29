@@ -58,7 +58,7 @@ protected:
       output_file = workflow->addFile("output_file", 20000.0);
 
       // Create one task
-      task = workflow->addTask("task", 3600);
+      task = workflow->addTask("task", 3600, 1, 1, 1.0, 0);
       task->addInputFile(input_file);
       task->addOutputFile(output_file);
 
@@ -412,7 +412,7 @@ private:
       }
 
       // Create another task
-        wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 2048);
+        wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 1.0, 2048);
 
       // Create a job with nullptrs in file locations
       success = true;
@@ -1340,7 +1340,7 @@ private:
       bool success;
 
       // Create another task
-      wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 2048);
+      wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 1.0, 2048);
 
       // Create a job
       wrench::StandardJob *job = job_manager->createStandardJob({task_big},
@@ -1468,7 +1468,7 @@ private:
 
       bool success;
 
-      wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 2048);
+      wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 1.0, 2048);
 
       // Create a job
       wrench::StandardJob *job = job_manager->createStandardJob({task_big},

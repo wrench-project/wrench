@@ -120,7 +120,7 @@ private:
       std::shared_ptr<wrench::StandardJobExecutor> executor;
 
       // Create a sequential task that lasts one hour
-      wrench::WorkflowTask *task = this->workflow->addTask("task", 3600);
+      wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0, 0);
       task->addInputFile(workflow->getFileByID("input_file"));
       task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -302,7 +302,7 @@ private:
 
 
       // Create a bogus StandardJobExecutor (not enough Cores specified)
-      wrench::WorkflowTask *task_too_many_cores = this->workflow->addTask("task_too_many_cores", 3600, 20, 20, 1.0);
+      wrench::WorkflowTask *task_too_many_cores = this->workflow->addTask("task_too_many_cores", 3600, 20, 20, 1.0, 0);
       task_too_many_cores->addInputFile(workflow->getFileByID("input_file"));
       task_too_many_cores->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -545,7 +545,7 @@ private:
 
       {
         // Create a sequential task that lasts one hour
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -739,7 +739,7 @@ private:
 
       {
         // Create a sequential task that lasts one hour and requires 1 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -920,7 +920,7 @@ private:
 
       {
         // Create a sequential task that lasts one hour and requires 1 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task", 3600, 1, 1, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -1102,10 +1102,10 @@ private:
         wrench::WorkflowFile *f3 = this->workflow->addFile("f3", 1.0);
 
         // Create sequential tasks
-        wrench::WorkflowTask *t1 = this->workflow->addTask("t1", 100, 1, 1, 1.0);
-        wrench::WorkflowTask *t2 = this->workflow->addTask("t2", 100, 1, 1, 1.0);
-        wrench::WorkflowTask *t3 = this->workflow->addTask("t3", 150, 1, 1, 1.0);
-        wrench::WorkflowTask *t4 = this->workflow->addTask("t4", 100, 1, 1, 1.0);
+        wrench::WorkflowTask *t1 = this->workflow->addTask("t1", 100, 1, 1, 1.0, 0);
+        wrench::WorkflowTask *t2 = this->workflow->addTask("t2", 100, 1, 1, 1.0, 0);
+        wrench::WorkflowTask *t3 = this->workflow->addTask("t3", 150, 1, 1, 1.0, 0);
+        wrench::WorkflowTask *t4 = this->workflow->addTask("t4", 100, 1, 1, 1.0, 0);
 
         t1->addOutputFile(f1);
         t2->addInputFile(f1);
@@ -1288,7 +1288,7 @@ private:
 
       /** Case 1: Create a multicore task with perfect parallel efficiency that lasts one hour **/
       {
-        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 1.0);
+        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 1.0, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -1352,7 +1352,7 @@ private:
 
       /** Case 2: Create a multicore task with 50% parallel efficiency that lasts one hour **/
       {
-        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
+        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -1419,7 +1419,7 @@ private:
 
       /** Case 3: Create a multicore task with 50% parallel efficiency and include thread startup overhead **/
       {
-        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5);
+        wrench::WorkflowTask *task = this->workflow->addTask("task1", 3600, 1, 10, 0.5, 0);
         task->addInputFile(workflow->getFileByID("input_file"));
         task->addOutputFile(workflow->getFileByID("output_file"));
 
@@ -1580,8 +1580,8 @@ private:
 
       /** Case 1: Create two tasks that will run in sequence with the default scheduling options **/
       {
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 2, 6, 1.0);
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 300, 6, 6, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 2, 6, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 300, 6, 6, 1.0, 0);
         task1->addInputFile(workflow->getFileByID("input_file"));
         task1->addOutputFile(workflow->getFileByID("output_file"));
         task2->addInputFile(workflow->getFileByID("input_file"));
@@ -1666,8 +1666,8 @@ private:
 
       /** Case 2: Create two tasks that will run in parallel with the default scheduling options **/
       {
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 300, 2, 6, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 300, 2, 6, 1.0, 0);
         task1->addInputFile(workflow->getFileByID("input_file"));
         task1->addOutputFile(workflow->getFileByID("output_file"));
         task2->addInputFile(workflow->getFileByID("input_file"));
@@ -1751,9 +1751,9 @@ private:
 
       /** Case 3: Create three tasks that will run in parallel and then sequential with the default scheduling options **/
       {
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 400, 2, 6, 1.0);
-        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 300, 10, 10, 0.6);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 400, 2, 6, 1.0, 0);
+        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 300, 10, 10, 0.6, 0);
         task1->addInputFile(workflow->getFileByID("input_file"));
         task1->addOutputFile(workflow->getFileByID("output_file"));
         task2->addInputFile(workflow->getFileByID("input_file"));
@@ -1941,8 +1941,8 @@ public:
 
       /** Case 1: Create two tasks that will each run on a different host **/
       {
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 3600, 6, 6, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 3600, 6, 6, 1.0, 0);
         task1->addInputFile(workflow->getFileByID("input_file"));
         task1->addOutputFile(workflow->getFileByID("output_file"));
         task2->addInputFile(workflow->getFileByID("input_file"));
@@ -2026,10 +2026,10 @@ public:
 
       /** Case 2: Create 4 tasks that will run in best fit manner **/
       {
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
-        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
-        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0, 0);
+        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0, 0);
+        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0, 0);
         task1->addInputFile(workflow->getFileByID("input_file"));
         task1->addOutputFile(workflow->getFileByID("output_file"));
         task2->addInputFile(workflow->getFileByID("input_file"));
@@ -2214,10 +2214,10 @@ private:
 
       /**  Create a 4-task job and kill it **/
       {
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
-        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
-        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0, 0);
+        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0, 0);
+        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0, 0);
         task1->addInputFile(workflow->getFileByID("input_file"));
         task1->addOutputFile(workflow->getFileByID("output_file"));
         task2->addInputFile(workflow->getFileByID("input_file"));
@@ -2367,10 +2367,10 @@ private:
 
       /**  Create a 4-task job and kill it **/
       {
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
-        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
-        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
+        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0, 0);
+        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0, 0);
+        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0, 0);
+        wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0, 0);
         task1->addInputFile(workflow->getFileByID("input_file"));
         task1->addOutputFile(workflow->getFileByID("output_file"));
         task2->addInputFile(workflow->getFileByID("input_file"));
@@ -2525,10 +2525,10 @@ private:
 
         /**  Create a 4-task job and kill it **/
         {
-          wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0);
-          wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0);
-          wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0);
-          wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0);
+          wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 3600, 6, 6, 1.0, 0);
+          wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 1000, 2, 2, 1.0, 0);
+          wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 800, 7, 7, 1.0, 0);
+          wrench::WorkflowTask *task4 = this->workflow->addTask("task4", 600, 2, 2, 1.0, 0);
 
           task1->addInputFile(workflow->getFileByID("input_file"));
 //          task1->addOutputFile(workflow->getFileByID("output_file"));

@@ -147,8 +147,8 @@ private:
       }
 
       // Create a job that will use cores on compute service #1
-      wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0000, 3, 3, 1.0);
-      wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 2, 2, 1.0);
+      wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0000, 3, 3, 1.0, 0);
+      wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 2, 2, 1.0, 0);
 
       std::vector<wrench::WorkflowTask *> tasks;
       tasks.push_back(t1);
