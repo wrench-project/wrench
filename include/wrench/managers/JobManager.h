@@ -41,8 +41,6 @@ namespace wrench {
 		public:
 
 
-				~JobManager();
-
 				void stop();
 
 				void kill();
@@ -73,6 +71,11 @@ namespace wrench {
 				std::set<PilotJob *> getPendingPilotJobs();
 
 				std::set<PilotJob *> getRunningPilotJobs();
+				/***********************/
+				/** \cond INTERNAL    */
+				/***********************/
+
+				~JobManager();
 
 		protected:
 
@@ -80,11 +83,11 @@ namespace wrench {
 
 				JobManager(WMS *wms);
 
-		private:
+				/***********************/
+				/** \endcond           */
+				/***********************/
 
-				/***********************/
-				/** \cond INTERNAL     */
-				/***********************/
+		private:
 
 				int main();
 
@@ -104,10 +107,6 @@ namespace wrench {
 				std::set<PilotJob *> running_pilot_jobs;
 				std::set<PilotJob *> completed_pilot_jobs;
 
-
-				/***********************/
-				/** \endcond           */
-				/***********************/
 		};
 
 		/***********************/
