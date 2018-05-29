@@ -30,7 +30,7 @@ namespace wrench {
      * @param id: a unique string id
      * @param flops: number of flops
      * @param min_num_cores: the minimum number of cores required to run the task
-     * @param max_num_cores: the maximum number of cores that can be used by the task (0 means infinity)
+     * @param max_num_cores: the maximum number of cores that can be used by the task (use INT_MAX for infinity)
      * @param parallel_efficiency: the multi-core parallel efficiency (number between 0.0 and 1.0)
      * @param memory_requirement: memory requirement (in bytes)
      * @param type: workflow task type (WorkflowTask::TaskType)
@@ -41,14 +41,15 @@ namespace wrench {
      */
     WorkflowTask *Workflow::addTask(const std::string id,
                                     double flops,
-                                    int min_num_cores,
-                                    int max_num_cores,
+                                    unsigned long min_num_cores,
+                                    unsigned long max_num_cores,
                                     double parallel_efficiency,
                                     double memory_requirement,
                                     const WorkflowTask::TaskType type) {
 
-      if ((flops < 0.0) || (min_num_cores < 1) || (max_num_cores < 0) ||
-          ((max_num_cores > 0) && (min_num_cores > max_num_cores))) {
+
+      if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) ||
+          (parallel_efficiency < 0.0) || (parallel_efficiency > 1.0) || (memory_requirement < 0)) {
         throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
       }
 
@@ -103,11 +104,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Find a WorkflowTask object based on its ID
+     * @brief Find a WorkflowTask based on its ID
      *
      * @param id: a string id
      *
-     * @return a workflow task
+     * @return a workflow task (or throws a std::invalid_argument if not found)
      *
      * @throw std::invalid_argument
      */
@@ -179,11 +180,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Find a WorkflowFile object based on its ID
+     * @brief Find a WorkflowFile based on its ID
      *
      * @param id: a string id
      *
-     * @return the WorkflowFile instance, or nullptr if not found
+     * @return the WorkflowFile instance (or throws a std::invalid_argument if not found)
      *
      * @throw std::invalid_argument
      */
@@ -223,7 +224,7 @@ namespace wrench {
     /**
      * @brief Determine whether one source is an ancestor of a destination task
      *
-     * @param src: the soure workflow task
+     * @param src: the source workflow task
      * @param dst: the destination task
      *
      * @return true if there is a path from src to dst, false otherwise
@@ -249,7 +250,7 @@ namespace wrench {
     /**
      * @brief Get a vector of ready tasks
      *
-     * @return vector of workflow tasks
+     * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getReadyTasks() {
 
@@ -305,7 +306,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Check whether all tasks are complete
+     * @brief Returns whether all tasks are complete
      *
      * @return true or false
      */
@@ -320,9 +321,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a list of all tasks in the workflow
+     * @brief Get the list of all tasks in the workflow
      *
-     * @return a vector of workflow tasks
+     * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getTasks() {
       std::vector<WorkflowTask *> all_tasks;
@@ -333,9 +334,9 @@ namespace wrench {
     };
 
     /**
-     * @brief Get a list of all files in the workflow
+     * @brief Get the list of all files in the workflow
      *
-     * @return a vector of workflow files
+     * @return a vector of files
      */
     std::vector<WorkflowFile *> Workflow::getFiles() {
       std::vector<WorkflowFile *> all_files;
@@ -346,11 +347,11 @@ namespace wrench {
     };
 
     /**
-     * @brief Get list of children for a task
+     * @brief Get the list of children for a task
      *
      * @param task: a workflow task
      *
-     * @return a vector of workflow tasks
+     * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getTaskChildren(const WorkflowTask *task) {
       if (task == nullptr) {
@@ -364,11 +365,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get list of parents for a task
+     * @brief Get the list of parents for a task
      *
      * @param task: a workflow task
      *
-     * @return a vector of workflow tasks
+     * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getTaskParents(const WorkflowTask *task) {
       if (task == nullptr) {
@@ -505,11 +506,12 @@ namespace wrench {
      * @brief Create a workflow based on a DAX file
      *
      * @param filename: the path to the DAX file
-     * @param reference_flop_rate: the compute speed (in flops/sec, assuming a task's computation is purely flops).
-     *                             The DAX file specified task execution times in seconds,
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because DAX files specify task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
      *                             apply reasonable scaling. (Because the XML platform description specifies host
-     *                             compute speeds in flops/sec).
+     *                             compute speeds in flops/sec). The times in the DAX file are thus asume to be obtained
+     *                             on an machine with flop rate reference_flop_rate.
      *
      * @throw std::invalid_argument
      */
@@ -604,11 +606,12 @@ namespace wrench {
      * @brief Create a workflow based on a JSON file
      *
      * @param filename: the path to the JSON file
-     * @param reference_flop_rate: the compute speed (in flops/sec, assuming a task's computation is purely flops).
-     *                             The JSON file specified task execution times in seconds,
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because JSON files specify task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
      *                             apply reasonable scaling. (Because the XML platform description specifies host
-     *                             compute speeds in flops/sec)
+     *                             compute speeds in flops/sec). The times in the JSON file are thus asume to be obtained
+     *                             on an machine with flop rate reference_flop_rate.
      *
      * @throw std::invalid_argument
      */
@@ -739,9 +742,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the workflow's completion date, or a negative value
-     *        If the workflow has not completed
-     * @return a date in seconds
+     * @brief Returns the workflow's completion date
+     * @return a date in seconds (or a negative value
+     *        If the workflow has not completed)
      */
     double Workflow::getCompletionDate() {
       double makespan = -1.0;
