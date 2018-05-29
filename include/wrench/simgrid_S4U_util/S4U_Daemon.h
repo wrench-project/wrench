@@ -24,7 +24,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief A generic "running daemon that listens on a mailbox" abstraction
+     * @brief A generic "running daemon" abstraction that serves as a basis for all simulated processes
      */
     class S4U_Daemon {
 
@@ -56,7 +56,7 @@ namespace wrench {
         virtual void cleanup();
 
         /**
-         * @brief The daemon's main method, to be overriden
+         * @brief The daemon's main method, to be overridden
          * @return 0 on success
          */
         virtual int main() = 0;
