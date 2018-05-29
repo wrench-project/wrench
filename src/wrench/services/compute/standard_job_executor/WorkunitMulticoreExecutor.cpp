@@ -436,8 +436,8 @@ namespace wrench {
     }
 
     /**
-     * @brief XXX
-     * @return  XXX
+     * @brief Retrieve the list of files stored in scratch space storage
+     * @return  a list of files
      */
     std::set<WorkflowFile *> WorkunitMulticoreExecutor::getFilesStoredInScratch() {
       return this->files_stored_in_scratch;
