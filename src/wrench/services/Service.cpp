@@ -23,9 +23,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
 namespace wrench {
 
     /**
-     * @brief Constructor that mostly calls the S4U_DaemonWithMailbox() constructor
-     *
-     * @param hostname: the name of the host on which the service runs
+     * @brief Constructor
+     * @param hostname: the name of the host on which the service will run
      * @param process_name_prefix: the prefix for the process name
      * @param mailbox_name_prefix: the prefix for the mailbox name
      */
@@ -75,7 +74,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a message_payload of the Service as a string
+     * @brief Get a message payload of the Service as a string
      * @param message_payload: the message payload
      * @return the message payload value as a string
      *
@@ -166,8 +165,8 @@ namespace wrench {
 
     /**
      * @brief Start the service
-     * @param this_service: a shared pointer to this service object
-     * @param daemonize: true if the daemon is to be truly daemonized, false otherwise
+     * @param this_service: a shared pointer to the service
+     * @param daemonize: true if the daemon is to be daemonized, false otherwise
      * 
      * @throw std::runtime_error
      */
@@ -229,7 +228,7 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the name of the host on which the service is running
+    * @brief Get the name of the host on which the service is / will be running
     * @return the hostname
     */
     std::string Service::getHostname() {
@@ -237,8 +236,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Find out whether the service is UP
-    * @return true if the service is UP, false otherwise
+    * @brief Returns true if the service is UP, false otherwise
+    * @return true or false
     */
     bool Service::isUp() {
       return (this->state == Service::UP);
@@ -252,7 +251,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set default and user defined properties
+     * @brief Set default and user-defined properties
      * @param default_property_values: list of default properties
      * @param overridden_poperty_values: list of overridden properties (override the default)
      */
@@ -270,9 +269,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Set default and user defined messagepayloads
-     * @param default_messagepayload_values: list of default messagepayloads
-     * @param overridden_messagepayload_values: list of overridden messagepayloads (override the default)
+     * @brief Set default and user-defined message payloads
+     * @param default_messagepayload_values: list of default message payloads
+     * @param overridden_messagepayload_values: list of overridden message payloads (override the default)
      */
     void Service::setMessagePayloads(std::map<std::string, std::string> default_messagepayload_values,
                                 std::map<std::string, std::string> overridden_messagepayload_values) {

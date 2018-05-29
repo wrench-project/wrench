@@ -20,7 +20,8 @@
 namespace wrench {
 
     /**
-     * @brief A simulated service that can be added to the simulation
+     * @brief A service that can be added to the simulation and that can be used by a WMS
+     *        when executing a workflow
      */
     class Service : public S4U_Daemon {
 
@@ -52,10 +53,6 @@ namespace wrench {
         
         bool getPropertyValueAsBoolean(std::string);
 
-        std::string getMessagePayloadValueAsString(std::string);
-
-        double getMessagePayloadValueAsDouble(std::string);
-
         double getNetworkTimeoutValue();
 
         void setNetworkTimeoutValue(double value);
@@ -67,6 +64,10 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+
+        std::string getMessagePayloadValueAsString(std::string);
+
+        double getMessagePayloadValueAsDouble(std::string);
 
         void setStateToDown();
 
