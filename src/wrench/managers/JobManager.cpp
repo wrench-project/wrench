@@ -30,7 +30,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 namespace wrench {
 
     /**
-     * @brief Constructor, which starts a job manager daemon
+     * @brief Constructor
      *
      * @param wms: the wms for which this manager is working
      */
@@ -80,17 +80,19 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param tasks: a vector of tasks (which must be either READY, or children of COMPLETED tasks or
+     * @param tasks: a list of tasks (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
-     * @param file_locations: a map that specifies on which storage services input/output files should be read/written
-     *         (default storage is used otherwise, provided that the job is submitted to a compute service
-     *          for which that default was specified)
+     * @param file_locations: a map that specifies on which storage services input/output files should be read/written.
+     *         When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      * @param pre_file_copies: a set of tuples that specify which file copy operations should be completed
-     *                         before task executions begin
+     *                         before task executions begin. The ComputeService::SCRATCH constant can be
+     *                         used to mean "the scratch storage space of the ComputeService".
      * @param post_file_copies: a set of tuples that specify which file copy operations should be completed
-     *                         after task executions end
+     *                         after task executions end. The ComputeService::SCRATCH constant can be
+     *                         used to mean "the scratch storage space of the ComputeService".
      * @param cleanup_file_deletions: a set of file tuples that specify file deletion operations that should be completed
-     *                                at the end of the job
+     *                                at the end of the job. The ComputeService::SCRATCH constant can be
+     *                         used to mean "the scratch storage space of the ComputeService".
      * @return the standard job
      *
      * @throw std::invalid_argument
@@ -171,11 +173,10 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param tasks: a vector of tasks  (which must be either READY, or children of COMPLETED tasks or
-     *                                   of tasks also included in the standard job)
-     * @param file_locations: a map that specifies on which storage services input/output files should be read/written
-     *         (default storage is used otherwise, provided that the job is submitted to a compute service
-     *          for which that default was specified)
+     * @param tasks: a list of tasks  (which must be either READY, or children of COMPLETED tasks or
+     *                                   of tasks also included in the list)
+     * @param file_locations: a map that specifies on which storage services input/output files should be read/written.
+     *                        When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      *
      * @return the standard job
      *
@@ -194,9 +195,8 @@ namespace wrench {
      * @brief Create a standard job
      *
      * @param task: a task (which must be ready)
-     * @param file_locations: a map that specifies on which storage services input/output files should be read/written
-     *         (default storage is used otherwise, provided that the job is submitted to a compute service
-     *          for which that default was specified)
+     * @param file_locations: a map that specifies on which storage services input/output files should be read/written.
+     *                When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      *
      * @return the standard job
      *
@@ -285,14 +285,15 @@ namespace wrench {
 //    }
 
     /**
-     * @brief Submit a job to batch service
+     * @brief Submit a job to compute service
      *
      * @param job: a workflow job
-     * @param compute_service: a batch service
+     * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
-     *      - to a multicore_compute_service: {}
-     *      - to a batch service: {"-t":"<int>","-n":"<int>","-N":"<int>","-c":"<int>"}
-     *      - to a cloud service: {}
+     *      - to a MultihostMulticoreComputeService: {}
+     *      - to a BatchService: {"-t":"<int>" (requested number of minutes),"-N":"<int>" (number of requested hosts),"-c":"<int>" (number of requestes cores per host)}
+     *      - to a VirtualizedClusterService: {}
+     *      - to a CloudService: {}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
@@ -425,7 +426,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Forget a job (to free memory, only once a job is completed)
+     * @brief Forget a job (to free memory, only once a job has completed or failed)
      *
      * @param job: a job to forget
      *

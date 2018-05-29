@@ -34,7 +34,8 @@ namespace wrench {
 
 
 		/**
-     * @brief A helper daemon (co-located with the WMS) to handle job executions
+     * @brief A helper daemon (co-located with and explicitly started by a WMS), which is used to
+     *        handle all job executions
      */
 		class JobManager : public Service {
 
