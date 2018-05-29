@@ -30,8 +30,9 @@ namespace wrench {
     public:
         Workflow();
 
-        WorkflowTask *addTask(std::string, double flops, int min_num_cores = 1,
-                              int max_num_cores = 1,
+        WorkflowTask *addTask(std::string, double flops,
+                              unsigned long min_num_cores = 1,
+                              unsigned long max_num_cores = 1,
                               double parallel_efficiency = 1.0,
                               double memory_requirement = 0.0,
                               WorkflowTask::TaskType type = WorkflowTask::TaskType::COMPUTE);
@@ -82,7 +83,6 @@ namespace wrench {
 
         std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
 
-        std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
 
         /***********************/
         /** \endcond           */
@@ -92,6 +92,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+        std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
 
         std::string getCallbackMailbox();
 
