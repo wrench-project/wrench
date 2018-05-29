@@ -18,7 +18,7 @@ namespace wrench {
     std::map<std::string, std::vector<SimulationMessage *>> MessageManager::mailbox_messages = {};
 
     /**
-     * @brief Insert a message in the message "database"
+     * @brief Insert a message in the manager's  "database"
      * @param mailbox: the name of the relevant mailbox
      * @param msg: the message
      */
@@ -46,7 +46,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Remove a received message from the "databse" of messages
+     * @brief Remove a received message from the "database" of messages
      * @param mailbox: the name of the mailbox from which the message was received
      * @param msg: the message
      */
