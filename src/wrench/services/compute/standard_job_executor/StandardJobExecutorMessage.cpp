@@ -26,8 +26,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param workunit_executor: the work unit executor  on which the work unit was performed
-     * @param workunit: the work unit that was performed
+     * @param workunit_executor: the work unit executor  on which the work unit has completed
+     * @param workunit: the work unit that has completed
      * @param payload: the message size in bytes
      */
     WorkunitExecutorDoneMessage::WorkunitExecutorDoneMessage(
@@ -41,8 +41,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param workunit_executor: the work unit executor on which the work was performed
-     * @param workunit: the work unit that was performed (and failed)
+     * @param workunit_executor: the work unit executor on which the work has failed
+     * @param workunit: the work unit that has failed
      * @param cause: the cause of the failure
      * @param payload: the message size in bytes
      */
@@ -59,8 +59,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: the job that completed
-     * @param executor: The executor that completed it
+     * @param job: the job that has completed
+     * @param executor: The executor that has completed it
      * @param payload: the message size in bytes
      */
     StandardJobExecutorDoneMessage::StandardJobExecutorDoneMessage(
@@ -74,8 +74,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: the job that failed
-     * @param executor: the executor on which the job failed
+     * @param job: the job that has failed
+     * @param executor: the executor on which the job has failed
      * @param cause: the cause of the failure
      * @param payload: the message size in bytes
      */
