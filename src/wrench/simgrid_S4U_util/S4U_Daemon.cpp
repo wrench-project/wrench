@@ -93,7 +93,7 @@ namespace wrench {
     /**
      * @brief Start the daemon
      *
-     * @param daemonized: whether the S4U actor should be daemonized (untstart_ested)
+     * @param daemonized: whether the S4U actor should be daemonized
      */
     void S4U_Daemon::startDaemon(bool daemonized) {
 

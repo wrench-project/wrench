@@ -21,9 +21,9 @@ namespace wrench {
 
 
     /**
-     * @brief NetworkProximityLookupRequestMessage class
+     * @brief Constructor
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param hosts: the pair of hosts to look for
+     * @param hosts: the pair of hosts to look up
      * @param payload: the message size in bytes
      */
     NetworkProximityLookupRequestMessage::NetworkProximityLookupRequestMessage(std::string answer_mailbox,
@@ -41,7 +41,7 @@ namespace wrench {
 
 
     /**
-     * @brief NetworkProximityLookupAnswerMessage class
+     * @brief Constructor
      * @param hosts: the pair of hosts that were looked up
      * @param proximityvalue: the proximity value between the pair of hosts
      * @param payload: the message size in bytes
@@ -58,8 +58,8 @@ namespace wrench {
     }
 
     /**
-     * @brief NetworkProximityComputeAnswerMessage class
-     * @param hosts: the pair of hosts that were looked up
+     * @brief Constructor
+     * @param hosts: a pair of hosts
      * @param proximityvalue: the proximity value between the pair of hosts
      * @param payload: the message size in bytes
      */
@@ -76,8 +76,8 @@ namespace wrench {
 
 
     /**
-     * @brief NextContactDaemonRequestMessage class
-     * @param daemon: the network proximity daemon to return the request to
+     * @brief Constructor
+     * @param daemon: the NetworkProximityDaemon to return the request to
      * @param payload: the message size in bytes
      */
     NextContactDaemonRequestMessage::NextContactDaemonRequestMessage(NetworkProximityDaemon *daemon, double payload) :
@@ -90,7 +90,7 @@ namespace wrench {
     }
 
     /**
-     * @brief NextContactDaemonAnswerMessage class
+     * @brief Constructor
      * @param next_host_to_send: the next host to contact
      * @param next_mailbox_to_send: the next mailbox to contact
      * @param payload: the message size in bytes
@@ -104,7 +104,7 @@ namespace wrench {
 
 
     /**
-     * @brief NetworkProximityTransferMessage class
+     * @brief Constructor
      * @param payload: the message size in bytes
      */
     NetworkProximityTransferMessage::NetworkProximityTransferMessage(double payload) :
