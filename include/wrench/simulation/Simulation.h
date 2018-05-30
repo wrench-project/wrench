@@ -57,7 +57,7 @@ namespace wrench {
 
         void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service);
 
-        SimulationOutput getOutput();
+        SimulationOutput &getOutput();
 
         /***********************/
         /** \cond DEVELOPER    */
