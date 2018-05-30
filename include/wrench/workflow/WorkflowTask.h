@@ -52,18 +52,22 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        /** @brief Task type */
+        /** @brief Task types */
         enum TaskType {
             COMPUTE,
             AUXILIARY,
             TRANSFER
         };
 
-        /** @brief Task state enum */
+        /** @brief Task states */
         enum State {
+            /** @brief Not ready (parents have not completed) */
             NOT_READY,
+            /** @brief Ready (parents have completed) */
             READY,
+            /** @brief Pending (has been submitted to a compute service) */
             PENDING,
+            /** @brief Completed (successfully completed) */
             COMPLETED
         };
 
