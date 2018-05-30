@@ -61,7 +61,7 @@ namespace wrench {
             Service(std::move(hostname), "network_daemons" + suffix, "network_daemons" + suffix) {
 
       this->simulation = simulation;
-      this->message_size = message_size;
+      this->message_size = message_size * 0;
       this->measurement_period = measurement_period;
       this->max_noise = noise;
       this->next_mailbox_to_send = "";
@@ -71,8 +71,7 @@ namespace wrench {
       // Set properties
       this->setProperties(this->default_property_values,
                           {});
-      this->setMessagePayloads(this->default_messagepayload_values,
-                          {std::make_pair("NETWORK_PROXIMITY_MESSAGE_SIZE", std::to_string(message_size))});
+      this->setMessagePayloads(this->default_messagepayload_values, {});
 
     }
 
@@ -107,7 +106,7 @@ namespace wrench {
         if (countdown > 0) {
           life = this->processNextMessage(countdown);
         } else {
-          if ((next_host_to_send != "") || (next_mailbox_to_send != "")) {
+          if ((not next_host_to_send.empty()) || (not next_mailbox_to_send.empty())) {
 
             double start_time = S4U_Simulation::getClock();
 
@@ -116,11 +115,10 @@ namespace wrench {
                           this->next_mailbox_to_send.c_str());
               S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                       new NetworkProximityTransferMessage(
-                                              this->getMessagePayloadValueAsDouble(
-                                                      NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE)));
+                                              this->message_size));
 
 
-            } catch (std::shared_ptr<NetworkError> cause) {
+            } catch (std::shared_ptr<NetworkError> &cause) {
               time_for_next_measurement = this->getTimeUntilNextMeasurement();
               continue;
             }
@@ -136,7 +134,7 @@ namespace wrench {
             S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
                                      new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
                                                                               this->getMessagePayloadValueAsDouble(
-                                                                                      NetworkProximityServiceMessagePayload::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD)));
+                                                                                      NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD)));
             next_host_to_send = "";
             next_mailbox_to_send = "";
 

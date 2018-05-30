@@ -288,7 +288,7 @@ private:
       frs->addEntry(file1, this->test->storage_service2);
       frs->addEntry(file1, this->test->storage_service3);
 
-      wrench::S4U_Simulation::sleep(100.0);
+      wrench::S4U_Simulation::sleep(600.0);
 
 
       std::vector<std::string> file1_expected_locations = {"Host4", "Host1", "Host2"};
@@ -359,16 +359,7 @@ void FileRegistryTest::do_lookupEntry_Test() {
 
   wrench::NetworkProximityService *network_proximity_service = new wrench::NetworkProximityService(host1, {host1, host3, host4});
 
-  simulation->add(std::move(network_proximity_service));
-
-//  compute_service = simulation->add(
-//          std::unique_ptr<wrench::MultihostMulticoreComputeService>(
-//                  new wrench::MultihostMulticoreComputeService(host1, true, true,
-//                                                               {std::make_tuple(host1,
-//                                                                                wrench::ComputeService::ALL_CORES,
-//                                                                                wrench::ComputeService::ALL_RAM)},
-//                                                               nullptr,
-//                                                               {})));
+  simulation->add(network_proximity_service);
 
   storage_service1 = simulation->add(
           new wrench::SimpleStorageService(host1, 10000000000000.0));
