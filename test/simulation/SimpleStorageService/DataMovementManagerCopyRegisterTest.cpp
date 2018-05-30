@@ -137,7 +137,7 @@ private:
       }
 
       try {
-        async_copy_event = workflow->waitForNextExecutionEvent();
+        async_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
       }
@@ -171,7 +171,7 @@ private:
         double_copy_failed = true;
       }
 
-      async_dual_copy_event = workflow->waitForNextExecutionEvent();
+      async_dual_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
 
       std::set<wrench::StorageService *> src_file_2_locations = file_registry_service->lookupEntry(this->test->src_file_2);
       dst_search = src_file_2_locations.find(this->test->dst_storage_service);
@@ -208,7 +208,7 @@ private:
         }
       }
 
-      async_dual_copy_event2 = workflow->waitForNextExecutionEvent();
+      async_dual_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
 
       if (async_dual_copy_event2->type != wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION)  {
         throw std::runtime_error(std::string("Unexpected workflow execution even (type=") + std::to_string(async_dual_copy_event2->type) + ")");
@@ -240,7 +240,7 @@ private:
 
       file_registry_service->stop();
 
-      async_copy_event2 = workflow->waitForNextExecutionEvent();
+      async_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
 
       if (async_copy_event2->type != wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION) {
         throw std::runtime_error("Asynchronous file copy should have completed");

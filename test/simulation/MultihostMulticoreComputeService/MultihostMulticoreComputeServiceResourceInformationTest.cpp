@@ -147,8 +147,8 @@ private:
       }
 
       // Create a job that will use cores on compute service #1
-      wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0000, 3, 3, 1.0, 0);
-      wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 2, 2, 1.0, 0);
+      wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 60.0000, 3, 3, 1.0, 0);
+      wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 60.0001, 2, 2, 1.0, 0);
 
       std::vector<wrench::WorkflowTask *> tasks;
       tasks.push_back(t1);
@@ -168,14 +168,14 @@ private:
       }
 
       // Wait for the workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
       if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
         throw std::runtime_error("Unexpected workflow execution event!");
       }
 
 
-      workflow->removeTask(t1);
-      workflow->removeTask(t2);
+      this->getWorkflow()->removeTask(t1);
+      this->getWorkflow()->removeTask(t2);
 
       return 0;
     }

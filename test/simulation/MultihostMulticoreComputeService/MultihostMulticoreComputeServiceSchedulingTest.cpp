@@ -102,9 +102,9 @@ private:
         double now = wrench::S4U_Simulation::getClock();
 
         // Create a job with 3 tasks
-        wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0000, 2, 3, 1.0, 0);
-        wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 1, 2, 1.0, 0);
-        wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60.0002, 2, 4, 1.0, 0);
+        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 60.0000, 2, 3, 1.0, 0);
+        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 60.0001, 1, 2, 1.0, 0);
+        wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 60.0002, 2, 4, 1.0, 0);
 
         std::vector<wrench::WorkflowTask *> tasks;
 
@@ -118,7 +118,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -155,9 +155,9 @@ private:
                                    " t3: " + std::to_string(task3_makespan));
         }
 
-        workflow->removeTask(t1);
-        workflow->removeTask(t2);
-        workflow->removeTask(t3);
+        this->getWorkflow()->removeTask(t1);
+        this->getWorkflow()->removeTask(t2);
+        this->getWorkflow()->removeTask(t3);
       }
 
 
@@ -170,9 +170,9 @@ private:
         double now = wrench::S4U_Simulation::getClock();
 
         // Create a job with 3 tasks
-        wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0001, 2, 3, 1.0, 0);
-        wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0000, 1, 2, 1.0, 0);
-        wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60.0002, 2, 4, 1.0, 0);
+        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 60.0001, 2, 3, 1.0, 0);
+        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 60.0000, 1, 2, 1.0, 0);
+        wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 60.0002, 2, 4, 1.0, 0);
 
         std::vector<wrench::WorkflowTask *> tasks;
 
@@ -186,7 +186,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -221,9 +221,9 @@ private:
                                    " t2: " + std::to_string(task2_makespan) +
                                    " t3: " + std::to_string(task3_makespan));
         }
-        workflow->removeTask(t1);
-        workflow->removeTask(t2);
-        workflow->removeTask(t3);
+        this->getWorkflow()->removeTask(t1);
+        this->getWorkflow()->removeTask(t2);
+        this->getWorkflow()->removeTask(t3);
       }
 
 
@@ -236,9 +236,9 @@ private:
         double now = wrench::S4U_Simulation::getClock();
 
         // Create a job with 3 tasks
-        wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0000, 2, 3, 1.0, 0);
-        wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 1, 2, 1.0, 0);
-        wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60.0002, 2, 4, 1.0, 0);
+        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 60.0000, 2, 3, 1.0, 0);
+        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 60.0001, 1, 2, 1.0, 0);
+        wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 60.0002, 2, 4, 1.0, 0);
 
         std::vector<wrench::WorkflowTask *> tasks;
 
@@ -252,7 +252,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -289,9 +289,9 @@ private:
                   " t3: " + std::to_string(task3_makespan));
         }
 
-        workflow->removeTask(t1);
-        workflow->removeTask(t2);
-        workflow->removeTask(t3);
+        this->getWorkflow()->removeTask(t1);
+        this->getWorkflow()->removeTask(t2);
+        this->getWorkflow()->removeTask(t3);
       }
 
       /*******************************************************************/
@@ -302,9 +302,9 @@ private:
         double now = wrench::S4U_Simulation::getClock();
 
         // Create a job with 3 tasks
-        wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0000, 3, 4, 1.0, 0);
-        wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 1, 2, 1.0, 0);
-        wrench::WorkflowTask *t3 = this->workflow->addTask("task3", 60.0002, 2, 4, 1.0, 0);
+        wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 60.0000, 3, 4, 1.0, 0);
+        wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 60.0001, 1, 2, 1.0, 0);
+        wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 60.0002, 2, 4, 1.0, 0);
 
         std::vector<wrench::WorkflowTask *> tasks;
 
@@ -318,7 +318,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -355,9 +355,9 @@ private:
                   " t3: " + std::to_string(task3_makespan));
         }
 
-        workflow->removeTask(t1);
-        workflow->removeTask(t2);
-        workflow->removeTask(t3);
+        this->getWorkflow()->removeTask(t1);
+        this->getWorkflow()->removeTask(t2);
+        this->getWorkflow()->removeTask(t3);
       }
 
 
@@ -483,8 +483,8 @@ private:
 
 
         // Create and submit a job with 2 2-core tasks
-        wrench::WorkflowTask *t1_1 = this->workflow->addTask("task1_1", 8000, 2, 2, 1.0, 0);
-        wrench::WorkflowTask *t1_2 = this->workflow->addTask("task1_2", 8000, 2, 2, 1.0, 0);
+        wrench::WorkflowTask *t1_1 = this->getWorkflow()->addTask("task1_1", 8000, 2, 2, 1.0, 0);
+        wrench::WorkflowTask *t1_2 = this->getWorkflow()->addTask("task1_2", 8000, 2, 2, 1.0, 0);
 
         std::vector<wrench::WorkflowTask *> job1_tasks;
         job1_tasks.push_back(t1_1);
@@ -494,8 +494,8 @@ private:
         job_manager->submitJob(job1, this->test->cs_fcfs_aggressive_maximum_maximum_flops_best_fit);
 
         // Create and submit a job with a 2-core task and a 1-core task
-        wrench::WorkflowTask *t2_1 = this->workflow->addTask("task2_1", 60, 2, 2, 1.0, 0);
-        wrench::WorkflowTask *t2_2 = this->workflow->addTask("task2_2", 60, 1, 1, 1.0, 0);
+        wrench::WorkflowTask *t2_1 = this->getWorkflow()->addTask("task2_1", 60, 2, 2, 1.0, 0);
+        wrench::WorkflowTask *t2_2 = this->getWorkflow()->addTask("task2_2", 60, 1, 1, 1.0, 0);
 
         std::vector<wrench::WorkflowTask *> job2_tasks;
         job2_tasks.push_back(t2_1);
@@ -509,7 +509,7 @@ private:
           // Wait for a PILOT JOB STARTED execution event
           std::unique_ptr<wrench::WorkflowExecutionEvent> event;
           try {
-            event = workflow->waitForNextExecutionEvent();
+            event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
           }
@@ -534,7 +534,7 @@ private:
           // Wait for a PILOT JOB EXPIRED execution event
           std::unique_ptr<wrench::WorkflowExecutionEvent> event;
           try {
-            event = workflow->waitForNextExecutionEvent();
+            event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
           }
@@ -559,7 +559,7 @@ private:
           // Wait for a STANDARD JOB COMPLETED execution event
           std::unique_ptr<wrench::WorkflowExecutionEvent> event;
           try {
-            event = workflow->waitForNextExecutionEvent();
+            event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
           }
@@ -585,7 +585,7 @@ private:
           // Wait for a STANDARD JOB COMPLETION execution event
           std::unique_ptr<wrench::WorkflowExecutionEvent> event;
           try {
-            event = workflow->waitForNextExecutionEvent();
+            event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
           }
@@ -608,10 +608,10 @@ private:
           }
         }
 
-        workflow->removeTask(t1_1);
-        workflow->removeTask(t1_2);
-        workflow->removeTask(t2_1);
-        workflow->removeTask(t2_2);
+        this->getWorkflow()->removeTask(t1_1);
+        this->getWorkflow()->removeTask(t1_2);
+        this->getWorkflow()->removeTask(t2_1);
+        this->getWorkflow()->removeTask(t2_2);
       }
 
       return 0;

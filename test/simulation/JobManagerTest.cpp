@@ -222,9 +222,9 @@ private:
         throw std::runtime_error("Should not be able to create a standard job with a negative duration");
       }
 
-      wrench::WorkflowTask *t1 = workflow->addTask("t1", 1.0, 1, 1, 1.0, 0.0);
-      wrench::WorkflowTask *t2 = workflow->addTask("t2", 1.0, 1, 1, 1.0, 0.0);
-      wrench::WorkflowFile *f = workflow->addFile("f", 100);
+      wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("t1", 1.0, 1, 1, 1.0, 0.0);
+      wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("t2", 1.0, 1, 1, 1.0, 0.0);
+      wrench::WorkflowFile *f = this->getWorkflow()->addFile("f", 100);
       t1->addOutputFile(f);
       t2->addInputFile(f);
 

@@ -130,7 +130,7 @@ private:
           }
 //          std::cerr << "SUBMITTING " << "sub="<< sub_time << "num_nodes=" << num_nodes << " id="<<id << " flops="<<flops << " rflops="<<requested_flops << " ram="<<requested_ram << "\n";
           // TODO: Should we use the "requested_ram" instead of 0 below?
-          wrench::WorkflowTask *task = this->workflow->addTask(id, flops, min_num_cores, max_num_cores,
+          wrench::WorkflowTask *task = this->getWorkflow()->addTask(id, flops, min_num_cores, max_num_cores,
                                                                parallel_efficiency, 0);
 
           wrench::StandardJob *standard_job = job_manager->createStandardJob(
@@ -161,7 +161,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = this->workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -262,7 +262,7 @@ private:
         double task_flops = 10 * (1 * (1800 - time_fudge));
         int num_cores = 10;
         double parallel_efficiency = 1.0;
-        tasks.push_back(workflow->addTask("test_job_1_task_" + std::to_string(i),
+        tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
                                           task_flops,
                                           num_cores, num_cores, parallel_efficiency,
                                           0.0));
@@ -288,7 +288,7 @@ private:
         double task_flops = 10 * (1 * (1800 - time_fudge));
         int num_cores = 10;
         double parallel_efficiency = 1.0;
-        tasks.push_back(workflow->addTask("test_job_2_task_" + std::to_string(i),
+        tasks.push_back(this->getWorkflow()->addTask("test_job_2_task_" + std::to_string(i),
                                           task_flops,
                                           num_cores, num_cores, parallel_efficiency,
                                           0.0));
@@ -315,7 +315,7 @@ private:
         WRENCH_INFO("Waiting for job completion of job %s", job->getName().c_str());
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
               if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job) {
@@ -350,7 +350,6 @@ private:
         }
 
       }
-      delete workflow;
       return 0;
     }
 };

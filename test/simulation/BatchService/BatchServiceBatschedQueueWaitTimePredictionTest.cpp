@@ -103,9 +103,9 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0, 0);
-        task->addInputFile(this->workflow->getFileByID("input_file"));
-        task->addOutputFile(this->workflow->getFileByID("output_file"));
+        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 299, 1, 1, 1.0, 0);
+        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -117,10 +117,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
+                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -136,7 +136,7 @@ private:
         }
         double first_job_running = this->simulation->getCurrentSimulatedDate();
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->compute_services.begin()));
+        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
         std::string job_id = "my_tentative_job";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
@@ -167,7 +167,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = this->workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -180,7 +180,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
           }
         }
-        this->workflow->removeTask(task);
+        this->getWorkflow()->removeTask(task);
 
       }
 
@@ -296,9 +296,9 @@ private:
       {
 
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0, 0);
-        task->addInputFile(this->workflow->getFileByID("input_file"));
-        task->addOutputFile(this->workflow->getFileByID("output_file"));
+        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 299, 1, 1, 1.0, 0);
+        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -310,10 +310,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
+                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -329,7 +329,7 @@ private:
         }
         double first_job_running = this->simulation->getCurrentSimulatedDate();
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->compute_services.begin()));
+        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
         std::string job_id = "my_tentative_job";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
@@ -374,7 +374,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = this->workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -387,7 +387,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
           }
         }
-        this->workflow->removeTask(task);
+        this->getWorkflow()->removeTask(task);
 
       }
 
@@ -498,9 +498,9 @@ private:
       {
 
         // Create a sequential task that lasts 5 minutes and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0, 0);
-        task->addInputFile(this->workflow->getFileByID("input_file"));
-        task->addOutputFile(this->workflow->getFileByID("output_file"));
+        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 299, 1, 1, 1.0, 0);
+        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -512,10 +512,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
+                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -532,7 +532,7 @@ private:
         double first_job_running = this->simulation->getCurrentSimulatedDate();
 
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->compute_services.begin()));
+        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
         std::string job_id = "my_job1";
         unsigned int nodes = 2;
         double walltime_seconds = 1000;
@@ -549,7 +549,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = this->workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -562,16 +562,16 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
           }
         }
-        this->workflow->removeTask(task);
+        this->getWorkflow()->removeTask(task);
 
       }
 
       {
 
         // Create a sequential task that lasts one min and requires 2 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 2, 2, 1.0, 0);
-        task->addInputFile(this->workflow->getFileByID("input_file"));
-        task->addOutputFile(this->workflow->getFileByID("output_file"));
+        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 60, 2, 2, 1.0, 0);
+        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -583,10 +583,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
+                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args;
@@ -601,7 +601,7 @@ private:
           );
         }
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->compute_services.begin()));
+        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
         std::set<std::tuple<std::string, unsigned int, unsigned int, double>> set_of_jobs = {};
         for (int i=0; i<10; i++) {
           std::string job_id = "new_job"+std::to_string(i);
@@ -616,7 +616,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = this->workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -629,7 +629,7 @@ private:
             throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
           }
         }
-        this->workflow->removeTask(task);
+        this->getWorkflow()->removeTask(task);
 
       }
 
@@ -736,9 +736,9 @@ private:
       {
 
         // Submit the first job for 300 seconds and using 4 full cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 299, 1, 1, 1.0, 0);
-        task->addInputFile(this->workflow->getFileByID("input_file"));
-        task->addOutputFile(this->workflow->getFileByID("output_file"));
+        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 299, 1, 1, 1.0, 0);
+        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -750,10 +750,10 @@ private:
                         {*(task->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
+                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
 
@@ -771,9 +771,9 @@ private:
 
 
         // Submit the second job for next 300 seconds and using 2 cores
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 299, 1, 1, 1.0, 0);
-        task1->addInputFile(this->workflow->getFileByID("input_file"));
-        task1->addOutputFile(this->workflow->getFileByID("output_file"));
+        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 299, 1, 1, 1.0, 0);
+        task1->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task1->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -785,10 +785,10 @@ private:
                         {*(task1->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
+                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args1;
@@ -805,9 +805,9 @@ private:
 
 
         // Submit the third job for next 300 seconds and using 4 cores
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 299, 1, 1, 1.0, 0);
-        task2->addInputFile(this->workflow->getFileByID("input_file"));
-        task2->addOutputFile(this->workflow->getFileByID("output_file"));
+        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 299, 1, 1, 1.0, 0);
+        task2->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task2->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
 
         // Create a StandardJob with some pre-copies and post-deletions (not useful, but this is testing after all)
@@ -819,10 +819,10 @@ private:
                         {*(task2->getOutputFiles().begin()), this->test->storage_service1}
                 },
                 {std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>(
-                        this->workflow->getFileByID("input_file"), this->test->storage_service1,
+                        this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1,
                         this->test->storage_service2)},
                 {},
-                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->workflow->getFileByID("input_file"),
+                {std::tuple<wrench::WorkflowFile *, wrench::StorageService *>(this->getWorkflow()->getFileByID("input_file"),
                                                                               this->test->storage_service2)});
 
         std::map<std::string, std::string> batch_job_args2;
@@ -837,7 +837,7 @@ private:
           );
         }
 
-        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->compute_services.begin()));
+        auto *batch_service = dynamic_cast<wrench::BatchService *>((*this->getAvailableComputeServices().begin()));
 
         std::string job_id = "my_job1";
         unsigned int nodes = 1;
@@ -892,7 +892,7 @@ private:
           // Wait for a workflow execution event
           std::unique_ptr<wrench::WorkflowExecutionEvent> event;
           try {
-            event = this->workflow->waitForNextExecutionEvent();
+            event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
           }
@@ -907,9 +907,9 @@ private:
           }
         }
 
-        this->workflow->removeTask(task);
-        this->workflow->removeTask(task1);
-        this->workflow->removeTask(task2);
+        this->getWorkflow()->removeTask(task);
+        this->getWorkflow()->removeTask(task1);
+        this->getWorkflow()->removeTask(task2);
 
       }
 

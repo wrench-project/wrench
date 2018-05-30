@@ -412,7 +412,7 @@ private:
       }
 
       // Create another task
-        wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 1.0, 2048);
+        wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 1.0, 2048);
 
       // Create a job with nullptrs in file locations
       success = true;
@@ -795,7 +795,7 @@ private:
       job_manager->submitJob(job, test->compute_service);
 
       // Wait for the workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
       if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
         throw std::runtime_error("Unexpected workflow execution event!");
       }
@@ -949,7 +949,7 @@ private:
       job_manager->submitJob(job, test->compute_service);
 
       // Wait for the workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
       if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
         throw std::runtime_error("Unexpected workflow execution event!");
       }
@@ -1072,7 +1072,7 @@ private:
       job_manager->submitJob(job, test->compute_service);
 
       // Wait for the workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
           break;
@@ -1221,7 +1221,7 @@ private:
       job_manager->submitJob(job, test->compute_service);
 
       // Wait for the workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
           bool success = false;
@@ -1340,7 +1340,7 @@ private:
       bool success;
 
       // Create another task
-      wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 1.0, 2048);
+      wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 1.0, 2048);
 
       // Create a job
       wrench::StandardJob *job = job_manager->createStandardJob({task_big},
@@ -1468,7 +1468,7 @@ private:
 
       bool success;
 
-      wrench::WorkflowTask *task_big = workflow->addTask("task2", 3600, 2, 2, 1.0, 2048);
+      wrench::WorkflowTask *task_big = this->getWorkflow()->addTask("task2", 3600, 2, 2, 1.0, 2048);
 
       // Create a job
       wrench::StandardJob *job = job_manager->createStandardJob({task_big},
