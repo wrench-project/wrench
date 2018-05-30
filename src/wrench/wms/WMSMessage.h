@@ -28,7 +28,7 @@ namespace wrench {
 
     /**
      * @brief Message sent by an alarm to a WMS to tell it that it can start
-     *        executing its workflow workflow
+     *        executing its workflow
      */
     class AlarmWMSDeferredStartMessage : public WMSMessage {
     public:
