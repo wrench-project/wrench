@@ -31,7 +31,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the hostname on which to start the service
+     * @param hostname: the name of the hostcreate on which to start the service
      * @param execution_hosts: the hosts available for running virtual machines
      * @param scratch_space_size: the size for the scratch space of the cloud service
      * @param property_list: a property list ({} means "use all defaults")
@@ -68,9 +68,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a list of execution hosts to run VMs
+     * @brief Get the list of execution hosts availble to run VMs
      *
-     * @return The list of execution hosts
+     * @return a list of hostnames
      *
      * @throw WorkflowExecutionException
      */
@@ -110,11 +110,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a multicore executor VM in a physical machine
+     * @brief Create a MultihostMulticoreComputeService VM on a physical machine
      *
      * @param pm_hostname: the name of the physical machine host
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
-     * @param ram_memory: the VM RAM memory capacity (-1 means "use all memory available on the host", this can be lead to an out of memory issue)
+     * @param ram_memory: the VM's RAM memory capacity (-1 means "use all memory available on the host", this can be lead to an out of memory issue)
      * @param property_list: a property list ({} means "use all defaults")
      *
      * @return Virtual machine hostname
@@ -215,7 +215,7 @@ namespace wrench {
      * @brief Submit a standard job to the virtualized cluster service
      *
      * @param job: a standard job
-     * @param service_specific_args: service specific arguments
+     * @param service_specific_args: service specific arguments (likely just {})
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -263,7 +263,7 @@ namespace wrench {
      * @brief Asynchronously submit a pilot job to the virtualized cluster service
      *
      * @param job: a pilot job
-     * @param service_specific_args: service specific arguments
+     * @param service_specific_args: service specific arguments (likely just {})
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -314,7 +314,7 @@ namespace wrench {
 
     /**
      * @brief Terminate a standard job to the compute service (virtual)
-     * @param job: the job
+     * @param job: the standard job
      *
      * @throw std::runtime_error
      */
@@ -324,7 +324,7 @@ namespace wrench {
 
     /**
      * @brief Terminate a pilot job to the compute service (virtual)
-     * @param job: the job
+     * @param job: the pilot job
      *
      * @throw std::runtime_error
      */
@@ -379,7 +379,7 @@ namespace wrench {
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
       if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
-        this->terminate();
+        this->stopAllVMs();
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -421,7 +421,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a list of execution hosts to run VMs
+     * @brief Process a execution host list request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      */
@@ -440,7 +440,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a multicore executor VM in a physical machine
+     * @brief Create a MultihostMulticoreComputeService VM on a physical machine
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param pm_hostname: the name of the physical machine host
@@ -448,7 +448,7 @@ namespace wrench {
      * @param supports_standard_jobs: true if the compute service should support standard jobs
      * @param supports_pilot_jobs: true if the compute service should support pilot jobs
      * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
-     * @param ram_memory: the VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue)
+     * @param ram_memory: the VM's RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue)
      * @param property_list: a property list ({} means "use all defaults")
      *
      * @throw std::runtime_error
@@ -543,7 +543,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Synchronously migrate a VM to another physical machine
+     * @brief Process a VM migration request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param vm_hostname: the name of the VM host
@@ -780,10 +780,9 @@ namespace wrench {
     }
 
     /**
-    * @brief Terminate the daemon.
+    * @brief Terminate all VMs.
     */
-    void VirtualizedClusterService::terminate() {
-      this->setStateToDown();
+    void VirtualizedClusterService::stopAllVMs() {
 
       WRENCH_INFO("Stopping Virtualized Cluster Service");
       for (auto &vm : this->vm_list) {

@@ -19,7 +19,7 @@ namespace wrench {
     /***********************/
 
     /**
-    * @brief Generic class that describe a message communicated by simulated processes
+    * @brief Top-level class for messages received/sent by a WMS
     */
     class WMSMessage : public SimulationMessage {
     protected:
@@ -27,21 +27,13 @@ namespace wrench {
     };
 
     /**
-     * @brief Message sent by an alarm to tell a WMS that it can start
-     *        executing a workflow
+     * @brief Message sent by an alarm to a WMS to tell it that it can start
+     *        executing its workflow workflow
      */
     class AlarmWMSDeferredStartMessage : public WMSMessage {
     public:
         AlarmWMSDeferredStartMessage(double payload);
 
-        #if 0
-//        AlarmWMSDeferredStartMessage(std::string &answer_mailbox, double start_time, double payload);
-
-//        /** @brief The mailbox to which the "go ahead" message should be sent to */
-//        std::string answer_mailbox;
-//        /** @brief The simulation time to start the workflow execution */
-//        double start_time;
-        #endif
     };
 
     /***********************/
