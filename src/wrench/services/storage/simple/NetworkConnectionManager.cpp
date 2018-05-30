@@ -26,7 +26,7 @@ namespace wrench {
 
     /**
      * @brief Wait for the next network connection to change state
-     * @return a network connection that has finished and its status
+     * @return a network connection that has finished and its status (true: success, false: failure)
      */
     std::pair<std::unique_ptr<NetworkConnection>, bool> NetworkConnectionManager::waitForNetworkConnection() {
 

@@ -29,7 +29,7 @@ namespace wrench {
     /**
      * @brief Submit a standard job to the compute service
      * @param job: a standard job
-     * @param service_specific_args: service specific arguments
+     * @param service_specific_args: service specific arguments ({} most likely)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -80,7 +80,6 @@ namespace wrench {
      * @brief Destructor
      */
     MultihostMulticoreComputeService::~MultihostMulticoreComputeService() {
-//      std::cerr << "IN MHMC DESTRUCTOR\n";
       this->default_property_values.clear();
     }
 
@@ -88,7 +87,7 @@ namespace wrench {
      * @brief Asynchronously submit a pilot job to the compute service
      *
      * @param job: a pilot job
-     * @param service_specific_args: service specific arguments
+     * @param service_specific_args: service specific arguments ({} most likely)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -144,11 +143,11 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the name of the host on which the job executor should be started
-     * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
+     * @param hostname: the name of the host on which the service should be started
+     * @param compute_resources: a list of <hostname, num_cores, memory> tuples, which represent
      *        the compute resources available to this service.
-     *          - num_cores = ComputeService::ALL_CORES: use all cores available on the host
-     *          - memory = ComputeService::ALL_RAM: use all RAM available on the host
+     *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
+     *          - use memory = ComputeService::ALL_RAM to use all RAM available on the host
      * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -173,8 +172,8 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the name of the host on which the job executor should be started
-     * @param compute_hosts:: a set of hostnames (the service
+     * @param hostname: the name of the host on which the service should be started
+     * @param compute_hosts:: the names of the hosts available as compute resources (the service
      *        will use all the cores and all the RAM of each host)
      * @param scratch_space_size: size (in bytes) of the compute service's scratch storage paste
      * @param property_list: a property list ({} means "use all defaults")
@@ -204,12 +203,12 @@ namespace wrench {
     /**
      * @brief Internal constructor
      *
-     * @param hostname: the name of the host
-     * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
+     * @param hostname: the name of the host on which the service should be started
+     * @param compute_resources: a list of <hostname, num_cores, memory> tuples, which represent
      *        the compute resources available to this service
-     * @param property_list: a property list
-     * @param messagepayload_list: a message payload list
-     * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
      * @param pj: a containing PilotJob  (nullptr if none)
      * @param suffix: a string to append to the process name
      *
@@ -239,8 +238,8 @@ namespace wrench {
      * @brief Internal constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
-     * @param compute_hosts:: a set of hostnames (the service
-     *        will use all the cores and all the RAM of each host)
+     * @param compute_hosts:: a list of <hostname, num_cores, memory> tuples, which represent
+     *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param scratch_space: the scratch space for this compute service
@@ -262,14 +261,14 @@ namespace wrench {
     }
 
 /**
- * @brief Internal method called by all constructors to initiate instance
+ * @brief Helper method called by all constructors to initiate object instance
  *
  * @param hostname: the name of the host
  * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
  *        the compute resources available to this service
- * @param property_list: a property list
- * @param messagepayload_list: a message payload list
- * @param ttl: the time-to-live, in seconds (-1: infinite time-to-live)
+ * @param property_list: a property list ({} means "use all defaults")
+ * @param messagepayload_list: a message payload list ({} means "use all defaults")
+ * @param ttl: the time-to-live, in seconds (DBL_MAX: infinite time-to-live)
  * @param pj: a containing PilotJob  (nullptr if none)
  *
  * @throw std::invalid_argument
@@ -281,6 +280,10 @@ namespace wrench {
             std::map<std::string, std::string> messagepayload_list,
             double ttl,
             PilotJob *pj) {
+
+      if (ttl < 0) {
+        throw std::invalid_argument("MultihostMulticoreComputeService::initiateInstance(): invalid TTL value (must be >0)");
+      }
 
       // Set default and specified properties
       this->setProperties(this->default_property_values, property_list);
@@ -345,7 +348,7 @@ namespace wrench {
       }
 
       this->ttl = ttl;
-      this->has_ttl = (ttl >= 0);
+      this->has_ttl = (this->ttl != DBL_MAX);
       this->containing_pilot_job = pj;
 
     }
@@ -1200,7 +1203,7 @@ namespace wrench {
 /**
  * @brief Synchronously terminate a standard job previously submitted to the compute service
  *
- * @param job: the standard job
+ * @param job: a standard job
  *
  * @throw WorkflowExecutionException
  * @throw std::runtime_error
@@ -1246,7 +1249,7 @@ namespace wrench {
     }
 
 /**
- * @brief Synchronously terminate a pilot job to the compute service
+ * @brief Synchronously terminate a pilot job previously submitted to the compute service
  *
  * @param job: a pilot job
  *

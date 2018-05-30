@@ -31,7 +31,7 @@ namespace wrench {
 
     /**
      * @brief A compute service that manages a set of multi-core compute hosts and
-     *        controls access to their resources using various scheduling strategies.
+     *        controls access to their resources using standard scheduling strategies.
      */
     class MultihostMulticoreComputeService : public ComputeService {
 
