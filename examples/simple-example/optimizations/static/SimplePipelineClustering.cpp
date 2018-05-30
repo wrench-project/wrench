@@ -25,7 +25,7 @@ namespace wrench {
       std::set<std::string> pipelined_tasks;
 
       for (auto task : workflow->getTasks()) {
-        if (pipelined_tasks.find(task->getId()) == pipelined_tasks.end()
+        if (pipelined_tasks.find(task->getID()) == pipelined_tasks.end()
             && (task->getNumberOfChildren() == 1 || task->getNumberOfParents() == 1)) {
 
           std::string cluster_id = "PIPELINE_CLUSTER_" + std::to_string(id++);
@@ -33,11 +33,11 @@ namespace wrench {
           // explore parent
           WorkflowTask *parent = getTask(workflow->getTaskParents(task));
           while (true) {
-            if (parent && pipelined_tasks.find(parent->getId()) == pipelined_tasks.end()
+            if (parent && pipelined_tasks.find(parent->getID()) == pipelined_tasks.end()
                 && parent->getNumberOfChildren() == 1) {
 
-              pipelined_tasks.insert(parent->getId());
-              parent->setClusterId(cluster_id);
+              pipelined_tasks.insert(parent->getID());
+              parent->setClusterID(cluster_id);
 
               // next parent
               parent = getTask(workflow->getTaskParents(parent));
@@ -50,11 +50,11 @@ namespace wrench {
           // explore child
           WorkflowTask *child = getTask(workflow->getTaskChildren(task));
           while (true) {
-            if (child && pipelined_tasks.find(child->getId()) == pipelined_tasks.end()
+            if (child && pipelined_tasks.find(child->getID()) == pipelined_tasks.end()
                 && child->getNumberOfParents() == 1) {
 
-              pipelined_tasks.insert(child->getId());
-              child->setClusterId(cluster_id);
+              pipelined_tasks.insert(child->getID());
+              child->setClusterID(cluster_id);
 
               // next child
               child = getTask(workflow->getTaskChildren(child));
@@ -66,8 +66,8 @@ namespace wrench {
 
           // create clustered task
           if (not pipelined_tasks.empty()) {
-            pipelined_tasks.insert(task->getId());
-            task->setClusterId(cluster_id);
+            pipelined_tasks.insert(task->getID());
+            task->setClusterID(cluster_id);
           }
         }
       }

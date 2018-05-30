@@ -357,7 +357,7 @@ namespace wrench {
  */
     int MultihostMulticoreComputeService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_RED);
 
       WRENCH_INFO("New Multicore Job Executor starting (%s) on %ld hosts with a total of %ld cores",
                   this->mailbox_name.c_str(), this->compute_resources.size(), this->total_num_cores);
@@ -487,7 +487,7 @@ namespace wrench {
         double picked_picked_ram = 0.0;
 
         for (auto t : tasks) {
-//          WRENCH_INFO("LOOKING AT TASK %s", t->getId().c_str());
+//          WRENCH_INFO("LOOKING AT TASK %s", t->getID().c_str());
           std::string picked_host;
           unsigned long picked_num_cores = 0;
           double picked_ram = 0.0;
@@ -534,7 +534,7 @@ namespace wrench {
 
         if (picked_picked_num_cores > 0) {
 //          WRENCH_INFO("ALLOCATION %s/%ld-%.2lf for task %s", picked_picked_host.c_str(),
-//                      picked_picked_num_cores, picked_picked_ram, picked_task->getId().c_str());
+//                      picked_picked_num_cores, picked_picked_ram, picked_task->getID().c_str());
 
           if (allocation.find(picked_picked_host) != allocation.end()) {
             std::get<0>(allocation[picked_picked_host]) += picked_picked_num_cores;

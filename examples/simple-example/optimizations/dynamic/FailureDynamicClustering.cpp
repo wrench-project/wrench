@@ -27,9 +27,9 @@ namespace wrench {
       for (auto task_map : workflow->getReadyClusters()) {
         if (task_map.second.size() > 1) {
           for (auto task : task_map.second) {
-            if (not task->getClusterId().empty() && task->getFailureCount() > 0) {
-              WRENCH_INFO("Ungrouping task %s due to failure", task->getId().c_str());
-              task->setClusterId(task->getId());
+            if (not task->getClusterID().empty() && task->getFailureCount() > 0) {
+              WRENCH_INFO("Ungrouping task %s due to failure", task->getID().c_str());
+              task->setClusterID(task->getID());
               ++count;
             }
           }

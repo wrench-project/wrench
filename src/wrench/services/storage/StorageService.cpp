@@ -23,10 +23,10 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the name of the host on which the service runs
+     * @param hostname: the name of the host on which the service should run
      * @param service_name: the name of the storage service
-     * @param mailbox_name_prefix:
-     * @param capacity:
+     * @param mailbox_name_prefix: the mailbox name prefix
+     * @param capacity: the storage capacity in bytes
      */
     StorageService::StorageService(std::string hostname, std::string service_name, std::string mailbox_name_prefix,
                                    double capacity) :
@@ -41,9 +41,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Internal method to add a file to the storage in a StorageService BEFORE the simulation start
+     * @brief Store a file on the storage service BEFORE the simulation is launched
      *
-     * @param file: a workflow file
+     * @param file: a file
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
@@ -65,15 +65,15 @@ namespace wrench {
       }
       this->stored_files.insert(file);
       this->occupied_space += file->getSize();
-      WRENCH_INFO("Stored file %s (storage usage: %.10lf%%)", file->getId().c_str(),
+      WRENCH_INFO("Stored file %s (storage usage: %.10lf%%)", file->getID().c_str(),
                   100.0 * this->occupied_space / this->capacity);
     }
 
 
     /**
-     * @brief Internal method to delete a file from the storage  in a StorageService
+     * @brief Remove a file from storage (internal method)
      *
-     * @param file: a workflow file
+     * @param file: a file
      *
      * @throw std::runtime_error
      */
@@ -89,13 +89,12 @@ namespace wrench {
       }
       this->stored_files.erase(file);
       this->occupied_space -= file->getSize();
-      WRENCH_INFO("Deleted file %s (storage usage: %.2lf%%)", file->getId().c_str(),
+      WRENCH_INFO("Deleted file %s (storage usage: %.2lf%%)", file->getID().c_str(),
                   100.0 * this->occupied_space / this->capacity);
     }
 
     /**
-     * @brief Stop the compute service - should be called by the stop()
-     *        method of derived classes, if any
+     * @brief Stop the service
      */
     void StorageService::stop() {
 
@@ -109,7 +108,7 @@ namespace wrench {
 
     /**
      * @brief Synchronously asks the storage service for its capacity
-     * @return the free space in bytes
+     * @return The free space in bytes
      *
      * @throw WorkflowExecutionException
      *
@@ -345,9 +344,8 @@ namespace wrench {
      *
      * @param files: the set of files to read
      * @param file_locations: a map of files to storage services
-     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
-     * @param files_in_scratch: the set of files that have been writted to the default storage service (which must be a compute service's scratch storage)
-     * @return nullptr on success, or a workflow execution failure cause on failure
+     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (which must be a compute service's scratch storage)
+     * @param files_in_scratch: the set of files that have been written to the default storage service (which must be a compute service's scratch storage)
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -370,9 +368,8 @@ namespace wrench {
      *
      * @param files: the set of files to write
      * @param file_locations: a map of files to storage services
-     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
+     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (which must be a compute service's scratch storage)
      * @param files_in_scratch: the set of files that have been writted to the default storage service (which must be a compute service's scratch storage)
-     * @return nullptr on success, or a workflow execution failure cause on failure
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -393,10 +390,10 @@ namespace wrench {
     /**
      * @brief Synchronously and sequentially write/read a set of files to/from storage services
      *
-     * @param action: DONWLOAD or WRITE
+     * @param action: FileOperation::DONWLOAD or FileOperation::WRITE
      * @param files: the set of files to read/write
      * @param file_locations: a map of files to storage services
-     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
+     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (which must be a compute service's scratch storage)
      * @param files_in_scratch: the set of files that have been writted to the default storage service (which must be a compute service's scratch storage)
      *
      * @throw std::runtime_error
@@ -431,9 +428,9 @@ namespace wrench {
 
         if (action == READ) {
           try {
-            WRENCH_INFO("Reading file %s from storage service %s", f->getId().c_str(), storage_service->getName().c_str());
+            WRENCH_INFO("Reading file %s from storage service %s", f->getID().c_str(), storage_service->getName().c_str());
             storage_service->readFile(f);
-            WRENCH_INFO("File %s read", f->getId().c_str());
+            WRENCH_INFO("File %s read", f->getID().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -445,9 +442,9 @@ namespace wrench {
             files_in_scratch.insert(f);
           }
           try {
-            WRENCH_INFO("Writing file %s to storage service %s", f->getId().c_str(), storage_service->getName().c_str());
+            WRENCH_INFO("Writing file %s to storage service %s", f->getID().c_str(), storage_service->getName().c_str());
             storage_service->writeFile(f);
-            WRENCH_INFO("Wrote file %s", f->getId().c_str());
+            WRENCH_INFO("Wrote file %s", f->getID().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -507,7 +504,7 @@ namespace wrench {
         if (!msg->success) {
           throw WorkflowExecutionException(std::move(msg->failure_cause));
         }
-        WRENCH_INFO("Deleted file %s on storage service %s", file->getId().c_str(), this->getName().c_str());
+        WRENCH_INFO("Deleted file %s on storage service %s", file->getID().c_str(), this->getName().c_str());
 
         if (unregister) {
             file_registry_service->removeEntry(file, this);
@@ -523,7 +520,7 @@ namespace wrench {
      *
      * @param files: the set of files to delete
      * @param file_locations: a map of files to storage services
-     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map
+     * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (or nullptr if none)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -553,7 +550,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Synchronously asks the storage service to read a file from another storage service
+     * @brief Synchronously ask the storage service to read a file from another storage service
      *
      * @param file: the file to copy
      * @param src: the storage service from which to read the file
@@ -613,7 +610,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Asynchronously asks the storage service to read a file from another storage service
+     * @brief Asynchronously ask the storage service to read a file from another storage service
      *
      * @param answer_mailbox: the mailbox to which a notification message will be sent
      * @param file: the file
@@ -655,7 +652,7 @@ namespace wrench {
 
 
     /**
-     * @brief Asynchrously read a file from the storage service
+     * @brief Asynchronously read a file from the storage service
      *
      * @param mailbox_that_should_receive_file_content: the mailbox to which the file should be sent
      * @param file: the file
@@ -667,7 +664,7 @@ namespace wrench {
     void StorageService::initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file) {
 
       WRENCH_INFO("Initiating a file read operation for file %s on storage service %s",
-                  file->getId().c_str(), this->getName().c_str());
+                  file->getID().c_str(), this->getName().c_str());
 
       if (file == nullptr) {
         throw std::invalid_argument("StorageService::initiateFileRead(): Invalid arguments");
@@ -720,10 +717,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the total capacity of the storage service (no simulation time consumption)
-     * @return capcacity of the storage service (double)
+     * @brief Get the total static capacity of the storage service (in zero simulation time)
+     * @return capacity of the storage service (double)
      */
-
     double StorageService::getTotalSpace() {
       return this->capacity;
     }

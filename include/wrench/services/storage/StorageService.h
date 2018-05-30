@@ -29,7 +29,7 @@ namespace wrench {
     class FileRegistryService;
 
     /**
-     * @brief A simulated storage service
+     * @brief The storage service base class
      */
     class StorageService : public Service {
 

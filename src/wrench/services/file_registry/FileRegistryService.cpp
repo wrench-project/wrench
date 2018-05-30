@@ -257,7 +257,7 @@ namespace wrench {
       if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
         if (!msg->success) {
           WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service",
-                      file->getId().c_str(), storage_service->getName().c_str());
+                      file->getID().c_str(), storage_service->getName().c_str());
         }
         return;
       } else {
@@ -273,7 +273,7 @@ namespace wrench {
      */
     int FileRegistryService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_MAGENTA);
 
       WRENCH_INFO("File Registry Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 

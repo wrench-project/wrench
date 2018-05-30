@@ -95,7 +95,7 @@ namespace wrench {
      */
     int SimpleStorageService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_CYAN);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_CYAN);
 
       WRENCH_INFO("Simple Storage Service %s starting on host %s (capacity: %lf, holding %ld files, listening on %s)",
                   this->getName().c_str(),
@@ -434,7 +434,7 @@ namespace wrench {
       }
 
       WRENCH_INFO("Asynchronously copying file %s from storage service %s",
-                  file->getId().c_str(),
+                  file->getID().c_str(),
                   src->getName().c_str());
 
       // Create a unique mailbox_name on which to receive the file
@@ -491,7 +491,7 @@ namespace wrench {
 
       if (message == nullptr) {
         WRENCH_INFO("SimpleStorageService::processDataConnection(): Communication failure when receiving file '%s",
-                    connection->file->getId().c_str());
+                    connection->file->getID().c_str());
         // Process the failure, meaning, just re-decrease the occupied space
         this->occupied_space -= connection->file->getSize();
         // And if this was an overwrite, now we lost the file!!!

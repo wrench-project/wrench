@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
   std::cerr << "Staging input files..." << std::endl;
   std::map<std::string, wrench::WorkflowFile *> input_files = workflow.getInputFiles();
   for (auto f : input_files) {
-    std::cerr << "---> " << f.second->getId() << "\n";
+    std::cerr << "---> " << f.second->getID() << "\n";
   }
   try {
     simulation.stageFiles(input_files, storage_service);
@@ -161,7 +161,7 @@ int main(int argc, char **argv) {
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
   trace = simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
   std::cerr << "Number of entries in TaskCompletion trace: " << trace.size() << std::endl;
-  std::cerr << "Task in first trace entry: " << trace[0]->getContent()->getTask()->getId() << std::endl;
+  std::cerr << "Task in first trace entry: " << trace[0]->getContent()->getTask()->getID() << std::endl;
 
   return 0;
 }

@@ -107,7 +107,7 @@ namespace wrench {
     int WorkunitMulticoreExecutor::main() {
 
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_BLUE);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_BLUE);
 
       WRENCH_INFO("New WorkunitExecutor starting (%s) to do: %ld pre file copies, %ld tasks, %ld post file copies",
                   this->mailbox_name.c_str(),
@@ -203,7 +203,7 @@ namespace wrench {
 
         try {
           WRENCH_INFO("Copying file %s from %s to %s",
-                      file->getId().c_str(),
+                      file->getID().c_str(),
                       src->getName().c_str(),
                       dst->getName().c_str());
 
@@ -224,7 +224,7 @@ namespace wrench {
         task->setInternalState(WorkflowTask::InternalState::TASK_RUNNING);
 
         // Read  all input files
-        WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getId().c_str());
+        WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
         try {
             StorageService::readFiles(task->getInputFiles(),
                                       work->file_locations,
@@ -235,7 +235,7 @@ namespace wrench {
         }
 
         // Run the task's computation (which can be multicore)
-        WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getId().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
         task->setStartDate(S4U_Simulation::getClock());
 
         try {
@@ -245,7 +245,7 @@ namespace wrench {
           throw;
         }
 
-        WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(), task->getId().c_str());
+        WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(), task->getID().c_str());
 
         // Write all output files
         try {
@@ -256,7 +256,7 @@ namespace wrench {
           throw;
         }
 
-        WRENCH_INFO("Setting the internal state of %s to TASK_COMPLETED", task->getId().c_str());
+        WRENCH_INFO("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
         task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
 
         // Deal with Children

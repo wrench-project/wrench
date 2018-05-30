@@ -180,7 +180,7 @@ private:
         double delta = fabs(actual_completion_times[i] - expected_completion_times[i]);
         if (delta > EPSILON) {
           throw std::runtime_error("Unexpected job completion time for the job containing task " +
-                                   tasks[i]->getId() +
+                                   tasks[i]->getID() +
                                    ": " +
                                    std::to_string(actual_completion_times[i]) +
                                    "(expected: " +

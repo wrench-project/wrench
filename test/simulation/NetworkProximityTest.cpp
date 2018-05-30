@@ -350,7 +350,7 @@ void NetworkProximityTest::do_CompareNetworkProximity_Test() {
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({std::make_pair(input_file->getId(), input_file)}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({std::make_pair(input_file->getID(), input_file)}, storage_service1));
 
   // Get a host for network proximity host
   std::string network_proximity_db_hostname = simulation->getHostnameList()[1];

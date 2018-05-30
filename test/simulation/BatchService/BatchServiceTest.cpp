@@ -1812,9 +1812,9 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
   wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file},
-                                          {input_file_1->getId(), input_file_1},
-                                          {input_file_2->getId(), input_file_2}}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file},
+                                          {input_file_1->getID(), input_file_1},
+                                          {input_file_2->getID(), input_file_2}}, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -1982,9 +1982,9 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
   wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file},
-                                          {input_file_1->getId(), input_file_1},
-                                          {input_file_2->getId(), input_file_2}}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file},
+                                          {input_file_1->getID(), input_file_1},
+                                          {input_file_2->getID(), input_file_2}}, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -2266,9 +2266,9 @@ void BatchServiceTest::do_RoundRobinTask_test() {
   wrench::WorkflowFile *output_file_2 = this->workflow->addFile("output_file_2", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file},
-                                          {input_file_1->getId(), input_file_1},
-                                          {input_file_2->getId(), input_file_2}}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file},
+                                          {input_file_1->getID(), input_file_1},
+                                          {input_file_2->getID(), input_file_2}}, storage_service1));
 
 
   // Running a "run a single task" simulation

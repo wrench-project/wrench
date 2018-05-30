@@ -195,7 +195,7 @@ namespace wrench {
      */
     int NetworkProximityService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_MAGENTA);
 
       WRENCH_INFO("Network Proximity Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 

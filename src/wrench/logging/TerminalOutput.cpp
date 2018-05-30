@@ -14,20 +14,31 @@
 
 namespace wrench {
 
+    const char *TerminalOutput::color_codes[] = {
+            "\033[1;30m",
+            "\033[1;31m",
+            "\033[1;32m",
+            "\033[1;33m",
+            "\033[1;34m",
+            "\033[1;35m",
+            "\033[1;36m",
+            "\033[1;37m",
+    };
+
     std::map<simgrid::s4u::ActorPtr, std::string> TerminalOutput::colormap;
     bool TerminalOutput::color_enabled = true;
 
     /**
      * @brief Set the color of log messages printed to the terminal
      *
-     * @param color: "WRENCH_LOGGING_COLOR_RED", "WRENCH_LOGGING_COLOR_GREEN", etc.
+     * @param color: a terminal output color
      */
-    void TerminalOutput::setThisProcessLoggingColor(std::string color) {
-      TerminalOutput::colormap[simgrid::s4u::Actor::self()] = color;
+    void TerminalOutput::setThisProcessLoggingColor(Color color) {
+      TerminalOutput::colormap[simgrid::s4u::Actor::self()] = TerminalOutput::color_codes[color];
     }
 
     /**
-     * @brief Turn on colored output for the current process
+     * @brief Turn on colored output for the calling process
      */
     void TerminalOutput::beginThisProcessColor() {
       if (TerminalOutput::color_enabled) {
@@ -36,7 +47,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Turn off colored output for the current process
+     * @brief Turn off colored output for the calling process
      */
     void TerminalOutput::endThisProcessColor() {
       if (TerminalOutput::color_enabled) {
@@ -45,15 +56,15 @@ namespace wrench {
     }
 
     /**
-     * @brief Disable color terminal output
+     * @brief Disable color terminal output for all processes
      */
     void TerminalOutput::disableColor() {
       TerminalOutput::color_enabled = false;
     }
 
     /**
-     * @brief Get the current output color for the current process
-     * @return the color as a string
+     * @brief Get the current output color ASCII code sequence for the current process
+     * @return the color ASCII code sequence as a string
      */
     std::string TerminalOutput::getThisProcessLoggingColor() {
 

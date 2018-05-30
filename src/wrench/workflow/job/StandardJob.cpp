@@ -54,7 +54,7 @@ namespace wrench {
           for (auto parent : parents) {
             if (parent->getState() != WorkflowTask::State::COMPLETED) {
               if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
-                throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getId() +
+                throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getID() +
                                             "' has non-completed parents not included in the job");
               }
             }

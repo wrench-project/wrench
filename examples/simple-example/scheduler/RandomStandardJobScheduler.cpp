@@ -36,7 +36,7 @@ namespace wrench {
         bool successfully_scheduled = false;
 
         // First: attempt to run the task on a running pilot job
-        WRENCH_INFO("Trying to submit task '%s' to a pilot job...", task->getId().c_str());
+        WRENCH_INFO("Trying to submit task '%s' to a pilot job...", task->getID().c_str());
 
         double total_flops = Workflow::getSumFlops({task});
 
@@ -82,7 +82,7 @@ namespace wrench {
           }
 
           // We can submit!
-          WRENCH_INFO("Submitting task %s for execution to a pilot job", task->getId().c_str());
+          WRENCH_INFO("Submitting task %s for execution to a pilot job", task->getID().c_str());
           WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(task, {});
           job_manager->submitJob(job, cs);
           successfully_scheduled = true;
@@ -96,7 +96,7 @@ namespace wrench {
         }
 
         // Second: attempt to run the task on a compute resource
-        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", task->getId().c_str());
+        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", task->getID().c_str());
 
         for (auto cs : compute_services) {
           WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
@@ -132,7 +132,7 @@ namespace wrench {
           }
 
           // We can submit!
-          WRENCH_INFO("Submitting task %s for execution as a standard job", task->getId().c_str());
+          WRENCH_INFO("Submitting task %s for execution as a standard job", task->getID().c_str());
           WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(task, file_locations);
           job_manager->submitJob(job, cs);
           successfully_scheduled = true;

@@ -160,7 +160,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
   this->big_file = workflow->addFile("big", 1000);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({std::make_pair(this->small_file->getId(), this->small_file)},
+  EXPECT_NO_THROW(simulation->stageFiles({std::make_pair(this->small_file->getID(), this->small_file)},
                                          storage_service1));
 
   // Running a "run a single task" simulation
@@ -332,7 +332,7 @@ void WMSTest::do_CustomHandlerWMS_test() {
   this->big_file = workflow->addFile("big", 1000);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({std::make_pair(this->small_file->getId(), this->small_file)},
+  EXPECT_NO_THROW(simulation->stageFiles({std::make_pair(this->small_file->getID(), this->small_file)},
                                          storage_service1));
 
   // Running a "run a single task" simulation

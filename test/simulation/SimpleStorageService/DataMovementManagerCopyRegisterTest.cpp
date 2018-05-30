@@ -307,13 +307,13 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
   wms->addWorkflow(this->workflow);
 
   // Stage the 2 files on the StorageHost
-  EXPECT_NO_THROW(simulation->stageFiles({{src_file_1->getId(), src_file_1},
-                                          {src_file_2->getId(), src_file_2},
-                                          {src_file_3->getId(), src_file_3}}, src_storage_service));
+  EXPECT_NO_THROW(simulation->stageFiles({{src_file_1->getID(), src_file_1},
+                                          {src_file_2->getID(), src_file_2},
+                                          {src_file_3->getID(), src_file_3}}, src_storage_service));
 
-  EXPECT_NO_THROW(simulation->stageFiles({{src2_file_1->getId(), src2_file_1},
-                                          {src2_file_2->getId(), src2_file_2},
-                                          {src2_file_3->getId(), src2_file_3}}, src2_storage_service));
+  EXPECT_NO_THROW(simulation->stageFiles({{src2_file_1->getID(), src2_file_1},
+                                          {src2_file_2->getID(), src2_file_2},
+                                          {src2_file_3->getID(), src2_file_3}}, src2_storage_service));
 
   EXPECT_NO_THROW(simulation->launch());
 

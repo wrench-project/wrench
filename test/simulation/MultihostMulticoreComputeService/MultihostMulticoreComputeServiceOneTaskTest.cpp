@@ -317,15 +317,15 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_Noop_test() {
 
   // Without a file registry service this should fail
   ASSERT_THROW(simulation->launch(), std::runtime_error);
-  ASSERT_THROW(simulation->stageFiles({{input_file->getId(),input_file}}, storage_service1), std::runtime_error);
+  ASSERT_THROW(simulation->stageFiles({{input_file->getID(),input_file}}, storage_service1), std::runtime_error);
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
-  ASSERT_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, nullptr), std::invalid_argument);
   ASSERT_THROW(simulation->stageFiles({{"foo", nullptr}}, storage_service1), std::invalid_argument);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
 
   // Running a "do nothing" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -632,7 +632,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_StandardJobConstructor_test
   wms->addWorkflow(workflow);
 
   // Staging the input_file on the storage service
-  simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1);
+  simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1);
 
   // Running a "do nothing" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -738,7 +738,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_HostMemory_test() {
   wms->addWorkflow(workflow);
 
   // Staging the input_file on the storage service
-  simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1);
+  simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1);
 
   // Running a "do nothing" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -888,7 +888,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithLocationMap_te
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -1009,7 +1009,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDefaultStorage
   EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
 
 
   // Running a "run a single task" simulation
@@ -1676,7 +1676,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDownService_te
   EXPECT_NO_THROW(wms->addWorkflow(workflow));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service1));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service1));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());

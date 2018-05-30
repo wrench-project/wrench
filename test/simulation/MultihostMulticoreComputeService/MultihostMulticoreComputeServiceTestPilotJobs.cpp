@@ -186,7 +186,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -388,7 +388,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -541,7 +541,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -651,7 +651,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -807,7 +807,7 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
+  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
