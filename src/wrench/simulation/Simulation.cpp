@@ -553,7 +553,7 @@ namespace wrench {
      * @brief Get the simulation output object
      * @return simulation output object
      */
-    SimulationOutput Simulation::getOutput() {
+    SimulationOutput &Simulation::getOutput() {
       return this->output;
     }
 
