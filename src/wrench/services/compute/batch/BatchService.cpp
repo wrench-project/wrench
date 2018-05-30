@@ -1740,7 +1740,7 @@ namespace wrench {
       // Flop rate per host
       std::vector<double> flop_rates;
       for (auto h : this->nodes_to_cores_map) {
-        flop_rates.push_back(S4U_Simulation::getFlopRate(h.first));
+        flop_rates.push_back(S4U_Simulation::getHostFlopRate(h.first));
       }
       dict.insert(std::make_pair("flop_rates", flop_rates));
 

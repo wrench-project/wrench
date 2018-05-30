@@ -468,7 +468,7 @@ namespace wrench {
 
         if (simgrid::s4u::Host::by_name_or_null(vm_hostname) == nullptr) {
           if (num_cores <= 0) {
-            num_cores = S4U_Simulation::getNumCores(pm_hostname);
+            num_cores = S4U_Simulation::getHostNumCores(pm_hostname);
           }
 
           // RAM memory management
@@ -747,7 +747,7 @@ namespace wrench {
         num_idle_cores.push_back(std::accumulate(idle_core_counts.begin(), idle_core_counts.end(), 0));
 
         // Flop rate per vm
-        flop_rates.push_back(S4U_Simulation::getFlopRate(std::get<0>(vm)));
+        flop_rates.push_back(S4U_Simulation::getHostFlopRate(std::get<0>(vm)));
 
         // RAM capacity per host
         ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(std::get<0>(vm)));

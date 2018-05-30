@@ -85,13 +85,13 @@ namespace wrench {
           throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): there should be at least one core per host");
         }
         if (std::get<1>(host) < ComputeService::ALL_CORES) {
-          if (std::get<1>(host) > S4U_Simulation::getNumCores(std::get<0>(host))) {
+          if (std::get<1>(host) > S4U_Simulation::getHostNumCores(std::get<0>(host))) {
             throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
-                                        " has only " + std::to_string(S4U_Simulation::getNumCores(std::get<0>(host))) + " cores");
+                                        " has only " + std::to_string(S4U_Simulation::getHostNumCores(std::get<0>(host))) + " cores");
           }
         } else {
           // Set the num_cores to the maximum
-          std::get<1>(host) = S4U_Simulation::getNumCores(std::get<0>(host));
+          std::get<1>(host) = S4U_Simulation::getHostNumCores(std::get<0>(host));
         }
       }
 
@@ -124,7 +124,7 @@ namespace wrench {
       for (auto host : compute_resources) {
         unsigned long num_cores_on_hosts = std::get<1>(host);
         if (num_cores_on_hosts == ComputeService::ALL_CORES) {
-          num_cores_on_hosts = S4U_Simulation::getNumCores(std::get<0>(host));
+          num_cores_on_hosts = S4U_Simulation::getHostNumCores(std::get<0>(host));
         }
 
         if (num_cores_on_hosts >= max_min_required_num_cores) {

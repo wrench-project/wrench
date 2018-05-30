@@ -149,7 +149,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    unsigned int S4U_Simulation::getNumCores(std::string hostname) {
+    unsigned int S4U_Simulation::getHostNumCores(std::string hostname) {
       unsigned int num_cores = 0;
       try {
         num_cores = (unsigned int) simgrid::s4u::Host::by_name(hostname)->getCoreCount();
@@ -167,7 +167,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    double S4U_Simulation::getFlopRate(std::string hostname) {
+    double S4U_Simulation::getHostFlopRate(std::string hostname) {
       double flop_rate = 0;
       try {
         flop_rate = simgrid::s4u::Host::by_name(hostname)->getPstateSpeed(0);
@@ -202,31 +202,31 @@ namespace wrench {
      * @brief Simulates a sleep
      * @param duration: the number of seconds to sleep
      */
-    void S4U_Simulation::sleep(double duration) {
+    void S4U_Simulation::sleep(double duration ) {
       simgrid::s4u::this_actor::sleep_for(duration);
     }
 
     /**
      * @brief Get the memory capacity of a host given a hostname
      * @param hostname: the name of the host
-     * @return the memory capacity in bytes
+     * @return a memory capacity in bytes
      */
     double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
       return getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
     }
 
     /**
-     * @brief Get the memory capacity of the host on which the calling actor is running
-     * @return the memory capacity in bytes
+     * @brief Get the name of the host on which the calling actor is running
+     * @return a hostname
      */
-    double S4U_Simulation::getMemoryCapacity() {
-      return S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host::current());
+    std::string S4U_Simulation::getHostname() {
+      return std::string(simgrid::s4u::Host::current()->getName());
     }
 
     /**
      * @brief Get the memory capacity of a S4U host
      * @param host: the host
-     * @return the memory capacity in bytes
+     * @return a memory capacity in bytes
      */
     double S4U_Simulation::getHostMemoryCapacity(simgrid::s4u::Host *host) {
       std::set<std::string> tags = {"mem", "Mem", "MEM", "ram", "Ram", "RAM", "memory", "Memory", "MEMORY"};

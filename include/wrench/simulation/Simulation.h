@@ -27,7 +27,7 @@ namespace wrench {
     class StorageService;
 
     /**
-     * @brief The simulation state
+     * @brief A class that provides basic simulation methods
      */
     class Simulation {
 
@@ -59,20 +59,22 @@ namespace wrench {
 
         SimulationOutput &getOutput();
 
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
-
-
-        double getCurrentSimulatedDate();
-
         static double getHostMemoryCapacity(std::string hostname);
 
         static unsigned long getHostNumCores(std::string hostname);
 
         static double getHostFlopRate(std::string hostname);
 
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
         static double getMemoryCapacity();
+        static unsigned long getNumCores();
+        static double getFlopRate();
+
+        double getCurrentSimulatedDate();
 
         static void sleep(double duration);
 

@@ -119,7 +119,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the list of names of all the hosts in the platform
+     * @brief Get the list of names of all the hosts in the platform
      *
      * @return a vector of hostnames
      *
@@ -128,9 +128,9 @@ namespace wrench {
       return this->s4u_simulation->getAllHostnames();
     }
     /**
-     * @brief Retrieve the list of names of all the hosts in each cluster composing the platform
+     * @brief Get the list of names of all the hosts in each cluster composing the platform
      *
-     * @return a map of (clustername, hostnames)
+     * @return a map of lists of hosts, indexed by cluster name
      *
      */
     std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
@@ -500,7 +500,7 @@ namespace wrench {
 
     /**
      * @brief Get the current simulated date
-     * @return the date
+     * @return a date
      */
     double Simulation::getCurrentSimulatedDate() {
       return S4U_Simulation::getClock();
@@ -509,7 +509,7 @@ namespace wrench {
     /**
      * @brief Get the memory capacity of a host given a hostname
      * @param hostname: the hostname
-     * @return the memory capacity in bytes
+     * @return a memory capacity in bytes
      */
     double Simulation::getHostMemoryCapacity(std::string hostname) {
       return S4U_Simulation::getHostMemoryCapacity(hostname);
@@ -518,32 +518,49 @@ namespace wrench {
     /**
     * @brief Get the number of cores of a host given a hostname
     * @param hostname: the hostname
-    * @return the number of cores
+    * @return a number of cores
     */
     unsigned long Simulation::getHostNumCores(std::string hostname) {
-      return S4U_Simulation::getNumCores(hostname);
+      return S4U_Simulation::getHostNumCores(hostname);
     }
 
     /**
      * @brief Get the flop rate of one core of a host given a hostname
      * @param hostname: the hostname
-     * @return the flop rate (flop / sec)
+     * @return a flop rate (flop / sec)
      */
     double Simulation::getHostFlopRate(std::string hostname) {
-      return S4U_Simulation::getFlopRate(hostname);
+      return S4U_Simulation::getHostFlopRate(hostname);
     }
 
     /**
-     * @brief Get the memory capacity of the current host
-     * @return the memory capacity in bytes
+     * @brief Get the memory capacity of the host on which the calling process is running
+     * @return a memory capacity in bytes
      */
     double Simulation::getMemoryCapacity() {
-      return S4U_Simulation::getMemoryCapacity();
+      return S4U_Simulation::getHostMemoryCapacity(S4U_Simulation::getHostname());
     }
 
     /**
-     * @brief Sleep for a number of (simulated) seconds
-     * @param duration in seconds
+     * @brief Get the number of cores of the host on which the calling process is running
+     * @return a number of cores
+     */
+    unsigned long Simulation::getNumCores() {
+      return S4U_Simulation::getHostNumCores(S4U_Simulation::getHostname());
+    }
+
+    /**
+     * @brief Get the flop rate of one core of the host on which the calling process is running
+     * @return a flop rate
+     */
+    double Simulation::getFlopRate() {
+      return S4U_Simulation::getHostFlopRate(S4U_Simulation::getHostname());
+    }
+
+
+    /**
+     * @brief Make the calling process sleep for a number of (simulated) seconds
+     * @param duration: a number of seconds
      */
     void Simulation::sleep(double duration) {
       S4U_Simulation::sleep(duration);

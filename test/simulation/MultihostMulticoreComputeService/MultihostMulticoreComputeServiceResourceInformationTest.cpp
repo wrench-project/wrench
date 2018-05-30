@@ -112,12 +112,12 @@ private:
 
       num_cores = this->test->compute_service1->getNumCores();
       if ((num_cores.size() != 2) or (num_cores[0] != 4) or (num_cores[1] != 4)) {
-        throw std::runtime_error("getNumCores() should return {4,4} for compute service #1");
+        throw std::runtime_error("getHostNumCores() should return {4,4} for compute service #1");
       }
 
       num_cores = this->test->compute_service2->getNumCores();
       if ((num_cores.size() != 2) or (num_cores[0] != 8) or (num_cores[1] != 8)) {
-        throw std::runtime_error("getNumCores() should return {8,8} for compute service #1");
+        throw std::runtime_error("getHostNumCores() should return {8,8} for compute service #1");
       }
 
       // Get Ram capacities
