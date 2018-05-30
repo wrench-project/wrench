@@ -159,7 +159,7 @@ int main(int argc, char **argv) {
    * many such events there are, and print some information for the first such event.
    */
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
-  trace = simulation.output.getTrace<wrench::SimulationTimestampTaskCompletion>();
+  trace = simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
   std::cerr << "Number of entries in TaskCompletion trace: " << trace.size() << std::endl;
   std::cerr << "Task in first trace entry: " << trace[0]->getContent()->getTask()->getId() << std::endl;
 

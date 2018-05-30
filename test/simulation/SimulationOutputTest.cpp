@@ -154,7 +154,7 @@ void SimulationOutputTest::do_emptyTrace_test() {
 
   // Get the number of task completions
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
-  trace = simulation->output.getTrace<wrench::SimulationTimestampTaskCompletion>();
+  trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
   ASSERT_EQ(0, trace.size());
 
   delete simulation;
