@@ -42,14 +42,14 @@ namespace wrench {
      *
      * @param simulation: a reference to a simulation object
      * @param callback_mailbox: the mailbox to which a reply will be sent
-     * @param hostname: the hostname of the host that should run this executor (could be the first compute resources - see below)
-     * @param job: the job to execute
+     * @param hostname: the name of the host on which this service will run (could be the first compute resources - see below)
+     * @param job: the standard job to execute
      * @param compute_resources: a non-empty list of <hostname, num_cores, memory> tuples, which represent
      *           the compute resources the job should execute on
      *              - If num_cores == ComputeService::ALL_CORES, then ALL the cores of the host are used
      *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
      * @param scratch_space: the usable scratch storage space  (or nullptr if none)
-     * @param part_of_pilot_job: try if the job executor is running within a pilot job
+     * @param part_of_pilot_job: true if the job executor is running within a pilot job
      * @param property_list: a property list
      * @param messagepayload_list: a message payload list
      *
@@ -955,7 +955,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the set of files stored in scratch space by a standardjob job
+     * @brief Get the set of files stored in scratch space during the standard job's execution
      *
      * @return a set of files
      */
@@ -965,7 +965,7 @@ namespace wrench {
 
 
   /**
-   * @brief Retrieve the executor's job
+   * @brief Get the executor's job
    * @return a standard job
    */
     StandardJob *StandardJobExecutor::getJob() {
@@ -973,8 +973,8 @@ namespace wrench {
     }
 
 /**
- * @brief Retrieve the executor's compute resources
- * @return a set of compute resources
+ * @brief Get the executor's compute resources
+ * @return a set of compute resources as <hostname, num cores, bytes of RAM> tuples
  */
     std::set<std::tuple<std::string, unsigned long, double>>  StandardJobExecutor::getComputeResources() {
       return this->compute_resources;
