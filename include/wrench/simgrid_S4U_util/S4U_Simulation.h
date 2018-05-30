@@ -32,10 +32,10 @@ namespace wrench {
 				static double getClock();
 				static std::string getHostName();
 				bool hostExists(std::string hostname);
-				static unsigned int getNumCores(std::string hostname);
-				static double getFlopRate(std::string hostname);
+				static unsigned int getHostNumCores(std::string hostname);
+				static double getHostFlopRate(std::string hostname);
 				static double getHostMemoryCapacity(std::string hostname);
-				static double getMemoryCapacity();
+				static std::string getHostname();
 				static void compute(double flops);
 				static void sleep(double duration);
 				bool isInitialized();

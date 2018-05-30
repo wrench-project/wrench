@@ -166,7 +166,7 @@ namespace wrench {
 
       initiateInstance(hostname,
                        std::move(compute_resources),
-                       property_list, messagepayload_list, -1, nullptr);
+                       property_list, messagepayload_list, DBL_MAX, nullptr);
     }
 
     /**
@@ -197,7 +197,7 @@ namespace wrench {
 
       initiateInstance(hostname,
                        compute_resources,
-                       std::move(property_list), std::move(messagepayload_list), -1, nullptr);
+                       std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
     }
 
     /**
@@ -256,7 +256,7 @@ namespace wrench {
 
       initiateInstance(hostname,
                        compute_resources,
-                       std::move(property_list), std::move(messagepayload_list), -1, nullptr);
+                       std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
 
     }
 
@@ -297,7 +297,7 @@ namespace wrench {
         unsigned long requested_cores = std::get<1>(host);
         unsigned long available_cores;
         try {
-          available_cores = S4U_Simulation::getNumCores(hname);
+          available_cores = S4U_Simulation::getHostNumCores(hname);
         } catch (std::runtime_error &e) {
           throw std::invalid_argument(
                   "MultihostMulticoreComputeService::initiateInstance(): Host '" + hname + "' does not exist");
@@ -1580,7 +1580,7 @@ namespace wrench {
       // Flop rate per host
       std::vector<double> flop_rates;
       for (auto h : this->compute_resources) {
-        flop_rates.push_back(S4U_Simulation::getFlopRate(std::get<0>(h)));
+        flop_rates.push_back(S4U_Simulation::getHostFlopRate(std::get<0>(h)));
       }
       dict.insert(std::make_pair("flop_rates", flop_rates));
 
