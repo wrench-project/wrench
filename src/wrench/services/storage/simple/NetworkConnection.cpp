@@ -65,7 +65,7 @@ namespace wrench {
       switch (this->type) {
         case NetworkConnection::INCOMING_DATA:
         WRENCH_INFO("Asynchronously receiving file %s...",
-                    this->file->getId().c_str());
+                    this->file->getID().c_str());
           try {
             this->comm = S4U_Mailbox::igetMessage(mailbox);
           } catch (std::shared_ptr<NetworkError> &cause) {
@@ -75,7 +75,7 @@ namespace wrench {
           break;
         case NetworkConnection::OUTGOING_DATA:
         WRENCH_INFO("Asynchronously sending file %s to mailbox_name %s...",
-                    this->file->getId().c_str(), this->mailbox.c_str() );
+                    this->file->getID().c_str(), this->mailbox.c_str() );
           try {
             this->comm = S4U_Mailbox::iputMessage(this->mailbox, new
                     StorageServiceFileContentMessage(this->file));

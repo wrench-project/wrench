@@ -52,11 +52,11 @@ protected:
       task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 1.0, 0);
       task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 1.0, 0);
       task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 1.0, 0);
-      task1->setClusterId("ID1");
-      task2->setClusterId("ID1");
-      task3->setClusterId("ID1");
-      task4->setClusterId("ID2");
-      task5->setClusterId("ID2");
+      task1->setClusterID("ID1");
+      task2->setClusterID("ID1");
+      task3->setClusterID("ID1");
+      task4->setClusterID("ID2");
+      task5->setClusterID("ID2");
 
       // Add file-task dependencies
       task1->addInputFile(input_file);

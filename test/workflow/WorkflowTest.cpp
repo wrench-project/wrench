@@ -22,8 +22,8 @@ protected:
       t3 = workflow->addTask("task-test-03", 1, 1, 1, 1.0, 0);
       t4 = workflow->addTask("task-test-04", 1, 1, 1, 1.0, 0);
 
-      t2->setClusterId("cluster-01");
-      t3->setClusterId("cluster-01");
+      t2->setClusterID("cluster-01");
+      t3->setClusterID("cluster-01");
 
       workflow->addControlDependency(t1, t2);
       workflow->addControlDependency(t1, t3);
@@ -109,7 +109,7 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
 
   // testing whether a task id exists
   EXPECT_THROW(workflow->getTaskByID("task-test-00"), std::invalid_argument);
-  EXPECT_TRUE(workflow->getTaskByID("task-test-01")->getId() == t1->getId());
+  EXPECT_TRUE(workflow->getTaskByID("task-test-01")->getID() == t1->getID());
 
   // testing whether a task already exists (check via task id)
   EXPECT_THROW(workflow->addTask("task-test-01", 1, 1, 1, 1.0, 0), std::invalid_argument);
@@ -129,7 +129,7 @@ TEST_F(WorkflowTest, WorkflowFile) {
   EXPECT_THROW(workflow->addFile("file-01", 10), std::invalid_argument);
 
   EXPECT_THROW(workflow->getFileByID("file-nonexist"), std::invalid_argument);
-  EXPECT_EQ(workflow->getFileByID("file-01")->getId(), "file-01");
+  EXPECT_EQ(workflow->getFileByID("file-01")->getID(), "file-01");
 
   EXPECT_EQ(workflow->getInputFiles().size(), 1);
 }

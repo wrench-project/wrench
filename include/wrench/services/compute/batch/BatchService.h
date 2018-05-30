@@ -209,7 +209,7 @@ namespace wrench {
 
 
 
-        unsigned long generateUniqueJobId();
+        unsigned long generateUniqueJobID();
 
         void removeJobFromRunningList(BatchJob *job);
 

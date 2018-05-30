@@ -113,7 +113,7 @@ private:
         std::set<wrench::StorageService *> result = file_registry_service->lookupEntry(f);
         if ((result.size() != 1) || (*(result.begin()) != this->test->storage_service_1000)) {
           throw std::runtime_error(
-                  "File registry service should know that file " + f->getId() + " is on storage service " +
+                  "File registry service should know that file " + f->getID() + " is on storage service " +
                   this->test->storage_service_1000->getName());
         }
 
@@ -441,10 +441,10 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   EXPECT_THROW(simulation->stageFile(file_500, storage_service_100), std::runtime_error);
 
   // Staging all files on the 1000 storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(),   file_1},
-                                          {file_10->getId(),  file_10},
-                                          {file_100->getId(), file_100},
-                                          {file_500->getId(), file_500}}, storage_service_1000));
+  EXPECT_NO_THROW(simulation->stageFiles({{file_1->getID(),   file_1},
+                                          {file_10->getID(),  file_10},
+                                          {file_100->getID(), file_100},
+                                          {file_500->getID(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -589,7 +589,7 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getId(), file_500}}, storage_service_1000));
+  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -741,7 +741,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getId(), file_500}}, storage_service_1000));
+  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());
@@ -1192,7 +1192,7 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getId(), file_500}}, storage_service_1000));
+  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
   EXPECT_NO_THROW(simulation->launch());

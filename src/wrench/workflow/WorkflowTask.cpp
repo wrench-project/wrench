@@ -54,7 +54,7 @@ namespace wrench {
       file->setInputOf(this);
 
       WRENCH_DEBUG("Adding file '%s' as input to task %s",
-                   file->getId().c_str(), this->getId().c_str());
+                   file->getID().c_str(), this->getID().c_str());
 
       if (file->getOutputOf()) {
         workflow->addControlDependency(file->getOutputOf(), this);
@@ -68,7 +68,7 @@ namespace wrench {
      */
     void WorkflowTask::addOutputFile(WorkflowFile *file) {
       WRENCH_DEBUG("Adding file '%s' as output t task %s",
-                   file->getId().c_str(), this->getId().c_str());
+                   file->getID().c_str(), this->getID().c_str());
 
       addFileToMap(output_files, input_files, file);
       file->setOutputOf(this);
@@ -84,7 +84,7 @@ namespace wrench {
      *
      * @return the id as a string
      */
-    std::string WorkflowTask::getId() const {
+    std::string WorkflowTask::getID() const {
       return this->id;
     }
 
@@ -248,7 +248,7 @@ namespace wrench {
      */
     void WorkflowTask::setState(WorkflowTask::State state) {
 
-//      WRENCH_INFO("SETTING %s's STATE TO %s", this->getId().c_str(), WorkflowTask::stateToString(state).c_str());
+//      WRENCH_INFO("SETTING %s's STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
       // Sanity check
       bool sane = true;
       switch (state) {
@@ -280,7 +280,7 @@ namespace wrench {
 
       if (not sane) {
         throw std::runtime_error("WorkflowTask::setState(): Cannot set " +
-                                 this->getId() + "'s visible state to " +
+                                 this->getID() + "'s visible state to " +
                                  stateToString(state) + " when its internal " +
                                  "state is " + stateToString(this->internal_state));
       }
@@ -308,7 +308,7 @@ namespace wrench {
      * @brief Get the cluster Id for the task
      * @return the cluster id, or an empty string
      */
-    std::string WorkflowTask::getClusterId() const {
+    std::string WorkflowTask::getClusterID() const {
       return this->cluster_id;
     }
 
@@ -317,7 +317,7 @@ namespace wrench {
      *
      * @param id: cluster id the task belongs to
      */
-    void WorkflowTask::setClusterId(std::string id) {
+    void WorkflowTask::setClusterID(std::string id) {
       this->cluster_id = id;
     }
 

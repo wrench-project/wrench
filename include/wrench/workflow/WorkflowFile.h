@@ -29,21 +29,13 @@ namespace wrench {
 
         double getSize();
 
-        std::string getId();
+        std::string getID();
 
         WorkflowTask *getOutputOf();
-
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
 
         bool isOutput();
 
         Workflow *getWorkflow();
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
 
     private:
 

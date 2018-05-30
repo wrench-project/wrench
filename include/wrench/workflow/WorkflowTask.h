@@ -26,7 +26,7 @@ namespace wrench {
     class WorkflowTask {
 
     public:
-        std::string getId() const;
+        std::string getID() const;
 
         double getFlops() const;
 
@@ -73,9 +73,9 @@ namespace wrench {
 
         Workflow *getWorkflow() const;
 
-        std::string getClusterId() const;
+        std::string getClusterID() const;
 
-        void setClusterId(std::string);
+        void setClusterID(std::string);
 
         void setTaskType(TaskType);
 

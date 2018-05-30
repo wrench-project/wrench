@@ -316,7 +316,7 @@ namespace wrench {
           for (auto t : ((StandardJob *) job)->tasks) {
             if ((t->getState() == WorkflowTask::State::COMPLETED) or
                 (t->getState() == WorkflowTask::State::PENDING)) {
-              throw std::invalid_argument("JobManager()::submitJob(): task " + t->getId() +
+              throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
                                           " cannot be submitted as part of a standard job because its state is " +
                                           WorkflowTask::stateToString(t->getState()));
             }
@@ -488,7 +488,7 @@ namespace wrench {
      */
     int JobManager::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_YELLOW);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_YELLOW);
 
       WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
@@ -528,7 +528,7 @@ namespace wrench {
               task->setState(WorkflowTask::State::COMPLETED);
             } else {
               throw std::runtime_error("JobManager::main(): got a 'job done' message, but task " +
-                                       task->getId() + " does not have a TASK_COMPLETED internal state (" +
+                                       task->getID() + " does not have a TASK_COMPLETED internal state (" +
                                        WorkflowTask::stateToString(task->getInternalState()) + ")");
             }
             if (task->getNumberOfChildren() > 0) {

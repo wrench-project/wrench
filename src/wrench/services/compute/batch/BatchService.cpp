@@ -299,7 +299,7 @@ namespace wrench {
       }
 
       // Create a Batch Job
-      unsigned long jobid = this->generateUniqueJobId();
+      unsigned long jobid = this->generateUniqueJobID();
       auto *batch_job = new BatchJob(job, jobid, time_asked_for,
                                      num_hosts, num_cores_per_host, -1, S4U_Simulation::getClock());
 
@@ -400,7 +400,7 @@ namespace wrench {
       }
 
       //Create a Batch Job
-      unsigned long jobid = this->generateUniqueJobId();
+      unsigned long jobid = this->generateUniqueJobID();
       auto *batch_job = new BatchJob(job, jobid, time_asked_for,
                                      nodes_asked_for, num_cores_per_hosts, -1, S4U_Simulation::getClock());
 
@@ -503,7 +503,7 @@ namespace wrench {
      */
     int BatchService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_MAGENTA);
 
       WRENCH_INFO("Batch Service starting");
 
@@ -1575,7 +1575,7 @@ namespace wrench {
      * @brief
      * @return
      */
-    unsigned long BatchService::generateUniqueJobId() {
+    unsigned long BatchService::generateUniqueJobID() {
       static unsigned long jobid = 1;
       return jobid++;
     }

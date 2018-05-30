@@ -136,7 +136,7 @@ namespace wrench {
 
       if (not pathExists(src, dst)) {
 
-        WRENCH_DEBUG("Adding control dependency %s-->%s", src->getId().c_str(), dst->getId().c_str());
+        WRENCH_DEBUG("Adding control dependency %s-->%s", src->getID().c_str(), dst->getID().c_str());
         DAG->addArc(src->DAG_node, dst->DAG_node);
 
         dst->updateTopLevel();
@@ -281,24 +281,24 @@ namespace wrench {
 
         if (task->getState() == WorkflowTask::State::READY) {
 
-          if (task->getClusterId().empty()) {
-            task_map[task->getId()] = {task};
+          if (task->getClusterID().empty()) {
+            task_map[task->getID()] = {task};
 
           } else {
-            if (task_map.find(task->getClusterId()) == task_map.end()) {
-              task_map[task->getClusterId()] = {task};
+            if (task_map.find(task->getClusterID()) == task_map.end()) {
+              task_map[task->getClusterID()] = {task};
             } else {
               // add to clustered task
-              task_map[task->getClusterId()].push_back(task);
+              task_map[task->getClusterID()].push_back(task);
             }
           }
         } else {
-          if (task_map.find(task->getClusterId()) != task_map.end()) {
+          if (task_map.find(task->getClusterID()) != task_map.end()) {
             if (task->getState() == WorkflowTask::State::NOT_READY) {
               task->setInternalState(WorkflowTask::InternalState::TASK_READY);
               task->setState(WorkflowTask::State::READY);
             }
-            task_map[task->getClusterId()].push_back(task);
+            task_map[task->getClusterID()].push_back(task);
           }
         }
       }
@@ -422,7 +422,7 @@ namespace wrench {
 //      }
 //
 ////      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
-////                  task->getId().c_str(),
+////                  task->getID().c_str(),
 ////                  WorkflowTask::stateToString(task->state).c_str(),
 ////                  WorkflowTask::stateToString(state).c_str());
 //

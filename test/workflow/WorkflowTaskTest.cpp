@@ -31,9 +31,9 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
   // WorkflowTask structure sanity check
   ASSERT_EQ(t1->getWorkflow(), workflow);
 
-  ASSERT_NE(t1->getId(), t2->getId());
-  EXPECT_EQ(t1->getId(), "task-01");
-  EXPECT_NE(t2->getId(), "task-01");
+  ASSERT_NE(t1->getID(), t2->getID());
+  EXPECT_EQ(t1->getID(), "task-01");
+  EXPECT_NE(t2->getID(), "task-01");
 
   ASSERT_GT(t1->getFlops(), t2->getFlops());
 
@@ -56,15 +56,15 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
   EXPECT_EQ(t1->getNumberOfChildren(), 1);
   EXPECT_EQ(t2->getNumberOfChildren(), 0);
 
-  EXPECT_EQ(t1->getClusterId(), "");
+  EXPECT_EQ(t1->getClusterID(), "");
 }
 
 TEST_F(WorkflowTaskTest, GetSet) {
   t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_NOT_READY);
   EXPECT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
 
-  t1->setClusterId("my-cluster-id");
-  EXPECT_EQ(t1->getClusterId(), "my-cluster-id");
+  t1->setClusterID("my-cluster-id");
+  EXPECT_EQ(t1->getClusterID(), "my-cluster-id");
 
   t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
   EXPECT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);

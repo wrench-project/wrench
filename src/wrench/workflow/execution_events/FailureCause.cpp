@@ -70,7 +70,7 @@ namespace wrench {
      * @return the message
      */
     std::string NoStorageServiceForFile::toString() {
-      return "No Storage Service location is specified for file " + this->file->getId();
+      return "No Storage Service location is specified for file " + this->file->getID();
     }
 
     /**
@@ -105,7 +105,7 @@ namespace wrench {
      * @return the message
      */
     std::string FileNotFound::toString() {
-      return "Couldn't find file " + this->file->getId() + " at Storage Service " + this->storage_service->getName();
+      return "Couldn't find file " + this->file->getID() + " at Storage Service " + this->storage_service->getName();
     }
 
     /**
@@ -140,7 +140,7 @@ namespace wrench {
      * @return the message
      */
     std::string StorageServiceNotEnoughSpace::toString() {
-      return "Cannot write file " + this->file->getId() + " to Storage Service " +
+      return "Cannot write file " + this->file->getID() + " to Storage Service " +
              this->storage_service->getName() + " due to lack of storage space";
     }
 
@@ -425,7 +425,7 @@ namespace wrench {
      * @return the message
      */
     std::string StorageServiceFileAlreadyThere::toString() {
-      return "Cannot write file " + this->file->getId() + " to Storage Service " +
+      return "Cannot write file " + this->file->getID() + " to Storage Service " +
              this->storage_service->getName() + " because it's already stored there";
     }
 
@@ -462,7 +462,7 @@ namespace wrench {
      * @return the message
      */
     std::string FileAlreadyBeingCopied::toString() {
-      return "File " + this->file->getId() + " is already being copied to  Storage Service " +
+      return "File " + this->file->getID() + " is already being copied to  Storage Service " +
              this->storage_service->getName();
     }
 

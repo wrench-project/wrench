@@ -46,7 +46,7 @@ namespace wrench {
      */
     int SimpleWMS::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_GREEN);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_GREEN);
 
       // Check whether the WMS has a deferred start time
       checkDeferredStart();

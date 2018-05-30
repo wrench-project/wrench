@@ -257,7 +257,7 @@ namespace wrench {
           for (auto frs : this->file_registry_services) {
             if (frs->entries.find(f.second) == frs->entries.end()) {
               throw std::runtime_error(
-                      "Workflow input file " + f.second->getId() + " is not staged on any storage service!");
+                      "Workflow input file " + f.second->getID() + " is not staged on any storage service!");
             }
           }
         }
@@ -452,7 +452,7 @@ namespace wrench {
                 "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
       }
 
-      XBT_INFO("Staging file %s (%lf)", file->getId().c_str(), file->getSize());
+      XBT_INFO("Staging file %s (%lf)", file->getID().c_str(), file->getSize());
       // Put the file on the storage service (not via the service daemon)
       try {
         storage_service->stageFile(file);

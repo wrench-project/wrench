@@ -252,7 +252,7 @@ namespace wrench {
      */
     int StandardJobExecutor::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_RED);
       WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores and %.2le bytes of RAM over %ld hosts: ",
                   this->mailbox_name.c_str(), this->total_num_cores, this->total_ram, this->core_availabilities.size());
       for (auto h : this->core_availabilities) {
@@ -612,7 +612,7 @@ namespace wrench {
 
       // Process task completions, if any
       for (auto task : workunit->tasks) {
-        WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)", task->getId().c_str(),
+        WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)", task->getID().c_str(),
                     WorkflowTask::stateToString(task->getInternalState()).c_str());
 
         // Increase the "completed tasks" count of the job
@@ -644,7 +644,7 @@ namespace wrench {
             for (auto task : child->tasks) {
               if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                 throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
-                                         std::to_string(task->getInternalState()) + " for task " + task->getId());
+                                         std::to_string(task->getInternalState()) + " for task " + task->getID());
               }
             }
 

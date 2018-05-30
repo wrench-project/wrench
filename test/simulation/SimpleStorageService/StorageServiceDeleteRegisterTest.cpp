@@ -149,8 +149,8 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
 
     // Stage the 2 files on the StorageHost
-    EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(), file_1},
-                                            {file_2->getId(), file_2}}, storage_service));
+    EXPECT_NO_THROW(simulation->stageFiles({{file_1->getID(), file_1},
+                                            {file_2->getID(), file_2}}, storage_service));
 
     EXPECT_NO_THROW(simulation->launch());
 
