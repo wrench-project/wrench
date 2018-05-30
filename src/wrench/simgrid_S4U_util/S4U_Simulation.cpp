@@ -73,7 +73,7 @@ namespace wrench {
     /**
      * @brief Initialize the simulated platform. Must only be called once.
      *
-     * @param filename: the path to an XML platform file
+     * @param filename: the path to an XML platform description file
      */
     void S4U_Simulation::setupPlatform(std::string &filename) {
       try {
@@ -85,7 +85,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieves the hostname on which the calling actor is running
+     * @brief Get the hostname on which the calling actor is running
      *
      * @return the hostname as a string
      */
@@ -94,7 +94,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieves the list of hostnames
+     * @brief Get the list of hostnames
      *
      * @return a vector of hostnames
      */
@@ -110,7 +110,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the by-cluster structure of the platform
+     * @brief Get the by-cluster structure of the platform
      * @return a map of all cluster names and their associated hostname list
      */
     std::map<std::string, std::vector<std::string>> S4U_Simulation::getAllHostnamesByCluster() {
@@ -134,7 +134,7 @@ namespace wrench {
 
     /**
      * @brief Determines whether a host exists for a given hostname
-     * @param hostname: the hostname
+     * @param hostname: the name of the host
      * @return true or false
      */
     bool S4U_Simulation::hostExists(std::string hostname) {
@@ -142,7 +142,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the number of cores of a host
+     * @brief Get the number of cores of a host
      *
      * @param hostname: the name of the host
      * @return the number of cores of the host
@@ -160,7 +160,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the flop rate of a host
+     * @brief Get the flop rate of a host
      *
      * @param hostname: the name of the host
      * @return the flop rate in floating point operations per second
@@ -180,7 +180,7 @@ namespace wrench {
 
 
     /**
-     * @brief Retrieves the current simulation date
+     * @brief Get the current simulation date
      *
      * @return the simulation clock
      */
@@ -208,7 +208,7 @@ namespace wrench {
 
     /**
      * @brief Get the memory capacity of a host given a hostname
-     * @param hostname: the hostname
+     * @param hostname: the name of the host
      * @return the memory capacity in bytes
      */
     double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
@@ -216,7 +216,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the memory capacity of the current host
+     * @brief Get the memory capacity of the host on which the calling actor is running
      * @return the memory capacity in bytes
      */
     double S4U_Simulation::getMemoryCapacity() {
