@@ -21,7 +21,7 @@ namespace wrench {
 		/***********************/
 
 		/**
-		 * @brief Wrappers around Simgrid's basic simulation methods
+		 * @brief Wrappers around S4U's basic simulation methods
 		 */
 		class S4U_Simulation {
 

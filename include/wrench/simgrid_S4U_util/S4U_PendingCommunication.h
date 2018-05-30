@@ -24,7 +24,7 @@ namespace wrench {
     /** \cond INTERNAL */
     /*******************/
 
-    /** @brief This is a simple wrapper class around S4U */
+    /** @brief This is a simple wrapper class around S4U asynchronous communication checking methods */
     class S4U_PendingCommunication {
     public:
         S4U_PendingCommunication(std::string mailbox);

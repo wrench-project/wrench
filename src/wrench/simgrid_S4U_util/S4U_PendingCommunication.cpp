@@ -21,7 +21,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Co
 namespace wrench {
 
     /**
-     * @brief Wait for a pending communication
+     * @brief Wait for the pending communication to complete
      *
      * @return A (unique pointer to a) simulation message
      *
@@ -50,11 +50,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Wait for any completion
-     * @param pending_comms: pending communications
-     * @param timeout: timeout (-1 means no timeout)
+     * @brief Wait for any pending communication completion
+     * @param pending_comms: a list of pending communications
+     * @param timeout: timeout value in seconds (-1 means no timeout)
      *
-     * @return the index of the comm to which something happened
+     * @return the index of the comm to which something happened (success or failure)
      *
      * @throw std::invalid_argument
      */
@@ -69,11 +69,11 @@ namespace wrench {
 
 
     /**
-     * @brief Wait for any completion
-     * @param pending_comms: pending communications
-     * @param timeout: timeout (-1 means no timeout)
+     * @brief Wait for any pending communication completion
+     * @param pending_comms: a list of pending communications
+     * @param timeout: timeout value in seconds (-1 means no timeout)
      *
-     * @return the index of the comm to which something happened
+     * @return the index of the comm to which something happened (success or failure)
      *
      * @throw std::invalid_argument
      */
