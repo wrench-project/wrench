@@ -34,15 +34,14 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Mult
 namespace wrench {
 
     /**
-     * @brief Constructor, which starts the workunit executor on the host
+     * @brief Constructor
      *
      * @param simulation: a pointer to the simulation object
-     * @param hostname: the name of the host
-     * @param num_cores: the number of cores available to the executor
-     * @param ram_utilization: the number of bytes of RAM used by the executor
-     * @param callback_mailbox: the callback mailbox to which the worker
-     *        thread can send "work done" messages
-     * @param workunit: the workunit to perform
+     * @param hostname: the name of the host on which the service will run
+     * @param num_cores: the number of cores available to the service
+     * @param ram_utilization: the number of bytes of RAM used by the service
+     * @param callback_mailbox: the callback mailbox to which a "work done" or "work failed" message will be sent
+     * @param workunit: the work unit to perform
      * @param scratch_space: the service's scratch storage service (nullptr if none)
      * @param thread_startup_overhead: the thread_startup overhead, in seconds
      */
@@ -420,16 +419,16 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the number of cores the executor is running on
-     * @return number of cores
+     * @brief Returns the number of cores the service has been allocated
+     * @return a number of cores
      */
     unsigned long WorkunitMulticoreExecutor::getNumCores() {
       return this->num_cores;
     }
 
     /**
-     * @brief Returns the RAM the executor is utilizing
-     * @return number of bytes
+     * @brief Returns the RAM the service has been allocated
+     * @return a number of bytes
      */
     double WorkunitMulticoreExecutor::getMemoryUtilization() {
       return this->ram_utilization;

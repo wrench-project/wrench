@@ -19,7 +19,8 @@ namespace wrench {
     /***********************/
 
     /**
-     *  @brief An abstract static optimization class
+     *  @brief An abstract class that serves as a base class for implementing static (i.e., before workflow execution) optimizations
+     *         to be used by a WMS
      */
     class StaticOptimization {
     public:
