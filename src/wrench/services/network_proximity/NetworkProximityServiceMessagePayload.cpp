@@ -20,6 +20,4 @@ namespace wrench {
 
     SET_MESSAGEPAYLOAD_NAME(NetworkProximityServiceMessagePayload, NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD);
 
-    SET_MESSAGEPAYLOAD_NAME(NetworkProximityServiceMessagePayload, NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD);
-
 };

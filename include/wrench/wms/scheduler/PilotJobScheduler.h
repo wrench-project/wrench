@@ -21,7 +21,7 @@ namespace wrench {
     class JobManager;
 
     /**
-     * @brief A (mostly virtual) base class for implementing pilot job schedulers
+     * @brief A (mostly virtual) base class for implementing PilotJob scheduling algorithms to be used by a WMS
      */
     class PilotJobScheduler {
 
@@ -35,23 +35,19 @@ namespace wrench {
           this->job_manager = nullptr;
         }
 
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
         /**
-         * @brief Method that schedules pilot jobs, according to whatever decision algorithm
+         * @brief A method that schedules pilot jobs, according to whatever decision algorithm
          *        it implements, over a set of compute services
          * @param compute_services: the set of compute services
          */
         virtual void schedulePilotJobs(const std::set<ComputeService *> &compute_services) = 0;
 
         /**
-         * @brief Set a reference to the data movement manager to be used by this scheduler (nullptr: none is used)
-         * @param data_movement_manager: a data movement manager
-         */
-        void setDataMovementManager(DataMovementManager *data_movement_manager) {
-          this->data_movement_manager = data_movement_manager;
-        }
-
-        /**
-         * @brief Get a reference to the data movement manager to be used by this scheduler (nullptr: none is used)
+         * @brief Get the data movement manager to be used by this scheduler (nullptr: none is used)
          * @return a data movement manager
          */
         DataMovementManager *getDataMovementManager() {
@@ -59,20 +55,40 @@ namespace wrench {
         }
 
         /**
-         * @brief Set a reference to the job manager to be used by this scheduler (nullptr: none is used)
+         * @brief Get the job manager to be used by this scheduler (nullptr: none is used)
+         * @return a job manager
+         */
+        JobManager *getJobManager() {
+          return this->job_manager;
+        }
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
+        /**
+         * @brief Set the data movement manager to be used by this scheduler (nullptr: none is used)
+         * @param data_movement_manager: a data movement manager
+         */
+        void setDataMovementManager(DataMovementManager *data_movement_manager) {
+          this->data_movement_manager = data_movement_manager;
+        }
+
+        /**
+         * @brief Set the job manager to be used by this scheduler (nullptr: none is used)
          * @param job_manager: a job manager
          */
         void setJobManager(JobManager *job_manager) {
           this->job_manager = job_manager;
         }
 
-        /**
-         * @brief Get a reference to the job manager to be used by this scheduler (nullptr: none is used)
-         * @return a job manager
-         */
-        JobManager *getJobManager() {
-          return this->job_manager;
-        }
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     private:
 

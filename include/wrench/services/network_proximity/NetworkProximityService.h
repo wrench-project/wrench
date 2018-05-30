@@ -20,8 +20,8 @@
 namespace wrench{
 
     /**
-     * @brief A simulated network proximity service that estimates inter-host latencies
-     *        and can be queries for such estimates
+     * @brief A network proximity service that continuously estimates inter-host latencies
+     *        and can be queried for such estimates
      */
     class NetworkProximityService: public Service {
 
@@ -30,7 +30,7 @@ namespace wrench{
                  {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                            "0.0"},
                  {NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE,             "ALLTOALL"},
                  {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE,             "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,       "10"},
+                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD,       "60"},
                  {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "20"},
                  {NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE,    "1.0"},
                  {NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED, "1"}
@@ -45,16 +45,17 @@ namespace wrench{
 
     public:
 
-        /**
-         * @brief A convenient constant that is returned as a latency between two hosts
-         *        when no latency estimates are available for this pair of hosts.
-         */
-        static constexpr double NOT_AVAILABLE = DBL_MAX;
 
 
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+
+        /**
+         * @brief A convenient constant that is returned as a latency between two hosts
+         *        when no latency estimates are available for this pair of hosts.
+         */
+        static constexpr double NOT_AVAILABLE = DBL_MAX;
 
         ~NetworkProximityService();
 
@@ -68,15 +69,21 @@ namespace wrench{
                                 std::map<std::string, std::string> = {}
         );
 
-//        void start(std::shared_ptr<NetworkProximityService> this_service, bool daemonize = true);
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
 
         double query(std::pair<std::string, std::string> hosts);
 
         std::vector<std::string> getHostnameList();
-        
+
         std::pair<double, double> getCoordinate(std::string);
 
         std::string getNetworkProximityServiceType();
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
 
     private:
 

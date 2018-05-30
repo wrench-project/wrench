@@ -44,10 +44,11 @@ namespace wrench {
      * @brief Constructor
      * @param simulation: a pointer to the simulation object
      * @param hostname: the hostname on which to start the service
-     * @param network_proximity_service_mailbox the mailbox of the network proximity service
-     * @param message_size the size of the message to be sent between network daemons to compute proximity
-     * @param measurement_period the time-difference between two message transfer to compute proximity
-     * @param noise the noise to add to compute the time-difference
+     * @param network_proximity_service_mailbox: the mailbox of the network proximity service
+     * @param message_size: the size of the message to be sent between network daemons to compute proximity
+     * @param measurement_period: the time-difference between two message transfer to compute proximity
+     * @param noise: the maximum magnitude of random noises added to the measurement_period at each iteration,
+     *               so as to avoid idiosyncratic behaviors that occur with perfect synchrony
      * @param suffix: suffix to append to the service name and mailbox
      */
 
@@ -71,7 +72,7 @@ namespace wrench {
       this->setProperties(this->default_property_values,
                           {});
       this->setMessagePayloads(this->default_messagepayload_values,
-                          {std::make_pair("NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD", std::to_string(message_size))});
+                          {std::make_pair("NETWORK_PROXIMITY_MESSAGE_SIZE", std::to_string(message_size))});
 
     }
 
@@ -116,7 +117,7 @@ namespace wrench {
               S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                       new NetworkProximityTransferMessage(
                                               this->getMessagePayloadValueAsDouble(
-                                                      NetworkProximityServiceMessagePayload::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD)));
+                                                      NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE)));
 
 
             } catch (std::shared_ptr<NetworkError> cause) {

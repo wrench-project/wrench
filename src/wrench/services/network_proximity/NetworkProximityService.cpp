@@ -39,8 +39,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param hostname: the hostname on which to start the service
-     * @param hosts_in_network: the hosts running in the network
+     * @param hostname: the name of the host on which to start the service
+     * @param hosts_in_network: the hosts participating in network measurements
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
@@ -68,7 +68,7 @@ namespace wrench {
 
     // ADD TEST
     /**
-     * @brief Look up the current (x,y) coordinates of a given host for Vivaldi network service type
+     * @brief Look up the current (x,y) coordinates of a given host (only for a Vivaldi network service type)
      * @param requested_host: the host whose coordinates are being requested
      * @return The pair (x,y) coordinate values
      *
@@ -121,8 +121,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Look up for the proximity value in database
-     * @param hosts: the pair of hosts to look for the proximity value
+     * @brief Look up a proximity value in database
+     * @param hosts: the pair of hosts whose proxiity is of interest
      * @return The proximity value between the pair of hosts
      *
      * @throw WorkflowExecutionException
@@ -176,7 +176,7 @@ namespace wrench {
     /**
      * @brief Internal method to add an entry to the database
      * @param pair: a pair of hosts
-     * @param proximity_value: proximity value between the pair
+     * @param proximity_value: proximity value between the pair of hosts
      */
     void NetworkProximityService::addEntryToDatabase(std::pair<std::string, std::string> pair_hosts,
                                                      double proximity_value) {
