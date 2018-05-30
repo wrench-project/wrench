@@ -26,7 +26,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
-    * @param payload: message size in bytes
+    * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
@@ -42,7 +42,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param free_space: the free space, in bytes
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -59,7 +59,7 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
-    * @param payload: message size in bytes
+    * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
@@ -79,7 +79,7 @@ namespace wrench {
      * @brief Constructor
      * @param file: the file
      * @param file_is_available: true if the file is available on the storage system
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -100,7 +100,7 @@ namespace wrench {
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which to send the answer
      * @param file: the file
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -122,7 +122,7 @@ namespace wrench {
      * @param storage_service: the storage service on which to delete it
      * @param success: whether the deletion was successful
      * @param failure_cause: the cause of a failure (nullptr means "no failure")
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -150,7 +150,7 @@ namespace wrench {
     * @param file: the file
     * @param src: the source storage service
     * @param file_registry_service: the file registry service to update (nullptr if none)
-    * @param payload: message size in bytes
+    * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
@@ -174,10 +174,10 @@ namespace wrench {
      * @param file: the file
      * @param storage_service: the storage service
      * @param file_registry_service: the file registry service to update (nullptr if none)
-     * @param file_registry_service_updated: whetre the file registry service was updated
+     * @param file_registry_service_updated: whether the file registry service was updated
      * @param success: true on success, false otherwise
      * @param failure_cause: the cause of a failure (nullptr if success==true)
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -208,7 +208,7 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
-    * @param payload: message size in bytes
+    * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
@@ -232,7 +232,7 @@ namespace wrench {
      * @param success: whether the write operation succeeded
      * @param failure_cause: the cause of the failure (nullptr if success)
      * @param data_write_mailbox_name: the mailbox to which file content should be sent
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
@@ -259,7 +259,7 @@ namespace wrench {
    * @param answer_mailbox: the mailbox to which to send the answer
    * @param mailbox_to_receive_the_file_content: the mailbox to which to send the file content
    * @param file: the file
-   * @param payload: message size in bytes
+   * @param payload: the message size in bytes
    *
    * @throw std::invalid_argument
    */
@@ -283,7 +283,7 @@ namespace wrench {
      * @param storage_service: the storage service
      * @param success: whether the read operation was successful
      * @param failure_cause: the cause of the failure (or nullptr on success)
-     * @param payload: message size in bytes
+     * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
