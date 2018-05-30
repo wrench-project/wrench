@@ -96,7 +96,7 @@ private:
       wrench::WorkflowTask *tasks[8];
       wrench::StandardJob *jobs[8];
       for (int i=0; i < 8; i++) {
-        tasks[i] = this->workflow->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
+        tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
         jobs[i] = job_manager->createStandardJob(tasks[i], {});
       }
 
@@ -160,7 +160,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = this->workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -274,7 +274,7 @@ private:
       wrench::WorkflowTask *tasks[9];
       wrench::StandardJob *jobs[9];
       for (int i=0; i < 9; i++) {
-        tasks[i] = this->workflow->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
+        tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
         jobs[i] = job_manager->createStandardJob(tasks[i], {});
       }
 

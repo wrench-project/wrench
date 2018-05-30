@@ -124,7 +124,7 @@ private:
 
       while (proximity == DBL_MAX && count < max_count) {
         count++;
-        wrench::S4U_Simulation::sleep(10.0);
+        wrench::S4U_Simulation::sleep(20.0);
         proximity = (*network_proximity_service)->query(hosts_to_compute_proximity);
       }
 

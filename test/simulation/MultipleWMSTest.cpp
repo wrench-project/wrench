@@ -109,14 +109,14 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       std::set<std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*>> pre_copies = {};
-      for (auto it:workflow->getInputFiles()) {
+      for (auto it : this->getWorkflow()->getInputFiles()) {
         std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> each_copy =
                                                       std::make_tuple(it.second,this->test->storage_service, wrench::ComputeService::SCRATCH);
         pre_copies.insert(each_copy);
       }
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob(this->workflow->getTasks(), {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {},
                                                                          pre_copies,
                                                                          {}, {});
 
@@ -133,7 +133,7 @@ private:
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = this->workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }

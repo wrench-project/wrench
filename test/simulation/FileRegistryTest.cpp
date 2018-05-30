@@ -95,8 +95,8 @@ private:
     int main() {
 
 
-      wrench::WorkflowFile *file1 = workflow->addFile("file1", 100.0);
-      wrench::WorkflowFile *file2 = workflow->addFile("file2", 100.0);
+      wrench::WorkflowFile *file1 = this->getWorkflow()->addFile("file1", 100.0);
+      wrench::WorkflowFile *file2 = this->getWorkflow()->addFile("file2", 100.0);
       wrench::FileRegistryService *frs = this->getAvailableFileRegistryService();
 
       bool success;
@@ -279,7 +279,7 @@ private:
 
     int main() {
 
-      wrench::WorkflowFile *file1 = workflow->addFile("file1", 100.0);
+      wrench::WorkflowFile *file1 = this->getWorkflow()->addFile("file1", 100.0);
       wrench::WorkflowFile * nullptr_file = nullptr;
       wrench::FileRegistryService *frs = this->getAvailableFileRegistryService();
       wrench::NetworkProximityService *nps = *(this->getAvailableNetworkProximityServices().begin());

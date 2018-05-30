@@ -320,4 +320,20 @@ namespace wrench {
       return data_movement_manager;
     }
 
+    /** @brief Get the WMS's pilot scheduler
+     * 
+     * @return the pilot scheduler, or nullptr if none
+     */
+    PilotJobScheduler *WMS::getPilotJobScheduler() {
+      return (this->pilot_job_scheduler).get();
+    }
+
+    /** @brief Get the WMS's pilot scheduler
+     * 
+     * @return the pilot scheduler, or nullptr if none
+     */
+    StandardJobScheduler *WMS::getStandardJobScheduler() {
+      return (this->standard_job_scheduler).get();
+    }
+
 };

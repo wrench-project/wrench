@@ -98,15 +98,15 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task = this->workflow->addTask("task", 60, 1, 1, 1.0, 0);
-        task->addInputFile(this->workflow->getFileByID("input_file"));
-        task->addOutputFile(this->workflow->getFileByID("output_file"));
+        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 60, 1, 1, 1.0, 0);
+        task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
+        task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));
 
         // Create a StandardJob with some pre-copies
         wrench::StandardJob *job = job_manager->createStandardJob(
                 {task},
                 {},
-                {std::make_tuple(this->workflow->getFileByID("input_file"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->getWorkflow()->getFileByID("input_file"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -116,7 +116,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -229,18 +229,18 @@ private:
 
       {
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0, 0);
-        task1->addInputFile(this->workflow->getFileByID("input_file1"));
+        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 60, 1, 1, 1.0, 0);
+        task1->addInputFile(this->getWorkflow()->getFileByID("input_file1"));
 
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 60, 1, 1, 1.0, 0);
-        task2->addInputFile(this->workflow->getFileByID("input_file2"));
+        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 60, 1, 1, 1.0, 0);
+        task2->addInputFile(this->getWorkflow()->getFileByID("input_file2"));
 
         // Create a StandardJob with SOME pre-copies from public storage to scratch
         wrench::StandardJob *job1 = job_manager->createStandardJob(
                 {task1},
                 {},
-                {std::make_tuple(this->workflow->getFileByID("input_file1"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -248,7 +248,7 @@ private:
         wrench::StandardJob *job2 = job_manager->createStandardJob(
                 {task2},
                 {},
-                {std::make_tuple(this->workflow->getFileByID("input_file2"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -258,7 +258,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -279,7 +279,7 @@ private:
         job_manager->submitJob(job1, this->test->compute_service1);
         // Wait for a workflow execution event
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -307,7 +307,7 @@ private:
         int i = 0;
         while (i<2) {
           try {
-            event = workflow->waitForNextExecutionEvent();
+            event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
           }
@@ -469,7 +469,7 @@ private:
         // Wait for the pilot job start
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
                   "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));
@@ -485,22 +485,22 @@ private:
         }
 
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 60, 1, 1, 1.0, 0);
-        task1->addInputFile(this->workflow->getFileByID("input_file1"));
+        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 60, 1, 1, 1.0, 0);
+        task1->addInputFile(this->getWorkflow()->getFileByID("input_file1"));
 
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 360, 1, 1, 1.0, 0);
-        task2->addInputFile(this->workflow->getFileByID("input_file2"));
+        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 360, 1, 1, 1.0, 0);
+        task2->addInputFile(this->getWorkflow()->getFileByID("input_file2"));
 
         // Create a sequential task that lasts one min and requires 1 cores
-        wrench::WorkflowTask *task3 = this->workflow->addTask("task3", 600, 1, 1, 1.0, 0);
-        task3->addInputFile(this->workflow->getFileByID("input_file3"));
+        wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task3", 600, 1, 1, 1.0, 0);
+        task3->addInputFile(this->getWorkflow()->getFileByID("input_file3"));
 
         // Create a StandardJob with SOME pre-copies from public storage to scratch
         wrench::StandardJob *job1 = job_manager->createStandardJob(
                 {task1},
                 {},
-                {std::make_tuple(this->workflow->getFileByID("input_file1"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->getWorkflow()->getFileByID("input_file1"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -508,7 +508,7 @@ private:
         wrench::StandardJob *job2 = job_manager->createStandardJob(
                 {task2},
                 {},
-                {std::make_tuple(this->workflow->getFileByID("input_file2"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->getWorkflow()->getFileByID("input_file2"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -516,7 +516,7 @@ private:
         wrench::StandardJob *job3 = job_manager->createStandardJob(
                 {task3},
                 {},
-                {std::make_tuple(this->workflow->getFileByID("input_file3"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
+                {std::make_tuple(this->getWorkflow()->getFileByID("input_file3"), this->test->storage_service1, wrench::ComputeService::SCRATCH)},
                 {},
                 {});
 
@@ -535,7 +535,7 @@ private:
         while (i<3) {
           // Wait for the standard job completion
           try {
-            event = workflow->waitForNextExecutionEvent();
+            event = this->getWorkflow()->waitForNextExecutionEvent();
           } catch (wrench::WorkflowExecutionException &e) {
             throw std::runtime_error(
                     "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));
@@ -558,7 +558,7 @@ private:
 
         // Wait for the pilot job expiration
         try {
-          event = workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(
                   "Error while getting and execution event: " + std::to_string(e.getCause()->getCauseType()));

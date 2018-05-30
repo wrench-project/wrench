@@ -144,7 +144,7 @@ private:
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = this->workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -265,7 +265,7 @@ private:
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = this->workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -385,7 +385,7 @@ private:
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = this->workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
