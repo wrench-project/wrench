@@ -23,7 +23,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief A network daemon running (proximity is computed between two such running daemons)
+     * @brief A daemon used by a NetworkProximityService to run network measurements (proximity is computed between two such running daemons)
      */
     class NetworkProximityDaemon: public Service {
     public:
@@ -36,6 +36,7 @@ namespace wrench {
     private:
         std::map<std::string, std::string> default_property_values = {
                  {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                      "0.0"},
+                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE,            "1024"},
                 };
 
         std::map<std::string, std::string> default_messagepayload_values =
@@ -43,7 +44,6 @@ namespace wrench {
                  {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
                  {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD,    "1024"},
                  {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceMessagePayload::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD,    "1024"},
                  {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD,    "1024"},
                 };
 

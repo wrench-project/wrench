@@ -26,7 +26,7 @@ namespace wrench {
     class WorkflowTask;
 
     /**
-     * @brief A (mostly virtual) base class for implementing standard job schedulers
+     * @brief A (mostly virtual) base class for implementing StandardJob scheduling algorithms to be used by a WMS
      */
     class StandardJobScheduler {
 
@@ -41,34 +41,17 @@ namespace wrench {
         }
 
         /**
-         * @brief Schedules a set of tasks a standard jobs, according to whatever decision algorithm
+         * @brief A method that schedules tasks (as part of standard jobs), according to whatever decision algorithm
          *        it implements, over a set of compute services
          * @param compute_services: the set of compute services
-         * @param tasks: the set of tasks
+         * @param tasks: the set of tasks to be executed
          */
         virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
                                    const std::vector<WorkflowTask *> &tasks) = 0;
 
-#if 0
-//        /**
-//         * @brief Schedules a set of clustered tasks a standard jobs, according to whatever decision
-//         *        algorithm it implements, over a set of compute services
-//         * @param compute_services: the set of compute services
-//         * @param tasks: the map of clustered tasks
-//         */
-//        virtual void scheduleTasks(const std::set<ComputeService *> &compute_services,
-//                                   const std::map<std::string, std::vector<WorkflowTask *>> &tasks) {
-//          throw std::runtime_error("StandardJobScheduler::scheduleTasks(): Not implemented yet!");
-//        }
-#endif
-
-        /**
-         * @brief Set a reference to the data manager to be used by this scheduler (nullptr: none is used)
-         * @param data_movement_manager: a data movement manager
-         */
-        void setDataMovementManager(DataMovementManager *data_movement_manager) {
-          this->data_movement_manager = data_movement_manager;
-        }
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
 
         /**
          * @brief Get a reference to the data movement manager to be used by this scheduler (nullptr: none is used)
@@ -79,6 +62,30 @@ namespace wrench {
         }
 
         /**
+         * @brief Get a reference to the job manager to be used by this scheduler (nullptr: none is used)
+         * @return a job manager
+         */
+        JobManager *getJobManager() {
+          return this->job_manager;
+        }
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+
+        /**
+         * @brief Set a reference to the data manager to be used by this scheduler (nullptr: none is used)
+         * @param data_movement_manager: a data movement manager
+         */
+        void setDataMovementManager(DataMovementManager *data_movement_manager) {
+          this->data_movement_manager = data_movement_manager;
+        }
+
+        /**
          * @brief Set a reference to the job manager to be used by this scheduler (nullptr: none is used)
          * @param job_manager: a job manager
          */
@@ -86,13 +93,10 @@ namespace wrench {
           this->job_manager = job_manager;
         }
 
-        /**
-         * @brief Get a reference to the job manager to be used by this scheduler (nullptr: none is used)
-         * @return a job manager
-         */
-        JobManager *getJobManager() {
-          return this->job_manager;
-        }
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
 
     private:
         DataMovementManager *data_movement_manager;

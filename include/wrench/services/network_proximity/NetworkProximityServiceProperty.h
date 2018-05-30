@@ -20,40 +20,30 @@ namespace wrench {
 
     class NetworkProximityServiceProperty:public ServiceProperty {
     public:
-        /** @brief The number of bytes in a request control message sent to the daemon to request a list of file locations **/
-        DECLARE_PROPERTY_NAME(NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD);
 
-        /** @brief The number of bytes to send to the network daemon manager **/
-        DECLARE_PROPERTY_NAME(NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD);
-
-        /** @brief The number of bytes to send to reply to the network daemon from daemon manager **/
-        DECLARE_PROPERTY_NAME(NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD);
-
-        /** @brief The number of bytes to transfer to measure the proximity **/
-        DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD);
-
-        /** @brief The number of bytes to transfer to measure the proximity **/
-        DECLARE_PROPERTY_NAME(NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD);
-
-        /** @brief The overhead, in seconds, of looking up entries for a file **/
+        /** @brief The overhead, in seconds, of looking up entries for a file (default: 0) **/
         DECLARE_PROPERTY_NAME(LOOKUP_OVERHEAD);
 
-        /** @brief The type of network proximity service to be used **/
+        /** @brief The type of network proximity implementation to be used:
+         *   - ALLTOALL: a simple all-to-all algorithm (default)
+         *   - VIVALDI: The Vivaldi network coordinate-based approach
+         */
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_SERVICE_TYPE);
 
-        /** @brief The message size (in bytes) to be used **/
+        /** @brief The message size (in bytes) to be used in RTT measurements (default: 1024) **/
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MESSAGE_SIZE);
 
-        /** @brief The measurement period (in seconds) to be used **/
+        /** @brief The inter-measurement period (in seconds) to be used (default: 60) **/
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD);
 
-        /** @brief The maximum random uniformly distributed noise (in seconds) to be added to the measurement period **/
+        /** @brief The maximum random uniformly distributed noise (in seconds) to be added to the measurement period (useful
+         * to avoid idiosyncratic effects of perfect synchrony) (default: 20) **/
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE);
 
-        /** @brief The percentage of other network daemons that each network daemon will communicate with **/
+        /** @brief The percentage of other network proximity daemons that each network proximity daemon will conduct RTT measurements with (default: 1.0)**/
         DECLARE_PROPERTY_NAME(NETWORK_DAEMON_COMMUNICATION_COVERAGE);
 
-        /** @brief The random number generator seed (int) used by the service to decide a sequence of communication peers **/
+        /** @brief The random (integer) number generator seed used by the service to pick RTT measurement peers (default: 1) **/
         DECLARE_PROPERTY_NAME(NETWORK_PROXIMITY_PEER_LOOKUP_SEED);
     };
 }
