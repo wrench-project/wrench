@@ -22,18 +22,18 @@
 namespace wrench {
 
     /**
-     * @brief Post-mortem simulation-generated data
+     * @brief A class that contains post-mortem simulation-generated data
      */
     class SimulationOutput {
 
     public:
 
         /**
-         * @brief Retrieve a copy of a simulation trace (which should be filled in with timestamps)
+         * @brief Retrieve a copy of a simulation output trace
          *        once the simulation has completed
          *
-         * @tparam T   a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
-         * @return a vector pointers to SimulationTimestampXXXX instances
+         * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @return a vector of pointers to SimulationTimestampXXXX instances
          */
         template <class T> std::vector<SimulationTimestamp<T> *> getTrace() {
           std::type_index type_index  = std::type_index(typeid(T));
@@ -56,9 +56,9 @@ namespace wrench {
         /***********************/
 
         /**
-         * @brief Append a simulation timestamp to a simulation trace
+         * @brief Append a simulation timestamp to a simulation output trace
          *
-         * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          * @param timestamp: a pointer to a SimulationTimestampXXXX object
          */
         template <class T> void addTimestamp(T *timestamp) {
@@ -74,12 +74,18 @@ namespace wrench {
         /***********************/
 
 
+        /***********************/
+        /** \cond          */
+        /***********************/
         ~SimulationOutput() {
           for (auto t : this->traces) {
             delete t.second;
           }
           this->traces.clear();
         }
+        /***********************/
+        /** \endcond          */
+        /***********************/
 
     private:
         std::map<std::type_index, GenericSimulationTrace*> traces;

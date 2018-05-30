@@ -20,7 +20,7 @@ namespace wrench {
     /**
      * @brief A time-stamped simulation event stored in SimulationOutput
      *
-     * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+     * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
      */
     template<class T>
     class SimulationTimestamp {
