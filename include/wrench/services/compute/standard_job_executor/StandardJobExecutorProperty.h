@@ -41,7 +41,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(CORE_ALLOCATION_ALGORITHM);
 
         /** @brief The algorithm that decides which ready computational task,
-         *         in case multiple can be ran, should run first. Possible values are:
+         *         in case multiple tasks are ready, should run first. Possible values are:
          *                  - maximum_flops (default)
          *                  - maximum_minimum_cores
          **/
@@ -49,7 +49,7 @@ namespace wrench {
 
         /** @brief The algorithm that decides on which host a task should
          *         be placed. Possible values are:
-         *                  - best fit (default)
+         *                  - best_fit (default)
          */
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 

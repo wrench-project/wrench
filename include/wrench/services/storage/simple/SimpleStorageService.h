@@ -27,7 +27,7 @@ namespace wrench {
     class IncomingFile;
 
     /**
-     * @brief A simulated simple storage service that provides direct
+     * @brief A storage service that provides direct
      *        access to some storage resource (e.g., a disk)
      */
     class SimpleStorageService : public StorageService {

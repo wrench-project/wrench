@@ -32,7 +32,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief An actor that knows how to perform a work unit
+     * @brief An service that performs a WorkUnit
      */
     class WorkunitMulticoreExecutor : public Service {
 
