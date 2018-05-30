@@ -93,9 +93,8 @@ namespace wrench {
 
 
         /***********************/
-        /** \cond DEVELOPER    */
+        /** \cond INTERNAL     */
         /***********************/
-
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
@@ -103,14 +102,6 @@ namespace wrench {
         void terminateStandardJob(StandardJob *job) override;
 
         void terminatePilotJob(PilotJob *job) override;
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
 
         ~MultihostMulticoreComputeService();
 

@@ -30,7 +30,7 @@ namespace wrench {
     class ComputeService;
 
     /**
-     * @brief A simulated virtualized cluster-based compute service
+     * @brief A  virtualized cluster-based compute service
      */
     class VirtualizedClusterService : public ComputeService {
 
@@ -78,13 +78,6 @@ namespace wrench {
 
         std::vector<std::string> getExecutionHosts();
 
-        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
-
-        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
-
-        void terminateStandardJob(StandardJob *job) override;
-
-        void terminatePilotJob(PilotJob *job) override;
 
         /***********************/
         /** \endcond          **/
@@ -93,6 +86,13 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
+        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
+
+        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
+
+        void terminateStandardJob(StandardJob *job) override;
+
+        void terminatePilotJob(PilotJob *job) override;
 
         ~VirtualizedClusterService();
 
@@ -135,7 +135,7 @@ namespace wrench {
 
         virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
 
-        virtual void terminate();
+        void stopAllVMs();
 
         /** @brief List of execution host names */
         std::vector<std::string> execution_hosts;
