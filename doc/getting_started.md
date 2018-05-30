@@ -53,7 +53,7 @@ A detailed description on how to create a platform description file can be found
 
   - **WRENCH workflow file:**
 WRENCH provides native parsers for [DAX](http://workflowarchive.org) (DAG in XML) 
-and [JSON](http://workflowhub.org/traces/) worfklow description file formats. Refer to 
+and [JSON](http://workflowhub.org/traces/) workflow description file formats. Refer to 
 their respective Web sites for detailed documentation.
 
 The source file for the cloud-based simulator is at `examples/simple-example/SimulatorCloud.cpp`
