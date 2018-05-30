@@ -36,8 +36,8 @@ namespace wrench {
 				static double getFlopRate(std::string hostname);
 				static double getHostMemoryCapacity(std::string hostname);
 				static double getMemoryCapacity();
-				static void compute(double);
-				static void sleep(double);
+				static void compute(double flops);
+				static void sleep(double duration);
 				bool isInitialized();
         bool isPlatformSetup();
         std::vector<std::string> getAllHostnames();
