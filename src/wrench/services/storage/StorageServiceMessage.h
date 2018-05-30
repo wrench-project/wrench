@@ -26,7 +26,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level StorageServiceMessage class
+     * @brief Top-level class for messages received/sent by a StorageService
      */
     class StorageServiceMessage : public ServiceMessage {
     protected:
@@ -35,7 +35,7 @@ namespace wrench {
 
 
     /**
-     * @brief StorageServiceFreeSpaceRequestMessage class
+     * @brief A message sent to a StorageService to enquire about its free space
      */
     class StorageServiceFreeSpaceRequestMessage : public StorageServiceMessage {
     public:
@@ -45,7 +45,7 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFreeSpaceAnswerMessage class
+     * @brief A message sent by a StorageService in answer to a free space enquiry
      */
     class StorageServiceFreeSpaceAnswerMessage : public StorageServiceMessage {
     public:
@@ -56,7 +56,7 @@ namespace wrench {
     };
 
     /**
-    * @brief StorageServiceFileLookupRequestMessage class
+    * @brief A message sent to a StorageService to lookup a file
     */
     class StorageServiceFileLookupRequestMessage : public StorageServiceMessage {
     public:
@@ -69,7 +69,7 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFileLookupAnswerMessage class
+     * @brief A message sent by a StorageService in answer to a file lookup request
      */
     class StorageServiceFileLookupAnswerMessage : public StorageServiceMessage {
     public:
@@ -82,7 +82,7 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFileDeleteRequestMessage class
+     * @brief A message sent to a StorageService to delete a file
      */
     class StorageServiceFileDeleteRequestMessage : public StorageServiceMessage {
     public:
@@ -97,7 +97,7 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFileDeleteAnswerMessage class
+     * @brief A message sent  by a StorageService in answer to a file deletion request
      */
     class StorageServiceFileDeleteAnswerMessage : public StorageServiceMessage {
     public:
@@ -118,7 +118,7 @@ namespace wrench {
     };
 
     /**
-    * @brief StorageServiceFileCopyRequestMessage class
+    * @brief A message sent to a StorageService to copy a file from another StorageService
     */
     class StorageServiceFileCopyRequestMessage : public StorageServiceMessage {
     public:
@@ -132,12 +132,12 @@ namespace wrench {
         WorkflowFile *file;
         /** @brief The storage service from which to copy the file */
         StorageService *src;
-        /** @brief The file registry service to use */
+        /** @brief The file registry service to update, or none if nullptr */
         FileRegistryService *file_registry_service;
     };
 
     /**
-     * @brief StorageServiceFileCopyAnswerMessage class
+     * @brief A message sent by a StorageService in answer to a file copy request
      */
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
@@ -162,7 +162,7 @@ namespace wrench {
     };
 
     /**
-    * @brief StorageServiceFileWriteRequestMessage class
+    * @brief A message sent to a StorageService to write a file
     */
     class StorageServiceFileWriteRequestMessage : public StorageServiceMessage {
     public:
@@ -175,7 +175,7 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFileWriteAnswerMessage class
+     * @brief  A message sent by a StorageService in answer to a file write request
      */
     class StorageServiceFileWriteAnswerMessage : public StorageServiceMessage {
     public:
@@ -199,7 +199,7 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFileReadRequestMessage class
+     * @brief A message sent to a StorageService to read a file
      */
     class StorageServiceFileReadRequestMessage : public StorageServiceMessage {
     public:
@@ -216,7 +216,7 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFileReadAnswerMessage class
+     * @brief A message sent by a StorageService in answer to a file read request
      */
     class StorageServiceFileReadAnswerMessage : public StorageServiceMessage {
     public:
@@ -237,7 +237,7 @@ namespace wrench {
     };
 
     /**
-    * @brief StorageServiceFileContentMessage class
+    * @brief A message sent/received by a StorageService that has a file size as a payload
     */
     class StorageServiceFileContentMessage : public StorageServiceMessage {
     public:

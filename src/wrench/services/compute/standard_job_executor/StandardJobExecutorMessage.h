@@ -29,7 +29,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level class for messages received/sent by a  StandardJobExecutor
+     * @brief Top-level class for messages received/sent by a StandardJobExecutor
      */
     class StandardJobExecutorMessage : public SimulationMessage {
     protected:
