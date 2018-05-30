@@ -96,7 +96,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new CoordinateLookupRequestMessage(answer_mailbox, requested_host,
                                                                    this->getMessagePayloadValueAsDouble(
-                                                                           NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
+                                                                           NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -150,7 +150,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new NetworkProximityLookupRequestMessage(answer_mailbox, std::move(hosts),
                                                                          this->getMessagePayloadValueAsDouble(
-                                                                                 NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
+                                                                                 NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -297,7 +297,7 @@ namespace wrench {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new NetworkProximityLookupAnswerMessage(msg->hosts, proximityValue,
                                                                            this->getMessagePayloadValueAsDouble(
-                                                                                   NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD)));
+                                                                                   NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
         }
         catch (std::shared_ptr<NetworkError> &cause) {
           return true;
@@ -536,10 +536,16 @@ namespace wrench {
                                             NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD));
       }
 
-      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD) < 0) {
-        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD value " +
+      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD) < 0) {
+        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD value " +
                                     this->getMessagePayloadValueAsString(
-                                            NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD));
+                                            NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD));
+      }
+
+      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD) < 0) {
+        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD value " +
+                                    this->getMessagePayloadValueAsString(
+                                            NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
       }
 
       if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD) <

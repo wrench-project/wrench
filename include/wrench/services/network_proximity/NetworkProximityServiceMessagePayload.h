@@ -21,7 +21,10 @@ namespace wrench {
     class NetworkProximityServiceMessagePayload:public ServiceMessagePayload {
     public:
         /** @brief The number of bytes in the message sent to the service to request a proximity value lookup **/
-        DECLARE_MESSAGEPAYLOAD_NAME(NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD);
+        DECLARE_MESSAGEPAYLOAD_NAME(NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD);
+
+        /** @brief The number of bytes in the message sent by the service in answer to a request for a proximity value lookup **/
+        DECLARE_MESSAGEPAYLOAD_NAME(NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD);
 
         /** @brief The number of bytes in the message sent by a network proximity daemon to the network 
          * proximity service to request which other network proximity daemon it should run network proximity 
@@ -35,7 +38,7 @@ namespace wrench {
 
         /** @brief The number of bytes in the message sent by a network proximity daemon to the network proximity
          *  service to report on an  RTT measurement experiment  **/
-        DECLARE_MESSAGEPAYLOAD_NAME(NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD);
+        DECLARE_MESSAGEPAYLOAD_NAME(NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD);
 
     };
 }
