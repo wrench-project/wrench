@@ -24,7 +24,7 @@ namespace wrench {
      * @param id: the task id
      * @param flops: the task's number of flops
      * @param min_cores: the minimum number of cores required for running the task
-     * @param max_cores: the maximum number of cores that the task can use (infinity: ComputeService::ALL_CORES)
+     * @param max_cores: the maximum number of cores that the task can use (infinity: ULONG_MAX)
      * @param parallel_efficiency: the multi-core parallel efficiency
      * @param memory_requirement: memory requirement in bytes
      * @param type: the type of the task (WorkflowTask::TaskType)
@@ -82,7 +82,7 @@ namespace wrench {
     /**
      * @brief Get the id of the task
      *
-     * @return the id as a string
+     * @return an id as a string
      */
     std::string WorkflowTask::getID() const {
       return this->id;
@@ -91,7 +91,7 @@ namespace wrench {
     /**
      * @brief Get the number of flops of the task
      *
-     * @return the number of flops
+     * @return a number of flops
      */
     double WorkflowTask::getFlops() const {
       return this->flops;
@@ -100,16 +100,16 @@ namespace wrench {
     /**
      * @brief Get the minimum number of cores required for running the task
      *
-     * @return the number of cores
+     * @return a number of cores
      */
     unsigned long WorkflowTask::getMinNumCores() const {
       return this->min_num_cores;
     }
 
     /**
-     * @brief Get the maximum number of cores for the task can use
+     * @brief Get the maximum number of cores that the task can use
      *
-     * @return the number of cores
+     * @return a number of cores
      */
     unsigned long WorkflowTask::getMaxNumCores() const {
       return this->max_num_cores;
@@ -118,7 +118,7 @@ namespace wrench {
     /**
      * @brief Get the parallel efficiency of the task
      *
-     * @return the parallel efficiency (number between 0.0 and 1.0)
+     * @return a parallel efficiency (number between 0.0 and 1.0)
      */
     double WorkflowTask::getParallelEfficiency() const {
       return this->parallel_efficiency;
@@ -127,7 +127,7 @@ namespace wrench {
     /**
      * @brief Get the memory requirement of the task
      *
-     * @return the memory requirement (in bytes)
+     * @return a memory requirement (in bytes)
      */
     double WorkflowTask::getMemoryRequirement() const {
       return this->memory_requirement;
@@ -137,7 +137,7 @@ namespace wrench {
     /**
      * @brief Get the number of children of a task
      *
-     * @return the number of children
+     * @return a number of children
      */
     int WorkflowTask::getNumberOfChildren() const {
       int count = 0;
@@ -150,7 +150,7 @@ namespace wrench {
     /**
      * @brief Get the number of parents of a task
      *
-     * @return the number of parents
+     * @return a number of parents
      */
     int WorkflowTask::getNumberOfParents() const {
       int count = 0;
@@ -163,7 +163,7 @@ namespace wrench {
     /**
      * @brief Get the state of the task
      *
-     * @return the task state
+     * @return a task state
      */
     WorkflowTask::State WorkflowTask::getState() const {
       return this->visible_state;
@@ -173,7 +173,7 @@ namespace wrench {
     /**
      * @brief Get the state of the task (as known to the "internal" layer)
      *
-     * @return the task state
+     * @return a task state
      */
     WorkflowTask::InternalState WorkflowTask::getInternalState() const {
       return this->internal_state;
@@ -200,11 +200,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a task state as a string
+     * @brief Get a task internal state as a string
      *
-     * @param state: the state
+     * @param state: the internal state
      *
-     * @return the state as a string
+     * @return an internal state as a string
      */
     std::string WorkflowTask::stateToString(WorkflowTask::InternalState state) {
 
@@ -235,7 +235,7 @@ namespace wrench {
     /**
      * @brief Set the internal state of the task
      *
-     * @param state: the task state
+     * @param state: the task's internal state
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
       this->internal_state = state;
@@ -306,7 +306,7 @@ namespace wrench {
 
     /**
      * @brief Get the cluster Id for the task
-     * @return the cluster id, or an empty string
+     * @return a cluster id, or an empty string
      */
     std::string WorkflowTask::getClusterID() const {
       return this->cluster_id;
@@ -323,7 +323,7 @@ namespace wrench {
 
     /**
      * @brief Get the workflow task type
-     * @return workflow task type
+     * @return a workflow task type
      */
     WorkflowTask::TaskType WorkflowTask::getTaskType() const {
       return this->task_type;
@@ -380,8 +380,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the number of times a task has failed
-     * @return the failure count
+     * @brief Get the number of times a task has failed
+     * @return a failure count
      */
     unsigned int WorkflowTask::getFailureCount() {
       return this->failure_count;
@@ -395,7 +395,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieves the set of input WorkflowFile objects for the task
+     * @brief Get the set of input WorkflowFile objects for the task
      * @return a set workflow files
      */
     std::set<WorkflowFile *> WorkflowTask::getInputFiles() {
@@ -408,7 +408,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieves the set of output WorkflowFile objects for the task
+     * @brief Get the set of output WorkflowFile objects for the task
      * @return a set of workflow files
      */
     std::set<WorkflowFile *> WorkflowTask::getOutputFiles() {
@@ -422,7 +422,7 @@ namespace wrench {
 
     /**
      * @brief Get the task's start date
-     * @return the start date
+     * @return a start date (-1 if task has not started yet)
      */
     double WorkflowTask::getStartDate() {
       return this->start_date;
@@ -430,7 +430,7 @@ namespace wrench {
 
     /**
      * @brief Get the task's end date
-     * @return the start date
+     * @return a start date (-1 if task has not completed yet)
      */
     double WorkflowTask::getEndDate() {
       return this->end_date;
@@ -487,25 +487,25 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a map of src and dest hosts for file transfers
+     * @brief Get a map of src and dst hosts for file transfers
      *        (only available for WorkflowTask::TaskType::TRANSFER_IN or WorkflowTask::TaskType::TRANSFER_OUT tasks)
-     * @return transfer src and dest pair
+     * @return transfer src and dst pair
      */
     std::map<WorkflowFile *, std::pair<std::string, std::string>> WorkflowTask::getFileTransfers() const {
       return this->fileTransfers;
     }
 
     /**
-     * @brief Set a pair of src and dest hosts for transfers (it is only effective for
+     * @brief Set a pair of src and dest hosts for transfers (it is only meaningful for
      *        WorkflowTask::TaskType::TRANSFER tasks)
      *
-     * @param workflow_file: a pointer to a WorkflowFile object
+     * @param workflow_file: a pointer to a file to be transferred
      * @param src: source hostname
-     * @param dest: destination hostname
+     * @param dst: destination hostname
      */
-    void WorkflowTask::addSrcDest(WorkflowFile *workflow_file, const std::string &src, const std::string &dest) {
+    void WorkflowTask::addSrcDest(WorkflowFile *workflow_file, const std::string &src, const std::string &dst) {
       if (this->fileTransfers.find(workflow_file) == this->fileTransfers.end()) {
-        this->fileTransfers.insert(std::make_pair(workflow_file, std::make_pair(src, dest)));
+        this->fileTransfers.insert(std::make_pair(workflow_file, std::make_pair(src, dst)));
       }
     }
 
