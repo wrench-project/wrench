@@ -28,7 +28,7 @@ namespace wrench {
 		class S4U_PendingCommunication;
 
 		/**
-		 * @brief Wrappers around Simgrid's mailbox methods
+		 * @brief Wrappers around S4U's communication methods
 		 */
 		class S4U_Mailbox {
 

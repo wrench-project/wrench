@@ -190,7 +190,7 @@ namespace wrench {
     * @param mailbox_name: the mailbox name
     * @param msg: the SimulationMessage
     *
-    * @return: a pending communication handle
+    * @return a pending communication handle
     *
     * @throw std::shared_ptr<NetworkError>
     * @throw std::shared_ptr<FatalFailure>
@@ -225,7 +225,7 @@ namespace wrench {
     *
     * @param mailbox_name: the mailbox name
     *
-    * @return: a pending communication handle
+    * @return a pending communication handle
     *
      * @throw std::shared_ptr<NetworkError>
     */
@@ -255,7 +255,7 @@ namespace wrench {
 
 
     /**
-    * @brief A method to generate a unique sequence number
+    * @brief Generate a unique sequence number
     *
     * @return a unique sequence number
     */
@@ -266,7 +266,7 @@ namespace wrench {
 
 
     /**
-     * @brief A method to generate a unique mailbox name given a prefix (this method
+     * @brief Generate a unique mailbox name given a prefix (this method
      *        simply appends an increasing sequence number to the prefix)
      *
      * @param prefix: a prefix for the mailbox name
