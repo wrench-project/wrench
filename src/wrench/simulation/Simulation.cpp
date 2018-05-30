@@ -99,16 +99,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Append a SimulationEvent to the event trace
-     *
-     * @param event
-     */
-    template<class T>
-    void Simulation::newTimestamp(SimulationTimestamp<T> *event) {
-      this->output.addTimestamp(event);
-    }
-
-    /**
      * @brief Instantiate a simulated platform
      *
      * @param filename: the path to a SimGrid XML platform description file
@@ -557,6 +547,14 @@ namespace wrench {
      */
     void Simulation::sleep(double duration) {
       S4U_Simulation::sleep(duration);
+    }
+
+    /**
+     * @brief Get the simulation output object
+     * @return simulation output object
+     */
+    SimulationOutput Simulation::getOutput() {
+      return this->output;
     }
 
 };

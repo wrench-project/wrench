@@ -85,8 +85,8 @@ storage resources, network links, routers, routes between hosts, etc.)
       sanity checks the simulation setup and then launches and simulators all services, until all WMS services
       have exited (after they have completed or failed to complete workflows).
       
--# **Process simulation output** -- The `wrench::Simulation` class has an `output` field that is a collection of 
-   time-stamped traces of simulation events. These traces can be processed/analyzed at will.  
+-# **Process simulation output** -- The `wrench::Simulation` class has an `getOutput()` method that returns
+   an object that is a collection of time-stamped traces of simulation events. These traces can be processed/analyzed at will.  
       
 
 <!-- The above steps are depicted in the figure below: 
@@ -211,12 +211,12 @@ all details.
 # Analyzing Simulation Output #   {#wrench-101-simulation-output}
 
 Once the `wrench::Simulation::launch()` method has returned, it is possible to process time-stamped traces
-to analyze simulation output. The `wrench::Simulation` class has an `output` field, which is
-an instance of `wrench::SimulationOutput`, which has a templated
+to analyze simulation output. The `wrench::Simulation` class has an `getOutput()` method, which returns
+an instance of `wrench::SimulationOutput`. This object has a templated
 `wrench::SimulationOutput::getTrace()` method to retrieve traces for various information types. 
 For instance, the call
 ```
-simulation.output.getTrace<wrench::SimulationTimestampTaskCompletion>()
+simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()
 ```
 returns a vector of time-stamped task completion events. The classes that implement time-stamped events
 are all classes named `wrench::SimulationTimestampSomething`, where `Something` is pretty self-explanatory

@@ -277,7 +277,7 @@ namespace wrench {
         task->setExecutionHost(this->hostname);
 
         // Generate a SimulationTimestamp
-        this->simulation->output.addTimestamp<SimulationTimestampTaskCompletion>(
+        this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
                 new SimulationTimestampTaskCompletion(task));
       }
 

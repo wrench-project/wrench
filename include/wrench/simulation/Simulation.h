@@ -57,15 +57,12 @@ namespace wrench {
 
         void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service);
 
-        /** @brief The simulation post-mortem output */
-        SimulationOutput output;
+        SimulationOutput getOutput();
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
-        template<class T>
-        void newTimestamp(SimulationTimestamp<T> *event);
 
         double getCurrentSimulatedDate();
 
@@ -83,16 +80,8 @@ namespace wrench {
         /** \endcond            */
         /***********************/
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
     private:
+        SimulationOutput output;
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 
