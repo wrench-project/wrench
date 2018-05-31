@@ -68,9 +68,9 @@ The source file for the cloud-based simulator is at `examples/simple-example/Sim
   (`wrench::ComputeService`) – jobs can then be submitted to these services. 
 - A Workflow Management System (`wrench::WMS`) is instantiated (in this case the `SimpleWMS`) with a reference to 
   a workflow object (`wrench::Workflow`) and a scheduler (`wrench::Scheduler`). The scheduler implements the
-  decision-making algorithms inside the WMS, and are modularized (so that the same WMS implementation can be iniated
+  decision-making algorithms inside the WMS. These algorithms are modularized (so that the same WMS implementation can be iniated
   with various decision-making algorithms in different simulations). The source codes for the schedulers,
-  which is of interest to "Developers" (i.e., those users who use the WRENCH Developer API) is in 
+  which is of interest to "Developers" (i.e., those users who use the WRENCH Developer API), is in 
   directory `examples/scheduler`. 
 - A file registry (`wrench::FileRegistryService`), a.k.a. a file replica catalog, which keeps track of files stored in different storage services, is deployed on a host. 
 - Workflow input files are staged on the storage service

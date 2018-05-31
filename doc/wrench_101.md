@@ -7,10 +7,14 @@ WRENCH 101                        {#wrench-101}
 @WRENCHInternalDoc  <div class="doc-type">Internal Documentation</div><div class="doc-link">Other: <a href="../user/wrench-101.html">User</a> -  <a href="../developer/wrench-101.html">Developer</a></div> @endWRENCHDoc
 
 
-WRENCH 101 is a page and a set of documents that provide detailed information for each WRENCH's [classes of users](@ref overview-users),
-which serves as higher-level documentation than the [API Reference](./annotated.html). For instructions on how to
-[install](@ref install), run a [first example](@ref getting-started), or 
-[create a basic WRENCH-based simulator](@ref getting-started-prep), please refer to their respective sections 
+WRENCH 101 is a page and a set of documents that provide detailed information 
+for each WRENCH's [classes of users](@ref overview-users),
+provide higher-level content than the [API Reference](./annotated.html). 
+For instructions on how to
+[install](@ref install), run a [first example](@ref getting-started),
+ or 
+[create a basic WRENCH-based simulator](@ref getting-started-prep), 
+please refer to their respective sections 
 in the documentation.
 
 
@@ -22,7 +26,7 @@ in the documentation.
 @WRENCHUserDoc
 
 
-This **User 101** guide describes all the WRENCH's simulation components (building blocks) 
+This **User 101** guide describes all the WRENCH simulation components (building blocks) 
 necessary to build a custom simulator and run simulation scenarios. 
 
 [TOC]
@@ -32,21 +36,21 @@ necessary to build a custom simulator and run simulation scenarios.
 # 10,000-ft view of a WRENCH-based simulator #      {#wrench-101-simulator-10000ft}
 
 A WRENCH-based simulator can be as simple as a single `main()` function that first creates 
-a platform to be simulated (the hardware) and a set of services that turns on the platform
+a platform to be simulated (the hardware) and a set of services that run on the platform
 (the software).  These services correspond to software that knows how to store data, 
-perform computation, and many other useful things that real-world cyberinfrastructures
+perform computation, and many other useful things that real-world cyberinfrastructure services
 can do.  
 
 The simulator then needs to create a workflow to be executed, which is a set
 of compute tasks each with input and output files, and thus data-dependencies.  A special
 service is then created, called a Workflow Management System (WMS),  that will be in charge
 of executing the workflow on the platform. (This service must have been implemented by a WRENCH "developer", 
-i.e., a user that has used the Developer API.)  The set of input files to the workflow, if any, are then
-staged on the platform at some locations. 
+i.e., a user that has used the Developer API.)  The set of input files to the workflow, if any, are
+staged on the platform at particular storage locations. 
  
-The simulation is then simply launched via a single call. When this call returns, the WMS
-has completed (typically after completing the execution of the workflow, or failing to executed it) 
-and one can analyze simulation output. 
+The simulation is then launched via a single call. When this call returns, the WMS
+has terminated (typically after completing the execution of the workflow, or failing to executed it) 
+and the simulation output can be analyzed. 
 
 
 # Blueprint for a WRENCH-based simulator #         {#wrench-101-simulator-blueprint}
@@ -68,24 +72,23 @@ storage resources, network links, routers, routes between hosts, etc.)
 -# **Instantiate services on the platform** -- The `wrench::Simulation::add()` method is used
  to add services to the simulation. Each class of service is created with a particular 
  constructor, which also specifies host(s) on which the service is to be started. Typical kinds of services
- are compute services, storage services, network proximity services, file registry services.  The only service that's necessary
- is a WMS...
+ are compute services, storage services, network proximity services, file registry services.  
  
 -# **Create at least one workflow** --  This is done by creating an instance of the `wrench::Workflow` class, which has
  methods to manually add tasks and files to the workflow application, but also methods to import workflows
- from workflow description files ([DAX](http://workflowarchive.org) and [JSON](http://workflowhub.org/traces/). 
+ from standard workflow description files ([DAX](http://workflowarchive.org) and [JSON](http://workflowhub.org/traces/)). 
  If there are input files to the workflow's entry tasks, these must be staged on instantiated storage
  services. 
  
--# **Instantiate at least one WMS per workflow** -- One of the services instantiated must be a `wrench::WMS` instance, i.e., a service that is
+-# **Instantiate at least one WMS per workflow** -- At least one of the services instantiated must be a `wrench::WMS` instance, i.e., a service that is
  in charge of executing the workflow, as implemented by a WRENCH "developer" using the Developer API. Associating
  a workflow to a WMS is done via the `wrench::WMS::addWorkflow()` method.
 
 -# **Launch the simulation** -- This is done via the `wrench::Simulation::launch()` call which first
-      sanity checks the simulation setup and then launches and simulators all services, until all WMS services
+      sanity checks the simulation setup and then launches all simulated services, until all WMS services
       have exited (after they have completed or failed to complete workflows).
       
--# **Process simulation output** -- The `wrench::Simulation` class has an `getOutput()` method that returns
+-# **Process simulation output** -- The `wrench::Simulation` class has a `getOutput()` method that returns
    an object that is a collection of time-stamped traces of simulation events. These traces can be processed/analyzed at will.  
       
 
@@ -102,7 +105,8 @@ simulated platform:
 
 - **Compute Services** (classes that derive `wrench::ComputeService`): These are services
 that know how to compute workflow tasks. These include bare-metal servers (`wrench::MultihostMulticoreComputeService`), cloud
-platforms (`wrench::CloudService`), batch-scheduled clusters (`wrench::BatchService`), etc.
+platforms (`wrench::CloudService`), virtualized cluster platforms (`wrench::VirtualizedClusterService`), 
+batch-scheduled clusters (`wrench::BatchService`).
 It is not technically required to instantiate a compute service, but then no workflow task
 can be executed by the WMS. 
 
@@ -114,23 +118,26 @@ It is not technically required to instantiate a storage service, but then no wor
 can have an input or an output file. 
 
 - **File Registry Services** (the `wrench::FileRegistryService` class): 
-This is a service that is often known as a _replica catalog_, and which is simply
-a database of <filename, list of locations> key-value pairs of the storage services
-on which a copy of file are available.  It is used during simulation to decide where
+These services, often known as a _replica catalogs_, are simply
+databases of <filename, list of locations> key-value pairs of the storage services
+on which a copy of file are available.  They are used during workflow execution to decide where
 input files for tasks can be acquired. 
 It is not required to instantiate a file registry service, unless the workflow's
-entry tasks have input files (because in this case these files have to be somewhere
-before execution can start). But some WMSs may complain if none is available.
+entry tasks have input files (because in this case these files have to be stored at
+some storage services
+before execution can start, and all file registry service are then automatically made
+aware of where these files are stored). Note that some WMS implementations
+ may complain if no file registry service is available.
 
 
 - **Network Proximity Services** (the class `wrench::NetworkProximityService`): 
-These are services that monitor the network and provide a database of 
+These are services that monitor the network and maintain a database of 
 host-to-host network distances. This database can be queried by WMSs to make informed
 decisions, e.g., to pick from which storage service a file should be retrieved
 so as to reduce communication time.  Typically, network distances are estimated
-as or based on round-trip-times between hosts. 
-It is not required to instantiate a network proximity service, but some WMSs may complain if none
-is available.
+ based on round-trip-times between hosts. 
+It is not required to instantiate a network proximity service, but some WMS implementations
+ may complain if none is available.
 
 
 - **Workflow Management Systems (WMSs)** (classes that derive `wrench::WMS`): 
@@ -151,17 +158,22 @@ where each key is a property and each value is a string.  Each service defines a
 For instance, the `wrench::Service` class has an associated `wrench::ServiceProperty` class, 
 the `wrench::ComputeService` class has an associated `wrench::ComputeServiceProperty` class, and
 so on at all level of the service class hierarchy. The API documentation for these property
-class explains what each property means, what possible values are, and what default values are. 
-Some properties correspond to rather low-level simulation details. For instance, 
-the `wrench::ServiceProperty` class defines a `wrench::ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD`
-property which can be used to customize the size, in bytes, of the control message sent to the
-daemon that's the entry point to the service to tell it to terminate.  Other properties
-have more to do with what the service can or should do when in operation. For instance,
+classes explains what each property means, what possible values are, and what default values are. 
+  Other properties have more to do with what the service can or should do when in operation. For instance,
 the `wrench::BatchServiceProperty` class defines a
 `wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM` which specifies
 what scheduling algorithm a batch service should for prioritizing jobs.   All property classes
-inherit from the `wrench::ServiceProperty` class, and you an explore that hierarchy to discover
-all possible (and there are many) service customization opportunities.
+inherit from the `wrench::ServiceProperty` class, and one can explore that hierarchy to discover
+all possible (and there are many) service customization opportunities. Finally, each service
+exchanges messages on the network with other services (i.e., a WMS service sends a "do some work" message 
+to a compute service). The size in bytes, or payload, of all messages can be customized similarly to the 
+properties, i.e., by passing a key-value map to the service's constructor. For instance, 
+the `wrench::ServiceMessagePayload` class defines a `wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD`
+property which can be used to customize the size, in bytes, of the control message sent to the
+daemon that's the entry point to the service to tell it to terminate. 
+Each service class has a corresponding message payload class, and the API documentation for these
+message payload classes details all messages whose payload can be customized. 
+
 
 # Customizing logging  #        {#wrench-101-logging}
 
@@ -192,11 +204,11 @@ Disabling all logging is done with the SimGrid option `--log=root.threshold:crit
 
 
 Particular "log categories" can be toggled on and off. Log category names are attached to 
-`*.cpp` files in the WRENCH and SimGrid code. Using the `-help-log-categories` option shows the
+`*.cpp` files in the WRENCH and SimGrid code. Using the `--help-log-categories` option shows the
 entire log category hierarchy. For instance, there is a log category that's called `wms` for the
-WMS, i.e., those logging messages in the `wrench:WMS` class and a log category that's called
+WMS, i.e., those logging messages in the `wrench:WMS` classm and a log category that's called
 `simple_wms` for logging message in the `wrench::SimpleWMS` class, which inherits from `wrench::WMS`. 
-These messages are thus essentially displayed by the WMS in the simple example. They can be enabled
+These messages are thus logging output produced by the WMS in the simple example. They can be enabled
 while other message as disabled as follows: 
 
 ```

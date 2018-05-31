@@ -51,12 +51,13 @@ WRENCH comprises four distinct layers:
 ![](images/wrench-architecture.png)
 
 
-# Classes of Users #                       {#overview-users}
+# Three Classes of Users #                       {#overview-users}
 
 WRENCH is intended for two different classes of users:
 
-- **WMS Users**  use WRENCH to simulate workflow executions using existing software insfrastructures (WMS implementations, Core services).
-- **WMS Developers/Researchers**  use WRENCH to prototype and evaluate software WMS designs and/or to investigate and evaluate novel algorithms to be implemented in WMSs. 
+- **WMS Users**  use WRENCH to simulate workflow executions using already implemented WMS implementations and Core services.
+- **WMS Developers/Researchers**  use WRENCH to prototype and evaluate software WMS designs and/or to investigate and evaluate novel algorithms to be implemented in WMSs, interacting with already implemented Core Services. 
+- **Internal Developers** contribute to the WRENCH code, and in particular, implement new Core Services. 
 
 
 ## Three Levels of API Documentation ##              {#overview-users-levels}
