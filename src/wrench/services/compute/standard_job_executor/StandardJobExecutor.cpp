@@ -252,7 +252,7 @@ namespace wrench {
      */
     int StandardJobExecutor::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
       WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores and %.2le bytes of RAM over %ld hosts: ",
                   this->mailbox_name.c_str(), this->total_num_cores, this->total_ram, this->core_availabilities.size());
       for (auto h : this->core_availabilities) {

@@ -117,7 +117,7 @@ namespace wrench {
      */
     double StorageService::getFreeSpace() {
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // Send a message to the daemon
@@ -126,17 +126,15 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFreeSpaceRequestMessage(
                 answer_mailbox,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
       std::unique_ptr<SimulationMessage> message = nullptr;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -165,7 +163,7 @@ namespace wrench {
       }
 
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // Send a message to the daemon
@@ -175,17 +173,15 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
       std::unique_ptr<SimulationMessage> message;
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -212,7 +208,7 @@ namespace wrench {
       }
 
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // Send a message to the daemon
@@ -225,9 +221,6 @@ namespace wrench {
                                                                          this->getMessagePayloadValueAsDouble(
                                                                                  StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<FatalFailure> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
@@ -236,10 +229,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<FatalFailure> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -255,9 +244,6 @@ namespace wrench {
         try {
           file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
-          WRENCH_INFO("Network Error while getting a file content");
-          throw WorkflowExecutionException(cause);
-        } catch (std::shared_ptr<FatalFailure> &cause) {
           WRENCH_INFO("Unknown Error while getting a file content.... means we should just die. but throwing");
           throw WorkflowExecutionException(cause);
         }
@@ -291,7 +277,7 @@ namespace wrench {
       }
 
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // Send a  message to the daemon
@@ -302,8 +288,8 @@ namespace wrench {
                                                                           file,
                                                                           this->getMessagePayloadValueAsDouble(
                                                                                   StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
       } catch (std::exception &e) {
         WRENCH_INFO("Got a weird exception..... returning");
         return;
@@ -314,9 +300,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -329,8 +313,8 @@ namespace wrench {
         // Otherwise, synchronously send the file up!
         try {
           S4U_Mailbox::putMessage(msg->data_write_mailbox_name, new StorageServiceFileContentMessage(file));
-        } catch (FailureCause &cause) {
-          throw WorkflowExecutionException(&cause);
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          throw WorkflowExecutionException(cause);
         }
 
       } else {
@@ -423,7 +407,7 @@ namespace wrench {
           storage_service = file_locations[f];
         }
         if (storage_service == nullptr) {
-          throw WorkflowExecutionException(new NoStorageServiceForFile(f));
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoStorageServiceForFile(f)));
         }
 
         if (action == READ) {
@@ -472,10 +456,10 @@ namespace wrench {
       }
 
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
-      bool unregister = (file_registry_service != nullptr) ? true : false;
+      bool unregister = (file_registry_service != nullptr);
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("delete_file");
@@ -484,8 +468,8 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
@@ -493,9 +477,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -507,7 +489,7 @@ namespace wrench {
         WRENCH_INFO("Deleted file %s on storage service %s", file->getID().c_str(), this->getName().c_str());
 
         if (unregister) {
-            file_registry_service->removeEntry(file, this);
+          file_registry_service->removeEntry(file, this);
         }
 
       } else {
@@ -535,7 +517,7 @@ namespace wrench {
           storage_service = file_locations[f];
         }
         if (storage_service == nullptr) {
-          throw WorkflowExecutionException(new NoStorageServiceForFile(f));
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoStorageServiceForFile(f)));
         }
 
         // Remove the file
@@ -571,7 +553,7 @@ namespace wrench {
       }
 
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // Send a message to the daemon
@@ -585,8 +567,6 @@ namespace wrench {
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<FatalFailure> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
@@ -595,8 +575,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<FatalFailure> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -632,7 +610,7 @@ namespace wrench {
       }
 
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // Send a message to the daemon
@@ -644,8 +622,6 @@ namespace wrench {
                 nullptr,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<FatalFailure> &cause) {
         throw WorkflowExecutionException(cause);
       }
     }
@@ -671,7 +647,7 @@ namespace wrench {
       }
 
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // Send a message to the daemon
@@ -684,8 +660,8 @@ namespace wrench {
                                                                          file,
                                                                          this->getMessagePayloadValueAsDouble(
                                                                                  StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
 
@@ -694,9 +670,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
-      } catch (FailureCause &cause) {
-        throw WorkflowExecutionException(&cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
+      } catch (std::shared_ptr<NetworkError> cause) {
         throw WorkflowExecutionException(cause);
       }
 

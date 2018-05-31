@@ -106,7 +106,7 @@ namespace wrench {
     int WorkunitMulticoreExecutor::main() {
 
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_BLUE);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
       WRENCH_INFO("New WorkunitExecutor starting (%s) to do: %ld pre file copies, %ld tasks, %ld post file copies",
                   this->mailbox_name.c_str(),
@@ -155,10 +155,6 @@ namespace wrench {
         WRENCH_INFO("Work unit executor on can't report back due to network error.. aborting!");
         this->workunit = nullptr; // To decrease the ref count
         return 0;
-      } catch (std::shared_ptr<FatalFailure> &cause) {
-        WRENCH_INFO("Work unit executor got a fatal failure... aborting!");
-        this->workunit = nullptr; // To decrease the ref count
-        return 0;
       }
 
       WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
@@ -183,14 +179,14 @@ namespace wrench {
         StorageService *src = std::get<1>(file_copy);
         if (src == ComputeService::SCRATCH) {
           if (this->scratch_space == nullptr) {
-            throw WorkflowExecutionException(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as source but is null"));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as source but is null")));
           }
           src = this->scratch_space;
         }
         StorageService *dst = std::get<2>(file_copy);
         if (dst == ComputeService::SCRATCH) {
           if (this->scratch_space == nullptr) {
-            throw WorkflowExecutionException(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as destination but is null"));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as destination but is null")));
           } else {
             dst = this->scratch_space;
           }
@@ -350,7 +346,7 @@ namespace wrench {
         } catch (std::exception &e) {
           WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
           this->releaseDaemonLock();
-          throw WorkflowExecutionException(new FatalFailure());
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FatalFailure()));
         }
         std::shared_ptr<ComputeThread> compute_thread;
         try {
@@ -375,7 +371,7 @@ namespace wrench {
 //          ct->kill();
 //        }
         this->releaseDaemonLock();
-        throw WorkflowExecutionException(new ComputeThreadHasDied());
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
       }
       WRENCH_INFO("Waiting for completion of all compute threads");
 
@@ -390,10 +386,6 @@ namespace wrench {
         } catch (std::shared_ptr<NetworkError> &e) {
           WRENCH_INFO("Got a network error when trying to get completion message from compute thread");
           // Do nothing, perhaps the child has died
-          success = false;
-          continue;
-        } catch (std::shared_ptr<FatalFailure> &e) {
-          WRENCH_INFO("Go a fatal failure when trying to get completion message from compute thread");
           success = false;
           continue;
         }
@@ -414,7 +406,7 @@ namespace wrench {
       #endif
 
       if (!success) {
-        throw WorkflowExecutionException(new ComputeThreadHasDied());
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
       }
     }
 

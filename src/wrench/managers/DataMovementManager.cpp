@@ -156,7 +156,7 @@ namespace wrench {
  */
     int DataMovementManager::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_YELLOW);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
       WRENCH_INFO("New Data Movement Manager starting (%s)", this->mailbox_name.c_str());
 
@@ -184,8 +184,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        return true;
-      }  catch (std::shared_ptr<FatalFailure> &cause) {
         return true;
       }
 

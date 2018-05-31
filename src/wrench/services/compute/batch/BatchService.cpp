@@ -253,7 +253,7 @@ namespace wrench {
     void BatchService::submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       //check that the number of requested hosts is valid
@@ -321,8 +321,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobAnswerMessage *>(message.get())) {
@@ -353,7 +351,7 @@ namespace wrench {
     void BatchService::submitPilotJob(PilotJob *job, std::map<std::string, std::string> &batch_job_args) {
 
       if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // Check the -N argument
@@ -422,8 +420,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
@@ -453,7 +449,7 @@ namespace wrench {
     void BatchService::terminateStandardJob(StandardJob *job) {
 
       if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_standard_job");
@@ -474,8 +470,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -503,7 +497,7 @@ namespace wrench {
      */
     int BatchService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
       WRENCH_INFO("Batch Service starting");
 
@@ -960,7 +954,7 @@ namespace wrench {
     void BatchService::terminatePilotJob(PilotJob *job) {
 
       if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_pilot_job");
@@ -982,8 +976,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -1052,8 +1044,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        return true;
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         return true;
       }
 

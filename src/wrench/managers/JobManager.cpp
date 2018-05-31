@@ -361,7 +361,7 @@ namespace wrench {
       }
 
       if (job->getParentComputeService() == nullptr) {
-        throw WorkflowExecutionException(new JobCannotBeTerminated(job));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)));
       }
 
       try {
@@ -443,7 +443,7 @@ namespace wrench {
 
         if ((this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) ||
             (this->running_standard_jobs.find((StandardJob *) job) != this->running_standard_jobs.end())) {
-          throw WorkflowExecutionException(new JobCannotBeForgotten(job));
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new JobCannotBeForgotten(job)));
         }
         if (this->completed_standard_jobs.find((StandardJob *) job) != this->completed_standard_jobs.end()) {
           this->completed_standard_jobs.erase((StandardJob *) job);
@@ -466,7 +466,7 @@ namespace wrench {
       if (job->getType() == WorkflowJob::PILOT) {
         if ((this->pending_pilot_jobs.find((PilotJob *) job) != this->pending_pilot_jobs.end()) ||
             (this->running_pilot_jobs.find((PilotJob *) job) != this->running_pilot_jobs.end())) {
-          throw WorkflowExecutionException(new JobCannotBeForgotten(job));
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new JobCannotBeForgotten(job)));
         }
         if (this->completed_pilot_jobs.find((PilotJob *) job) != this->completed_pilot_jobs.end()) {
           this->jobs.erase(job);
@@ -488,7 +488,7 @@ namespace wrench {
      */
     int JobManager::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_YELLOW);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
       WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
@@ -499,8 +499,6 @@ namespace wrench {
           WRENCH_INFO("Waiting for a message");
           message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
-          continue;
-        } catch (std::shared_ptr<FatalFailure> &cause) {
           continue;
         }
 

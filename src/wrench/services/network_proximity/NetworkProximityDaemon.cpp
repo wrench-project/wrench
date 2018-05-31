@@ -87,16 +87,21 @@ namespace wrench {
 
     int NetworkProximityDaemon::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
       WRENCH_INFO("Network Daemons Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
       double time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
-      S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                               new NextContactDaemonRequestMessage(this,
-                                                                   this->getMessagePayloadValueAsDouble(
-                                                                           NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+      try {
+        S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+                                 new NextContactDaemonRequestMessage(this,
+                                                                     this->getMessagePayloadValueAsDouble(
+                                                                             NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        // give up right away!
+        return 0;
+      }
 
 
       bool life = true;
@@ -110,9 +115,9 @@ namespace wrench {
 
             double start_time = S4U_Simulation::getClock();
 
+            WRENCH_INFO("Sending a NetworkProximityTransferMessage from %s to %s", this->mailbox_name.c_str(),
+                        this->next_mailbox_to_send.c_str());
             try {
-              WRENCH_INFO("Sending a NetworkProximityTransferMessage from %s to %s", this->mailbox_name.c_str(),
-                          this->next_mailbox_to_send.c_str());
               S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                       new NetworkProximityTransferMessage(
                                               this->message_size));
@@ -131,10 +136,15 @@ namespace wrench {
             std::pair<std::string, std::string> hosts;
             hosts = std::make_pair(S4U_Simulation::getHostName(), this->next_host_to_send);
 
-            S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                     new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
-                                                                              this->getMessagePayloadValueAsDouble(
-                                                                                      NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD)));
+            try {
+              S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+                                       new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
+                                                                                this->getMessagePayloadValueAsDouble(
+                                                                                        NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+              // Couldn't report measurement... oh well.. ignoring
+            }
+
             next_host_to_send = "";
             next_mailbox_to_send = "";
 
@@ -144,10 +154,15 @@ namespace wrench {
             time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
 
-            S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                     new NextContactDaemonRequestMessage(this,
-                                                                         this->getMessagePayloadValueAsDouble(
-                                                                                 NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+            try {
+              S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+                                       new NextContactDaemonRequestMessage(this,
+                                                                           this->getMessagePayloadValueAsDouble(
+                                                                                   NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+              // Couldn't find out who to talk to next... aborting
+              life = false;
+            }
           }
 
         }
@@ -165,15 +180,14 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-//            if(timeout<1){
-//                std::cout<<"Timeout very less "<<this->mailbox_name<<"\n";
-//            }
         message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        return true;
       } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
+//      catch (std::shared_ptr<NetworkTimeout> &cause) {
+//        WRENCH_INFO("GETTING ND 1: WTF");
+//        return true;
+//      }
 
       if (message == nullptr) {
         WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");

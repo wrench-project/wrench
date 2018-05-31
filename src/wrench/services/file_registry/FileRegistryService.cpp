@@ -99,8 +99,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<FileRegistryFileLookupAnswerMessage *>(message.get())) {
@@ -156,8 +154,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       if (FileRegistryFileLookupByProximityAnswerMessage *msg = dynamic_cast<FileRegistryFileLookupByProximityAnswerMessage *> (message.get())) {
@@ -203,8 +199,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw (WorkflowExecutionException(cause));
       }
 
       if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
@@ -250,8 +244,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw (WorkflowExecutionException(cause));
       }
 
       if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
@@ -273,7 +265,7 @@ namespace wrench {
      */
     int FileRegistryService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
       WRENCH_INFO("File Registry Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
