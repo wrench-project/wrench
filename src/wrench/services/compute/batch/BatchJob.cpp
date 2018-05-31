@@ -12,6 +12,17 @@
 #include "wrench/workflow/WorkflowTask.h"
 
 namespace wrench {
+    /**
+     * @brief Constructor
+     *
+     * @param job: the workflow job corresponding to the batch job
+     * @param jobid: the batch job id
+     * @param time_in_minutes: the requested execution time in minutes
+     * @param num_nodes: the requested number of compute nodes (hosts)
+     * @param cores_per_node: the requested number of cores per node
+     * @param ending_time_stamp: the job's end date
+     * @param arrival_time_stamp: the job's arrival date
+     */
     BatchJob::BatchJob(WorkflowJob *job, unsigned long jobid, unsigned long time_in_minutes, unsigned long num_nodes,
                        unsigned long cores_per_node, double ending_time_stamp, double arrival_time_stamp) {
       if (job == nullptr) {
@@ -34,18 +45,34 @@ namespace wrench {
       this->arrival_time_stamp = arrival_time_stamp;
     }
 
+    /**
+     * @brief Get the number of cores per node
+     * @return a number of cores
+     */
     unsigned long BatchJob::getAllocatedCoresPerNode() {
       return this->cores_per_node;
     }
 
+    /**
+     * @brief Get the allocated time
+     * @return a time in seconds
+     */
     double BatchJob::getAllocatedTime() {
       return this->allocated_time;
     }
 
+    /**
+     * @brief Set the allocated time
+     * @param time: a time in seconds
+     */
     void BatchJob::setAllocatedTime(double time) {
       this->allocated_time = time;
     }
 
+    /**
+     * @brief Get the memory requirement
+     * @return a size in bytes
+     */
     double BatchJob::getMemoryRequirement() {
       WorkflowJob *workflow_job = this->job;
       double memory_requirement = 0.0;
@@ -60,37 +87,68 @@ namespace wrench {
 
     }
 
+    /**
+     * @brief Get the arrival time stamp
+     * @return a date
+     */
     double BatchJob::getArrivalTimeStamp() {
       return this->arrival_time_stamp;
     }
 
+    /**
+     * @brief Get the workflow job corresponding to this batch job
+     * @return a workflow job
+     */
     WorkflowJob *BatchJob::getWorkflowJob() {
       return this->job;
     }
 
+    /**
+     * @brief Get the id of this batch job
+     * @return a string id
+     */
     unsigned long BatchJob::getJobID() {
       return this->jobid;
     }
 
+    /**
+     * @brief Get the number of allocated compute nodes (or hosts)
+     * @return a number of nodes
+     */
     unsigned long BatchJob::getNumNodes() {
       return this->num_nodes;
     }
 
 
+    /**
+     * @brief Set the batch job's begin timestamp
+     * @param time_stamp: a date
+     */
     void BatchJob::setBeginTimeStamp(double time_stamp) {
       this->begin_time_stamp = time_stamp;
     }
 
 
+    /**
+     * @brief Get the batch job's begin timestamp
+     * @return a date
+     */
     double BatchJob::getBeginTimeStamp() {
       return this->begin_time_stamp;
     }
 
-
+/**
+     * @brief Get the batch job's end timestamp
+     * @return a date
+     */
     double BatchJob::getEndingTimeStamp() {
       return this->ending_time_stamp;
     }
 
+    /**
+     * @brief Set the batch job's end timestamp
+     * @param time_stamp: a date
+     */
     void BatchJob::setEndingTimeStamp(double time_stamp) {
       if (this->ending_time_stamp > 0) {
         throw std::runtime_error(
@@ -100,10 +158,18 @@ namespace wrench {
       this->ending_time_stamp = time_stamp;
     }
 
+    /**
+     * @brief Get the resources allocated to this batch job
+     * @return a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
+     */
     std::set<std::tuple<std::string, unsigned long, double>> BatchJob::getResourcesAllocated() {
       return this->resources_allocated;
     }
 
+    /**
+     * @brief Set the resources allocated to this batch job
+     * @param resources: a list of resource, each as a <hostname, number of cores, bytes of RAM> tuple
+     */
     void BatchJob::setAllocatedResources(std::set<std::tuple<std::string, unsigned long, double>> resources) {
       if (resources.empty()) {
         throw std::invalid_argument(
