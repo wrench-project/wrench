@@ -649,7 +649,7 @@ namespace wrench {
             }
 
             // Find the child working in the non-ready  queue
-            bool found_it = false;
+            found_it = false;
             for (auto it = this->non_ready_workunits.begin(); it != this->non_ready_workunits.end(); it++) {
               if ((*it).get() == child) {
                 // Move it to the ready  queue

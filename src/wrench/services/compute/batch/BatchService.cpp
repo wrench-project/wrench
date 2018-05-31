@@ -734,15 +734,15 @@ namespace wrench {
       std::set<std::tuple<std::string, unsigned long, double>> resources = {};
       std::vector<std::string> hosts_assigned = {};
       if (host_selection_algorithm == "FIRSTFIT") {
-        std::map<std::string, unsigned long>::iterator it;
+        std::map<std::string, unsigned long>::iterator map_it;
         unsigned long host_count = 0;
-        for (it = this->available_nodes_to_cores.begin();
-             it != this->available_nodes_to_cores.end(); it++) {
-          if ((*it).second >= cores_per_node) {
+        for (map_it = this->available_nodes_to_cores.begin();
+             map_it != this->available_nodes_to_cores.end(); map_it++) {
+          if ((*map_it).second >= cores_per_node) {
             //Remove that many cores from the available_nodes_to_core
-            (*it).second -= cores_per_node;
-            hosts_assigned.push_back((*it).first);
-            resources.insert(std::make_tuple((*it).first, cores_per_node, ram_per_node));
+            (*map_it).second -= cores_per_node;
+            hosts_assigned.push_back((*map_it).first);
+            resources.insert(std::make_tuple((*map_it).first, cores_per_node, ram_per_node));
             if (++host_count >= num_nodes) {
               break;
             }
@@ -750,9 +750,9 @@ namespace wrench {
         }
         if (resources.size() < num_nodes) {
           resources = {};
-          std::vector<std::string>::iterator it;
-          for (it = hosts_assigned.begin(); it != hosts_assigned.end(); it++) {
-            available_nodes_to_cores[*it] += cores_per_node;
+          std::vector<std::string>::iterator vector_it;
+          for (vector_it = hosts_assigned.begin(); vector_it != hosts_assigned.end(); vector_it++) {
+            available_nodes_to_cores[*vector_it] += cores_per_node;
           }
         }
       } else if (host_selection_algorithm == "BESTFIT") {
@@ -1576,7 +1576,7 @@ namespace wrench {
      * @param workflow_job
      * @param batch_job
      * @param num_nodes_allocated
-     * @param allocated_time
+     * @param allocated_time: in seconds
      * @param cores_per_node_asked_for
      */
     void
@@ -1878,8 +1878,8 @@ namespace wrench {
         // Update the core available times on each host used for the job
         for (unsigned int i = 0; i < num_hosts; i++) {
           std::string hostname = (*(earliest_start_times.begin() + i)).first;
-          for (unsigned int i = 0; i < num_cores_per_host; i++) {
-            *(core_available_times[hostname].begin() + i) = earliest_job_start_time + duration;
+          for (unsigned int j = 0; j < num_cores_per_host; j++) {
+            *(core_available_times[hostname].begin() + j) = earliest_job_start_time + duration;
           }
           std::sort(core_available_times[hostname].begin(), core_available_times[hostname].end());
         }
@@ -2013,7 +2013,7 @@ namespace wrench {
         }
       }
 
-      if (is_pending == false && is_running == false && is_waiting == false) {
+      if (!is_pending && !is_running && !is_waiting) {
         // Send a failure reply
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message =
                 new ComputeServiceTerminateStandardJobAnswerMessage(
@@ -2431,14 +2431,14 @@ namespace wrench {
         if (each_allocations.size() < 2) {
           std::string start_node = each_allocations[0];
           std::string::size_type sz;
-          int start = std::stoi(start_node, &sz);
+          unsigned long start = std::stoul(start_node, &sz);
           node_resources.push_back(start);
         } else {
           std::string start_node = each_allocations[0];
           std::string end_node = each_allocations[1];
           std::string::size_type sz;
-          unsigned long start = std::stoi(start_node, &sz);
-          unsigned long end = std::stoi(end_node, &sz);
+          unsigned long start = std::stoul(start_node, &sz);
+          unsigned long end = std::stoul(end_node, &sz);
           for (unsigned long i = start; i <= end; i++) {
             node_resources.push_back(i);
           }
@@ -2446,7 +2446,7 @@ namespace wrench {
       }
 
       unsigned long num_nodes_allocated = node_resources.size();
-      unsigned long time_in_minutes = batch_job->getAllocatedTime();
+      double time_in_minutes = batch_job->getAllocatedTime();
       unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
 
       std::set<std::tuple<std::string, unsigned long, double>> resources = {};
@@ -2459,7 +2459,7 @@ namespace wrench {
                                          0)); // TODO: Is setting RAM to 0 ok here?
       }
 
-      startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_minutes,
+      startJob(resources, workflow_job, batch_job, num_nodes_allocated, 60.0 * time_in_minutes,
                cores_per_node_asked_for);
 
     }
