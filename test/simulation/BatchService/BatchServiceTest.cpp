@@ -1337,7 +1337,7 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
-        // Create a sequential task that lasts one min and requires 2 cores
+        // Create a sequential task that lasts one min and requires 1 cores
         wrench::WorkflowTask *task = this->getWorkflow()->addTask("task", 65, 1, 1, 1.0, 0);
         task->addInputFile(this->getWorkflow()->getFileByID("input_file"));
         task->addOutputFile(this->getWorkflow()->getFileByID("output_file"));

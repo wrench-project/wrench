@@ -2459,7 +2459,7 @@ namespace wrench {
                                          0)); // TODO: Is setting RAM to 0 ok here?
       }
 
-      startJob(resources, workflow_job, batch_job, num_nodes_allocated, 60.0 * time_in_minutes,
+      startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_minutes,
                cores_per_node_asked_for);
 
     }
