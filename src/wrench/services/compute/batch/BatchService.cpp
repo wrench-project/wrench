@@ -2446,7 +2446,7 @@ namespace wrench {
       }
 
       unsigned long num_nodes_allocated = node_resources.size();
-      double time_in_minutes = batch_job->getAllocatedTime();
+      double time_in_seconds = batch_job->getAllocatedTime();
       unsigned long cores_per_node_asked_for = batch_job->getAllocatedCoresPerNode();
 
       std::set<std::tuple<std::string, unsigned long, double>> resources = {};
@@ -2459,7 +2459,7 @@ namespace wrench {
                                          0)); // TODO: Is setting RAM to 0 ok here?
       }
 
-      startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_minutes,
+      startJob(resources, workflow_job, batch_job, num_nodes_allocated, time_in_seconds,
                cores_per_node_asked_for);
 
     }
