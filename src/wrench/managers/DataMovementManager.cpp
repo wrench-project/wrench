@@ -243,7 +243,6 @@ namespace wrench {
         throw std::runtime_error("DataMovementManager::waitForNextMessage(): Unexpected [" + message->getName() + "] message");
       }
 
-      return false;
     }
 
 

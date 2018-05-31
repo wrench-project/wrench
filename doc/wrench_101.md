@@ -419,11 +419,11 @@ all details.
 
 Furthermore, one can change the color of the log messages with the
 `wrench::TerminalOutput::setThisProcessLoggingColor()` method, which takes as
-parameter a color specification (`wrench::COLOR_BLACK`,
-`wrench::COLOR_RED`, `wrench::COLOR_GREEN`,
-`wrench::COLOR_YELLOW`, `wrench::COLOR_BLUE`,
-`wrench::COLOR_MAGENTA`, `wrench::COLOR_CYAN`, or
-`wrench::COLOR_WHITE`)
+parameter a color specification (`wrench::TerminalOutput::COLOR_BLACK`,
+`wrench::TerminalOutput::COLOR_RED`, `wrench::TerminalOutput::COLOR_GREEN`,
+`wrench::TerminalOutput::COLOR_YELLOW`, `wrench::TerminalOutput::COLOR_BLUE`,
+`wrench::TerminalOutput::COLOR_MAGENTA`, `wrench::TerminalOutput::COLOR_CYAN`, or
+`wrench::TerminalOutput::COLOR_WHITE`)
 
   
 @endWRENCHDoc
