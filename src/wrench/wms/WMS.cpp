@@ -93,8 +93,6 @@ namespace wrench {
           message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
           throw std::runtime_error(cause->toString());
-        } catch (std::shared_ptr<NetworkTimeout> &cause) {
-          throw std::runtime_error(cause->toString());
         }
 
         if (message == nullptr) {

@@ -22,7 +22,7 @@ namespace wrench {
      */
     int OneJobWMS::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_YELLOW);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
       WRENCH_INFO("Starting!");
       auto workflow = new Workflow();

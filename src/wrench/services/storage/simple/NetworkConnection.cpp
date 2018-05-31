@@ -109,9 +109,16 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           if (this->type == NetworkConnection::OUTGOING_DATA) {
-            this->failure_cause = std::shared_ptr<FailureCause>(new NetworkError(NetworkError::SENDING, this->mailbox));
+            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, this->mailbox));
           } else {
-            this->failure_cause = std::shared_ptr<FailureCause>(new NetworkError(NetworkError::RECEIVING, this->mailbox));
+            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
+          }
+          return true;
+        } else if (e.category == timeout_error) {
+          if (this->type == NetworkConnection::OUTGOING_DATA) {
+            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, this->mailbox));
+          } else {
+            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->mailbox));
           }
           return true;
         }
@@ -125,7 +132,7 @@ namespace wrench {
      */
     std::unique_ptr<SimulationMessage> NetworkConnection::getMessage() {
 
-      WRENCH_INFO("Getting the message from connection");
+      WRENCH_DEBUG("Getting the message from connection");
       if (this->type == NetworkConnection::OUTGOING_DATA) {
         throw std::runtime_error("NetworkConnection::getMessage(): Cannot be called on an outgoing connection");
       }

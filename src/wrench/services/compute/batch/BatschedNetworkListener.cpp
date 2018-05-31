@@ -87,7 +87,7 @@ namespace wrench {
     int BatschedNetworkListener::main() {
 
       #ifdef ENABLE_BATSCHED
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_CYAN);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
       WRENCH_INFO("Starting");
 

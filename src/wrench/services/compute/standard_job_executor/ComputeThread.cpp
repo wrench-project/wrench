@@ -49,8 +49,6 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->reply_mailbox, new ComputeThreadDoneMessage());
       } catch (std::shared_ptr<NetworkError> &e) {
         WRENCH_INFO("Couldn't report on my completion to my parent");
-      } catch (std::shared_ptr<FatalFailure> &e) {
-        WRENCH_INFO("Couldn't report on my completion to my parent");
       }
 
       return 0;

@@ -78,7 +78,7 @@ namespace wrench {
     std::pair<double, double> NetworkProximityService::getCoordinate(std::string requested_host) {
 
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       if (boost::iequals(
@@ -104,11 +104,9 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
+        WRENCH_INFO("GETTING HERE 2");
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        std::cerr << cause->toString() << std::endl;
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -131,7 +129,7 @@ namespace wrench {
     double NetworkProximityService::query(std::pair<std::string, std::string> hosts) {
 
       if (this->state == DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       std::string network_service_type = this->getPropertyValueAsString(
@@ -158,10 +156,9 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
+        WRENCH_INFO("GETTING HERE 3");
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -195,7 +192,7 @@ namespace wrench {
      */
     int NetworkProximityService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
       WRENCH_INFO("Network Proximity Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
@@ -305,22 +302,17 @@ namespace wrench {
         return true;
 
       } else if (auto msg = dynamic_cast<NetworkProximityComputeAnswerMessage *>(message.get())) {
-        try {
-          WRENCH_INFO(
-                  "NetworkProximityService::processNextMessage()::Adding proximity value between %s and %s into the database",
-                  msg->hosts.first.c_str(), msg->hosts.second.c_str());
-          this->addEntryToDatabase(msg->hosts, msg->proximityValue);
+        WRENCH_INFO(
+                "NetworkProximityService::processNextMessage()::Adding proximity value between %s and %s into the database",
+                msg->hosts.first.c_str(), msg->hosts.second.c_str());
+        this->addEntryToDatabase(msg->hosts, msg->proximityValue);
 
-          if (boost::iequals(
-                  this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
-                  "vivaldi")) {
-            vivaldiUpdate(msg->proximityValue, msg->hosts.first, msg->hosts.second);
-          }
+        if (boost::iequals(
+                this->getPropertyValueAsString(NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE),
+                "vivaldi")) {
+          vivaldiUpdate(msg->proximityValue, msg->hosts.first, msg->hosts.second);
+        }
 
-        }
-        catch (std::shared_ptr<NetworkError> &cause) {
-          return true;
-        }
         return true;
 
       } else if (auto msg = dynamic_cast<NextContactDaemonRequestMessage *>(message.get())) {
@@ -330,11 +322,15 @@ namespace wrench {
 
 //            unsigned long randNum = (std::rand()%(this->hosts_in_network.size()));
 
-        S4U_Mailbox::dputMessage(msg->daemon->mailbox_name,
-                                 new NextContactDaemonAnswerMessage(chosen_peer->getHostname(),
-                                                                    chosen_peer->mailbox_name,
-                                                                    this->getMessagePayloadValueAsDouble(
-                                                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
+        try {
+          S4U_Mailbox::dputMessage(msg->daemon->mailbox_name,
+                                   new NextContactDaemonAnswerMessage(chosen_peer->getHostname(),
+                                                                      chosen_peer->mailbox_name,
+                                                                      this->getMessagePayloadValueAsDouble(
+                                                                              NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
+        } catch (std::shared_ptr<NetworkError> &cause) {
+          return true;
+        }
         return true;
       } else if (auto msg = dynamic_cast<CoordinateLookupRequestMessage *> (message.get())) {
         std::string requested_host = msg->requested_host;
@@ -348,8 +344,7 @@ namespace wrench {
                                                                                coordinate_itr->second.imag()),
                                                                        this->getMessagePayloadValueAsDouble(
                                                                                NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD)));
-          }
-          catch (std::shared_ptr<NetworkError> &cause) {
+          } catch (std::shared_ptr<NetworkError> &cause) {
             return true;
           }
         }
@@ -407,7 +402,7 @@ namespace wrench {
 
       return std::shared_ptr<NetworkProximityDaemon>(this->network_daemons.at(chosen_peer_index));
     }
-    
+
     /**
      * @brief Internal method to compute and update coordinates based on Vivaldi algorithm
      * @param proximity_value: one way elapsed time to send a message from the sender to the receiving peer

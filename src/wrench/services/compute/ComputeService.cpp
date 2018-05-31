@@ -57,7 +57,7 @@ namespace wrench {
       }
 
       if (this->state == ComputeService::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       try {
@@ -94,7 +94,7 @@ namespace wrench {
       }
 
       if (this->state == ComputeService::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       try {
@@ -345,7 +345,7 @@ namespace wrench {
     std::map<std::string, std::vector<double>> ComputeService::getServiceResourceInformation() {
 
       if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // send a "info request" message to the daemon's mailbox_name
@@ -365,8 +365,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 

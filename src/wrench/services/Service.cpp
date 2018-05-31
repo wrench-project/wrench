@@ -213,8 +213,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<ServiceDaemonStoppedMessage *>(message.get())) {
@@ -293,7 +291,7 @@ namespace wrench {
      */
     void Service::serviceSanityCheck() {
       if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
     }
 

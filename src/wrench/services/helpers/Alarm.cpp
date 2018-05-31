@@ -46,7 +46,7 @@ namespace wrench {
      * @return 0 on termination
      */
     int Alarm::main() {
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
       WRENCH_INFO("Alarm Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
       double time_to_sleep = this->date - S4U_Simulation::getClock();

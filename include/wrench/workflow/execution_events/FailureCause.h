@@ -328,40 +328,17 @@ namespace wrench {
             RECEIVING
         };
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-        NetworkError(NetworkError::OperationType, std::string mailbox);
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
-        std::string toString();
-        bool whileReceiving();
-        bool whileSending();
-        std::string getMailbox();
-
-    private:
-        NetworkError::OperationType operation_type;
-        bool while_sending = false;
-        std::string mailbox = "";
-    };
-
-    /**
-    * @brief A "network timout" failure cause
-    */
-    class NetworkTimeout : public FailureCause {
-    public:
-        /** A enumerated tupe that describes the operation that led to the network timeout */
-        enum OperationType {
-            SENDING,
-            RECEIVING
+        /** @brief Enumerated type to describe the type of the network error
+         */
+        enum ErrorType {
+            TIMEOUT,
+            FAILURE
         };
 
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        NetworkTimeout(NetworkTimeout::OperationType, std::string mailbox);
+        NetworkError(NetworkError::OperationType, NetworkError::ErrorType, std::string mailbox);
         /***********************/
         /** \endcond           */
         /***********************/
@@ -369,13 +346,45 @@ namespace wrench {
         std::string toString();
         bool whileReceiving();
         bool whileSending();
+        bool isTimeout();
         std::string getMailbox();
 
     private:
-        NetworkTimeout::OperationType operation_type;
+        NetworkError::OperationType operation_type;
+        NetworkError::ErrorType error_type;
         bool while_sending = false;
         std::string mailbox = "";
     };
+
+//    /**
+//    * @brief A "network timout" failure cause
+//    */
+//    class NetworkTimeout : public FailureCause {
+//    public:
+//        /** A enumerated tupe that describes the operation that led to the network timeout */
+//        enum OperationType {
+//            SENDING,
+//            RECEIVING
+//        };
+//
+//        /***********************/
+//        /** \cond INTERNAL     */
+//        /***********************/
+//        NetworkTimeout(NetworkTimeout::OperationType, std::string mailbox);
+//        /***********************/
+//        /** \endcond           */
+//        /***********************/
+//
+//        std::string toString();
+//        bool whileReceiving();
+//        bool whileSending();
+//        std::string getMailbox();
+//
+//    private:
+//        NetworkTimeout::OperationType operation_type;
+//        bool while_sending = false;
+//        std::string mailbox = "";
+//    };
     
     /**
      * @brief A "job cannot be terminated" failure cause

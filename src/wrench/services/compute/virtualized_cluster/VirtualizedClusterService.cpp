@@ -98,8 +98,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<VirtualizedClusterServiceGetExecutionHostsAnswerMessage *>(message.get())) {
@@ -154,8 +152,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<VirtualizedClusterServiceCreateVMAnswerMessage *>(message.get())) {
@@ -200,8 +196,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMAnswerMessage *>(message.get())) {
@@ -243,8 +237,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -293,8 +285,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw WorkflowExecutionException(cause);
       }
 
       if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(message.get())) {
@@ -340,7 +330,7 @@ namespace wrench {
     */
     int VirtualizedClusterService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::Color::COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
       WRENCH_INFO("Virtualized Cluster Service starting on host %s listening on mailbox_name %s",
                   this->hostname.c_str(),
                   this->mailbox_name.c_str());
