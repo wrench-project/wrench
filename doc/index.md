@@ -21,12 +21,12 @@ distributed applications in a way that is accurate (via validated simulation mod
 (low ratio of simulation time to simulated time, ability to run large simulations 
 on a single computer with low compute, memory, and energy footprints), and expressive (ability 
 to simulate arbitrary platform, application, and execution scenarios).  WRENCH provides directly
-ussable high-level simulation abstractions using SimGrid as a foundation. 
+usable high-level simulation abstractions using SimGrid as a foundation. 
 
 In a nutshell, WRENCH makes it possible to: 
 
 - Prototype implementations of Workflow Management System (WMS) components and underlying algorithms;
-- Quickly, scalability, and accurately simulate arbitrary workflow and platform scenarios for a simulated WMS 
+- Quickly, scalably, and accurately simulate arbitrary workflow and platform scenarios for a simulated WMS 
   implementation; and 
 - Run extensive experimental campaigns to conclusively compare workflow executions, platform 
   architectures, and WMS algorithms and designs.
@@ -43,7 +43,7 @@ abstractions to provide high-level **building blocks** for developing custom sim
 WRENCH comprises four distinct layers:
 
 - **Simulation Core:**  All necessary simulation models and base abstractions (computing, communicating, storing), provided by [SimGrid](http://simgrid.gforge.inria.fr).
-- **Simulated Core Services:** abstractions for simulated cyberinfrastructure components that can be used by a WMS to execute workflows (compute services, storage services, network proximity services, data location services, etc.).
+- **Simulated Core CI Services:** abstractions for simulated cyberinfrastructure (CI) components that can be used by a WMS to execute workflows (compute services, storage services, network proximity services, data location services, etc.).
 - **Simulated WMS:** simulated WMS implementations (e.g., simulated existing production WMSs, simulated WMS research prototypes).
 - **Top-Level Simulation:** a top-level set of abstractions to instantiate and simulate the execution of arbitrary workflows on arbitrary platforms using a particular WMS implementation.
 
@@ -53,10 +53,10 @@ WRENCH comprises four distinct layers:
 
 # Three Classes of Users #                       {#overview-users}
 
-WRENCH is intended for two different classes of users:
+WRENCH is intended for three different classes of users:
 
 - **WMS Users**  use WRENCH to simulate workflow executions using already implemented WMS implementations and Core services.
-- **WMS Developers/Researchers**  use WRENCH to prototype and evaluate software WMS designs and/or to investigate and evaluate novel algorithms to be implemented in WMSs, interacting with already implemented Core Services. 
+- **WMS Developers/Researchers**  use WRENCH to prototype and evaluate software WMS designs and/or to investigate and evaluate novel algorithms to be implemented in WMSs, or experimented in novel CI (interacting with already implemented Core Services). 
 - **Internal Developers** contribute to the WRENCH code, and in particular, implement new Core Services. 
 
 
