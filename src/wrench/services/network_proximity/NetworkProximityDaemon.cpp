@@ -64,8 +64,6 @@ namespace wrench {
       this->message_size = message_size * 0;
       this->measurement_period = measurement_period;
       this->max_noise = noise;
-//      this->rng = std::default_random_engine(0);
-//      this->noise_dist = std::uniform_real_distribution<double>(-max_noise, +max_noise);
 
       this->next_mailbox_to_send = "";
       this->next_host_to_send = "";
@@ -83,8 +81,10 @@ namespace wrench {
      * @return time until next measurement (in seconds)
      */
     double NetworkProximityDaemon::getTimeUntilNextMeasurement() {
-//      double noise = this->noise_dist(this->rng);
-      double noise = rand() % ((int) (2 * this->max_noise - 1)) - this->max_noise;
+
+      static std::default_random_engine rng(0);
+      static std::uniform_real_distribution<double> noise_dist(-max_noise, +max_noise);
+      double noise = noise_dist(rng);
       return S4U_Simulation::getClock() + measurement_period + noise;
     }
 
