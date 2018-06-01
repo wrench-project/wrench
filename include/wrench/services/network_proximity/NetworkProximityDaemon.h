@@ -61,8 +61,8 @@ namespace wrench {
         double message_size;
         double measurement_period;
         double max_noise;
-        std::default_random_engine rng;
-        std::uniform_real_distribution<double> noise_dist;
+//        std::default_random_engine rng;
+//        std::uniform_real_distribution<double> noise_dist;
 
         std::string suffix;
         std::string next_mailbox_to_send;
