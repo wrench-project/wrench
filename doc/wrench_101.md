@@ -266,12 +266,12 @@ A Workflow Management System (WMS), i.e., the software that makes all decisions
  a simulated process. This process has a `main()` function that goes through 
  a simple loop as follows:
  
-```
-  while (workflow execution hasn't completed or failed) {
-    interact with services
-    wait for an event
+~~~~~~~~~~~~~{.cpp}
+  while ( workflow_execution_hasnt_completed_or_failed ) {
+    // interact with services
+    // wait for an event
   }
-```
+~~~~~~~~~~~~~
 
 
 # Blueprint for a WMS in WRENCH #               {#wrench-101-WMS-blueprint}
@@ -288,7 +288,7 @@ typically follows the following steps:
    has a `wrench::ComputeService::getNumHosts()` method that makes it possible to find out how many compute hosts the service
    has access to in total.  A `wrench::StorageService` has a `wrench::StorageService::getFreeSpace()` method to find
    out have many bytes of free space are available to it.  Note that these methods actually involve
-   communication with the service, and thus incur (simulated) )overhead. 
+   communication with the service, and thus incur (simulated) overhead. 
    
 -# **Go through a main loop:** The heart of the WMS's execution consists in
    going through a loop until the workflow is executed or has failed to execute. This loop
@@ -304,18 +304,18 @@ typically follows the following steps:
 
 # Interacting with services  #                  {#wrench-101-WMS-services}
 
-Each service provides its own API. For instance a network proximity service provides methods to query the service's
+Each service provides its own API. For instance, a network proximity service provides methods to query the service's
 host distance databases. The [API Reference](./annotated.html) provides all necessary
 documentation, which also explains which methods are synchronous and which are asynchronous (in which
 case some [event](#wrench-101-WMS-events) will likely occur in the future).
  _However_, the WRENCH developer will find that many methods that one would
-expect ar nowhere to be found. For instance, the compute services do not have methods for compute job submissions!
+expect are nowhere to be found. For instance, the compute services do not have methods for compute job submissions!
 
 The rationale for the above is that many methods need to be asynchronous so that the WMS can
 use services concurrently. For instance, a WMS could submit a compute job to two distinct
 compute services asynchronously, and then wait for the service which
 completes its job first and cancel the job on the other service.  Exposing this asynchronicity to the WMS 
-would require that the WRENCH developer use data structures to perform the
+would require that the WRENCH developer uses data structures to perform the
 necessary bookkeeping of ongoing service interactions, and process incoming control messages
 from the services on the (simulated) network or register many callbacks. 
 Instead, WRENCH provides **managers**. One can think of managers are separate threads
@@ -327,6 +327,7 @@ For now there are two possible managers: a **job manager** manager (class `wrenc
 for instantiating and starting these managers: `wrench::WMS::createJobManager()` and `wrench::WMS::createDataMovementManager()`. 
  Creating these managers typically is the first thing a WMS does.
 Each manager has its own documented API, and is discussed further in sections below. 
+
 
 # Copying workflow data #                        {#wrench-101-WMS-data}
 
@@ -345,16 +346,16 @@ with a new entry once the file copy has been completed.
 # Running workflow tasks #                      {#wrench-101-WMS-tasks}
 
 A workflow comprises tasks, and a WMS must pack tasks into _jobs_ to execute them. There are two kinds of jobs in WRENCH:
-`wrench::PilotJob` and `wrench::StandardJob`.   A pilot job (sometimes called a "placeholder job") is a concept that's
-mostly relevant for batch scheduling. In a nutshell, it's a job that allows late binding of tasks to resources. It is submitted
+`wrench::PilotJob` and `wrench::StandardJob`.   A pilot job (sometimes called a "placeholder job") is a concept that is
+mostly relevant for batch scheduling. In a nutshell, it is a job that allows late binding of tasks to resources. It is submitted
 to a compute service (provided that service supports pilot jobs), and when a pilot job starts it just looks to the WMS like a short-lived compute service to which standard jobs can be
 submitted.  
 
 The most common kind of jobs is the standard job. A standard job is a unit of execution by which a WMS tells a compute service
 to do things. More specifically, in its most complete form, a standard job specifies:
     
-  - A vector of workflow tasks to execute
-  - A map of <file, storage service> values which specifies from which storage services particular input files should be read and to
+  - A vector of `wrench::WorkflowTask` to execute;
+  - A `std::map` of `<wrench::WorkflowFile*, wrench::StorageService *>` values which specifies from which storage services particular input files should be read and to
     which storage services output files should be written. (Note that a compute service can be associated to a "by default" storage service
     upon instantiation);
   - A set of file copy operations to be performed before executing the tasks;
@@ -372,6 +373,7 @@ acts as a job factory, and provides job management methods:
   - `wrench::JobManager::forgetJob()`: used to completely remove all data regarding a completed/failed job.
   - `wrench::JobManager::getPendingPilotJobs()`: used to retrieve a list of previously submitted jobs that have yet to begin executing.
   - `wrench::JobManager::getRunningPilotJobs()`: used to retrieve a list of currently running jobs.
+
 
 # Workflow execution events #                   {#wrench-101-WMS-events}
 
@@ -432,11 +434,18 @@ all details.
 
 Furthermore, one can change the color of the log messages with the
 `wrench::TerminalOutput::setThisProcessLoggingColor()` method, which takes as
-parameter a color specification (`wrench::TerminalOutput::COLOR_BLACK`,
-`wrench::TerminalOutput::COLOR_RED`, `wrench::TerminalOutput::COLOR_GREEN`,
-`wrench::TerminalOutput::COLOR_YELLOW`, `wrench::TerminalOutput::COLOR_BLUE`,
-`wrench::TerminalOutput::COLOR_MAGENTA`, `wrench::TerminalOutput::COLOR_CYAN`, or
-`wrench::TerminalOutput::COLOR_WHITE`)
+parameter a color specification:
+
+~~~~~~~~~~~~~{.cpp}
+wrench::TerminalOutput::COLOR_BLACK
+wrench::TerminalOutput::COLOR_RED
+wrench::TerminalOutput::COLOR_GREEN
+wrench::TerminalOutput::COLOR_YELLOW
+wrench::TerminalOutput::COLOR_BLUE
+wrench::TerminalOutput::COLOR_MAGENTA
+wrench::TerminalOutput::COLOR_CYAN
+wrench::TerminalOutput::COLOR_WHITE
+~~~~~~~~~~~~~
 
   
 @endWRENCHDoc
