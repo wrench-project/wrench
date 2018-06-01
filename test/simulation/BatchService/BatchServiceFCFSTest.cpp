@@ -477,6 +477,7 @@ private:
           throw std::runtime_error("Got expected exception and cause type, but functionality name is wrong (" +
           real_cause->getFunctionalityName() + ")");
         }
+        WRENCH_INFO("toString: %s", real_cause->toString().c_str());  // for coverage
 
       }
 

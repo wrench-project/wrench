@@ -159,6 +159,7 @@ private:
             throw std::runtime_error(
                     "Got the expected exception, but the failure cause does not point to the right service");
           }
+          WRENCH_INFO("toString: %s", real_cause->toString().c_str());  // for coverage
         }
         if (success) {
           throw std::runtime_error("Should not be able to get a queue waiting time estimate");
@@ -338,7 +339,6 @@ private:
         std::set<std::tuple<std::string,unsigned int,unsigned int, double>> set_of_jobs = {my_job};
 
         std::map<std::string,double> jobs_estimated_start_times;
-//        #ifdef ENABLE_BATSCHED
         try {
           jobs_estimated_start_times = batch_service->getStartTimeEstimates(set_of_jobs);
         } catch (std::runtime_error &e) {
@@ -350,26 +350,6 @@ private:
         if (delta > 1) {
           throw std::runtime_error("Estimated start time incorrect (expected: " + std::to_string(expected_wait_time) + ", got: " + std::to_string(jobs_estimated_start_times[job_id]) + ")");
         }
-
-//        #else
-//        bool success = true;
-//        try {
-//          jobs_estimated_start_times = batch_service->getQueueWaitingTimeEstimate(set_of_jobs);
-//        } catch (wrench::WorkflowExecutionException &e) {
-//          success = false;
-//          if (e.getCause()->getCauseType() != wrench::FailureCause::FUNCTIONALITY_NOT_AVAILABLE) {
-//            throw std::runtime_error("Got an exception, as expected, but not the right failure cause");
-//          }
-//          auto real_cause = (wrench::FunctionalityNotAvailable *) e.getCause().get();
-//          if (real_cause->getService() != batch_service) {
-//            throw std::runtime_error(
-//                    "Got the expected exception, but the failure cause does not point to the right service");
-//          }
-//        }
-//        if (success) {
-//          throw std::runtime_error("Should not be able to get a queue waiting time estimate");
-//        }
-//        #endif
 
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;

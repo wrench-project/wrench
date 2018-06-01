@@ -13,6 +13,8 @@
 #include <wrench-dev.h>
 #include "../../include/TestWithFork.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_functional_test, "Log category for SimpleStorageServiceFunctionalTest");
+
 
 class SimpleStorageServiceFunctionalTest : public ::testing::Test {
 
@@ -634,6 +636,32 @@ private:
         throw std::runtime_error("Got an exception while trying to initiate a file copy: " + std::string(e.what()));
       }
 
+      // Initiate it again which should fail
+      bool success = true;
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
+                                                            this->test->storage_service_500);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_ALREADY_BEING_COPIED) {
+          throw std::runtime_error("Got expected exception, but unexpected failure cause " +
+                                           e.getCause()->toString() +
+                                           "(was expecting a 'file already being copied' failure cause");
+        }
+        auto real_cause = dynamic_cast<wrench::FileAlreadyBeingCopied*>(e.getCause().get());
+        if (real_cause->getFile() != this->test->file_500) {
+          throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right file");
+        }
+        if (real_cause->getStorageService() != this->test->storage_service_500) {
+          throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right storage service");
+        }
+        WRENCH_INFO("%s", real_cause->toString().c_str()); // for coverage
+
+      }
+      if (success) {
+        throw std::runtime_error("A duplicate asynchronous file copy should fail!");
+      }
+
       // Wait for the next execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
 
@@ -652,44 +680,7 @@ private:
         }
       }
 
-      // Do it all again, which should fail
-      // Initiate a file copy
-      try {
-        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
-                                                            this->test->storage_service_500);
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error("Got an exception while trying to initiate a file copy: " + std::string(e.what()));
-      }
 
-      try {
-        event = this->getWorkflow()->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
-      }
-
-
-      switch (event->type) {
-        case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
-//          if (event->failure_cause->getCauseType() != wrench::FailureCause::FILE_ALREADY_THERE) {
-//            throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
-//                                     std::to_string(event->failure_cause->getCauseType()));
-//          }
-//          wrench::StorageServiceFileAlreadyThere *real_cause = (wrench::StorageServiceFileAlreadyThere *) event->failure_cause.get();
-//          if (real_cause->getFile() != this->test->file_500) {
-//            throw std::runtime_error(
-//                    "Got the expected 'file already there' exception, but the failure cause does not point to the correct file");
-//          }
-//          if (real_cause->getStorageService() != this->test->storage_service_500) {
-//            throw std::runtime_error(
-//                    "Got the expected 'file already there' exception, but the failure cause does not point to the correct storage service");
-//          }
-
-          break;
-        }
-        default: {
-          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
-        }
-      }
 
       return 0;
     }
