@@ -239,13 +239,13 @@ TAB_SIZE               = 4
 # newlines.
 
 ALIASES                = "WRENCHRelease=wrench-@WRENCH_RELEASE_VERSION@" \
-                         "WRENCHUserDoc=\if USER" \
-                         "WRENCHDeveloperDoc=\if DEVELOPER" \
-                         "WRENCHInternalDoc=\if INTERNAL" \
-                         "WRENCHNotUserDoc=\ifnot USER" \
-                         "WRENCHNotDeveloperDoc=\ifnot DEVELOPER" \
+                         "WRENCHUserDoc=\if (USER && !DEVELOPER && !INTERNAL)" \
+                         "WRENCHDeveloperDoc=\if (DEVELOPER && USER && !INTERNAL)" \
+                         "WRENCHInternalDoc=\if (INTERNAL && USER && DEVELOPER)" \
+                         "WRENCHNotUserDoc=\if (DEVELOPER || INTERNAL)" \
+                         "WRENCHNotDeveloperDoc=\if (!DEVELOPER || INTERNAL)" \
                          "WRENCHNotInternalDoc=\ifnot INTERNAL" \
-                         "endWRENCHDoc=\endif" \
+                         "endWRENCHDoc=\endif"
 
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
