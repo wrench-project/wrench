@@ -45,7 +45,8 @@ namespace wrench {
 
         S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix);
 
-        S4U_Daemon(std::string hostname, std::string process_name_prefix);
+        // Daemon without a mailbox (not needed?)
+//        S4U_Daemon(std::string hostname, std::string process_name_prefix);
 
         virtual ~S4U_Daemon();
 

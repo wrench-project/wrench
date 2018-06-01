@@ -655,7 +655,7 @@ private:
         if (real_cause->getStorageService() != this->test->storage_service_500) {
           throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right storage service");
         }
-        WRENCH_INFO("%s", real_cause->toString().c_str()); // for coverage
+        real_cause->toString(); // for coverage
 
       }
       if (success) {

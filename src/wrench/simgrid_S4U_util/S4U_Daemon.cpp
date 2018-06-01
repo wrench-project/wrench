@@ -43,22 +43,23 @@ namespace wrench {
       this->terminated = false;
     }
 
-    /**
-     * @brief Constructor (daemon without a mailbox)
-     *
-     * @param hostname: the name of the host on which the daemon will run
-     * @param process_name_prefix: the prefix of the name of the simulated process/actor
-     */
-    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
-      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
-        throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
-      }
-
-      this->hostname = hostname;
-      this->process_name = process_name_prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
-      this->mailbox_name = "";
-      this->terminated = false;
-    }
+//     NOT NEEDED?
+//    /**
+//     * @brief Constructor (daemon without a mailbox)
+//     *
+//     * @param hostname: the name of the host on which the daemon will run
+//     * @param process_name_prefix: the prefix of the name of the simulated process/actor
+//     */
+//    S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix) {
+//      if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
+//        throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
+//      }
+//
+//      this->hostname = hostname;
+//      this->process_name = process_name_prefix + "_" + std::to_string(S4U_Mailbox::generateUniqueSequenceNumber());
+//      this->mailbox_name = "";
+//      this->terminated = false;
+//    }
 
     S4U_Daemon::~S4U_Daemon() {
 //      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";

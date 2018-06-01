@@ -546,7 +546,6 @@ namespace wrench {
         for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
           if (job.attribute(tag.c_str())) {
             if (found_one) {
-              std::cerr << "THROWING\n";
               throw std::invalid_argument(
                       "Workflow::loadFromDAX(): multiple \"number of cores/procs\" specification for task " + id);
             } else {
