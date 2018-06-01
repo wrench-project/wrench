@@ -65,7 +65,7 @@ namespace wrench {
       this->measurement_period = measurement_period;
       this->max_noise = noise;
       this->rng = std::default_random_engine(0);
-      this->noise_dist = std::uniform_real_distribution(-max_noise, +max_noise);
+      this->noise_dist = std::uniform_real_distribution<double>(-max_noise, +max_noise);
 
       this->next_mailbox_to_send = "";
       this->next_host_to_send = "";
