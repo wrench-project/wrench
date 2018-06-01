@@ -268,7 +268,7 @@ namespace wrench {
         void sendPilotJobExpirationNotification(PilotJob *job);
 
         //send call back to the standard job submitters
-        void sendStandardJobFailureNotification(StandardJob *job, std::string job_id);
+        void sendStandardJobFailureNotification(StandardJob *job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
         // Try to schedule a job
         bool scheduleOneQueuedJob();

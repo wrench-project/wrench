@@ -1379,6 +1379,18 @@ private:
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+            auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+            wrench::FailureCause *failure_cause = real_event->failure_cause.get();
+            if (failure_cause->getCauseType() != wrench::FailureCause::JOB_TIMEOUT) {
+              throw std::runtime_error("Expected STANDARD_JOB_FAILURE event, but unexpected failure cause " +
+                                               std::to_string(failure_cause->getCauseType()));
+            }
+            auto real_cause = (dynamic_cast<wrench::JobTimeout*>(failure_cause));
+            if (real_cause->getJob() != job) {
+              throw std::runtime_error("Expected JobTimeOut failure cause does not point to expected job");
+            }
+            WRENCH_INFO("%s", real_cause->toString().c_str()); // for coverage
+
             // success, do nothing for now
             break;
           }

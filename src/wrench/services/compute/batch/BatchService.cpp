@@ -563,7 +563,7 @@ namespace wrench {
      * @brief Send back notification that a standard job has failed
      * @param job
      */
-    void BatchService::sendStandardJobFailureNotification(StandardJob *job, std::string job_id) {
+    void BatchService::sendStandardJobFailureNotification(StandardJob *job, std::string job_id, std::shared_ptr<FailureCause> cause) {
       WRENCH_INFO("A standard job executor has failed because of timeout %s", job->getName().c_str());
 
 #ifdef ENABLE_BATSCHED
@@ -573,9 +573,7 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(job->popCallbackMailbox(),
                                 new ComputeServiceStandardJobFailedMessage(
-                                        job, this,
-                                        std::shared_ptr<FailureCause>(
-                                                new ServiceIsDown(this)),
+                                        job, this, cause,
                                         this->getMessagePayloadValueAsDouble(
                                                 BatchServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -916,7 +914,7 @@ namespace wrench {
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto *job = (StandardJob *) workflow_job;
           terminateRunningStandardJob(job);
-          this->sendStandardJobFailureNotification(job, std::to_string(j->getJobID()));
+          this->sendStandardJobFailureNotification(job, std::to_string(j->getJobID()), cause);
           this->running_jobs.erase(j);
           this->freeJobFromJobsList(j);
         }
@@ -926,7 +924,7 @@ namespace wrench {
         WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto *job = (StandardJob *) workflow_job;
-          this->sendStandardJobFailureNotification(job, std::to_string((*it1)->getJobID()));
+          this->sendStandardJobFailureNotification(job, std::to_string((*it1)->getJobID()), cause);
           this->pending_jobs.erase(it1);
           this->freeJobFromJobsList(*it1);
         }
@@ -936,7 +934,7 @@ namespace wrench {
         WorkflowJob *workflow_job = (*it2)->getWorkflowJob();
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto *job = (StandardJob *) workflow_job;
-          this->sendStandardJobFailureNotification(job, std::to_string((*it2)->getJobID()));
+          this->sendStandardJobFailureNotification(job, std::to_string((*it2)->getJobID()), cause);
           this->waiting_jobs.erase(it2);
           this->freeJobFromJobsList(*it2);
         }
@@ -1109,7 +1107,8 @@ namespace wrench {
           this->removeJobFromRunningList(msg->job);
           this->freeUpResources(msg->job->getResourcesAllocated());
           this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob(),
-                                                   std::to_string(msg->job->getJobID()));
+                                                   std::to_string(msg->job->getJobID()),
+          std::shared_ptr<FailureCause>(new JobTimeout(msg->job->getWorkflowJob())));
           return true;
         } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
           WRENCH_INFO("Terminating pilot job %s", msg->job->getWorkflowJob()->getName().c_str());
@@ -1554,7 +1553,7 @@ namespace wrench {
       this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
 #endif
 
-      this->sendStandardJobFailureNotification(job, std::to_string((batch_job->getJobID())));
+      this->sendStandardJobFailureNotification(job, std::to_string((batch_job->getJobID())), cause);
       //Free the job from the global (pending, running, waiting) job list, (doing this at the end of this method to make sure
       // this job is not used anymore anywhere)
       this->freeJobFromJobsList(batch_job);
