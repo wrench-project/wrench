@@ -362,7 +362,7 @@ namespace wrench {
      * @param sender_daemon: the network daemon requesting a peer to communicate with next
      * @return a shared_ptr to the network daemon that is the selected communication peer
      */
-    std::shared_ptr<NetworkProximityDaemon> // TODO:
+    std::shared_ptr<NetworkProximityDaemon>
     NetworkProximityService::getCommunicationPeer(const NetworkProximityDaemon * sender_daemon) {
 
       WRENCH_INFO("Obtaining communication peer for %s", sender_daemon->mailbox_name.c_str());
