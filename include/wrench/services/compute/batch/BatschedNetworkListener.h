@@ -22,6 +22,7 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+        #ifdef ENABLE_BATSCHED
     /**
      * @brief A helper service that handles all interaction with Batsched
      */
@@ -52,12 +53,13 @@ namespace wrench {
         BatchService *batch_service;
         std::string batch_service_mailbox;
 
-        void send_receive();
+
 
         void sendExecuteMessageToBatchService(std::string answer_mailbox, std::string execute_job_reply_data);
         void sendQueryAnswerMessageToBatchService(double estimated_waiting_time);
-
+        void send_receive();
     };
+        #endif
 
     /***********************/
     /** \endcond           */
