@@ -284,11 +284,11 @@ namespace wrench {
 
 
         //vector of network listeners (only useful when ENABLE_BATSCHED == on)
-        std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
 
         std::map<std::string,double> getStartTimeEstimatesForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
 
 #ifdef ENABLE_BATSCHED
+        std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
 
         friend class BatschedNetworkListener;
 
