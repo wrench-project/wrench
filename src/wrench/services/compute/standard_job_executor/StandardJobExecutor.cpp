@@ -539,8 +539,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        // TODO: Send an exception above, and then send some "I failed" message to the service that created me?
-        // TODO: or do nothing, like now?
         return true;
       } catch (std::shared_ptr<FatalFailure> &cause) {
         WRENCH_INFO("Got a Unknown Failure during a communication... likely this means we're all done. Aborting");
