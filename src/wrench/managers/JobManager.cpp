@@ -529,33 +529,29 @@ namespace wrench {
                                        task->getID() + " does not have a TASK_COMPLETED internal state (" +
                                        WorkflowTask::stateToString(task->getInternalState()) + ")");
             }
-            if (task->getNumberOfChildren() > 0) {
-              // TODO: Weirdly, here, if we go in here while #children = 0, then we
-              // TODO: get a segfault when callking getTaskChildren()
-              auto children = this->wms->getWorkflow()->getTaskChildren(task);
-              for (auto child : children) {
-                switch (child->getInternalState()) {
-                  case WorkflowTask::InternalState::TASK_NOT_READY:
-                  case WorkflowTask::InternalState::TASK_RUNNING:
-                  case WorkflowTask::InternalState::TASK_FAILED:
-                  case WorkflowTask::InternalState::TASK_COMPLETED:
-                    // no nothing
-                    break;
-                  case WorkflowTask::InternalState::TASK_READY:
-                    if (child->getState() == WorkflowTask::State::NOT_READY) {
-                      bool all_parents_ready = true;
-                      for (auto parent : child->getWorkflow()->getTaskParents(child)) {
-                        if (parent->getState() != WorkflowTask::State::COMPLETED) {
-                          all_parents_ready = false;
-                          break;
-                        }
-                      }
-                      if (all_parents_ready) {
-                        child->setState(WorkflowTask::State::READY);
+            auto children = this->wms->getWorkflow()->getTaskChildren(task);
+            for (auto child : children) {
+              switch (child->getInternalState()) {
+                case WorkflowTask::InternalState::TASK_NOT_READY:
+                case WorkflowTask::InternalState::TASK_RUNNING:
+                case WorkflowTask::InternalState::TASK_FAILED:
+                case WorkflowTask::InternalState::TASK_COMPLETED:
+                  // no nothing
+                  break;
+                case WorkflowTask::InternalState::TASK_READY:
+                  if (child->getState() == WorkflowTask::State::NOT_READY) {
+                    bool all_parents_ready = true;
+                    for (auto parent : child->getWorkflow()->getTaskParents(child)) {
+                      if (parent->getState() != WorkflowTask::State::COMPLETED) {
+                        all_parents_ready = false;
+                        break;
                       }
                     }
-                    break;
-                }
+                    if (all_parents_ready) {
+                      child->setState(WorkflowTask::State::READY);
+                    }
+                  }
+                  break;
               }
             }
           }

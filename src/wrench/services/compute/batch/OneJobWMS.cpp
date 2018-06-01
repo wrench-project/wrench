@@ -26,6 +26,7 @@ namespace wrench {
 
       WRENCH_INFO("Starting!");
       auto workflow = new Workflow();
+      this->addWorkflow(workflow);
 
       // Create the set of tasks
       for (int i = 0; i < this->num_nodes; i++) {
