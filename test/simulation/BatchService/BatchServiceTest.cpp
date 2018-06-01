@@ -1389,7 +1389,7 @@ private:
             if (real_cause->getJob() != job) {
               throw std::runtime_error("Expected JobTimeOut failure cause does not point to expected job");
             }
-            WRENCH_INFO("%s", real_cause->toString().c_str()); // for coverage
+            real_cause->toString(); // for coverage
 
             // success, do nothing for now
             break;

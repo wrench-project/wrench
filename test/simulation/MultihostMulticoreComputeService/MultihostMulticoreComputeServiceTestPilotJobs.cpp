@@ -336,7 +336,31 @@ private:
         }
       }
 
-      // At this point another pilot job is running/pending, but this should be fine
+      // Shutdown the compute service
+      this->test->compute_service->stop();
+
+      // Submit a pilot job to a DOWN service
+      // Create another pilot job that requires 1 host, all core per host, 0 bytes of RAM per host, and 1 hour
+      wrench::PilotJob *doomed = job_manager->createPilotJob(1, 2, 0, 3600);
+
+      // Submit this other job
+      bool success = true;
+      try {
+        job_manager->submitJob(doomed, this->test->compute_service);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an expected exception, but the failure cause is not SERVICE_DOWN");
+        }
+        auto real_cause = dynamic_cast<wrench::ServiceIsDown *>(e.getCause().get());
+        if (real_cause->getService() != this->test->compute_service) {
+          throw std::runtime_error("Got an expected exception, but the failure cause does not point to the right service");
+        }
+        real_cause->toString(); // coverage
+      }
+      if (success) {
+        throw std::runtime_error("Shouldn't be able to submit a pilot job to a down service");
+      }
 
       return 0;
     }

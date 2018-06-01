@@ -166,3 +166,8 @@ TEST_F(WorkflowTest, SumFlops) {
   EXPECT_NO_THROW(sum_flops = wrench::Workflow::getSumFlops(workflow->getTasks()));
   ASSERT_EQ(sum_flops, 4.0);
 }
+
+
+TEST_F(WorkflowTest, Export) {
+  EXPECT_THROW(workflow->exportToEPS("tmp/workflow.eps"), std::runtime_error);
+}
