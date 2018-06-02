@@ -208,30 +208,30 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "Host1";
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
+  ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
+  ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
 //  #ifdef ENABLE_BATSCHED
-  EXPECT_THROW(compute_service = simulation->add(
+  ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,  {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "BOGUS"}
                                    })), std::invalid_argument);
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "easy_bf"}
@@ -239,10 +239,10 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(new BatchJobBrokenEstimateWaitingTimeTestWMS(
+  ASSERT_NO_THROW(wms = simulation->add(new BatchJobBrokenEstimateWaitingTimeTestWMS(
           this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
 //  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
 //          new wrench::FileRegistryService(hostname));
@@ -254,13 +254,13 @@ void BatchServiceTest::do_BatchJobBrokenEstimateWaitingTimeTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -395,24 +395,24 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "Host1";
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
+  ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
+  ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"}
@@ -420,10 +420,10 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(new BatchJobBasicEstimateWaitingTimeTestWMS(
+  ASSERT_NO_THROW(wms = simulation->add(new BatchJobBasicEstimateWaitingTimeTestWMS(
           this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
 //  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
 //          new wrench::FileRegistryService(hostname));
@@ -435,13 +435,13 @@ void BatchServiceTest::do_BatchJobBasicEstimateWaitingTimeTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -635,25 +635,25 @@ void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "Host1";
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
+  ASSERT_NO_THROW(storage_service1 = simulation->add(
 
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
+  ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
@@ -664,22 +664,22 @@ void BatchServiceTest::do_BatchJobEstimateWaitingTimeTest_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(new BatchJobEstimateWaitingTimeTestWMS(
+  ASSERT_NO_THROW(wms = simulation->add(new BatchJobEstimateWaitingTimeTestWMS(
           this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -916,24 +916,24 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "Host1";
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
+  ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
+  ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Batch Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0, {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "conservative_bf"},
@@ -942,10 +942,10 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(new BatchJobLittleComplexEstimateWaitingTimeTestWMS(
+  ASSERT_NO_THROW(wms = simulation->add(new BatchJobLittleComplexEstimateWaitingTimeTestWMS(
           this, {compute_service}, {storage_service1, storage_service2}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
 //  std::unique_ptr<wrench::FileRegistryService> file_registry_service(
 //          new wrench::FileRegistryService(hostname));
@@ -957,13 +957,13 @@ void BatchServiceTest::do_BatchJobLittleComplexEstimateWaitingTimeTest_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 

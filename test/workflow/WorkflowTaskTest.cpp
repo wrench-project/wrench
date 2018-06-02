@@ -32,8 +32,8 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
   ASSERT_EQ(t1->getWorkflow(), workflow);
 
   ASSERT_NE(t1->getID(), t2->getID());
-  EXPECT_EQ(t1->getID(), "task-01");
-  EXPECT_NE(t2->getID(), "task-01");
+  ASSERT_EQ(t1->getID(), "task-01");
+  ASSERT_NE(t2->getID(), "task-01");
 
   ASSERT_GT(t1->getFlops(), t2->getFlops());
 
@@ -44,46 +44,46 @@ TEST_F(WorkflowTaskTest, TaskStructure) {
   ASSERT_EQ(t2->getMaxNumCores(), 4);
   ASSERT_EQ(t2->getParallelEfficiency(), 0.5);
 
-  EXPECT_EQ(t1->getState(), wrench::WorkflowTask::State::READY);
-  EXPECT_EQ(t2->getState(), wrench::WorkflowTask::State::NOT_READY); // due to control dependency
+  ASSERT_EQ(t1->getState(), wrench::WorkflowTask::State::READY);
+  ASSERT_EQ(t2->getState(), wrench::WorkflowTask::State::NOT_READY); // due to control dependency
 
-  EXPECT_EQ(t1->getJob(), nullptr);
-  EXPECT_EQ(t2->getJob(), nullptr);
+  ASSERT_EQ(t1->getJob(), nullptr);
+  ASSERT_EQ(t2->getJob(), nullptr);
 
-  EXPECT_EQ(t1->getNumberOfParents(), 0);
-  EXPECT_EQ(t2->getNumberOfParents(), 1);
+  ASSERT_EQ(t1->getNumberOfParents(), 0);
+  ASSERT_EQ(t2->getNumberOfParents(), 1);
 
-  EXPECT_EQ(t1->getNumberOfChildren(), 1);
-  EXPECT_EQ(t2->getNumberOfChildren(), 0);
+  ASSERT_EQ(t1->getNumberOfChildren(), 1);
+  ASSERT_EQ(t2->getNumberOfChildren(), 0);
 
-  EXPECT_EQ(t1->getClusterID(), "");
+  ASSERT_EQ(t1->getClusterID(), "");
 }
 
 TEST_F(WorkflowTaskTest, GetSet) {
   t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_NOT_READY);
-  EXPECT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
+  ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
 
   t1->setClusterID("my-cluster-id");
-  EXPECT_EQ(t1->getClusterID(), "my-cluster-id");
+  ASSERT_EQ(t1->getClusterID(), "my-cluster-id");
 
   t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
-  EXPECT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
-  EXPECT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
+  ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
+  ASSERT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_NOT_READY);
 
 
   t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_RUNNING);
-  EXPECT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_RUNNING);
+  ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_RUNNING);
 
   t1->setInternalState(wrench::WorkflowTask::InternalState::TASK_COMPLETED);
-  EXPECT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_COMPLETED);
+  ASSERT_EQ(t1->getInternalState(), wrench::WorkflowTask::InternalState::TASK_COMPLETED);
   t2->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
-  EXPECT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
+  ASSERT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
 
-  EXPECT_NO_THROW(t1->setEndDate(1.0));
+  ASSERT_NO_THROW(t1->setEndDate(1.0));
 
-  EXPECT_EQ(t1->getFailureCount(), 0);
+  ASSERT_EQ(t1->getFailureCount(), 0);
   t1->incrementFailureCount();
-  EXPECT_EQ(t1->getFailureCount(), 1);
+  ASSERT_EQ(t1->getFailureCount(), 1);
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {
@@ -102,16 +102,16 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
   wrench::WorkflowTask* t3 = workflow->addTask("task-03", 50, 2, 4, 1.0, 0);
   t3->addInputFile(f2);
 
-  EXPECT_EQ(t3->getNumberOfParents(), 1);
+  ASSERT_EQ(t3->getNumberOfParents(), 1);
 }
 
 TEST_F(WorkflowTaskTest, StateToString) {
-  EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_NOT_READY), "NOT READY");
-  EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_READY), "READY");
-  EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_RUNNING), "RUNNING");
-  EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_COMPLETED), "COMPLETED");
-  EXPECT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_FAILED), "FAILED");
-  EXPECT_EQ(wrench::WorkflowTask::stateToString((wrench::WorkflowTask::InternalState)100), "UNKNOWN STATE");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_NOT_READY), "NOT READY");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_READY), "READY");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_RUNNING), "RUNNING");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_COMPLETED), "COMPLETED");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_FAILED), "FAILED");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString((wrench::WorkflowTask::InternalState)100), "UNKNOWN STATE");
 }
 
 

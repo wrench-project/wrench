@@ -63,10 +63,9 @@ namespace wrench {
       validateProperties();
 
       // Seed the master_rng
-      this->master_rng.seed(this->getPropertyValueAsDouble(wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED));
+      this->master_rng.seed((unsigned int)(this->getPropertyValueAsDouble(wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_PEER_LOOKUP_SEED)));
     }
 
-    // ADD TEST
     /**
      * @brief Look up the current (x,y) coordinates of a given host (only for a Vivaldi network service type)
      * @param requested_host: the host whose coordinates are being requested
@@ -104,7 +103,6 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        WRENCH_INFO("GETTING HERE 2");
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -156,7 +154,6 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-        WRENCH_INFO("GETTING HERE 3");
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -205,7 +202,8 @@ namespace wrench {
                                            this->getPropertyValueAsDouble(
                                                    NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD),
                                            this->getPropertyValueAsDouble(
-                                                   NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE)));
+                                                   NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE),
+                                            this->messagepayload_list));
         this->network_daemons.push_back(np_daemon);
 
         // if this network service type is 'vivaldi', setup the coordinate lookup table
@@ -518,7 +516,6 @@ namespace wrench {
                                       " for NETWORK_PROXIMITY_SERVICE_TYPE: " + network_service_type);
         }
       }
-
       if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD) < 0) {
         throw std::invalid_argument(error_prefix + "Invalid STOP_DAEMON_MESSAGE_PAYLOAD value " +
                                     this->getMessagePayloadValueAsString(
@@ -543,11 +540,25 @@ namespace wrench {
                                             NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
       }
 
+      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD) <
+          0) {
+        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD value " +
+                                    this->getMessagePayloadValueAsString(
+                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD));
+      }
+
       if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD) <
           0) {
         throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD value " +
                                     this->getMessagePayloadValueAsString(
                                             NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD));
+      }
+
+      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD) <
+          0) {
+        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD value " +
+                                    this->getMessagePayloadValueAsString(
+                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD));
       }
 
       if (this->getPropertyValueAsDouble(NetworkProximityServiceProperty::LOOKUP_OVERHEAD) < 0) {

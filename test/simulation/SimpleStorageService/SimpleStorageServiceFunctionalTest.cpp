@@ -392,30 +392,30 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a bad Storage Service
-  EXPECT_THROW(storage_service_100 = simulation->add(
+  ASSERT_THROW(storage_service_100 = simulation->add(
           new wrench::SimpleStorageService(hostname, -100.0)), std::invalid_argument);
 
   // Create Three Storage Services
-  EXPECT_NO_THROW(storage_service_100 = simulation->add(
+  ASSERT_NO_THROW(storage_service_100 = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0)));
-  EXPECT_NO_THROW(storage_service_500 = simulation->add(
+  ASSERT_NO_THROW(storage_service_500 = simulation->add(
           new wrench::SimpleStorageService(hostname, 500.0)));
-  EXPECT_NO_THROW(storage_service_1000 = simulation->add(
+  ASSERT_NO_THROW(storage_service_1000 = simulation->add(
           new wrench::SimpleStorageService(hostname, 1000.0)));
 
 
@@ -425,7 +425,7 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceBasicFunctionalityTestWMS(this,
                                                             {compute_service},
                                                             {
@@ -434,22 +434,22 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
                                                             },
                                                             file_registry_service, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // A bogus staging
-  EXPECT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
+  ASSERT_THROW(simulation->stageFile(nullptr, storage_service_100), std::invalid_argument);
 
   // Another bogus staging
-  EXPECT_THROW(simulation->stageFile(file_500, storage_service_100), std::runtime_error);
+  ASSERT_THROW(simulation->stageFile(file_500, storage_service_100), std::runtime_error);
 
   // Staging all files on the 1000 storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_1->getID(),   file_1},
+  ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(),   file_1},
                                           {file_10->getID(),  file_10},
                                           {file_100->getID(), file_100},
                                           {file_500->getID(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -556,45 +556,45 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopy_test() {
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a  Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, 1, 0)},
                                                        {})));
 
   // Create 2 Storage Services
-  EXPECT_NO_THROW(storage_service_1000 = simulation->add(
+  ASSERT_NO_THROW(storage_service_1000 = simulation->add(
           new wrench::SimpleStorageService(hostname, 1000.0)));
 
-  EXPECT_NO_THROW(storage_service_500 = simulation->add(
+  ASSERT_NO_THROW(storage_service_500 = simulation->add(
           new wrench::SimpleStorageService(hostname, 500.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceSynchronousFileCopyTestWMS(
                   this,
                   {compute_service},
                   {storage_service_1000, storage_service_500}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
+  ASSERT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -698,44 +698,44 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopy_test() {
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create 2 Storage Services
-  EXPECT_NO_THROW(storage_service_1000 = simulation->add(
+  ASSERT_NO_THROW(storage_service_1000 = simulation->add(
           new wrench::SimpleStorageService(hostname, 1000.0)));
 
-  EXPECT_NO_THROW(storage_service_500 = simulation->add(
+  ASSERT_NO_THROW(storage_service_500 = simulation->add(
           new wrench::SimpleStorageService(hostname, 500.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceAsynchronousFileCopyTestWMS(
                   this, {compute_service}, {storage_service_1000, storage_service_500},
                   hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
+  ASSERT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -910,33 +910,33 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create 3 Storage Services
-  EXPECT_NO_THROW(storage_service_1000 = simulation->add(
+  ASSERT_NO_THROW(storage_service_1000 = simulation->add(
           new wrench::SimpleStorageService(hostname, 1000.0)));
 
-  EXPECT_NO_THROW(storage_service_500 = simulation->add(
+  ASSERT_NO_THROW(storage_service_500 = simulation->add(
           new wrench::SimpleStorageService(hostname, 500.0)));
 
-  EXPECT_NO_THROW(storage_service_100 = simulation->add(
+  ASSERT_NO_THROW(storage_service_100 = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "infinity"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceSynchronousFileCopyFailuresTestWMS(
                   this, {
                           compute_service
@@ -945,16 +945,16 @@ void SimpleStorageServiceFunctionalTest::do_SynchronousFileCopyFailures_test() {
                           storage_service_1000
                   }, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
+  ASSERT_NO_THROW(simulation->stageFile(file_500, storage_service_1000));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -1142,33 +1142,33 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create 3 Storage Services
-  EXPECT_NO_THROW(storage_service_1000 = simulation->add(
+  ASSERT_NO_THROW(storage_service_1000 = simulation->add(
           new wrench::SimpleStorageService(hostname, 1000.0)));
 
-  EXPECT_NO_THROW(storage_service_500 = simulation->add(
+  ASSERT_NO_THROW(storage_service_500 = simulation->add(
           new wrench::SimpleStorageService(hostname, 500.0)));
 
-  EXPECT_NO_THROW(storage_service_100 = simulation->add(
+  ASSERT_NO_THROW(storage_service_100 = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceAsynchronousFileCopyFailuresTestWMS(
                   this, {
                           compute_service
@@ -1177,16 +1177,16 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
                           storage_service_1000
                   }, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging file_500 on the 1000-byte storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
+  ASSERT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);

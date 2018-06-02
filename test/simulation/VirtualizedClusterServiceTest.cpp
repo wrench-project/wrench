@@ -174,38 +174,38 @@ void VirtualizedClusterServiceTest::do_StandardJobTaskTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("cloud_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::CloudService(hostname, execution_hosts, 100, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new CloudStandardJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+  ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -294,40 +294,40 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("virtualized_cluster_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Virtualized Cluster Service
   std::vector<std::string> execution_hosts = simulation->getHostnameList();
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, execution_hosts, 100.0,
                                                 {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new VirtualizedClusterVMMigrationTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->add(
+  ASSERT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -419,40 +419,40 @@ void VirtualizedClusterServiceTest::do_PilotJobTaskTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("cloud_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::CloudService(hostname, execution_hosts, 0,
                                    {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new CloudPilotJobTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->add(
+  ASSERT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -538,40 +538,40 @@ void VirtualizedClusterServiceTest::do_NumCoresTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("cloud_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::CloudService(hostname, execution_hosts, 0,
                                    {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new CloudNumCoresTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->add(
+  ASSERT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);

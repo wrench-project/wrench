@@ -133,10 +133,10 @@ void SimulationOutputTest::do_emptyTrace_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("cloud_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
@@ -144,13 +144,13 @@ void SimulationOutputTest::do_emptyTrace_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new EmptySimulationOutputWMS(this, {}, {}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   // Get the number of task completions
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;

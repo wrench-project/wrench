@@ -181,48 +181,48 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("cloud_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service (note the BOGUS property, which is for testing puposes
   //  and doesn't matter because we do not stop the service)
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0,
                                    {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "BOGUS"}})));
 
   // Try to get a bogus property as string or double
-  EXPECT_THROW(storage_service->getPropertyValueAsString("BOGUS"), std::invalid_argument);
-  EXPECT_THROW(storage_service->getPropertyValueAsDouble("BOGUS"), std::invalid_argument);
+  ASSERT_THROW(storage_service->getPropertyValueAsString("BOGUS"), std::invalid_argument);
+  ASSERT_THROW(storage_service->getPropertyValueAsDouble("BOGUS"), std::invalid_argument);
   // Try to get a non-double double property (property value is "infinity", which is not a number)
-  EXPECT_THROW(storage_service->getPropertyValueAsDouble(wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD),
+  ASSERT_THROW(storage_service->getPropertyValueAsDouble(wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD),
                std::invalid_argument);
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::CloudService(hostname, execution_hosts, 100.0,
                                    { {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleSimulationReadyTasksTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+  ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);

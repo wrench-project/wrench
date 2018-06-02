@@ -32,21 +32,7 @@ namespace wrench {
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                        std::string network_proximity_service_mailbox,
         double message_size,double measurement_period,
-        double noise);
-
-    private:
-        std::map<std::string, std::string> default_property_values = {
-                };
-
-        std::map<std::string, std::string> default_messagepayload_values =
-                {{NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,          "1024"},
-                 {NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
-                 {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD,    "1024"},
-                };
-
-
+        double noise, std::map<std::string, std::string> messagepayload_list);
 
     private:
 
@@ -55,7 +41,7 @@ namespace wrench {
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                        std::string network_proximity_service_mailbox,
                        double message_size,double measurement_period,
-                       double noise, std::string suffix);
+                       double noise, std::map<std::string, std::string> messagepayload_list, std::string suffix);
 
 
         double message_size;
