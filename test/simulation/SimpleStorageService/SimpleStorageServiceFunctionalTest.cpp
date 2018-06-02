@@ -130,6 +130,29 @@ private:
         }
       }
 
+      // Do a couple of bogus copies
+      success = true;
+      try {
+        this->test->storage_service_100->copyFile(nullptr, this->test->storage_service_1000);
+      } catch (std::invalid_argument &) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error(
+                "Should not be able to store a nullptr to a storage service!");
+      }
+
+      success = true;
+      try {
+        this->test->storage_service_100->copyFile(this->test->file_500, nullptr);
+      } catch (std::invalid_argument &) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error(
+                "Should not be able to store a file to a nullptr storage service!");
+      }
+
       // Copy a file to a storage service that doesn't have enough space
       success = true;
       try {
@@ -375,6 +398,74 @@ private:
       if (success) {
         throw std::runtime_error("Should not be able to delete a nullptr file from a storage service");
       }
+
+      // Shutdown the service
+      this->test->storage_service_100->stop();
+
+      // Try to do stuff with a shutdown service
+      success = true;
+      try {
+        this->test->storage_service_100->lookupFile(this->test->file_1);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        // Check Exception
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
+                                   std::to_string(e.getCause()->getCauseType()) + "(was expecting ServiceIsDown)");
+        }
+        // Check Exception details
+        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
+        if (real_cause->getService() != this->test->storage_service_100) {
+          throw std::runtime_error(
+                  "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
+        }
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
+      }
+
+      success = true;
+      try {
+        this->test->storage_service_100->readFile(this->test->file_1);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        // Check Exception
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
+                                   std::to_string(e.getCause()->getCauseType()) + "(was expecting ServiceIsDown)");
+        }
+        // Check Exception details
+        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
+        if (real_cause->getService() != this->test->storage_service_100) {
+          throw std::runtime_error(
+                  "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
+        }
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
+      }
+
+      success = true;
+      try {
+        this->test->storage_service_100->writeFile(this->test->file_1);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        // Check Exception
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
+                                   std::to_string(e.getCause()->getCauseType()) + "(was expecting ServiceIsDown)");
+        }
+        // Check Exception details
+        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
+        if (real_cause->getService() != this->test->storage_service_100) {
+          throw std::runtime_error(
+                  "Got the expected 'service is down' exception, but the failure cause does not point to the correct storage service");
+        }
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
+      }
+
 
       return 0;
     }
