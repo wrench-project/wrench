@@ -215,41 +215,41 @@ void FileRegistryTest::do_FileRegistry_Test() {
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        {})));
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
+  ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
+  ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a file registry service
   wrench::FileRegistryService *file_registry_service = nullptr;
-  EXPECT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(hostname)));
+  ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new FileRegistryTestWMS(
                   this,
                   {compute_service}, {storage_service1, storage_service2}, file_registry_service, hostname)));
 
 
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -384,7 +384,7 @@ void FileRegistryTest::do_lookupEntry_Test() {
 
   wms->addWorkflow(workflow);
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 

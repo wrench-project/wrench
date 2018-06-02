@@ -192,31 +192,31 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "Host1";
 
   // Create a Batch Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new BatchTraceFileReplayTestWMS(
                   this, {compute_service}, {}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -367,10 +367,10 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "Host1";
@@ -448,7 +448,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname, 
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
@@ -457,15 +457,15 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(new WorkloadTraceFileTestWMS(
+  ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileTestWMS(
           this, {compute_service}, {}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 

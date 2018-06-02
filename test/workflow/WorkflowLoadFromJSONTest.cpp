@@ -3186,8 +3186,8 @@ TEST_F(WorkflowLoadFromJSONTest, LoadValidJSON) {
 
   auto *workflow = new wrench::Workflow();
 
-  EXPECT_THROW(workflow->loadFromJSON("bogus", "1f"), std::invalid_argument);
-  EXPECT_NO_THROW(workflow->loadFromJSON(this->json_file_path, "1f"));
+  ASSERT_THROW(workflow->loadFromJSON("bogus", "1f"), std::invalid_argument);
+  ASSERT_NO_THROW(workflow->loadFromJSON(this->json_file_path, "1f"));
   ASSERT_EQ(workflow->getNumberOfTasks(), 71);
   ASSERT_EQ(workflow->getFiles().size(), 69);
 

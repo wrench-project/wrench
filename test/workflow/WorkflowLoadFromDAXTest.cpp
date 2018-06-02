@@ -328,8 +328,8 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
 
   auto *workflow = new wrench::Workflow();
 
-  EXPECT_THROW(workflow->loadFromDAX("bogus", "1f"), std::invalid_argument);
-  EXPECT_NO_THROW(workflow->loadFromDAX(this->dax_file_path, "1f"));
+  ASSERT_THROW(workflow->loadFromDAX("bogus", "1f"), std::invalid_argument);
+  ASSERT_NO_THROW(workflow->loadFromDAX(this->dax_file_path, "1f"));
   ASSERT_EQ(workflow->getNumberOfTasks(), 36);
   ASSERT_EQ(workflow->getFiles().size(), 56);
 

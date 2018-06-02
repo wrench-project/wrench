@@ -273,49 +273,49 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("copy_register_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // set up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a (unused) Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService("WMSHost",
                                                        {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create src and dst storage services
-  EXPECT_NO_THROW(src_storage_service = simulation->add(
+  ASSERT_NO_THROW(src_storage_service = simulation->add(
           new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE)));
 
-  EXPECT_NO_THROW(src2_storage_service = simulation->add(
+  ASSERT_NO_THROW(src2_storage_service = simulation->add(
           new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE)
   ));
 
-  EXPECT_NO_THROW(dst_storage_service = simulation->add(
+  ASSERT_NO_THROW(dst_storage_service = simulation->add(
           new wrench::SimpleStorageService("DstHost", STORAGE_SIZE)));
 
   // Create a file registry
   wrench::FileRegistryService *file_registry_service = nullptr;
-  EXPECT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
+  ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(new DataMovementManagerCopyRegisterTestWMS(
+  ASSERT_NO_THROW(wms = simulation->add(new DataMovementManagerCopyRegisterTestWMS(
           this, {compute_service}, {src_storage_service, src2_storage_service, dst_storage_service}, file_registry_service, "WMSHost")));
 
   wms->addWorkflow(this->workflow);
 
   // Stage the 2 files on the StorageHost
-  EXPECT_NO_THROW(simulation->stageFiles({{src_file_1->getID(), src_file_1},
+  ASSERT_NO_THROW(simulation->stageFiles({{src_file_1->getID(), src_file_1},
                                           {src_file_2->getID(), src_file_2},
                                           {src_file_3->getID(), src_file_3}}, src_storage_service));
 
-  EXPECT_NO_THROW(simulation->stageFiles({{src2_file_1->getID(), src2_file_1},
+  ASSERT_NO_THROW(simulation->stageFiles({{src2_file_1->getID(), src2_file_1},
                                           {src2_file_2->getID(), src2_file_2},
                                           {src2_file_3->getID(), src2_file_3}}, src2_storage_service));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);

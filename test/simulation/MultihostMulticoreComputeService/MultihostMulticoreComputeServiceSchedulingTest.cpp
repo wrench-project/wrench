@@ -380,11 +380,11 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   std::set<wrench::ComputeService *> compute_services;
   // Create a Compute Service
-  EXPECT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
+  ASSERT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
           new wrench::MultihostMulticoreComputeService(
                   "Host1",
                   (std::set<std::string>){"Host1", "Host2"},
@@ -398,7 +398,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
   compute_services.insert(cs_fcfs_aggressive_maximum_maximum_flops_best_fit);
 
   // Create a Compute Service
-  EXPECT_NO_THROW(cs_fcfs_aggressive_minimum_maximum_flops_best_fit = simulation->add(
+  ASSERT_NO_THROW(cs_fcfs_aggressive_minimum_maximum_flops_best_fit = simulation->add(
           new wrench::MultihostMulticoreComputeService(
                   "Host1",
                   (std::set<std::string>){"Host1","Host2"},
@@ -412,7 +412,7 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
   compute_services.insert(cs_fcfs_aggressive_minimum_maximum_flops_best_fit);
 
   // Create a Compute Service
-  EXPECT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit = simulation->add(
+  ASSERT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_minimum_cores_best_fit = simulation->add(
           new wrench::MultihostMulticoreComputeService(
                   "Host1",
                   (std::set<std::string>){"Host1", "Host2"},
@@ -427,13 +427,13 @@ void MultihostMulticoreComputeServiceTestScheduling::do_OneJob_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new OneJobTestWMS(
                   this,  compute_services, {}, "Host1")));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -633,10 +633,10 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
+  ASSERT_NO_THROW(cs_fcfs_aggressive_maximum_maximum_flops_best_fit = simulation->add(
           new wrench::MultihostMulticoreComputeService("Host1",
                                                        (std::set<std::string>){"Host1", "Host2"}, 0.0,
                                                        {{wrench::MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY,                      "FCFS"},
@@ -650,13 +650,13 @@ void MultihostMulticoreComputeServiceTestScheduling::do_MultiJob_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new MultiJobTestWMS(
                   this, compute_services, {}, "Host1")));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 

@@ -163,25 +163,25 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("performance_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a (unused) Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
                   new wrench::MultihostMulticoreComputeService("WMSHost",
                                                                {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create Two Storage Services
-  EXPECT_NO_THROW(storage_service_1 = simulation->add(
+  ASSERT_NO_THROW(storage_service_1 = simulation->add(
                   new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE)));
-  EXPECT_NO_THROW(storage_service_2 = simulation->add(
+  ASSERT_NO_THROW(storage_service_2 = simulation->add(
                   new wrench::SimpleStorageService("DstHost", STORAGE_SIZE)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceConcurrencyFileCopiesTestWMS(
                   this, {compute_service}, {storage_service_1, storage_service_2},
                           "WMSHost")));
@@ -192,10 +192,10 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   simulation->add(new wrench::FileRegistryService("WMSHost"));
 
   // Staging all files on the Src storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{file_1->getID(), file_1}, {file_2->getID(), file_2}, {file_3->getID(), file_3}}, storage_service_1));
+  ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(), file_1}, {file_2->getID(), file_2}, {file_3->getID(), file_3}}, storage_service_1));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);

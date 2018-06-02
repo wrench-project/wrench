@@ -133,20 +133,20 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerConstructorTestWMS(
                   this, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -269,20 +269,20 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerCreateJobTestWMS(
                   this, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -377,21 +377,21 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Submit a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerSubmitJobTestWMS(
                   this, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 

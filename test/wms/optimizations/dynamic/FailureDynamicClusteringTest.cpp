@@ -44,7 +44,7 @@ TEST_F(FailureDynamicClusteringTest, UngroupFailedTasks) {
   opt->process(workflow);
 
   // initial task state
-  EXPECT_EQ(workflow->getReadyTasks().size(), 1);
+  ASSERT_EQ(workflow->getReadyTasks().size(), 1);
 
   t1->setRunning();
   t1->setCompleted();
@@ -53,5 +53,5 @@ TEST_F(FailureDynamicClusteringTest, UngroupFailedTasks) {
   t2->incrementFailureCount();
 
   opt->process(workflow);
-  EXPECT_EQ(workflow->getReadyTasks().size(), 2);
+  ASSERT_EQ(workflow->getReadyTasks().size(), 2);
 }

@@ -151,25 +151,25 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("scratch_space_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
+  ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
+  ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        10000000000000.0, {})));
@@ -178,11 +178,11 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleScratchSpaceTestWMS(
                   this,  {compute_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
 
   // Create two workflow files
@@ -190,12 +190,12 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
   wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service1));
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -361,37 +361,37 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("scratch_space_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
+  ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
+  ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
 
   // Create a Compute Service that does not have scratch space
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        0)));
 
   // Create a Compute Service that has smaller scratch space than the files to be stored
-  EXPECT_NO_THROW(compute_service1 = simulation->add(
+  ASSERT_NO_THROW(compute_service1 = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        100)));
 
   // Create a Compute Service that has enough scratch space to store the files
-  EXPECT_NO_THROW(compute_service2 = simulation->add(
+  ASSERT_NO_THROW(compute_service2 = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        10000)));
@@ -400,11 +400,11 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleScratchSpaceFailureTestWMS(
                   this,  {compute_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
 
   // Create two workflow files
@@ -412,13 +412,13 @@ void ScratchSpaceTest::do_ScratchSpaceFailure_test() {
   wrench::WorkflowFile *input_file2 = this->workflow->addFile("input_file2", 10000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file1, storage_service1));
-  EXPECT_NO_THROW(simulation->stageFile(input_file2, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file1, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service1));
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -598,25 +598,25 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("scratch_space_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service1 = simulation->add(
+  ASSERT_NO_THROW(storage_service1 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service2 = simulation->add(
+  ASSERT_NO_THROW(storage_service2 = simulation->add(
           new wrench::SimpleStorageService(hostname, 10000000000000.0)));
 
 
   // Create a Compute Service that does not have scratch space
-  EXPECT_NO_THROW(compute_service = simulation->add(
+  ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
                                                        3000, {})));
@@ -625,11 +625,11 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new PilotJobScratchSpaceTestWMS(
                   this,  {compute_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
 
   // Create two workflow files
@@ -638,14 +638,14 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
   wrench::WorkflowFile *input_file3 = this->workflow->addFile("input_file3", 1000.0);
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file1, storage_service1));
-  EXPECT_NO_THROW(simulation->stageFile(input_file2, storage_service1));
-  EXPECT_NO_THROW(simulation->stageFile(input_file3, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file1, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file2, storage_service1));
+  ASSERT_NO_THROW(simulation->stageFile(input_file3, storage_service1));
 
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 

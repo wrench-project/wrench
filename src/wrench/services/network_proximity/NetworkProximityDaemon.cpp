@@ -33,10 +33,11 @@ namespace wrench {
     NetworkProximityDaemon::NetworkProximityDaemon(Simulation *simulation,
                                                    std::string hostname,
                                                    std::string network_proximity_service_mailbox,
-                                                   double message_size = 1, double measurement_period = 1000,
-                                                   double noise = 100) :
+                                                   double message_size, double measurement_period,
+                                                   double noise,
+                                                   std::map<std::string, std::string> messagepayload_list) :
             NetworkProximityDaemon(simulation, std::move(hostname), std::move(network_proximity_service_mailbox),
-                                   message_size, measurement_period, noise, "") {
+                                   message_size, measurement_period, noise, messagepayload_list, "") {
     }
 
 
@@ -49,6 +50,7 @@ namespace wrench {
      * @param measurement_period: the time-difference between two message transfer to compute proximity
      * @param noise: the maximum magnitude of random noises added to the measurement_period at each iteration,
      *               so as to avoid idiosyncratic behaviors that occur with perfect synchrony
+     * @param messagepayload_list: a message payload list
      * @param suffix: suffix to append to the service name and mailbox
      */
 
@@ -56,9 +58,14 @@ namespace wrench {
             Simulation *simulation,
             std::string hostname,
             std::string network_proximity_service_mailbox,
-            double message_size = 1, double measurement_period = 1000,
-            double noise = 100, std::string suffix = "") :
+            double message_size, double measurement_period,
+            double noise,
+            std::map<std::string, std::string> messagepayload_list,
+            std::string suffix = "") :
             Service(std::move(hostname), "network_daemons" + suffix, "network_daemons" + suffix) {
+
+      // Set the message payloads
+      setMessagePayloads(messagepayload_list, {});
 
       this->simulation = simulation;
       this->message_size = message_size * 0;
@@ -68,11 +75,6 @@ namespace wrench {
       this->next_mailbox_to_send = "";
       this->next_host_to_send = "";
       this->network_proximity_service_mailbox = std::move(network_proximity_service_mailbox);
-
-      // Set properties
-      this->setProperties(this->default_property_values,
-                          {});
-      this->setMessagePayloads(this->default_messagepayload_values, {});
 
     }
 
@@ -187,10 +189,6 @@ namespace wrench {
       } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
-//      catch (std::shared_ptr<NetworkTimeout> &cause) {
-//        WRENCH_INFO("GETTING ND 1: WTF");
-//        return true;
-//      }
 
       if (message == nullptr) {
         WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
