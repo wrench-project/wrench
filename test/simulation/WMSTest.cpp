@@ -143,6 +143,7 @@ void WMSTest::do_DefaultHandlerWMS_test() {
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname1, execution_hosts, 100.0, {})));
 
+
   // Create a WMS
   auto *workflow = new wrench::Workflow();
   wrench::WMS *wms = nullptr;

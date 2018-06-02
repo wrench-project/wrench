@@ -213,6 +213,15 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   ASSERT_NO_THROW(wms = simulation->add(
           new SimpleSimulationReadyTasksTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
+
+  // BOGUS ADDS
+  ASSERT_THROW(simulation->add((wrench::WMS *) nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->add((wrench::StorageService *) nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->add((wrench::ComputeService *) nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->add((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
+
+
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
