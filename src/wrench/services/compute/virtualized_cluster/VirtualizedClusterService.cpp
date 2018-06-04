@@ -43,8 +43,7 @@ namespace wrench {
                                                          std::vector<std::string> &execution_hosts,
                                                          double scratch_space_size,
                                                          std::map<std::string, std::string> property_list,
-                                                         std::map<std::string, std::string> messagepayload_list
-    ) :
+                                                         std::map<std::string, std::string> messagepayload_list) :
             ComputeService(hostname, "virtualized_cluster_service", "virtualized_cluster_service",
                            scratch_space_size) {
 
@@ -54,10 +53,9 @@ namespace wrench {
       this->execution_hosts = execution_hosts;
 
       // Set default and specified properties
-      this->setProperties(this->default_property_values, property_list);
+      this->setProperties(this->default_property_values, std::move(property_list));
       // Set default and specified message payloads
-      this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
-
+      this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
     }
 
     /**
@@ -111,9 +109,12 @@ namespace wrench {
      * @brief Create a MultihostMulticoreComputeService VM on a physical machine
      *
      * @param pm_hostname: the name of the physical machine host
-     * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
-     * @param ram_memory: the VM's RAM memory capacity (-1 means "use all memory available on the host", this can be lead to an out of memory issue)
+     * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
+     *                   available on the host)
+     * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the
+     *                    host, this can be lead to an out of memory issue)
      * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
      * @return Virtual machine hostname
      *
@@ -122,7 +123,8 @@ namespace wrench {
     std::string VirtualizedClusterService::createVM(const std::string &pm_hostname,
                                                     unsigned long num_cores,
                                                     double ram_memory,
-                                                    std::map<std::string, std::string> property_list) {
+                                                    std::map<std::string, std::string> property_list,
+                                                    std::map<std::string, std::string> messagepayload_list) {
 
       serviceSanityCheck();
 
@@ -133,14 +135,13 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
 
       try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new VirtualizedClusterServiceCreateVMRequestMessage(
-                                        answer_mailbox, pm_hostname, vm_hostname,
-                                        getPropertyValueAsBoolean(VirtualizedClusterServiceProperty::SUPPORTS_STANDARD_JOBS),
-                                        getPropertyValueAsBoolean(VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS),
-                                        num_cores, ram_memory, property_list,
-                                        this->getMessagePayloadValueAsDouble(
-                                                VirtualizedClusterServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
+        S4U_Mailbox::putMessage(
+                this->mailbox_name,
+                new VirtualizedClusterServiceCreateVMRequestMessage(
+                        answer_mailbox, pm_hostname, vm_hostname,
+                        num_cores, ram_memory, property_list, messagepayload_list,
+                        this->getMessagePayloadValueAsDouble(
+                                VirtualizedClusterServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -389,8 +390,8 @@ namespace wrench {
         return true;
 
       } else if (auto msg = dynamic_cast<VirtualizedClusterServiceCreateVMRequestMessage *>(message.get())) {
-        processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->supports_standard_jobs,
-                        msg->supports_pilot_jobs, msg->num_cores, msg->ram_memory, msg->property_list);
+        processCreateVM(msg->answer_mailbox, msg->pm_hostname, msg->vm_hostname, msg->num_cores, msg->ram_memory,
+                        msg->property_list, msg->messagepayload_list);
         return true;
 
       } else if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMRequestMessage *>(message.get())) {
@@ -435,26 +436,23 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param pm_hostname: the name of the physical machine host
      * @param vm_hostname: the name of the VM host
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
-     * @param ram_memory: the VM's RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue)
+     * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores available on the host)
+     * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the host, this can be lead to out of memory issue)
      * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
      * @throw std::runtime_error
      */
     void VirtualizedClusterService::processCreateVM(const std::string &answer_mailbox,
                                                     const std::string &pm_hostname,
                                                     const std::string &vm_hostname,
-                                                    bool supports_standard_jobs,
-                                                    bool supports_pilot_jobs,
                                                     unsigned long num_cores,
                                                     double ram_memory,
-                                                    std::map<std::string, std::string> property_list) {
-
-      WRENCH_INFO("Asked to create a VM on %s with %d cores", pm_hostname.c_str(), (int) num_cores);
+                                                    std::map<std::string, std::string> &property_list,
+                                                    std::map<std::string, std::string> &messagepayload_list) {
 
       try {
+        WRENCH_INFO("Asked to create a VM on %s with %d cores", pm_hostname.c_str(), (int) num_cores);
 
         if (simgrid::s4u::Host::by_name_or_null(vm_hostname) == nullptr) {
           if (num_cores <= 0) {
@@ -481,24 +479,15 @@ namespace wrench {
           std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
                   std::make_tuple(vm_hostname, num_cores, ram_memory)};
 
-          // Create the compute service property list
-          std::map<std::string, std::string> cs_property_list = property_list;
-          if (cs_property_list.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != cs_property_list.end()) {
-            cs_property_list[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] = (supports_pilot_jobs ? "true" : "false");
-          } else {
-            // This shouldn't happen, but let's be paranoid
-            cs_property_list.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_PILOT_JOBS, (supports_pilot_jobs ? "true" : "false")));
-          }
-          if (cs_property_list.find(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS) != cs_property_list.end()) {
-            cs_property_list[ComputeServiceProperty::SUPPORTS_STANDARD_JOBS] = (supports_standard_jobs ? "true" : "false");
-          } else {
-            // This shouldn't happen, but let's be paranoid
-            cs_property_list.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, (supports_standard_jobs ? "true" : "false")));
-          }          
+          // Merge the compute service property and message payload lists
+          property_list.insert(this->property_list.begin(), this->property_list.end());
+          messagepayload_list.insert(this->messagepayload_list.begin(), this->messagepayload_list.end());
+
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(vm_hostname,
-                                                       compute_resources, cs_property_list,
-                                                       this->messagepayload_list,
+                                                       compute_resources,
+                                                       property_list,
+                                                       messagepayload_list,
                                                        getScratch()));
           cs->simulation = this->simulation;
 
@@ -737,14 +726,13 @@ namespace wrench {
         num_idle_cores.push_back(std::accumulate(idle_core_counts.begin(), idle_core_counts.end(), 0));
 
         // Flop rate per vm
-        flop_rates.push_back(S4U_Simulation::getHostFlopRate(std::get<0>(vm)));
+        flop_rates.push_back(S4U_Simulation::getHostFlopRate(vm.first));
 
         // RAM capacity per host
-        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(std::get<0>(vm)));
+        ram_capacities.push_back(S4U_Simulation::getHostMemoryCapacity(vm.first));
 
         // RAM availability per
-        ram_availabilities.push_back(
-                ComputeService::ALL_RAM);  // TODO FOR RAFAEL : What about VM memory availabilities???
+        ram_availabilities.push_back(S4U_Simulation::getHostMemoryCapacity(vm.first));
       }
 
       dict.insert(std::make_pair("num_cores", num_cores));
