@@ -766,8 +766,9 @@ namespace wrench {
       for (auto &vm : this->vm_list) {
         this->cs_available_ram[(std::get<0>(vm.second))->getPm()->getName()] += S4U_Simulation::getHostMemoryCapacity(
                 std::get<0>(vm));
-        std::get<0>(vm.second)->stop();
         std::get<1>(vm.second)->stop();
+        std::get<0>(vm.second)->stop();
       }
+      this->vm_list.clear();
     }
 }
