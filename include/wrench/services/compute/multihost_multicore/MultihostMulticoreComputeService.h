@@ -124,7 +124,7 @@ namespace wrench {
 
         // Private Constructor
         MultihostMulticoreComputeService(const std::string &hostname,
-                                         const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                         std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                          std::map<std::string, std::string> property_list,
                                          std::map<std::string, std::string> messagepayload_list,
                                          StorageService* scratch_space);

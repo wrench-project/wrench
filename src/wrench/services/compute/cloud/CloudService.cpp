@@ -37,7 +37,7 @@ namespace wrench {
     ) :
             VirtualizedClusterService(hostname, execution_hosts,
                                       scratch_space_size,
-                                      property_list, messagepayload_list) {}
+                                      std::move(property_list), std::move(messagepayload_list)) {}
 
     /**
      * @brief Main method of the daemon
