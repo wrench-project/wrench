@@ -37,6 +37,8 @@ public:
 
     void do_PilotJobScratchSpace_test();
 
+    void do_RaceConditionTest_test();
+
 protected:
     ScratchSpaceTest() {
 
@@ -81,8 +83,8 @@ class SimpleScratchSpaceTestWMS : public wrench::WMS {
 
 public:
     SimpleScratchSpaceTestWMS(ScratchSpaceTest *test,
-                                    const std::set<wrench::ComputeService *> &compute_services,
-                                    std::string hostname) :
+                              const std::set<wrench::ComputeService *> &compute_services,
+                              std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
       this->test = test;
@@ -212,8 +214,8 @@ class SimpleScratchSpaceFailureTestWMS : public wrench::WMS {
 
 public:
     SimpleScratchSpaceFailureTestWMS(ScratchSpaceTest *test,
-                              const std::set<wrench::ComputeService *> &compute_services,
-                              std::string hostname) :
+                                     const std::set<wrench::ComputeService *> &compute_services,
+                                     std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
       this->test = test;
@@ -435,8 +437,8 @@ class PilotJobScratchSpaceTestWMS : public wrench::WMS {
 
 public:
     PilotJobScratchSpaceTestWMS(ScratchSpaceTest *test,
-                                     const std::set<wrench::ComputeService *> &compute_services,
-                                     std::string hostname) :
+                                const std::set<wrench::ComputeService *> &compute_services,
+                                std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
                         "test") {
       this->test = test;
@@ -649,6 +651,147 @@ void ScratchSpaceTest::do_PilotJobScratchSpace_test() {
 
   delete simulation;
 
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+/**********************************************************************/
+/**           RACE CONDITION TEST                                    **/
+/**********************************************************************/
+
+class ScratchSpaceRaceConditionTestWMS : public wrench::WMS {
+
+public:
+    ScratchSpaceRaceConditionTestWMS(ScratchSpaceTest *test,
+                                     const std::set<wrench::ComputeService *> &compute_services,
+                                     const std::set<wrench::StorageService *> &storage_services,
+                                     std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    ScratchSpaceTest *test;
+
+    int main() {
+      // Create a data movement manager
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Get a reference to the file
+      wrench::WorkflowFile *file = this->getWorkflow()->getFileByID("input");
+
+      // Create three tasks
+      wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10, 1, 1, 1.0, 0); // 10 seconds
+      wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 10, 1, 1, 1.0, 0); // 10 seconds
+      this->getWorkflow()->addControlDependency(task1, task2); // task 1 depends on task2
+      task2->addInputFile(file);
+
+      wrench::WorkflowTask *task3 = this->getWorkflow()->addTask("task3", 1, 1, 1, 1.0, 0);  // 1 second
+
+
+      // Create a first job that:
+      //   - copies file "input" to the scratch space
+      //   - runs task1 and then task2 (10 second each)
+      //   - (task 2 needs "input")
+      wrench::StandardJob *job1 = job_manager->createStandardJob({task1, task2}, {},
+                                                                 {{file, this->test->storage_service1, wrench::ComputeService::SCRATCH}},
+                                                                 {}, {});
+
+      // Create a second job that:
+      //    - copies file "input" to the scratch space
+      //    - runs task3 (1 second)
+      wrench::StandardJob *job2 = job_manager->createStandardJob({task3}, {},
+                                                                 {{file, this->test->storage_service1, wrench::ComputeService::SCRATCH}},
+                                                                 {}, {});
+
+      // Submit both jobs
+      job_manager->submitJob(job1, this->test->compute_service);
+      job_manager->submitJob(job2, this->test->compute_service);
+
+
+
+      // Wait for workflow execution events
+      for (auto job : {job1, job2}) {
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        }
+        switch (event->type) {
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+            // success, do nothing for now
+            break;
+          }
+          default: {
+            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+          }
+        }
+      }
+
+
+      return 0;
+    }
+};
+
+TEST_F(ScratchSpaceTest, DISABLED_RaceConditionTest) {
+  DO_TEST_WITH_FORK(do_RaceConditionTest_test);
+}
+
+void ScratchSpaceTest::do_RaceConditionTest_test() {
+
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("cloud_service_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Storage Service (note the BOGUS property, which is for testing puposes
+  //  and doesn't matter because we do not stop the service)
+  ASSERT_NO_THROW(storage_service1 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 100.0,
+                                           {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "BOGUS"}})));
+
+  // Create a Cloud Service
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname, {"Host1"}, 100, {}, {})));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new ScratchSpaceRaceConditionTestWMS(this, {compute_service}, {storage_service1}, hostname)));
+
+
+  wrench::Workflow * workflow = new wrench::Workflow();
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Create a file registry
+  ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+  // Create a file
+  wrench::WorkflowFile *file = nullptr;
+  ASSERT_NO_THROW(file = workflow->addFile("input", 1));
+  // Staging the input_file on the storage service
+  ASSERT_NO_THROW(simulation->stageFile(file, storage_service1));
+
+  // Running a "run a single task" simulation
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
   free(argv[0]);
   free(argv);
 }
