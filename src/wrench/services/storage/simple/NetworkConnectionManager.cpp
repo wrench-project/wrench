@@ -39,6 +39,7 @@ namespace wrench {
       for (auto it = this->running_data_connections.begin(); it != this->running_data_connections.end(); it++) {
         pending_s4u_comms.push_back((*it)->comm.get());
       }
+
       if (this->running_control_connection) {
         pending_s4u_comms.push_back(this->running_control_connection->comm.get());
       }
