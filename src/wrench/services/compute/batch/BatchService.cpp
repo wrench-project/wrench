@@ -1161,6 +1161,10 @@ namespace wrench {
 
       WRENCH_INFO("Asked to run a batch job with id %ld", job->getJobID());
 
+      //this is actually to delete the referene of this job even when this job is not submitted and thus not maintained
+      //in a list of unique pointers of all_jobs.
+      std::unique_ptr<BatchJob> batch_job_unique_reference = std::unique_ptr<BatchJob>(job);
+
       // Check whether the job type is supported
       if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and (not getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_STANDARD_JOBS))) {
         try {
@@ -1284,7 +1288,7 @@ namespace wrench {
       // Add the RJMS delay to the job's requested time
       job->setAllocatedTime(job->getAllocatedTime() +
                             this->getPropertyValueAsDouble(BatchServiceProperty::BATCH_RJMS_DELAY));
-      this->all_jobs.insert(std::unique_ptr<BatchJob>(job));
+      this->all_jobs.insert(std::move(batch_job_unique_reference));
       this->pending_jobs.push_back(job);
     }
 
