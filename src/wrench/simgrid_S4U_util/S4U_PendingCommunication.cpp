@@ -45,7 +45,7 @@ namespace wrench {
                   "S4U_PendingCommunication::wait(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
-      return std::unique_ptr<SimulationMessage>(this->simulation_message);
+      return std::move(this->simulation_message);
     }
 
     /**
@@ -79,7 +79,7 @@ namespace wrench {
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
             std::vector<S4U_PendingCommunication *> pending_comms, double timeout) {
 
-      std::set<S4U_PendingCommunication *> completed_comms;
+//      std::set<S4U_PendingCommunication *> completed_comms;
 
       if (pending_comms.empty()) {
         throw std::invalid_argument("S4U_PendingCommunication::waitForSomethingToHappen(): invalid argument");
