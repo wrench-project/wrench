@@ -229,16 +229,17 @@ set(TEST_FILES
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceSchedulingTest.cpp
         test/simulation/MultihostMulticoreComputeService/StandardJobExecutorTest.cpp
-        test/simulation/NetworkProximityTest.cpp
-        test/simulation/FileRegistryTest.cpp
+        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
         test/simulation/BatchService/BatchServiceTest.cpp
         test/simulation/BatchService/BatchServiceFCFSTest.cpp
         test/simulation/BatchService/BatchServiceTraceFileTest.cpp
         test/simulation/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
+        test/simulation/wms/WMSTest.cpp
+        test/simulation/wms/MultipleWMSTest.cpp
+        test/simulation/wms/WMSOptimizationsTest.cpp
         test/simulation/VirtualizedClusterServiceTest.cpp
-        test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceResourceInformationTest.cpp
-        test/simulation/WMSTest.cpp
-        test/simulation/MultipleWMSTest.cpp
+        test/simulation/NetworkProximityTest.cpp
+        test/simulation/FileRegistryTest.cpp
         test/simulation/JobManagerTest.cpp
         test/simulation/SimpleSimulationTest.cpp
         test/simulation/SimulationOutputTest.cpp

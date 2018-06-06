@@ -11,7 +11,7 @@
 #include <wrench-dev.h>
 #include <numeric>
 
-#include "../include/TestWithFork.h"
+#include "../../include/TestWithFork.h"
 
 class WMSTest : public ::testing::Test {
 
