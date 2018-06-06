@@ -62,13 +62,13 @@ namespace wrench {
         /** @brief Task states */
         enum State {
             /** @brief Not ready (parents have not completed) */
-            NOT_READY,
+                    NOT_READY,
             /** @brief Ready (parents have completed) */
-            READY,
+                    READY,
             /** @brief Pending (has been submitted to a compute service) */
-            PENDING,
+                    PENDING,
             /** @brief Completed (successfully completed) */
-            COMPLETED
+                    COMPLETED
         };
 
         static std::string stateToString(WorkflowTask::State state);
@@ -84,6 +84,10 @@ namespace wrench {
         void setTaskType(TaskType);
 
         TaskType getTaskType() const;
+
+        void setPriority(long);
+
+        long getPriority() const;
 
         std::set<WorkflowFile *> getInputFiles();
 
@@ -157,6 +161,7 @@ namespace wrench {
         unsigned long max_num_cores;
         double parallel_efficiency;
         double memory_requirement;
+        long priority = 0;
 
         unsigned long toplevel;           // 0 if entry task
 
