@@ -182,6 +182,22 @@ namespace wrench {
       if (job != nullptr) {
         dst_dir += job->getName();
       }
+      return this->lookupFileFromDir(file,dst_dir);
+    }
+
+    /**
+     * @brief Synchronously asks the storage service whether it holds a file
+     *
+     * @param file: the file
+     * @param dst_dir: the directory from where we are doing the look up
+     *
+     * @return true or false
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_arguments
+     */
+    bool StorageService::lookupFileFromDir(WorkflowFile *file, std::string dst_dir) {
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_file");
@@ -214,7 +230,7 @@ namespace wrench {
      * @brief Synchronously read a file from the storage service
      *
      * @param file: the file
-     * @param job: the associated to the read of the workflow file
+     * @param job: the job associated to the read of the workflow file
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -234,7 +250,21 @@ namespace wrench {
       if (job != nullptr) {
         src_dir += job->getName();
       }
+      this->readFileFromDir(file,src_dir);
+    }
 
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     * @param src_dir: the directory associated to the read of the workflow file
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_arguments
+     */
+
+    void StorageService::readFileFromDir(WorkflowFile *file, std::string src_dir) {
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
       try {
@@ -291,7 +321,7 @@ namespace wrench {
      * @brief Synchronously write a file to the storage service
      *
      * @param file: the file
-     * @param job: the associated to the write of the workflow file
+     * @param job: the job associated to the write of the workflow file
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -310,6 +340,19 @@ namespace wrench {
       if (job != nullptr) {
         dst_dir += job->getName();
       }
+      this->writeFileToDir(file,dst_dir);
+    }
+
+    /**
+     * @brief Synchronously write a file to the storage service
+     *
+     * @param file: the file
+     * @param dst_dir: the directory associated to the write of the workflow file
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void StorageService::writeFileToDir(WorkflowFile *file, std::string dst_dir) {
 
       // Send a  message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
@@ -507,13 +550,27 @@ namespace wrench {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
-      bool unregister = (file_registry_service != nullptr);
-
       std::string dst_dir = "/";
       if (job != nullptr) {
         dst_dir += job->getName();
       }
+      this->deleteFileFromDir(file,file_registry_service, dst_dir);
+    }
 
+    /* @brief Synchronously asks the storage service to delete a file copy
+    *
+    * @param file: the file
+    * @param file_registry_service: a file registry service that should be updated once the
+    *         file deletion has (successfully) completed (none if nullptr)
+    *
+    * @param dst_dir: the directory from where the file will be deleted
+    * @throw WorkflowExecutionException
+    * @throw std::runtime_error
+    * @throw std::invalid_argument
+    */
+    void StorageService::deleteFileFromDir(WorkflowFile *file, FileRegistryService *file_registry_service, std::string dst_dir) {
+
+      bool unregister = (file_registry_service != nullptr);
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("delete_file");
       try {
@@ -624,6 +681,23 @@ namespace wrench {
       if (dst_job != nullptr) {
         dst_dir += dst_job->getName();
       }
+
+      this->copyFileFromToDirs(file,src,src_dir,dst_dir);
+    }
+
+    /**
+     * @brief Synchronously ask the storage service to read a file from another storage service
+     *
+     * @param file: the file to copy
+     * @param src: the storage service from which to read the file
+     * @param src_dir: the directory from where we are copying this file
+     * @param dst_dir: the directory to where we are copying this file
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_argument
+     */
+    void StorageService::copyFileFromToDirs(WorkflowFile *file, StorageService *src, std::string src_dir,
+                                            std::string dst_dir) {
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
