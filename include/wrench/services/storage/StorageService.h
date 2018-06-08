@@ -46,9 +46,13 @@ namespace wrench {
 
         double getTotalSpace();
 
-        virtual bool lookupFile(WorkflowFile *file, WorkflowJob* job);
+        virtual bool lookupFile(WorkflowFile *file, WorkflowJob* job = nullptr);
+
+        virtual bool lookupFileFromDir(WorkflowFile *file, std::string dst_dir = "/");
 
         virtual void deleteFile(WorkflowFile *file, FileRegistryService *file_registry_service=nullptr, WorkflowJob* job = nullptr);
+
+        virtual void deleteFileFromDir(WorkflowFile *file, FileRegistryService *file_registry_service=nullptr, std::string dst_dir = "/");
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -56,15 +60,21 @@ namespace wrench {
 
         virtual void copyFile(WorkflowFile *file, StorageService *src, WorkflowJob* src_job = nullptr, WorkflowJob* dst_job = nullptr);
 
+        virtual void copyFileFromToDirs(WorkflowFile *file, StorageService *src, std::string src_dir = "/", std::string dst_dir = "/");
+
         virtual void initiateFileCopy(std::string answer_mailbox,
                                       WorkflowFile *file,
                                       StorageService *src);
 
-        virtual void readFile(WorkflowFile *file, WorkflowJob* job);
+        virtual void readFile(WorkflowFile *file, WorkflowJob* job = nullptr);
+
+        virtual void readFileFromDir(WorkflowFile *file, std::string src_dir="/");
 
         virtual void initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file, std::string src_dir);
 
-        virtual void writeFile(WorkflowFile *file, WorkflowJob* job);
+        virtual void writeFile(WorkflowFile *file, WorkflowJob* job = nullptr);
+
+        virtual void writeFileToDir(WorkflowFile *file, std::string dst_dir = "/");
 
         static void readFiles(std::set<WorkflowFile *> files,
                               std::map<WorkflowFile *, StorageService *> file_locations,
