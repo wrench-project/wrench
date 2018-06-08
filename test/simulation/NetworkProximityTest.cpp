@@ -289,7 +289,7 @@ private:
       std::pair<std::string, std::string> first_pair_to_compute_proximity;
       first_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[0],
                                                        this->simulation->getHostnameList()[1]);
-      int count = 0, max_count = 100;
+      int count = 0, max_count = 1000;
       double first_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->query(
               first_pair_to_compute_proximity);
 
@@ -311,7 +311,7 @@ private:
       std::pair<std::string, std::string> second_pair_to_compute_proximity;
       second_pair_to_compute_proximity = std::make_pair(this->simulation->getHostnameList()[2],
                                                         this->simulation->getHostnameList()[3]);
-      count = 0, max_count = 100;
+      count = 0, max_count = 1000;
       double second_pair_proximity = (*(this->getAvailableNetworkProximityServices().begin()))->query(
               second_pair_to_compute_proximity);
 

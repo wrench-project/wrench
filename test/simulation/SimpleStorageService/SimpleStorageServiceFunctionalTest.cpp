@@ -123,9 +123,9 @@ private:
 
       // Do a few queries to storage services
       for (auto f : {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
-        if ((!this->test->storage_service_1000->lookupFile(f)) ||
-            (this->test->storage_service_100->lookupFile(f)) ||
-            (this->test->storage_service_500->lookupFile(f))) {
+        if ((!this->test->storage_service_1000->lookupFile(f, nullptr)) ||
+            (this->test->storage_service_100->lookupFile(f, nullptr)) ||
+            (this->test->storage_service_500->lookupFile(f, nullptr))) {
           throw std::runtime_error("Some storage services do/don't have the files that they shouldn't/should have");
         }
       }
@@ -168,7 +168,7 @@ private:
 
       // Make sure the copy didn't happen
       success = false;
-      if (this->test->storage_service_100->lookupFile(this->test->file_500)) {
+      if (this->test->storage_service_100->lookupFile(this->test->file_500, nullptr)) {
         success = true;
       }
       if (success) {
@@ -203,7 +203,7 @@ private:
 
       // Read a file on a storage service
       try {
-        this->test->storage_service_100->readFile(this->test->file_10);
+        this->test->storage_service_100->readFile(this->test->file_10, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Should be able to read a file available on a storage service");
       }
@@ -211,7 +211,7 @@ private:
       // Read a file on a storage service that doesn't have that file
       success = true;
       try {
-        this->test->storage_service_100->readFile(this->test->file_100);
+        this->test->storage_service_100->readFile(this->test->file_100, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
       }
@@ -317,7 +317,7 @@ private:
       }
 
       // Check that the copy has happened..
-      if (!this->test->storage_service_100->lookupFile(this->test->file_1)) {
+      if (!this->test->storage_service_100->lookupFile(this->test->file_1, nullptr)) {
         throw std::runtime_error("Asynchronous file copy operation didn't copy the file");
       }
 
@@ -405,7 +405,7 @@ private:
       // Try to do stuff with a shutdown service
       success = true;
       try {
-        this->test->storage_service_100->lookupFile(this->test->file_1);
+        this->test->storage_service_100->lookupFile(this->test->file_1, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
@@ -426,7 +426,7 @@ private:
 
       success = true;
       try {
-        this->test->storage_service_100->readFile(this->test->file_1);
+        this->test->storage_service_100->readFile(this->test->file_1, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
@@ -447,7 +447,7 @@ private:
 
       success = true;
       try {
-        this->test->storage_service_100->writeFile(this->test->file_1);
+        this->test->storage_service_100->writeFile(this->test->file_1, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
@@ -620,15 +620,15 @@ private:
       }
 
       // Do the file copy again, which should fail
-      success = true;
+      success = false;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                      this->test->storage_service_500);
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
+        success = true;
       }
       if (!success) {
-        throw std::runtime_error("Should be able fo write a file that's already there");
+        throw std::runtime_error("Should not be able to write a file beyond the storage capacity");
       }
 
       return 0;

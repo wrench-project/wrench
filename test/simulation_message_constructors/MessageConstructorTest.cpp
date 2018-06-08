@@ -217,16 +217,16 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   ASSERT_NO_THROW(new wrench::StorageServiceFreeSpaceAnswerMessage(0.1, 666));
   ASSERT_THROW(new wrench::StorageServiceFreeSpaceAnswerMessage(-0.1, 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::StorageServiceFileLookupRequestMessage("mailbox", file, 666));
-  ASSERT_THROW(new wrench::StorageServiceFileLookupRequestMessage("", file, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::StorageServiceFileLookupRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::StorageServiceFileLookupRequestMessage("mailbox", file, "/", 666));
+  ASSERT_THROW(new wrench::StorageServiceFileLookupRequestMessage("", file, "/", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::StorageServiceFileLookupRequestMessage("mailbox", nullptr, "/", 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::StorageServiceFileLookupAnswerMessage(file, true, 666));
   ASSERT_THROW(new wrench::StorageServiceFileLookupAnswerMessage(nullptr, true, 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::StorageServiceFileDeleteRequestMessage("mailbox", file, 666));
-  ASSERT_THROW(new wrench::StorageServiceFileDeleteRequestMessage("", file, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::StorageServiceFileDeleteRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::StorageServiceFileDeleteRequestMessage("mailbox", file, "/", 666));
+  ASSERT_THROW(new wrench::StorageServiceFileDeleteRequestMessage("", file, "/", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::StorageServiceFileDeleteRequestMessage("mailbox", nullptr, "/", 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, nullptr, 666));
   ASSERT_NO_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, false, failure_cause, 666));
@@ -239,10 +239,10 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   ASSERT_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, failure_cause, 666),
                std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, storage_service, nullptr, 666));
-  ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("", file, storage_service, nullptr, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", nullptr, storage_service, nullptr, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, nullptr, nullptr, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, storage_service, "/", "/", nullptr, 666));
+  ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("", file, storage_service, "/", "/", nullptr, 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", nullptr, storage_service, "/", "/", nullptr, 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, nullptr, "/", "/", nullptr, 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, nullptr, false, true, nullptr, 666));
   ASSERT_NO_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, nullptr, false, false, failure_cause, 666));
@@ -251,9 +251,9 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   ASSERT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, nullptr, false, true, failure_cause, 666), std::invalid_argument);
   ASSERT_THROW(new wrench::StorageServiceFileCopyAnswerMessage(file, storage_service, nullptr, false, false, nullptr, 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox", file, 666));
-  ASSERT_THROW(new wrench::StorageServiceFileWriteRequestMessage("", file, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox", file, "/", 666));
+  ASSERT_THROW(new wrench::StorageServiceFileWriteRequestMessage("", file, "/", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::StorageServiceFileWriteRequestMessage("mailbox", nullptr, "/", 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, true, nullptr, "mailbox", 666));
   ASSERT_NO_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, false, failure_cause, "mailbox", 666));
@@ -263,10 +263,10 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   ASSERT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, true, failure_cause, "mailbox", 666), std::invalid_argument);
   ASSERT_THROW(new wrench::StorageServiceFileWriteAnswerMessage(file, storage_service, false, nullptr, "mailbox", 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", file, 666));
-  ASSERT_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox", file, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "", file, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox", nullptr, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "mailbox", file, "/", 666));
+  ASSERT_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox", file, "/", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::StorageServiceFileReadRequestMessage("mailbox", "", file, "/", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::StorageServiceFileReadRequestMessage("", "mailbox", nullptr, "/", 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, storage_service, true, nullptr, 666));
   ASSERT_NO_THROW(new wrench::StorageServiceFileReadAnswerMessage(file, storage_service, false, failure_cause, 666));

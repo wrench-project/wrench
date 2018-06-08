@@ -125,9 +125,12 @@ private:
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-            if (this->test->compute_service->getFreeScratchSpaceSize() < 10000000000000.0) {
+            //sleep to make sure that the files are deleted
+            wrench::S4U_Simulation::sleep(100);
+            double free_space_size = this->test->compute_service->getFreeScratchSpaceSize();
+            if (free_space_size < this->test->compute_service->getTotalScratchSpaceSize()) {
               throw std::runtime_error(
-                      "ScratchSpaceTest::do_SimpleScratchSpace_test():File was not deleted from scratch");
+                      "File was not deleted from scratch");
             }
             break;
           }
@@ -165,11 +168,11 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service1 = simulation->add(
-          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 1000000.0)));
 
   // Create a Storage Service
   ASSERT_NO_THROW(storage_service2 = simulation->add(
-          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+          new wrench::SimpleStorageService(hostname, 1000000.0)));
 
 
   // Create a Compute Service
@@ -177,7 +180,7 @@ void ScratchSpaceTest::do_SimpleScratchSpace_test() {
           new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM)},
-                                                       10000000000000.0, {})));
+                                                       1000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -558,7 +561,8 @@ private:
           switch (event->type) {
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
               // success, check if the scratch space size is not full again or not, it should not be
-              if (pilot_job->getComputeService()->getFreeScratchSpaceSize() == 3000.0) {
+              double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
+              if (free_space_size == 3000.0) {
                 throw std::runtime_error(
                         "Pilot Job is expected to clear its scratch space only after all the standard job finishes");
               }
@@ -582,7 +586,8 @@ private:
           case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
             // success, check if the scratch space size is full again or not, it should be full
             wrench::S4U_Simulation::sleep(10); //sleep for some time to ensure everything is deleted
-            if (pilot_job->getComputeService()->getFreeScratchSpaceSize() != 3000.0) {
+            double free_space_size = pilot_job->getComputeService()->getFreeScratchSpaceSize();
+            if (free_space_size != 3000.0) {
               throw std::runtime_error(
                       "Scratch space should be full after this pilot job expires but it is not now");
             }
@@ -756,7 +761,7 @@ private:
     }
 };
 
-TEST_F(ScratchSpaceTest, DISABLED_RaceConditionTest) {
+TEST_F(ScratchSpaceTest, RaceConditionTest) {
   DO_TEST_WITH_FORK(do_RaceConditionTest_test);
 }
 
