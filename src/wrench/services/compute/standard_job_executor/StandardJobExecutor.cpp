@@ -932,7 +932,7 @@ namespace wrench {
         /** Perform scratch cleanup */
         for (auto scratch_cleanup_file : files_stored_in_scratch) {
           try {
-            this->scratch_space->deleteFile(scratch_cleanup_file, nullptr, job);
+            this->scratch_space->deleteFile(scratch_cleanup_file, job, nullptr);
           } catch (WorkflowExecutionException &e) {
             throw;
           }

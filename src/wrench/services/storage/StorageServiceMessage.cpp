@@ -66,7 +66,7 @@ namespace wrench {
     */
     StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(std::string answer_mailbox,
                                                                                    WorkflowFile *file,
-                                                                                   std::string dst_dir,
+                                                                                   std::string& dst_dir,
                                                                                    double payload)
             : StorageServiceMessage("FILE_LOOKUP_REQUEST",
                                     payload) {
@@ -165,8 +165,8 @@ namespace wrench {
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
                                                                                WorkflowFile *file,
                                                                                StorageService *src,
-                                                                               std::string src_dir,
-                                                                               std::string dst_dir,
+                                                                               std::string& src_dir,
+                                                                               std::string& dst_dir,
                                                                                FileRegistryService *file_registry_service,
                                                                                double payload) : StorageServiceMessage(
             "FILE_COPY_REQUEST", payload) {

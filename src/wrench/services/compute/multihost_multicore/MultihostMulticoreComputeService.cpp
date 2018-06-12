@@ -1629,7 +1629,7 @@ namespace wrench {
 
       for (auto scratch_cleanup_file : this->files_in_scratch) {
         try {
-          getScratch()->deleteFile(scratch_cleanup_file, nullptr, this->containing_pilot_job);
+          getScratch()->deleteFile(scratch_cleanup_file, this->containing_pilot_job, nullptr);
         } catch (WorkflowExecutionException &e) {
           throw;
         }

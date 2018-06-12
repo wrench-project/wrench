@@ -60,7 +60,7 @@ namespace wrench {
     */
     class StorageServiceFileLookupRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file, std::string dst_dir, double payload);
+        StorageServiceFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file, std::string& dst_dir, double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
@@ -128,7 +128,7 @@ namespace wrench {
     class StorageServiceFileCopyRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
-                                             std::string src_dir, std::string dst_dir,
+                                             std::string& src_dir, std::string& dst_dir,
                                              FileRegistryService *file_registry_service,
                                              double payload);
 
