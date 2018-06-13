@@ -110,7 +110,7 @@ namespace wrench {
      */
     StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
                                                                                    WorkflowFile *file,
-                                                                                   std::string dst_dir,
+                                                                                   std::string& dst_dir,
                                                                                    double payload)
             : StorageServiceMessage("FILE_DELETE_REQUEST",
                                     payload) {
@@ -226,7 +226,7 @@ namespace wrench {
     */
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
                                                                                  WorkflowFile *file,
-                                                                                 std::string dst_dir,
+                                                                                 std::string& dst_dir,
                                                                                  double payload)
             : StorageServiceMessage("FILE_WRITE_REQUEST",
                                     payload) {
@@ -280,7 +280,7 @@ namespace wrench {
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(std::string answer_mailbox,
                                                                                std::string mailbox_to_receive_the_file_content,
                                                                                WorkflowFile *file,
-                                                                               std::string src_dir,
+                                                                               std::string& src_dir,
                                                                                double payload) : StorageServiceMessage(
             "FILE_READ_REQUEST",
             payload) {
