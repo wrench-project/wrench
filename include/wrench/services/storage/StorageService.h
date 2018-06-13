@@ -48,25 +48,30 @@ namespace wrench {
 
         virtual bool lookupFile(WorkflowFile *file);
 
-        virtual bool lookupFile(WorkflowFile *file, WorkflowJob*);
+        virtual bool lookupFile(WorkflowFile *file, std::string dst_dir);
 
         virtual void deleteFile(WorkflowFile *file, FileRegistryService *file_registry_service=nullptr);
 
-        virtual void deleteFile(WorkflowFile *file, WorkflowJob* job, FileRegistryService *file_registry_service=nullptr);
+        virtual void deleteFile(WorkflowFile *file, std::string dst_dir, FileRegistryService *file_registry_service=nullptr);
+
+        virtual void copyFile(WorkflowFile *file, StorageService *src, std::string src_dir, std::string dst_dir);
+
+        virtual void readFile(WorkflowFile *file, std::string src_dir);
+
+        virtual void writeFile(WorkflowFile *file, std::string dst_dir);
+
 
         /***********************/
         /** \cond INTERNAL    **/
         /***********************/
 
-        virtual bool lookupFile(WorkflowFile *file, std::string dst_dir);
+        virtual void deleteFile(WorkflowFile *file, WorkflowJob* job, FileRegistryService *file_registry_service=nullptr);
 
-        virtual void deleteFile(WorkflowFile *file, std::string dst_dir, FileRegistryService *file_registry_service=nullptr);
+        virtual bool lookupFile(WorkflowFile *file, WorkflowJob*);
 
         virtual void copyFile(WorkflowFile *file, StorageService *src);
 
         virtual void copyFile(WorkflowFile *file, StorageService *src, WorkflowJob* src_job, WorkflowJob* dst_job);
-
-        virtual void copyFile(WorkflowFile *file, StorageService *src, std::string src_dir, std::string dst_dir);
 
         virtual void initiateFileCopy(std::string answer_mailbox,
                                       WorkflowFile *file,
@@ -76,15 +81,11 @@ namespace wrench {
 
         virtual void readFile(WorkflowFile *file, WorkflowJob* job);
 
-        virtual void readFile(WorkflowFile *file, std::string src_dir);
-
         virtual void initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file, std::string src_dir);
 
         virtual void writeFile(WorkflowFile *file);
 
         virtual void writeFile(WorkflowFile *file, WorkflowJob* job);
-
-        virtual void writeFile(WorkflowFile *file, std::string dst_dir);
 
         static void readFiles(std::set<WorkflowFile *> files,
                               std::map<WorkflowFile *, StorageService *> file_locations,
