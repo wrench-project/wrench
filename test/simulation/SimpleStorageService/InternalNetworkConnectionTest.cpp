@@ -58,33 +58,33 @@ void InternalNetworkConnectionTest::do_Constructor_test() {
   wrench::WorkflowFile *file = workflow->addFile("file", 10);
 
   // Bogus type
-  ASSERT_THROW(conn = new wrench::NetworkConnection(3, nullptr, "", ""), std::invalid_argument);
-  ASSERT_THROW(conn = new wrench::NetworkConnection(4, nullptr, "", ""), std::invalid_argument);
-  ASSERT_THROW(conn = new wrench::NetworkConnection(5, nullptr, "", ""), std::invalid_argument);
-  ASSERT_THROW(conn = new wrench::NetworkConnection(6, nullptr, "", ""), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(3, nullptr, "/", "", ""), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(4, nullptr, "/", "", ""), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(5, nullptr, "/", "", ""), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(6, nullptr, "/", "", ""), std::invalid_argument);
 
   // Empty mailbox_name
-  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, file, "", "ack"), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, file, "/", "", "ack"), std::invalid_argument);
 
   // Empty file
-  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, nullptr, "mailbox_name", "ack"), std::invalid_argument);
-  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, nullptr, "mailbox_name", ""), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, nullptr, "/", "mailbox_name", "ack"), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, nullptr, "/", "mailbox_name", ""), std::invalid_argument);
 
   // Ack mailbox_name should be empty
-  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, nullptr, "mailbox_name", "ack"), std::invalid_argument);
-  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, nullptr, "mailbox_name", "ack"), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, nullptr, "/", "mailbox_name", "ack"), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, nullptr, "/", "mailbox_name", "ack"), std::invalid_argument);
 
   // Non-Empty file
-  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, file, "mailbox_name", ""), std::invalid_argument);
+  ASSERT_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, file, "/", "mailbox_name", ""), std::invalid_argument);
 
-  ASSERT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, nullptr, "mailbox_name", ""));
+  ASSERT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_CONTROL, nullptr, "/", "mailbox_name", ""));
   delete conn;
-  ASSERT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, file, "mailbox_name", "ack"));
+  ASSERT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::INCOMING_DATA, file, "/", "mailbox_name", "ack"));
   delete conn;
-  ASSERT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, file, "mailbox_name", ""));
+  ASSERT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, file, "/", "mailbox_name", ""));
   delete conn;
 
-  ASSERT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, file, "mailbox_name", ""));
+  ASSERT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, file, "/", "mailbox_name", ""));
   ASSERT_THROW(conn->getMessage(), std::runtime_error);
   delete conn;
 

@@ -295,7 +295,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_Noop_test() {
   ASSERT_THROW(simulation->launch(), std::runtime_error);
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname,
-                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},100.0,
                                                        {})));
 
   // Create a Storage Service
@@ -614,7 +614,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_StandardJobConstructor_test
   // Create a Compute Service
   compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname1,
-                                                       {std::make_tuple(hostname1, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_tuple(hostname1, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},100.0,
                                                        {}));
 
   // Create a Storage Service
@@ -720,7 +720,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_HostMemory_test() {
   // Create a Compute Service
   compute_service = simulation->add(
           new wrench::MultihostMulticoreComputeService(hostname1,
-                                                       {std::make_tuple(hostname1, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       {std::make_tuple(hostname1, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},100.0,
                                                        {}));
 
   // Create a Storage Service
@@ -800,7 +800,7 @@ private:
         throw std::runtime_error("Unexpected workflow execution event!");
       }
 
-      if (!this->test->storage_service1->lookupFile(this->test->output_file)) {
+      if (!this->test->storage_service1->lookupFile(this->test->output_file, nullptr)) {
         throw std::runtime_error("Output file not written to storage service");
       }
 
@@ -954,7 +954,7 @@ private:
         throw std::runtime_error("Unexpected workflow execution event!");
       }
 
-      if (!this->test->storage_service1->lookupFile(this->test->output_file)) {
+      if (!this->test->storage_service1->lookupFile(this->test->output_file, job)) {
         throw std::runtime_error("Output file not written to storage service");
       }
 
@@ -1087,16 +1087,16 @@ private:
       }
 
       // Test file locations
-      if (!this->test->storage_service1->lookupFile(this->test->input_file)) {
+      if (!this->test->storage_service1->lookupFile(this->test->input_file, nullptr)) {
         throw std::runtime_error("Input file should be on Storage Service #1");
       }
-      if (!this->test->storage_service1->lookupFile(this->test->output_file)) {
+      if (!this->test->storage_service1->lookupFile(this->test->output_file, nullptr)) {
         throw std::runtime_error("Output file should be on Storage Service #1");
       }
-      if (this->test->storage_service2->lookupFile(this->test->input_file)) {
+      if (this->test->storage_service2->lookupFile(this->test->input_file,job)) {
         throw std::runtime_error("Input file should not be on Storage Service #2");
       }
-      if (this->test->storage_service2->lookupFile(this->test->input_file)) {
+      if (this->test->storage_service2->lookupFile(this->test->input_file,job)) {
         throw std::runtime_error("Output file should not be on Storage Service #2");
       }
 

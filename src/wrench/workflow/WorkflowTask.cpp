@@ -338,6 +338,22 @@ namespace wrench {
     }
 
     /**
+     * @brief Get the task priority. By default, priority is 0.
+     * @return the task priority
+     */
+    long WorkflowTask::getPriority() const {
+      return this->priority;
+    }
+
+    /**
+     * @brief Set the task priority
+     * @param priority: task priority
+     */
+    void WorkflowTask::setPriority(long priority) {
+      this->priority = priority;
+    }
+
+    /**
      * @brief Set the task's start date
      *
      * @param date: the end date

@@ -312,6 +312,14 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
   ASSERT_NO_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0)));
 
+
+  // Create a Virtualized Cluster Service with no hosts
+  std::vector<std::string> nothing;
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::VirtualizedClusterService(hostname, nothing, 100.0,
+                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})), std::invalid_argument);
+
+
   // Create a Virtualized Cluster Service
   std::vector<std::string> execution_hosts = simulation->getHostnameList();
   ASSERT_NO_THROW(compute_service = simulation->add(

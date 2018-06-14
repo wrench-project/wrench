@@ -3080,6 +3080,7 @@ protected:
               "      {\n"
               "        \"name\": \"register_local_2_0\", \n"
               "        \"type\": \"auxiliary\", \n"
+              "        \"priority\": 100, \n"
               "        \"runtime\": 0.427, \n"
               "        \"parents\": [\n"
               "          \"stage_out_local_local_2_0\"\n"
@@ -3190,6 +3191,14 @@ TEST_F(WorkflowLoadFromJSONTest, LoadValidJSON) {
   ASSERT_NO_THROW(workflow->loadFromJSON(this->json_file_path, "1f"));
   ASSERT_EQ(workflow->getNumberOfTasks(), 71);
   ASSERT_EQ(workflow->getFiles().size(), 69);
+
+  for (auto task : workflow->getTasks()) {
+    if (task->getID() == "register_local_2_0") {
+      ASSERT_EQ(task->getPriority(), 100);
+    } else {
+      ASSERT_EQ(task->getPriority(), 0);
+    }
+  }
 
   unsigned long num_input_files = workflow->getTaskByID("individuals_ID0000001")->getInputFiles().size();
   unsigned long num_output_files = workflow->getTaskByID("individuals_ID0000001")->getOutputFiles().size();

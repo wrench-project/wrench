@@ -77,15 +77,15 @@ protected:
 
       // Create a platform file
       std::string xml = "<?xml version='1.0'?>"
-                        "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                        "<platform version=\"4.1\"> "
-                        "   <zone id=\"AS0\" routing=\"Full\"> "
-                        "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-                        "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
-                        "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                        "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
-                        "   </zone> "
-                        "</platform>";
+              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+              "<platform version=\"4.1\"> "
+              "   <zone id=\"AS0\" routing=\"Full\"> "
+              "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
+              "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+              "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+              "   </zone> "
+              "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
       fclose(platform_file);
@@ -120,7 +120,7 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      // Create a file registry service
+      // Get a file registry service
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       std::vector<wrench::WorkflowTask *> tasks = this->test->workflow->getReadyTasks();
@@ -133,11 +133,22 @@ private:
         throw std::runtime_error("Should have exactly three clusters");
       }
 
+      // Create a bogus standard job with an empty task list for coverage
+      bool success = true;
+      try {
+        wrench::StandardJob *bogus_job = job_manager->createStandardJob({}, {});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a job with an empty task list");
+      }
+
+      wrench::StandardJob *two_task_job;
       for (auto task : tasks) {
         try {
-          wrench::StandardJob *two_task_job = job_manager->createStandardJob({task}, {},
-                                                                             {std::make_tuple(this->test->input_file, this->test->storage_service, wrench::ComputeService::SCRATCH)},
-                                                                             {}, {});
+          two_task_job = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
+                                                        {}, {}, {});
           auto cs = (wrench::CloudService *) this->test->compute_service;
           std::string execution_host = cs->getExecutionHosts()[0];
           cs->createVM(execution_host, 2, 10);
@@ -146,23 +157,71 @@ private:
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(e.what());
         }
+
+        // Try to forget this job, which should not be fine
+        success = true;
+        try {
+          job_manager->forgetJob(two_task_job);
+        } catch (wrench::WorkflowExecutionException &e) {
+          success = false;
+        }
+        if (success) {
+          throw std::runtime_error("Should not be able to forget a pending/running job");
+        }
       }
 
-      // Wait for a workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
-      try {
-        event = this->getWorkflow()->waitForNextExecutionEvent();
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      {
+        // Try to create and submit a job with tasks that are pending, which should fail
+        success = true;
+        wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(tasks.begin())}, {}, {}, {}, {});
+        try {
+          job_manager->submitJob(bogus_job, this->test->compute_service);
+        } catch (std::invalid_argument &e) {
+          success = false;
+        }
+        if (success) {
+          throw std::runtime_error("Should not be able to create a job with PENDING tasks");
+        }
       }
-      switch (event->type) {
-        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-          // success, do nothing for now
-          break;
+
+
+
+      // Wait for workflow execution events
+      for (auto task : tasks) {
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
-        default: {
-          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        switch (event->type) {
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+            // success, do nothing for now
+            break;
+          }
+          default: {
+            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+          }
         }
+      }
+
+      {
+        // Try to create and submit a job with tasks that are completed, which should fail
+        success = true;
+        wrench::StandardJob *bogus_job = job_manager->createStandardJob({*(++tasks.begin())}, {}, {}, {}, {});
+        try {
+          job_manager->submitJob(bogus_job, this->test->compute_service);
+        } catch (std::invalid_argument &e) {
+          success = false;
+        }
+        if (success) {
+          throw std::runtime_error("Should not be able to create a job with PENDING tasks");
+        }
+      }
+
+      {
+        // Try to forget a complete job, which should be fine
+        job_manager->forgetJob(two_task_job);
       }
 
       return 0;
@@ -193,7 +252,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   //  and doesn't matter because we do not stop the service)
   ASSERT_NO_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0,
-                                   {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "BOGUS"}})));
+                                           {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "BOGUS"}})));
 
   // Try to get a bogus property as string or double
   ASSERT_THROW(storage_service->getPropertyValueAsString("BOGUS"), std::invalid_argument);

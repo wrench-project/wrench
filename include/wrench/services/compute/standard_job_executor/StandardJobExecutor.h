@@ -56,6 +56,7 @@ namespace wrench {
                 std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                 StorageService* scratch_space,
                 bool part_of_pilot_job,
+                PilotJob* parent_pilot_job,
                 std::map<std::string, std::string> property_list,
                 std::map<std::string, std::string> messagepayload_list
         );
@@ -81,6 +82,9 @@ namespace wrench {
         StorageService *scratch_space;
 
         bool part_of_pilot_job;
+
+        // if this is not a part of pilot job, then this value will be nullptr
+        PilotJob* parent_pilot_job;
 
         // Files stored in scratch
         std::set<WorkflowFile*> files_stored_in_scratch;
