@@ -14,6 +14,7 @@
 #include <wrench/logging/TerminalOutput.h>
 
 #include <xbt/ex.hpp>
+#include <wrench/util/MessageManager.h>
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon, "Log category for S4U_Daemon");

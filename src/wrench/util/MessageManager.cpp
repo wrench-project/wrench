@@ -38,7 +38,9 @@ namespace wrench {
       for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
         if ((*msg_itr).first == mailbox) {
           for (size_t i = 0; i < (*msg_itr).second.size(); i++) {
-            delete (*msg_itr).second[i];
+            if ((*msg_itr).second[i] != nullptr) {
+              delete (*msg_itr).second[i];
+            }
           }
           (*msg_itr).second.clear();
         }
