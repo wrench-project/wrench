@@ -1599,6 +1599,7 @@ namespace wrench {
                           resources,
                           this->getScratch(),
                           false,
+                          nullptr,
                           {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                                    this->getPropertyValueAsString(
                                            BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}},

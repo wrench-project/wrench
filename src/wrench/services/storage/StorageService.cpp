@@ -63,7 +63,11 @@ namespace wrench {
                     file->getSize(), (this->capacity - this->occupied_space));
         throw std::runtime_error("StorageService::stageFile(): File exceeds free space capacity on storage service");
       }
-      this->stored_files.insert(file);
+      if (this->stored_files.find("/") != this->stored_files.end()) {
+        this->stored_files["/"].insert(file);
+      } else {
+        this->stored_files["/"] = {file}; // By default all the staged files will go to the / directory
+      }
       this->occupied_space += file->getSize();
       WRENCH_INFO("Stored file %s (storage usage: %.10lf%%)", file->getID().c_str(),
                   100.0 * this->occupied_space / this->capacity);
@@ -74,23 +78,30 @@ namespace wrench {
      * @brief Remove a file from storage (internal method)
      *
      * @param file: a file
+     * @param dst_dir: the directory from where the file will be deleted
      *
      * @throw std::runtime_error
      */
-    void StorageService::removeFileFromStorage(WorkflowFile *file) {
+    void StorageService::removeFileFromStorage(WorkflowFile *file, std::string dst_dir) {
 
       if (file == nullptr) {
         throw std::invalid_argument("StorageService::removeFileFromStorage(): Invalid arguments");
       }
 
-      if (this->stored_files.find(file) == this->stored_files.end()) {
+      std::set<WorkflowFile*> files = this->stored_files[dst_dir];
+      if (files.size() > 0) {
+        if (files.find(file) == files.end()) {
+          throw std::runtime_error(
+                  "StorageService::removeFileFromStorage(): Attempting to remove a file that is not on the storage service");
+        }
+        this->stored_files[dst_dir].erase(file);
+        this->occupied_space -= file->getSize();
+        WRENCH_INFO("Deleted file %s (storage usage: %.2lf%%)", file->getID().c_str(),
+                    100.0 * this->occupied_space / this->capacity);
+      } else {
         throw std::runtime_error(
                 "StorageService::removeFileFromStorage(): Attempting to remove a file that is not on the storage service");
       }
-      this->stored_files.erase(file);
-      this->occupied_space -= file->getSize();
-      WRENCH_INFO("Deleted file %s (storage usage: %.2lf%%)", file->getID().c_str(),
-                  100.0 * this->occupied_space / this->capacity);
     }
 
     /**
@@ -145,6 +156,7 @@ namespace wrench {
       }
     }
 
+
     /**
      * @brief Synchronously asks the storage service whether it holds a file
      *
@@ -166,12 +178,60 @@ namespace wrench {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
+      std::string dst_dir = "/";
+      return this->lookupFile(file,dst_dir);
+    }
+
+    /**
+     * @brief Synchronously asks the storage service whether it holds a file
+     *
+     * @param file: the file
+     * @param job: the job for whom we are doing the look up, the file is stored in this job's directory
+     *
+     * @return true or false
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_arguments
+     */
+    bool StorageService::lookupFile(WorkflowFile *file, WorkflowJob* job) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
+
+      std::string dst_dir = "/";
+      if (job != nullptr) {
+        dst_dir += job->getName();
+      }
+      return this->lookupFile(file,dst_dir);
+    }
+
+    /**
+     * @brief Synchronously asks the storage service whether it holds a file
+     *
+     * @param file: the file
+     * @param dst_dir: the directory from where we are doing the look up
+     *
+     * @return true or false
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_arguments
+     */
+    bool StorageService::lookupFile(WorkflowFile *file, std::string dst_dir) {
+
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileLookupRequestMessage(
                 answer_mailbox,
                 file,
+                dst_dir,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -211,6 +271,49 @@ namespace wrench {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
+      std::string src_dir = "/";
+      this->readFile(file,src_dir);
+    }
+
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     * @param job: the job associated to the read of the workflow file
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_arguments
+     */
+    void StorageService::readFile(WorkflowFile *file, WorkflowJob* job) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
+
+      std::string src_dir = "/";
+      if (job != nullptr) {
+        src_dir += job->getName();
+      }
+      this->readFile(file,src_dir);
+    }
+
+    /**
+     * @brief Synchronously read a file from the storage service
+     *
+     * @param file: the file
+     * @param src_dir: the directory associated to the read of the workflow file
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_arguments
+     */
+
+    void StorageService::readFile(WorkflowFile *file, std::string src_dir) {
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
       try {
@@ -218,6 +321,7 @@ namespace wrench {
                                 new StorageServiceFileReadRequestMessage(answer_mailbox,
                                                                          answer_mailbox,
                                                                          file,
+                                                                         src_dir,
                                                                          this->getMessagePayloadValueAsDouble(
                                                                                  StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -261,7 +365,6 @@ namespace wrench {
       }
     }
 
-
     /**
      * @brief Synchronously write a file to the storage service
      *
@@ -280,12 +383,55 @@ namespace wrench {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
+      std::string dst_dir = "/";
+      this->writeFile(file,dst_dir);
+    }
+
+
+    /**
+     * @brief Synchronously write a file to the storage service
+     *
+     * @param file: the file
+     * @param job: the job associated to the write of the workflow file
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void StorageService::writeFile(WorkflowFile *file, WorkflowJob* job) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
+
+      std::string dst_dir = "/";
+      if (job != nullptr) {
+        dst_dir += job->getName();
+      }
+      this->writeFile(file,dst_dir);
+    }
+
+    /**
+     * @brief Synchronously write a file to the storage service
+     *
+     * @param file: the file
+     * @param dst_dir: the directory associated to the write of the workflow file
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     */
+    void StorageService::writeFile(WorkflowFile *file, std::string dst_dir) {
+
       // Send a  message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new StorageServiceFileWriteRequestMessage(answer_mailbox,
                                                                           file,
+                                                                          dst_dir,
                                                                           this->getMessagePayloadValueAsDouble(
                                                                                   StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -330,6 +476,7 @@ namespace wrench {
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (which must be a compute service's scratch storage)
      * @param files_in_scratch: the set of files that have been written to the default storage service (which must be a compute service's scratch storage)
+     * @param job: the job which is doing the read of the files
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -337,9 +484,10 @@ namespace wrench {
     void StorageService::readFiles(std::set<WorkflowFile *> files,
                                    std::map<WorkflowFile *, StorageService *> file_locations,
                                    StorageService *default_storage_service,
-                                   std::set<WorkflowFile*>& files_in_scratch) {
+                                   std::set<WorkflowFile*>& files_in_scratch,
+                                   WorkflowJob* job) {
       try {
-        StorageService::writeOrReadFiles(READ, std::move(files), std::move(file_locations), default_storage_service, files_in_scratch);
+        StorageService::writeOrReadFiles(READ, std::move(files), std::move(file_locations), default_storage_service, files_in_scratch, job);
       } catch (std::runtime_error &e) {
         throw;
       } catch (WorkflowExecutionException &e) {
@@ -354,6 +502,8 @@ namespace wrench {
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (which must be a compute service's scratch storage)
      * @param files_in_scratch: the set of files that have been writted to the default storage service (which must be a compute service's scratch storage)
+     * @param job: the job which is doing the write of the files
+     *
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -361,9 +511,10 @@ namespace wrench {
     void StorageService::writeFiles(std::set<WorkflowFile *> files,
                                     std::map<WorkflowFile *, StorageService *> file_locations,
                                     StorageService *default_storage_service,
-                                    std::set<WorkflowFile*>& files_in_scratch) {
+                                    std::set<WorkflowFile*>& files_in_scratch,
+                                    WorkflowJob* job) {
       try {
-        StorageService::writeOrReadFiles(WRITE, std::move(files), std::move(file_locations), default_storage_service, files_in_scratch);
+        StorageService::writeOrReadFiles(WRITE, std::move(files), std::move(file_locations), default_storage_service, files_in_scratch, job);
       } catch (std::runtime_error &e) {
         throw;
       } catch (WorkflowExecutionException &e) {
@@ -379,6 +530,7 @@ namespace wrench {
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (which must be a compute service's scratch storage)
      * @param files_in_scratch: the set of files that have been writted to the default storage service (which must be a compute service's scratch storage)
+     * @param job: the job associated to the write/read of the files
      *
      * @throw std::runtime_error
      * @throw WorkflowExecutionException
@@ -387,7 +539,8 @@ namespace wrench {
                                           std::set<WorkflowFile *> files,
                                           std::map<WorkflowFile *, StorageService *> file_locations,
                                           StorageService *default_storage_service,
-                                          std::set<WorkflowFile*>& files_in_scratch) {
+                                          std::set<WorkflowFile*>& files_in_scratch,
+                                          WorkflowJob* job) {
 
       for (auto const &f : files) {
         if (f == nullptr) {
@@ -413,7 +566,13 @@ namespace wrench {
         if (action == READ) {
           try {
             WRENCH_INFO("Reading file %s from storage service %s", f->getID().c_str(), storage_service->getName().c_str());
-            storage_service->readFile(f);
+            if (storage_service != default_storage_service) {
+              //if the storage service where I am going to read from is not the default storage service (scratch), then I
+              // don't want to read from job's temp directory, rather I would like to read from / directory of the storage service
+              storage_service->readFile(f, nullptr);
+            } else {
+              storage_service->readFile(f, job);
+            }
             WRENCH_INFO("File %s read", f->getID().c_str());
           } catch (std::runtime_error &e) {
             throw;
@@ -421,13 +580,15 @@ namespace wrench {
             throw;
           }
         } else {
-          // Write the file
-          if (storage_service == default_storage_service) {
-            files_in_scratch.insert(f);
-          }
           try {
             WRENCH_INFO("Writing file %s to storage service %s", f->getID().c_str(), storage_service->getName().c_str());
-            storage_service->writeFile(f);
+            // Write the file
+            if (storage_service == default_storage_service) {
+              files_in_scratch.insert(f);
+              storage_service->writeFile(f, job);
+            } else {
+              storage_service->writeFile(f, nullptr);
+            }
             WRENCH_INFO("Wrote file %s", f->getID().c_str());
           } catch (std::runtime_error &e) {
             throw;
@@ -437,6 +598,7 @@ namespace wrench {
         }
       }
     }
+
 
     /**
      * @brief Synchronously asks the storage service to delete a file copy
@@ -459,14 +621,60 @@ namespace wrench {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
-      bool unregister = (file_registry_service != nullptr);
+      std::string dst_dir = "/";
+      this->deleteFile(file, dst_dir, file_registry_service);
+    }
 
+    /**
+     * @brief Synchronously asks the storage service to delete a file copy
+     *
+     * @param file: the file
+     * @param job: the job associated to deleting this file
+     * @param file_registry_service: a file registry service that should be updated once the
+     *         file deletion has (successfully) completed (none if nullptr)
+     *
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_argument
+     */
+    void StorageService::deleteFile(WorkflowFile *file , WorkflowJob* job, FileRegistryService *file_registry_service) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::deleteFile(): Invalid arguments");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
+
+      std::string dst_dir = "/";
+      if (job != nullptr) {
+        dst_dir += job->getName();
+      }
+      this->deleteFile(file, dst_dir, file_registry_service);
+    }
+
+    /* @brief Synchronously asks the storage service to delete a file copy
+    *
+    * @param file: the file
+    * @param dst_dir: the directory from where the file will be deleted
+    * @param file_registry_service: a file registry service that should be updated once the
+    *         file deletion has (successfully) completed (none if nullptr)
+    *
+    * @throw WorkflowExecutionException
+    * @throw std::runtime_error
+    * @throw std::invalid_argument
+    */
+    void StorageService::deleteFile(WorkflowFile *file, std::string dst_dir, FileRegistryService *file_registry_service) {
+
+      bool unregister = (file_registry_service != nullptr);
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("delete_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileDeleteRequestMessage(
                 answer_mailbox,
                 file,
+                dst_dir,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -531,12 +739,14 @@ namespace wrench {
       }
     }
 
+
     /**
      * @brief Synchronously ask the storage service to read a file from another storage service
      *
      * @param file: the file to copy
      * @param src: the storage service from which to read the file
-     *
+     * @param src_job: the job from whose directory we are copying this file
+     * @param dst_job: the job to whose directory we are copying this file
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      * @throw std::invalid_argument
@@ -556,6 +766,70 @@ namespace wrench {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
+      std::string src_dir = "/";
+
+      std::string dst_dir = "/";
+
+      this->copyFile(file,src,src_dir,dst_dir);
+    }
+
+    /**
+     * @brief Synchronously ask the storage service to read a file from another storage service
+     *
+     * @param file: the file to copy
+     * @param src: the storage service from which to read the file
+     * @param src_job: the job from whose directory we are copying this file
+     * @param dst_job: the job to whose directory we are copying this file
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_argument
+     */
+    void StorageService::copyFile(WorkflowFile *file, StorageService *src, WorkflowJob* src_job, WorkflowJob* dst_job) {
+
+
+      if ((file == nullptr) || (src == nullptr)) {
+        throw std::invalid_argument("StorageService::copyFile(): Invalid arguments");
+      }
+
+      if (src == this) {
+        throw std::invalid_argument("StorageService::copyFile(): Cannot copy a file from oneself");
+      }
+
+      if (src_job != nullptr && dst_job != nullptr) {
+        throw std::invalid_argument("StorageService::copyFile(): Cannot copy files from one job's private directory to another job's private directory");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
+
+      std::string src_dir = "/";
+      if (src_job != nullptr) {
+        src_dir += src_job->getName();
+      }
+
+      std::string dst_dir = "/";
+      if (dst_job != nullptr) {
+        dst_dir += dst_job->getName();
+      }
+
+      this->copyFile(file,src,src_dir,dst_dir);
+    }
+
+    /**
+     * @brief Synchronously ask the storage service to read a file from another storage service
+     *
+     * @param file: the file to copy
+     * @param src: the storage service from which to read the file
+     * @param src_dir: the directory from where we are copying this file
+     * @param dst_dir: the directory to where we are copying this file
+     * @throw WorkflowExecutionException
+     * @throw std::runtime_error
+     * @throw std::invalid_argument
+     */
+    void StorageService::copyFile(WorkflowFile *file, StorageService *src, std::string src_dir,
+                                            std::string dst_dir) {
+
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
       try {
@@ -563,6 +837,8 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 src,
+                src_dir,
+                dst_dir,
                 nullptr,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -615,10 +891,14 @@ namespace wrench {
 
       // Send a message to the daemon
       try {
+        std::string src_dir = "/";
+        std::string dst_dir = "/";
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
                 answer_mailbox,
                 file,
                 src,
+                src_dir, // I am not sure if it should always be /, but DataMovementManager calls this initiateFileCopy function and,
+                dst_dir, // so we probably don't need to copy from a job's directory. So, always from / directory to / directory
                 nullptr,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
@@ -632,12 +912,13 @@ namespace wrench {
      *
      * @param mailbox_that_should_receive_file_content: the mailbox to which the file should be sent
      * @param file: the file
+     * @param src_dir: the file directory from where the file will be read
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      * @throw std::invalid_arguments
      */
-    void StorageService::initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file) {
+    void StorageService::initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file, std::string src_dir) {
 
       WRENCH_INFO("Initiating a file read operation for file %s on storage service %s",
                   file->getID().c_str(), this->getName().c_str());
@@ -658,6 +939,7 @@ namespace wrench {
                                 new StorageServiceFileReadRequestMessage(request_answer_mailbox,
                                                                          mailbox_that_should_receive_file_content,
                                                                          file,
+                                                                         src_dir,
                                                                          this->getMessagePayloadValueAsDouble(
                                                                                  StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
