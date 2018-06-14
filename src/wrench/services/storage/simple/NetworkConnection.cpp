@@ -27,14 +27,16 @@ namespace wrench {
      *              - NetworkConnection::OUTGOING_DATA
      *              - NetworkConnection::INCOMING_CONTROL
      * @param file: the file (for DATA connection only)
+     * @param file_dir: the file directory inside the storage service where the file will be stored to/read from
      * @param mailbox: the mailbox: the mailbox for this connection
      * @param ack_mailbox: the mailbox to which an ack should be sent when the connection completes/fails
      */
-    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string mailbox, std::string ack_mailbox) {
+    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string file_dir, std::string mailbox, std::string ack_mailbox) {
       this->type = type;
       this->file = file;
       this->mailbox = mailbox;
       this->ack_mailbox = ack_mailbox;
+      this->file_dir = file_dir;
 
       if (this->mailbox.empty()) {
         throw std::invalid_argument("NetworkConnection::NetworkConnection(): empty mailbox_name");

@@ -23,7 +23,6 @@ namespace wrench {
 
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
-//    StorageService *ComputeService::SCRATCH = (StorageService *) ULONG_MAX;
     StorageService *ComputeService::SCRATCH = (StorageService *)ULONG_MAX;
 
     /**

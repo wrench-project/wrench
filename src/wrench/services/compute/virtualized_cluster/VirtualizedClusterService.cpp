@@ -48,7 +48,7 @@ namespace wrench {
                            scratch_space_size) {
 
       if (execution_hosts.empty()) {
-        throw std::runtime_error("At least one execution host should be provided");
+        throw std::invalid_argument("VirtualizedClusterService::VirtualizedClusterService(): At least one execution host should be provided");
       }
       this->execution_hosts = execution_hosts;
 

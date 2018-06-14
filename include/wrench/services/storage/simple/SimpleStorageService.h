@@ -95,12 +95,12 @@ namespace wrench {
 
         unsigned long getNewUniqueNumber();
 
-        bool processFileWriteRequest(WorkflowFile *file, std::string answer_mailbox);
+        bool processFileWriteRequest(WorkflowFile *file, std::string dst_dir, std::string answer_mailbox);
 
-        bool processFileReadRequest(WorkflowFile *file, std::string answer_mailbox,
+        bool processFileReadRequest(WorkflowFile *file, std::string src_dir, std::string answer_mailbox,
                                     std::string mailbox_to_receive_the_file_content);
 
-        bool processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string answer_mailbox);
+        bool processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string src_dir, std::string dst_dir, std::string answer_mailbox);
 
         unsigned long num_concurrent_connections;
 
