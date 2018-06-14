@@ -51,6 +51,7 @@ namespace wrench {
 //          std::cerr << "ACTOR: RUNNING MAIN: " << this->daemon->getName() << "\n";
           try {
             this->daemon->main();
+            wrench::S4U_Simulation::sleep(1);
           } catch (std::exception &e) {
             throw;
           }
