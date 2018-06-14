@@ -322,7 +322,7 @@ namespace wrench {
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
           if (storage_service == this->scratch_space) {
-            storage_service->deleteFile(file, nullptr, job);
+            storage_service->deleteFile(file, job, nullptr);
           } else {
             storage_service->deleteFile(file, nullptr, nullptr);
           }
