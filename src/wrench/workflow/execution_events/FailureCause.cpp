@@ -241,6 +241,42 @@ namespace wrench {
     }
 
     /**
+    * @brief Constructor
+    * @param job: the job that could not be executed
+    * @param compute_service: the compute service that didn't have enough cores
+    */
+    JobKilled::JobKilled(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
+            JOB_KILLED) {
+      this->job = job;
+      this->compute_service = compute_service;
+    }
+
+    /**
+     * @brief Getter
+     * @return the job
+     */
+    WorkflowJob *JobKilled::getJob() {
+      return this->job;
+    }
+
+    /**
+     * @brief Getter
+     * @return the compute service
+     */
+    ComputeService *JobKilled::getComputeService() {
+      return this->compute_service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string JobKilled::toString() {
+      return "Job " + this->job->getName() + " on service " +
+             this->compute_service->getName() + " was killed (likely the service was stopped/terminated)";
+    }
+
+    /**
      * @brief Constructor
      *
      * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING

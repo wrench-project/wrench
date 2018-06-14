@@ -1000,12 +1000,12 @@ namespace wrench {
     * @brief Declare all current jobs as failed (likely because the daemon is being terminated
     * or has timed out (because it's in fact a pilot job))
     */
-    void MultihostMulticoreComputeService::failCurrentStandardJobs(std::shared_ptr<FailureCause> cause) {
+    void MultihostMulticoreComputeService::failCurrentStandardJobs() {
 
       for (auto workflow_job : this->running_jobs) {
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto job = (StandardJob *) workflow_job;
-          this->failRunningStandardJob(job, cause);
+          this->failRunningStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
         }
       }
 
@@ -1014,7 +1014,7 @@ namespace wrench {
         this->pending_jobs.pop_back();
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto *job = (StandardJob *) workflow_job;
-          this->failPendingStandardJob(job, cause);
+          this->failPendingStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
         }
       }
     }
@@ -1138,7 +1138,7 @@ namespace wrench {
       this->setStateToDown();
 
       WRENCH_INFO("Failing current standard jobs");
-      this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      this->failCurrentStandardJobs();
 
       WRENCH_INFO("Terminate all pilot jobs");
       this->terminateAllPilotJobs();

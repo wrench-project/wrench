@@ -78,7 +78,7 @@ namespace wrench {
      * @brief Remove a file from storage (internal method)
      *
      * @param file: a file
-     * @param dst_dir: the directory from where the file will be deleted
+     * @param dst_dir: the directory in which the file will be deleted
      *
      * @throw std::runtime_error
      */
@@ -215,7 +215,7 @@ namespace wrench {
      * @brief Synchronously asks the storage service whether it holds a file
      *
      * @param file: the file
-     * @param dst_dir: the directory from where we are doing the look up
+     * @param dst_dir: the directory in which to perform the lookup
      *
      * @return true or false
      *
@@ -306,7 +306,7 @@ namespace wrench {
      * @brief Synchronously read a file from the storage service
      *
      * @param file: the file
-     * @param src_dir: the directory associated to the read of the workflow file
+     * @param src_dir: the directory from which to read the file
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -418,7 +418,7 @@ namespace wrench {
      * @brief Synchronously write a file to the storage service
      *
      * @param file: the file
-     * @param dst_dir: the directory associated to the write of the workflow file
+     * @param dst_dir: the directory in which to write the file
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -626,7 +626,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Synchronously asks the storage service to delete a file copy
+     * @brief Synchronously ask the storage service to delete a file copy
      *
      * @param file: the file
      * @param job: the job associated to deleting this file
@@ -654,10 +654,10 @@ namespace wrench {
       this->deleteFile(file, dst_dir, file_registry_service);
     }
 
-    /* @brief Synchronously asks the storage service to delete a file copy
+    /** @brief Synchronously ask the storage service to delete a file copy
     *
     * @param file: the file
-    * @param dst_dir: the directory from where the file will be deleted
+    * @param dst_dir: the directory in which to delete the file
     * @param file_registry_service: a file registry service that should be updated once the
     *         file deletion has (successfully) completed (none if nullptr)
     *
@@ -821,8 +821,8 @@ namespace wrench {
      *
      * @param file: the file to copy
      * @param src: the storage service from which to read the file
-     * @param src_dir: the directory from where we are copying this file
-     * @param dst_dir: the directory to where we are copying this file
+     * @param src_dir: the directory in which the file will be read
+     * @param dst_dir: the directory in which the file will be written
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
      * @throw std::invalid_argument
@@ -912,7 +912,7 @@ namespace wrench {
      *
      * @param mailbox_that_should_receive_file_content: the mailbox to which the file should be sent
      * @param file: the file
-     * @param src_dir: the file directory from where the file will be read
+     * @param src_dir: the directory in which the file will be read
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
