@@ -54,16 +54,15 @@ namespace wrench {
 
         virtual void deleteFile(WorkflowFile *file, std::string dst_dir, FileRegistryService *file_registry_service=nullptr);
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
+
         virtual void copyFile(WorkflowFile *file, StorageService *src, std::string src_dir, std::string dst_dir);
 
         virtual void readFile(WorkflowFile *file, std::string src_dir);
 
         virtual void writeFile(WorkflowFile *file, std::string dst_dir);
-
-
-        /***********************/
-        /** \cond INTERNAL    **/
-        /***********************/
 
         virtual void deleteFile(WorkflowFile *file, WorkflowJob* job, FileRegistryService *file_registry_service=nullptr);
 
@@ -75,7 +74,9 @@ namespace wrench {
 
         virtual void initiateFileCopy(std::string answer_mailbox,
                                       WorkflowFile *file,
-                                      StorageService *src);
+                                      StorageService *src,
+                                      std::string src_dir,
+                                      std::string dst_dir);
 
         virtual void readFile(WorkflowFile *file);
 

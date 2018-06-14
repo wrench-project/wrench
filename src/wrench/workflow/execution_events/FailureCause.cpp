@@ -485,10 +485,11 @@ namespace wrench {
      * @param file: the file that is already being copied
      * @param storage_service:  the storage service to which is is being copied
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, StorageService *storage_service)
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, StorageService *storage_service, std::string dst_dir)
             : FailureCause(FILE_ALREADY_BEING_COPIED) {
       this->file = file;
       this->storage_service = storage_service;
+      this->dst_dir = dst_dir;
     }
 
     /**
@@ -506,6 +507,15 @@ namespace wrench {
     StorageService *FileAlreadyBeingCopied::getStorageService() {
       return this->storage_service;
     }
+
+    /**
+    * @brief Getter
+    * @return the directory
+    */
+    std::string FileAlreadyBeingCopied::getDir() {
+      return this->dst_dir;
+    }
+
 
     /**
      * @brief Get the human-readable failure message

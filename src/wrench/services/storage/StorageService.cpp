@@ -869,16 +869,25 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which a notification message will be sent
      * @param file: the file
      * @param src: the storage service from which to read the file
+     * @param src_dir: the source directory
+     * @param dst_dir: the destination directory
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      * @throw std::runtime_error
      *
      */
-    void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file, StorageService *src) {
+    void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
+                                          std::string src_dir, std::string dst_dir) {
 
       if ((file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid arguments");
+      }
+      if (src_dir.empty()) {
+        src_dir = "/";
+      }
+      if (dst_dir.empty()) {
+        dst_dir = "/";
       }
 
       if (src == this) {
@@ -891,14 +900,12 @@ namespace wrench {
 
       // Send a message to the daemon
       try {
-        std::string src_dir = "/";
-        std::string dst_dir = "/";
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
                 answer_mailbox,
                 file,
                 src,
-                src_dir, // I am not sure if it should always be /, but DataMovementManager calls this initiateFileCopy function and,
-                dst_dir, // so we probably don't need to copy from a job's directory. So, always from / directory to / directory
+                src_dir,
+                dst_dir,
                 nullptr,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {

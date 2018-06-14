@@ -152,6 +152,7 @@ namespace wrench {
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyAnswerMessage(WorkflowFile *file, StorageService *storage_service,
+                                            std::string dst_dir,
                                             FileRegistryService *file_registry_service,
                                             bool file_registry_service_updated,
                                             bool success, std::shared_ptr<FailureCause> cause,
@@ -159,8 +160,10 @@ namespace wrench {
 
         /** @brief The file was was copied, or not */
         WorkflowFile *file;
-        /** @brief The storage service that performed the copy */
+        /** @brief The storage service that performed the copy (i.e., which stored the file) */
         StorageService *storage_service;
+        /** @brief The destination directory */
+        std::string dst_dir;
         /** @brief The file registry service that the user had requested be updated, or nullptr if none */
         FileRegistryService *file_registry_service;
         /** @brief Whether a file registry service has been updated or not */

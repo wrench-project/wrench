@@ -427,7 +427,7 @@ namespace wrench {
         WRENCH_INFO("Cannot perform file copy due to lack of space");
         try {
           S4U_Mailbox::putMessage(answer_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(file, this, nullptr, false,
+                                  new StorageServiceFileCopyAnswerMessage(file, this, dst_dir, nullptr, false,
                                                                           false,
                                                                           std::shared_ptr<FailureCause>(
                                                                                   new StorageServiceNotEnoughSpace(
@@ -455,7 +455,7 @@ namespace wrench {
       } catch (WorkflowExecutionException &e) {
         try {
           S4U_Mailbox::putMessage(answer_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(file, this, nullptr, false,
+                                  new StorageServiceFileCopyAnswerMessage(file, this, dst_dir, nullptr, false,
                                                                           false, e.getCause(),
                                                                           this->getMessagePayloadValueAsDouble(
                                                                                   SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
@@ -510,7 +510,7 @@ namespace wrench {
                 "Sending back an ack since this was a file copy and some client is waiting for me to say something");
         try {
           S4U_Mailbox::dputMessage(connection->ack_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(connection->file, this, nullptr, false,
+                                  new StorageServiceFileCopyAnswerMessage(connection->file, this, connection->file_dir, nullptr, false,
                                                                           false, connection->failure_cause,
                                                                           this->getMessagePayloadValueAsDouble(
                                                                                   SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
@@ -538,7 +538,7 @@ namespace wrench {
                   "Sending back an ack since this was a file copy and some client is waiting for me to say something");
           try {
             S4U_Mailbox::putMessage(connection->ack_mailbox,
-                                    new StorageServiceFileCopyAnswerMessage(connection->file, this, nullptr, false,
+                                    new StorageServiceFileCopyAnswerMessage(connection->file, this, connection->file_dir, nullptr, false,
                                                                             true, nullptr,
                                                                             this->getMessagePayloadValueAsDouble(
                                                                                     SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
