@@ -589,7 +589,7 @@ private:
     NetworkProximityTest *test;
 
     int main() {
-      wrench::S4U_Simulation::sleep(1000);
+//      wrench::S4U_Simulation::sleep(10);
       return 0;
     }
 };
@@ -636,94 +636,94 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
   std::string host2 = simulation->getHostnameList()[1];
   std::vector<std::string> hosts_in_network = {host1, host2};
 
-//  wrench::NetworkProximityService* nps = nullptr;
-//  ASSERT_NO_THROW(nps = simulation->add(new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                                            {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.5"}})),
-//               std::invalid_argument);
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.1"}})),
-//               std::invalid_argument);
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "-1.1"}})),
-//               std::invalid_argument);
-//
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
-//                                              {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, "-1.0"}})),
-//               std::invalid_argument);
-//
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
-//                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "-1.0"}})),
-//               std::invalid_argument);
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
-//                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, "-1.0"}})),
-//               std::invalid_argument);
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
-//                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "-1.0"}})),
-//               std::invalid_argument);
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-//                                               {wrench::NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "-1.0"}})),
-//               std::invalid_argument);
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "-1.0"}})),
-//               std::invalid_argument);
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "-1.0"}})),
-//               std::invalid_argument);
-//
-//
-//  ASSERT_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "-1.0"}})),
-//               std::invalid_argument);
-//
-//
-//  ASSERT_NO_THROW(nps = simulation->add(
-//          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
-//                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.01"},
-//                                               {wrench::NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "4.0"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "20.1"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "0.01"},
-//                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}},
-//                                              {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, "1"},
-//                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "2"},
-//                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, "2"},
-//                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "3.1"}}
-//
-//          )));
+  wrench::NetworkProximityService* nps = nullptr;
+  ASSERT_NO_THROW(nps = simulation->add(new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                                            {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}})));
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.5"}})),
+               std::invalid_argument);
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "1.1"}})),
+               std::invalid_argument);
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "-1.1"}})),
+               std::invalid_argument);
+
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
+                                              {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, "-1.0"}})),
+               std::invalid_argument);
+
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
+                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "-1.0"}})),
+               std::invalid_argument);
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
+                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, "-1.0"}})),
+               std::invalid_argument);
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"}},
+                                              {{wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "-1.0"}})),
+               std::invalid_argument);
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                               {wrench::NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "-1.0"}})),
+               std::invalid_argument);
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "-1.0"}})),
+               std::invalid_argument);
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "-1.0"}})),
+               std::invalid_argument);
+
+
+  ASSERT_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "ALLTOALL"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "-1.0"}})),
+               std::invalid_argument);
+
+
+  ASSERT_NO_THROW(nps = simulation->add(
+          new wrench::NetworkProximityService(network_proximity_db_hostname, hosts_in_network,
+                                              {{wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_SERVICE_TYPE, "VIVALDI"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_DAEMON_COMMUNICATION_COVERAGE, "0.01"},
+                                               {wrench::NetworkProximityServiceProperty::LOOKUP_OVERHEAD, "4.0"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MESSAGE_SIZE, "20.1"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD, "0.01"},
+                                               {wrench::NetworkProximityServiceProperty::NETWORK_PROXIMITY_MEASUREMENT_PERIOD_MAX_NOISE, "10"}},
+                                              {{wrench::NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD, "1"},
+                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD, "2"},
+                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD, "2"},
+                                               {wrench::NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD, "3.1"}}
+
+          )));
 
    //Create a WMS
   wrench::WMS *wms = nullptr;
@@ -732,14 +732,14 @@ void NetworkProximityTest::do_ValidateProperties_Test() {
                   this,
                   (std::set<wrench::ComputeService *>){compute_service},
                   (std::set<wrench::StorageService *>){storage_service1},
-//                  (std::set<wrench::NetworkProximityService *>){nps},
-                  {},
+                  (std::set<wrench::NetworkProximityService *>){nps},
                   hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
 //  // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
+
 
   delete simulation;
 
