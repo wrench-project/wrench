@@ -1398,7 +1398,7 @@ private:
         throw std::runtime_error("File should be in storage_service_1000, directory '/'");
       }
 
-   
+
       return 0;
     }
 };
