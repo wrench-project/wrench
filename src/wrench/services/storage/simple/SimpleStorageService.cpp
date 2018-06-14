@@ -8,6 +8,7 @@
  */
 
 #include <climits>
+#include <wrench/util/MessageManager.h>
 
 #include "wrench/services/storage/simple/SimpleStorageService.h"
 #include "wrench/services/ServiceMessage.h"
@@ -228,7 +229,6 @@ namespace wrench {
 
       } else if (auto msg = dynamic_cast<StorageServiceFileLookupRequestMessage *>(message.get())) {
 
-        //TODO:: change it to the src dir to look for, for the time being using / directory
         std::set<WorkflowFile*> files = this->stored_files[msg->dst_dir];
         bool file_found = (files.find(msg->file) != files.end());
         try {
