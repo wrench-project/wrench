@@ -216,18 +216,20 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileAlreadyBeingCopied(WorkflowFile *file, StorageService *dst);
+        FileAlreadyBeingCopied(WorkflowFile *file, StorageService *dst, std::string dst_dir);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowFile *getFile();
         StorageService *getStorageService();
+        std::string getDir();
         std::string toString();
 
     private:
         WorkflowFile *file;
         StorageService *storage_service;
+        std::string dst_dir;
     };
 
     /**

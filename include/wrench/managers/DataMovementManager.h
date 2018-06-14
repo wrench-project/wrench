@@ -37,8 +37,16 @@ namespace wrench {
         void kill();
 
         void initiateAsynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst, FileRegistryService *file_registry_service=nullptr);
+        void initiateAsynchronousFileCopy(WorkflowFile *file,
+                                          StorageService *src, std::string src_dir,
+                                          StorageService *dst, std::string dst_dir,
+                                          FileRegistryService *file_registry_service=nullptr);
 
         void doSynchronousFileCopy(WorkflowFile *file, StorageService *src, StorageService *dst, FileRegistryService *file_registry_service=nullptr);
+        void doSynchronousFileCopy(WorkflowFile *file,
+                                   StorageService *src, std::string src_dir,
+                                   StorageService *dst, std::string dst_dir,
+                                   FileRegistryService *file_registry_service=nullptr);
 
     protected:
 
@@ -66,14 +74,15 @@ namespace wrench {
         struct CopyRequestSpecs {
             WorkflowFile *file;
             StorageService *dst;
+            std::string dst_dir;
             FileRegistryService *file_registry_service;
 
             CopyRequestSpecs(WorkflowFile *file,
-            StorageService *dst,
-            FileRegistryService *file_registry_service) : file(file), dst(dst), file_registry_service(file_registry_service) {}
+            StorageService *dst, std::string dst_dir,
+            FileRegistryService *file_registry_service) : file(file), dst(dst), dst_dir(dst_dir), file_registry_service(file_registry_service) {}
 
             bool operator==(const CopyRequestSpecs &rhs) const {
-              return (file == rhs.file) && (dst == rhs.dst);
+              return (file == rhs.file) && (dst == rhs.dst) && (dst_dir == rhs.dst_dir);
             }
         };
 

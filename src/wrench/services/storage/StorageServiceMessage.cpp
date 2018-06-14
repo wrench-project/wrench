@@ -185,6 +185,7 @@ namespace wrench {
      * @brief Constructor
      * @param file: the file
      * @param storage_service: the storage service
+     * @param dst_dir: the destination directory
      * @param file_registry_service: the file registry service to update (nullptr if none)
      * @param file_registry_service_updated: whether the file registry service was updated
      * @param success: true on success, false otherwise
@@ -195,13 +196,14 @@ namespace wrench {
      */
     StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
                                                                              StorageService *storage_service,
+                                                                             std::string dst_dir,
                                                                              FileRegistryService *file_registry_service,
                                                                              bool file_registry_service_updated,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
                                                                              double payload)
             : StorageServiceMessage("FILE_COPY_ANSWER", payload) {
-      if ((file == nullptr) || (storage_service == nullptr) ||
+      if ((file == nullptr) || (storage_service == nullptr) || (dst_dir.empty()) ||
               (success && (failure_cause != nullptr)) ||
               (!success && (failure_cause == nullptr)) ||
               ((file_registry_service == nullptr) and (file_registry_service_updated))) {
@@ -209,6 +211,7 @@ namespace wrench {
       }
       this->file = file;
       this->storage_service = storage_service;
+      this->dst_dir = dst_dir;
       this->file_registry_service = file_registry_service;
       this->file_registry_service_updated = file_registry_service_updated;
       this->success = success;

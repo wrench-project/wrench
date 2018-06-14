@@ -82,16 +82,43 @@ namespace wrench {
                                                            StorageService *src,
                                                            StorageService *dst,
                                                            FileRegistryService *file_registry_service) {
+      initiateAsynchronousFileCopy(file, src, "/", dst, "/", file_registry_service);
+    }
+
+    /**
+     * @brief Ask the data manager to initiate an asynchronous file copy
+     * @param file: the file to copy
+     * @param src: the source storage service
+     * @param src_dir: the source directory
+     * @param dst: the destination storage service
+     * @param dst_dir: the destination directory
+     * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
+     *
+     * @throw std::invalid_argument
+     * @throw WorkflowExecutionException
+     */
+    void DataMovementManager::initiateAsynchronousFileCopy(WorkflowFile *file,
+                                                           StorageService *src,
+                                                           std::string src_dir,
+                                                           StorageService *dst,
+                                                           std::string dst_dir,
+                                                           FileRegistryService *file_registry_service) {
       if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
+      if (src_dir.empty()) {
+        src_dir = "/";
+      }
+      if (dst_dir.empty()) {
+        dst_dir = "/";
+      }
 
-      DataMovementManager::CopyRequestSpecs request(file, dst, file_registry_service);
+      DataMovementManager::CopyRequestSpecs request(file, dst, dst_dir, file_registry_service);
 
       try {
         for (auto const &p : this->pending_file_copies) {
           if (*p == request) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst, dst_dir)));
           }
         }
       } catch (WorkflowExecutionException &e) {
@@ -100,8 +127,8 @@ namespace wrench {
 
 
       try {
-        this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(new CopyRequestSpecs(file, dst, file_registry_service)));
-        dst->initiateFileCopy(this->mailbox_name, file, src);
+        this->pending_file_copies.push_front(std::unique_ptr<CopyRequestSpecs>(new CopyRequestSpecs(file, dst, dst_dir, file_registry_service)));
+        dst->initiateFileCopy(this->mailbox_name, file, src, src_dir, dst_dir);
       } catch (WorkflowExecutionException &e) {
         throw;
       }
@@ -121,16 +148,41 @@ namespace wrench {
                                                     StorageService *src,
                                                     StorageService *dst,
                                                     FileRegistryService *file_registry_service) {
+      doSynchronousFileCopy(file, src, "/", dst, "/", file_registry_service);
+    }
+
+    /**
+     * @brief Ask the data manager to perform a synchronous file copy
+     * @param file: the file to copy
+     * @param src: the source storage service
+     * @param dst: the destination storage service
+     * @param file_registry_service: a file registry service to update once the file copy has (successfully) completed (none if nullptr)
+     *
+     * @throw std::invalid_argument
+     * @throw WorkflowExecutionException
+     */
+    void DataMovementManager::doSynchronousFileCopy(WorkflowFile *file,
+                                                    StorageService *src,
+                                                    std::string src_dir,
+                                                    StorageService *dst,
+                                                    std::string dst_dir,
+                                                    FileRegistryService *file_registry_service) {
       if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
         throw std::invalid_argument("DataMovementManager::initiateFileCopy(): Invalid arguments");
       }
+      if (src_dir.empty()) {
+        src_dir = "/";
+      }
+      if (dst_dir.empty()) {
+        dst_dir = "/";
+      }
 
-      DataMovementManager::CopyRequestSpecs request(file, dst, file_registry_service);
+      DataMovementManager::CopyRequestSpecs request(file, dst, dst_dir, file_registry_service);
 
       try {
         for (auto const &p : this->pending_file_copies) {
           if (*p == request) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst)));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FileAlreadyBeingCopied(file, dst, dst_dir)));
           }
         }
 
@@ -201,7 +253,7 @@ namespace wrench {
       } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
         // Remove the record and find the File Registry Service, if any
-        DataMovementManager::CopyRequestSpecs request(msg->file, msg->storage_service, nullptr);
+        DataMovementManager::CopyRequestSpecs request(msg->file, msg->storage_service, msg->dst_dir, nullptr);
         for (auto it = this->pending_file_copies.begin();
              it != this->pending_file_copies.end();
              ++it) {
@@ -230,6 +282,7 @@ namespace wrench {
           S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
                                    new StorageServiceFileCopyAnswerMessage(request.file,
                                                                            request.dst,
+                                                                           request.dst_dir,
                                                                            request.file_registry_service,
                                                                            file_registry_service_updated,
                                                                            msg->success,
