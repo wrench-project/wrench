@@ -652,6 +652,7 @@ namespace wrench {
               compute_resources,
               getScratch(),
               part_of_pilot_job,
+              this->containing_pilot_job,
               {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,   this->getPropertyValueAsString(
                       MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
                {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, this->getPropertyValueAsString(
@@ -1628,7 +1629,7 @@ namespace wrench {
 
       for (auto scratch_cleanup_file : this->files_in_scratch) {
         try {
-          getScratch()->deleteFile(scratch_cleanup_file);
+          getScratch()->deleteFile(scratch_cleanup_file, this->containing_pilot_job, nullptr);
         } catch (WorkflowExecutionException &e) {
           throw;
         }

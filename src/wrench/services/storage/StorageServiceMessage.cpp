@@ -59,12 +59,14 @@ namespace wrench {
     * @brief Constructor
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
+    * @param dst_dir: the file directory to look up the file for
     * @param payload: the message size in bytes
     *
     * @throw std::invalid_argument
     */
     StorageServiceFileLookupRequestMessage::StorageServiceFileLookupRequestMessage(std::string answer_mailbox,
                                                                                    WorkflowFile *file,
+                                                                                   std::string& dst_dir,
                                                                                    double payload)
             : StorageServiceMessage("FILE_LOOKUP_REQUEST",
                                     payload) {
@@ -73,6 +75,7 @@ namespace wrench {
       }
       this->answer_mailbox = answer_mailbox;
       this->file = file;
+      this->dst_dir = dst_dir;
     }
 
     /**
@@ -100,12 +103,14 @@ namespace wrench {
      * @brief Constructor
      * @param answer_mailbox: the mailbox to which to send the answer
      * @param file: the file
+     * @param dst_dir: the file directory from where the file will be deleted
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
      */
     StorageServiceFileDeleteRequestMessage::StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
                                                                                    WorkflowFile *file,
+                                                                                   std::string& dst_dir,
                                                                                    double payload)
             : StorageServiceMessage("FILE_DELETE_REQUEST",
                                     payload) {
@@ -114,6 +119,7 @@ namespace wrench {
       }
       this->file = file;
       this->answer_mailbox = answer_mailbox;
+      this->dst_dir = dst_dir;
     }
 
     /**
@@ -149,6 +155,8 @@ namespace wrench {
     * @param answer_mailbox: the mailbox to which to send the answer
     * @param file: the file
     * @param src: the source storage service
+    * @param src_dir: the file directory from where the file will be copied
+    * @param dst_dir: the file directory where the file will be stored
     * @param file_registry_service: the file registry service to update (nullptr if none)
     * @param payload: the message size in bytes
     *
@@ -157,6 +165,8 @@ namespace wrench {
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
                                                                                WorkflowFile *file,
                                                                                StorageService *src,
+                                                                               std::string& src_dir,
+                                                                               std::string& dst_dir,
                                                                                FileRegistryService *file_registry_service,
                                                                                double payload) : StorageServiceMessage(
             "FILE_COPY_REQUEST", payload) {
@@ -167,6 +177,8 @@ namespace wrench {
       this->file = file;
       this->src = src;
       this->file_registry_service = file_registry_service;
+      this->src_dir = src_dir;
+      this->dst_dir = dst_dir;
     }
 
     /**
@@ -214,6 +226,7 @@ namespace wrench {
     */
     StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(std::string answer_mailbox,
                                                                                  WorkflowFile *file,
+                                                                                 std::string& dst_dir,
                                                                                  double payload)
             : StorageServiceMessage("FILE_WRITE_REQUEST",
                                     payload) {
@@ -223,6 +236,7 @@ namespace wrench {
       this->payload += file->getSize();
       this->answer_mailbox = answer_mailbox;
       this->file = file;
+      this->dst_dir = dst_dir;
     }
 
     /**
@@ -266,6 +280,7 @@ namespace wrench {
     StorageServiceFileReadRequestMessage::StorageServiceFileReadRequestMessage(std::string answer_mailbox,
                                                                                std::string mailbox_to_receive_the_file_content,
                                                                                WorkflowFile *file,
+                                                                               std::string& src_dir,
                                                                                double payload) : StorageServiceMessage(
             "FILE_READ_REQUEST",
             payload) {
@@ -275,6 +290,7 @@ namespace wrench {
       this->answer_mailbox = answer_mailbox;
       this->mailbox_to_receive_the_file_content = mailbox_to_receive_the_file_content;
       this->file = file;
+      this->src_dir = src_dir;
     }
 
     /**

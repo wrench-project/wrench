@@ -63,6 +63,7 @@ namespace wrench {
                                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                              StorageService* scratch_space,
                                              bool part_of_pilot_job,
+                                             PilotJob* parent_pilot_job,
                                              std::map<std::string, std::string> property_list,
                                              std::map<std::string, std::string> messagepayload_list
     ) :
@@ -165,6 +166,7 @@ namespace wrench {
       this->scratch_space = scratch_space;
       this->files_stored_in_scratch = {};
       this->part_of_pilot_job = part_of_pilot_job;
+      this->parent_pilot_job = parent_pilot_job;
 
 
       // set properties
@@ -483,6 +485,10 @@ namespace wrench {
 
 //        std::cerr << "CREATING A WORKUNIT EXECUTOR\n";
 
+        WorkflowJob* workflow_job = job;
+        if (this->part_of_pilot_job) {
+          workflow_job = this->parent_pilot_job;
+        }
         std::shared_ptr<WorkunitMulticoreExecutor> workunit_executor = std::shared_ptr<WorkunitMulticoreExecutor>(
                 new WorkunitMulticoreExecutor(this->simulation,
                                               target_host,
@@ -491,6 +497,7 @@ namespace wrench {
                                               this->mailbox_name,
                                               wu,
                                               this->scratch_space,
+                                              workflow_job,
                                               this->getPropertyValueAsDouble(
                                                       StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD)));
 
@@ -925,7 +932,7 @@ namespace wrench {
         /** Perform scratch cleanup */
         for (auto scratch_cleanup_file : files_stored_in_scratch) {
           try {
-            this->scratch_space->deleteFile(scratch_cleanup_file);
+            this->scratch_space->deleteFile(scratch_cleanup_file, job, nullptr);
           } catch (WorkflowExecutionException &e) {
             throw;
           }
