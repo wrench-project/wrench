@@ -184,6 +184,17 @@ private:
 
       success = true;
       try {
+        job_manager->createStandardJob(nullptr, {});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+      }
+
+
+      success = true;
+      try {
         job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr}, {});
       } catch (std::invalid_argument &e) {
         success = false;
@@ -194,7 +205,8 @@ private:
 
       success = true;
       try {
-        job_manager->createStandardJob({}, {});
+        std::vector<wrench::WorkflowTask *> tasks; // empty
+        job_manager->createStandardJob(tasks, {});
       } catch (std::invalid_argument &e) {
         success = false;
       }
