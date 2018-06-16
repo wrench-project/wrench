@@ -66,7 +66,7 @@ namespace wrench {
       if (this->stored_files.find("/") != this->stored_files.end()) {
         this->stored_files["/"].insert(file);
       } else {
-        this->stored_files["/"] = {file}; // By default all the staged files will go to the / partition
+        this->stored_files["/"] = {file}; // By default all the staged files will go to the "/" partition
       }
       this->occupied_space += file->getSize();
       WRENCH_INFO("Stored file %s (storage usage: %.10lf%%)", file->getID().c_str(),
@@ -86,6 +86,11 @@ namespace wrench {
 
       if (file == nullptr) {
         throw std::invalid_argument("StorageService::removeFileFromStorage(): Invalid arguments");
+      }
+
+      // Empty partition means "/"
+      if (dst_partition.empty()) {
+        dst_partition = "/";
       }
 
       std::set<WorkflowFile*> files = this->stored_files[dst_partition];
@@ -165,7 +170,6 @@ namespace wrench {
      * @return true or false
      *
      * @throw WorkflowExecutionException
-     * @throw std::runtime_error
      * @throw std::invalid_arguments
      */
     bool StorageService::lookupFile(WorkflowFile *file) {
@@ -191,7 +195,6 @@ namespace wrench {
      * @return true or false
      *
      * @throw WorkflowExecutionException
-     * @throw std::runtime_error
      * @throw std::invalid_arguments
      */
     bool StorageService::lookupFile(WorkflowFile *file, WorkflowJob* job) {
@@ -224,6 +227,11 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     bool StorageService::lookupFile(WorkflowFile *file, std::string dst_partition) {
+
+      // Empty partition means "/"
+      if (dst_partition.empty()) {
+        dst_partition = "/";
+      }
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("lookup_file");
@@ -258,7 +266,6 @@ namespace wrench {
      * @param file: the file
      *
      * @throw WorkflowExecutionException
-     * @throw std::runtime_error
      * @throw std::invalid_arguments
      */
     void StorageService::readFile(WorkflowFile *file) {
@@ -282,7 +289,6 @@ namespace wrench {
      * @param job: the job associated to the read of the workflow file
      *
      * @throw WorkflowExecutionException
-     * @throw std::runtime_error
      * @throw std::invalid_arguments
      */
     void StorageService::readFile(WorkflowFile *file, WorkflowJob* job) {
@@ -314,6 +320,12 @@ namespace wrench {
      */
 
     void StorageService::readFile(WorkflowFile *file, std::string src_partition) {
+
+      // Empty partition means "/"
+      if (src_partition.empty()) {
+        src_partition = "/";
+      }
+
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
       try {
@@ -325,6 +337,7 @@ namespace wrench {
                                                                          this->getMessagePayloadValueAsDouble(
                                                                                  StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
       }
 
       // Wait for a reply
@@ -371,7 +384,6 @@ namespace wrench {
      * @param file: the file
      *
      * @throw WorkflowExecutionException
-     * @throw std::runtime_error
      */
     void StorageService::writeFile(WorkflowFile *file) {
 
@@ -395,7 +407,6 @@ namespace wrench {
      * @param job: the job associated to the write of the workflow file
      *
      * @throw WorkflowExecutionException
-     * @throw std::runtime_error
      */
     void StorageService::writeFile(WorkflowFile *file, WorkflowJob* job) {
 
@@ -425,6 +436,11 @@ namespace wrench {
      */
     void StorageService::writeFile(WorkflowFile *file, std::string dst_partition) {
 
+      // Empty partition means "/"
+      if (dst_partition.empty()) {
+        dst_partition = "/";
+      }
+
       // Send a  message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
       try {
@@ -436,9 +452,6 @@ namespace wrench {
                                                                                   StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::exception &e) {
-        WRENCH_INFO("Got a weird exception..... returning");
-        return;
       }
 
       // Wait for a reply
@@ -667,6 +680,11 @@ namespace wrench {
     */
     void StorageService::deleteFile(WorkflowFile *file, std::string dst_partition, FileRegistryService *file_registry_service) {
 
+      // Empty partition means "/"
+      if (dst_partition.empty()) {
+        dst_partition = "/";
+      }
+
       bool unregister = (file_registry_service != nullptr);
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("delete_file");
@@ -709,7 +727,7 @@ namespace wrench {
      * @brief Synchronously and sequentially delete a set of files from storage services
      *
      * @param files: the set of files to delete
-     * @param file_locations: a map of files to storage services
+     * @param file_locations: a map of files to storage services (all must be in the "/" partition of their storage services)
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (or nullptr if none)
      *
      * @throw WorkflowExecutionException
@@ -745,10 +763,7 @@ namespace wrench {
      *
      * @param file: the file to copy
      * @param src: the storage service from which to read the file
-     * @param src_job: the job from whose partition we are copying this file
-     * @param dst_job: the job to whose partition we are copying this file
      * @throw WorkflowExecutionException
-     * @throw std::runtime_error
      * @throw std::invalid_argument
      */
     void StorageService::copyFile(WorkflowFile *file, StorageService *src) {
@@ -759,7 +774,7 @@ namespace wrench {
       }
 
       if (src == this) {
-        throw std::invalid_argument("StorageService::copyFile(file,src): Cannot copy a file from oneself within the same partition");
+        throw std::invalid_argument("StorageService::copyFile(file,src): Cannot redundantly copy a file to its own partition");
       }
 
       if (this->state == DOWN) {
@@ -781,7 +796,6 @@ namespace wrench {
      * @param src_job: the job from whose partition we are copying this file
      * @param dst_job: the job to whose partition we are copying this file
      * @throw WorkflowExecutionException
-     * @throw std::runtime_error
      * @throw std::invalid_argument
      */
     void StorageService::copyFile(WorkflowFile *file, StorageService *src, WorkflowJob* src_job, WorkflowJob* dst_job) {
@@ -792,7 +806,7 @@ namespace wrench {
       }
 
       if (src == this && src_job == nullptr && dst_job == nullptr) {
-        throw std::invalid_argument("StorageService::copyFile(): Cannot copy a file from oneself within the same partition");
+        throw std::invalid_argument("StorageService::copyFile(): Cannot redundantly copy a file to its own partition");
       }
 
       if (src_job != nullptr && dst_job != nullptr) {
@@ -830,8 +844,16 @@ namespace wrench {
     void StorageService::copyFile(WorkflowFile *file, StorageService *src, std::string src_partition,
                                             std::string dst_partition) {
 
-      if (src == this && src_partition == dst_partition) {
-        throw std::invalid_argument("StorageService::copyFile(file,src,src_partition,dst_partition): Cannot copy a file from oneself within the same partition");
+      if (src == this && (src_partition == dst_partition)) {
+        throw std::invalid_argument("StorageService::copyFile(file,src,src_partition,dst_partition): Cannot redundantly copy a file to its own partition");
+      }
+
+      // Empty partition means "/"
+      if (dst_partition.empty()) {
+        dst_partition = "/";
+      }
+      if (src_partition.empty()) {
+        src_partition = "/";
       }
 
       // Send a message to the daemon
@@ -887,6 +909,8 @@ namespace wrench {
       if ((file == nullptr) || (src == nullptr)) {
         throw std::invalid_argument("StorageService::initiateFileCopy(): Invalid arguments");
       }
+
+      // Empty partition means "/"
       if (src_partition.empty()) {
         src_partition = "/";
       }
@@ -894,8 +918,8 @@ namespace wrench {
         dst_partition = "/";
       }
 
-      if (src == this) {
-        throw std::invalid_argument("StorageService::copyFile(): Cannot copy a file from oneself");
+      if ((src == this) && (src_partition == dst_partition)) {
+        throw std::invalid_argument("StorageService::copyFile(): Cannot redundantly copy a file to the its own partition");
       }
 
       if (this->state == DOWN) {
@@ -940,6 +964,11 @@ namespace wrench {
 
       if (this->state == DOWN) {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
+
+      // Empty partition means "/"
+      if (src_partition.empty()) {
+        src_partition = "/";
       }
 
       // Send a message to the daemon

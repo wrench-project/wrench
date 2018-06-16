@@ -399,31 +399,9 @@ namespace wrench {
     bool
     SimpleStorageService::processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string src_partition, std::string dst_partition, std::string answer_mailbox) {
 
-//      // If the file is already here, send back a failure
-//      if (this->stored_files.find(file) != this->stored_files.end()) {
-//        WRENCH_INFO("Cannot perform file copy because file is already there");
-//        try {
-//          S4U_Mailbox::putMessage(answer_mailbox,
-//                                  new StorageServiceFileCopyAnswerMessage(file,
-//                                                                           this,
-//                                                                           false,
-//                                                                           std::shared_ptr<FailureCause>(
-//                                                                                   new StorageServiceFileAlreadyThere(
-//                                                                                           file,
-//                                                                                           this)),
-//                                                                           this->getMessagePayloadValueAsDouble(
-//                                                                                   SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//          return true;
-//        }
-//        return true;
-//      }
-
-
-      // If the file is not already there, do a capacity check/update
-      // (If the file is already there, then there will just be an overwrite. Not that
-      // if the overwrite fails, then the file will disappear)
-      // Figure out whether this succeeds or not
+      // Do a capacity check/update
+      // If the file is already there, then there will just be an overwrite. Note that
+      // if the overwrite fails, then the file will disappear, just like in the real world.
       if (file->getSize() > this->capacity - this->occupied_space) {
         WRENCH_INFO("Cannot perform file copy due to lack of space");
         try {
@@ -453,7 +431,9 @@ namespace wrench {
       // Initiate an ASYNCHRONOUS file read from the source
       try {
         if (src == this) {
-          //if the src and the destination are the same in a copy, then we try to simulate a particular time based on the SELF_CONNECTION_DELAY property value
+          //if the src and the destination are the same in a copy, then we try to simulate a
+          // particular time based on the SELF_CONNECTION_DELAY property value
+          // TODO: When S4U has a disk thingy, we'll have to revise this to simulate I/O normally
           wrench::S4U_Simulation::sleep(this->getPropertyValueAsDouble(SimpleStorageServiceProperty::SELF_CONNECTION_DELAY));
           //Also, we don't have to simulate the read, because right now it just takes 0 time to read
           //But, below we send/receive INCOMING DATA/OUTGOING DATA, and update my stored files map
@@ -475,7 +455,7 @@ namespace wrench {
       }
 
       if (src == this) {
-        //send something
+        // add a (bogus) connection since technically we are sending data (to oneself)
         this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
                 new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, src_partition, file_reception_mailbox, "")
         ));
