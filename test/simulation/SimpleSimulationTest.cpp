@@ -144,30 +144,41 @@ private:
         throw std::runtime_error("Should not be able to create a job with an empty task list");
       }
 
-      wrench::StandardJob *two_task_job;
+      wrench::StandardJob *one_task_jobs[5];
+      int job_index = 0;
       for (auto task : tasks) {
         try {
-          two_task_job = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
+          one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
                                                         {}, {}, {});
+
+          if (one_task_jobs[job_index]->getNumTasks() != 1) {
+            throw std::runtime_error("A one-task job should say it has one task");
+          }
+          if (one_task_jobs[job_index]->getNumCompletedTasks() != 0) {
+            throw std::runtime_error("A one-task job that hasn't even started should not say it has a completed task");
+          }
+
           auto cs = (wrench::CloudService *) this->test->compute_service;
           std::string execution_host = cs->getExecutionHosts()[0];
           cs->createVM(execution_host, 2, 10);
 
-          job_manager->submitJob(two_task_job, this->test->compute_service);
+          job_manager->submitJob(one_task_jobs[job_index], this->test->compute_service);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(e.what());
         }
 
-        // Try to forget this job, which should not be fine
+        // Try to forget this job, which should NOT be fine
         success = true;
         try {
-          job_manager->forgetJob(two_task_job);
+          job_manager->forgetJob(one_task_jobs[job_index]);
         } catch (wrench::WorkflowExecutionException &e) {
           success = false;
         }
         if (success) {
           throw std::runtime_error("Should not be able to forget a pending/running job");
         }
+
+        job_index++;
       }
 
       {
@@ -205,6 +216,12 @@ private:
         }
       }
 
+      for (int i = 0; i < 5; i++) {
+        if (one_task_jobs[i]->getNumCompletedTasks() != 1) {
+          throw std::runtime_error("A job with one completed task should say it has one completed task");
+        }
+      }
+
       {
         // Try to create and submit a job with tasks that are completed, which should fail
         success = true;
@@ -220,8 +237,10 @@ private:
       }
 
       {
-        // Try to forget a complete job, which should be fine
-        job_manager->forgetJob(two_task_job);
+        // Try to forget the completed jobs
+        for (int i=0; i < 5; i++) {
+          job_manager->forgetJob(one_task_jobs[i]);
+        }
       }
 
       return 0;
