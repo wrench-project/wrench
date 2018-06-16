@@ -15,6 +15,7 @@
 namespace wrench {
 
     SET_PROPERTY_NAME(StorageServiceProperty, MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+    SET_PROPERTY_NAME(StorageServiceProperty, SELF_CONNECTION_DELAY);
 
 };
 

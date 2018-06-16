@@ -39,7 +39,7 @@ public:
 
     void do_RaceConditionTest_test();
 
-    void do_DirectoriesTest_test();
+    void do_PartitionsTest_test();
 
 protected:
     ScratchSpaceTest() {
@@ -821,13 +821,13 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
 
 
 /**********************************************************************/
-/**     Directories Test (For both Sratch and Non-Scratch)           **/
+/**     Partitions Test (For both Sratch and Non-Scratch)           **/
 /**********************************************************************/
 
-class ScratchNonScratchDirectoriesTestWMS : public wrench::WMS {
+class ScratchNonScratchPartitionsTestWMS : public wrench::WMS {
 
 public:
-    ScratchNonScratchDirectoriesTestWMS(ScratchSpaceTest *test,
+    ScratchNonScratchPartitionsTestWMS(ScratchSpaceTest *test,
                                      const std::set<wrench::ComputeService *> &compute_services,
                                      const std::set<wrench::StorageService *> &storage_services,
                                      std::string &hostname) :
@@ -841,8 +841,8 @@ private:
 
     int main() {
 
-      //NonScratch have only / directory but other directories can be created
-      //Scratch have /, /<job's_name> directories
+      //NonScratch have only / partition but other partitions can be created
+      //Scratch have /, /<job's_name> partitions
 
       // Create a data movement manager and this should only copy from / to / of two non scratch space
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
@@ -855,16 +855,16 @@ private:
       // Get a reference to the file
       wrench::WorkflowFile *file2 = this->getWorkflow()->getFileByID("input2");
 
-      //check if this file is staged in / directory of non-scratch
-      if(!test->storage_service1->lookupFile(file1, nullptr)) { //nullptr is referring to no job's directory
+      //check if this file is staged in / partition of non-scratch
+      if(!test->storage_service1->lookupFile(file1, nullptr)) { //nullptr is referring to no job's partition
           throw std::runtime_error(
-                  "The file1 was supposed to be staged in / directory but is not"
+                  "The file1 was supposed to be staged in / partition but is not"
           );
       }
-      //check if this file is staged in / directory of non-scratch
-      if(!test->storage_service2->lookupFile(file2, nullptr)) { //nullptr is referring to no job's directory
+      //check if this file is staged in / partition of non-scratch
+      if(!test->storage_service2->lookupFile(file2, nullptr)) { //nullptr is referring to no job's partition
         throw std::runtime_error(
-                "The file2 was supposed to be staged in / directory but is not"
+                "The file2 was supposed to be staged in / partition but is not"
         );
       }
 
@@ -880,7 +880,7 @@ private:
               {std::make_tuple(file1, this->test->storage_service1, wrench::ComputeService::SCRATCH)},
               {}, {});
 
-      // Submit both jobs
+      // Submit job1
       job_manager->submitJob(job1, this->test->compute_service);
 
       // Wait for workflow execution events
@@ -902,15 +902,15 @@ private:
         }
       }
 
-      //the file1 should still be non-scratch space, the job should only delete file from it's scratch job's directory
-      //check if this file is staged in / directory of non-scratch
-      if(!test->storage_service1->lookupFile(file1, nullptr)) { //nullptr is referring to no job's directory
+      //the file1 should still be non-scratch space, the job should only delete file from it's scratch job's partition
+      //check if this file is staged in / partition of non-scratch
+      if(!test->storage_service1->lookupFile(file1, nullptr)) { //nullptr is referring to no job's partition
         throw std::runtime_error(
-                "The file1 again was supposed to be staged in / directory but is not"
+                "The file1 again was supposed to be staged in / partition but is not"
         );
       }
 
-      //try to copy file1 from job1's directory of storage service1 into storage service2 in / directory, this should fail
+      //try to copy file1 from job1's partition of storage service1 into storage service2 in / partition, this should fail
       bool success = false;
       try {
         this->test->storage_service2->copyFile(file1, this->test->storage_service1, job1, nullptr);
@@ -919,11 +919,11 @@ private:
       }
       if(!success) {
         throw std::runtime_error(
-                "Non-scratch space have / directory unless created by copying something into a new directory name"
+                "Non-scratch space have / partition unless created by copying something into a new partition name"
         );
       }
 
-      //try to copy file1 from / directory of storage service1 into storage service2 in job1's directory, this should succeed
+      //try to copy file1 from / partition of storage service1 into storage service2 in job1's partition, this should succeed
       success = true;
       try {
         this->test->storage_service2->copyFile(file1, this->test->storage_service1, nullptr, job1);
@@ -932,11 +932,11 @@ private:
       }
       if(!success) {
         throw std::runtime_error(
-                "We should have been able to copy from / directory of non-scratch to a new directory into another non-scratch space"
+                "We should have been able to copy from / partition of non-scratch to a new partition into another non-scratch space"
         );
       }
 
-      //try to copy file2 from / directory of stroage service2 into storage service1 in / directory, it should succeed
+      //try to copy file2 from / partition of stroage service2 into storage service1 in / partition, it should succeed
       success = true;
       try {
         this->test->storage_service1->copyFile(file2, this->test->storage_service2, nullptr, nullptr);
@@ -949,16 +949,36 @@ private:
         );
       }
 
+      //try to copy file2 from / partition of stroage service2 into storage service2 in /test partition, it should succeed
+      success = true;
+      try {
+        this->test->storage_service2->copyFile(file2, this->test->storage_service2, "/", "/test");
+      }catch(wrench::WorkflowExecutionException) {
+        success = false;
+      }
+      if(!success) {
+        throw std::runtime_error(
+                "We should have been able to copy from one partition to another partition of the same storage service"
+        );
+      }
+
+      //we just copied file to /test partition of storage service2, so it must be there
+      if(!test->storage_service2->lookupFile(file2, "/test")) {
+        throw std::runtime_error(
+                "The file2 was supposed to be stored in /test partition but is not"
+        );
+      }
+
 
       return 0;
     }
 };
 
-TEST_F(ScratchSpaceTest, ScratchNonScratchDirectoriesTest) {
-  DO_TEST_WITH_FORK(do_DirectoriesTest_test);
+TEST_F(ScratchSpaceTest, ScratchNonScratchPartitionsTest) {
+  DO_TEST_WITH_FORK(do_PartitionsTest_test);
 }
 
-void ScratchSpaceTest::do_DirectoriesTest_test() {
+void ScratchSpaceTest::do_PartitionsTest_test() {
 
   // Create and initialize a simulation
   auto *simulation = new wrench::Simulation();
@@ -993,7 +1013,7 @@ void ScratchSpaceTest::do_DirectoriesTest_test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new ScratchNonScratchDirectoriesTestWMS(this, {compute_service}, {storage_service1}, hostname)));
+          new ScratchNonScratchPartitionsTestWMS(this, {compute_service}, {storage_service1}, hostname)));
 
 
   wrench::Workflow *workflow = new wrench::Workflow();
