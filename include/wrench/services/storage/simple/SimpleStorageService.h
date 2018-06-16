@@ -35,6 +35,7 @@ namespace wrench {
     private:
         std::map<std::string, std::string> default_property_values = {
                  {SimpleStorageServiceProperty::MAX_NUM_CONCURRENT_DATA_CONNECTIONS,  "infinity"},
+                 {SimpleStorageServiceProperty::SELF_CONNECTION_DELAY,  "0"},
                 };
 
         std::map<std::string, std::string> default_messagepayload_values = {

@@ -208,7 +208,7 @@ namespace wrench {
           if (dst == this->scratch_space) {
             dst->copyFile(file, src, nullptr, job);
           } else {
-            dst->copyFile(file, src, nullptr, nullptr); // if there is no scratch space, then there is no notion of job's directory, it is always to / directory in such case
+            dst->copyFile(file, src, nullptr, nullptr); // if there is no scratch space, then there is no notion of job's partition, it is always to / partition in such case
           }
         } catch (WorkflowExecutionException &e) {
           throw;
