@@ -281,6 +281,12 @@ namespace wrench {
         throw std::invalid_argument("WMS::addWorkflow(): The WMS has already been given a workflow");
       } else {
         this->workflow = workflow;
+
+        /**
+         * Set the simulation pointer member variable of the workflow so that the
+         * workflow tasks have access to it for creating SimulationTimestamps
+         */
+        this->workflow->simulation = this->simulation;
       }
       this->start_time = start_time;
     }
