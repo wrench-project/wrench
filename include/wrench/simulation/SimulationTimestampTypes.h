@@ -10,15 +10,14 @@
 #ifndef WRENCH_SIMULATIONTIMESTAMPTYPES_H
 #define WRENCH_SIMULATIONTIMESTAMPTYPES_H
 
-
 namespace wrench {
 
     class WorkflowTask;
 
     /**
-    * @brief A "task completion event" simulation timestamp
+    * @brief A base class for simulation timestamps regarding workflow tasks
     */
-    class SimulationTimestampTaskCompletion {
+    class SimulationTimestampTask {
 
     public:
 
@@ -30,11 +29,12 @@ namespace wrench {
          * @brief Constructor
          * @param task: a workflow task
          */
-        SimulationTimestampTaskCompletion(WorkflowTask *task) {
-          this->task = task;
+        SimulationTimestampTask(WorkflowTask *task) {
+            this->task = task;
         }
 
-        ~SimulationTimestampTaskCompletion() {
+        ~SimulationTimestampTask() {
+
         }
 
         /***********************/
@@ -50,9 +50,32 @@ namespace wrench {
           return this->task;
         }
 
+
     private:
         WorkflowTask *task;
     };
+
+    class SimulationTimestampTaskStart : public SimulationTimestampTask {
+    public:
+        SimulationTimestampTaskStart(WorkflowTask *task) : SimulationTimestampTask(task) {
+
+        }
+    };
+
+    class SimulationTimestampTaskFailure : public SimulationTimestampTask {
+    public:
+        SimulationTimestampTaskFailure(WorkflowTask *task) : SimulationTimestampTask(task) {
+
+        }
+    };
+
+    class SimulationTimestampTaskCompletion : public SimulationTimestampTask {
+    public:
+        SimulationTimestampTaskCompletion(WorkflowTask *task) : SimulationTimestampTask(task) {
+
+        }
+    };
+
 };
 
 #endif //WRENCH_SIMULATIONTIMESTAMPTYPES_H
