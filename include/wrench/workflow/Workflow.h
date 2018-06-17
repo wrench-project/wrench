@@ -22,6 +22,8 @@ class WorkflowTask;
 
 namespace wrench {
 
+    class Simulation;
+
     /**
      * @brief A workflow (to be executed by a WMS)
      */
@@ -103,6 +105,7 @@ namespace wrench {
         /***********************/
 
     private:
+        friend class WMS;
         friend class WorkflowTask;
 
         void setNumLevels(unsigned long);
@@ -120,6 +123,8 @@ namespace wrench {
         std::string callback_mailbox;
 
         ComputeService *parent_compute_service; // The compute service to which the job was submitted, if any
+
+        Simulation * simulation; // a ptr to the simulation so that the simulation can obtain simulation timestamps for workflow tasks
     };
 };
 
