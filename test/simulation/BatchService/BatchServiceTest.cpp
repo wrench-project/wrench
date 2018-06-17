@@ -48,6 +48,7 @@ public:
     void do_StandardJobInsidePilotJobSucessTaskTest_test();
     void do_InsufficientCoresInsidePilotJobTaskTest_test();
     void do_DifferentBatchAlgorithmsSubmissionTest_test();
+    void do_ShutdownWithPendingRunningJobsTest_test();
 
 protected:
     BatchServiceTest() {
@@ -555,9 +556,9 @@ private:
         int num_cores = 10;
         double parallel_efficiency = 1.0;
         tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
-                                          task_flops,
-                                          num_cores, num_cores, parallel_efficiency,
-                                          0.0));
+                                                     task_flops,
+                                                     num_cores, num_cores, parallel_efficiency,
+                                                     0.0));
       }
 
       // Create a Standard Job with only the tasks
@@ -581,9 +582,9 @@ private:
         int num_cores = 10;
         double parallel_efficiency = 1.0;
         tasks.push_back(this->getWorkflow()->addTask("test_job_2_task_" + std::to_string(i),
-                                          task_flops,
-                                          num_cores, num_cores, parallel_efficiency,
-                                          0.0));
+                                                     task_flops,
+                                                     num_cores, num_cores, parallel_efficiency,
+                                                     0.0));
       }
 
       // Create a Standard Job with only the tasks
@@ -1014,7 +1015,7 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
@@ -1150,7 +1151,7 @@ void BatchServiceTest::do_InsufficientCoresTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
@@ -1278,7 +1279,7 @@ void BatchServiceTest::do_noArgumentsJobSubmissionTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
@@ -1383,7 +1384,7 @@ private:
             wrench::FailureCause *failure_cause = real_event->failure_cause.get();
             if (failure_cause->getCauseType() != wrench::FailureCause::JOB_TIMEOUT) {
               throw std::runtime_error("Expected STANDARD_JOB_FAILURE event, but unexpected failure cause " +
-                                               std::to_string(failure_cause->getCauseType()));
+                                       std::to_string(failure_cause->getCauseType()));
             }
             auto real_cause = (dynamic_cast<wrench::JobTimeout*>(failure_cause));
             if (real_cause->getJob() != job) {
@@ -1435,7 +1436,7 @@ void BatchServiceTest::do_StandardJobTimeOutTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
@@ -1577,7 +1578,7 @@ void BatchServiceTest::do_PilotJobTimeOutTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
@@ -1800,7 +1801,7 @@ void BatchServiceTest::do_BestFitTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
@@ -1970,7 +1971,7 @@ void BatchServiceTest::do_FirstFitTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
@@ -2254,7 +2255,7 @@ void BatchServiceTest::do_RoundRobinTask_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "ROUNDROBIN"}})));
 
@@ -2392,14 +2393,18 @@ private:
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-            if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+            if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::JOB_KILLED) {
               throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
             }
-            auto real_cause = (wrench::ServiceIsDown *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
+            auto real_cause = (wrench::JobKilled *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
             std::string error_msg = real_cause->toString();
-            if (real_cause->getService() != this->test->compute_service) {
+            if (real_cause->getComputeService() != this->test->compute_service) {
               std::runtime_error(
                       "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
+            }
+            if (real_cause->getJob() != job) {
+              std::runtime_error(
+                      "Got the correct failure even, a correct cause type, but the cause points to the wrong job");
             }
             break;
           }
@@ -2445,7 +2450,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobTimeOutTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, {})));
 
   // Create a WMS
@@ -2628,7 +2633,7 @@ void BatchServiceTest::do_StandardJobInsidePilotJobSucessTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
@@ -2795,7 +2800,7 @@ void BatchServiceTest::do_InsufficientCoresInsidePilotJobTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
@@ -2944,7 +2949,7 @@ void BatchServiceTest::do_MultipleStandardTaskTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"},
                                    {})));
 
@@ -3097,7 +3102,7 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname,
-                                   
+
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,  {
                                            {wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,     "filler"},
                                            {wrench::BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM, "fcfs"}
@@ -3123,6 +3128,154 @@ void BatchServiceTest::do_DifferentBatchAlgorithmsSubmissionTest_test() {
   // Running a "run a single task" simulation
   // Note that in these tests the WMS creates workflow tasks, which a user would
   // of course not be likely to do
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+
+
+/**********************************************************************/
+/**  SHUTDOWN WITH PENDING/RUNNING JOBS TEST **/
+/**********************************************************************/
+
+class ShutdownWithPendingRunningJobsTestWMS : public wrench::WMS {
+
+public:
+    ShutdownWithPendingRunningJobsTestWMS(BatchServiceTest *test,
+                                          const std::set<wrench::ComputeService *> &compute_services,
+                                          std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Create 3 tasks
+      wrench::WorkflowTask *tasks[3];
+      for (int i=0; i < 3; i++) {
+        tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 600, 10, 10, 1.0, 0);
+      }
+
+      // Submit them individually
+      wrench::StandardJob *jobs[3];
+
+      for (int i=0; i < 3; i++) {
+        jobs[i] = job_manager->createStandardJob({tasks[i]}, {}, {}, {}, {});
+
+        std::map<std::string, std::string> batch_job_args;
+        batch_job_args["-N"] = "1";
+        batch_job_args["-t"] = "2"; //time in minutes
+        batch_job_args["-c"] = "10"; //number of cores per node
+        try {
+          job_manager->submitJob(jobs[i], this->test->compute_service, batch_job_args);
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Exception: " + std::string(e.what()));
+        }
+      }
+
+      // Sleep 5 seconds
+      this->simulation->sleep(5);
+
+      // Terminate the service
+      this->test->compute_service->stop();
+
+
+      // Sleep 5 seconds
+      this->simulation->sleep(5);
+
+      // Wait for workflow execution events
+      for (int i=0; i < 3; i++) {
+        bool success = true;
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = this->getWorkflow()->waitForNextExecutionEvent();
+        } catch (wrench::WorkflowExecutionException &e) {
+          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        }
+        switch (event->type) {
+          case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
+            success = false;
+            break;
+          }
+          default: {
+            throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+          }
+        }
+        if (success) {
+          throw std::runtime_error("Should have received a STANDARD_JOB_FAILURE event");
+        }
+
+        auto real_event = dynamic_cast<wrench::StandardJobFailedEvent*>(event.get());
+        wrench::FailureCause *failure_cause = real_event->failure_cause.get();
+        if (failure_cause->getCauseType() != wrench::FailureCause::JOB_KILLED) {
+          throw std::runtime_error("Expected JOB_KILLED event, but unexpected failure cause " +
+                                   std::to_string(failure_cause->getCauseType()));
+        }
+        auto real_cause = (dynamic_cast<wrench::JobKilled*>(failure_cause));
+        if ((real_cause->getJob() != jobs[0])  and
+            (real_cause->getJob() != jobs[1]) and
+            (real_cause->getJob() != jobs[2])) {
+          throw std::runtime_error("Expected JOB_KILLED failure cause does not point to expected job");
+        }
+        real_cause->toString(); // for coverage
+      }
+
+
+      return 0;
+    }
+};
+
+
+TEST_F(BatchServiceTest, ShutdownWithPendingRunningJobsTest)
+{
+  DO_TEST_WITH_FORK(do_ShutdownWithPendingRunningJobsTest_test);
+}
+
+
+void BatchServiceTest::do_ShutdownWithPendingRunningJobsTest_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("batch_service_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = "Host1";
+
+  // Create a Batch Service
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+
+                                   {"Host1"}, 0,  {})));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new ShutdownWithPendingRunningJobsTestWMS(
+                  this,  {compute_service}, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow).get()));
+
+  simulation->add(new wrench::FileRegistryService(hostname));
+
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;

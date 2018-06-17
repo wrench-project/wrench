@@ -38,6 +38,8 @@ public:
     void do_SynchronousFileCopyFailures_test();
 
     void do_AsynchronousFileCopyFailures_test();
+    
+    void do_Partitions_test();
 
 
 protected:
@@ -123,9 +125,9 @@ private:
 
       // Do a few queries to storage services
       for (auto f : {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
-        if ((!this->test->storage_service_1000->lookupFile(f)) ||
-            (this->test->storage_service_100->lookupFile(f)) ||
-            (this->test->storage_service_500->lookupFile(f))) {
+        if ((!this->test->storage_service_1000->lookupFile(f, nullptr)) ||
+            (this->test->storage_service_100->lookupFile(f, nullptr)) ||
+            (this->test->storage_service_500->lookupFile(f, nullptr))) {
           throw std::runtime_error("Some storage services do/don't have the files that they shouldn't/should have");
         }
       }
@@ -168,7 +170,7 @@ private:
 
       // Make sure the copy didn't happen
       success = false;
-      if (this->test->storage_service_100->lookupFile(this->test->file_500)) {
+      if (this->test->storage_service_100->lookupFile(this->test->file_500, nullptr)) {
         success = true;
       }
       if (success) {
@@ -203,7 +205,7 @@ private:
 
       // Read a file on a storage service
       try {
-        this->test->storage_service_100->readFile(this->test->file_10);
+        this->test->storage_service_100->readFile(this->test->file_10, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Should be able to read a file available on a storage service");
       }
@@ -211,7 +213,7 @@ private:
       // Read a file on a storage service that doesn't have that file
       success = true;
       try {
-        this->test->storage_service_100->readFile(this->test->file_100);
+        this->test->storage_service_100->readFile(this->test->file_100, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
       }
@@ -317,7 +319,7 @@ private:
       }
 
       // Check that the copy has happened..
-      if (!this->test->storage_service_100->lookupFile(this->test->file_1)) {
+      if (!this->test->storage_service_100->lookupFile(this->test->file_1, nullptr)) {
         throw std::runtime_error("Asynchronous file copy operation didn't copy the file");
       }
 
@@ -405,7 +407,7 @@ private:
       // Try to do stuff with a shutdown service
       success = true;
       try {
-        this->test->storage_service_100->lookupFile(this->test->file_1);
+        this->test->storage_service_100->lookupFile(this->test->file_1, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
@@ -426,7 +428,7 @@ private:
 
       success = true;
       try {
-        this->test->storage_service_100->readFile(this->test->file_1);
+        this->test->storage_service_100->readFile(this->test->file_1, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
@@ -447,7 +449,7 @@ private:
 
       success = true;
       try {
-        this->test->storage_service_100->writeFile(this->test->file_1);
+        this->test->storage_service_100->writeFile(this->test->file_1, nullptr);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         // Check Exception
@@ -620,15 +622,15 @@ private:
       }
 
       // Do the file copy again, which should fail
-      success = true;
+      success = false;
       try {
         data_movement_manager->doSynchronousFileCopy(this->test->file_500, this->test->storage_service_1000,
                                                      this->test->storage_service_500);
       } catch (wrench::WorkflowExecutionException &e) {
-        success = false;
+        success = true;
       }
       if (!success) {
-        throw std::runtime_error("Should be able fo write a file that's already there");
+        throw std::runtime_error("Should not be able to write a file beyond the storage capacity");
       }
 
       return 0;
@@ -1275,6 +1277,238 @@ void SimpleStorageServiceFunctionalTest::do_AsynchronousFileCopyFailures_test() 
 
   // Staging file_500 on the 1000-byte storage service
   ASSERT_NO_THROW(simulation->stageFiles({{file_500->getID(), file_500}}, storage_service_1000));
+
+  // Running a "run a single task" simulation
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  DIRECTORIES TEST                                                **/
+/**********************************************************************/
+
+class PartitionsTestWMS : public wrench::WMS {
+
+public:
+    PartitionsTestWMS(SimpleStorageServiceFunctionalTest *test,
+                                                            const std::set<wrench::StorageService *> &storage_services,
+                                                            std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    SimpleStorageServiceFunctionalTest *test;
+
+    int main() {
+
+      // Create a data movement manager
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+
+      // Copy storage_service_1000:/:file_10 to storage_service_500:foo:file_10
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_1000, "/",
+                                                            this->test->storage_service_500, "foo");
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Got an unexpected exception");
+      }
+
+      // Wait for the next execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
+          // do nothing
+          break;
+        }
+        default:
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+      }
+
+      // Copy storage_service_500:/:file_10 to storage_service_1000:foo:file_10: SHOULD NOT WORK
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_500, "/",
+                                                            this->test->storage_service_1000, "foo");
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Got an unexpected exception");
+      }
+
+      // Wait for the next execution event
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::FILE_COPY_FAILURE: {
+          // do nothing
+          break;
+        }
+        default:
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+      }
+
+      // Copy storage_service_500:foo:file_10 to storage_service_1000:foo
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_500, "foo",
+                                                            this->test->storage_service_1000, "foo");
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Got an unexpected exception");
+      }
+
+      // Wait for the next execution event
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
+          // do nothing
+          break;
+        }
+        default:
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+      }
+
+
+      // Copy storage_service_500:foo:file_10 to storage_service_500:bar
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_500, "foo",
+                                                            this->test->storage_service_500, "bar");
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Got an unexpected exception");
+      }
+
+      // Wait for the next execution event
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
+          // do nothing
+          break;
+        }
+        default:
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+      }
+
+
+
+      // Copy storage_service_500:foo:file_10 to storage_service_500:foo    SHOULD NOT WORK
+      bool success = false;
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_500, "foo",
+                                                            this->test->storage_service_500, "foo");
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+
+      if (success) {
+        throw std::runtime_error("Should not be able to copy a file onto itself");
+      }
+
+      // Check all lookups
+      if (not this->test->storage_service_1000->lookupFile(this->test->file_10, "/")) {
+        throw std::runtime_error("File should be in storage_service_1000, partition '/'");
+      }
+      if (not this->test->storage_service_500->lookupFile(this->test->file_10, "foo")) {
+        throw std::runtime_error("File should be in storage_service_500, partition '/'");
+      }
+      if (not this->test->storage_service_1000->lookupFile(this->test->file_10, "foo")) {
+        throw std::runtime_error("File should be in storage_service_1000, partition '/'");
+      }
+
+      // File copy from oneself to oneself!
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_500, "foo",
+                                                            this->test->storage_service_500, "faa");
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Got an unexpected exception");
+      }
+
+      // Wait for the next execution event
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
+          // do nothing
+          break;
+        }
+        default:
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(SimpleStorageServiceFunctionalTest, Partitions) {
+  DO_TEST_WITH_FORK(do_Partitions_test);
+}
+
+void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("capacity_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create 2 Storage Services
+  ASSERT_NO_THROW(storage_service_1000 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 1000.0)));
+
+  ASSERT_NO_THROW(storage_service_500 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 500.0)));
+
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new PartitionsTestWMS(
+                  this, {
+                          storage_service_1000, storage_service_500
+                  }, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Create a file registry
+  simulation->add(new wrench::FileRegistryService(hostname));
+
+  // Staging file_500 on the 1000-byte storage service
+  ASSERT_NO_THROW(simulation->stageFiles({{file_10->getID(), file_10}}, storage_service_1000));
 
   // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());

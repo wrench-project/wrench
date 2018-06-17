@@ -53,6 +53,7 @@ namespace wrench {
             std::string callback_mailbox,
             Workunit *workunit,
             StorageService *scratch_space,
+            WorkflowJob* job,
             double thread_startup_overhead) :
             Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
 
@@ -71,6 +72,7 @@ namespace wrench {
       this->ram_utilization = ram_utilization;
       this->scratch_space = scratch_space;
       this->files_stored_in_scratch = {};
+      this->job = job;
 
     }
 
@@ -203,7 +205,11 @@ namespace wrench {
                       dst->getName().c_str());
 
           S4U_Simulation::sleep(this->thread_startup_overhead);
-          dst->copyFile(file, src);
+          if (dst == this->scratch_space) {
+            dst->copyFile(file, src, nullptr, job);
+          } else {
+            dst->copyFile(file, src, nullptr, nullptr); // if there is no scratch space, then there is no notion of job's partition, it is always to / partition in such case
+          }
         } catch (WorkflowExecutionException &e) {
           throw;
         }
@@ -224,7 +230,7 @@ namespace wrench {
         try {
             StorageService::readFiles(task->getInputFiles(),
                                       work->file_locations,
-                                      this->scratch_space, files_stored_in_scratch);
+                                      this->scratch_space, files_stored_in_scratch, job);
         } catch (WorkflowExecutionException &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
@@ -245,7 +251,7 @@ namespace wrench {
         // Write all output files
         try {
             StorageService::writeFiles(task->getOutputFiles(), work->file_locations, this->scratch_space,
-                                       files_stored_in_scratch);
+                                       files_stored_in_scratch, job);
         } catch (WorkflowExecutionException &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
@@ -294,7 +300,11 @@ namespace wrench {
 
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
-          dst->copyFile(file, src);
+          if (src == this->scratch_space) {
+            dst->copyFile(file, src, job, nullptr);
+          } else {
+            dst->copyFile(file, src, nullptr, nullptr);
+          }
 
         } catch (WorkflowExecutionException &e) {
           throw;
@@ -307,7 +317,11 @@ namespace wrench {
         StorageService *storage_service = std::get<1>(cleanup);
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
-          storage_service->deleteFile(file);
+          if (storage_service == this->scratch_space) {
+            storage_service->deleteFile(file, job, nullptr);
+          } else {
+            storage_service->deleteFile(file, nullptr, nullptr);
+          }
         } catch (WorkflowExecutionException &e) {
           throw;
         }

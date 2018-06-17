@@ -83,7 +83,7 @@ private:
 
         // delete file and don't unregister
         storage_service->deleteFile(file_1);
-        if (storage_service->lookupFile(file_1)) {
+        if (storage_service->lookupFile(file_1, nullptr)) {
             throw std::runtime_error("StorageService should have deleted file_1");
         }
 
@@ -93,7 +93,7 @@ private:
 
         // delete file and unregister
         storage_service->deleteFile(file_2, file_registry_service);
-        if (storage_service->lookupFile(file_2)) {
+        if (storage_service->lookupFile(file_2, nullptr)) {
             throw std::runtime_error("StorageService should have deleted file_2");
         }
 

@@ -176,7 +176,7 @@ namespace wrench {
 
         void terminateAllPilotJobs();
 
-        void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
+        void failCurrentStandardJobs();
 
         void processStandardJobCompletion(StandardJobExecutor *executor, StandardJob *job);
 
