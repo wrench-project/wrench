@@ -62,6 +62,8 @@ namespace wrench {
                     NETWORK_ERROR,
             /** @brief There was a network timeout (for a "with timeout" network operation) */
                     NETWORK_TIMEOUT,
+            /** @brief A Job has been killed (likely because the service performing it was terminated) */
+                    JOB_KILLED,
             /** @brief The job cannot be terminated because it is neither pending nor running */
                     JOB_CANNOT_BE_TERMINATED,
             /** @brief The job cannot be forgotten because it is not completed */
@@ -214,24 +216,27 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        FileAlreadyBeingCopied(WorkflowFile *file, StorageService *dst);
+        FileAlreadyBeingCopied(WorkflowFile *file, StorageService *dst, std::string dst_dir);
         /***********************/
         /** \endcond           */
         /***********************/
 
         WorkflowFile *getFile();
         StorageService *getStorageService();
+        std::string getDir();
         std::string toString();
 
     private:
         WorkflowFile *file;
         StorageService *storage_service;
+        std::string dst_dir;
     };
 
     /**
      * @brief A "service is down" failure cause
      */
-    class ServiceIsDown : public FailureCause {
+    class
+    ServiceIsDown : public FailureCause {
     public:
         /***********************/
         /** \cond INTERNAL     */
@@ -316,6 +321,29 @@ namespace wrench {
     };
 
     /**
+    * @brief A "job has been killed" failure cause
+    */
+    class JobKilled : public FailureCause {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        JobKilled(WorkflowJob *job, ComputeService *compute_service);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        WorkflowJob *getJob();
+        ComputeService *getComputeService();
+        std::string toString();
+
+    private:
+        WorkflowJob *job;
+        ComputeService *compute_service;
+    };
+
+
+    /**
      * @brief A "network error (or endpoint is down)" failure cause
      */
     class NetworkError : public FailureCause {
@@ -356,36 +384,7 @@ namespace wrench {
         std::string mailbox = "";
     };
 
-//    /**
-//    * @brief A "network timout" failure cause
-//    */
-//    class NetworkTimeout : public FailureCause {
-//    public:
-//        /** A enumerated tupe that describes the operation that led to the network timeout */
-//        enum OperationType {
-//            SENDING,
-//            RECEIVING
-//        };
-//
-//        /***********************/
-//        /** \cond INTERNAL     */
-//        /***********************/
-//        NetworkTimeout(NetworkTimeout::OperationType, std::string mailbox);
-//        /***********************/
-//        /** \endcond           */
-//        /***********************/
-//
-//        std::string toString();
-//        bool whileReceiving();
-//        bool whileSending();
-//        std::string getMailbox();
-//
-//    private:
-//        NetworkTimeout::OperationType operation_type;
-//        bool while_sending = false;
-//        std::string mailbox = "";
-//    };
-    
+
     /**
      * @brief A "job cannot be terminated" failure cause
      */

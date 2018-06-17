@@ -253,7 +253,7 @@ private:
         throw std::runtime_error("File registry service should not have been updated");
       }
 
-      if (!this->test->dst_storage_service->lookupFile(this->test->src2_file_2)) {
+      if (!this->test->dst_storage_service->lookupFile(this->test->src2_file_2, nullptr)) {
         throw std::runtime_error("Asynchronous file copy should have completed even though the FileRegistryService was down.");
       }
 
