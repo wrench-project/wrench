@@ -13,6 +13,8 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/workflow/WorkflowTask.h"
 #include "wrench/workflow/Workflow.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/simulation/SimulationTimestampTypes.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(workflowTask, "Log category for WorkflowTask");
 
@@ -238,7 +240,26 @@ namespace wrench {
      * @param state: the task's internal state
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
-      this->internal_state = state;
+        this->internal_state = state;
+
+        if (this->workflow->simulation != nullptr) {
+            switch (state) {
+                case TASK_RUNNING:
+                    this->workflow->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(
+                            new SimulationTimestampTaskStart(this));
+                    break;
+
+                case TASK_FAILED:
+                    this->workflow->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
+                            new SimulationTimestampTaskFailure(this));
+                    break;
+
+                case TASK_COMPLETED:
+                    this->workflow->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
+                            new SimulationTimestampTaskCompletion(this));
+                    break;
+            }
+        }
     }
 
     /**
