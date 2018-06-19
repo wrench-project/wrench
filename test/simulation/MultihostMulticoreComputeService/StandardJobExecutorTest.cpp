@@ -56,6 +56,10 @@ public:
       return ((variable > base) && (variable < base + EPSILON));
     }
 
+    static bool isJustABitGreaterThanOrEqual(double base, double variable) {
+        return ((variable >= base) && (variable < base + EPSILON));
+    }
+
 protected:
     StandardJobExecutorTest() {
 
@@ -623,9 +627,11 @@ private:
         }
 
         // Doe the task-stored time information look good
-        if (!StandardJobExecutorTest::isJustABitGreater(before, task->getStartDate())) {
+        if (!StandardJobExecutorTest::isJustABitGreaterThanOrEqual(before, task->getStartDate())) {
+          std::cerr << "START: " << task->getStartDate() << std::endl;
           throw std::runtime_error(
-                  "Case 1: Unexpected task start date: " + std::to_string(task->getStartDate()));
+                  "Case 1: Unexpected task start date: " + std::to_string(task->getStartDate()) + "| " +
+                  "before: " + std::to_string(before));
         }
 
         // Note that we have to subtract the last thread startup overhead (for file deletions)
