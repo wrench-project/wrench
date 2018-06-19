@@ -242,7 +242,8 @@ set(TEST_FILES
         test/simulation/FileRegistryTest.cpp
         test/simulation/JobManagerTest.cpp
         test/simulation/SimpleSimulationTest.cpp
-        test/simulation/SimulationOutputTest.cpp
+        test/simulation/simulation_output/SimulationOutputTest.cpp
+        test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
         test/simulation/ScratchSpaceTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
