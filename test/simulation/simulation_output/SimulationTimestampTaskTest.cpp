@@ -363,17 +363,17 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     }
 
     for (size_t i = 1; i < completions_trace.size(); ++i) {
-        double previous_start = std::floor(completions_trace.at(i-1)->getDate());
-        double current_start = std::floor(completions_trace.at(i)->getDate());
+        double previous_completion = std::floor(completions_trace.at(i-1)->getDate());
+        double current_completion = std::floor(completions_trace.at(i)->getDate());
 
-        ASSERT_DOUBLE_EQ(current_start - previous_start, 10.0);
+        ASSERT_DOUBLE_EQ(current_completion - previous_completion, 10.0);
     }
 
     for (size_t i = 1; i < failures_trace.size(); ++i) {
-        double previous_start = std::floor(failures_trace.at(i-1)->getDate());
-        double current_start = std::floor(failures_trace.at(i)->getDate());
+        double previous_failure = std::floor(failures_trace.at(i-1)->getDate());
+        double current_failure = std::floor(failures_trace.at(i)->getDate());
 
-        ASSERT_DOUBLE_EQ(current_start - previous_start, 10.0);
+        ASSERT_DOUBLE_EQ(current_failure - previous_failure, 10.0);
     }
 
     delete simulation;
