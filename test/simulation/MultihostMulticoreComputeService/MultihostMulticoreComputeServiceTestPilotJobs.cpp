@@ -248,7 +248,7 @@ private:
 
 
       // Try to forget it, which shouldn't work
-      success = true;
+      bool success = true;
       try {
         job_manager->forgetJob(pilot_job);
       } catch (wrench::WorkflowExecutionException &e) {
