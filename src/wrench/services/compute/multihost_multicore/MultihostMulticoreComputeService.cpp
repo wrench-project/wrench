@@ -286,7 +286,7 @@ namespace wrench {
       this->setProperties(this->default_property_values, std::move(property_list));
 
       // Validate that properties are correct
-      validateProperties();
+      this->validateProperties();
 
       // Set default and specified message payloads
       this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
@@ -1695,5 +1695,8 @@ namespace wrench {
 
       return;
     }
+
+
+
 
 };
