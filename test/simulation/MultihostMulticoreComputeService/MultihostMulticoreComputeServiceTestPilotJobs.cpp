@@ -231,17 +231,6 @@ private:
       // Forget it right now, which should be fine
       job_manager->forgetJob(pilot_job);
 
-      // Try to forget a bogus job
-      bool success = true;
-//      try {
-//        job_manager->forgetJob((wrench::PilotJob *)666);
-//      } catch (std::invalid_argument &e) {
-//        success = false;
-//      }
-//      if (success) {
-//        throw std::runtime_error("Did not get an exception while trying to forget a non-existing job");
-//      }
-
       // Create it again
       pilot_job = job_manager->createPilotJob(1, 1, 0, 3600);
 
