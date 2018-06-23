@@ -140,8 +140,6 @@ namespace wrench {
                               double ttl,
                               PilotJob *pj);
 
-        void validateProperties();
-
         std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
 
         // Core availabilities (for each hosts, how many cores and how many bytes of RAM are currently available on it)
