@@ -449,9 +449,6 @@ private:
         throw std::runtime_error("Should not be able to create a job with an empty task");
       }
 
-
-
-
       // Create a job with an empty vector of tasks (and no file copies)
       success = true;
       try {
