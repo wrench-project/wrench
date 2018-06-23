@@ -244,15 +244,23 @@ private:
 
 //      // Try to forget it, which shouldn't work
       bool success = true;
-//      try {
-//        job_manager->forgetJob(pilot_job);
-//      } catch (std::invalid_argument &e) {
-//        success = false;
-//      }
-//      if (success) {
-//        throw std::runtime_error(
-//                "Should not be able to forget the job!");
-//      }
+      try {
+        job_manager->forgetJob(pilot_job);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_CANNOT_BE_FORGOTTEN) {
+          throw std::runtime_error("Got and execption, but not of the expected JOB_CANNOT_BE_FORGOTTEN type");
+        }
+        auto real_cause = dynamic_cast<wrench::JobCannotBeForgotten *>(e.getCause().get());
+        if (real_cause->getJob() != pilot_job) {
+          throw std::runtime_error("Got an expected exception, but the failure cause does not point to the right job");
+        }
+        real_cause->toString(); // coverage
+      }
+      if (success) {
+        throw std::runtime_error(
+                "Should not be able to forget the job!");
+      }
 
 
       // Wait for the pilot job start
