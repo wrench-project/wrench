@@ -322,8 +322,6 @@ private:
                 "Unexpected exception while submitting standard job to pilot job: " + std::string(e.what()));
       }
 
-
-
       // Wait for the standard job completion
       try {
         event = this->getWorkflow()->waitForNextExecutionEvent();
