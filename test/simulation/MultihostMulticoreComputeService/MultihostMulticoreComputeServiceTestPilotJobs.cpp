@@ -228,6 +228,22 @@ private:
       // Create a pilot job that requires 1 host, 1 core per host, 0 bytes of RAM per host, and 1 hour
       wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0, 3600);
 
+      // Forget it right now, which should be fine
+      job_manager->forgetJob(pilot_job);
+
+      // Try to forget a bogus job
+      bool success = true;
+//      try {
+//        job_manager->forgetJob((wrench::PilotJob *)666);
+//      } catch (std::invalid_argument &e) {
+//        success = false;
+//      }
+//      if (success) {
+//        throw std::runtime_error("Did not get an exception while trying to forget a non-existing job");
+//      }
+
+      // Create it again
+      pilot_job = job_manager->createPilotJob(1, 1, 0, 3600);
 
       std::string job_type_as_string = pilot_job->getTypeAsString();
       if (job_type_as_string != "Pilot") {
@@ -242,8 +258,8 @@ private:
       }
 
 
-//      // Try to forget it, which shouldn't work
-      bool success = true;
+      // Try to forget it, which shouldn't work
+      success = true;
       try {
         job_manager->forgetJob(pilot_job);
       } catch (wrench::WorkflowExecutionException &e) {
@@ -357,6 +373,10 @@ private:
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
         }
       }
+
+      // Forget the pilot job
+      job_manager->forgetJob(pilot_job);
+
 
       // Shutdown the compute service
       this->test->compute_service->stop();
