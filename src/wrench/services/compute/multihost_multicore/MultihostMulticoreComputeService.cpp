@@ -285,6 +285,9 @@ namespace wrench {
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(property_list));
 
+      // Validate that properties are correct
+      validateProperties();
+
       // Set default and specified message payloads
       this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
@@ -385,7 +388,6 @@ namespace wrench {
 
       if (this->containing_pilot_job != nullptr) {
         /*** Clean up everything in the scratch space ***/
-//        WRENCH_INFO("CLEANING UP SCRATCH IN MULTIHOSTMULTICORECOMPUTE SERVICE");
         cleanUpScratch();
       }
 
@@ -1634,6 +1636,64 @@ namespace wrench {
           throw;
         }
       }
+    }
+
+    /**
+     * @brief Method to make sure that property specs are valid
+     *
+     * @throw std::invalid_argument
+     */
+    void MultihostMulticoreComputeService::validateProperties() {
+
+      bool success = true;
+
+      // Thread startup overhead
+      double thread_startup_overhead = 0;
+      success = true;
+      try {
+        thread_startup_overhead = this->getPropertyValueAsDouble(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+
+      if ((!success) or (thread_startup_overhead < 0)) {
+        throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
+                        this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD));
+      }
+
+      // Job selection policy
+      if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY) != "FCFS") {
+        throw std::invalid_argument("Invalid JOB_SELECTION_POLICY property specification: " +
+                        this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY));
+      }
+
+      // Resource allocation policy
+      if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY) != "aggressive") {
+        throw std::invalid_argument("Invalid RESOURCE_ALLOCATION_POLICY property specification: " +
+                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY));
+      }
+
+      // Core allocation algorithm
+      if ((this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) != "maximum") and
+          (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) != "minimum")) {
+        throw std::invalid_argument("Invalid TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM property specification: " +
+                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM));
+      }
+
+      // Task selection algorithm
+      if ((this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM) != "maximum_flops") and
+          (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM) != "maximum_minimum_cores")) {
+        throw std::invalid_argument("Invalid TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM property specification: " +
+                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM));
+      }
+
+      // Host selection algorithm
+      if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM) != "best_fit") {
+        throw std::invalid_argument("Invalid TASK_SCHEDULING_HOST_SELECTION_ALGORITHM property specification: " +
+                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM));
+      }
+
+      return;
     }
 
 };
