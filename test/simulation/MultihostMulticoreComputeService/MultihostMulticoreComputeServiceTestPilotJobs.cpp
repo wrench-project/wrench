@@ -159,14 +159,14 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_UnsupportedPilotJobs_test
 
   // Create A Storage Services
   ASSERT_NO_THROW(storage_service = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 100.0)));
+          new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               0,
-                                                               {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+          new wrench::MultihostMulticoreComputeService(hostname,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       0,
+                                                       {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms;
@@ -242,6 +242,18 @@ private:
       }
 
 
+//      // Try to forget it, which shouldn't work
+      bool success = true;
+//      try {
+//        job_manager->forgetJob(pilot_job);
+//      } catch (std::invalid_argument &e) {
+//        success = false;
+//      }
+//      if (success) {
+//        throw std::runtime_error(
+//                "Should not be able to forget the job!");
+//      }
+
 
       // Wait for the pilot job start
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -297,6 +309,8 @@ private:
                 "Unexpected exception while submitting standard job to pilot job: " + std::string(e.what()));
       }
 
+
+
       // Wait for the standard job completion
       try {
         event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -344,7 +358,7 @@ private:
       wrench::PilotJob *doomed = job_manager->createPilotJob(1, 2, 0, 3600);
 
       // Submit this other job
-      bool success = true;
+      success = true;
       try {
         job_manager->submitJob(doomed, this->test->compute_service);
       } catch (wrench::WorkflowExecutionException &e) {
@@ -388,19 +402,19 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
 
   // Create A Storage Services
   ASSERT_NO_THROW(storage_service = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 100.0)));
+          new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, 100.0,
-                                                               {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+          new wrench::MultihostMulticoreComputeService(hostname,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, 100.0,
+                                                       {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-                  new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(
-                          this,  {
+          new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutWaitForExpirationTestWMS(
+                  this,  {
                           compute_service
                   }, {
                           storage_service
@@ -540,19 +554,19 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
 
   // Create A Storage Services
   ASSERT_NO_THROW(storage_service = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 100.0)));
+          new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               100.0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+          new wrench::MultihostMulticoreComputeService(hostname,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       100.0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-                  new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(
-                          this,  {
+          new MultihostMulticoreComputeServiceOnePilotJobNoTimeoutShutdownServiceTestWMS(
+                  this,  {
                           compute_service
                   }, {
                           storage_service
@@ -650,19 +664,19 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
 
   // Create A Storage Services
   ASSERT_NO_THROW(storage_service = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 100.0)));
+          new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+          new wrench::MultihostMulticoreComputeService(hostname,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-                  new MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(
-                          this,  {
+          new MultihostMulticoreComputeServiceNonSubmittedPilotJobTerminationTestWMS(
+                  this,  {
                           compute_service
                   }, {
                           storage_service
@@ -810,19 +824,19 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
 
   // Create A Storage Services
   ASSERT_NO_THROW(storage_service = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 100.0)));
+          new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               100.0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+          new wrench::MultihostMulticoreComputeService(hostname,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       100.0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-                  new MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS(
-                          this,  {compute_service}, {storage_service}, hostname)));
+          new MultihostMulticoreComputeServiceIdlePilotJobTerminationTestWMS(
+                  this,  {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
@@ -978,19 +992,19 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
 
   // Create A Storage Services
   ASSERT_NO_THROW(storage_service = simulation->add(
-                  new wrench::SimpleStorageService(hostname, 100.0)));
+          new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               100.0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+          new wrench::MultihostMulticoreComputeService(hostname,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       100.0, {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-                  new MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(
-                          this,  {compute_service}, {storage_service}, hostname)));
+          new MultihostMulticoreComputeServiceNonIdlePilotJobTerminationTestWMS(
+                  this,  {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
