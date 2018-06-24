@@ -362,9 +362,7 @@ private:
       }
 
       // Forget the pilot job
-      // TODO: THIS BELOW WILL CAUSE A SEGFAULT DUE TO SCRATCH SPACE CLEANUP!
       job_manager->forgetJob(pilot_job);
-
 
       // Shutdown the compute service
       this->test->compute_service->stop();
