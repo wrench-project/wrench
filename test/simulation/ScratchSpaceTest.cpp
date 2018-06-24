@@ -41,6 +41,8 @@ public:
 
     void do_PartitionsTest_test();
 
+    void do_JobForgettingAndScratchSpaceCleanup_test();
+
 protected:
     ScratchSpaceTest() {
 
@@ -1016,7 +1018,7 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
           new ScratchNonScratchPartitionsTestWMS(this, {compute_service}, {storage_service1}, hostname)));
 
 
-  wrench::Workflow *workflow = new wrench::Workflow();
+  auto workflow = new wrench::Workflow();
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
