@@ -386,10 +386,7 @@ namespace wrench {
         while (this->dispatchNextPendingJob());
       }
 
-      if (this->containing_pilot_job != nullptr) {
-        /*** Clean up everything in the scratch space ***/
-        cleanUpScratch();
-      }
+
 
       WRENCH_INFO("Multicore Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
@@ -798,11 +795,22 @@ namespace wrench {
 
       if (auto msg = dynamic_cast<ServiceTTLExpiredMessage *>(message.get())) {
         WRENCH_INFO("My TTL has expired, terminating and perhaps notify a pilot job submitted");
+        if (this->containing_pilot_job != nullptr) {
+          /*** Clean up everything in the scratch space ***/
+          cleanUpScratch();
+        }
+
         this->terminate(true);
+
         return false;
 
       } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (this->containing_pilot_job != nullptr) {
+          /*** Clean up everything in the scratch space ***/
+          cleanUpScratch();
+        }
         this->terminate(false);
+
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
