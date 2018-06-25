@@ -54,7 +54,7 @@ namespace wrench {
         throw std::invalid_argument("StorageService::stageFile(): Invalid arguments");
       }
 
-      if (!simgrid::s4u::this_actor::isMaestro()) {
+      if (!simgrid::s4u::this_actor::is_maestro()) {
         throw std::runtime_error("StorageService::stageFile(): Can only be called before the simulation starts");
       }
 

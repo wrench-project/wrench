@@ -545,10 +545,10 @@ namespace wrench {
           std::shared_ptr<ComputeService> cs = std::get<1>((*it).second);
           simgrid::s4u::Host *dest_pm = simgrid::s4u::Host::by_name_or_null(dest_pm_hostname);
 
-          double mig_sta = simgrid::s4u::Engine::getClock();
+          double mig_sta = simgrid::s4u::Engine::get_clock();
           sg_vm_migrate(vm->get(), dest_pm);
-          double mig_end = simgrid::s4u::Engine::getClock();
-          WRENCH_INFO("%s migrated: %s to %g s", vm_hostname.c_str(), dest_pm->getName().c_str(), mig_end - mig_sta);
+          double mig_end = simgrid::s4u::Engine::get_clock();
+          WRENCH_INFO("%s migrated: %s to %g s", vm_hostname.c_str(), dest_pm->get_cname(), mig_end - mig_sta);
 
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
@@ -764,7 +764,7 @@ namespace wrench {
 
       WRENCH_INFO("Stopping Virtualized Cluster Service");
       for (auto &vm : this->vm_list) {
-        this->cs_available_ram[(std::get<0>(vm.second))->getPm()->getName()] += S4U_Simulation::getHostMemoryCapacity(
+        this->cs_available_ram[(std::get<0>(vm.second))->getPm()->get_name()] += S4U_Simulation::getHostMemoryCapacity(
                 std::get<0>(vm));
         std::get<1>(vm.second)->stop();
         std::get<0>(vm.second)->stop();

@@ -11,6 +11,7 @@
 #define WRENCH_NETWORKCONNECTION_H
 
 
+#include <memory>
 #include <string>
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
 #include <wrench/workflow/execution_events/FailureCause.h>

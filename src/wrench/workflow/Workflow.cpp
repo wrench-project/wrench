@@ -762,7 +762,7 @@ namespace wrench {
           makespan = -1.0;
           break;
         } else {
-          makespan = MAX(makespan, task->getEndDate());
+          makespan = std::max(makespan, task->getEndDate());
         }
       }
       return makespan;
