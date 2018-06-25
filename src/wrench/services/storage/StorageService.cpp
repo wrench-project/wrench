@@ -228,6 +228,14 @@ namespace wrench {
      */
     bool StorageService::lookupFile(WorkflowFile *file, std::string dst_partition) {
 
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
+
       // Empty partition means "/"
       if (dst_partition.empty()) {
         dst_partition = "/";
