@@ -30,7 +30,7 @@ namespace wrench {
     std::unique_ptr<SimulationMessage> S4U_PendingCommunication::wait() {
 
       try {
-        if (this->comm_ptr->getState() != finished) {
+        if (this->comm_ptr->get_state() !=  simgrid::s4u::Activity::State::FINISHED) {
           this->comm_ptr->wait();
         }
       } catch (xbt_ex &e) {

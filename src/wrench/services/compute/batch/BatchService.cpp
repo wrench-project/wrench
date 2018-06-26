@@ -763,7 +763,7 @@ namespace wrench {
             if (num_available_cores < cores_per_node) {
               continue;
             }
-            unsigned long tentative_target_num_cores = MIN(num_available_cores, cores_per_node);
+            unsigned long tentative_target_num_cores = std::min(num_available_cores, cores_per_node);
             unsigned long tentative_target_slack =
                     num_available_cores - tentative_target_num_cores;
 
@@ -1875,9 +1875,9 @@ namespace wrench {
 
       // Update core availabilities for jobs that are currently running
       for (auto job : this->running_jobs) {
-        double time_to_finish = MAX(0, job->getBeginTimeStamp() +
-                                       job->getAllocatedTime() -
-                                       this->simulation->getCurrentSimulatedDate());
+        double time_to_finish =  std::max(0.0, job->getBeginTimeStamp() +
+                                          job->getAllocatedTime() -
+                                          this->simulation->getCurrentSimulatedDate());
         for (auto resource : job->getResourcesAllocated()) {
           std::string hostname = std::get<0>(resource);
           unsigned long num_cores = std::get<1>(resource);

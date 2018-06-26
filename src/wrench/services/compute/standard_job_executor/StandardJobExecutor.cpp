@@ -451,7 +451,7 @@ namespace wrench {
 
 //            std::cerr << "    HOST COULD WORK \n";
 
-            unsigned long tentative_target_num_cores = MIN(num_available_cores, desired_num_cores);
+            unsigned long tentative_target_num_cores = std::min(num_available_cores, desired_num_cores);
             unsigned long tentative_target_slack = num_available_cores - tentative_target_num_cores;
 
             if ((target_host == "") ||

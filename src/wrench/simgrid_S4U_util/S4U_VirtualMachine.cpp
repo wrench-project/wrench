@@ -29,7 +29,7 @@ namespace wrench {
                                                   num_cores,
                                                   ram_memory);
 
-      this->vm->setRamsize(ram_memory);
+      this->vm->set_ramsize(ram_memory);
       this->vm->start();
     }
 
@@ -47,7 +47,7 @@ namespace wrench {
      * @return a pointer to the physical machine host
      */
     simgrid::s4u::Host *S4U_VirtualMachine::getPm() {
-      return this->vm->getPm();
+      return this->vm->get_pm();
     }
 
     /**
