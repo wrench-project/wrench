@@ -10,14 +10,37 @@
 #ifndef WRENCH_SIMULATIONTIMESTAMPTYPES_H
 #define WRENCH_SIMULATIONTIMESTAMPTYPES_H
 
+#include "wrench/workflow/WorkflowTask.h"
+
 namespace wrench {
 
     class WorkflowTask;
 
+    class SimulationTimestampType {
+    public:
+        SimulationTimestampType() {
+            this->date = S4U_Simulation::getClock();
+        }
+
+        double getDate() {
+            return this->date;
+        }
+
+        SimulationTimestampType *getEndpoint() {
+            return this->endpoint;
+        }
+
+    protected:
+        SimulationTimestampType *endpoint = nullptr;
+
+    private:
+        double date = -1.0;
+    };
+
     /**
     * @brief A base class for simulation timestamps regarding workflow tasks
     */
-    class SimulationTimestampTask {
+    class SimulationTimestampTask : public SimulationTimestampType {
 
     public:
 
@@ -51,6 +74,18 @@ namespace wrench {
         }
 
 
+    protected:
+        static std::map<std::string, SimulationTimestampTask* const&> pending_task_timestamps;
+
+        void setEndpoints(WorkflowTask *task) {
+            auto pending_tasks_itr = pending_task_timestamps.find(task->getID());
+            if (pending_tasks_itr != pending_task_timestamps.end()) {
+                (*pending_tasks_itr).second->endpoint = this;
+                this->endpoint = (*pending_tasks_itr).second->endpoint;
+                pending_task_timestamps.erase(pending_tasks_itr);
+            }
+        }
+
     private:
         WorkflowTask *task;
     };
@@ -58,21 +93,21 @@ namespace wrench {
     class SimulationTimestampTaskStart : public SimulationTimestampTask {
     public:
         SimulationTimestampTaskStart(WorkflowTask *task) : SimulationTimestampTask(task) {
-
+            pending_task_timestamps.insert(std::make_pair(task->getID(), this));
         }
     };
 
     class SimulationTimestampTaskFailure : public SimulationTimestampTask {
     public:
-        SimulationTimestampTaskFailure(WorkflowTask *task) : SimulationTimestampTask(task) {
-
+        SimulationTimestampTaskFailure(WorkflowTask *task) : SimulationTimestampTask(task){
+            setEndpoints(task);
         }
     };
 
     class SimulationTimestampTaskCompletion : public SimulationTimestampTask {
     public:
         SimulationTimestampTaskCompletion(WorkflowTask *task) : SimulationTimestampTask(task) {
-
+            setEndpoints(task);
         }
     };
 

@@ -141,23 +141,23 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     /*
      * expected timeline: task1_start...task1_end...task2_start...task2_end
-     * WorkflowTask member variables start_date and end_date should equal SimulationTimestamp<SimulationTimestampTaskStart>::getDate()
-     * and SimulationTimestamp<SimulationTimestampTaskCompletion>::getDate() respectively
+     * WorkflowTask member variables start_date and end_date should equal SimulationTimestamp<SimulationTimestampTaskStart>::getContent()->getDate()
+     * and SimulationTimestamp<SimulationTimestampTaskCompletion>::getContent()->getDate() respectively
      */
     auto timestamp_start_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskStart>();
     double task1_start_date = this->task1->getStartDate();
-    double task1_start_timestamp = timestamp_start_trace[0]->getDate();
+    double task1_start_timestamp = timestamp_start_trace[0]->getContent()->getDate();
 
     ASSERT_DOUBLE_EQ(task1_start_date, task1_start_timestamp);
 
     auto timestamp_completion_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     double task1_completion_date = this->task1->getEndDate();
-    double task1_completion_timestamp = timestamp_completion_trace[0]->getDate();
+    double task1_completion_timestamp = timestamp_completion_trace[0]->getContent()->getDate();
 
     ASSERT_DOUBLE_EQ(task1_completion_date, task1_completion_timestamp);
 
-    double task2_start_timestamp = timestamp_start_trace[1]->getDate();
-    double task2_completion_timestamp = timestamp_completion_trace[1]->getDate();
+    double task2_start_timestamp = timestamp_start_trace[1]->getContent()->getDate();
+    double task2_completion_timestamp = timestamp_completion_trace[1]->getContent()->getDate();
 
     ASSERT_GT(task2_start_timestamp, task1_start_timestamp);
     ASSERT_GT(task2_completion_timestamp, task1_completion_timestamp);
@@ -167,9 +167,9 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
      */
 
     auto timestamp_failure_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
-    double failed_task_start_timestamp = timestamp_start_trace[2]->getDate();
+    double failed_task_start_timestamp = timestamp_start_trace[2]->getContent()->getDate();
     double failed_task_end_date = this->failed_task->getEndDate();
-    double failed_task_failure_timestamp = timestamp_failure_trace[0]->getDate();
+    double failed_task_failure_timestamp = timestamp_failure_trace[0]->getContent()->getDate();
 
     ASSERT_GT(failed_task_start_timestamp, task2_completion_timestamp);
     ASSERT_GT(failed_task_failure_timestamp, failed_task_start_timestamp);
@@ -244,7 +244,7 @@ private:
             this->test->failed_task->setInternalState(wrench::WorkflowTask::InternalState::TASK_RUNNING);
 
             /*
-             * SimulationTimestampTaskFailure::getDate() should be 10s after the start time of the task.
+             * SimulationTimestampTaskFailure::getContent()->getDate() should be 10s after the start time of the task.
              */
             wrench::S4U_Simulation::sleep(10);
             this->test->failed_task->setInternalState(wrench::WorkflowTask::InternalState::TASK_FAILED);
@@ -295,19 +295,19 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     auto failures_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
 
 /*    for (auto &s : starts) {
-        std::cerr << std::setw(15) << s->getContent()->getTask()->getID() << std::setw(15) << s->getDate() << std::endl;
+        std::cerr << std::setw(15) << s->getContent()->getTask()->getID() << std::setw(15) << s->getContent()->getDate() << std::endl;
     }
 
     std::cerr << " " << std::endl;
 
     for (auto &c : completions) {
-        std::cerr << std::setw(15) << c->getContent()->getTask()->getID() << std::setw(15) << c->getDate() << std::endl;
+        std::cerr << std::setw(15) << c->getContent()->getTask()->getID() << std::setw(15) << c->getContent()->getDate() << std::endl;
     }
 
     std::cerr << " " << std::endl;
 
     for (auto &f: failures) {
-        std::cerr << std::setw(15) << f->getContent()->getTask()->getID() << std::setw(15) << f->getDate() << std::endl;
+        std::cerr << std::setw(15) << f->getContent()->getTask()->getID() << std::setw(15) << f->getContent()->getDate() << std::endl;
     }*/
 
 
@@ -356,22 +356,22 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
      * There should be about a 10s difference in each of the dates in each trace.
      */
     for (size_t i = 1; i < starts_trace.size(); ++i) {
-        double previous_start = std::floor(starts_trace.at(i-1)->getDate());
-        double current_start = std::floor(starts_trace.at(i)->getDate());
+        double previous_start = std::floor(starts_trace.at(i-1)->getContent()->getDate());
+        double current_start = std::floor(starts_trace.at(i)->getContent()->getDate());
 
         ASSERT_DOUBLE_EQ(current_start - previous_start, 10.0);
     }
 
     for (size_t i = 1; i < completions_trace.size(); ++i) {
-        double previous_completion = std::floor(completions_trace.at(i-1)->getDate());
-        double current_completion = std::floor(completions_trace.at(i)->getDate());
+        double previous_completion = std::floor(completions_trace.at(i-1)->getContent()->getDate());
+        double current_completion = std::floor(completions_trace.at(i)->getContent()->getDate());
 
         ASSERT_DOUBLE_EQ(current_completion - previous_completion, 10.0);
     }
 
     for (size_t i = 1; i < failures_trace.size(); ++i) {
-        double previous_failure = std::floor(failures_trace.at(i-1)->getDate());
-        double current_failure = std::floor(failures_trace.at(i)->getDate());
+        double previous_failure = std::floor(failures_trace.at(i-1)->getContent()->getDate());
+        double current_failure = std::floor(failures_trace.at(i)->getContent()->getDate());
 
         ASSERT_DOUBLE_EQ(current_failure - previous_failure, 10.0);
     }
