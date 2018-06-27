@@ -120,6 +120,14 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
+      // Get the scheduler pointers just for coverage
+      if (this->getPilotJobScheduler() != nullptr) {
+        throw std::runtime_error("getPilotJobScheduler() should return nullptr");
+      }
+      if (this->getStandardJobScheduler() != nullptr) {
+        throw std::runtime_error("getStandardJobScheduler() should return nullptr");
+      }
+
       // Get a file registry service
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
