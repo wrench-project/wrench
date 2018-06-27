@@ -12,4 +12,6 @@
 
 namespace wrench {
 
+    std::map<std::string, SimulationTimestampTask* const&> SimulationTimestampTask::pending_task_timestamps;
+
 };

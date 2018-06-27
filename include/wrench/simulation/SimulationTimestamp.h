@@ -28,15 +28,6 @@ namespace wrench {
     public:
 
         /**
-         * Retrieve the timestamp's date
-         *
-         * @return the date (as a number of seconds since the beginning of the simulation)
-         */
-        double getDate() {
-          return this->date;
-        }
-
-        /**
          * Retrieve the timestamp's content
          *
          * @return a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
@@ -56,22 +47,18 @@ namespace wrench {
         SimulationTimestamp(T *content) {
           // TODO: Make content a unique_ptr to make memory management better
           this->content = content;
-          this->date = S4U_Simulation::getClock();
         }
 
         /***********************/
         /** \endcond           */
         /***********************/
 
-
         ~SimulationTimestamp() {
           delete this->content;
         }
 
     private:
-        double date = -1.0;
         T *content;
-
     };
 
 };
