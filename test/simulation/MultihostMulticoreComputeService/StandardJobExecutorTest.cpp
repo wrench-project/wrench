@@ -1742,7 +1742,7 @@ private:
 
         double observed_duration = after - before;
 
-        double expected_duration = MAX(task1->getFlops() / 6, task2->getFlops() / 4);
+        double expected_duration = std::max(task1->getFlops() / 6, task2->getFlops() / 4);
 
         // Does the overall completion time make sense?
         if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
@@ -1830,7 +1830,7 @@ private:
 
         double observed_duration = after - before;
 
-        double expected_duration = MAX(task1->getFlops() / 6, task2->getFlops() / 4) +
+        double expected_duration = std::max(task1->getFlops() / 6, task2->getFlops() / 4) +
                                    task3->getFlops() / (task3->getParallelEfficiency() * 10);
 
         // Does the job completion time make sense?
@@ -2020,7 +2020,7 @@ public:
 
         double observed_duration = after - before;
 
-        double expected_duration = MAX(task1->getFlops() / 6, task2->getFlops() / 6);
+        double expected_duration = std::max(task1->getFlops() / 6, task2->getFlops() / 6);
 
         // Does the task completion time make sense?
         if (!StandardJobExecutorTest::isJustABitGreater(expected_duration, observed_duration)) {
@@ -2112,7 +2112,7 @@ public:
 
         double observed_duration = after - before;
 
-        double expected_duration = MAX(MAX(MAX(task1->getFlops() / 6, task2->getFlops() / 2), task4->getFlops() / 2),
+        double expected_duration = std::max(std::max(std::max(task1->getFlops() / 6, task2->getFlops() / 2), task4->getFlops() / 2),
                                        task3->getFlops() / 8);
 
         // Does the overall completion time make sense?
