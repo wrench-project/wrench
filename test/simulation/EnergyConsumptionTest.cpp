@@ -37,10 +37,7 @@ public:
     std::unique_ptr<wrench::Workflow> workflow;
 
 protected:
-    EnergyConsumptionTest() {
-
-      // Create the simplest workflow
-      workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    EnergyConsumptionTest():workflow(std::unique_ptr<wrench::Workflow>(new wrench::Workflow())) {
 
       // Create a four-host 1-core platform file along with different pstates
       std::string xml = "<?xml version='1.0'?>"
@@ -364,7 +361,7 @@ private:
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
           std::string error_msg = cause->toString();
-          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + error_msg);
         }
 
         // Did we get the expected message?
