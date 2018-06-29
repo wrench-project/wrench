@@ -19,12 +19,12 @@ namespace wrench {
           workflow = new Workflow();
 
           // create simple diamond workflow
-          t1 = workflow->addTask("task-test-01", 100);
-          t2 = workflow->addTask("task-test-02", 200);
-          t3 = workflow->addTask("task-test-03", 100);
-          t4 = workflow->addTask("task-test-04", 200);
-          t5 = workflow->addTask("task-test-05", 100);
-          t6 = workflow->addTask("task-test-06", 100);
+          t1 = workflow->addTask("task-test-01", 100, 1, 1, 1.0, 0);
+          t2 = workflow->addTask("task-test-02", 200, 1, 1, 1.0, 0);
+          t3 = workflow->addTask("task-test-03", 100, 1, 1, 1.0, 0);
+          t4 = workflow->addTask("task-test-04", 200, 1, 1, 1.0, 0);
+          t5 = workflow->addTask("task-test-05", 100, 1, 1, 1.0, 0);
+          t6 = workflow->addTask("task-test-06", 100, 1, 1, 1.0, 0);
 
           workflow->addControlDependency(t1, t2);
           workflow->addControlDependency(t1, t3);
@@ -51,16 +51,16 @@ namespace wrench {
       tasks.push_back(t5);
       tasks.push_back(t6);
 
-      EXPECT_EQ(600, scheduler->getFlops(this->workflow, tasks));
+      ASSERT_EQ(600, scheduler->getFlops(this->workflow, tasks));
 
       tasks.erase(std::remove(tasks.begin(), tasks.end(), t1), tasks.end());
-      EXPECT_EQ(500, scheduler->getFlops(this->workflow, tasks));
+      ASSERT_EQ(500, scheduler->getFlops(this->workflow, tasks));
 
       tasks.erase(std::remove(tasks.begin(), tasks.end(), t2), tasks.end());
-      EXPECT_EQ(300, scheduler->getFlops(this->workflow, tasks));
+      ASSERT_EQ(300, scheduler->getFlops(this->workflow, tasks));
 
       tasks.erase(std::remove(tasks.begin(), tasks.end(), t4), tasks.end());
-      EXPECT_EQ(300, scheduler->getFlops(this->workflow, tasks));
+      ASSERT_EQ(300, scheduler->getFlops(this->workflow, tasks));
     }
 
     TEST_F(CriticalPathSchedulerTest, GetMaxParallelization) {
@@ -69,15 +69,15 @@ namespace wrench {
 
       std::set<WorkflowTask *> tasks = {t1};
 
-      EXPECT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
+      ASSERT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
 
       tasks = {t2, t3};
-      EXPECT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
+      ASSERT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
 
       tasks = {t2};
-      EXPECT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
+      ASSERT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
 
       tasks = {t3};
-      EXPECT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
+      ASSERT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
     }
 }

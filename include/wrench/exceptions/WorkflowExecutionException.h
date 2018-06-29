@@ -59,14 +59,14 @@ namespace wrench {
 				/***********************/
 
 
-
-				/**
-				 * @brief Constructor
-				 * @param cause: the cause of the failure
-				 */
-				WorkflowExecutionException(FailureCause *cause) {
-					this->cause = std::shared_ptr<FailureCause>(cause);
-				}
+//
+//				/**
+//				 * @brief Constructor
+//				 * @param cause: the cause of the failure
+//				 */
+//				WorkflowExecutionException(FailureCause *cause) {
+//					this->cause = std::shared_ptr<FailureCause>(cause);
+//				}
 
 				/**
 				 * @brief Constructor

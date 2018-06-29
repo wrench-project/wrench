@@ -112,12 +112,12 @@ private:
 
       num_cores = this->test->compute_service1->getNumCores();
       if ((num_cores.size() != 2) or (num_cores[0] != 4) or (num_cores[1] != 4)) {
-        throw std::runtime_error("getNumCores() should return {4,4} for compute service #1");
+        throw std::runtime_error("getHostNumCores() should return {4,4} for compute service #1");
       }
 
       num_cores = this->test->compute_service2->getNumCores();
       if ((num_cores.size() != 2) or (num_cores[0] != 8) or (num_cores[1] != 8)) {
-        throw std::runtime_error("getNumCores() should return {8,8} for compute service #1");
+        throw std::runtime_error("getHostNumCores() should return {8,8} for compute service #1");
       }
 
       // Get Ram capacities
@@ -147,8 +147,8 @@ private:
       }
 
       // Create a job that will use cores on compute service #1
-      wrench::WorkflowTask *t1 = this->workflow->addTask("task1", 60.0000, 3, 3, 1.0);
-      wrench::WorkflowTask *t2 = this->workflow->addTask("task2", 60.0001, 2, 2, 1.0);
+      wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 60.0000, 3, 3, 1.0, 0);
+      wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 60.0001, 2, 2, 1.0, 0);
 
       std::vector<wrench::WorkflowTask *> tasks;
       tasks.push_back(t1);
@@ -168,14 +168,14 @@ private:
       }
 
       // Wait for the workflow execution event
-      std::unique_ptr<wrench::WorkflowExecutionEvent> event = workflow->waitForNextExecutionEvent();
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event = this->getWorkflow()->waitForNextExecutionEvent();
       if (event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION) {
         throw std::runtime_error("Unexpected workflow execution event!");
       }
 
 
-      workflow->removeTask(t1);
-      workflow->removeTask(t2);
+      this->getWorkflow()->removeTask(t1);
+      this->getWorkflow()->removeTask(t2);
 
       return 0;
     }
@@ -197,20 +197,20 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create 1 Compute Service that manages Host1 and Host2
-  EXPECT_NO_THROW(compute_service1 = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("Host1", true, true,
+  ASSERT_NO_THROW(compute_service1 = simulation->add(
+                  new wrench::MultihostMulticoreComputeService("Host1",
                                                                {{std::make_tuple("Host1", 4, wrench::ComputeService::ALL_RAM)},
-                                                                {std::make_tuple("Host2", 4, wrench::ComputeService::ALL_RAM)}}
+                                                                {std::make_tuple("Host2", 4, wrench::ComputeService::ALL_RAM)}}, 0
                   )));
 
   // Create 1 Compute Service that manages Host3 and Host4
-  EXPECT_NO_THROW(compute_service2 = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("Host1", true, true,
+  ASSERT_NO_THROW(compute_service2 = simulation->add(
+                  new wrench::MultihostMulticoreComputeService("Host1",
                                                                {{std::make_tuple("Host3", 8, wrench::ComputeService::ALL_RAM)},
-                                                                {std::make_tuple("Host4", 8, wrench::ComputeService::ALL_RAM)}}
+                                                                {std::make_tuple("Host4", 8, wrench::ComputeService::ALL_RAM)}}, 0
                   )));
   std::set<wrench::ComputeService *> compute_services;
   compute_services.insert(compute_service1);
@@ -218,13 +218,13 @@ void MultihostMulticoreComputeServiceTestResourceInformation::do_ResourceInforma
 
   // Create the WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new ResourceInformationTestWMS(
                   this,  compute_services, {}, "Host1")));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 

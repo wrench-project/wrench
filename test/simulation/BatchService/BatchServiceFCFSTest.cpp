@@ -96,7 +96,7 @@ private:
       wrench::WorkflowTask *tasks[8];
       wrench::StandardJob *jobs[8];
       for (int i=0; i < 8; i++) {
-        tasks[i] = this->workflow->addTask("task" + std::to_string(i), 60, 1, 1, 1.0);
+        tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
         jobs[i] = job_manager->createStandardJob(tasks[i], {});
       }
 
@@ -160,7 +160,7 @@ private:
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
         try {
-          event = this->workflow->waitForNextExecutionEvent();
+          event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
         }
@@ -180,7 +180,7 @@ private:
         double delta = fabs(actual_completion_times[i] - expected_completion_times[i]);
         if (delta > EPSILON) {
           throw std::runtime_error("Unexpected job completion time for the job containing task " +
-                                   tasks[i]->getId() +
+                                   tasks[i]->getID() +
                                    ": " +
                                    std::to_string(actual_completion_times[i]) +
                                    "(expected: " +
@@ -212,30 +212,30 @@ void BatchServiceFCFSTest::do_SimpleFCFS_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "Host1";
 
   // Create a Batch Service with a FCFS scheduling algorithm
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleFCFSTestWMS(
                   this,  {compute_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -274,7 +274,7 @@ private:
       wrench::WorkflowTask *tasks[9];
       wrench::StandardJob *jobs[9];
       for (int i=0; i < 9; i++) {
-        tasks[i] = this->workflow->addTask("task" + std::to_string(i), 60, 1, 1, 1.0);
+        tasks[i] = this->getWorkflow()->addTask("task" + std::to_string(i), 60, 1, 1, 1.0, 0);
         jobs[i] = job_manager->createStandardJob(tasks[i], {});
       }
 
@@ -397,30 +397,30 @@ void BatchServiceFCFSTest::do_SimpleFCFSQueueWaitTimePrediction_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "Host1";
 
   // Create a Batch Service with a FCFS scheduling algorithm
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"}})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleFCFSQueueWaitTimePredictionWMS(
                   this,  {compute_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -477,6 +477,7 @@ private:
           throw std::runtime_error("Got expected exception and cause type, but functionality name is wrong (" +
           real_cause->getFunctionalityName() + ")");
         }
+        WRENCH_INFO("toString: %s", real_cause->toString().c_str());  // for coverage
 
       }
 
@@ -507,17 +508,17 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("batch_service_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "Host1";
 
   // Create a Batch Service with a FCFS scheduling algorithm
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, true, true, {"Host1", "Host2", "Host3", "Host4"},
+          new wrench::BatchService(hostname, {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM, "FCFS"},
                                     {wrench::BatchServiceProperty::HOST_SELECTION_ALGORITHM, "BESTFIT"}})));
 
@@ -525,13 +526,13 @@ void BatchServiceFCFSTest::do_BrokenQueueWaitTimePrediction_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new BrokenQueueWaitTimePredictionWMS(
                   this,  {compute_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 

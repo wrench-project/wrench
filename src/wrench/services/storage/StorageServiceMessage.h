@@ -26,7 +26,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level StorageServiceMessage class
+     * @brief Top-level class for messages received/sent by a StorageService
      */
     class StorageServiceMessage : public ServiceMessage {
     protected:
@@ -35,7 +35,7 @@ namespace wrench {
 
 
     /**
-     * @brief StorageServiceFreeSpaceRequestMessage class
+     * @brief A message sent to a StorageService to enquire about its free space
      */
     class StorageServiceFreeSpaceRequestMessage : public StorageServiceMessage {
     public:
@@ -45,7 +45,7 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFreeSpaceAnswerMessage class
+     * @brief A message sent by a StorageService in answer to a free space enquiry
      */
     class StorageServiceFreeSpaceAnswerMessage : public StorageServiceMessage {
     public:
@@ -56,20 +56,22 @@ namespace wrench {
     };
 
     /**
-    * @brief StorageServiceFileLookupRequestMessage class
+    * @brief A message sent to a StorageService to lookup a file
     */
     class StorageServiceFileLookupRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
+        StorageServiceFileLookupRequestMessage(std::string answer_mailbox, WorkflowFile *file, std::string& dst_partition, double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The file to lookup */
         WorkflowFile *file;
+        /** @brief The file partition where to lookup the file for */
+        std::string dst_partition;
     };
 
     /**
-     * @brief StorageServiceFileLookupAnswerMessage class
+     * @brief A message sent by a StorageService in answer to a file lookup request
      */
     class StorageServiceFileLookupAnswerMessage : public StorageServiceMessage {
     public:
@@ -82,22 +84,25 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFileDeleteRequestMessage class
+     * @brief A message sent to a StorageService to delete a file
      */
     class StorageServiceFileDeleteRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileDeleteRequestMessage(std::string answer_mailbox,
                                                WorkflowFile *file,
+                                               std::string& dst_partition,
                                                double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The file to delete */
         WorkflowFile *file;
+        /** @brief The file partition from where the file will be deleted */
+        std::string dst_partition;
     };
 
     /**
-     * @brief StorageServiceFileDeleteAnswerMessage class
+     * @brief A message sent  by a StorageService in answer to a file deletion request
      */
     class StorageServiceFileDeleteAnswerMessage : public StorageServiceMessage {
     public:
@@ -118,12 +123,14 @@ namespace wrench {
     };
 
     /**
-    * @brief StorageServiceFileCopyRequestMessage class
+    * @brief A message sent to a StorageService to copy a file from another StorageService
     */
     class StorageServiceFileCopyRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
-                                             double payload, FileRegistryService *file_registry_service=nullptr);
+                                             std::string& src_partition, std::string& dst_partition,
+                                             FileRegistryService *file_registry_service,
+                                             double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
@@ -131,16 +138,21 @@ namespace wrench {
         WorkflowFile *file;
         /** @brief The storage service from which to copy the file */
         StorageService *src;
-        /** @brief The file registry service to use */
+        /** @brief The file partition from where the file will be copied */
+        std::string src_partition;
+        /** @brief The file partition inside the storage service where the file will be stored */
+        std::string dst_partition;
+        /** @brief The file registry service to update, or none if nullptr */
         FileRegistryService *file_registry_service;
     };
 
     /**
-     * @brief StorageServiceFileCopyAnswerMessage class
+     * @brief A message sent by a StorageService in answer to a file copy request
      */
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
         StorageServiceFileCopyAnswerMessage(WorkflowFile *file, StorageService *storage_service,
+                                            std::string dst_partition,
                                             FileRegistryService *file_registry_service,
                                             bool file_registry_service_updated,
                                             bool success, std::shared_ptr<FailureCause> cause,
@@ -148,8 +160,10 @@ namespace wrench {
 
         /** @brief The file was was copied, or not */
         WorkflowFile *file;
-        /** @brief The storage service that performed the copy */
+        /** @brief The storage service that performed the copy (i.e., which stored the file) */
         StorageService *storage_service;
+        /** @brief The destination partition */
+        std::string dst_partition;
         /** @brief The file registry service that the user had requested be updated, or nullptr if none */
         FileRegistryService *file_registry_service;
         /** @brief Whether a file registry service has been updated or not */
@@ -161,20 +175,22 @@ namespace wrench {
     };
 
     /**
-    * @brief StorageServiceFileWriteRequestMessage class
+    * @brief A message sent to a StorageService to write a file
     */
     class StorageServiceFileWriteRequestMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileWriteRequestMessage(std::string answer_mailbox, WorkflowFile *file, double payload);
+        StorageServiceFileWriteRequestMessage(std::string answer_mailbox, WorkflowFile *file, std::string& dst_partition, double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The file to write */
         WorkflowFile *file;
+        /** @brief The file partition to write the file to */
+        std::string dst_partition;
     };
 
     /**
-     * @brief StorageServiceFileWriteAnswerMessage class
+     * @brief  A message sent by a StorageService in answer to a file write request
      */
     class StorageServiceFileWriteAnswerMessage : public StorageServiceMessage {
     public:
@@ -198,13 +214,13 @@ namespace wrench {
     };
 
     /**
-     * @brief StorageServiceFileReadRequestMessage class
+     * @brief A message sent to a StorageService to read a file
      */
     class StorageServiceFileReadRequestMessage : public StorageServiceMessage {
     public:
         StorageServiceFileReadRequestMessage(std::string answer_mailbox,
                                              std::string mailbox_to_receive_the_file_content,
-                                             WorkflowFile *file, double payload);
+                                             WorkflowFile *file, std::string& src_partition, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
@@ -212,10 +228,12 @@ namespace wrench {
         std::string mailbox_to_receive_the_file_content;
         /** @brief The file to read */
         WorkflowFile *file;
+        /** @brief The source partition from which to read the file */
+        std::string src_partition;
     };
 
     /**
-     * @brief StorageServiceFileReadAnswerMessage class
+     * @brief A message sent by a StorageService in answer to a file read request
      */
     class StorageServiceFileReadAnswerMessage : public StorageServiceMessage {
     public:
@@ -236,7 +254,7 @@ namespace wrench {
     };
 
     /**
-    * @brief StorageServiceFileContentMessage class
+    * @brief A message sent/received by a StorageService that has a file size as a payload
     */
     class StorageServiceFileContentMessage : public StorageServiceMessage {
     public:

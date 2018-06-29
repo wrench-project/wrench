@@ -20,7 +20,7 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param string: the file name/id
+     * @param string: the file id
      * @param s: the file size
      */
     WorkflowFile::WorkflowFile(const std::string name, double s) :
@@ -30,7 +30,7 @@ namespace wrench {
 
     /**
      * @brief Get the file size
-     * @return  the file size in bytes
+     * @return a size in bytes
      */
     double WorkflowFile::getSize() {
       return this->size;
@@ -40,23 +40,23 @@ namespace wrench {
      * @brief Get the file id
      * @return the id
      */
-    std::string WorkflowFile::getId() {
+    std::string WorkflowFile::getID() {
       return this->id;
     }
 
     /**
      * @brief Define the task that outputs this file
      *
-     * @param task: a workflow task
+     * @param task: a task
      */
     void WorkflowFile::setOutputOf(WorkflowTask * const task) {
       this->output_of = task;
     }
 
     /**
-     * @brief Get the task the outputs this file
+     * @brief Get the task that outputs this file
      *
-     * @return a workflow task
+     * @return a task
      */
     WorkflowTask *WorkflowFile::getOutputOf() {
       return this->output_of;
@@ -65,24 +65,24 @@ namespace wrench {
     /**
      * @brief Add a task that uses this file as input
      *
-     * @param task: a workflow task
+     * @param task: a task
      */
     void WorkflowFile::setInputOf(WorkflowTask *task) {
-      this->input_of[task->getId()] = task;
+      this->input_of[task->getID()] = task;
     }
 
     /**
-     * @brief Get the set of tasks that use this file as input
+     * @brief Get the list of tasks that use this file as input
      *
-     * @return a map of workflow tasks
+     * @return a map of tasks index by task ids
      */
     std::map<std::string, WorkflowTask *> WorkflowFile::getInputOf() {
       return this->input_of;
     }
 
     /**
-     * @brief Retrieve the file's workflow
-     * @return the workflow
+     * @brief Get the workflow that this file is a part of
+     * @return a workflow
      */
     Workflow *WorkflowFile::getWorkflow() {
       return this->workflow;

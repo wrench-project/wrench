@@ -133,20 +133,20 @@ void JobManagerTest::do_JobManagerConstructorTest_test() {
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerConstructorTestWMS(
                   this, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -184,6 +184,17 @@ private:
 
       success = true;
       try {
+        job_manager->createStandardJob(nullptr, {});
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to create a standard job with a nullptr task in it");
+      }
+
+
+      success = true;
+      try {
         job_manager->createStandardJob((std::vector<wrench::WorkflowTask *>) {nullptr}, {});
       } catch (std::invalid_argument &e) {
         success = false;
@@ -194,7 +205,8 @@ private:
 
       success = true;
       try {
-        job_manager->createStandardJob({}, {});
+        std::vector<wrench::WorkflowTask *> tasks; // empty
+        job_manager->createStandardJob(tasks, {});
       } catch (std::invalid_argument &e) {
         success = false;
       }
@@ -222,9 +234,9 @@ private:
         throw std::runtime_error("Should not be able to create a standard job with a negative duration");
       }
 
-      wrench::WorkflowTask *t1 = workflow->addTask("t1", 1.0, 1, 1, 1.0, 0.0);
-      wrench::WorkflowTask *t2 = workflow->addTask("t2", 1.0, 1, 1, 1.0, 0.0);
-      wrench::WorkflowFile *f = workflow->addFile("f", 100);
+      wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("t1", 1.0, 1, 1, 1.0, 0.0);
+      wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("t2", 1.0, 1, 1, 1.0, 0.0);
+      wrench::WorkflowFile *f = this->getWorkflow()->addFile("f", 100);
       t1->addOutputFile(f);
       t2->addInputFile(f);
 
@@ -269,20 +281,20 @@ void JobManagerTest::do_JobManagerCreateJobTest_test() {
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerCreateJobTestWMS(
                   this, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 
@@ -377,21 +389,21 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
   simulation->init(&argc, argv);
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Submit a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerSubmitJobTestWMS(
                   this, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow.get()));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
 

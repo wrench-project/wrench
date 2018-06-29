@@ -22,18 +22,16 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level SimulationMessage class
+     * @brief Top-level class for messages received/sent by a Service
      */
     class ServiceMessage : public SimulationMessage {
-//    public:
-//      virtual ~ServiceMessage(){};
     protected:
         ServiceMessage(std::string name, double payload);
 
     };
 
     /**
-     * @brief ServiceStopDaemonMessage class
+     * @brief A message sent to a Service to request for it to terminate
      */
     class ServiceStopDaemonMessage : public ServiceMessage {
     public:
@@ -46,7 +44,7 @@ namespace wrench {
     };
 
     /**
-     * @brief ServiceDaemonStoppedMessage class
+     * @brief A message sent by a Service to acknowledge a terminate request
      */
     class ServiceDaemonStoppedMessage : public ServiceMessage {
     public:
@@ -55,7 +53,8 @@ namespace wrench {
 
 
     /**
-    * @brief ServiceTTLExpiredMessage class
+    * @brief A message sent to a Service to notify it that its time-to-live has expired (which will
+     *       cause the service to terminate)
     */
     class ServiceTTLExpiredMessage : public ServiceMessage {
     public:

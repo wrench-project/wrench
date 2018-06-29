@@ -51,7 +51,6 @@ namespace wrench {
             standard_job_scheduler(std::move(standard_job_scheduler)),
             pilot_job_scheduler(std::move(pilot_job_scheduler))
     {
-
       this->workflow = nullptr;
     }
 
@@ -76,7 +75,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Check whether the WMS has a deferred start simulation time
+     * @brief Check whether the WMS has a deferred start simulation time (likely the
+     *        first call in the main() routine of any WMS
      *
      * @throw std::runtime_error
      */
@@ -84,7 +84,7 @@ namespace wrench {
       if (S4U_Simulation::getClock() < this->start_time) {
 
         Alarm::createAndStartAlarm(this->simulation, this->start_time, this->hostname, this->mailbox_name,
-                                   new AlarmWMSDeferredStartMessage(this->mailbox_name, this->start_time, 0), "wms_start");
+                                   new AlarmWMSDeferredStartMessage(0), "wms_start");
 
         // Wait for a message
         std::unique_ptr<SimulationMessage> message = nullptr;
@@ -92,8 +92,6 @@ namespace wrench {
         try {
           message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
-          throw std::runtime_error(cause->toString());
-        } catch (std::shared_ptr<NetworkTimeout> &cause) {
           throw std::runtime_error(cause->toString());
         }
 
@@ -164,7 +162,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Wait for a workflow execution event and then call the associated function to process
+     * @brief Wait for a workflow execution event and then call the associated function to process that event
      *
      * @throw wrench::WorkflowExecutionException
      */
@@ -222,7 +220,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::STANDARD_JOB_FAILURE
+     * @brief Process a WorkflowExecutionEvent::STANDARD_JOB_FAILURE event
      *
      * @param event: a workflow execution event
      */
@@ -231,7 +229,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::PILOT_JOB_START
+     * @brief Process a WorkflowExecutionEvent::PILOT_JOB_START event
      *
      * @param event: a workflow execution event
      */
@@ -240,7 +238,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::PILOT_JOB_EXPIRATION
+     * @brief Process a WorkflowExecutionEvent::PILOT_JOB_EXPIRATION event
      *
      * @param event: a workflow execution event
      */
@@ -249,7 +247,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::FILE_COPY_COMPLETION
+     * @brief Process a WorkflowExecutionEvent::FILE_COPY_COMPLETION event
      *
      * @param event: a workflow execution event
      */
@@ -258,7 +256,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Process a WorkflowExecutionEvent::FILE_COPY_FAILURE
+     * @brief Process a WorkflowExecutionEvent::FILE_COPY_FAILURE event
      *
      * @param event: a workflow execution event
      */
@@ -267,7 +265,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the workflow to be executed by the WMS
+     * @brief Assign a workflow to the WMS
      * @param workflow: a workflow to execute
      * @param start_time: the simulated time when the WMS should start executed the workflow (0 if not specified)
      *
@@ -297,7 +295,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Instantiate a job manager
+     * @brief Instantiate and start a job manager
      * @return a job manager
      */
     std::shared_ptr<JobManager> WMS::createJobManager() {
@@ -309,7 +307,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Instantiate a data movement manager
+     * @brief Instantiate and start a data movement manager
      * @return a data movement manager
      */
     std::shared_ptr<DataMovementManager> WMS::createDataMovementManager() {
@@ -318,6 +316,22 @@ namespace wrench {
       data_movement_manager->simulation = this->simulation;
       data_movement_manager->start(data_movement_manager, true); // Always daemonize
       return data_movement_manager;
+    }
+
+    /** @brief Get the WMS's pilot scheduler
+     * 
+     * @return the pilot scheduler, or nullptr if none
+     */
+    PilotJobScheduler *WMS::getPilotJobScheduler() {
+      return (this->pilot_job_scheduler).get();
+    }
+
+    /** @brief Get the WMS's pilot scheduler
+     * 
+     * @return the pilot scheduler, or nullptr if none
+     */
+    StandardJobScheduler *WMS::getStandardJobScheduler() {
+      return (this->standard_job_scheduler).get();
     }
 
 };

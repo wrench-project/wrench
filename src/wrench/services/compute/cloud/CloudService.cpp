@@ -22,22 +22,22 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the hostname on which to start the service
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param execution_hosts: the hosts available for running virtual machines
-     * @param plist: a property list ({} means "use all defaults")
-     * @param scratch_size: the size for the scratch space of the cloud service
+     * @param execution_hosts: the list of the names of the hosts available for running virtual machines
+     * @param scratch_space_size: the size for the scratch storage pace of the cloud service
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
      * @throw std::runtime_error
      */
     CloudService::CloudService(const std::string &hostname,
-                               bool supports_standard_jobs,
-                               bool supports_pilot_jobs,
                                std::vector<std::string> &execution_hosts,
-                               std::map<std::string, std::string> plist,
-                               double scratch_size) :
-            VirtualizedClusterService(hostname, supports_standard_jobs, supports_pilot_jobs, execution_hosts,
-                                      plist, scratch_size) {}
+                               double scratch_space_size,
+                               std::map<std::string, std::string> property_list,
+                               std::map<std::string, std::string> messagepayload_list
+    ) :
+            VirtualizedClusterService(hostname, execution_hosts,
+                                      scratch_space_size,
+                                      std::move(property_list), std::move(messagepayload_list)) {}
 
     /**
      * @brief Main method of the daemon
@@ -46,7 +46,7 @@ namespace wrench {
      */
     int CloudService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
       WRENCH_INFO("Cloud Service starting on host %s listening on mailbox_name %s",
                   this->hostname.c_str(),
                   this->mailbox_name.c_str());

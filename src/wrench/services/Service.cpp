@@ -15,7 +15,7 @@
 #include "wrench/services/Service.h"
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/exceptions/WorkflowExecutionException.h"
-#include "wrench/services/ServiceProperty.h"
+#include "wrench/services/ServiceMessagePayload.h"
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
 
@@ -23,9 +23,8 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(service, "Log category for Service");
 namespace wrench {
 
     /**
-     * @brief Constructor that mostly calls the S4U_DaemonWithMailbox() constructor
-     *
-     * @param hostname: the name of the host on which the service runs
+     * @brief Constructor
+     * @param hostname: the name of the host on which the service will run
      * @param process_name_prefix: the prefix for the process name
      * @param mailbox_name_prefix: the prefix for the mailbox name
      */
@@ -48,6 +47,18 @@ namespace wrench {
     }
 
     /**
+    * @brief Set a message payload of the Service
+    * @param messagepayload: the message payload
+    * @param value: the message payload value
+    */
+    void Service::setMessagePayload(std::string messagepayload, std::string value) {
+      if (this->messagepayload_list.find(messagepayload) != this->messagepayload_list.end()) {
+        this->messagepayload_list[messagepayload] = value;
+      } else {
+        this->messagepayload_list.insert(std::make_pair(messagepayload, value));
+      }
+    }
+    /**
      * @brief Get a property of the Service as a string
      * @param property: the property
      * @return the property value as a string
@@ -62,6 +73,22 @@ namespace wrench {
       return this->property_list[property];
     }
 
+    /**
+     * @brief Get a message payload of the Service as a string
+     * @param message_payload: the message payload
+     * @return the message payload value as a string
+     *
+     * @throw std::invalid_argument
+     */
+    std::string Service::getMessagePayloadValueAsString(std::string message_payload) {
+      if (this->messagepayload_list.find(message_payload) == this->messagepayload_list.end()) {
+        throw std::invalid_argument("Service::getMessagePayloadValueAsString(): Cannot find value for message_payload " + message_payload +
+                                    " (perhaps a derived service class does not provide a default value?)");
+      }
+      return this->messagepayload_list[message_payload];
+    }
+
+    
     /**
      * @brief Get a property of the Service as a double
      * @param property: the property
@@ -86,9 +113,60 @@ namespace wrench {
     }
 
     /**
+     * @brief Get a message payload of the Service as a double
+     * @param message_payload: the message payload
+     * @return the message payload value as a double
+     *
+     * @throw std::invalid_argument
+     */
+    double Service::getMessagePayloadValueAsDouble(std::string message_payload) {
+      double value;
+      std::string string_value;
+      try {
+        string_value = this->getMessagePayloadValueAsString(message_payload);
+      } catch (std::invalid_argument &e) {
+        throw;
+      }
+      if ((sscanf(string_value.c_str(), "%lf", &value) != 1) || (value < 0)) {
+        throw std::invalid_argument(
+                "Service::getMessagePayloadValueAsDouble(): Invalid double message payload value " + message_payload + " " +
+                this->getMessagePayloadValueAsString(message_payload));
+      }
+      return value;
+    }
+
+
+
+    /**
+     * @brief Get a property of the Service as a boolean
+     * @param property: the property
+     * @return the property value as a boolean
+     *
+     * @throw std::invalid_argument
+     */
+    bool Service::getPropertyValueAsBoolean(std::string property) {
+      bool value;
+      std::string string_value;
+      try {
+        string_value = this->getPropertyValueAsString(property);
+      } catch (std::invalid_argument &e) {
+        throw;
+      }
+      if (string_value == "true") {
+        return true;
+      } else if (string_value == "false") {
+        return false;
+      } else {
+        throw std::invalid_argument(
+                "Service::getPropertyValueAsBoolean(): Invalid boolean property value " + property + " " +
+                this->getPropertyValueAsString(property));
+      }
+    }
+
+    /**
      * @brief Start the service
-     * @param this_service: a shared pointer to this service object
-     * @param daemonize: true if the daemon is to be truly daemonized, false otherwise
+     * @param this_service: a shared pointer to the service
+     * @param daemonize: true if the daemon is to be daemonized, false otherwise
      * 
      * @throw std::runtime_error
      */
@@ -123,7 +201,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ServiceStopDaemonMessage(
                                         ack_mailbox,
-                                        this->getPropertyValueAsDouble(ServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD)));
+                                        this->getMessagePayloadValueAsDouble(ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -134,8 +212,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(ack_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -150,7 +226,7 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the name of the host on which the service is running
+    * @brief Get the name of the host on which the service is / will be running
     * @return the hostname
     */
     std::string Service::getHostname() {
@@ -158,22 +234,22 @@ namespace wrench {
     }
 
     /**
-    * @brief Find out whether the service is UP
-    * @return true if the service is UP, false otherwise
+    * @brief Returns true if the service is UP, false otherwise
+    * @return true or false
     */
     bool Service::isUp() {
       return (this->state == Service::UP);
     }
 
     /**
-		 * @brief Set the state of the compute service to DOWN
+		 * @brief Set the state of the service to DOWN
 		 */
     void Service::setStateToDown() {
       this->state = Service::DOWN;
     }
 
     /**
-     * @brief Set default and user defined properties
+     * @brief Set default and user-defined properties
      * @param default_property_values: list of default properties
      * @param overridden_poperty_values: list of overridden properties (override the default)
      */
@@ -191,13 +267,31 @@ namespace wrench {
     }
 
     /**
+     * @brief Set default and user-defined message payloads
+     * @param default_messagepayload_values: list of default message payloads
+     * @param overridden_messagepayload_values: list of overridden message payloads (override the default)
+     */
+    void Service::setMessagePayloads(std::map<std::string, std::string> default_messagepayload_values,
+                                std::map<std::string, std::string> overridden_messagepayload_values) {
+      // Set default messagepayloads
+      for (auto const &p : default_messagepayload_values) {
+        this->setMessagePayload(p.first, p.second);
+      }
+
+      // Set specified messagepayloads (possible overwriting default ones)
+      for (auto const &p : overridden_messagepayload_values) {
+        this->setMessagePayload(p.first, p.second);
+      }
+    }
+
+    /**
      * @brief Check whether the service is properly configured and running
      *
      * @throws WorkflowExecutionException
      */
     void Service::serviceSanityCheck() {
       if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
     }
 

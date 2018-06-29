@@ -11,31 +11,30 @@
 #ifndef WRENCH_WORKFLOWEXECUTIONEVENT_H
 #define WRENCH_WORKFLOWEXECUTIONEVENT_H
 
-
 #include <string>
 #include "FailureCause.h"
 
-namespace wrench {
+/***********************/
+/** \cond DEVELOPER    */
+/***********************/
 
+namespace wrench {
 
     class WorkflowTask;
 
     class WorkflowFile;
 
     class StandardJob;
+
     class PilotJob;
 
     class ComputeService;
+
     class StorageService;
-    class FileRegistryService;
 
     class FileRegistryService;
 
-    class FailureCause;
-
-    /***********************/
-    /** \cond DEVELOPER    */
-    /***********************/
+    class FileRegistryService;
 
     /**
      * @brief A class to represent the various execution events that
@@ -66,27 +65,27 @@ namespace wrench {
         /** @brief The event type */
         WorkflowExecutionEvent::EventType type;
 
-        static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
 
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+        static std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent(std::string);
         virtual ~WorkflowExecutionEvent() = default;
-        /***********************/
-        /** \endcond           */
-        /***********************/
 
     protected:
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
+        /**
+         * @brief Constructor
+         *
+         * @param type: event type
+         */
         WorkflowExecutionEvent(EventType type) : type(type) {}
         /***********************/
         /** \endcond           */
         /***********************/
 
     };
+
 
     /**
      * @brief A "standard job has completed" WorkflowExecutionEvent
@@ -225,9 +224,9 @@ namespace wrench {
                   file_registry_service_updated(file_registry_service_updated) {}
 
     public:
-        /** @brief The worflow file that has successfully been copied */
+        /** @brief The workflow file that has successfully been copied */
         WorkflowFile *file;
-        /** @brief The storate service to which the file has been copied */
+        /** @brief The storage service to which the file has been copied */
         StorageService *storage_service;
         /** @brief The file registry service that was supposed to be updated (or nullptr if none) */
         FileRegistryService *file_registry_service;
@@ -269,14 +268,12 @@ namespace wrench {
 
     };
 
-
-
+};
 
 /***********************/
 /** \endcond           */
 /***********************/
 
-};
 
 
 #endif //WRENCH_WORKFLOWEXECUTIONEVENT_H

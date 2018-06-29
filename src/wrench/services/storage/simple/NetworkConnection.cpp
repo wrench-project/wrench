@@ -19,25 +19,24 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_data_connection, "Log catego
 
 namespace wrench {
 
-//    constexpr unsigned char NetworkConnection::INCOMING_DATA;
-//    constexpr unsigned char NetworkConnection::OUTGOING_DATA;
-//    constexpr unsigned char NetworkConnection::INCOMING_CONTROL;
 
     /**
-     * @brief: Constructor
+     * @brief Constructor
      * @param type: the type of connection
      *              - NetworkConnection::INCOMING_DATA
      *              - NetworkConnection::OUTGOING_DATA
      *              - NetworkConnection::INCOMING_CONTROL
      * @param file: the file (for DATA connection only)
+     * @param file_partition: the file partition inside the storage service where the file will be stored to/read from
      * @param mailbox: the mailbox: the mailbox for this connection
      * @param ack_mailbox: the mailbox to which an ack should be sent when the connection completes/fails
      */
-    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string mailbox, std::string ack_mailbox) {
+    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string file_partition, std::string mailbox, std::string ack_mailbox) {
       this->type = type;
       this->file = file;
       this->mailbox = mailbox;
       this->ack_mailbox = ack_mailbox;
+      this->file_partition = file_partition;
 
       if (this->mailbox.empty()) {
         throw std::invalid_argument("NetworkConnection::NetworkConnection(): empty mailbox_name");
@@ -68,7 +67,7 @@ namespace wrench {
       switch (this->type) {
         case NetworkConnection::INCOMING_DATA:
         WRENCH_INFO("Asynchronously receiving file %s...",
-                    this->file->getId().c_str());
+                    this->file->getID().c_str());
           try {
             this->comm = S4U_Mailbox::igetMessage(mailbox);
           } catch (std::shared_ptr<NetworkError> &cause) {
@@ -78,7 +77,7 @@ namespace wrench {
           break;
         case NetworkConnection::OUTGOING_DATA:
         WRENCH_INFO("Asynchronously sending file %s to mailbox_name %s...",
-                    this->file->getId().c_str(), this->mailbox.c_str() );
+                    this->file->getID().c_str(), this->mailbox.c_str() );
           try {
             this->comm = S4U_Mailbox::iputMessage(this->mailbox, new
                     StorageServiceFileContentMessage(this->file));
@@ -103,8 +102,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Determine whether the connection has failed
-     * @return true if failed
+     * @brief Returns true if the connection has failed, false otherwise
+     * @return true or false
      */
     bool NetworkConnection::hasFailed() {
       try {
@@ -112,9 +111,16 @@ namespace wrench {
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           if (this->type == NetworkConnection::OUTGOING_DATA) {
-            this->failure_cause = std::shared_ptr<FailureCause>(new NetworkError(NetworkError::SENDING, this->mailbox));
+            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, this->mailbox));
           } else {
-            this->failure_cause = std::shared_ptr<FailureCause>(new NetworkError(NetworkError::RECEIVING, this->mailbox));
+            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox));
+          }
+          return true;
+        } else if (e.category == timeout_error) {
+          if (this->type == NetworkConnection::OUTGOING_DATA) {
+            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, this->mailbox));
+          } else {
+            this->failure_cause = std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->mailbox));
           }
           return true;
         }
@@ -124,11 +130,11 @@ namespace wrench {
 
     /**
      * @brief Retrieve the message for a communication
-     * @return  the message, or nullptr if the connection has failed
+     * @return the message, or nullptr if the connection has failed
      */
     std::unique_ptr<SimulationMessage> NetworkConnection::getMessage() {
 
-      WRENCH_INFO("Getting the message from connection");
+      WRENCH_DEBUG("Getting the message from connection");
       if (this->type == NetworkConnection::OUTGOING_DATA) {
         throw std::runtime_error("NetworkConnection::getMessage(): Cannot be called on an outgoing connection");
       }

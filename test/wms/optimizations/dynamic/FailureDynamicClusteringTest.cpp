@@ -24,8 +24,8 @@ protected:
       t3 = workflow->addTask("task-test-03", 1);
       t4 = workflow->addTask("task-test-04", 1);
 
-      t2->setClusterId("cluster-01");
-      t3->setClusterId("cluster-01");
+      t2->setClusterID("cluster-01");
+      t3->setClusterID("cluster-01");
 
       workflow->addControlDependency(t1, t2);
       workflow->addControlDependency(t1, t3);
@@ -44,7 +44,7 @@ TEST_F(FailureDynamicClusteringTest, UngroupFailedTasks) {
   opt->process(workflow);
 
   // initial task state
-  EXPECT_EQ(workflow->getReadyTasks().size(), 1);
+  ASSERT_EQ(workflow->getReadyTasks().size(), 1);
 
   t1->setRunning();
   t1->setCompleted();
@@ -53,5 +53,5 @@ TEST_F(FailureDynamicClusteringTest, UngroupFailedTasks) {
   t2->incrementFailureCount();
 
   opt->process(workflow);
-  EXPECT_EQ(workflow->getReadyTasks().size(), 2);
+  ASSERT_EQ(workflow->getReadyTasks().size(), 2);
 }

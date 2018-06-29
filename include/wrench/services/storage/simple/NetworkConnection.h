@@ -25,8 +25,8 @@ namespace wrench {
 
     /**
      * @brief A helper class that implements a network connection abstraction to
-     *        be used by a service, e.g., that needs to limit its number of concurrent
-     *        connections
+     *        be used by a service, e.g., when the service needs to limit its number of concurrent
+     *        connections.
      */
     class NetworkConnection {
 
@@ -41,7 +41,7 @@ namespace wrench {
             INCOMING_CONTROL
         };
 
-        NetworkConnection(int type, WorkflowFile* file, std::string mailbox, std::string ack_mailbox);
+        NetworkConnection(int type, WorkflowFile* file, std::string file_partition, std::string mailbox, std::string ack_mailbox);
         bool start();
         bool hasFailed();
         std::unique_ptr<SimulationMessage> getMessage();
@@ -50,6 +50,8 @@ namespace wrench {
         int type;
         /** @brief: the file (for a DATA connection) */
         WorkflowFile *file;
+        /** @brief: the file partition inside the storage service where the file will be stored to/read from */
+        std::string file_partition;
         /** @brief: the mailbox for this connection */
         std::string mailbox;
         /** @brief The low-level pending communication */

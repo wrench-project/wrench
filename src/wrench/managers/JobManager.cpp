@@ -30,7 +30,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
 namespace wrench {
 
     /**
-     * @brief Constructor, which starts a job manager daemon
+     * @brief Constructor
      *
      * @param wms: the wms for which this manager is working
      */
@@ -80,17 +80,19 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param tasks: a vector of tasks (which must be either READY, or children of COMPLETED tasks or
+     * @param tasks: a list of tasks (which must be either READY, or children of COMPLETED tasks or
      *                                   of tasks also included in the standard job)
-     * @param file_locations: a map that specifies on which storage services input/output files should be read/written
-     *         (default storage is used otherwise, provided that the job is submitted to a compute service
-     *          for which that default was specified)
+     * @param file_locations: a map that specifies on which storage services input/output files should be read/written.
+     *         When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      * @param pre_file_copies: a set of tuples that specify which file copy operations should be completed
-     *                         before task executions begin
+     *                         before task executions begin. The ComputeService::SCRATCH constant can be
+     *                         used to mean "the scratch storage space of the ComputeService".
      * @param post_file_copies: a set of tuples that specify which file copy operations should be completed
-     *                         after task executions end
+     *                         after task executions end. The ComputeService::SCRATCH constant can be
+     *                         used to mean "the scratch storage space of the ComputeService".
      * @param cleanup_file_deletions: a set of file tuples that specify file deletion operations that should be completed
-     *                                at the end of the job
+     *                                at the end of the job. The ComputeService::SCRATCH constant can be
+     *                         used to mean "the scratch storage space of the ComputeService".
      * @return the standard job
      *
      * @throw std::invalid_argument
@@ -110,43 +112,53 @@ namespace wrench {
 
       for (auto fl : file_locations) {
         if (fl.first == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the file_locations map");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr workflow file in the file_locations map");
         }
         if (fl.second == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the file_locations map");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr storage service in the file_locations map");
         }
       }
 
       for (auto fc : pre_file_copies) {
         if (std::get<0>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the pre_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr workflow file in the pre_file_copies set");
         }
         if (std::get<1>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr src storage service in the pre_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr src storage service in the pre_file_copies set");
         }
         if (std::get<2>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr dst storage service in the pre_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr dst storage service in the pre_file_copies set");
         }
       }
 
       for (auto fc : post_file_copies) {
         if (std::get<0>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the post_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr workflow file in the post_file_copies set");
         }
         if (std::get<1>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr src storage service in the post_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr src storage service in the post_file_copies set");
         }
         if (std::get<2>(fc) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr dst storage service in the post_file_copies set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr dst storage service in the post_file_copies set");
         }
       }
 
       for (auto fd : cleanup_file_deletions) {
         if (std::get<0>(fd) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr workflow file in the cleanup_file_deletions set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr workflow file in the cleanup_file_deletions set");
         }
         if (std::get<1>(fd) == nullptr) {
-          throw std::invalid_argument("JobManager::createStandardJob(): nullptr storage service in the cleanup_file_deletions set");
+          throw std::invalid_argument(
+                  "JobManager::createStandardJob(): nullptr storage service in the cleanup_file_deletions set");
         }
       }
 
@@ -161,11 +173,10 @@ namespace wrench {
     /**
      * @brief Create a standard job
      *
-     * @param tasks: a vector of tasks  (which must be either READY, or children of COMPLETED tasks or
-     *                                   of tasks also included in the standard job)
-     * @param file_locations: a map that specifies on which storage services input/output files should be read/written
-     *         (default storage is used otherwise, provided that the job is submitted to a compute service
-     *          for which that default was specified)
+     * @param tasks: a list of tasks  (which must be either READY, or children of COMPLETED tasks or
+     *                                   of tasks also included in the list)
+     * @param file_locations: a map that specifies on which storage services input/output files should be read/written.
+     *                        When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      *
      * @return the standard job
      *
@@ -173,7 +184,7 @@ namespace wrench {
      */
     StandardJob *JobManager::createStandardJob(std::vector<WorkflowTask *> tasks,
                                                std::map<WorkflowFile *, StorageService *> file_locations) {
-      if (tasks.size() < 1) {
+      if (tasks.empty()) {
         throw std::invalid_argument("JobManager::createStandardJob(): Invalid arguments");
       }
 
@@ -184,9 +195,8 @@ namespace wrench {
      * @brief Create a standard job
      *
      * @param task: a task (which must be ready)
-     * @param file_locations: a map that specifies on which storage services input/output files should be read/written
-     *         (default storage is used otherwise, provided that the job is submitted to a compute service
-     *          for which that default was specified)
+     * @param file_locations: a map that specifies on which storage services input/output files should be read/written.
+     *                When unspecified, it is assumed that the ComputeService's scratch storage space will be used.
      *
      * @return the standard job
      *
@@ -275,14 +285,15 @@ namespace wrench {
 //    }
 
     /**
-     * @brief Submit a job to batch service
+     * @brief Submit a job to compute service
      *
      * @param job: a workflow job
-     * @param compute_service: a batch service
+     * @param compute_service: a compute service
      * @param service_specific_args: arguments specific for compute services:
-     *      - to a multicore_compute_service: {}
-     *      - to a batch service: {"-t":"<int>","-n":"<int>","-N":"<int>","-c":"<int>"}
-     *      - to a cloud service: {}
+     *      - to a MultihostMulticoreComputeService: {}
+     *      - to a BatchService: {"-t":"<int>" (requested number of minutes),"-N":"<int>" (number of requested hosts),"-c":"<int>" (number of requestes cores per host)}
+     *      - to a VirtualizedClusterService: {}
+     *      - to a CloudService: {}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException
@@ -305,9 +316,9 @@ namespace wrench {
           for (auto t : ((StandardJob *) job)->tasks) {
             if ((t->getState() == WorkflowTask::State::COMPLETED) or
                 (t->getState() == WorkflowTask::State::PENDING)) {
-              throw std::invalid_argument("JobManager()::submitJob(): task %s cannot be submitted "
-                                                  "as part of a standard job  standard job because its"
-                                                  "state is " + WorkflowTask::stateToString(t->getState()));
+              throw std::invalid_argument("JobManager()::submitJob(): task " + t->getID() +
+                                          " cannot be submitted as part of a standard job because its state is " +
+                                          WorkflowTask::stateToString(t->getState()));
             }
           }
           // Modify task states
@@ -350,7 +361,7 @@ namespace wrench {
       }
 
       if (job->getParentComputeService() == nullptr) {
-        throw WorkflowExecutionException(new JobCannotBeTerminated(job));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)));
       }
 
       try {
@@ -360,8 +371,8 @@ namespace wrench {
       }
 
       if (job->getType() == WorkflowJob::STANDARD) {
-        ((StandardJob *)job)->state = StandardJob::State::TERMINATED;
-        for (auto task : ((StandardJob *)job)->tasks) {
+        ((StandardJob *) job)->state = StandardJob::State::TERMINATED;
+        for (auto task : ((StandardJob *) job)->tasks) {
           switch (task->getInternalState()) {
             case WorkflowTask::TASK_NOT_READY:
               task->setState(WorkflowTask::State::NOT_READY);
@@ -379,7 +390,7 @@ namespace wrench {
           }
         }
         // Make second pass to fix NOT_READY states
-        for (auto task : ((StandardJob *)job)->tasks) {
+        for (auto task : ((StandardJob *) job)->tasks) {
           if (task->getState() == WorkflowTask::State::NOT_READY) {
             bool ready = true;
             for (auto parent : task->getWorkflow()->getTaskParents(task)) {
@@ -415,7 +426,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Forget a job (to free memory, only once a job is completed)
+     * @brief Forget a job (to free memory, only once a job has completed or failed)
      *
      * @param job: a job to forget
      *
@@ -432,7 +443,7 @@ namespace wrench {
 
         if ((this->pending_standard_jobs.find((StandardJob *) job) != this->pending_standard_jobs.end()) ||
             (this->running_standard_jobs.find((StandardJob *) job) != this->running_standard_jobs.end())) {
-          throw WorkflowExecutionException(new JobCannotBeForgotten(job));
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new JobCannotBeForgotten(job)));
         }
         if (this->completed_standard_jobs.find((StandardJob *) job) != this->completed_standard_jobs.end()) {
           this->completed_standard_jobs.erase((StandardJob *) job);
@@ -455,7 +466,7 @@ namespace wrench {
       if (job->getType() == WorkflowJob::PILOT) {
         if ((this->pending_pilot_jobs.find((PilotJob *) job) != this->pending_pilot_jobs.end()) ||
             (this->running_pilot_jobs.find((PilotJob *) job) != this->running_pilot_jobs.end())) {
-          throw WorkflowExecutionException(new JobCannotBeForgotten(job));
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new JobCannotBeForgotten(job)));
         }
         if (this->completed_pilot_jobs.find((PilotJob *) job) != this->completed_pilot_jobs.end()) {
           this->jobs.erase(job);
@@ -477,7 +488,7 @@ namespace wrench {
      */
     int JobManager::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_YELLOW);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
       WRENCH_INFO("New Job Manager starting (%s)", this->mailbox_name.c_str());
 
@@ -488,8 +499,6 @@ namespace wrench {
           WRENCH_INFO("Waiting for a message");
           message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
-          continue;
-        } catch (std::shared_ptr<FatalFailure> &cause) {
           continue;
         }
 
@@ -517,36 +526,32 @@ namespace wrench {
               task->setState(WorkflowTask::State::COMPLETED);
             } else {
               throw std::runtime_error("JobManager::main(): got a 'job done' message, but task " +
-                                       task->getId() + " does not have a TASK_COMPLETED internal state (" +
+                                       task->getID() + " does not have a TASK_COMPLETED internal state (" +
                                        WorkflowTask::stateToString(task->getInternalState()) + ")");
             }
-            if (task->getNumberOfChildren() > 0) {
-              // TODO: Weirdly, here, if we go in here while #children = 0, then we
-              // TODO: get a segfault when callking getTaskChildren()
-              auto children = this->wms->getWorkflow()->getTaskChildren(task);
-              for (auto child : children) {
-                switch (child->getInternalState()) {
-                  case WorkflowTask::InternalState::TASK_NOT_READY:
-                  case WorkflowTask::InternalState::TASK_RUNNING:
-                  case WorkflowTask::InternalState::TASK_FAILED:
-                  case WorkflowTask::InternalState::TASK_COMPLETED:
-                    // no nothing
-                    break;
-                  case WorkflowTask::InternalState::TASK_READY:
-                    if (child->getState() == WorkflowTask::State::NOT_READY) {
-                      bool all_parents_ready = true;
-                      for (auto parent : child->getWorkflow()->getTaskParents(child)) {
-                        if (parent->getState() != WorkflowTask::State::COMPLETED) {
-                          all_parents_ready = false;
-                          break;
-                        }
-                      }
-                      if (all_parents_ready) {
-                        child->setState(WorkflowTask::State::READY);
+            auto children = this->wms->getWorkflow()->getTaskChildren(task);
+            for (auto child : children) {
+              switch (child->getInternalState()) {
+                case WorkflowTask::InternalState::TASK_NOT_READY:
+                case WorkflowTask::InternalState::TASK_RUNNING:
+                case WorkflowTask::InternalState::TASK_FAILED:
+                case WorkflowTask::InternalState::TASK_COMPLETED:
+                  // no nothing
+                  break;
+                case WorkflowTask::InternalState::TASK_READY:
+                  if (child->getState() == WorkflowTask::State::NOT_READY) {
+                    bool all_parents_ready = true;
+                    for (auto parent : child->getWorkflow()->getTaskParents(child)) {
+                      if (parent->getState() != WorkflowTask::State::COMPLETED) {
+                        all_parents_ready = false;
+                        break;
                       }
                     }
-                    break;
-                }
+                    if (all_parents_ready) {
+                      child->setState(WorkflowTask::State::READY);
+                    }
+                  }
+                  break;
               }
             }
           }
@@ -619,7 +624,8 @@ namespace wrench {
           // Forward the notification along the notification chain
           try {
             S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                     new ComputeServiceStandardJobFailedMessage(job, msg->compute_service, std::move(msg->cause),
+                                     new ComputeServiceStandardJobFailedMessage(job, msg->compute_service,
+                                                                                std::move(msg->cause),
                                                                                 0.0));
           } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;

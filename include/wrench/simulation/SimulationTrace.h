@@ -19,10 +19,10 @@ namespace wrench {
 
 
     /***********************/
-    /** \cond INTERNAL    */
+    /** \cond              */
     /***********************/
 
-    /** @brief A dummy top-level class */
+    /** @brief A dummy top-level class derived by simulation output traces */
     class GenericSimulationTrace {
 
     public:
@@ -40,7 +40,7 @@ namespace wrench {
     /**
      * @brief A template class to represent a trace of timestamps
      *
-     * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+     * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
      */
     template <class T> class SimulationTrace : public GenericSimulationTrace  {
 
@@ -50,27 +50,37 @@ namespace wrench {
          * @brief Append a timestamp to the trace
          *
          * @param timestamp: a pointer to a SimulationTimestamp<T> object
-         * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          */
         void addTimestamp(SimulationTimestamp<T> *timestamp) {
           this->trace.push_back(timestamp);
         }
 
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
         /**
          * @brief Retrieve the trace as a vector of timestamps
          *
-         * @tparam T: a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
+         * @tparam a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          * @return a vector of pointers to SimulationTimestamp<T> objects
          */
         std::vector<SimulationTimestamp<T> *> getTrace() {
           return this->trace;
         }
 
+        /**
+         * @brief Destructor
+         */
         ~SimulationTrace<T>() {
           for (auto s : this->trace) {
             delete s;
           }
         }
+
+        /***********************/
+        /** \endcond INTERNAL     */
+        /***********************/
 
     private:
         std::vector<SimulationTimestamp<T> *> trace;

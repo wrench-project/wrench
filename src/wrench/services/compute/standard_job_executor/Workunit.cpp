@@ -39,7 +39,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Add a dependency between two work unit (does nothing
+     * @brief Add a dependency between two work units (does nothing
      *        if the dependency already exists)
      *
      * @param parent: the parent work unit

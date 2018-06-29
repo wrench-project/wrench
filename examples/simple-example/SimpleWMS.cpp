@@ -46,7 +46,7 @@ namespace wrench {
      */
     int SimpleWMS::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_GREEN);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_GREEN);
 
       // Check whether the WMS has a deferred start time
       checkDeferredStart();
@@ -54,7 +54,7 @@ namespace wrench {
       WRENCH_INFO("Starting on host %s listening on mailbox_name %s",
                   S4U_Simulation::getHostName().c_str(),
                   this->mailbox_name.c_str());
-      WRENCH_INFO("About to execute a workflow with %lu tasks", this->workflow->getNumberOfTasks());
+      WRENCH_INFO("About to execute a workflow with %lu tasks", this->getWorkflow()->getNumberOfTasks());
 
       // Create a job manager
 
@@ -69,7 +69,7 @@ namespace wrench {
       while (true) {
 
         // Get the ready tasks
-        std::vector<WorkflowTask *> ready_tasks = this->workflow->getReadyTasks();
+        std::vector<WorkflowTask *> ready_tasks = this->getWorkflow()->getReadyTasks();
 
         // Get the available compute services
         std::set<ComputeService *> compute_services = this->getAvailableComputeServices();
@@ -80,9 +80,9 @@ namespace wrench {
         }
 
         // Submit pilot jobs
-        if (this->pilot_job_scheduler) {
+        if (this->getPilotJobScheduler()) {
           WRENCH_INFO("Scheduling pilot jobs...");
-          this->pilot_job_scheduler->schedulePilotJobs(
+          this->getPilotJobScheduler()->schedulePilotJobs(
                                                     this->getAvailableComputeServices());
         }
 
@@ -91,7 +91,7 @@ namespace wrench {
 
         // Run ready tasks with defined scheduler implementation
         WRENCH_INFO("Scheduling tasks...");
-        this->standard_job_scheduler->scheduleTasks(
+        this->getStandardJobScheduler()->scheduleTasks(
                                        this->getAvailableComputeServices(),
                                        ready_tasks);
 
@@ -103,7 +103,7 @@ namespace wrench {
                       (e.getCause()->toString().c_str()));
           continue;
         }
-        if (this->abort || workflow->isDone()) {
+        if (this->abort || this->getWorkflow()->isDone()) {
           break;
         }
       }
@@ -111,7 +111,7 @@ namespace wrench {
       S4U_Simulation::sleep(10);
 
       WRENCH_INFO("--------------------------------------------------------");
-      if (workflow->isDone()) {
+      if (this->getWorkflow()->isDone()) {
         WRENCH_INFO("Workflow execution is complete!");
       } else {
         WRENCH_INFO("Workflow execution is incomplete!");

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,8 @@ namespace wrench {
     class WorkflowTask;
 
     /**
-     * @brief A standard (i.e., non-pilot) workflow job
+     * @brief A standard (i.e., non-pilot) workflow job that can be submitted to a ComputeService
+     * by a WMS (via a JobManager)
      */
     class StandardJob : public WorkflowJob {
 
@@ -55,8 +56,6 @@ namespace wrench {
 
         std::vector<WorkflowTask *> getTasks();
 
-        void incrementNumCompletedTasks();
-
         unsigned long getMinimumRequiredNumCores();
 
         unsigned long getNumCompletedTasks();
@@ -67,8 +66,9 @@ namespace wrench {
 
         std::map<WorkflowFile *, StorageService *> getFileLocations();
 
-
         // Tasks to run
+
+
         /** @brief The job's computational tasks */
         std::vector<WorkflowTask *> tasks;
         /** @brief The job's total computational cost (in flops) */
@@ -77,26 +77,28 @@ namespace wrench {
         unsigned long num_completed_tasks;
         /** @brief The file locations that tasks should read/write files from/to */
         std::map<WorkflowFile *, StorageService *> file_locations;
-
         /** @brief The file copy operations to perform before computational tasks */
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
+
         /** @brief The file copy operations to perform after computational tasks */
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies;
         /** @brief The file deletion operations to perform at the end */
         std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions;
 
-        ~StandardJob();
-
     private:
+
+        friend class StandardJobExecutor;
+
+        void incrementNumCompletedTasks();
+
         friend class JobManager;
 
-        StandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> file_locations,
-                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-                    std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
+        StandardJob(std::vector<WorkflowTask *> tasks, std::map<WorkflowFile *, StorageService *> &file_locations,
+                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &pre_file_copies,
+                    std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &post_file_copies,
+                    std::set<std::tuple<WorkflowFile *, StorageService *>> &cleanup_file_deletions);
 
         State state;
-
 
     };
 
@@ -105,6 +107,5 @@ namespace wrench {
     /***********************/
 
 };
-
 
 #endif //WRENCH_MULTITASKJOB_H

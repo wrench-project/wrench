@@ -30,7 +30,7 @@ namespace wrench {
     class S4U_Daemon;
 
     /**
-     * @brief The actor for the S4U_DaemonWithMailbox abstraction
+     * @brief The S4U actor that's the foundation for the S4U_Daemon abstraction
      */
     class S4U_DaemonActor {
 
@@ -38,14 +38,14 @@ namespace wrench {
 
         /**
          * @brief Constructor
-         * @param d: a "daemon with mailbox" instance
+         * @param d: a daemon instance
          */
         explicit S4U_DaemonActor(S4U_Daemon *d) {
           this->daemon = d;
         }
 
         /**
-         * @brief The S4U way of doing things
+         * @brief The S4U way of defining the actor's "main" method
          */
         void operator()() {
 //          std::cerr << "ACTOR: RUNNING MAIN: " << this->daemon->getName() << "\n";

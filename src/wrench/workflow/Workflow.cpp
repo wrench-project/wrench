@@ -30,9 +30,10 @@ namespace wrench {
      * @param id: a unique string id
      * @param flops: number of flops
      * @param min_num_cores: the minimum number of cores required to run the task
-     * @param max_num_cores: the maximum number of cores that can be used by the task (0 means infinity)
+     * @param max_num_cores: the maximum number of cores that can be used by the task (use INT_MAX for infinity)
      * @param parallel_efficiency: the multi-core parallel efficiency (number between 0.0 and 1.0)
      * @param memory_requirement: memory requirement (in bytes)
+     * @param type: workflow task type (WorkflowTask::TaskType)
      *
      * @return the WorkflowTask instance
      *
@@ -40,13 +41,15 @@ namespace wrench {
      */
     WorkflowTask *Workflow::addTask(const std::string id,
                                     double flops,
-                                    int min_num_cores,
-                                    int max_num_cores,
+                                    unsigned long min_num_cores,
+                                    unsigned long max_num_cores,
                                     double parallel_efficiency,
-                                    double memory_requirement) {
+                                    double memory_requirement,
+                                    const WorkflowTask::TaskType type) {
 
-      if ((flops < 0.0) || (min_num_cores < 1) || (max_num_cores < 0) ||
-          ((max_num_cores > 0) && (min_num_cores > max_num_cores))) {
+
+      if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) ||
+          (parallel_efficiency < 0.0) || (parallel_efficiency > 1.0) || (memory_requirement < 0)) {
         throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
       }
 
@@ -57,7 +60,7 @@ namespace wrench {
 
       // Create the WorkflowTask object
       WorkflowTask *task = new WorkflowTask(id, flops, min_num_cores, max_num_cores, parallel_efficiency,
-                                            memory_requirement);
+                                            memory_requirement, type);
       // Create a DAG node for it
       task->workflow = this;
       task->DAG = this->DAG.get();
@@ -101,17 +104,17 @@ namespace wrench {
     }
 
     /**
-     * @brief Find a WorkflowTask object based on its ID
+     * @brief Find a WorkflowTask based on its ID
      *
      * @param id: a string id
      *
-     * @return a workflow task
+     * @return a workflow task (or throws a std::invalid_argument if not found)
      *
      * @throw std::invalid_argument
      */
-    WorkflowTask *Workflow::getWorkflowTaskByID(const std::string id) {
+    WorkflowTask *Workflow::getTaskByID(const std::string id) {
       if (tasks.find(id) == tasks.end()) {
-        throw std::invalid_argument("Workflow::getWorkflowTaskByID(): Unknown WorkflowTask ID " + id);
+        throw std::invalid_argument("Workflow::getTaskByID(): Unknown WorkflowTask ID " + id);
       }
       return tasks[id].get();
     }
@@ -133,7 +136,7 @@ namespace wrench {
 
       if (not pathExists(src, dst)) {
 
-        WRENCH_DEBUG("Adding control dependency %s-->%s", src->getId().c_str(), dst->getId().c_str());
+        WRENCH_DEBUG("Adding control dependency %s-->%s", src->getID().c_str(), dst->getID().c_str());
         DAG->addArc(src->DAG_node, dst->DAG_node);
 
         dst->updateTopLevel();
@@ -177,17 +180,17 @@ namespace wrench {
     }
 
     /**
-     * @brief Find a WorkflowFile object based on its ID
+     * @brief Find a WorkflowFile based on its ID
      *
      * @param id: a string id
      *
-     * @return the WorkflowFile instance, or nullptr if not found
+     * @return the WorkflowFile instance (or throws a std::invalid_argument if not found)
      *
      * @throw std::invalid_argument
      */
-    WorkflowFile *Workflow::getWorkflowFileByID(const std::string id) {
+    WorkflowFile *Workflow::getFileByID(const std::string id) {
       if (files.find(id) == files.end()) {
-        throw std::invalid_argument("Workflow::getWorkflowFileByID(): Unknown WorkflowFile ID " + id);
+        throw std::invalid_argument("Workflow::getFileByID(): Unknown WorkflowFile ID " + id);
       } else {
         return files[id].get();
       }
@@ -221,7 +224,7 @@ namespace wrench {
     /**
      * @brief Determine whether one source is an ancestor of a destination task
      *
-     * @param src: the soure workflow task
+     * @param src: the source workflow task
      * @param dst: the destination task
      *
      * @return true if there is a path from src to dst, false otherwise
@@ -237,8 +240,8 @@ namespace wrench {
      * @brief  Constructor
      */
     Workflow::Workflow() {
-      DAG = std::unique_ptr<lemon::ListDigraph>(new lemon::ListDigraph());
-      DAG_node_map = std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>>(
+      this->DAG = std::unique_ptr<lemon::ListDigraph>(new lemon::ListDigraph());
+      this->DAG_node_map = std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>>(
               new lemon::ListDigraph::NodeMap<WorkflowTask *>(*DAG));
       this->num_levels = 0;
       this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
@@ -247,7 +250,7 @@ namespace wrench {
     /**
      * @brief Get a vector of ready tasks
      *
-     * @return vector of workflow tasks
+     * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getReadyTasks() {
 
@@ -278,24 +281,24 @@ namespace wrench {
 
         if (task->getState() == WorkflowTask::State::READY) {
 
-          if (task->getClusterId().empty()) {
-            task_map[task->getId()] = {task};
+          if (task->getClusterID().empty()) {
+            task_map[task->getID()] = {task};
 
           } else {
-            if (task_map.find(task->getClusterId()) == task_map.end()) {
-              task_map[task->getClusterId()] = {task};
+            if (task_map.find(task->getClusterID()) == task_map.end()) {
+              task_map[task->getClusterID()] = {task};
             } else {
               // add to clustered task
-              task_map[task->getClusterId()].push_back(task);
+              task_map[task->getClusterID()].push_back(task);
             }
           }
         } else {
-          if (task_map.find(task->getClusterId()) != task_map.end()) {
+          if (task_map.find(task->getClusterID()) != task_map.end()) {
             if (task->getState() == WorkflowTask::State::NOT_READY) {
               task->setInternalState(WorkflowTask::InternalState::TASK_READY);
               task->setState(WorkflowTask::State::READY);
             }
-            task_map[task->getClusterId()].push_back(task);
+            task_map[task->getClusterID()].push_back(task);
           }
         }
       }
@@ -303,7 +306,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Check whether all tasks are complete
+     * @brief Returns whether all tasks are complete
      *
      * @return true or false
      */
@@ -318,9 +321,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get a list of all tasks in the workflow
+     * @brief Get the list of all tasks in the workflow
      *
-     * @return a vector of workflow tasks
+     * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getTasks() {
       std::vector<WorkflowTask *> all_tasks;
@@ -331,9 +334,9 @@ namespace wrench {
     };
 
     /**
-     * @brief Get a list of all files in the workflow
+     * @brief Get the list of all files in the workflow
      *
-     * @return a vector of workflow files
+     * @return a vector of files
      */
     std::vector<WorkflowFile *> Workflow::getFiles() {
       std::vector<WorkflowFile *> all_files;
@@ -344,11 +347,11 @@ namespace wrench {
     };
 
     /**
-     * @brief Get list of children for a task
+     * @brief Get the list of children for a task
      *
      * @param task: a workflow task
      *
-     * @return a vector of workflow tasks
+     * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getTaskChildren(const WorkflowTask *task) {
       if (task == nullptr) {
@@ -362,11 +365,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Get list of parents for a task
+     * @brief Get the list of parents for a task
      *
      * @param task: a workflow task
      *
-     * @return a vector of workflow tasks
+     * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getTaskParents(const WorkflowTask *task) {
       if (task == nullptr) {
@@ -397,74 +400,76 @@ namespace wrench {
       return this->callback_mailbox;
     }
 
-//    /**
-//     * @brief Update the state of a task, and propagate the change
-//     *        to other tasks if necessary. WARNING: This method
-//     *        doesn't do ANY CHECK about whether the state change makes sense
-//     *
-//     * @param task: a workflow task
-//     * @param state: the new task state
-//     *
-//     * @throw std::invalid_argument
-//     * @throw std::runtime_error
-//     */
-//    void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state) {
-//      if (task == nullptr) {
-//        throw std::invalid_argument("Workflow::updateTaskState(): Invalid arguments");
-//      }
-//
-//      if (task->getState() == state) {
-//        return;
-//      }
-//
-////      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
-////                  task->getId().c_str(),
-////                  WorkflowTask::stateToString(task->state).c_str(),
-////                  WorkflowTask::stateToString(state).c_str());
-//
-//      switch (state) {
-//        // Make a task completed, which may failure_cause its children to become ready
-//        case WorkflowTask::COMPLETED: {
-//          task->setState(WorkflowTask::COMPLETED);
-//
-//          // Go through the children and make them ready if possible
-//          for (lemon::ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
-//            WorkflowTask *child = (*DAG_node_map)[(*DAG).target(a)];
-//            updateTaskState(child, WorkflowTask::READY);
-//          }
-//          break;
-//        }
-//        case WorkflowTask::READY: {
-//          // Go through the parent and check whether they are all completed
-//          for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
-//            WorkflowTask *parent = (*DAG_node_map)[(*DAG).source(a)];
-//            if (parent->getState() != WorkflowTask::COMPLETED) {
-//              // At least one parent is not in the COMPLETED state
-//              return;
-//            }
-//          }
-//          task->setState(WorkflowTask::READY);
-//
-//          break;
-//        }
-//        case WorkflowTask::RUNNING: {
-//          task->setState(WorkflowTask::RUNNING);
-//          break;
-//        }
-//        case WorkflowTask::NOT_READY: {
-//          task->setState(WorkflowTask::NOT_READY);
-//          break;
-//        }
-//        case WorkflowTask::FAILED: {
-//          task->setState(WorkflowTask::FAILED);
-//          break;
-//        }
-//        default: {
-//          throw std::invalid_argument("Workflow::updateTaskState(): Unknown task state '" +
-//                                      std::to_string(state) + "'");
-//        }
-//      }
-//    }
+#if 0
+    //    /**
+    //     * @brief Update the state of a task, and propagate the change
+    //     *        to other tasks if necessary. WARNING: This method
+    //     *        doesn't do ANY CHECK about whether the state change makes sense
+    //     *
+    //     * @param task: a workflow task
+    //     * @param state: the new task state
+    //     *
+    //     * @throw std::invalid_argument
+    //     * @throw std::runtime_error
+    //     */
+    //    void Workflow::updateTaskState(WorkflowTask *task, WorkflowTask::State state) {
+    //      if (task == nullptr) {
+    //        throw std::invalid_argument("Workflow::updateTaskState(): Invalid arguments");
+    //      }
+    //
+    //      if (task->getState() == state) {
+    //        return;
+    //      }
+    //
+    ////      WRENCH_INFO("Changing state of task %s from '%s' to '%s'",
+    ////                  task->getID().c_str(),
+    ////                  WorkflowTask::stateToString(task->state).c_str(),
+    ////                  WorkflowTask::stateToString(state).c_str());
+    //
+    //      switch (state) {
+    //        // Make a task completed, which may failure_cause its children to become ready
+    //        case WorkflowTask::COMPLETED: {
+    //          task->setState(WorkflowTask::COMPLETED);
+    //
+    //          // Go through the children and make them ready if possible
+    //          for (lemon::ListDigraph::OutArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
+    //            WorkflowTask *child = (*DAG_node_map)[(*DAG).target(a)];
+    //            updateTaskState(child, WorkflowTask::READY);
+    //          }
+    //          break;
+    //        }
+    //        case WorkflowTask::READY: {
+    //          // Go through the parent and check whether they are all completed
+    //          for (lemon::ListDigraph::InArcIt a(*DAG, task->DAG_node); a != lemon::INVALID; ++a) {
+    //            WorkflowTask *parent = (*DAG_node_map)[(*DAG).source(a)];
+    //            if (parent->getState() != WorkflowTask::COMPLETED) {
+    //              // At least one parent is not in the COMPLETED state
+    //              return;
+    //            }
+    //          }
+    //          task->setState(WorkflowTask::READY);
+    //
+    //          break;
+    //        }
+    //        case WorkflowTask::RUNNING: {
+    //          task->setState(WorkflowTask::RUNNING);
+    //          break;
+    //        }
+    //        case WorkflowTask::NOT_READY: {
+    //          task->setState(WorkflowTask::NOT_READY);
+    //          break;
+    //        }
+    //        case WorkflowTask::FAILED: {
+    //          task->setState(WorkflowTask::FAILED);
+    //          break;
+    //        }
+    //        default: {
+    //          throw std::invalid_argument("Workflow::updateTaskState(): Unknown task state '" +
+    //                                      std::to_string(state) + "'");
+    //        }
+    //      }
+    //    }
+#endif
 
     /**
      * @brief Retrieve a map (indexed by file id) of input files for a workflow (i.e., those files
@@ -483,19 +488,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve a file by its id
-     * @param id: the file id
-     * @return the file, or nullptr if not found
-     */
-    WorkflowFile *Workflow::getFileById(const std::string id) {
-      if (this->files.find(id) != this->files.end()) {
-        return this->files[id].get();
-      } else {
-        return nullptr;
-      }
-    }
-
-    /**
      * @brief Get the total number of flops for a list of tasks
      *
      * @param tasks: list of tasks
@@ -510,16 +502,16 @@ namespace wrench {
       return total_flops;
     }
 
-
     /**
      * @brief Create a workflow based on a DAX file
      *
      * @param filename: the path to the DAX file
-     * @param reference_flop_rate: the compute speed (in flops/sec, assuming a task's computation is purely flops).
-     *                             The DAX file specified task execution times in seconds,
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because DAX files specify task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
-     *                             apply reasonable scaling. (Because the XML platform description specifies host compute
-     *                             speeds in flops/sec).
+     *                             apply reasonable scaling. (Because the XML platform description specifies host
+     *                             compute speeds in flops/sec). The times in the DAX file are thus asume to be obtained
+     *                             on an machine with flop rate reference_flop_rate.
      *
      * @throw std::invalid_argument
      */
@@ -554,7 +546,6 @@ namespace wrench {
         for (std::string tag : {"numprocs", "num_procs", "numcores", "num_cores"}) {
           if (job.attribute(tag.c_str())) {
             if (found_one) {
-              std::cerr << "THROWING\n";
               throw std::invalid_argument(
                       "Workflow::loadFromDAX(): multiple \"number of cores/procs\" specification for task " + id);
             } else {
@@ -567,7 +558,7 @@ namespace wrench {
 
         // Create the task
         // If the DAX says num_procs = x, then we set min_cores=1, max_cores=x, efficiency=1.0
-        task = this->addTask(id, runtime * flop_rate, 1, num_procs, 1.0);
+        task = this->addTask(id, runtime * flop_rate, 1, num_procs, 1.0, 0.0);
 
         // Go through the children "uses" nodes
         for (pugi::xml_node uses = job.child("uses"); uses; uses = uses.next_sibling("uses")) {
@@ -581,7 +572,7 @@ namespace wrench {
           WorkflowFile *file = nullptr;
 
           try {
-            file = this->getWorkflowFileByID(id);
+            file = this->getFileByID(id);
           } catch (std::invalid_argument &e) {
             file = this->addFile(id, size);
           }
@@ -598,13 +589,13 @@ namespace wrench {
       // Iterate through the "child" nodes to handle control dependencies
       for (pugi::xml_node child = dag.child("child"); child; child = child.next_sibling("child")) {
 
-        WorkflowTask *child_task = this->getWorkflowTaskByID(child.attribute("ref").value());
+        WorkflowTask *child_task = this->getTaskByID(child.attribute("ref").value());
 
         // Go through the children "parent" nodes
         for (pugi::xml_node parent = child.child("parent"); parent; parent = parent.next_sibling("parent")) {
           std::string parent_id = parent.attribute("ref").value();
 
-          WorkflowTask *parent_task = this->getWorkflowTaskByID(parent_id);
+          WorkflowTask *parent_task = this->getTaskByID(parent_id);
           this->addControlDependency(parent_task, child_task);
         }
       }
@@ -614,11 +605,12 @@ namespace wrench {
      * @brief Create a workflow based on a JSON file
      *
      * @param filename: the path to the JSON file
-     * @param reference_flop_rate: the compute speed (in flops/sec, assuming a task's computation is purely flops).
-     *                             The JSON file specified task execution times in seconds,
+     * @param reference_flop_rate: a reference compute speed (in flops/sec), assuming a task's computation is purely flops.
+     *                             This is needed because JSON files specify task execution times in seconds,
      *                             but the WRENCH simulation needs some notion of "amount of computation" to
-     *                             apply reasonable scaling. (Because the XML platform description specifies host compute
-     *                             speeds in flops/sec)
+     *                             apply reasonable scaling. (Because the XML platform description specifies host
+     *                             compute speeds in flops/sec). The times in the JSON file are thus asume to be obtained
+     *                             on an machine with flop rate reference_flop_rate.
      *
      * @throw std::invalid_argument
      */
@@ -658,42 +650,62 @@ namespace wrench {
           std::vector<nlohmann::json> jobs = it.value();
 
           for (auto &job : jobs) {
-            if (job.at("type") == "compute") {
-              std::string name = job.at("name");
-              double runtime = job.at("runtime");
-              int num_procs = 1;
-              task = this->addTask(name, runtime * flop_rate, num_procs);
-              std::vector<nlohmann::json> files = job.at("files");
+            std::string name = job.at("name");
+            double runtime = job.at("runtime");
+            unsigned long num_procs = 1;
+            task = this->addTask(name, runtime * flop_rate, num_procs, num_procs, 1.0, 0.0);
 
-              // task files
-              for (auto &f : files) {
-                double size = f.at("size");
-                std::string link = f.at("link");
-                std::string id = f.at("name");
-                wrench::WorkflowFile *workflow_file = nullptr;
-                try {
-                  workflow_file = this->getWorkflowFileByID(id);
-                } catch (const std::invalid_argument &ia) {
-                  // making a new file
-                  workflow_file = this->addFile(id, size);
-                }
-                if (link == "input") {
-                  task->addInputFile(workflow_file);
-                }
-                if (link == "output") {
-                  task->addOutputFile(workflow_file);
-                }
+            // task priority
+            try {
+              task->setPriority(job.at("priority"));
+            } catch (nlohmann::json::out_of_range &e) {
+              // do nothing
+            }
+
+            // task type
+            std::string type = job.at("type");
+            if (type == "transfer") {
+              task->setTaskType(WorkflowTask::TaskType::TRANSFER);
+            } else if (type == "auxiliary") {
+              task->setTaskType(WorkflowTask::TaskType::AUXILIARY);
+            }
+
+            // task files
+            std::vector<nlohmann::json> files = job.at("files");
+
+            for (auto &f : files) {
+              double size = f.at("size");
+              std::string link = f.at("link");
+              std::string id = f.at("name");
+              wrench::WorkflowFile *workflow_file = nullptr;
+              try {
+                workflow_file = this->getFileByID(id);
+              } catch (const std::invalid_argument &ia) {
+                // making a new file
+                workflow_file = this->addFile(id, size);
               }
+              if (link == "input") {
+                task->addInputFile(workflow_file);
+              } else if (link == "output") {
+                task->addOutputFile(workflow_file);
+              }
+              if (type == "transfer") {
+                task->addSrcDest(workflow_file, f.at("src"), f.at("dest"));
+              }
+            }
+          }
 
-              std::vector<nlohmann::json> parents = job.at("parents");
-              // task dependencies
-              for (auto &parent : parents) {
-                try {
-                  WorkflowTask *parent_task = this->getWorkflowTaskByID(parent);
-                  this->addControlDependency(parent_task, task);
-                } catch (std::invalid_argument &e) {
-                  // do nothing
-                }
+          // since tasks may not be ordered in the JSON file, we need to iterate over all tasks again
+          for (auto &job : jobs) {
+            task = this->getTaskByID(job.at("name"));
+            std::vector<nlohmann::json> parents = job.at("parents");
+            // task dependencies
+            for (auto &parent : parents) {
+              try {
+                WorkflowTask *parent_task = this->getTaskByID(parent);
+                this->addControlDependency(parent_task, task);
+              } catch (std::invalid_argument &e) {
+                // do nothing
               }
             }
           }
@@ -736,9 +748,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the workflow's completion date, or a negative value
-     *        If the workflow has not completed
-     * @return a date in seconds
+     * @brief Returns the workflow's completion date
+     * @return a date in seconds (or a negative value
+     *        If the workflow has not completed)
      */
     double Workflow::getCompletionDate() {
       double makespan = -1.0;

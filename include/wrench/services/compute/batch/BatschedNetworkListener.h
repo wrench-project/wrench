@@ -22,6 +22,7 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
+        #ifdef ENABLE_BATSCHED
     /**
      * @brief A helper service that handles all interaction with Batsched
      */
@@ -29,27 +30,19 @@ namespace wrench {
 
     public:
 
-        /** @brief Enumerated type to specified the type of the BatschedNetworkListener */
-        enum NETWORK_LISTENER_TYPE{
-            LISTENER,
-            SENDER,
-            SENDER_RECEIVER
-        };
-
         BatschedNetworkListener(std::string hostname, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,
-                             NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send,std::map<std::string, std::string> plist = {});
+                             std::string data_to_send,std::map<std::string, std::string> property_list = {});
 
 
     private:
-        std::map<std::string, std::string> default_property_values =
-                {{BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,          "1024"},
-                 {BatchServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
-                 {BatchServiceProperty::BATCH_SCHED_READY_PAYLOAD,           "0"},
-                 {BatchServiceProperty::BATCH_EXECUTE_JOB_PAYLOAD,           "0"}
+        std::map<std::string, std::string> default_property_values = {
+                };
+
+        std::map<std::string, std::string> default_messagepayload_values = {
                 };
 
         BatschedNetworkListener(std::string, BatchService *batch_service, std::string batch_service_mailbox, std::string sched_port,
-                             NETWORK_LISTENER_TYPE MY_TYPE, std::string data_to_send, std::map<std::string, std::string> plist, std::string suffix);
+                             std::string data_to_send, std::map<std::string, std::string> property_list, std::string suffix);
 
 
         int main() override;
@@ -60,14 +53,13 @@ namespace wrench {
         BatchService *batch_service;
         std::string batch_service_mailbox;
 
-        NETWORK_LISTENER_TYPE MY_LISTENER_TYPE;
 
-        void send_receive();
 
         void sendExecuteMessageToBatchService(std::string answer_mailbox, std::string execute_job_reply_data);
         void sendQueryAnswerMessageToBatchService(double estimated_waiting_time);
-
+        void send_receive();
     };
+        #endif
 
     /***********************/
     /** \endcond           */

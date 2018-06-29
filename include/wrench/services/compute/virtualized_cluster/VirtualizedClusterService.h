@@ -15,6 +15,7 @@
 #include <simgrid/s4u/VirtualMachine.hpp>
 
 #include "VirtualizedClusterServiceProperty.h"
+#include "VirtualizedClusterServiceMessagePayload.h"
 #include "wrench/services/Service.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
@@ -29,56 +30,54 @@ namespace wrench {
     class ComputeService;
 
     /**
-     * @brief A simulated virtualized cluster-based compute service
+     * @brief A  virtualized cluster-based compute service
      */
     class VirtualizedClusterService : public ComputeService {
 
     private:
-        std::map<std::string, std::string> default_property_values =
-                {{VirtualizedClusterServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                  "1024"},
-                 {VirtualizedClusterServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,               "1024"},
-                 {VirtualizedClusterServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {VirtualizedClusterServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {VirtualizedClusterServiceProperty::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {VirtualizedClusterServiceProperty::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                 {VirtualizedClusterServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
-                 {VirtualizedClusterServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
-                 {VirtualizedClusterServiceProperty::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
-                 {VirtualizedClusterServiceProperty::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
-                 {VirtualizedClusterServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {VirtualizedClusterServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                 {VirtualizedClusterServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
-                 {VirtualizedClusterServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      "1024"}
-                };
+        std::map<std::string, std::string> default_property_values = {
+                {VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS,    "true"},
+                {VirtualizedClusterServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+        };
+
+        std::map<std::string, std::string> default_messagepayload_values = {
+                {VirtualizedClusterServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  "1024"},
+                {VirtualizedClusterServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               "1024"},
+                {VirtualizedClusterServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                {VirtualizedClusterServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                {VirtualizedClusterServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                {VirtualizedClusterServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
+                {VirtualizedClusterServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
+                {VirtualizedClusterServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                {VirtualizedClusterServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                {VirtualizedClusterServiceMessagePayload::MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
+                {VirtualizedClusterServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                {VirtualizedClusterServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
+                {VirtualizedClusterServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
+                {VirtualizedClusterServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      "1024"}
+        };
 
     public:
         VirtualizedClusterService(const std::string &hostname,
-                                  bool supports_standard_jobs,
-                                  bool supports_pilot_jobs,
                                   std::vector<std::string> &execution_hosts,
-                                  std::map<std::string, std::string> plist = {},
-                                  double scratch_size = 0);
+                                  double scratch_space_size,
+                                  std::map<std::string, std::string> property_list = {},
+                                  std::map<std::string, std::string> messagepayload_list = {});
 
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
 
         virtual std::string createVM(const std::string &pm_hostname,
-                                     unsigned long num_cores,
+                                     unsigned long num_cores = ComputeService::ALL_CORES,
                                      double ram_memory = ComputeService::ALL_RAM,
-                                     std::map<std::string, std::string> plist = {});
+                                     std::map<std::string, std::string> property_list = {},
+                                     std::map<std::string, std::string> messagepayload_list = {});
 
         virtual bool migrateVM(const std::string &vm_hostname, const std::string &dest_pm_hostname);
 
         std::vector<std::string> getExecutionHosts();
 
-        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
-
-        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
-
-        void terminateStandardJob(StandardJob *job) override;
-
-        void terminatePilotJob(PilotJob *job) override;
 
         /***********************/
         /** \endcond          **/
@@ -87,6 +86,13 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL    */
         /***********************/
+        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
+
+        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
+
+        void terminateStandardJob(StandardJob *job) override;
+
+        void terminatePilotJob(PilotJob *job) override;
 
         ~VirtualizedClusterService();
 
@@ -114,11 +120,10 @@ namespace wrench {
         virtual void processCreateVM(const std::string &answer_mailbox,
                                      const std::string &pm_hostname,
                                      const std::string &vm_hostname,
-                                     bool supports_standard_jobs,
-                                     bool supports_pilot_jobs,
                                      unsigned long num_cores,
                                      double ram_memory,
-                                     std::map<std::string, std::string> plist);
+                                     std::map<std::string, std::string> &property_list,
+                                     std::map<std::string, std::string> &messagepayload_list);
 
         virtual void processMigrateVM(const std::string &answer_mailbox,
                                       const std::string &vm_hostname,
@@ -129,10 +134,12 @@ namespace wrench {
 
         virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
 
-        virtual void terminate();
+        void stopAllVMs();
 
+        /** @brief List of execution host names */
         std::vector<std::string> execution_hosts;
 
+        /** @brief Map of available RAM at hosts */
         std::map<std::string, double> cs_available_ram;
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */

@@ -21,7 +21,7 @@ namespace wrench {
 		/***********************/
 
 		/**
-		 * @brief Wrappers around Simgrid's basic simulation methods
+		 * @brief Wrappers around S4U's basic simulation methods
 		 */
 		class S4U_Simulation {
 
@@ -32,8 +32,8 @@ namespace wrench {
 				static double getClock();
 				static std::string getHostName();
 				bool hostExists(std::string hostname);
-				static unsigned int getNumCores(std::string hostname);
-				static double getFlopRate(std::string hostname);
+				static unsigned int getHostNumCores(std::string hostname);
+				static double getHostFlopRate(std::string hostname);
 				static double getHostMemoryCapacity(std::string hostname);
 				static double getMemoryCapacity();
 				static void compute(double);

@@ -11,7 +11,7 @@
 #include <wrench-dev.h>
 #include <numeric>
 
-#include "../include/TestWithFork.h"
+#include "../../include/TestWithFork.h"
 
 class MultipleWMSTest : public ::testing::Test {
 
@@ -27,15 +27,15 @@ protected:
     MultipleWMSTest() {
       // Create a platform file
       std::string xml = "<?xml version='1.0'?>"
-              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-              "<platform version=\"4.1\"> "
-              "   <zone id=\"AS0\" routing=\"Full\"> "
-              "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-              "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
-              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-              "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
-              "   </zone> "
-              "</platform>";
+                        "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                        "<platform version=\"4.1\"> "
+                        "   <zone id=\"AS0\" routing=\"Full\"> "
+                        "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
+                        "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+                        "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                        "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+                        "   </zone> "
+                        "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
       fclose(platform_file);
@@ -58,8 +58,8 @@ protected:
       output_file2 = workflow->addFile("output_file2", 10.0);
 
       // Create the tasks
-      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0);
-      task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 1.0);
+      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0, 0);
+      task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 1.0, 0);
 
       // Add file-task dependencies
       task1->addInputFile(input_file);
@@ -85,8 +85,8 @@ public:
                             const std::set<wrench::ComputeService *> &compute_services,
                             const std::set<wrench::StorageService *> &storage_services,
                             std::string &hostname) :
-            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr, hostname, "test"
-                        ) {
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test"
+            ) {
       this->test = test;
     }
 
@@ -108,15 +108,15 @@ private:
       // Get the file registry service
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
-      std::set<std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*>> pre_copies = {};
-      for (auto it:workflow->getInputFiles()) {
-        std::tuple<wrench::WorkflowFile*, wrench::StorageService*, wrench::StorageService*> each_copy =
-                                                      std::make_tuple(it.second,this->test->storage_service, wrench::ComputeService::SCRATCH);
+      std::set<std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *>> pre_copies = {};
+      for (auto it : this->getWorkflow()->getInputFiles()) {
+        std::tuple<wrench::WorkflowFile *, wrench::StorageService *, wrench::StorageService *> each_copy =
+                std::make_tuple(it.second, this->test->storage_service, wrench::ComputeService::SCRATCH);
         pre_copies.insert(each_copy);
       }
 
       // Create a 2-task job
-      wrench::StandardJob *two_task_job = job_manager->createStandardJob(this->workflow->getTasks(), {},
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {},
                                                                          pre_copies,
                                                                          {}, {});
 
@@ -133,7 +133,7 @@ private:
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = this->workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -163,43 +163,44 @@ void MultipleWMSTest::do_deferredWMSStartOneWMS_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("multiple_wms_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::CloudService(hostname, true, false, execution_hosts, {}, 100.0)));
+  ASSERT_NO_THROW(compute_service = simulation->add(new wrench::CloudService(
+          hostname, execution_hosts, 100.0,
+          {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
-          new DeferredWMSStartTestWMS(this,  {compute_service}, {storage_service}, hostname)));
+  ASSERT_NO_THROW(wms = simulation->add(
+          new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow, 100));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow, 100));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->add(
+  ASSERT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles(workflow->getInputFiles(), storage_service));
+  ASSERT_NO_THROW(simulation->stageFiles(workflow->getInputFiles(), storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   // Simulation trace
-  EXPECT_GT(simulation->getCurrentSimulatedDate(), 100);
+  ASSERT_GT(simulation->getCurrentSimulatedDate(), 100);
 
   delete simulation;
   free(argv[0]);
@@ -213,52 +214,53 @@ void MultipleWMSTest::do_deferredWMSStartTwoWMS_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("multiple_wms_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create a Storage Service
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::CloudService(hostname, true, false, execution_hosts, {}, 100.0)));
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::CloudService(hostname, execution_hosts, 100.0,
+                                   {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   // Create a WMS
   wrench::Workflow *workflow = this->createWorkflow();
   wrench::WMS *wms1 = nullptr;
-  EXPECT_NO_THROW(wms1 = simulation->add(
+  ASSERT_NO_THROW(wms1 = simulation->add(
           new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms1->addWorkflow(workflow, 100));
+  ASSERT_NO_THROW(wms1->addWorkflow(workflow, 100));
 
   // Create a second WMS
   wrench::Workflow *workflow2 = this->createWorkflow();
   wrench::WMS *wms2 = nullptr;
-  EXPECT_NO_THROW(wms2 = simulation->add(
-          new DeferredWMSStartTestWMS(this,  {compute_service}, {storage_service}, hostname)));
+  ASSERT_NO_THROW(wms2 = simulation->add(
+          new DeferredWMSStartTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms2->addWorkflow(workflow2, 10000));
+  ASSERT_NO_THROW(wms2->addWorkflow(workflow2, 10000));
 
   // Create a file registry
-  EXPECT_NO_THROW(simulation->add(
+  ASSERT_NO_THROW(simulation->add(
           new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles(workflow->getInputFiles(), storage_service));
-  EXPECT_NO_THROW(simulation->stageFiles(workflow2->getInputFiles(), storage_service));
+  ASSERT_NO_THROW(simulation->stageFiles(workflow->getInputFiles(), storage_service));
+  ASSERT_NO_THROW(simulation->stageFiles(workflow2->getInputFiles(), storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   // Simulation trace
-  EXPECT_GT(simulation->getCurrentSimulatedDate(), 1000);
+  ASSERT_GT(simulation->getCurrentSimulatedDate(), 1000);
 
   delete simulation;
   free(argv[0]);

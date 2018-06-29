@@ -17,7 +17,6 @@
 #include "wrench/wms/scheduler/PilotJobScheduler.h"
 #include "wrench/wms/scheduler/StandardJobScheduler.h"
 #include "wrench/workflow/Workflow.h"
-#include "wrench/workflow/execution_events/WorkflowExecutionEvent.h"
 
 namespace wrench {
 
@@ -28,18 +27,20 @@ namespace wrench {
     class FileRegistryService;
 
     /**
-     * @brief A simulated workflow management system (WMS)
+     * @brief A workflow management system (WMS)
      */
     class WMS : public Service {
 
     public:
         void addWorkflow(Workflow *workflow, double start_time = 0);
         Workflow *getWorkflow();
-
+        PilotJobScheduler *getPilotJobScheduler();
+        StandardJobScheduler *getStandardJobScheduler();
 
         void addStaticOptimization(std::unique_ptr<StaticOptimization>);
 
         void addDynamicOptimization(std::unique_ptr<DynamicOptimization>);
+
 
     protected:
 
@@ -55,6 +56,7 @@ namespace wrench {
             FileRegistryService *file_registry_service,
             const std::string &hostname,
             const std::string suffix);
+
 
         void checkDeferredStart();
 
@@ -93,6 +95,7 @@ namespace wrench {
         /** \cond INTERNAL     */
         /***********************/
 
+    private:
         friend class Simulation;
         friend class DataMovementManager;
         friend class JobManager;

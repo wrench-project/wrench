@@ -83,7 +83,7 @@ private:
 
         // delete file and don't unregister
         storage_service->deleteFile(file_1);
-        if (storage_service->lookupFile(file_1)) {
+        if (storage_service->lookupFile(file_1, nullptr)) {
             throw std::runtime_error("StorageService should have deleted file_1");
         }
 
@@ -93,7 +93,7 @@ private:
 
         // delete file and unregister
         storage_service->deleteFile(file_2, file_registry_service);
-        if (storage_service->lookupFile(file_2)) {
+        if (storage_service->lookupFile(file_2, nullptr)) {
             throw std::runtime_error("StorageService should have deleted file_2");
         }
 
@@ -120,28 +120,28 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
     char **argv = (char **) calloc(1, sizeof(char *));
     argv[0] = strdup("delete_register_test");
 
-    EXPECT_NO_THROW(simulation->init(&argc, argv));
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
 
     // set up the platform
-    EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
     // Create a (unused) Compute Service
-    EXPECT_NO_THROW(compute_service = simulation->add(
-            new wrench::MultihostMulticoreComputeService("WMSHost", true, true,
+    ASSERT_NO_THROW(compute_service = simulation->add(
+            new wrench::MultihostMulticoreComputeService("WMSHost",
                                                          {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES,
                                                                           wrench::ComputeService::ALL_RAM)}, {})));
 
     // Create One Storage Service
-    EXPECT_NO_THROW(storage_service = simulation->add(
+    ASSERT_NO_THROW(storage_service = simulation->add(
             new wrench::SimpleStorageService("StorageHost", STORAGE_SIZE)));
 
     // Create a file registry
     wrench::FileRegistryService *file_registry_service = nullptr;
-    EXPECT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
+    ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
     // Create a WMS
     wrench::WMS *wms = nullptr;
-    EXPECT_NO_THROW(wms = simulation->add(new SimpleStorageServiceDeleteRegisterTestWMS(
+    ASSERT_NO_THROW(wms = simulation->add(new SimpleStorageServiceDeleteRegisterTestWMS(
             this, {compute_service}, {storage_service}, file_registry_service, "WMSHost")));
 
     wms->addWorkflow(this->workflow);
@@ -149,10 +149,10 @@ void SimpleStorageServiceDeleteRegisterTest::do_DeleteRegisterTest() {
 
 
     // Stage the 2 files on the StorageHost
-    EXPECT_NO_THROW(simulation->stageFiles({{file_1->getId(), file_1},
-                                            {file_2->getId(), file_2}}, storage_service));
+    ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(), file_1},
+                                            {file_2->getID(), file_2}}, storage_service));
 
-    EXPECT_NO_THROW(simulation->launch());
+    ASSERT_NO_THROW(simulation->launch());
 
     delete simulation;
     free(argv[0]);

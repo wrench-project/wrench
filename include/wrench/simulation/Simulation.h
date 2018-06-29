@@ -27,7 +27,7 @@ namespace wrench {
     class StorageService;
 
     /**
-     * @brief The simulation state
+     * @brief A class that provides basic simulation methods
      */
     class Simulation {
 
@@ -57,17 +57,7 @@ namespace wrench {
 
         void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service);
 
-        /** @brief The simulation post-mortem output */
-        SimulationOutput output;
-
-        /***********************/
-        /** \cond DEVELOPER    */
-        /***********************/
-
-        template<class T>
-        void newTimestamp(SimulationTimestamp<T> *event);
-
-        double getCurrentSimulatedDate();
+        SimulationOutput &getOutput();
 
         static double getHostMemoryCapacity(std::string hostname);
 
@@ -75,26 +65,27 @@ namespace wrench {
 
         static double getHostFlopRate(std::string hostname);
 
+
+
+
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
         static double getMemoryCapacity();
+        static unsigned long getNumCores();
+        static double getFlopRate();
+
+        double getCurrentSimulatedDate();
 
         static void sleep(double duration);
-
-
 
         /***********************/
         /** \endcond            */
         /***********************/
 
-        /***********************/
-        /** \cond INTERNAL     */
-        /***********************/
-
-
-        /***********************/
-        /** \endcond           */
-        /***********************/
-
     private:
+        SimulationOutput output;
 
         std::unique_ptr<S4U_Simulation> s4u_simulation;
 

@@ -20,7 +20,8 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief A helper class that manages the messages
+     * @brief A helper class that manages messages (in terms of memory deallocation to avoid leaks when
+     *        a message was sent but never received)
      */
 
     class MessageManager {

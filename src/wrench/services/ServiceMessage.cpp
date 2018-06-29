@@ -13,7 +13,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param name: service name
+     * @param name: the message name
      * @param payload: message size in bytes
      */
     ServiceMessage::ServiceMessage(std::string name, double payload) :
@@ -21,7 +21,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param ack_mailbox: mailbox to which and DaemonStoppedMessage ack will be sent. No ack if ack_mailbox=""
+     * @param ack_mailbox: mailbox to which the DaemonStoppedMessage ack will be sent. No ack will be sent if ack_mailbox=""
      * @param payload: message size in bytes
      *
      * @throw std::invalid_arguments

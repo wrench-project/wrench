@@ -328,20 +328,20 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
 
   auto *workflow = new wrench::Workflow();
 
-  EXPECT_THROW(workflow->loadFromDAX("bogus", "1f"), std::invalid_argument);
-  EXPECT_NO_THROW(workflow->loadFromDAX(this->dax_file_path, "1f"));
+  ASSERT_THROW(workflow->loadFromDAX("bogus", "1f"), std::invalid_argument);
+  ASSERT_NO_THROW(workflow->loadFromDAX(this->dax_file_path, "1f"));
   ASSERT_EQ(workflow->getNumberOfTasks(), 36);
   ASSERT_EQ(workflow->getFiles().size(), 56);
 
-  unsigned long num_input_files = workflow->getWorkflowTaskByID("ID00000")->getInputFiles().size();
-  unsigned long num_output_files = workflow->getWorkflowTaskByID("ID00000")->getOutputFiles().size();
+  unsigned long num_input_files = workflow->getTaskByID("ID00000")->getInputFiles().size();
+  unsigned long num_output_files = workflow->getTaskByID("ID00000")->getOutputFiles().size();
 
   ASSERT_EQ(num_input_files, 1);
   ASSERT_EQ(num_output_files, 8);
 
-  ASSERT_NEAR(workflow->getWorkflowTaskByID("ID00000")->getFlops(), 35.79, 0.001);
-  ASSERT_EQ(workflow->getWorkflowTaskByID("ID00000")->getMinNumCores(), 1);
-  ASSERT_EQ(workflow->getWorkflowTaskByID("ID00000")->getMaxNumCores(), 3);
+  ASSERT_NEAR(workflow->getTaskByID("ID00000")->getFlops(), 35.79, 0.001);
+  ASSERT_EQ(workflow->getTaskByID("ID00000")->getMinNumCores(), 1);
+  ASSERT_EQ(workflow->getTaskByID("ID00000")->getMaxNumCores(), 3);
 
   ASSERT_EQ(workflow->getNumLevels(), 8);
   ASSERT_EQ(workflow->getTasksInTopLevelRange(0,0).size(), 1);

@@ -12,6 +12,7 @@
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/ComputeServiceProperty.h"
+#include "wrench/services/compute/ComputeServiceMessagePayload.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/simgrid_S4U_util/S4U_Mailbox.h"
@@ -22,6 +23,7 @@ namespace wrench {
 
     constexpr unsigned long ComputeService::ALL_CORES;
     constexpr double ComputeService::ALL_RAM;
+    StorageService *ComputeService::SCRATCH = (StorageService *)ULONG_MAX;
 
     /**
      * @brief Stop the compute service - must be called by the stop()
@@ -31,13 +33,12 @@ namespace wrench {
       Service::stop();
     }
 
-    StorageService *ComputeService::SCRATCH = (StorageService *) (new int(553453));
 
     /**
      * @brief Submit a job to the compute service
      * @param job: the job
      * @param service_specific_args: arguments specific to compute services when needed:
-     *      - to a MultihostMultiCoreComputeService: {}
+     *      - to a MultihostMulticoreComputeService: {}
      *      - to a BatchService: {"-t":"<int>","-N":"<int>","-c":"<int>"} (SLURM-like)
      *         - "-t": number of requested job duration in minutes
      *         - "-N": number of requested compute hosts
@@ -55,7 +56,7 @@ namespace wrench {
       }
 
       if (this->state == ComputeService::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       try {
@@ -92,7 +93,7 @@ namespace wrench {
       }
 
       if (this->state == ComputeService::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       try {
@@ -116,28 +117,25 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the name of the host on which the service runs
+     * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
-     * @param supports_standard_jobs: true if the job executor should support standard jobs
-     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
-     * @param scratch_size: the size for the scratch space of the compute service
+     * @param scratch_space_size: the size for the scratch storage space of the compute service (0 if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
                                    const std::string mailbox_name_prefix,
-                                   bool supports_standard_jobs,
-                                   bool supports_pilot_jobs,
-                                   double scratch_size) :
-            Service(hostname, service_name, mailbox_name_prefix),
-            supports_pilot_jobs(supports_pilot_jobs),
-            supports_standard_jobs(supports_standard_jobs) {
+                                   double scratch_space_size) :
+            Service(hostname, service_name, mailbox_name_prefix)
+            {
 
       this->state = ComputeService::UP;
-      if (scratch_size > 0) {
+              // Set default and specified properties
+
+      if (scratch_space_size > 0) {
         try {
           this->scratch_space_storage_service =
-                  new SimpleStorageService(hostname, scratch_size);
+                  new SimpleStorageService(hostname, scratch_space_size);
         } catch (std::runtime_error &e) {
           throw;
         }
@@ -149,23 +147,16 @@ namespace wrench {
     /**
      * @brief Constructor
      *
-     * @param hostname: the name of the host on which the service runs
+     * @param hostname: the name of the host on which the compute service runs
      * @param service_name: the name of the compute service
      * @param mailbox_name_prefix: the mailbox name prefix
-     * @param supports_standard_jobs: true if the job executor should support standard jobs
-     * @param supports_pilot_jobs: true if the job executor should support pilot jobs
-     * @param default_storage_service: a storage service
-     * @param scratch_space: scratch space of the compute service
+     * @param scratch_space: scratch storage space of the compute service (nullptr if none)
      */
     ComputeService::ComputeService(const std::string &hostname,
                                    const std::string service_name,
                                    const std::string mailbox_name_prefix,
-                                   bool supports_standard_jobs,
-                                   bool supports_pilot_jobs,
                                    StorageService *scratch_space) :
-            Service(hostname, service_name, mailbox_name_prefix),
-            supports_pilot_jobs(supports_pilot_jobs),
-            supports_standard_jobs(supports_standard_jobs) {
+            Service(hostname, service_name, mailbox_name_prefix) {
 
       this->state = ComputeService::UP;
       this->scratch_space_storage_service = scratch_space;
@@ -176,7 +167,7 @@ namespace wrench {
      * @return true or false
      */
     bool ComputeService::supportsStandardJobs() {
-      return this->supports_standard_jobs;
+      return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS);
     }
 
     /**
@@ -184,12 +175,12 @@ namespace wrench {
      * @return true or false
      */
     bool ComputeService::supportsPilotJobs() {
-      return this->supports_pilot_jobs;
+      return getPropertyValueAsBoolean(ComputeServiceProperty::SUPPORTS_PILOT_JOBS);
     }
 
     /**
      * @brief Get the number of hosts that the compute service manages
-     * @return the host counts
+     * @return the host count
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -272,8 +263,8 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the per-core fop ratea of the compute service's hosts
-    * @return flop rates in flop/sec
+    * @brief Get the per-core flop rate of the compute service's hosts
+    * @return a list of flop rates in flop/sec
     *
     * @throw std::runtime_error
     */
@@ -299,7 +290,7 @@ namespace wrench {
     }
 
     /**
-    * @brief Get the RAM capacities of the compute service's hosts
+    * @brief Get the RAM capacities for each of the compute service's hosts
     * @return a vector of RAM capacities
     *
     * @throw std::runtime_error
@@ -353,7 +344,7 @@ namespace wrench {
     std::map<std::string, std::vector<double>> ComputeService::getServiceResourceInformation() {
 
       if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(new ServiceIsDown(this));
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
       // send a "info request" message to the daemon's mailbox_name
@@ -362,8 +353,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new ComputeServiceResourceInformationRequestMessage(
                 answer_mailbox,
-                this->getPropertyValueAsDouble(
-                        ComputeServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(
+                        ComputeServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -373,8 +364,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -389,24 +378,24 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the total size of the scratch space (not the remaining free space on the scratch space)
-     * @return return size (double)
+     * @brief Get the total capacity of the compute service's scratch storage space
+     * @return a size (in bytes)
      */
-    double ComputeService::getScratchSize() {
+    double ComputeService::getTotalScratchSpaceSize() {
       return this->scratch_space_storage_service ? this->scratch_space_storage_service->getTotalSpace() : 0.0;
     }
 
     /**
-     * @brief Get the free space of the scratch service
-     * @return return size (double)
+     * @brief Get the free space on the compute service's scratch storage space
+     * @return a size (in bytes)
      */
-    double ComputeService::getFreeRemainingScratchSpace() {
+    double ComputeService::getFreeScratchSpaceSize() {
       return this->scratch_space_storage_service ? this->scratch_space_storage_service->getFreeSpace() : 0.0;
     }
 
     /**
-    * @brief Get a shared pointer to the scratch space
-    * @return returns a pointer to the shared scratch space
+    * @brief Get the compute service's scratch storage space
+    * @return a pointer to the shared scratch space
     */
     StorageService *ComputeService::getScratch() {
       return this->scratch_space_storage_service;
@@ -414,7 +403,7 @@ namespace wrench {
 
     /**
     * @brief Checks if the compute service has a scratch space
-    * @return returns TRUE/FALSE (compute service has some scratch space or not)
+    * @return true if the compute service has some scratch storage space, false otherwise
     */
     bool ComputeService::hasScratch() {
       return (this->scratch_space_storage_service != nullptr);

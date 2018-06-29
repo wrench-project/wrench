@@ -26,13 +26,14 @@ namespace wrench {
     class WorkerThreadWork;
     class Workunit;
     class ComputeThread;
+    class WorkflowJob;
 
     /***********************/
     /** \cond INTERNAL     */
     /***********************/
 
     /**
-     * @brief An actor that knows how to perform a work unit
+     * @brief An service that performs a WorkUnit
      */
     class WorkunitMulticoreExecutor : public Service {
 
@@ -46,6 +47,7 @@ namespace wrench {
                      std::string callback_mailbox,
                      Workunit *workunit,
                      StorageService *scratch_space,
+                     WorkflowJob* job,
                      double thread_startup_overhead = 0.0);
 
         void kill();
@@ -74,6 +76,9 @@ namespace wrench {
 
         std::set<WorkflowFile* > files_stored_in_scratch;
         std::vector<std::shared_ptr<ComputeThread>> compute_threads;
+
+        // a reference to the job it is a part of (currently required for creating the /tmp directory in scratch space)
+        WorkflowJob* job;
 
     };
 
