@@ -59,6 +59,7 @@ namespace wrench {
 
     private:
         T *content;
+        double date = -1.0;
     };
 
 };

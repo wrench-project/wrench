@@ -205,6 +205,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/NetworkConnectionManager.cpp
         src/wrench/services/storage/simple/NetworkConnection.cpp
         src/wrench/util/UnitParser.cpp
+        src/wrench/simulation/SimulationTimestampTypes.cpp
         )
 
 # test files

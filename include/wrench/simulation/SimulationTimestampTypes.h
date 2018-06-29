@@ -14,24 +14,20 @@
 
 namespace wrench {
 
+    // TODO: do file copies (lazy match end times to start times should be ok, gotta check)
+
     class WorkflowTask;
 
     class SimulationTimestampType {
     public:
-        SimulationTimestampType() {
-            this->date = S4U_Simulation::getClock();
-        }
-
-        double getDate() {
-            return this->date;
-        }
-
-        SimulationTimestampType *getEndpoint() {
-            return this->endpoint;
-        }
+        SimulationTimestampType();
+        virtual ~SimulationTimestampType() {}
+        double getDate();
+        SimulationTimestampType* getEndpoint();
 
     protected:
         SimulationTimestampType *endpoint = nullptr;
+        virtual void setEndpoints() = 0;
 
     private:
         double date = -1.0;
@@ -52,13 +48,7 @@ namespace wrench {
          * @brief Constructor
          * @param task: a workflow task
          */
-        SimulationTimestampTask(WorkflowTask *task) {
-            this->task = task;
-        }
-
-        ~SimulationTimestampTask() {
-
-        }
+        SimulationTimestampTask(WorkflowTask *);
 
         /***********************/
         /** \endcond           */
@@ -69,22 +59,11 @@ namespace wrench {
          *
          * @return the task
          */
-        WorkflowTask *getTask() {
-          return this->task;
-        }
-
+        WorkflowTask *getTask();
 
     protected:
-        static std::map<std::string, SimulationTimestampTask* const&> pending_task_timestamps;
-
-        void setEndpoints(WorkflowTask *task) {
-            auto pending_tasks_itr = pending_task_timestamps.find(task->getID());
-            if (pending_tasks_itr != pending_task_timestamps.end()) {
-                (*pending_tasks_itr).second->endpoint = this;
-                this->endpoint = (*pending_tasks_itr).second->endpoint;
-                pending_task_timestamps.erase(pending_tasks_itr);
-            }
-        }
+        static std::map<std::string, SimulationTimestampTask *> pending_task_timestamps;
+        void setEndpoints();
 
     private:
         WorkflowTask *task;
@@ -92,23 +71,16 @@ namespace wrench {
 
     class SimulationTimestampTaskStart : public SimulationTimestampTask {
     public:
-        SimulationTimestampTaskStart(WorkflowTask *task) : SimulationTimestampTask(task) {
-            pending_task_timestamps.insert(std::make_pair(task->getID(), this));
-        }
+        SimulationTimestampTaskStart(WorkflowTask *);
     };
-
     class SimulationTimestampTaskFailure : public SimulationTimestampTask {
     public:
-        SimulationTimestampTaskFailure(WorkflowTask *task) : SimulationTimestampTask(task){
-            setEndpoints(task);
-        }
+        SimulationTimestampTaskFailure(WorkflowTask *);
     };
 
     class SimulationTimestampTaskCompletion : public SimulationTimestampTask {
     public:
-        SimulationTimestampTaskCompletion(WorkflowTask *task) : SimulationTimestampTask(task) {
-            setEndpoints(task);
-        }
+        SimulationTimestampTaskCompletion(WorkflowTask *);
     };
 
 };
