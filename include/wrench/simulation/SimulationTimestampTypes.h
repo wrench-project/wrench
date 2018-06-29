@@ -14,8 +14,6 @@
 
 namespace wrench {
 
-    // TODO: do file copies (lazy match end times to start times should be ok, gotta check)
-
     class WorkflowTask;
 
     class SimulationTimestampType {
