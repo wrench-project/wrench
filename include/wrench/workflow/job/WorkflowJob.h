@@ -30,11 +30,12 @@ namespace wrench {
     class WorkflowJob {
     public:
 
-        /** @brief Job type enum */
+        /** @brief Job types */
         enum Type {
-            /** @brief A standard job that is submitted as is */
+            /** @brief A standard job that can be submitted directly to a ComputeService for execution */
             STANDARD,
-            /** @brief A pilot job that onces started will act as a mini compute service with an expiration date */
+            /** @brief A pilot job that can be submitted to a ComputeService and that, once started, will act as a ComputeService
+             * (likely a MultihostMulticoreComputeService) with an expiration date */
             PILOT
         };
 

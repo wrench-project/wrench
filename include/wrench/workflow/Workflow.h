@@ -30,20 +30,20 @@ namespace wrench {
     public:
         Workflow();
 
-        WorkflowTask *addTask(std::string, double flops, int min_num_cores = 1,
-                              int max_num_cores = 1,
-                              double parallel_efficiency = 1.0,
-                              double memory_requirement = 0.0);
+        WorkflowTask *addTask(std::string, double flops,
+                              unsigned long min_num_cores,
+                              unsigned long max_num_cores,
+                              double parallel_efficiency,
+                              double memory_requirement,
+                              WorkflowTask::TaskType type = WorkflowTask::TaskType::COMPUTE);
 
         void removeTask(WorkflowTask *task);
 
-        WorkflowTask *getWorkflowTaskByID(std::string);
+        WorkflowTask *getTaskByID(std::string);
 
         WorkflowFile *addFile(std::string, double);
 
-        WorkflowFile *getFileById(std::string id);
-
-        WorkflowFile *getWorkflowFileByID(std::string);
+        WorkflowFile *getFileByID(std::string);
 
         static double getSumFlops(std::vector<WorkflowTask *> tasks);
 
@@ -63,11 +63,11 @@ namespace wrench {
 
         std::map<std::string, WorkflowFile *> getInputFiles();
 
+        bool isDone();
+
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
-
-        bool isDone();
 
         std::vector<WorkflowTask *> getTasksInTopLevelRange(unsigned long min, unsigned long max);
 
@@ -83,7 +83,6 @@ namespace wrench {
 
         std::vector<WorkflowTask *> getTaskChildren(const WorkflowTask *task);
 
-        std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
 
         /***********************/
         /** \endcond           */
@@ -93,6 +92,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+        std::unique_ptr<WorkflowExecutionEvent> waitForNextExecutionEvent();
 
         std::string getCallbackMailbox();
 

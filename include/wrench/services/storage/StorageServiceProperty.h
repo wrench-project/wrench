@@ -23,44 +23,11 @@ namespace wrench {
 
     public:
 
-        /** @brief The number of bytes in the control message sent to the daemon to request its free space information **/
-        DECLARE_PROPERTY_NAME(FREE_SPACE_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to answer free space information request **/
-        DECLARE_PROPERTY_NAME(FREE_SPACE_ANSWER_MESSAGE_PAYLOAD);
-
-        /** @brief The number of bytes in the control message sent to the daemon to request a file lookup **/
-        DECLARE_PROPERTY_NAME(FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to answer a file lookup request **/
-        DECLARE_PROPERTY_NAME(FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD);
-
-        /** @brief The number of bytes in the control message sent to the daemon to request a file deletion **/
-        DECLARE_PROPERTY_NAME(FILE_DELETE_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to answer a file deletion request **/
-        DECLARE_PROPERTY_NAME(FILE_DELETE_ANSWER_MESSAGE_PAYLOAD);
-
-        /** @brief The number of bytes in the control message sent to the daemon to request a file copy **/
-        DECLARE_PROPERTY_NAME(FILE_COPY_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to answer a file copy request **/
-        DECLARE_PROPERTY_NAME(FILE_COPY_ANSWER_MESSAGE_PAYLOAD);
-
-        /** @brief The number of bytes in the control message sent to the daemon to request a file copy **/
-        DECLARE_PROPERTY_NAME(FILE_WRITE_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to answer a file copy request **/
-        DECLARE_PROPERTY_NAME(FILE_WRITE_ANSWER_MESSAGE_PAYLOAD);
-
-        /** @brief The number of bytes in the control message sent to the daemon to request a file copy **/
-        DECLARE_PROPERTY_NAME(FILE_READ_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the daemon to answer a file copy request **/
-        DECLARE_PROPERTY_NAME(FILE_READ_ANSWER_MESSAGE_PAYLOAD);
-
-        /** @brief The number of bytes in the control message sent by the daemon to say "file not found" **/
-        DECLARE_PROPERTY_NAME(FILE_NOT_FOUND_MESSAGE_PAYLOAD);
-
-        /** @brief The number of bytes in the control message sent by the daemon to say "not enough space" **/
-        DECLARE_PROPERTY_NAME(NOT_ENOUGH_STORAGE_SPACE_MESSAGE_PAYLOAD);
-
         /** @brief The maximum number of concurrent data connections supported by the service (default = "infinity") **/
         DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
+
+        /** @brief The simulated delay when a storage service connects to itself (default = "0") **/
+        DECLARE_PROPERTY_NAME(SELF_CONNECTION_DELAY);
 
     };
 

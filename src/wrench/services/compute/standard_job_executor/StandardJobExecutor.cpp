@@ -42,14 +42,16 @@ namespace wrench {
      *
      * @param simulation: a reference to a simulation object
      * @param callback_mailbox: the mailbox to which a reply will be sent
-     * @param hostname: the hostname of the host that should run this executor (could be the first compute resources - see below)
-     * @param job: the job to execute
+     * @param hostname: the name of the host on which this service will run (could be the first compute resources - see below)
+     * @param job: the standard job to execute
      * @param compute_resources: a non-empty list of <hostname, num_cores, memory> tuples, which represent
      *           the compute resources the job should execute on
      *              - If num_cores == ComputeService::ALL_CORES, then ALL the cores of the host are used
      *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
-     * @param default_storage_service: a storage service (or nullptr)
-     * @param plist: a property list
+     * @param scratch_space: the usable scratch storage space  (or nullptr if none)
+     * @param part_of_pilot_job: true if the job executor is running within a pilot job
+     * @param property_list: a property list
+     * @param messagepayload_list: a message payload list
      *
      * @throw std::invalid_argument
      * @throw std::runtime_error
@@ -61,7 +63,10 @@ namespace wrench {
                                              std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
                                              StorageService* scratch_space,
                                              bool part_of_pilot_job,
-                                             std::map<std::string, std::string> plist) :
+                                             PilotJob* parent_pilot_job,
+                                             std::map<std::string, std::string> property_list,
+                                             std::map<std::string, std::string> messagepayload_list
+    ) :
             Service(hostname, "standard_job_executor", "standard_job_executor") {
 
       if ((job == nullptr) || (compute_resources.empty())) {
@@ -81,13 +86,13 @@ namespace wrench {
           throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): there should be at least one core per host");
         }
         if (std::get<1>(host) < ComputeService::ALL_CORES) {
-          if (std::get<1>(host) > S4U_Simulation::getNumCores(std::get<0>(host))) {
+          if (std::get<1>(host) > S4U_Simulation::getHostNumCores(std::get<0>(host))) {
             throw std::invalid_argument("StandardJobExecutor::StandardJobExecutor(): host " + std::get<0>(host) +
-                                        " has only " + std::to_string(S4U_Simulation::getNumCores(std::get<0>(host))) + " cores");
+                                        " has only " + std::to_string(S4U_Simulation::getHostNumCores(std::get<0>(host))) + " cores");
           }
         } else {
           // Set the num_cores to the maximum
-          std::get<1>(host) = S4U_Simulation::getNumCores(std::get<0>(host));
+          std::get<1>(host) = S4U_Simulation::getHostNumCores(std::get<0>(host));
         }
       }
 
@@ -120,7 +125,7 @@ namespace wrench {
       for (auto host : compute_resources) {
         unsigned long num_cores_on_hosts = std::get<1>(host);
         if (num_cores_on_hosts == ComputeService::ALL_CORES) {
-          num_cores_on_hosts = S4U_Simulation::getNumCores(std::get<0>(host));
+          num_cores_on_hosts = S4U_Simulation::getHostNumCores(std::get<0>(host));
         }
 
         if (num_cores_on_hosts >= max_min_required_num_cores) {
@@ -161,10 +166,12 @@ namespace wrench {
       this->scratch_space = scratch_space;
       this->files_stored_in_scratch = {};
       this->part_of_pilot_job = part_of_pilot_job;
+      this->parent_pilot_job = parent_pilot_job;
 
 
       // set properties
-      this->setProperties(this->default_property_values, plist);
+      this->setProperties(this->default_property_values, property_list);
+      this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
 
       // Compute the total number of cores and set initial core availabilities
       this->total_num_cores = 0;
@@ -247,7 +254,7 @@ namespace wrench {
      */
     int StandardJobExecutor::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_RED);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
       WRENCH_INFO("New StandardJobExecutor starting (%s) with %d cores and %.2le bytes of RAM over %ld hosts: ",
                   this->mailbox_name.c_str(), this->total_num_cores, this->total_ram, this->core_availabilities.size());
       for (auto h : this->core_availabilities) {
@@ -478,6 +485,10 @@ namespace wrench {
 
 //        std::cerr << "CREATING A WORKUNIT EXECUTOR\n";
 
+        WorkflowJob* workflow_job = job;
+        if (this->part_of_pilot_job) {
+          workflow_job = this->parent_pilot_job;
+        }
         std::shared_ptr<WorkunitMulticoreExecutor> workunit_executor = std::shared_ptr<WorkunitMulticoreExecutor>(
                 new WorkunitMulticoreExecutor(this->simulation,
                                               target_host,
@@ -486,6 +497,7 @@ namespace wrench {
                                               this->mailbox_name,
                                               wu,
                                               this->scratch_space,
+                                              workflow_job,
                                               this->getPropertyValueAsDouble(
                                                       StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD)));
 
@@ -534,8 +546,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(this->mailbox_name);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        // TODO: Send an exception above, and then send some "I failed" message to the service that created me?
-        // TODO: or do nothing, like now?
         return true;
       } catch (std::shared_ptr<FatalFailure> &cause) {
         WRENCH_INFO("Got a Unknown Failure during a communication... likely this means we're all done. Aborting");
@@ -607,7 +617,7 @@ namespace wrench {
 
       // Process task completions, if any
       for (auto task : workunit->tasks) {
-        WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)", task->getId().c_str(),
+        WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)", task->getID().c_str(),
                     WorkflowTask::stateToString(task->getInternalState()).c_str());
 
         // Increase the "completed tasks" count of the job
@@ -623,8 +633,8 @@ namespace wrench {
         try {
           S4U_Mailbox::putMessage(this->callback_mailbox,
                                   new StandardJobExecutorDoneMessage(this->job, this,
-                                                                     this->getPropertyValueAsDouble(
-                                                                             StandardJobExecutorProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
+                                                                     this->getMessagePayloadValueAsDouble(
+                                                                             StandardJobExecutorMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           WRENCH_INFO("Failed to send the callback... oh well");
           this->releaseDaemonLock();
@@ -639,12 +649,12 @@ namespace wrench {
             for (auto task : child->tasks) {
               if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                 throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
-                                         std::to_string(task->getInternalState()) + " for task " + task->getId());
+                                         std::to_string(task->getInternalState()) + " for task " + task->getID());
               }
             }
 
             // Find the child working in the non-ready  queue
-            bool found_it = false;
+            found_it = false;
             for (auto it = this->non_ready_workunits.begin(); it != this->non_ready_workunits.end(); it++) {
               if ((*it).get() == child) {
                 // Move it to the ready  queue
@@ -739,8 +749,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->callback_mailbox,
                                 new StandardJobExecutorFailedMessage(this->job, this, cause,
-                                                                     this->getPropertyValueAsDouble(
-                                                                             StandardJobExecutorProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
+                                                                     this->getMessagePayloadValueAsDouble(
+                                                                             StandardJobExecutorMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         // do nothing
       }
@@ -922,7 +932,7 @@ namespace wrench {
         /** Perform scratch cleanup */
         for (auto scratch_cleanup_file : files_stored_in_scratch) {
           try {
-            this->scratch_space->deleteFile(scratch_cleanup_file);
+            this->scratch_space->deleteFile(scratch_cleanup_file, job, nullptr);
           } catch (WorkflowExecutionException &e) {
             throw;
           }
@@ -950,7 +960,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the set of files stored in scratch space by a standardjob job
+     * @brief Get the set of files stored in scratch space during the standard job's execution
+     *
+     * @return a set of files
      */
     std::set<WorkflowFile*> StandardJobExecutor::getFilesInScratch() {
       return this->files_stored_in_scratch;
@@ -958,7 +970,7 @@ namespace wrench {
 
 
   /**
-   * @brief Retrieve the executor's job
+   * @brief Get the executor's job
    * @return a standard job
    */
     StandardJob *StandardJobExecutor::getJob() {
@@ -966,8 +978,8 @@ namespace wrench {
     }
 
 /**
- * @brief Retrieve the executor's compute resources
- * @return a set of compute resources
+ * @brief Get the executor's compute resources
+ * @return a set of compute resources as <hostname, num cores, bytes of RAM> tuples
  */
     std::set<std::tuple<std::string, unsigned long, double>>  StandardJobExecutor::getComputeResources() {
       return this->compute_resources;

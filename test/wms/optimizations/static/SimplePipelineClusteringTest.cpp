@@ -45,8 +45,8 @@ TEST_F(SimplePipelineClusteringTest, GroupTasks) {
   opt->process(workflow);
 
   std::map<std::string, std::vector<wrench::WorkflowTask *>> map = workflow->getReadyTasks();
-  EXPECT_EQ(map.size(), 1);
+  ASSERT_EQ(map.size(), 1);
 
-  EXPECT_EQ(map.begin()->second.size(), 3);
-  EXPECT_EQ(map["PIPELINE_CLUSTER_1"].size(), 3);
+  ASSERT_EQ(map.begin()->second.size(), 3);
+  ASSERT_EQ(map["PIPELINE_CLUSTER_1"].size(), 3);
 }

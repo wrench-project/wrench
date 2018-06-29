@@ -22,7 +22,7 @@ namespace wrench {
     /***********************/
 
     /**
-    * @brief Generic class that describe a message communicated by simulated processes
+    * @brief Top-level class to describe a message communicated by processes in the simulation
     */
     class SimulationMessage {
 

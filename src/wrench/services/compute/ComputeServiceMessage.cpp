@@ -16,7 +16,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param name: message name
-     * @param payload: message payload
+     * @param payload: message size in bytes
      */
     ComputeServiceMessage::ComputeServiceMessage(std::string name, double payload) :
             ServiceMessage("ComputeServiceMessage::" + name, payload) {
@@ -26,7 +26,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param answer_mailbox: mailbox to which the answer message should be sent
-    * @param job: a standard job
+    * @param job: a standard job submitted for execution
     * @param service_specific_args: a map of extra arguments (each specified by a name and value, both strings) required by some services
     * @param payload: message size in bytes
     *
@@ -49,10 +49,10 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a standard job
+     * @param job: a standard job that had been submitted for execution
      * @param compute_service: the compute service
      * @param success: true on success, false otherwise
-     * @param failure_cause: cause of the failure (nullptr is success=true)
+     * @param failure_cause: cause of the failure (nullptr if success == true)
      * @param payload: message size in bytes
      *
      * @throw std::invalid_arguments
@@ -77,8 +77,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a standard job
-     * @param cs: points to a ComputeService
+     * @param job: a standard job that has completed
+     * @param cs: the compute service on which the job has completed
      * @param payload: message size in bytes
      *
      * @throw std::invalid_arguments
@@ -97,8 +97,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a standard job
-     * @param cs: a compute service
+     * @param job: a standard job that has failed
+     * @param cs: the compute service on which the job has failed
      * @param cause: the cause of the failure
      * @param payload: message size in bytes
      *
@@ -121,7 +121,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param answer_mailbox: mailbox to which the answer message should be sent
-    * @param job: a standard job
+    * @param job: a standard job to terminate
     * @param payload: message size in bytes
     *
     * @throw std::invalid_arguments
@@ -141,10 +141,10 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a standard job
-     * @param compute_service: the compute service
+     * @param job: a standard job whose termination was requested
+     * @param compute_service: the compute service that was executing the standard job
      * @param success: true on success, false otherwise
-     * @param failure_cause: cause of the failure (nullptr is success=true)
+     * @param failure_cause: cause of the failure (nullptr if success == true)
      * @param payload: message size in bytes
      *
      * @throw std::invalid_arguments
@@ -171,7 +171,7 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param answer_mailbox: mailbox to which the answer message should be sent
-     * @param job: a pilot job
+     * @param job: a pilot job submitted for execution
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -192,9 +192,9 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param job: the pilot job
-     * @param compute_service: the compute service
-     * @param success: whether the submission is accepted
-     * @param failure_cause: the failure cause (nullptr is success=true)
+     * @param compute_service: the compute service to which the job had been submitted
+     * @param success: whether the submission was successful or not
+     * @param failure_cause: cause of the failure (nullptr if success == true)
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -220,8 +220,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a pilot job
-     * @param cs: a compute service
+     * @param job: a pilot job that has started execution
+     * @param cs: the compute service on which the pilot job has started
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -240,8 +240,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a pilot job
-     * @param cs: a compute service
+     * @param job: a pilot job that has expired
+     * @param cs: the compute service on which the pilot job has expired
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -259,8 +259,8 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a pilot job
-     * @param cs: a compute service
+     * @param job: a pilot job that has failed
+     * @param cs: the compute service on which the pilot job has failed
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
@@ -279,7 +279,7 @@ namespace wrench {
     /**
     * @brief Constructor
     * @param answer_mailbox: mailbox to which the answer message should be sent
-    * @param job: a pilot job
+    * @param job: a pilot job whose termination is requested
     * @param payload: message size in bytes
     *
     * @throw std::invalid_arguments
@@ -299,10 +299,10 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param job: a pilot job
+     * @param job: a pilot job whose termination had been requested
      * @param compute_service: the compute service
      * @param success: true on success, false otherwise
-     * @param failure_cause: cause of the failure (nullptr is success=true)
+     * @param failure_cause: cause of the failure (nullptr if success == true)
      * @param payload: message size in bytes
      *
      * @throw std::invalid_arguments
@@ -327,7 +327,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param answer_mailbox: the mailbox to which the answer should be sent
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -345,7 +345,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param info: resource description
+     * @param info: the resource description map
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument

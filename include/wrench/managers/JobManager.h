@@ -34,14 +34,13 @@ namespace wrench {
 
 
 		/**
-     * @brief A helper daemon (co-located with the WMS) to handle job executions
+     * @brief A helper daemon (co-located with and explicitly started by a WMS), which is used to
+     *        handle all job executions
      */
 		class JobManager : public Service {
 
 		public:
 
-
-				~JobManager();
 
 				void stop();
 
@@ -73,6 +72,11 @@ namespace wrench {
 				std::set<PilotJob *> getPendingPilotJobs();
 
 				std::set<PilotJob *> getRunningPilotJobs();
+				/***********************/
+				/** \cond INTERNAL    */
+				/***********************/
+
+				~JobManager();
 
 		protected:
 
@@ -80,11 +84,11 @@ namespace wrench {
 
 				JobManager(WMS *wms);
 
-		private:
+				/***********************/
+				/** \endcond           */
+				/***********************/
 
-				/***********************/
-				/** \cond INTERNAL     */
-				/***********************/
+		private:
 
 				int main();
 
@@ -104,10 +108,6 @@ namespace wrench {
 				std::set<PilotJob *> running_pilot_jobs;
 				std::set<PilotJob *> completed_pilot_jobs;
 
-
-				/***********************/
-				/** \endcond           */
-				/***********************/
 		};
 
 		/***********************/

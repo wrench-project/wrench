@@ -50,16 +50,16 @@ namespace wrench {
       tasks.push_back(t5);
       tasks.push_back(t6);
 
-      EXPECT_EQ(600, scheduler->getFlops(this->workflow, tasks));
+      ASSERT_EQ(600, scheduler->getFlops(this->workflow, tasks));
 
       tasks.erase(std::remove(tasks.begin(), tasks.end(), t1), tasks.end());
-      EXPECT_EQ(500, scheduler->getFlops(this->workflow, tasks));
+      ASSERT_EQ(500, scheduler->getFlops(this->workflow, tasks));
 
       tasks.erase(std::remove(tasks.begin(), tasks.end(), t2), tasks.end());
-      EXPECT_EQ(300, scheduler->getFlops(this->workflow, tasks));
+      ASSERT_EQ(300, scheduler->getFlops(this->workflow, tasks));
 
       tasks.erase(std::remove(tasks.begin(), tasks.end(), t4), tasks.end());
-      EXPECT_EQ(300, scheduler->getFlops(this->workflow, tasks));
+      ASSERT_EQ(300, scheduler->getFlops(this->workflow, tasks));
     }
 
     TEST_F(CriticalPathSchedulerTest, GetMaxParallelization) {
@@ -67,15 +67,15 @@ namespace wrench {
 
       std::set<WorkflowTask *> tasks = {t1};
 
-      EXPECT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
+      ASSERT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
 
       tasks = {t2, t3};
-      EXPECT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
+      ASSERT_EQ(2, scheduler->getMaxParallelization(this->workflow, tasks));
 
       tasks = {t2};
-      EXPECT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
+      ASSERT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
 
       tasks = {t3};
-      EXPECT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
+      ASSERT_EQ(1, scheduler->getMaxParallelization(this->workflow, tasks));
     }
 }

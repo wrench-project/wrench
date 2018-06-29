@@ -16,6 +16,7 @@
 #include "wrench/services/compute/batch/BatchJob.h"
 #include "wrench/services/compute/batch/BatschedNetworkListener.h"
 #include "wrench/services/compute/batch/BatchServiceProperty.h"
+#include "wrench/services/compute/batch/BatchServiceMessagePayload.h"
 #include "wrench/services/helpers/Alarm.h"
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/WorkflowJob.h"
@@ -33,12 +34,15 @@ namespace wrench {
      *        controls access to their resource via a batch queue.
      *
      *        In the current implementation of
-     *        this service, like for many of its real-world counterparts, it does not handle memory
-     *        partitioning among jobs on the same host. It also does not simulate effects
-     *        of memory sharing (e.g., swapping). When multiple jobs share hosts,
+     *        this service, like for many of its real-world counterparts, memory
+     *        partitioning among jobs on the same host is not handled.  When multiple jobs share hosts,
      *        which can happen when jobs require only a few cores per host and can thus
-     *        be co-located on the same hosts in a non-exclusive fashion, each job simply runs as if it had access to the
-     *        full RAM of each compute host it is scheduled on.
+     *        be co-located on the same hosts in a non-exclusive fashion,
+     *        each job simply runs as if it had access to the
+     *        full RAM of each compute host it is scheduled on. The simulation of these
+     *        memory contended scenarios is thus, for now, not realistic as there is no simulation
+     *        of the effects
+     *        of memory sharing (e.g., swapping).
      */
     class BatchService : public ComputeService {
 
@@ -47,24 +51,10 @@ namespace wrench {
          */
     private:
 
-        std::map<std::string, std::string> default_property_values =
-                {{BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
-                 {BatchServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,"1024"},
-                 {BatchServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, "1024"},
-                 {BatchServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,              "1024"},
+        std::map<std::string, std::string> default_property_values = {
+                 {BatchServiceProperty::SUPPORTS_PILOT_JOBS,                         "true"},
+                 {BatchServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
                  {BatchServiceProperty::THREAD_STARTUP_OVERHEAD,                     "0"},
-                 {BatchServiceProperty::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           "1024"},
-                 {BatchServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {BatchServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {BatchServiceProperty::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {BatchServiceProperty::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {BatchServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
-                 {BatchServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
-                 {BatchServiceProperty::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         "1024"},
-                 {BatchServiceProperty::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,           "1024"},
-                 {BatchServiceProperty::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
-                 {BatchServiceProperty::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {BatchServiceProperty::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
                  {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
                 #ifdef ENABLE_BATSCHED
                  {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
@@ -76,17 +66,32 @@ namespace wrench {
                  {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""}
                 };
 
+        std::map<std::string, std::string> default_messagepayload_values = {
+                 {BatchServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
+                 {BatchServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,"1024"},
+                 {BatchServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, "1024"},
+                 {BatchServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,              "1024"},
+                 {BatchServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           "1024"},
+                 {BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                 {BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                 {BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {BatchServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
+                 {BatchServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
+                 {BatchServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         "1024"},
+                 {BatchServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,           "1024"},
+                 {BatchServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
+                 {BatchServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {BatchServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                };
+
     public:
         BatchService(std::string &hostname,
-                     bool supports_standard_jobs,
-                     bool supports_pilot_jobs,
                      std::vector<std::string> compute_hosts,
-                     std::map<std::string, std::string> plist = {},
-                     double scratch_size = 0);
-
-        //returns jobid,started time, running time
-//        std::vector<std::tuple<unsigned long, double, double>> getJobsInQueue();
-
+                     double scratch_space_size,
+                     std::map<std::string, std::string> property_list = {},
+                     std::map<std::string, std::string> messagepayload_list = {}
+        );
 
         /***********************/
         /** \cond DEVELOPER   **/
@@ -97,23 +102,28 @@ namespace wrench {
         /** \endcond          **/
         /***********************/
 
+        /***********************/
+        /** \cond INTERNAL    **/
+        /***********************/
         ~BatchService() override;
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
 
     private:
         friend class WorkloadTraceFileReplayer;
 
         BatchService(std::string hostname,
-                     bool supports_standard_jobs,
-                     bool supports_pilot_jobs,
                      std::vector<std::string> compute_hosts,
                      unsigned long cores_per_host,
                      double ram_per_host,
-                     std::map<std::string, std::string> plist,
-                     std::string suffix,
-                     double scratch_size = 0);
+                     double scratch_space_size,
+                     std::map<std::string, std::string> property_list,
+                     std::map<std::string, std::string> messagepayload_list,
+                     std::string suffix
+        );
 
-        unsigned int batsched_port; // ONLY USED FOR BATSCHED
 
         //submits a standard job
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &batch_job_args) override;
@@ -172,6 +182,8 @@ namespace wrench {
 
         //Batch scheduling supported algorithms
 #ifdef ENABLE_BATSCHED
+        unsigned long batsched_port; // ONLY USED FOR BATSCHED
+
         std::set<std::string> scheduling_algorithms = {"easy_bf", "conservative_bf", "easy_bf_plot_liquid_load_horizon",
                                                        "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
                                                        "energy_bf_monitoring",
@@ -197,7 +209,7 @@ namespace wrench {
 
 
 
-        unsigned long generateUniqueJobId();
+        unsigned long generateUniqueJobID();
 
         void removeJobFromRunningList(BatchJob *job);
 
@@ -230,8 +242,8 @@ namespace wrench {
         // Terminate currently running pilot jobs
         void terminateRunningPilotJobs();
 
-        //Fail the standard jobs inside the pilot jobs
-        void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
+        //Fail the standard jobs
+        void failCurrentStandardJobs();
 
         //Process the pilot job completion
         void processPilotJobCompletion(PilotJob *job);
@@ -256,7 +268,7 @@ namespace wrench {
         void sendPilotJobExpirationNotification(PilotJob *job);
 
         //send call back to the standard job submitters
-        void sendStandardJobFailureNotification(StandardJob *job, std::string job_id);
+        void sendStandardJobFailureNotification(StandardJob *job, std::string job_id, std::shared_ptr<FailureCause> cause);
 
         // Try to schedule a job
         bool scheduleOneQueuedJob();
@@ -272,11 +284,11 @@ namespace wrench {
 
 
         //vector of network listeners (only useful when ENABLE_BATSCHED == on)
-        std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
 
         std::map<std::string,double> getStartTimeEstimatesForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
 
 #ifdef ENABLE_BATSCHED
+        std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
 
         friend class BatschedNetworkListener;
 
@@ -294,7 +306,7 @@ namespace wrench {
         void startBatschedNetworkListener();
 
         void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
-                                       std::string kill_reason);
+                                       std::string kill_reason, std::string even_type);
         void sendAllQueuedJobsToBatsched();
 
         //process execute events from batsched

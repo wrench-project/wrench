@@ -32,7 +32,7 @@ namespace wrench {
     };
 
     /**
-     * @brief FileRegistryFileLookupRequestMessage class
+     * @brief A message sent to a FileRegistryService to request a file lookup
      */
     class FileRegistryFileLookupRequestMessage : public FileRegistryMessage {
     public:
@@ -45,7 +45,7 @@ namespace wrench {
     };
 
     /**
-     * @brief FileRegistryFileLookupAnswerMessage class
+     * @brief A message sent by a FileRegistryService in answer to a file lookup request
      */
     class FileRegistryFileLookupAnswerMessage : public FileRegistryMessage {
     public:
@@ -58,7 +58,8 @@ namespace wrench {
     };
 
     /**
-     * @brief FileRegistryFileLookupByProximityRequestMessage class
+     * @brief A message sent to a FileRegistryService to request a file lookup, expecting a reply
+     *        in which file locations are sorted by decreasing proximity to some reference host
      */
     class FileRegistryFileLookupByProximityRequestMessage : public FileRegistryMessage {
     public:
@@ -86,7 +87,8 @@ namespace wrench {
     };
 
     /**
-     * @brief FileRegistryFileLookupByProximityAnswerMessage class
+     * @brief A message sent by a FileRegistryService in answer to a file lookup request, in which
+     *        file locations are sorted by decreasing proximity to some reference host
      */
     class FileRegistryFileLookupByProximityAnswerMessage : public FileRegistryMessage {
     public:
@@ -113,7 +115,7 @@ namespace wrench {
     };
 
     /**
-     * @brief FileRegistryRemoveEntryRequestMessage class
+     * @brief A message sent to a FileRegistryService to request the removal of an entry
      */
     class FileRegistryRemoveEntryRequestMessage : public FileRegistryMessage {
     public:
@@ -122,25 +124,25 @@ namespace wrench {
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
-        /** @brief The file whose entry to remove */
+        /** @brief The file for which one entry should be removed */
         WorkflowFile *file;
-        /** @brief The storage service */
+        /** @brief The storage service of the entry to remove */
         StorageService *storage_service;
     };
 
     /**
-     * @brief FileRegistryRemoveEntryAnswerMessage
+     * @brief A message sent by a FileRegistryService in answer to an entry removal request
      */
     class FileRegistryRemoveEntryAnswerMessage : public FileRegistryMessage {
     public:
         FileRegistryRemoveEntryAnswerMessage(bool success, double payload);
 
-        /** @brief Whether the remove entry operation was successful or not */
+        /** @brief Whether the entry removal was successful or not */
         bool success;
     };
 
     /**
-     * @brief FileRegistryAddEntryRequestMessage class
+     * @brief A message sent to a FileRegistryService to request the addition of an entry
      */
     class FileRegistryAddEntryRequestMessage : public FileRegistryMessage {
     public:
@@ -151,12 +153,12 @@ namespace wrench {
         std::string answer_mailbox;
         /** @brief The file for which to add an entry */
         WorkflowFile *file;
-        /** @brief The storage service */
+        /** @brief The storage service in that entry */
         StorageService *storage_service;
     };
 
     /**
-     * @brief FileRegistryAddEntryAnswerMessage class
+     * @brief A message sent by a FileRegistryService in answer to an entry addition request
      */
     class FileRegistryAddEntryAnswerMessage : public FileRegistryMessage {
     public:

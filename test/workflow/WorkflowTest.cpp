@@ -17,13 +17,13 @@ protected:
       workflow = new wrench::Workflow();
 
       // create simple diamond workflow
-      t1 = workflow->addTask("task-test-01", 1);
-      t2 = workflow->addTask("task-test-02", 1);
-      t3 = workflow->addTask("task-test-03", 1);
-      t4 = workflow->addTask("task-test-04", 1);
+      t1 = workflow->addTask("task-test-01", 1, 1, 1, 1.0, 0);
+      t2 = workflow->addTask("task-test-02", 1, 1, 1, 1.0, 0);
+      t3 = workflow->addTask("task-test-03", 1, 1, 1, 1.0, 0);
+      t4 = workflow->addTask("task-test-04", 1, 1, 1, 1.0, 0);
 
-      t2->setClusterId("cluster-01");
-      t3->setClusterId("cluster-01");
+      t2->setClusterID("cluster-01");
+      t3->setClusterID("cluster-01");
 
       workflow->addControlDependency(t1, t2);
       workflow->addControlDependency(t1, t3);
@@ -55,83 +55,83 @@ TEST_F(WorkflowTest, WorkflowStructure) {
   ASSERT_EQ(4, workflow->getNumberOfTasks());
 
   // testing number of task's parents
-  EXPECT_EQ(0, workflow->getTaskParents(t1).size());
-  EXPECT_EQ(1, workflow->getTaskParents(t2).size());
-  EXPECT_EQ(1, workflow->getTaskParents(t3).size());
-  EXPECT_EQ(2, workflow->getTaskParents(t4).size());
+  ASSERT_EQ(0, workflow->getTaskParents(t1).size());
+  ASSERT_EQ(1, workflow->getTaskParents(t2).size());
+  ASSERT_EQ(1, workflow->getTaskParents(t3).size());
+  ASSERT_EQ(2, workflow->getTaskParents(t4).size());
 
   // testing number of task's children
-  EXPECT_EQ(2, workflow->getTaskChildren(t1).size());
-  EXPECT_EQ(1, workflow->getTaskChildren(t2).size());
-  EXPECT_EQ(1, workflow->getTaskChildren(t3).size());
-  EXPECT_EQ(0, workflow->getTaskChildren(t4).size());
+  ASSERT_EQ(2, workflow->getTaskChildren(t1).size());
+  ASSERT_EQ(1, workflow->getTaskChildren(t2).size());
+  ASSERT_EQ(1, workflow->getTaskChildren(t3).size());
+  ASSERT_EQ(0, workflow->getTaskChildren(t4).size());
 
   // testing top-levels
-  EXPECT_EQ(0, t1->getTopLevel());
-  EXPECT_EQ(1, t2->getTopLevel());
-  EXPECT_EQ(1, t3->getTopLevel());
-  EXPECT_EQ(2, t4->getTopLevel());
+  ASSERT_EQ(0, t1->getTopLevel());
+  ASSERT_EQ(1, t2->getTopLevel());
+  ASSERT_EQ(1, t3->getTopLevel());
+  ASSERT_EQ(2, t4->getTopLevel());
 
-  EXPECT_EQ(3, workflow->getNumLevels());
+  ASSERT_EQ(3, workflow->getNumLevels());
 
   // Get tasks with a given top-level
   std::vector<wrench::WorkflowTask *> top_level_equal_to_1_or_2;
   top_level_equal_to_1_or_2 = workflow->getTasksInTopLevelRange(1,2);
-  EXPECT_EQ(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t1), top_level_equal_to_1_or_2.end());
-  EXPECT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t2), top_level_equal_to_1_or_2.end());
-  EXPECT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t3), top_level_equal_to_1_or_2.end());
-  EXPECT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t4), top_level_equal_to_1_or_2.end());
+  ASSERT_EQ(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t1), top_level_equal_to_1_or_2.end());
+  ASSERT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t2), top_level_equal_to_1_or_2.end());
+  ASSERT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t3), top_level_equal_to_1_or_2.end());
+  ASSERT_NE(std::find(top_level_equal_to_1_or_2.begin(), top_level_equal_to_1_or_2.end(), t4), top_level_equal_to_1_or_2.end());
 
   // remove tasks
   workflow->removeTask(t4);
-  EXPECT_EQ(0, workflow->getTaskChildren(t3).size());
-  EXPECT_EQ(0, workflow->getTaskChildren(t2).size());
+  ASSERT_EQ(0, workflow->getTaskChildren(t3).size());
+  ASSERT_EQ(0, workflow->getTaskChildren(t2).size());
 
-  EXPECT_EQ(3, workflow->getTasks().size());
+  ASSERT_EQ(3, workflow->getTasks().size());
 
   workflow->removeTask(t1);
 }
 
 TEST_F(WorkflowTest, ControlDependency) {
   // testing null control dependencies
-  EXPECT_THROW(workflow->addControlDependency(nullptr, nullptr), std::invalid_argument);
-  EXPECT_THROW(workflow->addControlDependency(t1, nullptr), std::invalid_argument);
-  EXPECT_THROW(workflow->addControlDependency(nullptr, t1), std::invalid_argument);
+  ASSERT_THROW(workflow->addControlDependency(nullptr, nullptr), std::invalid_argument);
+  ASSERT_THROW(workflow->addControlDependency(t1, nullptr), std::invalid_argument);
+  ASSERT_THROW(workflow->addControlDependency(nullptr, t1), std::invalid_argument);
 }
 
 TEST_F(WorkflowTest, WorkflowTaskThrow) {
   // testing invalid task creation
-  EXPECT_THROW(workflow->addTask("task-error", -100), std::invalid_argument);
-  EXPECT_THROW(workflow->addTask("task-error", 100, -4), std::invalid_argument);
+  ASSERT_THROW(workflow->addTask("task-error", -100, 1, 1, 1.0, 0), std::invalid_argument);
+  ASSERT_THROW(workflow->addTask("task-error", 100, 2, 1, 1.0, 0), std::invalid_argument);
+  ASSERT_THROW(workflow->addTask("task-error", 100, 1, 1, -2.0, 0), std::invalid_argument);
+  ASSERT_THROW(workflow->addTask("task-error", 100, 1, 1, 2.0, 0), std::invalid_argument);
+  ASSERT_THROW(workflow->addTask("task-error", 100, 1, 1, 1.0, -1.0), std::invalid_argument);
 
   // testing whether a task id exists
-  EXPECT_THROW(workflow->getWorkflowTaskByID("task-test-00"), std::invalid_argument);
-  EXPECT_TRUE(workflow->getWorkflowTaskByID("task-test-01")->getId() == t1->getId());
+  ASSERT_THROW(workflow->getTaskByID("task-test-00"), std::invalid_argument);
+  ASSERT_TRUE(workflow->getTaskByID("task-test-01")->getID() == t1->getID());
 
   // testing whether a task already exists (check via task id)
-  EXPECT_THROW(workflow->addTask("task-test-01", 1), std::invalid_argument);
-  EXPECT_THROW(workflow->addTask("task-test-01", 1, 1), std::invalid_argument);
-  EXPECT_THROW(workflow->addTask("task-test-01", 1, 10), std::invalid_argument);
-  EXPECT_THROW(workflow->addTask("task-test-01", 10000, 1), std::invalid_argument);
+  ASSERT_THROW(workflow->addTask("task-test-01", 1, 1, 1, 1.0, 0), std::invalid_argument);
 
   // remove tasks
-  EXPECT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
+  ASSERT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
   workflow->removeTask(t1);
 
-  EXPECT_THROW(workflow->getTaskChildren(nullptr), std::invalid_argument);
-  EXPECT_THROW(workflow->getTaskParents(nullptr), std::invalid_argument);
+  ASSERT_THROW(workflow->getTaskChildren(nullptr), std::invalid_argument);
+  ASSERT_THROW(workflow->getTaskParents(nullptr), std::invalid_argument);
 
-//  EXPECT_THROW(workflow->updateTaskState(nullptr, wrench::WorkflowTask::State::FAILED), std::invalid_argument);
+//  ASSERT_THROW(workflow->updateTaskState(nullptr, wrench::WorkflowTask::State::FAILED), std::invalid_argument);
 }
 
 TEST_F(WorkflowTest, WorkflowFile) {
-  EXPECT_THROW(workflow->addFile("file-error-00", -1), std::invalid_argument);
-  EXPECT_THROW(workflow->addFile("file-01", 10), std::invalid_argument);
+  ASSERT_THROW(workflow->addFile("file-error-00", -1), std::invalid_argument);
+  ASSERT_THROW(workflow->addFile("file-01", 10), std::invalid_argument);
 
-  EXPECT_THROW(workflow->getWorkflowFileByID("file-nonexist"), std::invalid_argument);
-  EXPECT_EQ(workflow->getWorkflowFileByID("file-01")->getId(), "file-01");
+  ASSERT_THROW(workflow->getFileByID("file-nonexist"), std::invalid_argument);
+  ASSERT_EQ(workflow->getFileByID("file-01")->getID(), "file-01");
 
-  EXPECT_EQ(workflow->getInputFiles().size(), 1);
+  ASSERT_EQ(workflow->getInputFiles().size(), 1);
 }
 //
 //TEST_F(WorkflowTest, UpdateTaskState) {
@@ -145,7 +145,7 @@ TEST_F(WorkflowTest, WorkflowFile) {
 //  workflow->updateTaskState(t2, wrench::WorkflowTask::State::READY);
 //  workflow->updateTaskState(t3, wrench::WorkflowTask::State::READY);
 //  ASSERT_EQ(1, workflow->getReadyTasks().size());
-//  EXPECT_EQ(2, workflow->getReadyTasks()["cluster-01"].size());
+//  ASSERT_EQ(2, workflow->getReadyTasks()["cluster-01"].size());
 //}
 
 TEST_F(WorkflowTest, IsDone) {
@@ -156,13 +156,18 @@ TEST_F(WorkflowTest, IsDone) {
     task->setState(wrench::WorkflowTask::State::COMPLETED);
   }
 
-  EXPECT_TRUE(workflow->isDone());
+  ASSERT_TRUE(workflow->isDone());
 }
 
 TEST_F(WorkflowTest, SumFlops) {
 
   double sum_flops = 0;
 
-  EXPECT_NO_THROW(sum_flops = wrench::Workflow::getSumFlops(workflow->getTasks()));
+  ASSERT_NO_THROW(sum_flops = wrench::Workflow::getSumFlops(workflow->getTasks()));
   ASSERT_EQ(sum_flops, 4.0);
+}
+
+
+TEST_F(WorkflowTest, Export) {
+  ASSERT_THROW(workflow->exportToEPS("tmp/workflow.eps"), std::runtime_error);
 }

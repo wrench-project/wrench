@@ -21,7 +21,8 @@ namespace wrench {
 
 
     /**
-     * @brief A class that can load a job submission trace in the SWF format
+     * @brief A class that can load a job submission trace (a.k.a. supercomputer workload) in the SWF format
+     *        (see http://www.cs.huji.ac.il/labs/parallel/workload/swf.html)
      *        and store it as a vector of simulation-relevant fields
      */
     class TraceFileLoader {

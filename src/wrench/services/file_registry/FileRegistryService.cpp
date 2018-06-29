@@ -30,27 +30,33 @@ namespace wrench {
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
-     * @param plist: a property list ({} means "use all defaults")
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      */
     FileRegistryService::FileRegistryService(std::string hostname,
-                                             std::map<std::string, std::string> plist) :
-            FileRegistryService(hostname, plist, "") {
+                                             std::map<std::string, std::string> property_list,
+                                             std::map<std::string, std::string> messagepayload_list
+    ) :
+            FileRegistryService(hostname, property_list, messagepayload_list,  "") {
 
     }
 
     /**
      * @brief Constructor
      * @param hostname: the hostname on which to start the service
-     * @param plist: a property list ({} means "use all defaults")
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param suffix: suffix to append to the service name and mailbox
      */
     FileRegistryService::FileRegistryService(
             std::string hostname,
-            std::map<std::string, std::string> plist,
+            std::map<std::string, std::string> property_list,
+            std::map<std::string, std::string> messagepayload_list,
             std::string suffix) :
             Service(hostname, "file_registry" + suffix, "file_registry" + suffix) {
 
-      this->setProperties(this->default_property_values, plist);
+      this->setProperties(this->default_property_values, property_list);
+      this->setMessagePayloads(this->default_messagepayload_values, messagepayload_list);
     }
 
 
@@ -59,9 +65,9 @@ namespace wrench {
     }
 
     /**
-     * @brief Lookup an entry for a file
+     * @brief Lookup entries for a file
      * @param file: the file to lookup
-     * @return The storage services that hold a copy of the file
+     * @return The list of storage services that hold a copy of the file
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
@@ -81,8 +87,8 @@ namespace wrench {
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupRequestMessage(answer_mailbox, file,
-                                                                                             this->getPropertyValueAsDouble(
-                                                                                                     FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                                                                                             this->getMessagePayloadValueAsDouble(
+                                                                                                     FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -92,8 +98,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -109,10 +113,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve a list of storage services that hold a file, sorted by increasing network distance from a reference host, according to a network proximity service
-     * @param file: the file of interest
-     * @param reference_host: reference host from which network proximity values will be measured
-     * @param network_proximity_service: the network proximity service
+     * @brief Lookup entries for a file, including for each entry a network distance from a reference host (as determined by a network proximity service)
+     * @param file: the file to lookup
+     * @param reference_host: reference host from which network proximity values are to be measured
+     * @param network_proximity_service: the network proximity service to use
      *
      * @return a map of <distance , storage service> pairs
      */
@@ -138,8 +142,8 @@ namespace wrench {
 
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new FileRegistryFileLookupByProximityRequestMessage(answer_mailbox, file, reference_host, network_proximity_service,
-                                                                                                        this->getPropertyValueAsDouble(
-                                                                                                                FileRegistryServiceProperty::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                                                                                                        this->getMessagePayloadValueAsDouble(
+                                                                                                                FileRegistryServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -149,8 +153,6 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
@@ -185,8 +187,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new FileRegistryAddEntryRequestMessage(answer_mailbox, file, storage_service,
-                                                                       this->getPropertyValueAsDouble(
-                                                                               FileRegistryServiceProperty::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
+                                                                       this->getMessagePayloadValueAsDouble(
+                                                                               FileRegistryServiceMessagePayload::ADD_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -197,8 +199,6 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw (WorkflowExecutionException(cause));
       }
 
       if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
@@ -232,8 +232,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new FileRegistryRemoveEntryRequestMessage(answer_mailbox, file, storage_service,
-                                                                          this->getPropertyValueAsDouble(
-                                                                                  FileRegistryServiceProperty::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
+                                                                          this->getMessagePayloadValueAsDouble(
+                                                                                  FileRegistryServiceMessagePayload::REMOVE_ENTRY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -244,14 +244,12 @@ namespace wrench {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        throw (WorkflowExecutionException(cause));
       }
 
       if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
         if (!msg->success) {
           WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service",
-                      file->getId().c_str(), storage_service->getName().c_str());
+                      file->getID().c_str(), storage_service->getName().c_str());
         }
         return;
       } else {
@@ -267,7 +265,7 @@ namespace wrench {
      */
     int FileRegistryService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
       WRENCH_INFO("File Registry Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
@@ -307,8 +305,8 @@ namespace wrench {
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                  new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                          FileRegistryServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                  new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                          FileRegistryServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }
@@ -320,12 +318,12 @@ namespace wrench {
           locations = this->entries[msg->file];
         }
         // Simulate a lookup overhead
-        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_OVERHEAD));
+        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new FileRegistryFileLookupAnswerMessage(msg->file, locations,
-                                                                           this->getPropertyValueAsDouble(
-                                                                                   FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                                                                           this->getMessagePayloadValueAsDouble(
+                                                                                   FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
@@ -349,10 +347,11 @@ namespace wrench {
           locations_itr = locations.insert(locations_itr, std::make_pair(proximity, storage_service));
         }
 
-        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_OVERHEAD));
+        S4U_Simulation::compute(getPropertyValueAsDouble(FileRegistryServiceProperty::LOOKUP_COMPUTE_COST));
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox, new FileRegistryFileLookupByProximityAnswerMessage(msg->file,
-                                                                                                           msg->reference_host, locations, this->getPropertyValueAsDouble(FileRegistryServiceProperty::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
+                                                                                                           msg->reference_host, locations, 
+                                                                                                           this->getMessagePayloadValueAsDouble(FileRegistryServiceMessagePayload::FILE_LOOKUP_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
@@ -362,8 +361,8 @@ namespace wrench {
         addEntryToDatabase(msg->file, msg->storage_service);
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
-                                   new FileRegistryAddEntryAnswerMessage(this->getPropertyValueAsDouble(
-                                           FileRegistryServiceProperty::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
+                                   new FileRegistryAddEntryAnswerMessage(this->getMessagePayloadValueAsDouble(
+                                           FileRegistryServiceMessagePayload::ADD_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
@@ -375,8 +374,8 @@ namespace wrench {
         try {
           S4U_Mailbox::dputMessage(msg->answer_mailbox,
                                    new FileRegistryRemoveEntryAnswerMessage(success,
-                                                                            this->getPropertyValueAsDouble(
-                                                                                    FileRegistryServiceProperty::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
+                                                                            this->getMessagePayloadValueAsDouble(
+                                                                                    FileRegistryServiceMessagePayload::REMOVE_ENTRY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }

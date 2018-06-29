@@ -34,7 +34,7 @@ public:
     void do_EnergyConsumption_test();
 
     void do_EnergyConsumptionPStateChange_test();
-
+    std::unique_ptr<wrench::Workflow> workflow;
 
 protected:
     EnergyConsumptionTest() {
@@ -83,7 +83,7 @@ protected:
     }
 
     std::string platform_file_path = "/tmp/platform.xml";
-    std::unique_ptr<wrench::Workflow> workflow;
+
 
 };
 
@@ -114,7 +114,7 @@ private:
         std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
 
         //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-        wrench::WorkflowTask *task = this->workflow->addTask("task1", 10000000000, 1, 1, 1.0);
+        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
 
         // Create a StandardJob
         wrench::StandardJob *job = job_manager->createStandardJob(
@@ -127,6 +127,7 @@ private:
         std::string my_mailbox = "test_callback_mailbox";
         double before = wrench::S4U_Simulation::getClock();
 
+
         // Create a StandardJobExecutor that will run stuff on one host and 6 core
         std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
                 new wrench::StandardJobExecutor(
@@ -137,6 +138,8 @@ private:
                         {std::make_tuple(test->simulation->getHostnameList()[1], 1, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         false,
+                        nullptr,
+                        {},
                         {}
                 ));
         executor->start(executor, true);
@@ -206,9 +209,9 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       {}, 10000000000000.0)));
+                                                       10000000000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 
@@ -268,7 +271,7 @@ private:
         std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
 
         //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-        wrench::WorkflowTask *task1 = this->workflow->addTask("task1", 10000000000, 1, 1, 1.0);
+        wrench::WorkflowTask *task1 = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
 
         // Create a StandardJob
         wrench::StandardJob *job1 = job_manager->createStandardJob(
@@ -277,7 +280,7 @@ private:
                 });
 
         //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
-        wrench::WorkflowTask *task2 = this->workflow->addTask("task2", 10000000000, 1, 1, 1.0);
+        wrench::WorkflowTask *task2 = this->getWorkflow()->addTask("task2", 10000000000, 1, 1, 1.0, 1.0);
 
         // Create a StandardJob
         wrench::StandardJob *job2 = job_manager->createStandardJob(
@@ -302,6 +305,8 @@ private:
                         {std::make_tuple(test->simulation->getHostnameList()[1], 1, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         false,
+                        nullptr,
+                        {},
                         {}
                 ));
         executor->start(executor, true);
@@ -350,6 +355,8 @@ private:
                         {std::make_tuple(test->simulation->getHostnameList()[1], 1, wrench::ComputeService::ALL_RAM)},
                         nullptr,
                         false,
+                        nullptr,
+                        {},
                         {}
                 ));
         executor->start(executor, true);
@@ -414,9 +421,9 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
   // Create a Compute Service
   EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService(hostname, true, true,
+          new wrench::MultihostMulticoreComputeService(hostname,
                                                        {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                       {}, 10000000000000.0)));
+                                                       10000000000000.0, {})));
 
   simulation->add(new wrench::FileRegistryService(hostname));
 

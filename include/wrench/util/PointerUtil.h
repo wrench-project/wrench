@@ -31,7 +31,7 @@ namespace wrench {
 
         /**
          * @brief A helper method to move a unique_ptr from a set to another
-         * @tparam T: template class
+         * @tparam template class
          * @param it: iterator
          * @param from: pointer to the set in which the object is
          * @param to: pointer to the set to which the object should be moved
@@ -49,6 +49,13 @@ namespace wrench {
 
         };
 
+        /**
+         * @brief A helper method to move a shared_ptr from a set to another
+         * @tparam template class
+         * @param it: iterator
+         * @param from: pointer to the set in which the object is
+         * @param to: pointer to the set to which the object should be moved
+         */
         template<class T>
         static void moveSharedPtrFromSetToSet(
                 typename std::set<std::shared_ptr<T>>::iterator it,
@@ -62,8 +69,14 @@ namespace wrench {
 
         };
 
-
-
+#if 0
+        /**
+         * @brief A helper method to move a unique_ptr from a dequeue to a set
+         * @tparam template class
+         * @param it: iterator
+         * @param from: pointer to the dequeue in which the object is
+         * @param to: pointer to the set to which the object should be moved
+         */
         template<class T>
         static void moveUniquePtrFromDequeToSet(
                 typename std::deque<std::unique_ptr<T>>::iterator it,
@@ -76,7 +89,16 @@ namespace wrench {
             (*to).insert(std::move(tmp));
 
         };
+#endif
 
+
+        /**
+         * @brief A helper method to move a unique_ptr from a set to another
+         * @tparam template class
+         * @param ptr: the object to move
+         * @param from: pointer to the set in which the object is
+         * @param to: pointer to the set to which the object should be moved
+         */
         template <class T1>
         static void moveSingleSeparateUniquePtrFromSetToSet(std::unique_ptr<T1>* ptr,
                                                            std::set<std::unique_ptr<T1>> *from,

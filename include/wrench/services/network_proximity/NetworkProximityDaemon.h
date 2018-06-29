@@ -10,8 +10,10 @@
 #ifndef WRENCH_NETWORKDAEMONS_H
 #define WRENCH_NETWORKDAEMONS_H
 
+#include <random>
 #include "wrench/services/Service.h"
 #include "wrench/services/network_proximity/NetworkProximityServiceProperty.h"
+#include "wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h"
 
 namespace wrench {
 
@@ -22,7 +24,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief A network daemon running (proximity is computed between two such running daemons)
+     * @brief A daemon used by a NetworkProximityService to run network measurements (proximity is computed between two such running daemons)
      */
     class NetworkProximityDaemon: public Service {
     public:
@@ -30,20 +32,7 @@ namespace wrench {
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                        std::string network_proximity_service_mailbox,
         double message_size,double measurement_period,
-        double noise);
-
-    private:
-        std::map<std::string, std::string> default_property_values =
-                {{NetworkProximityServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,          "1024"},
-                 {NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,       "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceProperty::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD,    "1024"},
-                 {NetworkProximityServiceProperty::LOOKUP_OVERHEAD,                      "0.0"},
-                };
-
-
+        double noise, std::map<std::string, std::string> messagepayload_list);
 
     private:
 
@@ -52,12 +41,13 @@ namespace wrench {
         NetworkProximityDaemon(Simulation *simulation, std::string hostname,
                        std::string network_proximity_service_mailbox,
                        double message_size,double measurement_period,
-                       double noise, std::string suffix);
+                       double noise, std::map<std::string, std::string> messagepayload_list, std::string suffix);
 
 
         double message_size;
         double measurement_period;
         double max_noise;
+
         std::string suffix;
         std::string next_mailbox_to_send;
         std::string next_host_to_send;

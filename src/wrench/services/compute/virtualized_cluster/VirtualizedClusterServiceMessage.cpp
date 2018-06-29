@@ -59,11 +59,12 @@ namespace wrench {
      * @param answer_mailbox: the mailbox to which to send the answer
      * @param pm_hostname: the name of the physical machine host
      * @param vm_hostname: the name of the new VM host
-     * @param supports_standard_jobs: true if the compute service should support standard jobs
-     * @param supports_pilot_jobs: true if the compute service should support pilot jobs
-     * @param num_cores: the number of cores the service can use (0 means "use as many as there are cores on the host")
-     * @param ram_memory: the VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue)
-     * @param plist: a property list ({} means "use all defaults")
+     * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
+     *                   available on the host)
+     * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the
+     *                    host, this can be lead to an out of memory issue)
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
      * @param payload: the message size in bytes
      *
      * @throw std::invalid_argument
@@ -72,15 +73,14 @@ namespace wrench {
             const std::string &answer_mailbox,
             const std::string &pm_hostname,
             const std::string &vm_hostname,
-            bool supports_standard_jobs,
-            bool supports_pilot_jobs,
             unsigned long num_cores,
             double ram_memory,
-            std::map<std::string, std::string> &plist,
+            std::map<std::string, std::string> &property_list,
+            std::map<std::string, std::string> &messagepayload_list,
             double payload) :
             VirtualizedClusterServiceMessage("CREATE_VM_REQUEST", payload),
-            supports_standard_jobs(supports_standard_jobs),
-            supports_pilot_jobs(supports_pilot_jobs), num_cores(num_cores), ram_memory(ram_memory), plist(plist) {
+            num_cores(num_cores), ram_memory(ram_memory),
+            property_list(property_list), messagepayload_list(messagepayload_list) {
 
       if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty()) {
         throw std::invalid_argument(

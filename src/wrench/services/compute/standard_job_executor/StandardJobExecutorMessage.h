@@ -29,7 +29,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief StandardJobExecutorMessage top-level class
+     * @brief Top-level class for messages received/sent by a StandardJobExecutor
      */
     class StandardJobExecutorMessage : public SimulationMessage {
     protected:
@@ -37,7 +37,7 @@ namespace wrench {
     };
 
     /**
-     * @brief WorkunitExecutorDoneMessage class
+     * @brief A message sent by a WorkunitExecutor to notify that it has completed a WorkUnit
      */
     class WorkunitExecutorDoneMessage : public StandardJobExecutorMessage {
     public:
@@ -46,14 +46,14 @@ namespace wrench {
                 Workunit *workunit,
                 double payload);
 
-        /** @brief The worker thread that performed the work */
+        /** @brief The work unit executor that has completed the work unit */
         WorkunitMulticoreExecutor *workunit_executor;
-        /** @brief The work that was performed */
+        /** @brief The work unit that has completed */
         Workunit *workunit;
     };
 
     /**
-     * @brief WorkunitExecutorFailedMessage class
+     * @brief A message sent by a WorkunitExecutor to notify that its WorkUnit as failed
      */
     class WorkunitExecutorFailedMessage : public StandardJobExecutorMessage {
     public:
@@ -63,9 +63,9 @@ namespace wrench {
                 std::shared_ptr<FailureCause> cause,
                 double payload);
 
-        /** @brief The worker thread that failed to perform the work */
+        /** @brief The worker unit executor that has failed to perform the work unit */
         WorkunitMulticoreExecutor *workunit_executor;
-        /** @brief The work that failed */
+        /** @brief The work unit that has failed */
         Workunit *workunit;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
@@ -73,7 +73,7 @@ namespace wrench {
 
 
     /**
-     * @brief StandardJobExecutorDoneMessage class
+     * @brief A message sent by a StandardJobExecutor to notify that it has completed a StandardJob
      */
     class StandardJobExecutorDoneMessage : public StandardJobExecutorMessage {
     public:
@@ -82,15 +82,15 @@ namespace wrench {
                 StandardJobExecutor *executor,
                 double payload);
 
-        /** @brief The executor that completed the work */
+        /** @brief The standard job executor that has completed the standard job */
         StandardJobExecutor *executor;
-        /** @brief The job that was completed */
+        /** @brief The standard job that has completed */
         StandardJob *job;
 
     };
 
     /**
-     * @brief StandardJobExecutorFailedMessage class
+     * @brief A message sent by a StandardJobExecutor to notify that its StandardJob has failed
      */
     class StandardJobExecutorFailedMessage : public StandardJobExecutorMessage {
     public:
@@ -100,9 +100,9 @@ namespace wrench {
                 std::shared_ptr<FailureCause> cause,
                 double payload);
 
-        /** @brief The executor that failed to complete the work */
+        /** @brief The standard job executor that has ailed to complete the standard job */
         StandardJobExecutor *executor;
-        /** @brief The job that failed */
+        /** @brief The standard job that has failed */
         StandardJob *job;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
@@ -111,7 +111,7 @@ namespace wrench {
 
 
     /**
-     * @brief ComputeThreadDoneMessage class
+     * @brief A message sent by a ComputeThread once it's done performing its computation
      */
     class ComputeThreadDoneMessage : public StandardJobExecutorMessage {
     public:

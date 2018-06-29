@@ -22,10 +22,11 @@ namespace wrench {
      */
     int OneJobWMS::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_YELLOW);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_YELLOW);
 
       WRENCH_INFO("Starting!");
       auto workflow = new Workflow();
+      this->addWorkflow(workflow);
 
       // Create the set of tasks
       for (int i = 0; i < this->num_nodes; i++) {

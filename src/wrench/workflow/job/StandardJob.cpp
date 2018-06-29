@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,18 +35,17 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StandardJob::StandardJob(std::vector<WorkflowTask *> tasks,
-                             std::map<WorkflowFile *, StorageService *> file_locations,
-                             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
-                             std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions) :
+                             std::map<WorkflowFile *, StorageService *> &file_locations,
+                             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &pre_file_copies,
+                             std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> &post_file_copies,
+                             std::set<std::tuple<WorkflowFile *, StorageService *>> &cleanup_file_deletions) :
             WorkflowJob(WorkflowJob::STANDARD),
             num_completed_tasks(0),
             file_locations(file_locations),
             pre_file_copies(pre_file_copies),
             post_file_copies(post_file_copies),
             cleanup_file_deletions(cleanup_file_deletions),
-            state(StandardJob::State::NOT_SUBMITTED)
-    {
+            state(StandardJob::State::NOT_SUBMITTED) {
 
       // Check that this is a ready sub-graph
       for (auto t : tasks) {
@@ -55,7 +54,8 @@ namespace wrench {
           for (auto parent : parents) {
             if (parent->getState() != WorkflowTask::State::COMPLETED) {
               if (std::find(tasks.begin(), tasks.end(), parent) == tasks.end()) {
-                throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getId() + "' has non-completed parents not included in the job");
+                throw std::invalid_argument("StandardJob::StandardJob(): Task '" + t->getID() +
+                                            "' has non-completed parents not included in the job");
               }
             }
           }
@@ -71,15 +71,9 @@ namespace wrench {
       this->name = "standard_job_" + std::to_string(WorkflowJob::getNewUniqueNumber());
     };
 
-
     /**
-     * @brief Destructor
-     */
-    StandardJob::~StandardJob() {
-    }
-
-    /**
-     * @brief Returns the minimum number of cores that the job needs to run
+     * @brief Returns the minimum number of cores required, over all tasks in the job (i.e., at least
+     *        one task in the job cannot run if fewer cores than this minimum are available)
      * @return the number of cores
      */
     unsigned long StandardJob::getMinimumRequiredNumCores() {

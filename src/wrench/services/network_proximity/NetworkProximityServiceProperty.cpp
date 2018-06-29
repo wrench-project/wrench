@@ -12,15 +12,6 @@
 
 namespace wrench {
 
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_DB_LOOKUP_MESSAGE_PAYLOAD);
-
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD);
-
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD);
-
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD);
-
-    SET_PROPERTY_NAME(NetworkProximityServiceProperty, NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD);
 
     SET_PROPERTY_NAME(NetworkProximityServiceProperty, LOOKUP_OVERHEAD);
 

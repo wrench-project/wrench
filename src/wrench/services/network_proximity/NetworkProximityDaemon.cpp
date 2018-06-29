@@ -33,10 +33,11 @@ namespace wrench {
     NetworkProximityDaemon::NetworkProximityDaemon(Simulation *simulation,
                                                    std::string hostname,
                                                    std::string network_proximity_service_mailbox,
-                                                   double message_size = 1, double measurement_period = 1000,
-                                                   double noise = 100) :
+                                                   double message_size, double measurement_period,
+                                                   double noise,
+                                                   std::map<std::string, std::string> messagepayload_list) :
             NetworkProximityDaemon(simulation, std::move(hostname), std::move(network_proximity_service_mailbox),
-                                   message_size, measurement_period, noise, "") {
+                                   message_size, measurement_period, noise, messagepayload_list, "") {
     }
 
 
@@ -44,10 +45,12 @@ namespace wrench {
      * @brief Constructor
      * @param simulation: a pointer to the simulation object
      * @param hostname: the hostname on which to start the service
-     * @param network_proximity_service_mailbox the mailbox of the network proximity service
-     * @param message_size the size of the message to be sent between network daemons to compute proximity
-     * @param measurement_period the time-difference between two message transfer to compute proximity
-     * @param noise the noise to add to compute the time-difference
+     * @param network_proximity_service_mailbox: the mailbox of the network proximity service
+     * @param message_size: the size of the message to be sent between network daemons to compute proximity
+     * @param measurement_period: the time-difference between two message transfer to compute proximity
+     * @param noise: the maximum magnitude of random noises added to the measurement_period at each iteration,
+     *               so as to avoid idiosyncratic behaviors that occur with perfect synchrony
+     * @param messagepayload_list: a message payload list
      * @param suffix: suffix to append to the service name and mailbox
      */
 
@@ -55,21 +58,23 @@ namespace wrench {
             Simulation *simulation,
             std::string hostname,
             std::string network_proximity_service_mailbox,
-            double message_size = 1, double measurement_period = 1000,
-            double noise = 100, std::string suffix = "") :
+            double message_size, double measurement_period,
+            double noise,
+            std::map<std::string, std::string> messagepayload_list,
+            std::string suffix = "") :
             Service(std::move(hostname), "network_daemons" + suffix, "network_daemons" + suffix) {
 
+      // Set the message payloads
+      setMessagePayloads(messagepayload_list, {});
+
       this->simulation = simulation;
-      this->message_size = message_size;
+      this->message_size = message_size * 0;
       this->measurement_period = measurement_period;
       this->max_noise = noise;
+
       this->next_mailbox_to_send = "";
       this->next_host_to_send = "";
       this->network_proximity_service_mailbox = std::move(network_proximity_service_mailbox);
-
-      // Set properties
-      this->setProperties(this->default_property_values,
-                          {std::make_pair("NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD", std::to_string(message_size))});
 
     }
 
@@ -78,23 +83,30 @@ namespace wrench {
      * @return time until next measurement (in seconds)
      */
     double NetworkProximityDaemon::getTimeUntilNextMeasurement() {
-      // TODO: Probably redo this: (i) pick a random double between -max_noise and + max_noise
-      double noise = rand() % ((int) (2 * this->max_noise - 1)) - this->max_noise;
+
+      static std::default_random_engine rng(0);
+      static std::uniform_real_distribution<double> noise_dist(-max_noise, +max_noise);
+      double noise = noise_dist(rng);
       return S4U_Simulation::getClock() + measurement_period + noise;
     }
 
     int NetworkProximityDaemon::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_MAGENTA);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
 
       WRENCH_INFO("Network Daemons Service starting on host %s!", S4U_Simulation::getHostName().c_str());
 
       double time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
-      S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                               new NextContactDaemonRequestMessage(this,
-                                                                   this->getPropertyValueAsDouble(
-                                                                           NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+      try {
+        S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+                                 new NextContactDaemonRequestMessage(this,
+                                                                     this->getMessagePayloadValueAsDouble(
+                                                                             NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        // give up right away!
+        return 0;
+      }
 
 
       bool life = true;
@@ -104,20 +116,19 @@ namespace wrench {
         if (countdown > 0) {
           life = this->processNextMessage(countdown);
         } else {
-          if ((next_host_to_send != "") || (next_mailbox_to_send != "")) {
+          if ((not next_host_to_send.empty()) || (not next_mailbox_to_send.empty())) {
 
             double start_time = S4U_Simulation::getClock();
 
+            WRENCH_INFO("Sending a NetworkProximityTransferMessage from %s to %s", this->mailbox_name.c_str(),
+                        this->next_mailbox_to_send.c_str());
             try {
-              WRENCH_INFO("Sending a NetworkProximityTransferMessage from %s to %s", this->mailbox_name.c_str(),
-                          this->next_mailbox_to_send.c_str());
               S4U_Mailbox::putMessage(this->next_mailbox_to_send,
                                       new NetworkProximityTransferMessage(
-                                              this->getPropertyValueAsDouble(
-                                                      NetworkProximityServiceProperty::NETWORK_PROXIMITY_TRANSFER_MESSAGE_PAYLOAD)));
+                                              this->message_size));
 
 
-            } catch (std::shared_ptr<NetworkError> cause) {
+            } catch (std::shared_ptr<NetworkError> &cause) {
               time_for_next_measurement = this->getTimeUntilNextMeasurement();
               continue;
             }
@@ -130,10 +141,15 @@ namespace wrench {
             std::pair<std::string, std::string> hosts;
             hosts = std::make_pair(S4U_Simulation::getHostName(), this->next_host_to_send);
 
-            S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                     new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
-                                                                              this->getPropertyValueAsDouble(
-                                                                                      NetworkProximityServiceProperty::NETWORK_DAEMON_COMPUTE_ANSWER_PAYLOAD)));
+            try {
+              S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+                                       new NetworkProximityComputeAnswerMessage(hosts, proximityValue,
+                                                                                this->getMessagePayloadValueAsDouble(
+                                                                                        NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+              // Couldn't report measurement... oh well.. ignoring
+            }
+
             next_host_to_send = "";
             next_mailbox_to_send = "";
 
@@ -143,10 +159,15 @@ namespace wrench {
             time_for_next_measurement = this->getTimeUntilNextMeasurement();
 
 
-            S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
-                                     new NextContactDaemonRequestMessage(this,
-                                                                         this->getPropertyValueAsDouble(
-                                                                                 NetworkProximityServiceProperty::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+            try {
+              S4U_Mailbox::dputMessage(this->network_proximity_service_mailbox,
+                                       new NextContactDaemonRequestMessage(this,
+                                                                           this->getMessagePayloadValueAsDouble(
+                                                                                   NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD)));
+            } catch (std::shared_ptr<NetworkError> &cause) {
+              // Couldn't find out who to talk to next... aborting
+              life = false;
+            }
           }
 
         }
@@ -164,12 +185,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> message = nullptr;
 
       try {
-//            if(timeout<1){
-//                std::cout<<"Timeout very less "<<this->mailbox_name<<"\n";
-//            }
         message = S4U_Mailbox::getMessage(this->mailbox_name, timeout);
-      } catch (std::shared_ptr<NetworkTimeout> &cause) {
-        return true;
       } catch (std::shared_ptr<NetworkError> &cause) {
         return true;
       }
@@ -185,8 +201,8 @@ namespace wrench {
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
-                                  new ServiceDaemonStoppedMessage(this->getPropertyValueAsDouble(
-                                          NetworkProximityServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
+                                  new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
+                                          NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return false;
         }

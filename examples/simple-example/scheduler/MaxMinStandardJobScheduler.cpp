@@ -53,7 +53,7 @@ namespace wrench {
         // TODO: add pilot job support
 
         // Second: attempt to run the task on a compute resource
-        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", task->getId().c_str());
+        WRENCH_INFO("Trying to submit task '%s' to a standard compute service...", task->getID().c_str());
 
         for (auto cs : compute_services) {
           WRENCH_INFO("Asking compute service %s if it can run this standard job...", cs->getName().c_str());
@@ -86,7 +86,7 @@ namespace wrench {
             file_locations.insert(std::make_pair(f, default_storage_service));
           }
 
-          WRENCH_INFO("Submitting task %s for execution as a standard job", task->getId().c_str());
+          WRENCH_INFO("Submitting task %s for execution as a standard job", task->getID().c_str());
           WorkflowJob *job = (WorkflowJob *) job_manager->createStandardJob(task, file_locations);
           job_manager->submitJob(job, cs);
           successfully_scheduled = true;

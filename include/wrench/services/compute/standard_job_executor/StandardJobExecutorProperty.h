@@ -26,12 +26,8 @@ namespace wrench {
 
     public:
 
-        /** @brief The number of seconds to start a thread **/
+        /** @brief The number of seconds to start a thread (default = 0) **/
         DECLARE_PROPERTY_NAME(THREAD_STARTUP_OVERHEAD);
-        /** @brief The number of bytes in the control message sent by the executor to state that it has completed a job **/
-        DECLARE_PROPERTY_NAME(STANDARD_JOB_DONE_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the executor to state that a job has failed **/
-        DECLARE_PROPERTY_NAME(STANDARD_JOB_FAILED_MESSAGE_PAYLOAD);
 
         /** @brief The number of bytes in the control message sent by the executor to provide the set of files stored in the scratch **/
         DECLARE_PROPERTY_NAME(STANDARD_JOB_FILES_STORED_IN_SCRATCH);
@@ -45,7 +41,7 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(CORE_ALLOCATION_ALGORITHM);
 
         /** @brief The algorithm that decides which ready computational task,
-         *         in case multiple can be ran, should run first. Possible values are:
+         *         in case multiple tasks are ready, should run first. Possible values are:
          *                  - maximum_flops (default)
          *                  - maximum_minimum_cores
          **/
@@ -53,7 +49,7 @@ namespace wrench {
 
         /** @brief The algorithm that decides on which host a task should
          *         be placed. Possible values are:
-         *                  - best fit (default)
+         *                  - best_fit (default)
          */
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 

@@ -15,6 +15,6 @@ TEST(WorkflowFileTest, FileStructure) {
   wrench::Workflow workflow;
   wrench::WorkflowFile *f1 = workflow.addFile("file-01", 100);
 
-  EXPECT_EQ(f1->getId(), "file-01");
-  EXPECT_EQ(f1->getSize(), 100);
+  ASSERT_EQ(f1->getID(), "file-01");
+  ASSERT_EQ(f1->getSize(), 100);
 }

@@ -20,12 +20,14 @@ namespace wrench {
     /***********************/
 
     /**
-     *  @brief An abstract dynamic optimization class
+     *  @brief An abstract class that serves as a base class for implementing dynamic (i.e., at runtime) optimizations
+     *         to be used by a WMS while executing a Workflow
      */
     class DynamicOptimization {
     public:
         /**
-         * @brief Method to process a workflow at runtime so as to optimize its execution (to be overridden)
+         * @brief Method to process (i.e., modify the structure of) a workflow at runtime so as to
+         * optimize its execution (to be overridden)
          *
          * @param workflow: the workflow
          */

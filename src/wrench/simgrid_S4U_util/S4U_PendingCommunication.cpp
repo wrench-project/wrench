@@ -21,7 +21,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(pending_communication, "Log category for Pending Co
 namespace wrench {
 
     /**
-     * @brief Wait for a pending communication
+     * @brief Wait for the pending communication to complete
      *
      * @return A (unique pointer to a) simulation message
      *
@@ -35,12 +35,11 @@ namespace wrench {
         }
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
-          WRENCH_INFO("Network error while doing a dputMessage()");
-//          throw std::shared_ptr<NetworkError>(
-//                  new NetworkError(NetworkError::RECEIVING, this->comm_ptr->getMailbox()->getName()));throw std::shared_ptr<NetworkError>(
-          // TODO: Why isn't the above working anymore???
           throw std::shared_ptr<NetworkError>(
-                  new NetworkError(NetworkError::RECEIVING, this->mailbox_name));
+                  new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, this->mailbox_name));
+        } else if (e.category == timeout_error) {
+          throw std::shared_ptr<NetworkError>(
+                  new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, this->mailbox_name));
         } else {
           throw std::runtime_error(
                   "S4U_PendingCommunication::wait(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
@@ -50,11 +49,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Wait for any completion
-     * @param pending_comms: pending communications
-     * @param timeout: timeout (-1 means no timeout)
+     * @brief Wait for any pending communication completion
+     * @param pending_comms: a list of pending communications
+     * @param timeout: timeout value in seconds (-1 means no timeout)
      *
-     * @return the index of the comm to which something happened
+     * @return the index of the comm to which something happened (success or failure)
      *
      * @throw std::invalid_argument
      */
@@ -69,11 +68,11 @@ namespace wrench {
 
 
     /**
-     * @brief Wait for any completion
-     * @param pending_comms: pending communications
-     * @param timeout: timeout (-1 means no timeout)
+     * @brief Wait for any pending communication completion
+     * @param pending_comms: a list of pending communications
+     * @param timeout: timeout value in seconds (-1 means no timeout)
      *
-     * @return the index of the comm to which something happened
+     * @return the index of the comm to which something happened (success or failure)
      *
      * @throw std::invalid_argument
      */

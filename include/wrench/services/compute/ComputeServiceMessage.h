@@ -27,7 +27,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level ComputeServiceMessage class
+     * @brief Top-level class for messages received/sent by a ComputeService
      */
     class ComputeServiceMessage : public ServiceMessage {
     protected:
@@ -36,7 +36,7 @@ namespace wrench {
 
 
     /**
-     * @brief ComputeServiceSubmitStandardJobRequestMessage class
+     * @brief A message sent to a ComputeService to submit a StandardJob for execution
      */
     class ComputeServiceSubmitStandardJobRequestMessage : public ComputeServiceMessage {
     public:
@@ -53,7 +53,7 @@ namespace wrench {
     };
 
     /**
-     * @brief ComputeServiceSubmitStandardJobAnswerMessage class
+     * @brief  A message sent by a ComputeService in answer to a StandardJob submission request
      */
     class ComputeServiceSubmitStandardJobAnswerMessage : public ComputeServiceMessage {
     public:
@@ -71,36 +71,36 @@ namespace wrench {
     };
 
     /**
-     * @brief ComputeServiceStandardJobDoneMessage class
+     * @brief A message sent by a ComputeService when a StandardJob has completed execution
      */
     class ComputeServiceStandardJobDoneMessage : public ComputeServiceMessage {
     public:
         ComputeServiceStandardJobDoneMessage(StandardJob *, ComputeService *, double payload);
 
-        /** @brief The job that completed */
+        /** @brief The job that has completed */
         StandardJob *job;
-        /** @brief The compute service that completed the job */
+        /** @brief The compute service on which the job has completed */
         ComputeService *compute_service;
     };
 
     /**
-     * @brief ComputeServiceStandardJobFailedMessage class
+     * @brief A message sent by a ComputeService when a StandardJob has failed to execute
      */
     class ComputeServiceStandardJobFailedMessage : public ComputeServiceMessage {
     public:
         ComputeServiceStandardJobFailedMessage(StandardJob *, ComputeService *, std::shared_ptr<FailureCause> cause,
                                                double payload);
 
-        /** @brief The job that failed */
+        /** @brief The job that has failed */
         StandardJob *job;
-        /** @brief The compute service on which the job failed */
+        /** @brief The compute service on which the job has failed */
         ComputeService *compute_service;
         /** @brief The cause of the failure */
         std::shared_ptr<FailureCause> cause;
     };
 
     /**
-    * @brief ComputeServiceTerminateStandardJobRequestMessage class
+    * @brief A message sent to a ComputeService to terminate a StandardJob previously submitted for execution
     */
     class ComputeServiceTerminateStandardJobRequestMessage : public ComputeServiceMessage {
     public:
@@ -113,7 +113,7 @@ namespace wrench {
     };
 
     /**
-     * @brief ComputeServiceTerminateStandardJobAnswerMessage class
+     * @brief A message sent by a ComputeService in answer to a StandardJob termination request
      */
     class ComputeServiceTerminateStandardJobAnswerMessage : public ComputeServiceMessage {
     public:
@@ -131,7 +131,7 @@ namespace wrench {
     };
 
     /**
-     * @brief ComputeServiceSubmitPilotJobRequestMessage class
+     * @brief A message sent to a ComputeService to submit a PilotJob for execution
      */
     class ComputeServiceSubmitPilotJobRequestMessage : public ComputeServiceMessage {
     public:
@@ -144,7 +144,7 @@ namespace wrench {
     };
 
     /**
-    * @brief ComputeServiceSubmitPilotJobAnswerMessage class
+    * @brief A message sent by a ComputeService in answer to a PilotJob submission request
     */
     class ComputeServiceSubmitPilotJobAnswerMessage : public ComputeServiceMessage {
     public:
@@ -164,46 +164,46 @@ namespace wrench {
 
 
     /**
-     * @brief ComputeServicePilotJobStartedMessage class
+     * @brief A message sent by a ComputeService when a PilotJob has started its execution
      */
     class ComputeServicePilotJobStartedMessage : public ComputeServiceMessage {
     public:
         ComputeServicePilotJobStartedMessage(PilotJob *, ComputeService *, double payload);
 
-        /** @brief The pilot job that just started */
+        /** @brief The pilot job that has started */
         PilotJob *job;
-        /** @brief The compute service that just started the pilot job */
+        /** @brief The compute service on which the pilot job has started */
         ComputeService *compute_service;
     };
 
     /**
-     * @brief ComputeServicePilotJobExpiredMessage class
+     * @brief A message sent by a ComputeService when a PilotJob has expired
      */
     class ComputeServicePilotJobExpiredMessage : public ComputeServiceMessage {
     public:
         ComputeServicePilotJobExpiredMessage(PilotJob *, ComputeService *, double payload);
 
-        /** @brief The pilot job that expired */
+        /** @brief The pilot job that has expired */
         PilotJob *job;
-        /** @brief The compute service on which the pilot job expired */
+        /** @brief The compute service on which the pilot job has expired */
         ComputeService *compute_service;
     };
 
     /**
-     * @brief ComputeServicePilotJobFailedMessage class
+     * @brief A message sent by a ComputeService when a PilotJob has failed
      */
     class ComputeServicePilotJobFailedMessage : public ComputeServiceMessage {
     public:
         ComputeServicePilotJobFailedMessage(PilotJob *, ComputeService *, double payload);
 
-        /** @brief The pilot job that failed */
+        /** @brief The pilot job that has failed */
         PilotJob *job;
         /** @brief The compute service on which the pilot job failed */
         ComputeService *compute_service;
     };
 
     /**
-    * @brief ComputeServiceTerminatePilotJobRequestMessage class
+    * @brief A message sent to a ComputeService to terminate a PilotJob previously submitted for execution
     */
     class ComputeServiceTerminatePilotJobRequestMessage : public ComputeServiceMessage {
     public:
@@ -216,7 +216,7 @@ namespace wrench {
     };
 
     /**
-     * @brief ComputeServiceTerminatePilotJobAnswerMessage class
+     * @brief A message sent by a ComputeService in answer to a PilotJob termination request
      */
     class ComputeServiceTerminatePilotJobAnswerMessage : public ComputeServiceMessage {
     public:
@@ -233,34 +233,20 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause;
     };
 
-//    /**
-//     * @brief ComputeServiceInformationMessage class
-//     */
-//    class ComputeServiceInformationMessage : public ComputeServiceMessage {
-//    public:
-//        ComputeServiceInformationMessage(WorkflowJob* job, std::string information, double payload);
-//
-//        /** @brief The job that is replying the information*/
-//        WorkflowJob* job;
-//
-//        /** @brief The information to reply back */
-//        std::string information;
-//    };
-
 
     /**
-     * @brief ComputeServiceResourceDescriptionRequestMessage class
+     * @brief A message sent to a ComputeService to request information on its compute resources
     */
     class ComputeServiceResourceInformationRequestMessage : public ComputeServiceMessage {
     public:
         ComputeServiceResourceInformationRequestMessage(std::string answer_mailbox, double payload);
 
-        /** @brief The mailbox to which the answer message should be sent */
+        /** @brief The mailbox to which the answer should be sent */
         std::string answer_mailbox;
     };
 
     /**
-     * @brief ComputeServiceNumIdleCoresAnswerMessage class
+     * @brief A message sent by a ComputeService in answer to a resource information request
      */
     class ComputeServiceResourceInformationAnswerMessage : public ComputeServiceMessage {
     public:

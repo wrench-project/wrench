@@ -24,7 +24,7 @@ namespace wrench {
     /***********************/
 
     /**
-     * @brief Top-level VirtualizedClusterServiceMessage class
+     * @brief Top-level class for messages received/sent by a VirtualizedClusterService
      */
     class VirtualizedClusterServiceMessage : public ComputeServiceMessage {
     protected:
@@ -32,7 +32,7 @@ namespace wrench {
     };
 
     /**
-     * @brief VirtualizedClusterServiceGetExecutionHostsRequestMessage class
+     * @brief A message sent to a VirtualizedClusterService to request the list of its execution hosts
      */
     class VirtualizedClusterServiceGetExecutionHostsRequestMessage : public VirtualizedClusterServiceMessage {
     public:
@@ -43,7 +43,7 @@ namespace wrench {
     };
 
     /**
-     * @brief VirtualizedClusterServiceGetExecutionHostsAnswerMessage class
+     * @brief A message sent by a VirtualizedClusterService in answer to a list of execution hosts request
      */
     class VirtualizedClusterServiceGetExecutionHostsAnswerMessage : public VirtualizedClusterServiceMessage {
     public:
@@ -55,32 +55,38 @@ namespace wrench {
     };
 
     /**
-     * @brief VirtualizedClusterServiceCreateVMRequestMessage class
+     * @brief A message sent to a VirtualizedClusterService to request a VM creation
      */
     class VirtualizedClusterServiceCreateVMRequestMessage : public VirtualizedClusterServiceMessage {
     public:
         VirtualizedClusterServiceCreateVMRequestMessage(const std::string &answer_mailbox,
                                                         const std::string &pm_hostname,
                                                         const std::string &vm_hostname,
-                                                        bool supports_standard_jobs,
-                                                        bool supports_pilot_jobs,
                                                         unsigned long num_cores,
                                                         double ram_memory,
-                                                        std::map<std::string, std::string> &plist,
+                                                        std::map<std::string, std::string> &property_list,
+                                                        std::map<std::string, std::string> &messagepayload_list,
                                                         double payload);
 
-        std::string pm_hostname;
-        std::string vm_hostname;
-        bool supports_standard_jobs;
-        bool supports_pilot_jobs;
-        unsigned long num_cores;
-        double ram_memory;
-        std::map<std::string, std::string> plist;
+    public:
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
+        /** @brief The name of the physical machine host */
+        std::string pm_hostname;
+        /** @brief The name of the new VM host */
+        std::string vm_hostname;
+        /** @brief The number of cores the service can use (0 means "use as many as there are cores on the host") */
+        unsigned long num_cores;
+        /** @brief The VM RAM memory capacity (0 means "use all memory available on the host", this can be lead to out of memory issue) */
+        double ram_memory;
+        /** @brief A property list ({} means "use all defaults") */
+        std::map<std::string, std::string> property_list;
+        /** @brief A message payload list ({} means "use all defaults") */
+        std::map<std::string, std::string> messagepayload_list;
     };
 
     /**
-     * @brief VirtualizedClusterServiceCreateVMAnswerMessage class
+     * @brief A message sent by a VirtualizedClusterService in answer to a VM creation request
      */
     class VirtualizedClusterServiceCreateVMAnswerMessage : public VirtualizedClusterServiceMessage {
     public:
@@ -91,7 +97,7 @@ namespace wrench {
     };
 
     /**
-     * @brief VirtualizedClusterServiceMigrateVMRequestMessage class
+     * @brief A message sent to a VirtualizedClusterService to request a VM migration
      */
     class VirtualizedClusterServiceMigrateVMRequestMessage : public VirtualizedClusterServiceMessage {
     public:
@@ -100,13 +106,16 @@ namespace wrench {
                                                          const std::string &dest_pm_hostname,
                                                          double payload);
 
+        /** @brief The name of the host on which the VM is currently executed */
         std::string vm_hostname;
+        /** @brief The name of the host to which the VM should be migrated */
         std::string dest_pm_hostname;
+        /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
     };
 
     /**
-     * @brief VirtualizedClusterServiceMigrateVMAnswerMessage class
+     * @brief A message sent by a VirtualizedClusterService in answer to a VM migration request
      */
     class VirtualizedClusterServiceMigrateVMAnswerMessage : public VirtualizedClusterServiceMessage {
     public:

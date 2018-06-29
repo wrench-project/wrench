@@ -66,12 +66,12 @@ protected:
       output_file4 = workflow->addFile("output_file4", 10.0);
 
       // Create the tasks
-      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0);
-      task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 1.0);
-      task3 = workflow->addTask("task_3_10s_2cores", 10.0, 2, 2, 1.0);
-      task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 1.0);
-      task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 1.0);
-      task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 1.0);
+      task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0, 0);
+      task2 = workflow->addTask("task_2_10s_1core", 10.0, 1, 1, 1.0, 0);
+      task3 = workflow->addTask("task_3_10s_2cores", 10.0, 2, 2, 1.0, 0);
+      task4 = workflow->addTask("task_4_10s_2cores", 10.0, 2, 2, 1.0, 0);
+      task5 = workflow->addTask("task_5_30s_1_to_3_cores", 30.0, 1, 3, 1.0, 0);
+      task6 = workflow->addTask("task_6_10s_1_to_2_cores", 12.0, 1, 2, 1.0, 0);
 
       // Add file-task dependencies
       task1->addInputFile(input_file);
@@ -187,41 +187,41 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_UnsupportedStandardJob
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create A Storage Services
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
                   new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, false, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               {})));
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService(hostname,
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, 0,
+                                                               {{{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new MulticoreComputeServiceUnsupportedJobTypeTestWMS(
                   this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -268,7 +268,7 @@ private:
       // Wait for a workflow execution event
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -312,41 +312,41 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoSingleCoreTasks_tes
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create A Storage Services
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
                   new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               {}, 100.0))); //scratch space of size 100
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService(hostname,
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, 100.0,
+                                                               {}))); //scratch space of size 100
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new MulticoreComputeServiceTwoSingleCoreTasksTestWMS(
                   this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
+  ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -393,7 +393,7 @@ private:
       // Wait for the job completion
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -438,40 +438,40 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase1_
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create A Storage Services
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
                   new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService(hostname,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               {}, 100.0)));
+                                                               100.0, {})));
 
   // Create a WMS
   wrench::WMS *wms;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new MulticoreComputeServiceTwoDualCoreTasksCase1TestWMS(
                   this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFiles({{input_file->getId(), input_file}}, storage_service));
+  ASSERT_NO_THROW(simulation->stageFiles({{input_file->getID(), input_file}}, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -519,7 +519,7 @@ private:
       // Wait for the job completion
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -568,41 +568,41 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_TwoDualCoreTasksCase2_
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = "QuadCoreHost";
 
   // Create A Storage Services
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
                   new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService(hostname,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               {}, 100.0)));
+                                                               100.0, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new MulticoreComputeServiceTwoDualCoreTasksCase2TestWMS(
                   this,  {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);
@@ -683,57 +683,57 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create A Storage Services
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
                   new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService(hostname,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               {}, 100.0)));
+                                                               100.0, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new MulticoreComputeServiceJobTerminationTestWMS(
                   this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   // Check completion states and times
   if ((this->task1->getState() != wrench::WorkflowTask::READY) ||
       (this->task2->getState() != wrench::WorkflowTask::READY)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getId() + ": " +
+                             this->task2->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
   }
 
   // Check failure counts: Terminations DO NOT COUNT as failures
   if ((this->task1->getFailureCount() != 0) ||
       (this->task2->getFailureCount() != 0)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
                              std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getId() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
+                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
   }
 
 
@@ -812,57 +812,57 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create A Storage Services
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
                   new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService(hostname,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               {})));
+                                                               0, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new MulticoreComputeServiceNonSubmittedJobTerminationTestWMS(
                   this,  {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   // Check completion states and times
   if ((this->task1->getState() != wrench::WorkflowTask::READY) ||
       (this->task2->getState() != wrench::WorkflowTask::READY)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getId() + ": " +
+                             this->task2->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
   }
 
   // Check failure counts: Terminations DO NOT count as failures
   if ((this->task1->getFailureCount() != 0) ||
       (this->task2->getFailureCount() != 0)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
                              std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getId() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
+                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
   }
 
   delete simulation;
@@ -911,7 +911,7 @@ private:
       // Wait for the job completion
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -952,57 +952,57 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create A Storage Services
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
                   new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
-                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, {},
-                                                               100.0)));
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService(hostname,
+                                                               {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                               100.0, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new MulticoreComputeServiceCompletedJobTerminationTestWMS(
                   this,  {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   // Check completion states and times
   if ((this->task1->getState() != wrench::WorkflowTask::COMPLETED) ||
       (this->task2->getState() != wrench::WorkflowTask::COMPLETED)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getId() + ": " +
+                             this->task2->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
   }
 
   // Check failure counts: Terminations DO NOT count as failures
   if ((this->task1->getFailureCount() != 0) ||
       (this->task2->getFailureCount() != 0)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
                              std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getId() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
+                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
   }
 
   delete simulation;
@@ -1055,19 +1055,23 @@ private:
       // Wait for the job failure notification
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::JOB_KILLED) {
             throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
           }
-          auto *real_cause = (wrench::ServiceIsDown *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
-          if (real_cause->getService() != this->test->compute_service) {
+          auto *real_cause = (wrench::JobKilled *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
+          if (real_cause->getComputeService() != this->test->compute_service) {
             std::runtime_error(
                     "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
+          }
+          if (real_cause->getJob() != two_task_job) {
+            std::runtime_error(
+                    "Got the correct failure even, a correct cause type, but the cause points to the wrong job");
           }
           break;
         }
@@ -1093,57 +1097,57 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create A Storage Services
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
                   new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService(hostname,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               {}, 100.0)));
+                                                               100.0, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
                   new MulticoreComputeServiceShutdownComputeServiceWhileJobIsRunningTestWMS(
                           this, {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   // Check completion states and times
   if ((this->task1->getState() != wrench::WorkflowTask::READY) ||
       (this->task2->getState() != wrench::WorkflowTask::READY)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getId() + ": " +
+                             this->task2->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
   }
 
   // Check failure counts: Terminations DO NOT count as failures
   if ((this->task1->getFailureCount() != 1) ||
       (this->task2->getFailureCount() != 1)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
                              std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getId() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
+                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
   }
 
   delete simulation;
@@ -1195,7 +1199,7 @@ private:
       // Wait for the job failure notification
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
-        event = workflow->waitForNextExecutionEvent();
+        event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
@@ -1232,57 +1236,57 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   auto **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("capacity_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
   // Create A Storage Services
-  EXPECT_NO_THROW(storage_service = simulation->add(
+  ASSERT_NO_THROW(storage_service = simulation->add(
                   new wrench::SimpleStorageService(hostname, 100.0)));
 
   // Create a Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService(hostname, true, true,
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService(hostname,
                                                                {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
-                                                               {})));
+                                                               0, {})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
                   new MulticoreComputeServiceShutdownStorageServiceBeforeJobIsSubmittedTestWMS(
                           this,  {compute_service}, {storage_service}, hostname)));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService(hostname));
 
 
   // Staging the input file on the storage service
-  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   // Check completion states and times
   if ((this->task1->getState() != wrench::WorkflowTask::READY) ||
       (this->task2->getState() != wrench::WorkflowTask::READY)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getId() + ": " +
+                             this->task2->getID() + ": " +
                              wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
   }
 
   // Check failure counts: Terminations DO NOT count as failures
   if ((this->task1->getFailureCount() != 1) ||
       (this->task2->getFailureCount() != 1)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getId() + ": " +
+    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
                              std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getId() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
+                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
   }
 
   delete simulation;

@@ -13,6 +13,7 @@
 
 #include "wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h"
 #include "CloudServiceProperty.h"
+#include "CloudServiceMessagePayload.h"
 
 namespace wrench {
 
@@ -28,28 +29,31 @@ namespace wrench {
     class CloudService : public VirtualizedClusterService {
 
     private:
-        std::map<std::string, std::string> default_property_values =
-                {{CloudServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD,                  "1024"},
-                 {CloudServiceProperty::DAEMON_STOPPED_MESSAGE_PAYLOAD,               "1024"},
-                 {CloudServiceProperty::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {CloudServiceProperty::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {CloudServiceProperty::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {CloudServiceProperty::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                 {CloudServiceProperty::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
-                 {CloudServiceProperty::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
-                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {CloudServiceProperty::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                 {CloudServiceProperty::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
-                 {CloudServiceProperty::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      "1024"}
+        std::map<std::string, std::string> default_property_values = {
+                };
+
+        std::map<std::string, std::string> default_messagepayload_values = {
+                 {CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  "1024"},
+                 {CloudServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               "1024"},
+                 {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                 {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                 {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                 {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
+                 {CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
+                 {CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
+                 {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
+                 {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      "1024"}
                 };
 
     public:
         CloudService(const std::string &hostname,
-                     bool supports_standard_jobs,
-                     bool supports_pilot_jobs,
                      std::vector<std::string> &execution_hosts,
-                     std::map<std::string, std::string> plist = {},
-                     double scratch_size = 0);
+                     double scratch_space_size,
+                     std::map<std::string, std::string> property_list = {},
+                     std::map<std::string, std::string> messagepayload_list = {}
+        );
 
     private:
         friend class Simulation;

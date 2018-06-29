@@ -107,16 +107,6 @@ namespace wrench {
     }
 
     /**
-     * @brief Append a SimulationEvent to the event trace
-     *
-     * @param event
-     */
-    template<class T>
-    void Simulation::newTimestamp(SimulationTimestamp<T> *event) {
-      this->output.addTimestamp(event);
-    }
-
-    /**
      * @brief Instantiate a simulated platform
      *
      * @param filename: the path to a SimGrid XML platform description file
@@ -137,7 +127,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Retrieve the list of names of all the hosts in the platform
+     * @brief Get the list of names of all the hosts in the platform
      *
      * @return a vector of hostnames
      *
@@ -146,9 +136,9 @@ namespace wrench {
       return this->s4u_simulation->getAllHostnames();
     }
     /**
-     * @brief Retrieve the list of names of all the hosts in each cluster composing the platform
+     * @brief Get the list of names of all the hosts in each cluster composing the platform
      *
-     * @return a map of (clustername, hostnames)
+     * @return a map of lists of hosts, indexed by cluster name
      *
      */
     std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
@@ -216,8 +206,7 @@ namespace wrench {
                 "A WMS should have been instantiated and passed to Simulation.setWMS()");
       }
 
-      for (const auto &wmse : this->wmses) {
-        auto wms = wmse.get();
+      for (const auto &wms : this->wmses) {
         if (not this->hostExists(wms->getHostname())) {
           throw std::runtime_error("A WMS cannot be started on host '" + wms->getHostname() + "'");
         }
@@ -234,8 +223,7 @@ namespace wrench {
         }
       }
 
-      for (auto wms : this->wmses) {
-
+      for (auto &wms : this->wmses) {
         // Check that at least one StorageService is running (only needed if there are files in the workflow),
         // and that each StorageService is on a valid host
         if (not wms->workflow->getFiles().empty()) {
@@ -277,7 +265,7 @@ namespace wrench {
           for (auto frs : this->file_registry_services) {
             if (frs->entries.find(f.second) == frs->entries.end()) {
               throw std::runtime_error(
-                      "Workflow input file " + f.second->getId() + " is not staged on any storage service!");
+                      "Workflow input file " + f.second->getID() + " is not staged on any storage service!");
             }
           }
         }
@@ -472,7 +460,7 @@ namespace wrench {
                 "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
       }
 
-      XBT_INFO("Staging file %s (%lf)", file->getId().c_str(), file->getSize());
+      XBT_INFO("Staging file %s (%lf)", file->getID().c_str(), file->getSize());
       // Put the file on the storage service (not via the service daemon)
       try {
         storage_service->stageFile(file);
@@ -520,7 +508,7 @@ namespace wrench {
 
     /**
      * @brief Get the current simulated date
-     * @return the date
+     * @return a date
      */
     double Simulation::getCurrentSimulatedDate() {
       return S4U_Simulation::getClock();
@@ -529,7 +517,7 @@ namespace wrench {
     /**
      * @brief Get the memory capacity of a host given a hostname
      * @param hostname: the hostname
-     * @return the memory capacity in bytes
+     * @return a memory capacity in bytes
      */
     double Simulation::getHostMemoryCapacity(std::string hostname) {
       return S4U_Simulation::getHostMemoryCapacity(hostname);
@@ -538,35 +526,60 @@ namespace wrench {
     /**
     * @brief Get the number of cores of a host given a hostname
     * @param hostname: the hostname
-    * @return the number of cores
+    * @return a number of cores
     */
     unsigned long Simulation::getHostNumCores(std::string hostname) {
-      return S4U_Simulation::getNumCores(hostname);
+      return S4U_Simulation::getHostNumCores(hostname);
     }
 
     /**
      * @brief Get the flop rate of one core of a host given a hostname
      * @param hostname: the hostname
-     * @return the flop rate (flop / sec)
+     * @return a flop rate (flop / sec)
      */
     double Simulation::getHostFlopRate(std::string hostname) {
-      return S4U_Simulation::getFlopRate(hostname);
+      return S4U_Simulation::getHostFlopRate(hostname);
     }
 
     /**
-     * @brief Get the memory capacity of the current host
-     * @return the memory capacity in bytes
+     * @brief Get the memory capacity of the host on which the calling process is running
+     * @return a memory capacity in bytes
      */
     double Simulation::getMemoryCapacity() {
-      return S4U_Simulation::getMemoryCapacity();
+      return S4U_Simulation::getHostMemoryCapacity(S4U_Simulation::getHostName());
     }
 
     /**
-     * @brief Sleep for a number of (simulated) seconds
-     * @param duration in seconds
+     * @brief Get the number of cores of the host on which the calling process is running
+     * @return a number of cores
+     */
+    unsigned long Simulation::getNumCores() {
+      return S4U_Simulation::getHostNumCores(S4U_Simulation::getHostName());
+    }
+
+    /**
+     * @brief Get the flop rate of one core of the host on which the calling process is running
+     * @return a flop rate
+     */
+    double Simulation::getFlopRate() {
+      return S4U_Simulation::getHostFlopRate(S4U_Simulation::getHostName());
+    }
+
+
+    /**
+     * @brief Make the calling process sleep for a number of (simulated) seconds
+     * @param duration: a number of seconds
      */
     void Simulation::sleep(double duration) {
       S4U_Simulation::sleep(duration);
+    }
+
+    /**
+     * @brief Get the simulation output object
+     * @return simulation output object
+     */
+    SimulationOutput &Simulation::getOutput() {
+      return this->output;
     }
 
 };

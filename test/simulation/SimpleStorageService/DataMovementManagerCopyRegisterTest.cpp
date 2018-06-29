@@ -93,14 +93,10 @@ private:
 
     int main() {
 
-//        std::cerr << ::getpid() << std::endl;
-//        std::chrono::seconds timespan(15);
-//        std::this_thread::sleep_for(timespan);
 
       std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
-      #if 0
       // try synchronous copy and register
       bool success = true;
       bool is_registered_at_dst = true;
@@ -141,7 +137,7 @@ private:
       }
 
       try {
-        async_copy_event = workflow->waitForNextExecutionEvent();
+        async_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
       }
@@ -175,7 +171,7 @@ private:
         double_copy_failed = true;
       }
 
-      async_dual_copy_event = workflow->waitForNextExecutionEvent();
+      async_dual_copy_event = this->getWorkflow()->waitForNextExecutionEvent();
 
       std::set<wrench::StorageService *> src_file_2_locations = file_registry_service->lookupEntry(this->test->src_file_2);
       dst_search = src_file_2_locations.find(this->test->dst_storage_service);
@@ -212,7 +208,7 @@ private:
         }
       }
 
-      async_dual_copy_event2 = workflow->waitForNextExecutionEvent();
+      async_dual_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
 
       if (async_dual_copy_event2->type != wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION)  {
         throw std::runtime_error(std::string("Unexpected workflow execution even (type=") + std::to_string(async_dual_copy_event2->type) + ")");
@@ -235,7 +231,6 @@ private:
         throw std::runtime_error("File was not registered after Asynchronous copy completed.");
       }
 
-      #endif
       // try 1 asynchronous copy and then kill the file registry service right after the copy is instantiated
       std::unique_ptr<wrench::WorkflowExecutionEvent> async_copy_event2;
 
@@ -245,7 +240,7 @@ private:
 
       file_registry_service->stop();
 
-      async_copy_event2 = workflow->waitForNextExecutionEvent();
+      async_copy_event2 = this->getWorkflow()->waitForNextExecutionEvent();
 
       if (async_copy_event2->type != wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION) {
         throw std::runtime_error("Asynchronous file copy should have completed");
@@ -258,7 +253,7 @@ private:
         throw std::runtime_error("File registry service should not have been updated");
       }
 
-      if (!this->test->dst_storage_service->lookupFile(this->test->src2_file_2)) {
+      if (!this->test->dst_storage_service->lookupFile(this->test->src2_file_2, nullptr)) {
         throw std::runtime_error("Asynchronous file copy should have completed even though the FileRegistryService was down.");
       }
 
@@ -278,49 +273,49 @@ void DataMovementManagerCopyRegisterTest::do_CopyRegister_test() {
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("copy_register_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // set up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a (unused) Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-          new wrench::MultihostMulticoreComputeService("WMSHost", true, true,
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService("WMSHost",
                                                        {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES,
                                                                         wrench::ComputeService::ALL_RAM)}, {})));
 
   // Create src and dst storage services
-  EXPECT_NO_THROW(src_storage_service = simulation->add(
+  ASSERT_NO_THROW(src_storage_service = simulation->add(
           new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE)));
 
-  EXPECT_NO_THROW(src2_storage_service = simulation->add(
+  ASSERT_NO_THROW(src2_storage_service = simulation->add(
           new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE)
   ));
 
-  EXPECT_NO_THROW(dst_storage_service = simulation->add(
+  ASSERT_NO_THROW(dst_storage_service = simulation->add(
           new wrench::SimpleStorageService("DstHost", STORAGE_SIZE)));
 
   // Create a file registry
   wrench::FileRegistryService *file_registry_service = nullptr;
-  EXPECT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
+  ASSERT_NO_THROW(file_registry_service = simulation->add(new wrench::FileRegistryService("WMSHost")));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(new DataMovementManagerCopyRegisterTestWMS(
+  ASSERT_NO_THROW(wms = simulation->add(new DataMovementManagerCopyRegisterTestWMS(
           this, {compute_service}, {src_storage_service, src2_storage_service, dst_storage_service}, file_registry_service, "WMSHost")));
 
   wms->addWorkflow(this->workflow);
 
   // Stage the 2 files on the StorageHost
-  EXPECT_NO_THROW(simulation->stageFiles({{src_file_1->getId(), src_file_1},
-                                          {src_file_2->getId(), src_file_2},
-                                          {src_file_3->getId(), src_file_3}}, src_storage_service));
+  ASSERT_NO_THROW(simulation->stageFiles({{src_file_1->getID(), src_file_1},
+                                          {src_file_2->getID(), src_file_2},
+                                          {src_file_3->getID(), src_file_3}}, src_storage_service));
 
-  EXPECT_NO_THROW(simulation->stageFiles({{src2_file_1->getId(), src2_file_1},
-                                          {src2_file_2->getId(), src2_file_2},
-                                          {src2_file_3->getId(), src2_file_3}}, src2_storage_service));
+  ASSERT_NO_THROW(simulation->stageFiles({{src2_file_1->getID(), src2_file_1},
+                                          {src2_file_2->getID(), src2_file_2},
+                                          {src2_file_3->getID(), src2_file_3}}, src2_storage_service));
 
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);

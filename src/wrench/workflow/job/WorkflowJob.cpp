@@ -46,7 +46,7 @@ namespace wrench {
 
     /**
      * @brief Get the job type name
-     * @return the name of the type
+     * @return the type name as a string
      *
      * @throw std::runtime_error
      */

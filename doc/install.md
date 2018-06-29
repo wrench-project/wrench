@@ -7,16 +7,8 @@ Installing WRENCH                  {#install}
 
 [TOC]
 
-# Docker Containers #             {#install-docker}
 
-WRENCH is also distributed in Docker containers. Please, visit the
-[WRENCH's Repository on Docker Hub](https://hub.docker.com/r/wrenchproject/wrench/)
-to pull WRENCH's Docker images.
 
-The `latest` tag provides a container with the latest 
-[WRENCH's release](https://github.com/wrench-project/wrench/releases), while the 
-`unstable` tag provides a container with the current code in the GitHub's `master` 
-branch. Additional tags are available for all WRENCH releases.  
 
 
 # Prerequisites #                 {#install-prerequisites}
@@ -40,7 +32,7 @@ And, one of the following:
 - [JSON for Modern C++](https://github.com/nlohmann/json) -- version 2.1.1 or higher 
 - [Google Test](https://github.com/google/googletest) -- version 1.8 or higher (only required for running test cases)
 - [Doxygen](http://www.doxygen.org) -- version 1.8 or higher (only required for generating documentation)
-- [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for batch-scheduled resource simulation
+- [Batsched](https://gitlab.inria.fr/batsim/batsched) -- only needed for realistic simulation of resource managed by production batch schedulers
 
 
 
@@ -99,6 +91,32 @@ If you want to see actual compiler and linker invocations, add VERBOSE=1 to your
 make VERBOSE=1
 ~~~~~~~~~~~~~
 
+
+# Docker Containers #             {#install-docker}
+
+WRENCH is also distributed in Docker containers. Please, visit the
+[WRENCH's Repository on Docker Hub](https://hub.docker.com/r/wrenchproject/wrench/)
+to pull WRENCH's Docker images.
+
+The `latest` tag provides a container with the latest 
+[WRENCH's release](https://github.com/wrench-project/wrench/releases):
+
+~~~~~~~~~~~~~{.sh}
+docker pull wrenchproject/wrench 
+# or
+docker run -it wrenchproject/wrench /bin/bash
+~~~~~~~~~~~~~
+
+ The `unstable` tag provides a container with the current code in the GitHub's `master` 
+branch:
+
+~~~~~~~~~~~~~{.sh}
+docker pull wrenchproject/wrench:unstable
+# or
+docker run -it wrenchproject/wrench:unstable /bin/bash
+~~~~~~~~~~~~~ 
+
+Additional tags are available for all WRENCH releases. 
 
 
 ## Installation Troubleshooting ##  {#install-troubleshooting}

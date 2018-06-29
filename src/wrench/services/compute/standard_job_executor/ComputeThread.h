@@ -26,7 +26,7 @@ namespace wrench {
     class Simulation;
 
     /**
-     * @brief A helper service that is simply a CPU-bound thread that
+     * @brief A one-shot service that simulates a CPU-bound thread that
      *        performs a given number of flops and then reports to
      *        some mailbox saying "I am done"
      */
@@ -34,15 +34,10 @@ namespace wrench {
 
     public:
 
-        ~ComputeThread();
-
         ComputeThread(Simulation *simulation, std::string hostname, double flops, std::string reply_mailbox);
 
-        int main();
-
+        int main() override;
         void kill();
-        void join();
-
 
     private:
         double flops;

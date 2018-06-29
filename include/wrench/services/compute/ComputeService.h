@@ -48,22 +48,24 @@ namespace wrench {
 
     public:
 
-        /** @brief A convenient constant to mean "use all cores on the physical host" whenever a number of cores
-         *  is needed when instantiat services
+        /** @brief A convenient constant to mean "use all cores of a physical host" whenever a number of cores
+         *  is needed when instantiating compute services
          */
         static constexpr unsigned long ALL_CORES = ULONG_MAX;
 
-        /** @brief A convenient constant to mean "use all ram on the physical host" whenever a ram capacity
-         *  is needed when instantiating services
+        /** @brief A convenient constant to mean "use all ram of a physical host" whenever a ram capacity
+         *  is needed when instantiating compute services
          */
         static constexpr double ALL_RAM = DBL_MAX;
 
-        /** A static StorageService pointer to the SCRATCH space inside the compute service **/
-        static StorageService *SCRATCH;
 
         /***********************/
         /** \cond DEVELOPER   **/
         /***********************/
+
+        /** @brief A convenient constant to mean "the scratch storage space" of a ComputeService. This is used
+         *   to move data to a ComputeService's scratch storage space. **/
+        static StorageService *SCRATCH;
 
         virtual ~ComputeService() {}
 
@@ -91,9 +93,13 @@ namespace wrench {
 
         double getTTL();
 
-        double getScratchSize();
+        double getTotalScratchSpaceSize();
 
-        double getFreeRemainingScratchSpace();
+        double getFreeScratchSpaceSize();
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
         /***********************/
         /** \cond INTERNAL    **/
@@ -111,41 +117,41 @@ namespace wrench {
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
-                       bool supports_standard_jobs,
-                       bool supports_pilot_jobs,
-                       double sratch_size = 0);
+                       double scratch_space_size);
+
+
 
     protected:
 
         ComputeService(const std::string &hostname,
                        std::string service_name,
                        std::string mailbox_name_prefix,
-                       bool supports_standard_jobs,
-                       bool supports_pilot_jobs,
-                       StorageService *scratch_space = nullptr);
-
-        /** @brief Whether the compute service supports pilot jobs */
-        bool supports_pilot_jobs;
-        /** @brief Whether the compute service supports standard jobs */
-        bool supports_standard_jobs;
+                       StorageService *scratch_space);
 
         /** @brief A scratch storage service associated to the compute service */
         StorageService *scratch_space_storage_service;
 
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
+        /***********************/
+        /** \cond DEVELOPER   **/
+        /***********************/
+
         StorageService *getScratch();
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
 
     private:
 
         std::map<std::string, std::vector<double>> getServiceResourceInformation();
 
-        /***********************/
-        /** \endcond          **/
-        /***********************/
     };
 
-    /***********************/
-    /** \endcond           */
-    /***********************/
+
 };
 
 #endif //SIMULATION_COMPUTESERVICE_H

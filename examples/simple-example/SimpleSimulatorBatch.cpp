@@ -74,17 +74,16 @@ int main(int argc, char **argv) {
    * A batch service is an abstraction of a compute service that corresponds to
    * batch-scheduled platforms in which jobs are submitted to a queue and dispatched
    * to compute nodes according to various scheduling algorithms.
-   * In this example, this particular batch service supports both standard jobs and pilot jobs.
-   * Unless otherwise specified, tasks running on the service will read/write workflow files
-   * from the storage service instantiated above. Finally, the last argument to the constructor
+   * In this example, this particular batch service has no scratch storage space (size = 0).
+   * The last argument to the constructor
    * shows how to configure particular simulated behaviors of the compute service via a property
    * list. In this example, one specifies that the message that will be send to the service to
    * terminate it will be 2048 bytes. See the documentation to find out all available
    * configurable properties for each kind of service.
    */
   wrench::ComputeService *batch_service = new wrench::BatchService(
-          wms_host, true, true, hostname_list,
-          {{wrench::BatchServiceProperty::STOP_DAEMON_MESSAGE_PAYLOAD, "2048"}});
+          wms_host, hostname_list, 0, {},
+          {{wrench::BatchServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "2048"}});
 
   /* Add the batch service to the simulation, catching a possible exception */
   try {
@@ -136,7 +135,7 @@ int main(int argc, char **argv) {
   std::cerr << "Staging input files..." << std::endl;
   std::map<std::string, wrench::WorkflowFile *> input_files = workflow.getInputFiles();
   for (auto f : input_files) {
-    std::cerr << "---> " << f.second->getId() << "\n";
+    std::cerr << "---> " << f.second->getID() << "\n";
   }
   try {
     simulation.stageFiles(input_files, storage_service);
@@ -160,9 +159,9 @@ int main(int argc, char **argv) {
    * many such events there are, and print some information for the first such event.
    */
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> trace;
-  trace = simulation.output.getTrace<wrench::SimulationTimestampTaskCompletion>();
+  trace = simulation.getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
   std::cerr << "Number of entries in TaskCompletion trace: " << trace.size() << std::endl;
-  std::cerr << "Task in first trace entry: " << trace[0]->getContent()->getTask()->getId() << std::endl;
+  std::cerr << "Task in first trace entry: " << trace[0]->getContent()->getTask()->getID() << std::endl;
 
   return 0;
 }

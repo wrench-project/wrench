@@ -20,7 +20,8 @@
 namespace wrench {
 
     /**
-     * @brief A simulated service that can be added to the simulation
+     * @brief A service that can be added to the simulation and that can be used by a WMS
+     *        when executing a workflow
      */
     class Service : public S4U_Daemon {
 
@@ -32,7 +33,9 @@ namespace wrench {
 
         /** @brief Service states */
         enum State {
+            /** @brief UP state: the service has been started and is still running */
             UP,
+            /** @brief DOWN state: the service has been shutdown and/or has terminated */
             DOWN,
         };
 
@@ -47,6 +50,8 @@ namespace wrench {
         std::string getPropertyValueAsString(std::string);
 
         double getPropertyValueAsDouble(std::string);
+        
+        bool getPropertyValueAsBoolean(std::string);
 
         double getNetworkTimeoutValue();
 
@@ -59,6 +64,10 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+
+        std::string getMessagePayloadValueAsString(std::string);
+
+        double getMessagePayloadValueAsDouble(std::string);
 
         void setStateToDown();
 
@@ -80,12 +89,23 @@ namespace wrench {
         void setProperty(std::string, std::string);
 
         void setProperties(std::map<std::string, std::string> default_property_values,
-                           std::map<std::string, std::string> overriden_poperty_values);
+                           std::map<std::string, std::string> overriden_property_values);
+
+        // MessagePayload stuff
+        void setMessagePayload(std::string, std::string);
+
+        void setMessagePayloads(std::map<std::string, std::string> default_messagepayload_values,
+                           std::map<std::string, std::string> overriden_messagepayload_values);
+
 
         void serviceSanityCheck();
 
         /** @brief The service's property list */
         std::map<std::string, std::string> property_list;
+
+        /** @brief The service's messagepayload list */
+        std::map<std::string, std::string> messagepayload_list;
+
 
         /** @brief The service's state */
         State state;

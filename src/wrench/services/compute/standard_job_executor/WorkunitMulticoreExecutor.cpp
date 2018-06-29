@@ -34,16 +34,15 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(workunit_multicore_executor, "Log category for Mult
 namespace wrench {
 
     /**
-     * @brief Constructor, which starts the workunit executor on the host
+     * @brief Constructor
      *
      * @param simulation: a pointer to the simulation object
-     * @param hostname: the name of the host
-     * @param num_cores: the number of cores available to the executor
-     * @param ram_utilization: the number of bytes of RAM used by the executor
-     * @param callback_mailbox: the callback mailbox to which the worker
-     *        thread can send "work done" messages
-     * @param workunit: the workunit to perform
-     * @param default_storage_service: the default storage service from which to read/write data (if any)
+     * @param hostname: the name of the host on which the service will run
+     * @param num_cores: the number of cores available to the service
+     * @param ram_utilization: the number of bytes of RAM used by the service
+     * @param callback_mailbox: the callback mailbox to which a "work done" or "work failed" message will be sent
+     * @param workunit: the work unit to perform
+     * @param scratch_space: the service's scratch storage service (nullptr if none)
      * @param thread_startup_overhead: the thread_startup overhead, in seconds
      */
     WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(
@@ -54,6 +53,7 @@ namespace wrench {
             std::string callback_mailbox,
             Workunit *workunit,
             StorageService *scratch_space,
+            WorkflowJob* job,
             double thread_startup_overhead) :
             Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
 
@@ -72,6 +72,7 @@ namespace wrench {
       this->ram_utilization = ram_utilization;
       this->scratch_space = scratch_space;
       this->files_stored_in_scratch = {};
+      this->job = job;
 
     }
 
@@ -107,7 +108,7 @@ namespace wrench {
     int WorkunitMulticoreExecutor::main() {
 
 
-      TerminalOutput::setThisProcessLoggingColor(COLOR_BLUE);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
       WRENCH_INFO("New WorkunitExecutor starting (%s) to do: %ld pre file copies, %ld tasks, %ld post file copies",
                   this->mailbox_name.c_str(),
@@ -156,10 +157,6 @@ namespace wrench {
         WRENCH_INFO("Work unit executor on can't report back due to network error.. aborting!");
         this->workunit = nullptr; // To decrease the ref count
         return 0;
-      } catch (std::shared_ptr<FatalFailure> &cause) {
-        WRENCH_INFO("Work unit executor got a fatal failure... aborting!");
-        this->workunit = nullptr; // To decrease the ref count
-        return 0;
       }
 
       WRENCH_INFO("Work unit executor on host %s terminating!", S4U_Simulation::getHostName().c_str());
@@ -184,24 +181,16 @@ namespace wrench {
         StorageService *src = std::get<1>(file_copy);
         if (src == ComputeService::SCRATCH) {
           if (this->scratch_space == nullptr) {
-            throw WorkflowExecutionException(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as source but is null"));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as source but is null")));
           }
           src = this->scratch_space;
         }
         StorageService *dst = std::get<2>(file_copy);
         if (dst == ComputeService::SCRATCH) {
           if (this->scratch_space == nullptr) {
-            throw WorkflowExecutionException(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as destination but is null"));
-          }
-          if (this->scratch_space->getFreeSpace() > 0) {
-            dst = this->scratch_space;
-            files_stored_in_scratch.insert(file);
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as destination but is null")));
           } else {
-            // TODO: Here we are returning a pointer to the scratch storage service, meaning
-            // TODO: that the "developer" level can do whatever it wants with that pointer, e.g.,
-            // TODO: Use the scratch storage service as any storage service... something we probably
-            // TODO: don't want in the long term...
-            throw WorkflowExecutionException(new StorageServiceNotEnoughSpace(file,dst));
+            dst = this->scratch_space;
           }
         }
 
@@ -211,14 +200,22 @@ namespace wrench {
 
         try {
           WRENCH_INFO("Copying file %s from %s to %s",
-                      file->getId().c_str(),
+                      file->getID().c_str(),
                       src->getName().c_str(),
                       dst->getName().c_str());
 
           S4U_Simulation::sleep(this->thread_startup_overhead);
-          dst->copyFile(file, src);
+          if (dst == this->scratch_space) {
+            dst->copyFile(file, src, nullptr, job);
+          } else {
+            dst->copyFile(file, src, nullptr, nullptr); // if there is no scratch space, then there is no notion of job's partition, it is always to / partition in such case
+          }
         } catch (WorkflowExecutionException &e) {
           throw;
+        }
+
+        if (dst == this->scratch_space) {
+          files_stored_in_scratch.insert(file);
         }
       }
 
@@ -228,18 +225,18 @@ namespace wrench {
         task->setInternalState(WorkflowTask::InternalState::TASK_RUNNING);
 
         // Read  all input files
-        WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getId().c_str());
+        WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
         try {
             StorageService::readFiles(task->getInputFiles(),
                                       work->file_locations,
-                                      this->scratch_space, files_stored_in_scratch);
+                                      this->scratch_space, files_stored_in_scratch, job);
         } catch (WorkflowExecutionException &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
         }
 
         // Run the task's computation (which can be multicore)
-        WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getId().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
+        WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
         task->setStartDate(S4U_Simulation::getClock());
 
         try {
@@ -249,18 +246,18 @@ namespace wrench {
           throw;
         }
 
-        WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(), task->getId().c_str());
+        WRENCH_INFO("Writing the %ld output files for task %s", task->getOutputFiles().size(), task->getID().c_str());
 
         // Write all output files
         try {
             StorageService::writeFiles(task->getOutputFiles(), work->file_locations, this->scratch_space,
-                                       files_stored_in_scratch);
+                                       files_stored_in_scratch, job);
         } catch (WorkflowExecutionException &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
         }
 
-        WRENCH_INFO("Setting the internal state of %s to TASK_COMPLETED", task->getId().c_str());
+        WRENCH_INFO("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
         task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
 
         // Deal with Children
@@ -281,7 +278,7 @@ namespace wrench {
         task->setExecutionHost(this->hostname);
 
         // Generate a SimulationTimestamp
-        this->simulation->output.addTimestamp<SimulationTimestampTaskCompletion>(
+        this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
                 new SimulationTimestampTaskCompletion(task));
       }
 
@@ -307,7 +304,11 @@ namespace wrench {
 
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
-          dst->copyFile(file, src);
+          if (src == this->scratch_space) {
+            dst->copyFile(file, src, job, nullptr);
+          } else {
+            dst->copyFile(file, src, nullptr, nullptr);
+          }
 
         } catch (WorkflowExecutionException &e) {
           throw;
@@ -320,7 +321,11 @@ namespace wrench {
         StorageService *storage_service = std::get<1>(cleanup);
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);
-          storage_service->deleteFile(file);
+          if (storage_service == this->scratch_space) {
+            storage_service->deleteFile(file, job, nullptr);
+          } else {
+            storage_service->deleteFile(file, nullptr, nullptr);
+          }
         } catch (WorkflowExecutionException &e) {
           throw;
         }
@@ -355,7 +360,7 @@ namespace wrench {
         } catch (std::exception &e) {
           WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
           this->releaseDaemonLock();
-          throw WorkflowExecutionException(new FatalFailure());
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FatalFailure()));
         }
         std::shared_ptr<ComputeThread> compute_thread;
         try {
@@ -380,7 +385,7 @@ namespace wrench {
 //          ct->kill();
 //        }
         this->releaseDaemonLock();
-        throw WorkflowExecutionException(new ComputeThreadHasDied());
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
       }
       WRENCH_INFO("Waiting for completion of all compute threads");
 
@@ -395,10 +400,6 @@ namespace wrench {
         } catch (std::shared_ptr<NetworkError> &e) {
           WRENCH_INFO("Got a network error when trying to get completion message from compute thread");
           // Do nothing, perhaps the child has died
-          success = false;
-          continue;
-        } catch (std::shared_ptr<FatalFailure> &e) {
-          WRENCH_INFO("Go a fatal failure when trying to get completion message from compute thread");
           success = false;
           continue;
         }
@@ -419,29 +420,29 @@ namespace wrench {
       #endif
 
       if (!success) {
-        throw WorkflowExecutionException(new ComputeThreadHasDied());
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
       }
     }
 
     /**
-     * @brief Returns the number of cores the executor is running on
-     * @return number of cores
+     * @brief Returns the number of cores the service has been allocated
+     * @return a number of cores
      */
     unsigned long WorkunitMulticoreExecutor::getNumCores() {
       return this->num_cores;
     }
 
     /**
-     * @brief Returns the RAM the executor is utilizing
-     * @return number of bytes
+     * @brief Returns the RAM the service has been allocated
+     * @return a number of bytes
      */
     double WorkunitMulticoreExecutor::getMemoryUtilization() {
       return this->ram_utilization;
     }
 
     /**
-     * @brief XXX
-     * @return  XXX
+     * @brief Retrieve the list of files stored in scratch space storage
+     * @return  a list of files
      */
     std::set<WorkflowFile *> WorkunitMulticoreExecutor::getFilesStoredInScratch() {
       return this->files_stored_in_scratch;

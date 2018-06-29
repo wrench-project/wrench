@@ -121,7 +121,7 @@ private:
 
           double completion_dates[10];
           for (int i = 0; i < 10; i++) {
-            std::unique_ptr<wrench::WorkflowExecutionEvent> event1 = workflow->waitForNextExecutionEvent();
+            std::unique_ptr<wrench::WorkflowExecutionEvent> event1 = this->getWorkflow()->waitForNextExecutionEvent();
             if (event1->type != wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION) {
               throw std::runtime_error("Unexpected Workflow Execution Event " + std::to_string(event1->type));
             }
@@ -189,47 +189,49 @@ void SimpleStorageServiceLimitedConnectionsTest::do_ConcurrencyFileCopies_test()
   char **argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("performance_test");
 
-  EXPECT_NO_THROW(simulation->init(&argc, argv));
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
-  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create a (unused) Compute Service
-  EXPECT_NO_THROW(compute_service = simulation->add(
-                  new wrench::MultihostMulticoreComputeService("WMSHost", true, true,
-                                                               {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)}, {})));
+  ASSERT_NO_THROW(compute_service = simulation->add(
+                  new wrench::MultihostMulticoreComputeService("WMSHost",
+                                                               {std::make_tuple("WMSHost", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                               0,
+                                                               {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}, {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "true"}})));
 
   // Create a Local storage service with unlimited connections
-  EXPECT_NO_THROW(storage_service_wms = simulation->add(
+  ASSERT_NO_THROW(storage_service_wms = simulation->add(
                   new wrench::SimpleStorageService("WMSHost", STORAGE_SIZE)));
 
   // Create a Storage service with unlimited connections
-  EXPECT_NO_THROW(storage_service_1 = simulation->add(
+  ASSERT_NO_THROW(storage_service_1 = simulation->add(
                   new wrench::SimpleStorageService("Host1", STORAGE_SIZE)));
 
   // Create a Storage Service limited to 3 connections
-  EXPECT_NO_THROW(storage_service_2 = simulation->add(
+  ASSERT_NO_THROW(storage_service_2 = simulation->add(
                   new wrench::SimpleStorageService("Host2", STORAGE_SIZE, {{"MAX_NUM_CONCURRENT_DATA_CONNECTIONS", "3"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  EXPECT_NO_THROW(wms = simulation->add(
+  ASSERT_NO_THROW(wms = simulation->add(
           new SimpleStorageServiceConcurrencyFileCopiesLimitedConnectionsTestWMS(
                   this, {compute_service}, {storage_service_wms, storage_service_1, storage_service_2},
                   "WMSHost")));
 
-  EXPECT_NO_THROW(wms->addWorkflow(workflow));
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
   simulation->add(new wrench::FileRegistryService("WMSHost"));
 
   // Staging all files on the WMS storage service
   for (int i=0; i < 10; i++) {
-    EXPECT_NO_THROW(simulation->stageFile(files[i], storage_service_wms));
+    ASSERT_NO_THROW(simulation->stageFile(files[i], storage_service_wms));
   }
 
   // Running a "run a single task" simulation
-  EXPECT_NO_THROW(simulation->launch());
+  ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
   free(argv[0]);

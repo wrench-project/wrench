@@ -33,7 +33,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param file: the file that cannot be find on any storage service
+     * @param file: the file that could not be found on any storage service
      */
     NoStorageServiceForFile::NoStorageServiceForFile(WorkflowFile *file) : FailureCause(
             NO_STORAGE_SERVICE_FOR_FILE) {
@@ -42,6 +42,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
+     * @param error: error message
      */
     NoScratchSpace::NoScratchSpace(std::string error) : FailureCause(
             NO_SCRATCH_SPACE) {
@@ -69,7 +70,7 @@ namespace wrench {
      * @return the message
      */
     std::string NoStorageServiceForFile::toString() {
-      return "No Storage Service location is specified for file " + this->file->getId();
+      return "No Storage Service location is specified for file " + this->file->getID();
     }
 
     /**
@@ -104,7 +105,7 @@ namespace wrench {
      * @return the message
      */
     std::string FileNotFound::toString() {
-      return "Couldn't find file " + this->file->getId() + " at Storage Service " + this->storage_service->getName();
+      return "Couldn't find file " + this->file->getID() + " at Storage Service " + this->storage_service->getName();
     }
 
     /**
@@ -139,7 +140,7 @@ namespace wrench {
      * @return the message
      */
     std::string StorageServiceNotEnoughSpace::toString() {
-      return "Cannot write file " + this->file->getId() + " to Storage Service " +
+      return "Cannot write file " + this->file->getID() + " to Storage Service " +
              this->storage_service->getName() + " due to lack of storage space";
     }
 
@@ -240,13 +241,55 @@ namespace wrench {
     }
 
     /**
+    * @brief Constructor
+    * @param job: the job that could not be executed
+    * @param compute_service: the compute service that didn't have enough cores
+    */
+    JobKilled::JobKilled(WorkflowJob *job, ComputeService *compute_service) : FailureCause(
+            JOB_KILLED) {
+      this->job = job;
+      this->compute_service = compute_service;
+    }
+
+    /**
+     * @brief Getter
+     * @return the job
+     */
+    WorkflowJob *JobKilled::getJob() {
+      return this->job;
+    }
+
+    /**
+     * @brief Getter
+     * @return the compute service
+     */
+    ComputeService *JobKilled::getComputeService() {
+      return this->compute_service;
+    }
+
+    /**
+     * @brief Get the human-readable failure message
+     * @return the message
+     */
+    std::string JobKilled::toString() {
+      return "Job " + this->job->getName() + " on service " +
+             this->compute_service->getName() + " was killed (likely the service was stopped/terminated)";
+    }
+
+    /**
      * @brief Constructor
      *
      * @param operation_type: NetworkError:OperationType::SENDING or NetworkError::OperationType::RECEIVING
      * @param mailbox: the name of a mailbox
      */
-    NetworkError::NetworkError(NetworkError::OperationType operation_type, std::string mailbox) : FailureCause(NETWORK_ERROR) {
+    NetworkError::NetworkError(NetworkError::OperationType operation_type,
+                               NetworkError::ErrorType error_type,
+                               std::string mailbox) : FailureCause(NETWORK_ERROR) {
+      if (mailbox.empty()) {
+        throw std::invalid_argument("NetworkError::NetworkError(): invalid arguments");
+      }
       this->operation_type = operation_type;
+      this->error_type = error_type;
       this->mailbox = mailbox;
     }
 
@@ -264,6 +307,14 @@ namespace wrench {
      */
     bool NetworkError::whileSending() {
       return (this->operation_type == NetworkError::SENDING);
+    }
+
+    /**
+     * @brief Returns whether the network error was a timeout
+     * @return true or false
+     */
+    bool NetworkError::isTimeout() {
+      return (this->error_type == NetworkError::TIMEOUT);
     }
 
     /**
@@ -288,54 +339,54 @@ namespace wrench {
       return "Network error (link failure, or communication peer died) while " + operation + " mailbox_name " + this->mailbox;
     };
 
-    /**
-     * @brief Constructor
-     *
-     * @param operation_type: NetworkTimeout::OperationType::SENDING or NetworkTimeout::OperationType::RECEIVING
-     * @param mailbox: the mailbox name
-     */
-    NetworkTimeout::NetworkTimeout(NetworkTimeout::OperationType operation_type, std::string mailbox) : FailureCause(NETWORK_TIMEOUT) {
-      this->operation_type = operation_type;
-      this->mailbox = mailbox;
-    }
-
-    /**
-     * @brief Returns whether the network error occurred while receiving
-     * @return true or false
-     */
-    bool NetworkTimeout::whileReceiving() {
-      return (this->operation_type == NetworkTimeout::RECEIVING);
-    }
-
-    /**
-     * @brief Returns whether the network error occurred while sending
-     * @return true or false
-     */
-    bool NetworkTimeout::whileSending() {
-      return (this->operation_type == NetworkTimeout::SENDING);
-    }
-
-    /**
-     * @brief Returns the mailbox name on which the error occurred
-     * @return the mailbox name
-     */
-    std::string NetworkTimeout::getMailbox() {
-      return this->mailbox;
-    }
-
-    /**
-     * @brief Get the human-readable failure message
-     * @return the message
-     */
-    std::string NetworkTimeout::toString() {
-      std::string operation;
-      if (this->while_sending) {
-        operation = "sending to";
-      } else {
-        operation = "receiving from";
-      }
-      return "Network timeout while " + operation + " mailbox_name " + this->mailbox;
-    };
+//    /**
+//     * @brief Constructor
+//     *
+//     * @param operation_type: NetworkTimeout::OperationType::SENDING or NetworkTimeout::OperationType::RECEIVING
+//     * @param mailbox: the mailbox name
+//     */
+//    NetworkTimeout::NetworkTimeout(NetworkTimeout::OperationType operation_type, std::string mailbox) : FailureCause(NETWORK_TIMEOUT) {
+//      this->operation_type = operation_type;
+//      this->mailbox = mailbox;
+//    }
+//
+//    /**
+//     * @brief Returns whether the network error occurred while receiving
+//     * @return true or false
+//     */
+//    bool NetworkTimeout::whileReceiving() {
+//      return (this->operation_type == NetworkTimeout::RECEIVING);
+//    }
+//
+//    /**
+//     * @brief Returns whether the network error occurred while sending
+//     * @return true or false
+//     */
+//    bool NetworkTimeout::whileSending() {
+//      return (this->operation_type == NetworkTimeout::SENDING);
+//    }
+//
+//    /**
+//     * @brief Returns the mailbox name on which the error occurred
+//     * @return the mailbox name
+//     */
+//    std::string NetworkTimeout::getMailbox() {
+//      return this->mailbox;
+//    }
+//
+//    /**
+//     * @brief Get the human-readable failure message
+//     * @return the message
+//     */
+//    std::string NetworkTimeout::toString() {
+//      std::string operation;
+//      if (this->while_sending) {
+//        operation = "sending to";
+//      } else {
+//        operation = "receiving from";
+//      }
+//      return "Network timeout while " + operation + " mailbox_name " + this->mailbox;
+//    };
 
     /**
      * @brief Constructor
@@ -424,7 +475,7 @@ namespace wrench {
      * @return the message
      */
     std::string StorageServiceFileAlreadyThere::toString() {
-      return "Cannot write file " + this->file->getId() + " to Storage Service " +
+      return "Cannot write file " + this->file->getID() + " to Storage Service " +
              this->storage_service->getName() + " because it's already stored there";
     }
 
@@ -434,10 +485,11 @@ namespace wrench {
      * @param file: the file that is already being copied
      * @param storage_service:  the storage service to which is is being copied
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, StorageService *storage_service)
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, StorageService *storage_service, std::string dst_dir)
             : FailureCause(FILE_ALREADY_BEING_COPIED) {
       this->file = file;
       this->storage_service = storage_service;
+      this->dst_dir = dst_dir;
     }
 
     /**
@@ -457,11 +509,20 @@ namespace wrench {
     }
 
     /**
+    * @brief Getter
+    * @return the directory
+    */
+    std::string FileAlreadyBeingCopied::getDir() {
+      return this->dst_dir;
+    }
+
+
+    /**
      * @brief Get the human-readable failure message
      * @return the message
      */
     std::string FileAlreadyBeingCopied::toString() {
-      return "File " + this->file->getId() + " is already being copied to  Storage Service " +
+      return "File " + this->file->getID() + " is already being copied to  Storage Service " +
              this->storage_service->getName();
     }
 
