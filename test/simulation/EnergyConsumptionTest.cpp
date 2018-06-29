@@ -111,7 +111,6 @@ private:
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       {
-        std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
 
         //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
         wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
@@ -317,7 +316,7 @@ private:
           message = wrench::S4U_Mailbox::getMessage(my_mailbox);
         } catch (std::shared_ptr<wrench::NetworkError> &cause) {
           std::string error_msg = cause->toString();
-          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + error_msg);
         }
 
         // Did we get the expected message?
@@ -438,7 +437,6 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
 
   // Create two workflow files
   wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
-  wrench::WorkflowFile *output_file = this->workflow->addFile("output_file", 20000.0);
 
   // Staging the input_file on the storage service
   EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
