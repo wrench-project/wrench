@@ -34,7 +34,7 @@ namespace wrench {
         throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
       }
 
-      this->daemon_lock = simgrid::s4u::Mutex::createMutex();
+      this->daemon_lock = simgrid::s4u::Mutex::create();
       this->hostname = hostname;
       this->simulation = nullptr;
       unsigned long seq = S4U_Mailbox::generateUniqueSequenceNumber();
@@ -76,7 +76,7 @@ namespace wrench {
     /**
      * \cond
      */
-    static int daemon_goodbye(void *x, void *service_instance) {
+    static int daemon_goodbye(int x, void *service_instance) {
       WRENCH_INFO("Terminating");
       if (service_instance) {
         auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
@@ -113,7 +113,7 @@ namespace wrench {
 
       // Create the s4u_actor
       try {
-        this->s4u_actor = simgrid::s4u::Actor::createActor(this->process_name.c_str(),
+        this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
                                                            simgrid::s4u::Host::by_name(hostname),
                                                            S4U_DaemonActor(this));
       } catch (std::exception &e) {
@@ -129,11 +129,11 @@ namespace wrench {
         if (daemonized) {
           this->s4u_actor->daemonize();
         }
-        this->s4u_actor->onExit(daemon_goodbye, (void *) (this));
+        this->s4u_actor->on_exit(daemon_goodbye, (void *) (this));
 
         // Set the mailbox_name receiver
-        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(this->mailbox_name);
-        mailbox->setReceiver(this->s4u_actor);
+        simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(this->mailbox_name);
+        mailbox->set_receiver(this->s4u_actor);
       }
     }
 
