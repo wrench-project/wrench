@@ -106,7 +106,13 @@ TEST_F(WorkflowTaskTest, InputOutputFile) {
 }
 
 TEST_F(WorkflowTaskTest, StateToString) {
-  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_NOT_READY), "NOT READY");
+
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::NOT_READY), "NOT READY");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::READY), "READY");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::PENDING), "PENDING");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::COMPLETED), "COMPLETED");
+  ASSERT_EQ(wrench::WorkflowTask::stateToString((wrench::WorkflowTask::State)100), "UNKNOWN STATE");
+
   ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_READY), "READY");
   ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_RUNNING), "RUNNING");
   ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_COMPLETED), "COMPLETED");
