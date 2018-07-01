@@ -199,32 +199,16 @@ namespace wrench {
       }
 
       for (const auto &wms : this->wmses) {
-        if (not this->hostExists(wms->getHostname())) {
-          throw std::runtime_error("A WMS cannot be started on host '" + wms->getHostname() + "'");
-        }
         if (wms->getWorkflow() == nullptr) {
           throw std::runtime_error("The WMS on host '" + wms->getHostname() + "' was not given a workflow to execute");
         }
       }
 
-      // Check that at each ComputeService is on valid hosts
-      for (const auto &compute_service : this->compute_services) {
-        if (not this->hostExists(compute_service->getHostname())) {
-          throw std::runtime_error(
-                  "A ComputeService cannot be started on host '" + compute_service->getHostname() + "'");
-        }
-      }
-
       for (auto &wms : this->wmses) {
         // Check that at least one StorageService is running (only needed if there are files in the workflow),
-        // and that each StorageService is on a valid host
         if (not wms->workflow->getFiles().empty()) {
           bool one_storage_service_running = false;
           for (const auto &storage_service : this->storage_services) {
-            if (not this->hostExists(storage_service->getHostname())) {
-              throw std::runtime_error(
-                      "A StorageService cannot be started on host '" + storage_service->getHostname() + "'");
-            }
             if (storage_service->state == Service::UP) {
               one_storage_service_running = true;
               break;
@@ -236,19 +220,12 @@ namespace wrench {
           }
         }
 
-        // Check that a FileRegistryService is running if needed, and is on a valid host
+        // Check that a FileRegistryService is running if needed
         if (not wms->workflow->getInputFiles().empty()) {
           if (this->file_registry_services.empty()) {
             throw std::runtime_error(
                     "At least one FileRegistryService should have been instantiated and passed to Simulation.add()"
                             "because there are workflow input files to be staged.");
-          }
-          for (auto frs : this->file_registry_services) {
-            if (not this->hostExists(frs->getHostname())) {
-              throw std::runtime_error(
-                      "A FileRegistry service cannot be started on host '" + frs->getHostname() +
-                      "'");
-            }
           }
         }
 
