@@ -18,6 +18,7 @@ namespace wrench {
     /***********************/
 
 
+#if 0
     /**
      * @brief An internal helper method to move a unique_ptr from a set to another
      * @tparam template class
@@ -45,6 +46,7 @@ namespace wrench {
                                                                                            std::set<std::unique_ptr<StandardJobExecutor>> *from,
                                                                                            std::set<std::unique_ptr<StandardJobExecutor>> *to);
 
+#endif
 
     /***********************/
     /** \endcond           */
