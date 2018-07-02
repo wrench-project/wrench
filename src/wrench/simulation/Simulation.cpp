@@ -302,9 +302,6 @@ namespace wrench {
       if (service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
-      if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
-      }
       service->simulation = this;
       this->compute_services.insert(std::shared_ptr<ComputeService>(service));
       return service;
@@ -324,9 +321,6 @@ namespace wrench {
     NetworkProximityService * Simulation::add(NetworkProximityService *service) {
       if (service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
-      }
-      if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
       service->simulation = this;
       this->network_proximity_services.insert(std::shared_ptr<NetworkProximityService>(service));
@@ -349,9 +343,6 @@ namespace wrench {
       if (service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
-      if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
-      }
       service->simulation = this;
       this->storage_services.insert(std::shared_ptr<StorageService>(service));
       return service;
@@ -372,9 +363,6 @@ namespace wrench {
       if (wms == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid argument (nullptr wms)");
       }
-      if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
-      }
       wms->simulation = this;
       this->wmses.insert(std::shared_ptr<WMS>(wms));
       return wms;
@@ -393,9 +381,6 @@ namespace wrench {
     FileRegistryService * Simulation::add(FileRegistryService *file_registry_service) {
       if (file_registry_service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid arguments");
-      }
-      if (not this->s4u_simulation->isInitialized()) {
-        throw std::runtime_error("Simulation::add(): Simulation is not initialized");
       }
       file_registry_service->simulation = this;
       this->file_registry_services.insert(std::shared_ptr<FileRegistryService>(file_registry_service));
