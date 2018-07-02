@@ -6,7 +6,14 @@ namespace wrench {
     /**
      * @brief Constructor
      */
-    SimulationTimestampType::SimulationTimestampType() {
+    SimulationTimestampType::SimulationTimestampType() : SimulationTimestampType(nullptr) {
+
+    }
+
+    /**
+     *  @brief Constructor
+     */
+    SimulationTimestampType::SimulationTimestampType(wrench::SimulationTimestampType *endpoint) : endpoint(endpoint){
         this->date = S4U_Simulation::getClock();
     }
 
@@ -99,6 +106,91 @@ namespace wrench {
         if (task != nullptr) {
             setEndpoints();
         }
+    }
+
+    /**
+     * @brief Constructor
+     * @param file: the file associated with this file copy
+     * @param src: the source StorageService from which this file is being copied
+     * @param src_partition: the partition in the source StorageService from which this file is being copied
+     * @param dst: the destination StorageService where this file will be copied
+     * @param dst_partition: the partition in the destination StorageService where this file will be copied
+     */
+    SimulationTimestampFileCopy::SimulationTimestampFileCopy(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
+            SimulationTimestampType(start_timestamp), file(file), source(FileLocation(src, src_partition)), destination(FileLocation(dst, dst_partition)) {
+    }
+
+    /**
+     * @brief retrieves the file being copied
+     * @return a pointer to the WorkflowFile associated with this copy
+     */
+    WorkflowFile* SimulationTimestampFileCopy::getFile() {
+        return this->file;
+    }
+
+    /**
+     * @brief retrieves the location from which the file is being copied
+     * @return a FileLocation object containing the source StorageService and source partition from which the file is being copied
+     */
+    SimulationTimestampFileCopy::FileLocation SimulationTimestampFileCopy::getSource() {
+        return this->source;
+    }
+
+    /**
+     * @brief retrieves the location where the file will be copied
+     * @return a FileLocation object containing the destination StorageService and destination partition into which the file is being copied
+     */
+    SimulationTimestampFileCopy::FileLocation SimulationTimestampFileCopy::getDestination() {
+        return this->destination;
+    }
+
+    /**
+     * @brief Constructor
+     * @param file: the file associated with this file copy
+     * @param src: the source StorageService from which this file is being copied
+     * @param src_partition: the partition in the source StorageService from which this file is being copied
+     * @param dst: the destination StorageService where this file will be copied
+     * @param dst_partition: the partition in the destination StorageService where this file will be copied
+     */
+    SimulationTimestampFileCopyStart::SimulationTimestampFileCopyStart(WorkflowFile *file, StorageService *src, std::string src_partition,
+                                                                       StorageService *dst, std::string dst_partition) :
+            SimulationTimestampFileCopy(file, src, src_partition, dst, dst_partition) {
+
+    }
+
+
+    /**
+     * @brief Constructor
+     * @param file: the file associated with this file copy
+     * @param src: the source StorageService from which this file was being copied
+     * @param src_partition: the partition in the source StorageService from which this file was being copied
+     * @param dst: the destination StorageService where this file was going to be copied
+     * @param dst_partition: the partition in the destination StorageService where this file was going to be copied
+     * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
+     */
+    SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(WorkflowFile *file, StorageService *src, std::string src_partition,
+                                                                           StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
+            SimulationTimestampFileCopy(file, src, src_partition, dst, dst_partition, start_timestamp) {
+            setEndpoints();
+    }
+
+    /**
+     * @brief Constructor
+     * @param file: the file associated with this file copy
+     * @param src: the source StorageService from which this file was being copied
+     * @param src_partition: the partition in the source StorageService from which this file was being copied
+     * @param dst: the destination StorageService where this file was going to be copied
+     * @param dst_partition: the partition in the destination StorageService where this file was going to be copied
+     * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
+     */
+    SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(WorkflowFile *file, StorageService *src, std::string src_partition,
+                                                                           StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
+            SimulationTimestampFileCopy(file, src, src_partition, dst, dst_partition, start_timestamp) {
+            setEndpoints();
+    }
+
+    void SimulationTimestampFileCopy::setEndpoints() {
+        this->endpoint->endpoint = this;
     }
 }
 
