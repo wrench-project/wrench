@@ -2096,8 +2096,9 @@ namespace wrench {
         this->freeJobFromJobsList(batch_job);
       }
       if (is_pending) {
+        BatchJob *to_free = *batch_pending_it;
         this->pending_jobs.erase(batch_pending_it);
-        this->freeJobFromJobsList(*batch_pending_it);
+        this->freeJobFromJobsList(to_free);
       }
       if (is_waiting) {
         this->waiting_jobs.erase(batch_job);

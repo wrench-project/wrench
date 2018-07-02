@@ -123,6 +123,17 @@ private:
 
       }
 
+      // Do a bogus lookup
+      success = true;
+      try {
+        this->test->storage_service_1000->lookupFile(nullptr, nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to lookup a nullptr file!");
+      }
+
       // Do a few queries to storage services
       for (auto f : {this->test->file_1, this->test->file_10, this->test->file_100, this->test->file_500}) {
         if ((!this->test->storage_service_1000->lookupFile(f, nullptr)) ||
@@ -1496,12 +1507,16 @@ private:
       if (not this->test->storage_service_1000->lookupFile(this->test->file_10, "/")) {
         throw std::runtime_error("File should be in storage_service_1000, partition '/'");
       }
+      if (not this->test->storage_service_1000->lookupFile(this->test->file_10, "")) {
+        throw std::runtime_error("File should be in storage_service_1000, partition '/'");
+      }
       if (not this->test->storage_service_500->lookupFile(this->test->file_10, "foo")) {
         throw std::runtime_error("File should be in storage_service_500, partition '/'");
       }
       if (not this->test->storage_service_1000->lookupFile(this->test->file_10, "foo")) {
         throw std::runtime_error("File should be in storage_service_1000, partition '/'");
       }
+
 
       // Bogus lookup
       success = true;
