@@ -267,6 +267,18 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("cloud_service_test");
 
+
+  // Adding services to an uninitialized simulation
+  std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
+  ASSERT_THROW(simulation->add(
+          new wrench::CloudService("DualCoreHost", hosts, 100.0)), std::runtime_error);
+  ASSERT_THROW(simulation->add(
+          new wrench::SimpleStorageService("DualCoreHost", 100.0)), std::runtime_error);
+  ASSERT_THROW(simulation->add(
+          new wrench::NetworkProximityService("DualCoreHost", hosts)), std::runtime_error);
+  ASSERT_THROW(simulation->add(
+          new wrench::FileRegistryService("DualCoreHost")), std::runtime_error);
+  
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
