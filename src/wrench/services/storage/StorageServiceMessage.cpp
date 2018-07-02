@@ -10,6 +10,10 @@
 
 #include "StorageServiceMessage.h"
 #include <wrench/workflow/WorkflowFile.h>
+#include <wrench/simulation/SimulationTimestampTypes.h>
+#include <wrench/simulation/Simulation.h>
+#include <wrench/simulation/SimulationOutput.h>
+#include <wrench/services/storage/StorageService.h>
 
 namespace wrench {
 
@@ -165,8 +169,9 @@ namespace wrench {
     StorageServiceFileCopyRequestMessage::StorageServiceFileCopyRequestMessage(std::string answer_mailbox,
                                                                                WorkflowFile *file,
                                                                                StorageService *src,
-                                                                               std::string& src_partition,
-                                                                               std::string& dst_partition,
+                                                                               std::string &src_partition,
+                                                                               StorageService *dst,
+                                                                               std::string &dst_partition,
                                                                                FileRegistryService *file_registry_service,
                                                                                double payload) : StorageServiceMessage(
             "FILE_COPY_REQUEST", payload) {
@@ -179,12 +184,22 @@ namespace wrench {
       this->file_registry_service = file_registry_service;
       this->src_partition = src_partition;
       this->dst_partition = dst_partition;
+      this->dst = dst;
+
+      this->simulation_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, dst, dst_partition);
+      src->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(this->simulation_timestamp);
+
+      /**
+       *
+       */
     }
 
     /**
      * @brief Constructor
      * @param file: the file
-     * @param storage_service: the storage service
+     * @param src: the source storage service
+     * @param src_partition: the source partition
+     * @param dst: the destination storage service
      * @param dst_partition: the destination partition
      * @param file_registry_service: the file registry service to update (nullptr if none)
      * @param file_registry_service_updated: whether the file registry service was updated
@@ -195,28 +210,41 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(WorkflowFile *file,
-                                                                             StorageService *storage_service,
+                                                                             StorageService *src,
+                                                                             std::string src_partition,
+                                                                             StorageService *dst,
                                                                              std::string dst_partition,
                                                                              FileRegistryService *file_registry_service,
                                                                              bool file_registry_service_updated,
                                                                              bool success,
                                                                              std::shared_ptr<FailureCause> failure_cause,
+                                                                             SimulationTimestampFileCopyStart *start_timestamp,
                                                                              double payload)
             : StorageServiceMessage("FILE_COPY_ANSWER", payload) {
-      if ((file == nullptr) || (storage_service == nullptr) || (dst_partition.empty()) ||
+      if ((file == nullptr) || (dst == nullptr) || (dst_partition.empty()) ||
               (success && (failure_cause != nullptr)) ||
               (!success && (failure_cause == nullptr)) ||
               ((file_registry_service == nullptr) and (file_registry_service_updated))) {
         throw std::invalid_argument("StorageServiceFileCopyAnswerMessage::StorageServiceFileCopyAnswerMessage(): Invalid arguments");
       }
       this->file = file;
-      this->storage_service = storage_service;
+      this->src = src;
+      this->src_partition = src_partition;
+      this->dst = dst;
       this->dst_partition = dst_partition;
       this->file_registry_service = file_registry_service;
       this->file_registry_service_updated = file_registry_service_updated;
       this->success = success;
       this->failure_cause = failure_cause;
       this->file_registry_service = file_registry_service;
+      this->start_timestamp = start_timestamp;
+
+      if (not success) {
+          src->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(
+                  file, src, src_partition, dst, dst_partition, start_timestamp
+                  ));
+      }
+
     }
 
     /**

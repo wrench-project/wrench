@@ -61,11 +61,11 @@ namespace wrench {
       } else if (auto m = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
         if (m->success) {
           return std::unique_ptr<FileCopyCompletedEvent>(
-                  new FileCopyCompletedEvent(m->file, m->storage_service, m->file_registry_service, m->file_registry_service_updated));
+                  new FileCopyCompletedEvent(m->file, m->dst, m->file_registry_service, m->file_registry_service_updated));
 
         } else {
           return std::unique_ptr<FileCopyFailedEvent>(
-                  new FileCopyFailedEvent(m->file, m->storage_service, m->failure_cause));
+                  new FileCopyFailedEvent(m->file, m->dst, m->failure_cause));
         }
       } else {
         throw std::runtime_error(

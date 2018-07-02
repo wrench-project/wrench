@@ -872,6 +872,7 @@ namespace wrench {
                 file,
                 src,
                 src_partition,
+                this,
                 dst_partition,
                 nullptr,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
@@ -941,6 +942,7 @@ namespace wrench {
                 file,
                 src,
                 src_partition,
+                this,
                 dst_partition,
                 nullptr,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
