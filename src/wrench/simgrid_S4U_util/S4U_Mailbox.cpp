@@ -40,7 +40,7 @@ namespace wrench {
      */
     std::unique_ptr<SimulationMessage> S4U_Mailbox::getMessage(std::string mailbox_name) {
       WRENCH_DEBUG("Getting a message from mailbox_name '%s'", mailbox_name.c_str());
-      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       SimulationMessage *msg = nullptr;
       try {
         msg = static_cast<SimulationMessage *>(mailbox->get());
@@ -86,7 +86,7 @@ namespace wrench {
       }
 
       WRENCH_DEBUG("Getting a message from mailbox_name '%s' with timeout %lf sec", mailbox_name.c_str(), timeout);
-      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       void *data = nullptr;
 
       try {
@@ -131,7 +131,7 @@ namespace wrench {
       WRENCH_DEBUG("Putting a %s message (%.2lf bytes) to mailbox_name '%s'",
                    msg->getName().c_str(), msg->payload,
                    mailbox_name.c_str());
-      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       try {
         //also let the MessageManager manage this message
         MessageManager::manageMessage(mailbox_name,msg);
@@ -167,7 +167,7 @@ namespace wrench {
 
       simgrid::s4u::CommPtr comm = nullptr;
 
-      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
       try {
         mailbox->put_init(msg, (uint64_t) msg->payload)->detach();
@@ -204,7 +204,7 @@ namespace wrench {
 
       simgrid::s4u::CommPtr comm_ptr = nullptr;
 
-      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       try {
         comm_ptr = mailbox->put_async(msg, (uint64_t) msg->payload);
       } catch (xbt_ex &e) {
@@ -242,7 +242,7 @@ namespace wrench {
 
       std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication(mailbox_name));
 
-      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::byName(mailbox_name);
+      simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       try {
         comm_ptr = mailbox->get_async((void**)(&(pending_communication->simulation_message)));
       } catch (xbt_ex &e) {

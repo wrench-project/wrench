@@ -12,6 +12,7 @@
 
 
 #include <string>
+#include <memory>
 #include <wrench/simgrid_S4U_util/S4U_PendingCommunication.h>
 #include <wrench/workflow/execution_events/FailureCause.h>
 

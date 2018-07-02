@@ -157,7 +157,7 @@ private:
       for (auto task : tasks) {
         try {
           one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
-                                                        {}, {}, {});
+                                                                    {}, {}, {});
 
           if (one_task_jobs[job_index]->getNumTasks() != 1) {
             throw std::runtime_error("A one-task job should say it has one task");
@@ -294,6 +294,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
           new wrench::CloudService(hostname, execution_hosts, 100.0,
                                    { {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
+  // Try to get the message payload as a string, just for kicks
+  ASSERT_NO_THROW(compute_service->getMessagePayloadValueAsString(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
+  ASSERT_THROW(compute_service->getMessagePayloadValueAsString("BOGUS"), std::invalid_argument);
+
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
@@ -308,13 +312,17 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
 
 
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
   // Create a file registry
   ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
   ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+
+  // Won't work without a workflow!
+  ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
@@ -323,3 +331,5 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   free(argv[0]);
   free(argv);
 }
+
+

@@ -67,11 +67,6 @@ namespace wrench {
       task->DAG_node = DAG->addNode();
       task->toplevel = 0; // upon creation, a task is an entry task
 
-      // Update the workflow's number of levels
-      if (this->getNumLevels() < 1 + task->toplevel) {
-        this->setNumLevels(1 + task->toplevel);
-      }
-
       // Add it to the DAG node's metadata
       (*DAG_node_map)[task->DAG_node] = task;
       // Add it to the set of workflow tasks
@@ -99,8 +94,16 @@ namespace wrench {
         throw std::invalid_argument("Workflow::removeTask(): Task '" + task->id + "' does not exist");
       }
 
+      std::vector<wrench::WorkflowTask *> children = this->getTaskChildren(task);
+
       DAG.get()->erase(task->DAG_node);
       tasks.erase(tasks.find(task->id));
+
+      // Brute-force a top-level update all all the children of the removed task
+      for (auto const &child : children) {
+        child->updateTopLevel();
+      }
+
     }
 
     /**
@@ -243,7 +246,6 @@ namespace wrench {
       this->DAG = std::unique_ptr<lemon::ListDigraph>(new lemon::ListDigraph());
       this->DAG_node_map = std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>>(
               new lemon::ListDigraph::NodeMap<WorkflowTask *>(*DAG));
-      this->num_levels = 0;
       this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
       this->simulation = nullptr;
     };
@@ -736,17 +738,26 @@ namespace wrench {
      * @return the number of levels
      */
     unsigned long Workflow::getNumLevels() {
-      return this->num_levels;
+      unsigned long max_top_level = 0;
+      for (auto const &t : this->tasks) {
+        wrench::WorkflowTask *task = t.second.get();
+        if (task->getNumberOfChildren() == 0) {
+          if (1 + task->getTopLevel() > max_top_level) {
+            max_top_level = 1 + task->getTopLevel();
+          }
+        }
+      }
+      return max_top_level;
     }
 
 
-    /**
-     * @brief Sets the number of levels in the workflow
-     * @param num_levels: the number of levels
-     */
-    void Workflow::setNumLevels(unsigned long num_levels) {
-      this->num_levels = num_levels;
-    }
+//    /**
+//     * @brief Sets the number of levels in the workflow
+//     * @param num_levels: the number of levels
+//     */
+//    void Workflow::setNumLevels(unsigned long num_levels) {
+//      this->num_levels = num_levels;
+//    }
 
     /**
      * @brief Returns the workflow's completion date
@@ -763,7 +774,7 @@ namespace wrench {
           makespan = -1.0;
           break;
         } else {
-          makespan = MAX(makespan, task->getEndDate());
+          makespan = std::max<double>(makespan, task->getEndDate());
         }
       }
       return makespan;
