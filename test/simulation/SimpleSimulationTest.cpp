@@ -294,6 +294,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
           new wrench::CloudService(hostname, execution_hosts, 100.0,
                                    { {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
+  // Try to get the message payload as a string, just for kicks
+  ASSERT_NO_THROW(compute_service->getMessagePayloadValueAsString(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
+  ASSERT_THROW(compute_service->getMessagePayloadValueAsString("BOGUS"), std::invalid_argument);
+
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
