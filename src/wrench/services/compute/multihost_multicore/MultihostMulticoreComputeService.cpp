@@ -512,9 +512,9 @@ namespace wrench {
               desired_num_cores = t->getMinNumCores();
             }
 
-            if ((picked_num_cores == 0) || (picked_num_cores < MIN(num_available_cores, desired_num_cores))) {
+            if ((picked_num_cores == 0) || (picked_num_cores < std::min(num_available_cores, desired_num_cores))) {
               picked_host = hostname;
-              picked_num_cores = MIN(num_available_cores, desired_num_cores);
+              picked_num_cores = std::min(num_available_cores, desired_num_cores);
               picked_ram = t->getMemoryRequirement();
             }
           }
@@ -578,13 +578,13 @@ namespace wrench {
       // Compute the required minimum number of cores
       unsigned long max_min_required_num_cores = 1;
       for (auto t : (job)->getTasks()) {
-        max_min_required_num_cores = MAX(max_min_required_num_cores, t->getMinNumCores());
+        max_min_required_num_cores = std::max(max_min_required_num_cores, t->getMinNumCores());
       }
 
       // Compute the required minimum ram
       double max_min_required_ram = 0.0;
       for (auto t : (job)->getTasks()) {
-        max_min_required_ram = MAX(max_min_required_ram, t->getMemoryRequirement());
+        max_min_required_ram = std::max(max_min_required_ram, t->getMemoryRequirement());
       }
 
       // Find the list of hosts with the required number of cores AND the required RAM
@@ -611,9 +611,9 @@ namespace wrench {
 //        WRENCH_INFO("===> %s", this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM).c_str()
 //        );
 //        if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) == "minimum") {
-//          maximum_num_cores = MAX(maximum_num_cores, t->getMinNumCores());
+//          maximum_num_cores = std::max(maximum_num_cores, t->getMinNumCores());
 //        } else {
-//          maximum_num_cores = MAX(maximum_num_cores, t->getMaxNumCores());
+//          maximum_num_cores = std::max(maximum_num_cores, t->getMaxNumCores());
 //        }
 //      }
 //
