@@ -134,9 +134,6 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_BadSetup_test() {
   argc = 1;
   ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
 
-  argv = (char **) calloc(1, sizeof(char *));
-  ASSERT_THROW(simulation->init(&argc, nullptr), std::invalid_argument);
-
   ASSERT_THROW(simulation->instantiatePlatform(platform_file_path), std::runtime_error);
 
   ASSERT_THROW(simulation->launch(), std::runtime_error);

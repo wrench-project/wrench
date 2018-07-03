@@ -30,9 +30,14 @@ namespace wrench {
      */
     S4U_Daemon::S4U_Daemon(std::string hostname, std::string process_name_prefix, std::string mailbox_prefix) {
 
+      if (not simgrid::s4u::Engine::is_initialized()) {
+        throw std::runtime_error("Simulation must be initialized before services can be created");
+      }
+
       if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
         throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
       }
+
 
       this->daemon_lock = simgrid::s4u::Mutex::create();
       this->hostname = hostname;
