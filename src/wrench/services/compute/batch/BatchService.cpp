@@ -763,7 +763,7 @@ namespace wrench {
             if (num_available_cores < cores_per_node) {
               continue;
             }
-            unsigned long tentative_target_num_cores = MIN(num_available_cores, cores_per_node);
+            unsigned long tentative_target_num_cores = std::min(num_available_cores, cores_per_node);
             unsigned long tentative_target_slack =
                     num_available_cores - tentative_target_num_cores;
 
@@ -1709,7 +1709,7 @@ namespace wrench {
           try {
             cs->start(cs, true);
             batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
-            double timeout_timestamp = std::min(job->getDuration(), allocated_time);
+            double timeout_timestamp = std::min<double>(job->getDuration(), allocated_time);
             batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
           } catch (std::runtime_error &e) {
             throw;
@@ -1875,7 +1875,7 @@ namespace wrench {
 
       // Update core availabilities for jobs that are currently running
       for (auto job : this->running_jobs) {
-        double time_to_finish = MAX(0, job->getBeginTimeStamp() +
+        double time_to_finish = std::max<double>(0, job->getBeginTimeStamp() +
                                        job->getAllocatedTime() -
                                        this->simulation->getCurrentSimulatedDate());
         for (auto resource : job->getResourcesAllocated()) {
@@ -2096,8 +2096,9 @@ namespace wrench {
         this->freeJobFromJobsList(batch_job);
       }
       if (is_pending) {
+        BatchJob *to_free = *batch_pending_it;
         this->pending_jobs.erase(batch_pending_it);
-        this->freeJobFromJobsList(*batch_pending_it);
+        this->freeJobFromJobsList(to_free);
       }
       if (is_waiting) {
         this->waiting_jobs.erase(batch_job);

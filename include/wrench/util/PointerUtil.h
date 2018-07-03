@@ -89,7 +89,6 @@ namespace wrench {
             (*to).insert(std::move(tmp));
 
         };
-#endif
 
 
         /**
@@ -103,6 +102,9 @@ namespace wrench {
         static void moveSingleSeparateUniquePtrFromSetToSet(std::unique_ptr<T1>* ptr,
                                                            std::set<std::unique_ptr<T1>> *from,
                                                            std::set<std::unique_ptr<T1>> *to);
+
+#endif
+
     };
 
     /***********************/

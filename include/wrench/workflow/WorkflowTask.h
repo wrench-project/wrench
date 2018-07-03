@@ -127,7 +127,7 @@ namespace wrench {
 
         static std::string stateToString(WorkflowTask::InternalState state);
 
-        void updateTopLevel();
+        unsigned long updateTopLevel();
 
         void setInternalState(WorkflowTask::InternalState);
 

@@ -285,6 +285,9 @@ namespace wrench {
       // Set default and specified properties
       this->setProperties(this->default_property_values, std::move(property_list));
 
+      // Validate that properties are correct
+      this->validateProperties();
+
       // Set default and specified message payloads
       this->setMessagePayloads(this->default_messagepayload_values, std::move(messagepayload_list));
 
@@ -383,11 +386,7 @@ namespace wrench {
         while (this->dispatchNextPendingJob());
       }
 
-      if (this->containing_pilot_job != nullptr) {
-        /*** Clean up everything in the scratch space ***/
-//        WRENCH_INFO("CLEANING UP SCRATCH IN MULTIHOSTMULTICORECOMPUTE SERVICE");
-        cleanUpScratch();
-      }
+
 
       WRENCH_INFO("Multicore Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
@@ -513,9 +512,9 @@ namespace wrench {
               desired_num_cores = t->getMinNumCores();
             }
 
-            if ((picked_num_cores == 0) || (picked_num_cores < MIN(num_available_cores, desired_num_cores))) {
+            if ((picked_num_cores == 0) || (picked_num_cores < std::min(num_available_cores, desired_num_cores))) {
               picked_host = hostname;
-              picked_num_cores = MIN(num_available_cores, desired_num_cores);
+              picked_num_cores = std::min(num_available_cores, desired_num_cores);
               picked_ram = t->getMemoryRequirement();
             }
           }
@@ -579,13 +578,13 @@ namespace wrench {
       // Compute the required minimum number of cores
       unsigned long max_min_required_num_cores = 1;
       for (auto t : (job)->getTasks()) {
-        max_min_required_num_cores = MAX(max_min_required_num_cores, t->getMinNumCores());
+        max_min_required_num_cores = std::max(max_min_required_num_cores, t->getMinNumCores());
       }
 
       // Compute the required minimum ram
       double max_min_required_ram = 0.0;
       for (auto t : (job)->getTasks()) {
-        max_min_required_ram = MAX(max_min_required_ram, t->getMemoryRequirement());
+        max_min_required_ram = std::max(max_min_required_ram, t->getMemoryRequirement());
       }
 
       // Find the list of hosts with the required number of cores AND the required RAM
@@ -612,9 +611,9 @@ namespace wrench {
 //        WRENCH_INFO("===> %s", this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM).c_str()
 //        );
 //        if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) == "minimum") {
-//          maximum_num_cores = MAX(maximum_num_cores, t->getMinNumCores());
+//          maximum_num_cores = std::max(maximum_num_cores, t->getMinNumCores());
 //        } else {
-//          maximum_num_cores = MAX(maximum_num_cores, t->getMaxNumCores());
+//          maximum_num_cores = std::max(maximum_num_cores, t->getMaxNumCores());
 //        }
 //      }
 //
@@ -796,11 +795,22 @@ namespace wrench {
 
       if (auto msg = dynamic_cast<ServiceTTLExpiredMessage *>(message.get())) {
         WRENCH_INFO("My TTL has expired, terminating and perhaps notify a pilot job submitted");
+        if (this->containing_pilot_job != nullptr) {
+          /*** Clean up everything in the scratch space ***/
+          cleanUpScratch();
+        }
+
         this->terminate(true);
+
         return false;
 
       } else if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        if (this->containing_pilot_job != nullptr) {
+          /*** Clean up everything in the scratch space ***/
+          cleanUpScratch();
+        }
         this->terminate(false);
+
         // This is Synchronous
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
@@ -1635,5 +1645,66 @@ namespace wrench {
         }
       }
     }
+
+    /**
+     * @brief Method to make sure that property specs are valid
+     *
+     * @throw std::invalid_argument
+     */
+    void MultihostMulticoreComputeService::validateProperties() {
+
+      bool success = true;
+
+      // Thread startup overhead
+      double thread_startup_overhead = 0;
+      success = true;
+      try {
+        thread_startup_overhead = this->getPropertyValueAsDouble(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+
+      if ((!success) or (thread_startup_overhead < 0)) {
+        throw std::invalid_argument("Invalid THREAD_STARTUP_OVERHEAD property specification: " +
+                        this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD));
+      }
+
+      // Job selection policy
+      if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY) != "FCFS") {
+        throw std::invalid_argument("Invalid JOB_SELECTION_POLICY property specification: " +
+                        this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY));
+      }
+
+      // Resource allocation policy
+      if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY) != "aggressive") {
+        throw std::invalid_argument("Invalid RESOURCE_ALLOCATION_POLICY property specification: " +
+                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY));
+      }
+
+      // Core allocation algorithm
+      if ((this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) != "maximum") and
+          (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) != "minimum")) {
+        throw std::invalid_argument("Invalid TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM property specification: " +
+                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM));
+      }
+
+      // Task selection algorithm
+      if ((this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM) != "maximum_flops") and
+          (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM) != "maximum_minimum_cores")) {
+        throw std::invalid_argument("Invalid TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM property specification: " +
+                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM));
+      }
+
+      // Host selection algorithm
+      if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM) != "best_fit") {
+        throw std::invalid_argument("Invalid TASK_SCHEDULING_HOST_SELECTION_ALGORITHM property specification: " +
+                                    this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM));
+      }
+
+      return;
+    }
+
+
+
 
 };
