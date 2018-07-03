@@ -26,6 +26,9 @@ namespace wrench {
         /** @brief The maximum number of concurrent data connections supported by the service (default = "infinity") **/
         DECLARE_PROPERTY_NAME(MAX_NUM_CONCURRENT_DATA_CONNECTIONS);
 
+        /** @brief The simulated delay when a storage service connects to itself (default = "0") **/
+        DECLARE_PROPERTY_NAME(SELF_CONNECTION_DELAY);
+
     };
 
 };

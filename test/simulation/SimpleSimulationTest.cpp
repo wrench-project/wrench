@@ -120,6 +120,14 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
+      // Get the scheduler pointers just for coverage
+      if (this->getPilotJobScheduler() != nullptr) {
+        throw std::runtime_error("getPilotJobScheduler() should return nullptr");
+      }
+      if (this->getStandardJobScheduler() != nullptr) {
+        throw std::runtime_error("getStandardJobScheduler() should return nullptr");
+      }
+
       // Get a file registry service
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
@@ -144,30 +152,41 @@ private:
         throw std::runtime_error("Should not be able to create a job with an empty task list");
       }
 
-      wrench::StandardJob *two_task_job;
+      wrench::StandardJob *one_task_jobs[5];
+      int job_index = 0;
       for (auto task : tasks) {
         try {
-          two_task_job = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
-                                                        {}, {}, {});
+          one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
+                                                                    {}, {}, {});
+
+          if (one_task_jobs[job_index]->getNumTasks() != 1) {
+            throw std::runtime_error("A one-task job should say it has one task");
+          }
+          if (one_task_jobs[job_index]->getNumCompletedTasks() != 0) {
+            throw std::runtime_error("A one-task job that hasn't even started should not say it has a completed task");
+          }
+
           auto cs = (wrench::CloudService *) this->test->compute_service;
           std::string execution_host = cs->getExecutionHosts()[0];
           cs->createVM(execution_host, 2, 10);
 
-          job_manager->submitJob(two_task_job, this->test->compute_service);
+          job_manager->submitJob(one_task_jobs[job_index], this->test->compute_service);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(e.what());
         }
 
-        // Try to forget this job, which should not be fine
+        // Try to forget this job, which should NOT be fine
         success = true;
         try {
-          job_manager->forgetJob(two_task_job);
+          job_manager->forgetJob(one_task_jobs[job_index]);
         } catch (wrench::WorkflowExecutionException &e) {
           success = false;
         }
         if (success) {
           throw std::runtime_error("Should not be able to forget a pending/running job");
         }
+
+        job_index++;
       }
 
       {
@@ -205,6 +224,12 @@ private:
         }
       }
 
+      for (int i = 0; i < 5; i++) {
+        if (one_task_jobs[i]->getNumCompletedTasks() != 1) {
+          throw std::runtime_error("A job with one completed task should say it has one completed task");
+        }
+      }
+
       {
         // Try to create and submit a job with tasks that are completed, which should fail
         success = true;
@@ -220,8 +245,10 @@ private:
       }
 
       {
-        // Try to forget a complete job, which should be fine
-        job_manager->forgetJob(two_task_job);
+        // Try to forget the completed jobs
+        for (int i=0; i < 5; i++) {
+          job_manager->forgetJob(one_task_jobs[i]);
+        }
       }
 
       return 0;
@@ -240,6 +267,18 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   auto argv = (char **) calloc(1, sizeof(char *));
   argv[0] = strdup("cloud_service_test");
 
+
+  // Adding services to an uninitialized simulation
+  std::vector<std::string> hosts = {"DualCoreHost", "QuadCoreHost"};
+  ASSERT_THROW(simulation->add(
+          new wrench::CloudService("DualCoreHost", hosts, 100.0)), std::runtime_error);
+  ASSERT_THROW(simulation->add(
+          new wrench::SimpleStorageService("DualCoreHost", 100.0)), std::runtime_error);
+  ASSERT_THROW(simulation->add(
+          new wrench::NetworkProximityService("DualCoreHost", hosts)), std::runtime_error);
+  ASSERT_THROW(simulation->add(
+          new wrench::FileRegistryService("DualCoreHost")), std::runtime_error);
+  
   ASSERT_NO_THROW(simulation->init(&argc, argv));
 
   // Setting up the platform
@@ -267,6 +306,10 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
           new wrench::CloudService(hostname, execution_hosts, 100.0,
                                    { {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
+  // Try to get the message payload as a string, just for kicks
+  ASSERT_NO_THROW(compute_service->getMessagePayloadValueAsString(wrench::ServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
+  ASSERT_THROW(compute_service->getMessagePayloadValueAsString("BOGUS"), std::invalid_argument);
+
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
@@ -281,13 +324,17 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
 
 
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
   // Create a file registry
   ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
   ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+
+  // Won't work without a workflow!
+  ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
@@ -296,3 +343,5 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   free(argv[0]);
   free(argv);
 }
+
+

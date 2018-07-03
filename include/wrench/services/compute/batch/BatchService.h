@@ -242,8 +242,8 @@ namespace wrench {
         // Terminate currently running pilot jobs
         void terminateRunningPilotJobs();
 
-        //Fail the standard jobs inside the pilot jobs
-        void failCurrentStandardJobs(std::shared_ptr<FailureCause> cause);
+        //Fail the standard jobs
+        void failCurrentStandardJobs();
 
         //Process the pilot job completion
         void processPilotJobCompletion(PilotJob *job);
