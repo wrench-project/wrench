@@ -238,6 +238,19 @@ private:
         this->test->storage_service_100->deleteFile(this->test->file_100);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
+        if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
+          throw std::runtime_error("Got an expected 'file not found' exception, but not the expected failure cause type");
+        }
+        auto real_cause = (wrench::FileNotFound *) e.getCause().get();
+        if (real_cause->getStorageService() != this->test->storage_service_100) {
+          throw std::runtime_error(
+                  "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
+        }
+        if (real_cause->getFile() != this->test->file_100) {
+          throw std::runtime_error(
+                  "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
+        }
+
       }
       if (success) {
         throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
