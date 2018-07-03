@@ -287,6 +287,7 @@ private:
       if (success) {
         throw std::runtime_error("Shouldn't be able to do an initiateAsynchronousFileCopy with a nullptr src");
       }
+
       // Do a bogus asynchronous file copy (dst = nullptr);
       success = true;
       try {
@@ -344,6 +345,8 @@ private:
         throw std::runtime_error(
                 "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 99.0");
       }
+
+
 
       // Do an INVALID asynchronous file copy (file too big)
       try {
@@ -1411,6 +1414,40 @@ private:
         default:
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
       }
+
+      // Do a very similar copy, but with "empty" partitions that default to "/"
+      // Copy storage_service_1000:/:file_10 to storage_service_500:/:file_10
+      try {
+        data_movement_manager->initiateAsynchronousFileCopy(this->test->file_10, this->test->storage_service_1000, "",
+                                                            this->test->storage_service_500, "");
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Got an unexpected exception");
+      }
+
+      // Wait for the next execution event
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::FILE_COPY_COMPLETION: {
+          // do nothing
+          break;
+        }
+        default:
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+      }
+
+      // Remove the file at storage_service_500:/:file_10
+      try {
+        this->test->storage_service_500->deleteFile(this->test->file_10, "");
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Should be able to delete file storage_service_500:/:file_10");
+      }
+
+
 
       // Copy storage_service_500:/:file_10 to storage_service_1000:foo:file_10: SHOULD NOT WORK
       try {
