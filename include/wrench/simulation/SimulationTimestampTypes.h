@@ -31,10 +31,6 @@ namespace wrench {
     protected:
         SimulationTimestampType *endpoint;
 
-        virtual void setEndpoints() = 0;
-
-        friend class SimulationTimestampFileCopy;
-
     private:
         double date = -1.0;
     };
@@ -119,10 +115,6 @@ namespace wrench {
         FileLocation getSource();
         FileLocation getDestination();
 
-    protected:
-
-        void setEndpoints();
-
     private:
         WorkflowFile *file;
 
@@ -130,19 +122,25 @@ namespace wrench {
         FileLocation destination;
     };
 
+    class SimulationTimestampFileCopyFailure;
+    class SimulationTimestampFileCopyCompletion;
+
     class SimulationTimestampFileCopyStart : public SimulationTimestampFileCopy {
     public:
         SimulationTimestampFileCopyStart(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition);
+
+        friend class SimulationTimestampFileCopyFailure;
+        friend class SimulationTimestampFileCopyCompletion;
     };
 
     class SimulationTimestampFileCopyFailure : public SimulationTimestampFileCopy {
     public:
-        SimulationTimestampFileCopyFailure(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp);
+        SimulationTimestampFileCopyFailure(SimulationTimestampFileCopyStart *start_timestamp);
     };
 
     class SimulationTimestampFileCopyCompletion : public SimulationTimestampFileCopy {
     public:
-        SimulationTimestampFileCopyCompletion(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp);
+        SimulationTimestampFileCopyCompletion(SimulationTimestampFileCopyStart *start_timestamp);
     };
 };
 

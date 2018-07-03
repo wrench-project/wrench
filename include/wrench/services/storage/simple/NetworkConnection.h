@@ -43,28 +43,17 @@ namespace wrench {
             INCOMING_CONTROL
         };
 
-        NetworkConnection(int type, WorkflowFile *file, StorageService *src, std::string src_partition,
-                          StorageService *dst, std::string dst_partition, std::string mailbox, std::string ack_mailbox,
-                            SimulationTimestampFileCopyStart *start_timestamp = nullptr);
-
+        NetworkConnection(int type, WorkflowFile* file, std::string file_partition, std::string mailbox, std::string ack_mailbox, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
         bool start();
-
         bool hasFailed();
-
         std::unique_ptr<SimulationMessage> getMessage();
 
         /** @brief: the connection type */
         int type;
         /** @brief: the file (for a DATA connection) */
         WorkflowFile *file;
-        /** @brief: the source StorageService from which the file will be read */
-        StorageService *src;
-        /** @brief: the source partition from which the file will be read */
-        std::string src_partition;
-        /** @brief: the destination StorageService which the file will be read into*/
-        StorageService *dst;
         /** @brief: the file partition inside the storage service where the file will be stored to/read from */
-        std::string dst_partition;
+        std::string file_partition;
         /** @brief: the mailbox for this connection */
         std::string mailbox;
         /** @brief The low-level pending communication */
@@ -73,12 +62,8 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause;
         /** @brief: the mailbox to which to send an ack when this connection completes/fails */
         std::string ack_mailbox;
-
-        /** @brief: a pointer to a SimulationTimestampFileCopyStart associated with this network connection */
+        /** @brief: if this is a file copy, a start timestamp associated with it */
         SimulationTimestampFileCopyStart *start_timestamp;
-
-
-
     };
 
     /***********************/

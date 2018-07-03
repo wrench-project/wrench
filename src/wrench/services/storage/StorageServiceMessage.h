@@ -132,6 +132,7 @@ namespace wrench {
         StorageServiceFileCopyRequestMessage(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
                                              std::string& src_partition, StorageService * dst, std::string& dst_partition,
                                              FileRegistryService *file_registry_service,
+                                             SimulationTimestampFileCopyStart *start_timestamp,
                                              double payload);
 
         /** @brief Mailbox to which the answer message should be sent */
@@ -149,7 +150,7 @@ namespace wrench {
         /** @brief The file registry service to update, or none if nullptr */
         FileRegistryService *file_registry_service;
         /** @brief The SimulationTimestampFileCopyStart associated with this file copy request */
-        SimulationTimestampFileCopyStart *simulation_timestamp;
+        SimulationTimestampFileCopyStart *start_timestamp;
     };
 
     /**
@@ -157,22 +158,17 @@ namespace wrench {
      */
     class StorageServiceFileCopyAnswerMessage : public StorageServiceMessage {
     public:
-        StorageServiceFileCopyAnswerMessage(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst,
+        StorageServiceFileCopyAnswerMessage(WorkflowFile *file, StorageService *storage_service,
                                             std::string dst_partition,
                                             FileRegistryService *file_registry_service,
                                             bool file_registry_service_updated,
                                             bool success, std::shared_ptr<FailureCause> cause,
-                                            SimulationTimestampFileCopyStart *start_timestamp,
                                             double payload);
 
         /** @brief The file was was copied, or not */
         WorkflowFile *file;
-        /** @brief The source storage service */
-        StorageService *src;
-        /** @brief The source partition */
-        std::string src_partition;
-        /** @brief The destitnation storage service */
-        StorageService *dst;
+        /** @brief The storage service that performed the copy (i.e., which stored the file) */
+        StorageService *storage_service;
         /** @brief The destination partition */
         std::string dst_partition;
         /** @brief The file registry service that the user had requested be updated, or nullptr if none */
@@ -183,8 +179,6 @@ namespace wrench {
         bool success;
         /** @brief The cause of the failure, or nullptr if success */
         std::shared_ptr<FailureCause> failure_cause;
-        /** @brief a start timestamp associated with this file copy */
-        SimulationTimestampFileCopyStart *start_timestamp;
 
     };
 
