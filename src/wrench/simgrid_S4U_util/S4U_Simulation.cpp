@@ -78,7 +78,7 @@ namespace wrench {
      */
     void S4U_Simulation::setupPlatform(std::string &filename) {
       try {
-        this->engine->loadPlatform(filename.c_str());
+        this->engine->load_platform(filename.c_str());
       } catch (xbt_ex &e) {
         // TODO: S4U doesn't throw for this
       }
@@ -91,7 +91,7 @@ namespace wrench {
      * @return the hostname as a string
      */
     std::string S4U_Simulation::getHostName() {
-      return simgrid::s4u::Host::current()->getName();
+      return simgrid::s4u::Host::current()->get_name();
     }
 
     /**
@@ -100,12 +100,11 @@ namespace wrench {
      * @return a vector of hostnames
      */
     std::vector<std::string> S4U_Simulation::getAllHostnames() {
-      std::vector<simgrid::s4u::Host *> host_list;
-      this->engine->getHostList(&host_list);
+      std::vector<simgrid::s4u::Host *> host_list = this->engine->get_all_hosts();
       std::vector<std::string> hostname_list;
       hostname_list.reserve(host_list.size());
       for (auto h : host_list) {
-        hostname_list.push_back(h->getName());
+        hostname_list.push_back(h->get_name());
       }
       return hostname_list;
     }
@@ -118,16 +117,15 @@ namespace wrench {
       std::map<std::string, std::vector<std::string>> result;
       std::vector<simgrid::kernel::routing::ClusterZone*>clusters;
 
-      this->engine->getNetzoneByType<simgrid::kernel::routing::ClusterZone>(&clusters);
+      clusters = this->engine->get_filtered_netzones<simgrid::kernel::routing::ClusterZone>();
       for (auto c : clusters) {
-        std::vector<simgrid::s4u::Host*> host_list;
-        c->getHosts(&host_list);
+        std::vector<simgrid::s4u::Host*> host_list = c->get_all_hosts();
         std::vector<std::string> hostname_list;
         hostname_list.reserve(host_list.size());
         for (auto h : host_list) {
-          hostname_list.push_back(std::string(h->getCname()));
+          hostname_list.push_back(std::string(h->get_cname()));
         }
-        result.insert({c->getName(), hostname_list});
+        result.insert({c->get_name(), hostname_list});
       }
 
       return result;
@@ -153,7 +151,7 @@ namespace wrench {
     unsigned int S4U_Simulation::getHostNumCores(std::string hostname) {
       unsigned int num_cores = 0;
       try {
-        num_cores = (unsigned int) simgrid::s4u::Host::by_name(hostname)->getCoreCount();
+        num_cores = (unsigned int) simgrid::s4u::Host::by_name(hostname)->get_core_count();
       } catch (std::out_of_range &e) {
         throw std::invalid_argument("Unknown hostname " + hostname);
       }
@@ -171,7 +169,7 @@ namespace wrench {
     double S4U_Simulation::getHostFlopRate(std::string hostname) {
       double flop_rate = 0;
       try {
-        flop_rate = simgrid::s4u::Host::by_name(hostname)->getSpeed(); // changed it to speed of the current pstate
+        flop_rate = simgrid::s4u::Host::by_name(hostname)->get_speed(); // changed it to speed of the current pstate
       } catch (std::out_of_range &e) {
         throw std::invalid_argument("Unknown hostname " + hostname);
       }
@@ -186,7 +184,7 @@ namespace wrench {
      * @return the simulation clock
      */
     double S4U_Simulation::getClock() {
-      return simgrid::s4u::Engine::getClock();
+      return simgrid::s4u::Engine::get_clock();
     }
 
     /**
@@ -216,7 +214,6 @@ namespace wrench {
       return getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
     }
 
-
     /**
      * @brief Get the memory capacity of a S4U host
      * @param host: the host
@@ -227,16 +224,16 @@ namespace wrench {
       double capacity_value = ComputeService::ALL_RAM;
 
       for (auto const &tag : tags) {
-        const char *capacity_string = host->getProperty(tag.c_str());
+        const char *capacity_string = host->get_property(tag.c_str());
         if (capacity_string) {
           if (capacity_value != ComputeService::ALL_RAM) {
-            throw std::invalid_argument("S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->getCname()) + "' has multiple memory capacity specifications");
+            throw std::invalid_argument("S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) + "' has multiple memory capacity specifications");
           }
           try {
             capacity_value = UnitParser::parse_size(capacity_string);
           } catch (std::invalid_argument &e) {
             throw std::invalid_argument(
-                    "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->getCname()) + "'has invalid memory capacity specification '" + tag +":" +
+                    "S4U_Simulation::getHostMemoryCapacity(): Host '" + std::string(host->get_cname()) + "'has invalid memory capacity specification '" + tag +":" +
                     std::string(capacity_string) + "'");
           }
         }
@@ -250,7 +247,7 @@ namespace wrench {
      */
     std::string S4U_Simulation::getHostProperty(std::string hostname, std::string property_name) {
       std::cerr << "The host is " << hostname << " and the property to look for is " << property_name << "\n";
-      return simgrid::s4u::Host::by_name(hostname)->getProperty(property_name.c_str());
+      return simgrid::s4u::Host::by_name(hostname)->get_property(property_name.c_str());
     }
 
     /**
@@ -277,7 +274,7 @@ namespace wrench {
      * @brief Set the power state of the host specified in the platform xml
      */
     void S4U_Simulation::setPstate(std::string hostname, int pstate ) {
-      simgrid::s4u::Host::by_name(hostname)->setPstate(pstate);
+      simgrid::s4u::Host::by_name(hostname)->set_pstate(pstate);
     }
 
     /**
@@ -285,7 +282,7 @@ namespace wrench {
      * @return an int referring to the number of power states available to the current host as specified in the platform xml
      */
     int S4U_Simulation::getNumberofPstates(std::string hostname) {
-      return simgrid::s4u::Host::by_name(hostname)->getPstatesCount();
+      return simgrid::s4u::Host::by_name(hostname)->get_pstate_count();
     }
 
     /**
@@ -293,7 +290,7 @@ namespace wrench {
      * @return an int referring to the current pstate of the current host
      */
     int S4U_Simulation::getCurrentPstate(std::string hostname) {
-      return simgrid::s4u::Host::by_name(hostname)->getPstate();
+      return simgrid::s4u::Host::by_name(hostname)->get_pstate();
     }
 
     /**
@@ -301,7 +298,7 @@ namespace wrench {
      * @return an double referring to the minimum power available to the host as specified in the platform xml
      */
     double S4U_Simulation::getMinPowerAvailable(std::string hostname) {
-      return sg_host_get_wattmin_at(simgrid::s4u::Host::by_name(hostname), (simgrid::s4u::Host::by_name(hostname))->getPstate());
+      return sg_host_get_wattmin_at(simgrid::s4u::Host::by_name(hostname), (simgrid::s4u::Host::by_name(hostname))->get_pstate());
     }
 
     /**
@@ -309,7 +306,7 @@ namespace wrench {
      * @return an double referring to the maximum power possible for the host to consume as specified in the platform xml
      */
     double S4U_Simulation::getMaxPowerPossible(std::string hostname) {
-      return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname), (simgrid::s4u::Host::by_name(hostname))->getPstate());
+      return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname), (simgrid::s4u::Host::by_name(hostname))->get_pstate());
     }
 
 
