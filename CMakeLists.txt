@@ -28,7 +28,6 @@ endif ()
 
 
 include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include)
-#include_directories(src/wrench/ include/ /usr/include /usr/local/include /Users/casanova/Home/PROJECTS/SIMGRID/SimGrid-3.17 /opt/local/include /usr/local/include/nlohmann)
 
 
 # library header files

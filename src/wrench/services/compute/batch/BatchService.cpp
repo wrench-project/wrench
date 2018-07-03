@@ -1,3 +1,4 @@
+
 /**
  * Copyright (c) 2017-2018. The WRENCH Team.
  *
@@ -98,7 +99,7 @@ namespace wrench {
                                double scratch_space_size,
                                std::map<std::string, std::string> property_list,
                                std::map<std::string, std::string> messagepayload_list
-                               ) :
+    ) :
             BatchService(hostname, std::move(compute_hosts), ComputeService::ALL_CORES,
                          ComputeService::ALL_RAM, scratch_space_size, std::move(property_list),
                          std::move(messagepayload_list), "") {}
@@ -183,7 +184,7 @@ namespace wrench {
           ((ram_per_host != ComputeService::ALL_RAM) and (ram_per_host != ram_available))) {
         throw std::invalid_argument(
                 "BatchService::BatchService(): A Batch Service must be given ALL core and RAM resources of hosts "
-                "(e.g., passing ComputeService::ALL_CORES and ComputeService::ALL_RAM)");
+                        "(e.g., passing ComputeService::ALL_CORES and ComputeService::ALL_RAM)");
       }
 
       //create a map for host to cores
@@ -458,8 +459,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
                                 new ComputeServiceTerminateStandardJobRequestMessage(answer_mailbox, job,
-                                                                                  this->getMessagePayloadValueAsDouble(
-                                                                                          BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
+                                                                                     this->getMessagePayloadValueAsDouble(
+                                                                                             BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -536,9 +537,7 @@ namespace wrench {
 #endif
       }
 
-      this->setStateToDown();
-      this->failCurrentStandardJobs(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      this->terminateRunningPilotJobs();
+
 
       return 0;
     }
@@ -659,7 +658,7 @@ namespace wrench {
 
               case WorkflowTask::InternalState::TASK_RUNNING:
                 throw std::runtime_error("BatchService::processStandardJobTimeout: task state shouldn't be 'RUNNING'"
-                                         "after a StandardJobExecutor was killed!");
+                                                 "after a StandardJobExecutor was killed!");
               case WorkflowTask::InternalState::TASK_FAILED:
                 // Making failed task READY again
                 task->setInternalState(WorkflowTask::InternalState::TASK_READY);
@@ -700,7 +699,6 @@ namespace wrench {
       // Terminate the executor
       WRENCH_INFO("Terminating a standard job executor");
       executor->kill();
-
       // Do not update the resource availability, because this is done at a higher level
 
     }
@@ -765,7 +763,7 @@ namespace wrench {
             if (num_available_cores < cores_per_node) {
               continue;
             }
-            unsigned long tentative_target_num_cores = MIN(num_available_cores, cores_per_node);
+            unsigned long tentative_target_num_cores = std::min(num_available_cores, cores_per_node);
             unsigned long tentative_target_slack =
                     num_available_cores - tentative_target_num_cores;
 
@@ -907,38 +905,76 @@ namespace wrench {
     * @brief Declare all current jobs as failed (likely because the daemon is being terminated
     * or has timed out (because it's in fact a pilot job))
     */
-    void BatchService::failCurrentStandardJobs(std::shared_ptr<FailureCause> cause) {
+    void BatchService::failCurrentStandardJobs() {
+
+      // LOCK
+      this->acquireDaemonLock();
+
       WRENCH_INFO("Failing current standard jobs");
-      for (auto const &j : this->running_jobs) {
-        WorkflowJob *workflow_job = j->getWorkflowJob();
-        if (workflow_job->getType() == WorkflowJob::STANDARD) {
-          auto *job = (StandardJob *) workflow_job;
-          terminateRunningStandardJob(job);
-          this->sendStandardJobFailureNotification(job, std::to_string(j->getJobID()), cause);
+
+      {
+        std::vector<BatchJob *> to_erase;
+        for (auto const &j : this->running_jobs) {
+          WorkflowJob *workflow_job = j->getWorkflowJob();
+          if (workflow_job->getType() == WorkflowJob::STANDARD) {
+            auto *job = (StandardJob *) workflow_job;
+            terminateRunningStandardJob(job);
+            this->sendStandardJobFailureNotification(job, std::to_string(j->getJobID()),
+                                                     std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
+            to_erase.push_back(j);
+          }
+        }
+
+        for (auto const &j : to_erase) {
           this->running_jobs.erase(j);
           this->freeJobFromJobsList(j);
         }
+        to_erase.clear();
       }
 
-      for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); it1++) {
-        WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
-        if (workflow_job->getType() == WorkflowJob::STANDARD) {
-          auto *job = (StandardJob *) workflow_job;
-          this->sendStandardJobFailureNotification(job, std::to_string((*it1)->getJobID()), cause);
-          this->pending_jobs.erase(it1);
-          this->freeJobFromJobsList(*it1);
+
+      {
+        std::vector<std::deque<BatchJob *>::iterator> to_erase;
+
+        for (auto it1 = this->pending_jobs.begin(); it1 != this->pending_jobs.end(); it1++) {
+          WorkflowJob *workflow_job = (*it1)->getWorkflowJob();
+          if (workflow_job->getType() == WorkflowJob::STANDARD) {
+            to_erase.push_back(it1);
+            auto *job = (StandardJob *) workflow_job;
+            this->sendStandardJobFailureNotification(job, std::to_string((*it1)->getJobID()),
+                                                     std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
+          }
         }
+
+        for (auto const &j : to_erase) {
+          this->pending_jobs.erase(j);
+          this->freeJobFromJobsList(*j);
+        }
+        to_erase.clear();
       }
 
-      for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
-        WorkflowJob *workflow_job = (*it2)->getWorkflowJob();
-        if (workflow_job->getType() == WorkflowJob::STANDARD) {
-          auto *job = (StandardJob *) workflow_job;
-          this->sendStandardJobFailureNotification(job, std::to_string((*it2)->getJobID()), cause);
-          this->waiting_jobs.erase(it2);
-          this->freeJobFromJobsList(*it2);
+      {
+        std::vector<BatchJob *> to_erase;
+
+        for (auto it2 = this->waiting_jobs.begin(); it2 != this->waiting_jobs.end(); it2++) {
+          WorkflowJob *workflow_job = (*it2)->getWorkflowJob();
+          if (workflow_job->getType() == WorkflowJob::STANDARD) {
+            to_erase.push_back(*it2);
+            auto *job = (StandardJob *) workflow_job;
+            this->sendStandardJobFailureNotification(job, std::to_string((*it2)->getJobID()),
+                                                     std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
+          }
         }
+
+        for (auto const &j : to_erase) {
+          this->waiting_jobs.erase(j);
+          this->freeJobFromJobsList(j);
+        }
+        to_erase.clear();
       }
+
+      // UNLOCK
+      this->releaseDaemonLock();
     }
 
     /**
@@ -1012,6 +1048,12 @@ namespace wrench {
     void BatchService::terminateRunningPilotJobs() {
       if (getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_PILOT_JOBS)) {
         WRENCH_INFO("Failing running pilot jobs");
+        std::vector<BatchJob *> to_erase;
+
+        // LOCK
+        this->acquireDaemonLock();
+
+        // Stopping services
         for (auto &job : this->running_jobs) {
           if ((job)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
             PilotJob *p_job = (PilotJob *) ((job)->getWorkflowJob());
@@ -1025,8 +1067,18 @@ namespace wrench {
             } catch (wrench::WorkflowExecutionException &e) {
               // ignore
             }
+            to_erase.push_back(job);
           }
         }
+
+        // Cleaning up data structures
+        for (auto &job : to_erase) {
+          this->running_jobs.erase(job);
+          this->freeJobFromJobsList(job);
+        }
+
+        // UNLOCK
+        this->releaseDaemonLock();
       }
     }
 
@@ -1054,8 +1106,11 @@ namespace wrench {
 
 
       if (auto msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
+        this->setStateToDown();
+        this->failCurrentStandardJobs();
+        this->terminateRunningPilotJobs();
         this->cleanup();
-        // This is Synchronous;
+        // Send back a synchronous reply!
         try {
           S4U_Mailbox::putMessage(msg->ack_mailbox,
                                   new ServiceDaemonStoppedMessage(this->getMessagePayloadValueAsDouble(
@@ -1108,7 +1163,7 @@ namespace wrench {
           this->freeUpResources(msg->job->getResourcesAllocated());
           this->sendStandardJobFailureNotification((StandardJob *) msg->job->getWorkflowJob(),
                                                    std::to_string(msg->job->getJobID()),
-          std::shared_ptr<FailureCause>(new JobTimeout(msg->job->getWorkflowJob())));
+                                                   std::shared_ptr<FailureCause>(new JobTimeout(msg->job->getWorkflowJob())));
           return true;
         } else if (msg->job->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
           WRENCH_INFO("Terminating pilot job %s", msg->job->getWorkflowJob()->getName().c_str());
@@ -1184,7 +1239,7 @@ namespace wrench {
         }
         return;
       } else if ((job->getWorkflowJob()->getType() == WorkflowJob::PILOT) and (not getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_PILOT_JOBS)
-                                                                                                                                                                                                                                       )) {
+      )) {
         try {
           S4U_Mailbox::dputMessage(answer_mailbox,
                                    new ComputeServiceSubmitPilotJobAnswerMessage(
@@ -1658,7 +1713,7 @@ namespace wrench {
           try {
             cs->start(cs, true);
             batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
-            double timeout_timestamp = std::min(job->getDuration(), allocated_time);
+            double timeout_timestamp = std::min<double>(job->getDuration(), allocated_time);
             batch_job->setEndingTimeStamp(S4U_Simulation::getClock() + timeout_timestamp);
           } catch (std::runtime_error &e) {
             throw;
@@ -1824,7 +1879,7 @@ namespace wrench {
 
       // Update core availabilities for jobs that are currently running
       for (auto job : this->running_jobs) {
-        double time_to_finish = MAX(0, job->getBeginTimeStamp() +
+        double time_to_finish = std::max<double>(0, job->getBeginTimeStamp() +
                                        job->getAllocatedTime() -
                                        this->simulation->getCurrentSimulatedDate());
         for (auto resource : job->getResourcesAllocated()) {
@@ -2045,8 +2100,9 @@ namespace wrench {
         this->freeJobFromJobsList(batch_job);
       }
       if (is_pending) {
+        BatchJob *to_free = *batch_pending_it;
         this->pending_jobs.erase(batch_pending_it);
-        this->freeJobFromJobsList(*batch_pending_it);
+        this->freeJobFromJobsList(to_free);
       }
       if (is_waiting) {
         this->waiting_jobs.erase(batch_job);

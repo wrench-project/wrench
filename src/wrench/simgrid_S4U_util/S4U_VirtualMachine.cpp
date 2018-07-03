@@ -26,10 +26,11 @@ namespace wrench {
 
       this->vm = new simgrid::s4u::VirtualMachine(vm_hostname.c_str(),
                                                   simgrid::s4u::Host::by_name(pm_hostname),
-                                                  num_cores,
-                                                  ram_memory);
+                                                  (int)num_cores,
+                                                  (size_t)ram_memory);
 
-      this->vm->setRamsize(ram_memory);
+      // TODO: Why is this call below needed? The RAM size is passed to the constructor above...
+      this->vm->set_ramsize((size_t)ram_memory);
       this->vm->start();
     }
 
@@ -47,7 +48,7 @@ namespace wrench {
      * @return a pointer to the physical machine host
      */
     simgrid::s4u::Host *S4U_VirtualMachine::getPm() {
-      return this->vm->getPm();
+      return this->vm->get_pm();
     }
 
     /**

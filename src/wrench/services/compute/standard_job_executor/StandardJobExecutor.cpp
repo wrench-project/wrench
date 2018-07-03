@@ -451,7 +451,7 @@ namespace wrench {
 
 //            std::cerr << "    HOST COULD WORK \n";
 
-            unsigned long tentative_target_num_cores = MIN(num_available_cores, desired_num_cores);
+            unsigned long tentative_target_num_cores = std::min(num_available_cores, desired_num_cores);
             unsigned long tentative_target_slack = num_available_cores - tentative_target_num_cores;
 
             if ((target_host == "") ||
@@ -877,7 +877,7 @@ namespace wrench {
 
       for (auto const &wu : this->ready_workunits) {
         sorted_workunits.push_back(wu.get());
-//        std::cerr << "WORKUNITS.GET = " << wu.get() << ": " << wu.get()->tasks.size() << "\n";
+//        std::cerr << "WORKUNITS.GET = " << wu.get () << ": " << wu.get()->tasks.size() << "\n";
       }
 
 //      std::cerr << "SORTED LENGTH = " << sorted_workunits.size() << "\n";

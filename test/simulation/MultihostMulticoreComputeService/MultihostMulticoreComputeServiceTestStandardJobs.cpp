@@ -1061,13 +1061,17 @@ private:
       }
       switch (event->type) {
         case wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE: {
-          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          if (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause->getCauseType() != wrench::FailureCause::JOB_KILLED) {
             throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
           }
-          auto *real_cause = (wrench::ServiceIsDown *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
-          if (real_cause->getService() != this->test->compute_service) {
+          auto *real_cause = (wrench::JobKilled *) (dynamic_cast<wrench::StandardJobFailedEvent*>(event.get())->failure_cause.get());
+          if (real_cause->getComputeService() != this->test->compute_service) {
             std::runtime_error(
                     "Got the correct failure even, a correct cause type, but the cause points to the wrong service");
+          }
+          if (real_cause->getJob() != two_task_job) {
+            std::runtime_error(
+                    "Got the correct failure even, a correct cause type, but the cause points to the wrong job");
           }
           break;
         }

@@ -68,7 +68,7 @@ namespace wrench {
      */
     std::string TerminalOutput::getThisProcessLoggingColor() {
 
-      if (simgrid::s4u::this_actor::isMaestro() ||
+      if (simgrid::s4u::this_actor::is_maestro() ||
               (TerminalOutput::colormap.find(simgrid::s4u::Actor::self()) == TerminalOutput::colormap.end())) {
         return "";
       } else {

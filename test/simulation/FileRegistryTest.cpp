@@ -332,6 +332,52 @@ private:
                 "lookupEntry using NetworkProximityService did not include the unmonitored Storage Service");
       }
 
+      // shutwon service
+      frs->stop();
+
+      success = true;
+      try {
+        frs->lookupEntry(file1);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        // Check Exception
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
+                                   std::to_string(e.getCause()->getCauseType()) + " (was expecting ServiceIsDown)");
+        }
+        // Check Exception details
+        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
+        if (real_cause->getService() != frs) {
+          throw std::runtime_error(
+                  "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
+        }
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to lookup a file when the service is down");
+      }
+
+      success = true;
+      try {
+        file1_locations_by_proximity = frs->lookupEntry(file1, "Host3", nps);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        // Check Exception
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
+                                   std::to_string(e.getCause()->getCauseType()) + " (was expecting ServiceIsDown)");
+        }
+        // Check Exception details
+        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
+        if (real_cause->getService() != frs) {
+          throw std::runtime_error(
+                  "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
+        }
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to lookup a file when the service is down");
+      }
+
+
       return 0;
     }
 };
