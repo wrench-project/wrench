@@ -114,7 +114,7 @@ namespace wrench {
         // Post a recv on my standard mailbox_name in case there is none pending
         if (should_add_incoming_control_connection) {
           this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
-                  new NetworkConnection(NetworkConnection::INCOMING_CONTROL, nullptr, nullptr, "/", nullptr, "/", this->mailbox_name, "")
+                  new NetworkConnection(NetworkConnection::INCOMING_CONTROL, nullptr, "/", this->mailbox_name, "")
           ));
           should_add_incoming_control_connection = false;
         }
@@ -251,7 +251,7 @@ namespace wrench {
         return processFileReadRequest(msg->file, msg->src_partition, msg->answer_mailbox, msg->mailbox_to_receive_the_file_content);
 
       } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
-        return processFileCopyRequest(msg->file, msg->src, msg->src_partition, msg->dst_partition, msg->answer_mailbox, msg->simulation_timestamp);
+        return processFileCopyRequest(msg->file, msg->src, msg->src_partition, msg->dst_partition, msg->answer_mailbox, msg->start_timestamp);
 
       } else {
         throw std::runtime_error(
@@ -333,7 +333,7 @@ namespace wrench {
       }
 
       this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
-              new NetworkConnection(NetworkConnection::INCOMING_DATA, file, this, "123", this, dst_partition, file_reception_mailbox, "")));
+              new NetworkConnection(NetworkConnection::INCOMING_DATA, file, dst_partition, file_reception_mailbox, "")));
 
       return true;
     }
@@ -380,7 +380,7 @@ namespace wrench {
       // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
       if (success) {
         this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
-                new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, this, src_partition, this, "123",mailbox_to_receive_the_file_content, "")
+                new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, src_partition , mailbox_to_receive_the_file_content, "")
         ));
       }
 
@@ -397,25 +397,28 @@ namespace wrench {
      * @return
      */
     bool
-    SimpleStorageService::processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string src_partition, std::string dst_partition, std::string answer_mailbox, SimulationTimestampFileCopyStart *simulation_timestamp) {
+    SimpleStorageService::processFileCopyRequest(WorkflowFile *file, StorageService *src, std::string src_partition, std::string dst_partition, std::string answer_mailbox, SimulationTimestampFileCopyStart *start_timestamp) {
 
       // Do a capacity check/update
       // If the file is already there, then there will just be an overwrite. Note that
       // if the overwrite fails, then the file will disappear, just like in the real world.
       if (file->getSize() > this->capacity - this->occupied_space) {
         WRENCH_INFO("Cannot perform file copy due to lack of space");
-        this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(file, src, src_partition, this, dst_partition, simulation_timestamp));
+
+          this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(start_timestamp));
+
         try {
           S4U_Mailbox::putMessage(answer_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(file, src, src_partition, this, dst_partition, nullptr, false,
+                                  new StorageServiceFileCopyAnswerMessage(file, this, dst_partition, nullptr, false,
                                                                           false,
                                                                           std::shared_ptr<FailureCause>(
                                                                                   new StorageServiceNotEnoughSpace(
                                                                                           file,
                                                                                           this)),
-                                                                          simulation_timestamp,
                                                                           this->getMessagePayloadValueAsDouble(
                                                                                   SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
@@ -446,11 +449,13 @@ namespace wrench {
       } catch (WorkflowExecutionException &e) {
         try {
           S4U_Mailbox::putMessage(answer_mailbox,
-                                  new StorageServiceFileCopyAnswerMessage(file, src, src_partition, this, dst_partition, nullptr, false,
+                                  new StorageServiceFileCopyAnswerMessage(file, this, dst_partition, nullptr, false,
                                                                           false, e.getCause(),
-                                                                          simulation_timestamp,
                                                                           this->getMessagePayloadValueAsDouble(
                                                                                   SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+
+          this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(start_timestamp));
+
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
@@ -460,13 +465,13 @@ namespace wrench {
       if (src == this) {
         // add a (bogus) connection since technically we are sending data (to oneself)
         this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
-                new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, src, src_partition, this, dst_partition, file_reception_mailbox, "")
+                new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, src_partition, file_reception_mailbox, "")
         ));
       }
 
       this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
-              new NetworkConnection(NetworkConnection::INCOMING_DATA, file, src, src_partition, this, dst_partition, file_reception_mailbox,
-                                    answer_mailbox, simulation_timestamp)
+              new NetworkConnection(NetworkConnection::INCOMING_DATA, file, dst_partition, file_reception_mailbox,
+                                    answer_mailbox, start_timestamp)
       ));
 
       return true;
@@ -503,17 +508,18 @@ namespace wrench {
         // Process the failure, meaning, just re-decrease the occupied space
         this->occupied_space -= connection->file->getSize();
         // And if this was an overwrite, now we lost the file!!!
-        this->stored_files[connection->dst_partition].erase(connection->file);
+        this->stored_files[connection->file_partition].erase(connection->file);
 
         WRENCH_INFO(
                 "Sending back an ack since this was a file copy and some client is waiting for me to say something");
+
+        this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(connection->start_timestamp));
+
         try {
             S4U_Mailbox::dputMessage(connection->ack_mailbox,
-                                     new StorageServiceFileCopyAnswerMessage(connection->file, connection->src,
-                                                                             connection->src_partition, this,
-                                                                             connection->dst_partition, nullptr, false,
+                                     new StorageServiceFileCopyAnswerMessage(connection->file, this,
+                                                                             connection->file_partition, nullptr, false,
                                                                              false, connection->failure_cause,
-                                                                             nullptr,
                                                                              this->getMessagePayloadValueAsDouble(
                                                                                      SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -532,14 +538,9 @@ namespace wrench {
         }
 
         // Add the file to my storage (this will not add a duplicate in case of an overwrite, because it's a set)
-        this->stored_files[connection->dst_partition].insert(connection->file);
+        this->stored_files[connection->file_partition].insert(connection->file);
         if (connection->start_timestamp != nullptr) {
             this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyCompletion>(new SimulationTimestampFileCopyCompletion(
-                    connection->file,
-                    connection->src,
-                    connection->src_partition,
-                    connection->dst,
-                    connection->dst_partition,
                     connection->start_timestamp
             ));
 
@@ -551,13 +552,12 @@ namespace wrench {
                   "Sending back an ack since this was a file copy and some client is waiting for me to say something");
           try {
               S4U_Mailbox::putMessage(connection->ack_mailbox,
-                                      new StorageServiceFileCopyAnswerMessage(connection->file, connection->src,
-                                                                              connection->src_partition,
-                                                                              this, connection->dst_partition,
+                                      new StorageServiceFileCopyAnswerMessage(connection->file,
+                                                                              this,
+                                                                              connection->file_partition,
                                                                               nullptr,
                                                                               false,
                                                                               true,
-                                                                              nullptr,
                                                                               nullptr,
                                                                               this->getMessagePayloadValueAsDouble(
                                                                                       SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));

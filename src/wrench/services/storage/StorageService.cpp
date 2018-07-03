@@ -866,6 +866,9 @@ namespace wrench {
 
       // Send a message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("copy_file");
+      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, this, dst_partition);
+      this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
+
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
                 answer_mailbox,
@@ -875,6 +878,7 @@ namespace wrench {
                 this,
                 dst_partition,
                 nullptr,
+                start_timestamp,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
@@ -935,6 +939,9 @@ namespace wrench {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
       }
 
+      auto start_timestamp = new SimulationTimestampFileCopyStart(file, src, src_partition, this, dst_partition);
+      this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyStart>(start_timestamp);
+
       // Send a message to the daemon
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFileCopyRequestMessage(
@@ -945,6 +952,7 @@ namespace wrench {
                 this,
                 dst_partition,
                 nullptr,
+                start_timestamp,
                 this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_COPY_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);

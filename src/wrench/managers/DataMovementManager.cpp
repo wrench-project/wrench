@@ -253,7 +253,7 @@ namespace wrench {
       } else if (auto msg = dynamic_cast<StorageServiceFileCopyAnswerMessage *>(message.get())) {
 
         // Remove the record and find the File Registry Service, if any
-        DataMovementManager::CopyRequestSpecs request(msg->file, msg->dst, msg->dst_partition, nullptr);
+        DataMovementManager::CopyRequestSpecs request(msg->file, msg->storage_service, msg->dst_partition, nullptr);
         for (auto it = this->pending_file_copies.begin();
              it != this->pending_file_copies.end();
              ++it) {
@@ -281,15 +281,13 @@ namespace wrench {
         try {
           S4U_Mailbox::dputMessage(msg->file->getWorkflow()->getCallbackMailbox(),
                                    new StorageServiceFileCopyAnswerMessage(msg->file,
-                                                                           msg->src,
-                                                                           msg->src_partition,
-                                                                           msg->dst,
+                                                                            msg->storage_service,
                                                                            msg->dst_partition,
                                                                            request.file_registry_service,
                                                                            file_registry_service_updated,
                                                                            msg->success,
                                                                            std::move(msg->failure_cause),
-                                                                           msg->start_timestamp, 0
+                                                                            0
                                    ));
         } catch  (std::shared_ptr<NetworkError> &cause) {
           return true;

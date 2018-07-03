@@ -33,6 +33,7 @@ namespace wrench {
         return this->endpoint;
     }
 
+
     /**
      * @brief Constructor
      * @param task: a pointer to the WorkflowTask associated with this timestamp
@@ -168,10 +169,9 @@ namespace wrench {
      * @param dst_partition: the partition in the destination StorageService where this file was going to be copied
      * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
      */
-    SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(WorkflowFile *file, StorageService *src, std::string src_partition,
-                                                                           StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampFileCopy(file, src, src_partition, dst, dst_partition, start_timestamp) {
-            setEndpoints();
+    SimulationTimestampFileCopyFailure::SimulationTimestampFileCopyFailure(SimulationTimestampFileCopyStart *start_timestamp) :
+            SimulationTimestampFileCopy(start_timestamp->getFile(), start_timestamp->getSource().storage_service, start_timestamp->getSource().partition, start_timestamp->getDestination().storage_service, start_timestamp->getDestination().partition, start_timestamp) {
+            start_timestamp->endpoint = this;
     }
 
     /**
@@ -183,14 +183,9 @@ namespace wrench {
      * @param dst_partition: the partition in the destination StorageService where this file was going to be copied
      * @param start_timestamp: a pointer to the SimulationTimestampFileCopyStart associated with this timestamp
      */
-    SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(WorkflowFile *file, StorageService *src, std::string src_partition,
-                                                                           StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp) :
-            SimulationTimestampFileCopy(file, src, src_partition, dst, dst_partition, start_timestamp) {
-            setEndpoints();
-    }
-
-    void SimulationTimestampFileCopy::setEndpoints() {
-        this->endpoint->endpoint = this;
+    SimulationTimestampFileCopyCompletion::SimulationTimestampFileCopyCompletion(SimulationTimestampFileCopyStart *start_timestamp) :
+            SimulationTimestampFileCopy(start_timestamp->getFile(), start_timestamp->getSource().storage_service, start_timestamp->getSource().partition, start_timestamp->getDestination().storage_service, start_timestamp->getDestination().partition, start_timestamp) {
+            start_timestamp->endpoint = this;
     }
 }
 
