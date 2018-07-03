@@ -2437,8 +2437,9 @@ namespace wrench {
         batch_submission_data["events"][i]["data"]["job"]["res"] = num_nodes_asked_for;
         batch_submission_data["events"][i]["data"]["job"]["core"] = cores_per_node_asked_for;
         batch_submission_data["events"][i]["data"]["job"]["walltime"] = allocated_time;
+
         this->pending_jobs.erase(it);
-        this->waiting_jobs.insert(*it);
+        this->waiting_jobs.insert(batch_job);
 
       }
       std::string data = batch_submission_data.dump();
