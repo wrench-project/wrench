@@ -278,14 +278,6 @@ namespace wrench {
      */
     void StorageService::readFile(WorkflowFile *file) {
 
-      if (file == nullptr) {
-        throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
-      }
-
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
-
       std::string src_partition = "/";
       this->readFile(file,src_partition);
     }
@@ -301,13 +293,6 @@ namespace wrench {
      */
     void StorageService::readFile(WorkflowFile *file, WorkflowJob* job) {
 
-      if (file == nullptr) {
-        throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
-      }
-
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
 
       std::string src_partition = "/";
       if (job != nullptr) {
@@ -328,6 +313,14 @@ namespace wrench {
      */
 
     void StorageService::readFile(WorkflowFile *file, std::string src_partition) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::readFile(): Invalid arguments");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
 
       // Empty partition means "/"
       if (src_partition.empty()) {
@@ -395,14 +388,6 @@ namespace wrench {
      */
     void StorageService::writeFile(WorkflowFile *file) {
 
-      if (file == nullptr) {
-        throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
-      }
-
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
-
       std::string dst_partition = "/";
       this->writeFile(file,dst_partition);
     }
@@ -417,14 +402,6 @@ namespace wrench {
      * @throw WorkflowExecutionException
      */
     void StorageService::writeFile(WorkflowFile *file, WorkflowJob* job) {
-
-      if (file == nullptr) {
-        throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
-      }
-
-      if (this->state == DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
 
       std::string dst_partition = "/";
       if (job != nullptr) {
@@ -443,6 +420,14 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void StorageService::writeFile(WorkflowFile *file, std::string dst_partition) {
+
+      if (file == nullptr) {
+        throw std::invalid_argument("StorageService::writeFile(): Invalid arguments");
+      }
+
+      if (this->state == DOWN) {
+        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
 
       // Empty partition means "/"
       if (dst_partition.empty()) {
