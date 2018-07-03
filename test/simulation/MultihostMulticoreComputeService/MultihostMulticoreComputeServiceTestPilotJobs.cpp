@@ -234,6 +234,11 @@ private:
       // Create it again
       pilot_job = job_manager->createPilotJob(1, 1, 0, 3600);
 
+      // Get its state
+      if (pilot_job->getState() != wrench::PilotJob::State::NOT_SUBMITTED) {
+        throw std::runtime_error("Unexpected pilot job state (should be NOT_SUBMITTED");
+      }
+
       std::string job_type_as_string = pilot_job->getTypeAsString();
       if (job_type_as_string != "Pilot") {
         throw std::runtime_error("Job type as string should be 'Pilot'");
@@ -245,7 +250,6 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Unexpected exception: " + e.getCause()->toString());
       }
-
 
       // Try to forget it, which shouldn't work
       bool success = true;
@@ -286,6 +290,10 @@ private:
         }
       }
 
+      // Get its state
+      if (pilot_job->getState() != wrench::PilotJob::State::RUNNING) {
+        throw std::runtime_error("Unexpected pilot job state (should be RUNNING");
+      }
 
       // Getting the list of running pilot jobs
       std::set<wrench::PilotJob *>running_pilot_jobs = job_manager->getRunningPilotJobs();
@@ -359,6 +367,11 @@ private:
         default: {
           throw std::runtime_error("Unexpected workflow execution event: " + std::to_string(event->type));
         }
+      }
+
+      // Get its state
+      if (pilot_job->getState() != wrench::PilotJob::State::EXPIRED) {
+        throw std::runtime_error("Unexpected pilot job state (should be EXPIRED");
       }
 
       // Forget the pilot job
