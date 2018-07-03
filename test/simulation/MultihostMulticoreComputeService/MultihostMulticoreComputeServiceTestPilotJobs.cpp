@@ -459,6 +459,8 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutWaitF
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -612,6 +614,8 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_OnePilotJobNoTimeoutShutd
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -722,6 +726,8 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonSubmittedPilotJobTermi
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
@@ -1046,4 +1052,6 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_NonIdlePilotJobTerminatio
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
