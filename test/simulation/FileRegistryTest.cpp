@@ -196,6 +196,9 @@ private:
         throw std::runtime_error("Got the wrong locations for file 1");
       }
 
+      // Remove an already removed entry
+      frs->removeEntry(file1, this->test->storage_service1);
+
       // Shutting down the service
       frs->stop();
 
