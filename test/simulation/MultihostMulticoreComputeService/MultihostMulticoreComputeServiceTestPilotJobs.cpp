@@ -888,6 +888,8 @@ void MultihostMulticoreComputeServiceTestPilotJobs::do_IdlePilotJobTermination_t
   ASSERT_NO_THROW(simulation->launch());
 
   delete simulation;
+  free(argv[0]);
+  free(argv);
 }
 
 
