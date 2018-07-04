@@ -248,7 +248,7 @@ namespace wrench {
 
       if (auto msg = dynamic_cast<FileRegistryRemoveEntryAnswerMessage *>(message.get())) {
         if (!msg->success) {
-          WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service",
+          WRENCH_WARN("Attempted to remove non-existent (%s,%s) entry from file registry service (ignored)",
                       file->getID().c_str(), storage_service->getName().c_str());
         }
         return;
