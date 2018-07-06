@@ -26,7 +26,7 @@ namespace wrench {
 
         double getDate();
 
-        SimulationTimestampType *getEndpoint();
+        virtual SimulationTimestampType *getEndpoint();
 
     protected:
         SimulationTimestampType *endpoint;
@@ -62,6 +62,7 @@ namespace wrench {
          * @return the task
          */
         WorkflowTask *getTask();
+        SimulationTimestampTask *getEndpoint();
 
     protected:
         static std::map<std::string, SimulationTimestampTask *> pending_task_timestamps;
@@ -102,20 +103,21 @@ namespace wrench {
 
             }
 
-            bool operator==(FileLocation &rhs) {
+            bool operator==(const FileLocation &rhs) {
                 return (this->storage_service == rhs.storage_service) && (this->partition == rhs.partition);
             }
 
-            bool operator!=(FileLocation &rhs) {
+            bool operator!=(const FileLocation &rhs) {
                 return !FileLocation::operator==(rhs);
             }
         };
 
+        SimulationTimestampFileCopy *getEndpoint() override;
         WorkflowFile *getFile();
         FileLocation getSource();
         FileLocation getDestination();
 
-    private:
+    protected:
         WorkflowFile *file;
 
         FileLocation source;
