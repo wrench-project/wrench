@@ -36,6 +36,9 @@ namespace wrench {
           return this->content;
         }
 
+        double getDate()  {
+            return this->getContent()->getDate();
+        }
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
