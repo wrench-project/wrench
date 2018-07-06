@@ -244,6 +244,10 @@ namespace wrench {
 
         if (this->workflow->simulation != nullptr) {
             switch (state) {
+                case TASK_READY:
+                    break;
+                case TASK_NOT_READY:
+                    break;
                 case TASK_RUNNING:
                     this->workflow->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(
                             new SimulationTimestampTaskStart(this));

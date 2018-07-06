@@ -642,7 +642,9 @@ private:
         throw std::runtime_error("Should not be able to create a job with a nullptr storage service in file deletions");
       }
 
-
+      if (job) {
+        // use job to avoid 'unused-but-set-variable' warning
+      }
 
       // Stop the Job Manager manually, just for kicks
       job_manager->stop();

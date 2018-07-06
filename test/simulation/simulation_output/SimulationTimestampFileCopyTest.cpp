@@ -63,8 +63,8 @@ public:
     const std::set<wrench::ComputeService *> compute_services,
     const std::set<wrench::StorageService *> storage_services,
     wrench::FileRegistryService *file_registry_service,
-    std::string &hostname) : test(test), wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
-
+    std::string &hostname) : wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, file_registry_service, hostname, "test") {
+        this->test = test;
     }
 protected:
     SimulationTimestampFileCopyTest *test;
@@ -112,6 +112,8 @@ protected:
          * too_large_file failure
          * xl_file end
          */
+
+        return 0;
      }
 };
 
