@@ -20,7 +20,6 @@ public:
     void do_SimulationTimestampTaskBasic_test();
     void do_SimulationTimestampTaskMultiple_test();
 
-    void tester();
 
 protected:
     SimulationTimestampTaskTest() {
@@ -162,10 +161,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     ASSERT_GT(task2_start_timestamp, task1_start_timestamp);
     ASSERT_GT(task2_completion_timestamp, task1_completion_timestamp);
 
-    /*
-     * expected timeline: task2_end...failed_task_start...failed_task_failed
-     */
-
+    // expected timeline: task2_end...failed_task_start...failed_task_failed
     auto timestamp_failure_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
     double failed_task_start_timestamp = timestamp_start_trace[2]->getContent()->getDate();
     double failed_task_end_date = this->failed_task->getEndDate();
@@ -184,9 +180,30 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
      */
     for (auto &ts : timestamp_completion_trace) {
         if (ts->getContent()->getTask()->getID() == "failed_task") {
-            throw std::runtime_error("timstamp_completion_trace should not have the 'failed_task'");
+            throw std::runtime_error("timestamp_completion_trace should not have the 'failed_task'");
         }
     }
+
+    // check that endpoints match up correctly
+    wrench::SimulationTimestampTask *task_1_start = timestamp_start_trace[0]->getContent();
+    wrench::SimulationTimestampTask *task_1_end = timestamp_completion_trace[0]->getContent();
+    ASSERT_EQ(task_1_start->getEndpoint(), task_1_end);
+    ASSERT_EQ(task_1_end->getEndpoint(), task_1_start);
+
+    wrench::SimulationTimestampTask *task_2_start = timestamp_start_trace[1]->getContent();
+    wrench::SimulationTimestampTask *task_2_completion = timestamp_completion_trace[1]->getContent();
+    ASSERT_EQ(task_2_start->getEndpoint(), task_2_completion);
+    ASSERT_EQ(task_2_completion->getEndpoint(), task_2_start);
+
+    wrench::SimulationTimestampTask *failed_task_start = timestamp_start_trace[2]->getContent();
+    wrench::SimulationTimestampTask *failed_task_failed = timestamp_failure_trace[0]->getContent();
+    ASSERT_EQ(failed_task_start->getEndpoint(), failed_task_failed);
+    ASSERT_EQ(failed_task_failed->getEndpoint(), failed_task_start);
+
+    // test constructors
+    ASSERT_THROW(wrench::SimulationTimestampTaskStart(nullptr), std::invalid_argument);
+    ASSERT_THROW(wrench::SimulationTimestampTaskFailure(nullptr), std::invalid_argument);
+    ASSERT_THROW(wrench::SimulationTimestampTaskCompletion(nullptr), std::invalid_argument);
 
     delete simulation;
     free(argv[0]);
