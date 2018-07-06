@@ -995,7 +995,7 @@ namespace wrench {
 
       try {
         message = S4U_Mailbox::getMessage(request_answer_mailbox, this->network_timeout);
-      } catch (std::shared_ptr<NetworkError> cause) {
+      } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
 
