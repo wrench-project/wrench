@@ -50,7 +50,7 @@ public:
 
     void do_JobTerminationTestAtRandomTimes_test();
 
-    void do_DEBUG_test();
+    void do_WorkUnit_test();
 
     static bool isJustABitGreater(double base, double variable) {
       return ((variable > base) && (variable < base + EPSILON));
@@ -2689,3 +2689,45 @@ void StandardJobExecutorTest::do_JobTerminationTestAtRandomTimes_test() {
   free(argv);
 }
 
+
+/**********************************************************************/
+/**  WORK UNIT TEST (INTERNAL)                                       **/
+/**********************************************************************/
+
+
+
+TEST_F(StandardJobExecutorTest, WorkUnitTest) {
+  DO_TEST_WITH_FORK(do_WorkUnit_test);
+}
+
+void StandardJobExecutorTest::do_WorkUnit_test() {
+
+  // Create and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Create two WorkUnits
+  wrench::Workunit *wu1 = new wrench::Workunit({}, {}, {}, {}, {});
+  wrench::Workunit *wu2 = new wrench::Workunit({}, {}, {}, {}, {});
+
+
+  ASSERT_THROW(wrench::Workunit::addDependency(wu1, nullptr), std::invalid_argument);
+  ASSERT_THROW(wrench::Workunit::addDependency(nullptr, wu2), std::invalid_argument);
+
+  ASSERT_NO_THROW(wrench::Workunit::addDependency(wu1, wu2));
+
+  ASSERT_NO_THROW(wrench::Workunit::addDependency(wu1, wu2));
+
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
