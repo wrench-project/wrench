@@ -32,10 +32,15 @@ namespace wrench {
          *
          * @return a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          */
-        T *getContent() {
-          return this->content;
+        T * const getContent() {
+          return this->content.get();
         }
 
+        /**
+         * Retrieve the recorded time of the timestamp
+         *
+         * @return the recorded time of the timestamp
+         */
         double getDate()  {
             return this->getContent()->getDate();
         }
@@ -48,21 +53,15 @@ namespace wrench {
          * @param content: a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          */
         SimulationTimestamp(T *content) {
-          // TODO: Make content a unique_ptr to make memory management better
-          this->content = content;
+            this->content = std::unique_ptr<T>(content);
         }
 
         /***********************/
         /** \endcond           */
         /***********************/
 
-        ~SimulationTimestamp() {
-          delete this->content;
-        }
-
     private:
-        T *content;
-        double date = -1.0;
+        std::unique_ptr<T>content;
     };
 
 };
