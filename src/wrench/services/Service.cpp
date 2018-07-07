@@ -48,10 +48,20 @@ namespace wrench {
 
     /**
     * @brief Set a message payload of the Service
-    * @param messagepayload: the message payload
+    * @param messagepayload: the message payload (which must a a string representation of a >=0 double)
     * @param value: the message payload value
+    * @throw std::invalid_argument
     */
     void Service::setMessagePayload(std::string messagepayload, std::string value) {
+      // Check that the value is a >=0 double
+      double double_value;
+
+      if ((sscanf(value.c_str(), "%lf", &double_value) != 1) || (double_value < 0)) {
+        throw std::invalid_argument(
+                "Service::setMessagePayload(): Invalid message payload value " + messagepayload + ": " +
+                value);
+      }
+
       if (this->messagepayload_list.find(messagepayload) != this->messagepayload_list.end()) {
         this->messagepayload_list[messagepayload] = value;
       } else {
