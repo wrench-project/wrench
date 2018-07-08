@@ -283,6 +283,9 @@ private:
                 wrench::FailureCause::NO_SCRATCH_SPACE) {
               throw std::runtime_error("Got a job failure event, but the failure cause seems wrong");
             }
+            auto real_cause = dynamic_cast<wrench::NoScratchSpace *>(
+                    dynamic_cast<wrench::StandardJobFailedEvent *>(event.get())->failure_cause.get());
+            real_cause->toString(); // for coverage
             break;
           }
           default: {
