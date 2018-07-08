@@ -256,6 +256,32 @@ private:
         throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
       }
 
+      // Delete a file in a bogus partition
+      success = true;
+      try {
+        this->test->storage_service_100->deleteFile(this->test->file_100, "bogus");
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
+          throw std::runtime_error("Got an expected 'file not found' exception, but not the expected failure cause type");
+        }
+        auto real_cause = (wrench::FileNotFound *) e.getCause().get();
+        if (real_cause->getStorageService() != this->test->storage_service_100) {
+          throw std::runtime_error(
+                  "Got the expected 'file not found' exception, but the failure cause does not point to the correct storage service");
+        }
+        if (real_cause->getFile() != this->test->file_100) {
+          throw std::runtime_error(
+                  "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
+        }
+
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to delete a file unavailable a storage service");
+      }
+
+
+
       // Delete a file on a storage service that has it
       try {
         this->test->storage_service_100->deleteFile(this->test->file_10);
@@ -417,7 +443,7 @@ private:
         }
       }
 
-      // Do a bogus file removal
+      // Do a really bogus file removal
       success = true;
       try {
         this->test->storage_service_100->deleteFile(nullptr);
@@ -427,6 +453,7 @@ private:
       if (success) {
         throw std::runtime_error("Should not be able to delete a nullptr file from a storage service");
       }
+
 
       // Shutdown the service
       this->test->storage_service_100->stop();
@@ -513,7 +540,7 @@ private:
         }
       }
       if (success) {
-        throw std::runtime_error("Should not be able to lookup a file from a DOWN service");
+        throw std::runtime_error("Should not be able to lookup a file from a down service");
       }
 
       success = true;
