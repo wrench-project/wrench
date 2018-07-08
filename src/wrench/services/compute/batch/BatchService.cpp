@@ -626,7 +626,7 @@ namespace wrench {
      * @param job
      */
     void BatchService::processPilotJobTimeout(PilotJob *job) {
-      auto *cs = (BatchService *) job->getComputeService();
+      auto cs = job->getComputeService();
       if (cs == nullptr) {
         throw std::runtime_error(
                 "BatchService::terminate(): can't find compute service associated to pilot job");
@@ -1056,8 +1056,8 @@ namespace wrench {
         // Stopping services
         for (auto &job : this->running_jobs) {
           if ((job)->getWorkflowJob()->getType() == WorkflowJob::PILOT) {
-            PilotJob *p_job = (PilotJob *) ((job)->getWorkflowJob());
-            BatchService *cs = (BatchService *) p_job->getComputeService();
+            auto p_job = (PilotJob *) ((job)->getWorkflowJob());
+            auto cs = p_job->getComputeService();
             if (cs == nullptr) {
               throw std::runtime_error(
                       "BatchService::terminate(): can't find compute service associated to pilot job");
