@@ -63,7 +63,8 @@ namespace wrench {
                         {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
                 #endif
                  {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
-                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""}
+                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
+                 {BatchServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""}
                 };
 
         std::map<std::string, std::string> default_messagepayload_values = {
@@ -307,6 +308,9 @@ namespace wrench {
 
         void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                        std::string kill_reason, std::string even_type);
+
+        void appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status);
+
         void sendAllQueuedJobsToBatsched();
 
         //process execute events from batsched
