@@ -34,6 +34,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <signal.h>
+#include <iostream>
+#include <fstream>
 
 #endif
 
@@ -224,9 +226,21 @@ namespace wrench {
         }
       }
 
+
 #ifdef ENABLE_BATSCHED
+      // Launch the Batsched process
       this->startBatsched();
-//      this->setBatschedReady(true);
+
+      // Create the output CSV file if needed
+      std::string output_csv_file = this->getPropertyValueAsString(BatchServiceProperty::OUTPUT_CSV_JOB_LOG);
+      if (not output_csv_file.empty()) {
+        std::ofstream file;
+        file.open(output_csv_file, std::ios_base::out);
+        if (not file) {
+            throw std::invalid_argument("BatchService(): Unable to create CSV output file " +
+               output_csv_file + " (as specified by the BatchServiceProperty::OUTPUT_CSV_JOB_LOG property)");
+        }
+      }
 #else
       if (this->scheduling_algorithms.find(this->getPropertyValueAsString(BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM))
           == this->scheduling_algorithms.end()) {
@@ -299,10 +313,19 @@ namespace wrench {
         );
       }
 
+
+
+
       // Create a Batch Job
       unsigned long jobid = this->generateUniqueJobID();
       auto *batch_job = new BatchJob(job, jobid, time_asked_for,
                                      num_hosts, num_cores_per_host, -1, S4U_Simulation::getClock());
+
+      // Set job display color
+      it = batch_job_args.find("-color");
+      if (it != batch_job_args.end()) {
+        batch_job->csv_metadata = "color:" + (*it).second;
+      }
 
       // Send a "run a batch job" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_standard_job_mailbox");
@@ -398,10 +421,15 @@ namespace wrench {
         );
       }
 
-      //Create a Batch Job
+      // Create a Batch Job
       unsigned long jobid = this->generateUniqueJobID();
       auto *batch_job = new BatchJob(job, jobid, time_asked_for,
                                      nodes_asked_for, num_cores_per_hosts, -1, S4U_Simulation::getClock());
+      // Set job display color
+      it = batch_job_args.find("-color");
+      if (it != batch_job_args.end()) {
+        batch_job->csv_metadata = "color:" + (*it).second;
+      }
 
       //  send a "run a batch job" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("batch_pilot_job_mailbox");
@@ -567,6 +595,16 @@ namespace wrench {
 
 #ifdef ENABLE_BATSCHED
       this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
+      BatchJob *batch_job = nullptr;
+      for (auto it = this->all_jobs.begin(); it != this->all_jobs.end();) {
+        if ((*it)->getWorkflowJob() == job) {
+          batch_job = (*it).get();
+          break;
+        }
+      }
+      this->appendJobInfoToCSVOutputFile(batch_job, "FAILED");
+
+
 #endif
 
       try {
@@ -1374,6 +1412,7 @@ namespace wrench {
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
       this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
+      this->appendJobInfoToCSVOutputFile(batch_job, "success");
 #endif
 
       // Forward the notification
@@ -1407,11 +1446,12 @@ namespace wrench {
           } catch (std::shared_ptr<NetworkError> &cause) {
             return;
           }
-          this->freeJobFromJobsList(*it);
-          //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
+          // forward this notification to batsched
           this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
+          this->appendJobInfoToCSVOutputFile(*it, "TERMINATED");
 #endif
+          this->freeJobFromJobsList(*it);
           return;
         }
       }
@@ -1429,11 +1469,12 @@ namespace wrench {
           } catch (std::shared_ptr<NetworkError> &cause) {
             return;
           }
-          this->freeJobFromJobsList(*it2);
-          //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
+          // forward this notification to batsched
           this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "NOT_SUBMITTED", "", "JOB_COMPLETED");
+          this->appendJobInfoToCSVOutputFile(*it2, "TERMINATED");
 #endif
+          this->freeJobFromJobsList(*it2);
           return;
         }
       }
@@ -1461,12 +1502,14 @@ namespace wrench {
           BatchJob *to_erase = *it1;
           this->running_jobs.erase(it1);
 
+#ifdef ENABLE_BATSCHED
+          // forward this notification to batsched
+          this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
+          this->appendJobInfoToCSVOutputFile(to_erase, "TERMINATED");
+
+#endif
           //this is the list of unique pointers
           this->freeJobFromJobsList(to_erase);
-          //first forward this notification to the batsched
-#ifdef ENABLE_BATSCHED
-          this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
-#endif
           return;
         } else {
           ++it1;
@@ -1537,6 +1580,7 @@ namespace wrench {
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
       this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
+      this->appendJobInfoToCSVOutputFile(batch_job, "COMPLETED");
 #endif
 
       // Send the callback to the originator
@@ -1606,6 +1650,7 @@ namespace wrench {
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
       this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
+      this->appendJobInfoToCSVOutputFile(batch_job, "COMPLETED");
 #endif
 
       this->sendStandardJobFailureNotification(job, std::to_string((batch_job->getJobID())), cause);
@@ -1876,8 +1921,8 @@ namespace wrench {
       // Update core availabilities for jobs that are currently running
       for (auto job : this->running_jobs) {
         double time_to_finish = std::max<double>(0, job->getBeginTimeStamp() +
-                                       job->getAllocatedTime() -
-                                       this->simulation->getCurrentSimulatedDate());
+                                                    job->getAllocatedTime() -
+                                                    this->simulation->getCurrentSimulatedDate());
         for (auto resource : job->getResourcesAllocated()) {
           std::string hostname = std::get<0>(resource);
           unsigned long num_cores = std::get<1>(resource);
@@ -2086,8 +2131,9 @@ namespace wrench {
 
 
 #ifdef ENABLE_BATSCHED
-//      throw std::runtime_error("BatchService::processStandardJobTerminationRequest(): Not implemented for BATSCHED yet");
+      //      throw std::runtime_error("BatchService::processStandardJobTerminationRequest(): Not implemented for BATSCHED yet");
       notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
+      this->appendJobInfoToCSVOutputFile(batch_job, "FAILED");
 #endif
       // Is it running?
       if (is_running) {
@@ -2125,7 +2171,7 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
 
     /**
-     * @brief: Start a batsched process
+     *  @brief: Start a batsched process
      *           - exit code 1: unsupported algorithm
      *           - exit code 2: unsupported queuing option
      *           - exit code 3: execvp error
@@ -2277,12 +2323,8 @@ namespace wrench {
       nlohmann::json batch_submission_data;
       batch_submission_data["now"] = S4U_Simulation::getClock();
 
-//      if (not this->isBatschedReady()) {
-//        throw std::runtime_error("BatchService::getStartTimeEstimatesFromBatsched(): "
-//                                         "BATSCHED is not ready, which should not happen");
-//      }
 
-      // TODO: THIS IGNORES THE NUMBER OF CORES (IS THIS A LIMITATION OF BATSCHED?)
+      // IMPORTANT: THIS IGNORES THE NUMBER OF CORES (THIS IS A LIMITATION OF BATSCHED!)
 
       int idx = 0;
       batch_submission_data["events"] = nlohmann::json::array();
@@ -2479,6 +2521,7 @@ namespace wrench {
       /* Get the nodes and cores per nodes asked for */
 
       std::string nodes_allocated_by_batsched = execute_events["alloc"];
+      batch_job->csv_allocated_processors = nodes_allocated_by_batsched;
       std::vector<std::string> allocations;
       boost::split(allocations, nodes_allocated_by_batsched, boost::is_any_of(" "));
       std::vector<unsigned long> node_resources;
@@ -2529,6 +2572,83 @@ namespace wrench {
 //    bool BatchService::isBatschedReady() {
 //      return this->is_bat_sched_ready;
 //    }
+
+
+    /**
+     * @brief Appends a job to the CSV Output file
+     *
+     * @param batch_job: the batch job
+     * @param status: "COMPLETED", "TERMINATED" (by user), "FAILED" (timeout)
+     */
+    void BatchService::appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status) {
+      std::string csv_file_path;
+      static unsigned long job_id = 0;
+
+      csv_file_path = this->getPropertyValueAsString(BatchServiceProperty::OUTPUT_CSV_JOB_LOG);
+      if (csv_file_path.empty()) {
+        return;
+      }
+      std::ofstream file;
+      file.open(csv_file_path, std::ios_base::app);
+      if (not file) {
+            throw std::runtime_error("BatchService(): Unable to append to CSV output file " +
+              csv_file_path + " (as specified by the BatchServiceProperty::OUTPUT_CSV_JOB_LOG property)");
+      }
+      std::string csv_line = "";
+
+      // Allocated Processors
+      csv_line += batch_job->csv_allocated_processors + ",";
+      // Consumed Energy
+      csv_line += "0,";
+      // Execution Time
+      double execution_time = batch_job->getEndingTimeStamp() - batch_job->getBeginTimeStamp();
+      csv_line += std::to_string(execution_time) + ",";
+      // Finish time
+      double finish_time = batch_job->getEndingTimeStamp();
+      csv_line += std::to_string(finish_time) + ",";
+      // Job ID
+      csv_line += std::to_string(job_id++) + ",";
+      // MetaData
+      csv_line += std::string("\"") + batch_job->csv_metadata + "\",";
+      // Requested number of processors
+      csv_line += std::to_string(batch_job->getNumNodes()) + ",";
+      // Requested time
+      csv_line += std::to_string(batch_job->getAllocatedTime()) + ",";
+      // Starting time
+      double starting_time = batch_job->getBeginTimeStamp();
+      csv_line += std::to_string(starting_time) + ",";
+      // Stretch
+      double stretch = (batch_job->getEndingTimeStamp() - batch_job->getArrivalTimeStamp()) /
+              (batch_job->getEndingTimeStamp() - batch_job->getBeginTimeStamp());
+      csv_line += std::to_string(stretch) + ",";
+      // Submission time
+      double submission_time = batch_job->getArrivalTimeStamp();
+      csv_line += std::to_string(submission_time) + ",";
+      // Success
+      unsigned char success = 1;
+      if (status == "COMPLETED") {
+        success = 1;
+      } else if (status == "FAILED") {
+        success = 0;
+      } else if (status == "TERMINATED") {
+        success = 2;
+      }
+      csv_line += std::to_string(success) + ",";
+      // Turnaround time
+      double turnaround_time = (batch_job->getEndingTimeStamp() - batch_job->getArrivalTimeStamp());
+      csv_line += std::to_string(turnaround_time) + ",";
+      // Waiting time
+      double waiting_time = (batch_job->getBeginTimeStamp() - batch_job->getArrivalTimeStamp());
+      csv_line += std::to_string(waiting_time) + ",";
+      // Workload name
+      csv_line += "wrench";
+
+
+
+      file << csv_line << std::endl;
+      file.close();
+
+    }
 
 #endif  // ENABLE_BATSCHED
 

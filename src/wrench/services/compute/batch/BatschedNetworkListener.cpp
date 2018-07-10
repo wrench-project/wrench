@@ -105,7 +105,7 @@ namespace wrench {
     }
 
     /**
-     * @brief An an "execute" message to the batch service
+     * @brief Send an "execute" message to the batch service
      * @param answer_mailbox: mailbox on which ack will be received
      * @param execute_job_reply_data: message to send
      */
@@ -120,7 +120,7 @@ namespace wrench {
     }
 
     /**
-     * @brief An an "query answer" message to the batch service
+     * @brief Send a "query answer" message to the batch service
      * @param estimated_waiting_time: batch queue wait time estimate
      */
     void BatschedNetworkListener::sendQueryAnswerMessageToBatchService(double estimated_waiting_time) {
