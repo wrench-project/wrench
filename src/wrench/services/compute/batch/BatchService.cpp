@@ -596,7 +596,7 @@ namespace wrench {
 #ifdef ENABLE_BATSCHED
       this->notifyJobEventsToBatSched(job_id, "TIMEOUT", "COMPLETED_FAILED", "", "JOB_COMPLETED");
       BatchJob *batch_job = nullptr;
-      for (auto it = this->all_jobs.begin(); it != this->all_jobs.end();) {
+      for (auto it = this->all_jobs.begin(); it != this->all_jobs.end(); it++) {
         if ((*it)->getWorkflowJob() == job) {
           batch_job = (*it).get();
           break;
