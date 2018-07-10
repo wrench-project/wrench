@@ -49,6 +49,11 @@ namespace wrench {
         double ending_time_stamp;
         double arrival_time_stamp;
         std::set<std::tuple<std::string,unsigned long, double>> resources_allocated;
+
+    public:
+        // Variables below are for the BatSim-style CVS output log file (only ifdef ENABLED_BATSCHED)
+        std::string csv_metadata; // "metadata" field
+        std::string csv_allocated_processors; // "allocated_processors" field
     };
 
     /***********************/
