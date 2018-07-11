@@ -184,12 +184,14 @@ namespace wrench {
 
 #ifdef ENABLE_BATSCHED
 
-        std::set<std::string> scheduling_algorithms = {"easy_bf", "conservative_bf", "easy_bf_plot_liquid_load_horizon",
+        std::set<std::string> scheduling_algorithms = {"conservative_bf", "crasher", "easy_bf", "easy_bf_fast",
+                                                       "easy_bf_plot_liquid_load_horizon",
                                                        "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
                                                        "energy_bf_monitoring",
                                                        "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
-                                                       "filler", "killer", "killer2", "rejecter", "sleeper",
-                                                       "submitter", "waiting_time_estimator"
+                                                       "energy_watcher", "fcfs_fast", "fast_conservative_bf",
+                                                       "filler", "killer", "killer2", "random", "rejecter",
+                                                       "sequencer", "sleeper", "submitter", "waiting_time_estimator"
         };
 
         std::set<std::string> queue_ordering_options = {"fcfs", "lcfs", "desc_bounded_slowdown", "desc_slowdown",
