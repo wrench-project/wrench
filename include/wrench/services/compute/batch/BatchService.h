@@ -174,16 +174,15 @@ namespace wrench {
 
         //Queue of pending batch jobs
         std::deque<BatchJob *> pending_jobs;
+
         //A set of running batch jobs
         std::set<BatchJob *> running_jobs;
+
         // A set of waiting jobs that have been submitted to batsched, but not scheduled
         std::set<BatchJob *> waiting_jobs;
 
 
-
-        //Batch scheduling supported algorithms
 #ifdef ENABLE_BATSCHED
-        unsigned long batsched_port; // ONLY USED FOR BATSCHED
 
         std::set<std::string> scheduling_algorithms = {"conservative_bf", "crasher", "easy_bf", "easy_bf_fast",
                                                        "easy_bf_plot_liquid_load_horizon",
@@ -195,7 +194,6 @@ namespace wrench {
                                                        "sequencer", "sleeper", "submitter", "waiting_time_estimator"
         };
 
-        //Batch queue ordering options
         std::set<std::string> queue_ordering_options = {"fcfs", "lcfs", "desc_bounded_slowdown", "desc_slowdown",
                                                         "asc_size", "desc_size", "asc_walltime", "desc_walltime"
 
@@ -209,7 +207,6 @@ namespace wrench {
         };
 
 #endif
-
 
 
         unsigned long generateUniqueJobID();
@@ -290,19 +287,18 @@ namespace wrench {
 
         std::map<std::string,double> getStartTimeEstimatesForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
 
-#ifdef ENABLE_BATSCHED
+
+        /** BATSCHED-related fields **/
         std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
-
-        friend class BatschedNetworkListener;
-
         pid_t pid;
+        unsigned long batsched_port;
 
-//        bool is_bat_sched_ready;
+
+#ifdef ENABLE_BATSCHED
+        friend class BatschedNetworkListener;
 
         void startBatsched();
         void stopBatsched();
-//        void setBatschedReady(bool v);
-//        bool isBatschedReady();
 
         std::map<std::string,double> getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
 
