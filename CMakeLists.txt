@@ -224,6 +224,7 @@ set(TEST_FILES
         test/simulation/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
         test/simulation/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
         test/simulation/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
+        test/simulation/SimpleStorageService/ZeroSizeFileTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceSchedulingTest.cpp
