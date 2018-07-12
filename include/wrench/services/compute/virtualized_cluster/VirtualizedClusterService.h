@@ -38,6 +38,7 @@ namespace wrench {
         std::map<std::string, std::string> default_property_values = {
                 {VirtualizedClusterServiceProperty::SUPPORTS_PILOT_JOBS,    "true"},
                 {VirtualizedClusterServiceProperty::SUPPORTS_STANDARD_JOBS, "true"},
+                {VirtualizedClusterServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}
         };
 
         std::map<std::string, std::string> default_messagepayload_values = {
