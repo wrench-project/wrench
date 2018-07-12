@@ -336,7 +336,13 @@ namespace wrench {
       } else {
         operation = "receiving from";
       }
-      return "Network error (link failure, or communication peer died) while " + operation + " mailbox_name " + this->mailbox;
+      std::string error;
+      if (this->isTimeout()) {
+        error = "timeout";
+      } else {
+        error = "link failure, or communication peer died";
+      }
+      return "Network error (" + error + ") while " + operation + " mailbox_name " + this->mailbox;
     };
 
 //    /**
