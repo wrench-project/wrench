@@ -57,12 +57,23 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 
         /**
-         * @brief Path to a workload trace file to be replayed. The trace file neede to
+         * @brief Path to a workload trace file to be replayed. The trace file needed to
          * be in the SWF format (see http://www.cs.huji.ac.il/labs/parallel/workload/swf.html).
          * Note that jobs in the trace whose node/host/processor/core requirements exceed the capacity
          * of the batch service will simply be capped at that capacity.
          */
         DECLARE_PROPERTY_NAME(SIMULATED_WORKLOAD_TRACE_FILE);
+
+        /**
+         * @brief Path to a to-be-generated Batsim-style CSV trace file (e.g. for b3atch schedule visualization purposes).
+         *      - If ENABLE_BATSCHED is set to off or not set: ignored
+         *      - In ENABLE_BATSCHED is set to on: The trace file is generated in CVS format as follows:
+         *          allocated_processors,consumed_energy,execution_time,finish_time,job_id,metadata,
+         *          requested_number_of_processors,requested_time,starting_time,stretch,submission_time,success,
+         *          turnaround_time,waiting_time,workload_name
+
+         */
+        DECLARE_PROPERTY_NAME(OUTPUT_CSV_JOB_LOG);
 
 
         /**

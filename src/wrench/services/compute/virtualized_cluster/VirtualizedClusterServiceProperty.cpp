@@ -13,4 +13,6 @@
 
 namespace wrench {
 
+    SET_PROPERTY_NAME(VirtualizedClusterServiceProperty, VM_BOOT_OVERHEAD_IN_SECONDS);
+
 }
