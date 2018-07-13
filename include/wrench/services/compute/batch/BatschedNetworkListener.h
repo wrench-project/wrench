@@ -22,7 +22,6 @@ namespace wrench {
     /** \cond INTERNAL     */
     /***********************/
 
-        #ifdef ENABLE_BATSCHED
     /**
      * @brief A helper service that handles all interaction with Batsched
      */
@@ -59,7 +58,6 @@ namespace wrench {
         void sendQueryAnswerMessageToBatchService(double estimated_waiting_time);
         void send_receive();
     };
-        #endif
 
     /***********************/
     /** \endcond           */

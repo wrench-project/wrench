@@ -50,6 +50,7 @@ namespace wrench {
       batch_job_args["-N"] = std::to_string(this->num_nodes); // Number of nodes/taks
       batch_job_args["-t"] = std::to_string(1 + this->requested_time / 60); // Time in minutes (note the +1)
       batch_job_args["-c"] = std::to_string(this->num_cores_per_task); //number of cores per task
+      batch_job_args["-color"] = "green";
 
       // Submit this job to the batch service
       WRENCH_INFO("Submitting a [-N:%s, -t:%s, -c:%s] job",

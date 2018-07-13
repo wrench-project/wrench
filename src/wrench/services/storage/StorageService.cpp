@@ -347,7 +347,7 @@ namespace wrench {
       try {
         message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
       } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
+        throw;
       }
 
       if (auto msg = dynamic_cast<StorageServiceFileReadAnswerMessage *>(message.get())) {
@@ -362,8 +362,7 @@ namespace wrench {
         try {
           file_content_message = S4U_Mailbox::getMessage(answer_mailbox);
         } catch (std::shared_ptr<NetworkError> &cause) {
-          WRENCH_INFO("Unknown Error while getting a file content.... means we should just die. but throwing");
-          throw WorkflowExecutionException(cause);
+          throw;
         }
 
         if (auto file_content_msg = dynamic_cast<StorageServiceFileContentMessage *>(file_content_message.get())) {

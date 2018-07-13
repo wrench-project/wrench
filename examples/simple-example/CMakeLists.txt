@@ -7,14 +7,8 @@ set(SOURCE_FILES
         optimizations/dynamic/FailureDynamicClustering.cpp
         SimpleWMS.h
         SimpleWMS.cpp
-        scheduler/RandomStandardJobScheduler.h
-        scheduler/RandomStandardJobScheduler.cpp
         scheduler/CloudStandardJobScheduler.h
         scheduler/CloudStandardJobScheduler.cpp
-        scheduler/MinMinStandardJobScheduler.h
-        scheduler/MinMinStandardJobScheduler.cpp
-        scheduler/MaxMinStandardJobScheduler.h
-        scheduler/MaxMinStandardJobScheduler.cpp
         scheduler/BatchStandardJobScheduler.cpp
         scheduler/BatchStandardJobScheduler.h
         scheduler/pilot_job/CriticalPathPilotJobScheduler.h

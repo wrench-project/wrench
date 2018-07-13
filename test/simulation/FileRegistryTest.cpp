@@ -360,7 +360,19 @@ private:
                 "lookupEntry using NetworkProximityService did not include the unmonitored Storage Service");
       }
 
-      // shutwon service
+
+      // Use a bogus host
+      success = true;
+      try {
+        frs->lookupEntry(file1, "BogusHost", nps);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to lookup a file by proximity with a bogus reference host");
+      }
+
+      // shutdown service
       frs->stop();
 
       success = true;

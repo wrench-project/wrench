@@ -225,6 +225,7 @@ set(TEST_FILES
         test/simulation/SimpleStorageService/SimpleStorageServiceLimitedConnectionsTest.cpp
         test/simulation/SimpleStorageService/StorageServiceDeleteRegisterTest.cpp
         test/simulation/SimpleStorageService/DataMovementManagerCopyRegisterTest.cpp
+        test/simulation/SimpleStorageService/ZeroSizeFileTest.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestStandardJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceTestPilotJobs.cpp
         test/simulation/MultihostMulticoreComputeService/MultihostMulticoreComputeServiceSchedulingTest.cpp
@@ -233,6 +234,7 @@ set(TEST_FILES
         test/simulation/BatchService/BatchServiceTest.cpp
         test/simulation/BatchService/BatchServiceFCFSTest.cpp
         test/simulation/BatchService/BatchServiceTraceFileTest.cpp
+        test/simulation/BatchService/BatchServiceOutputCSVFileTest.cpp
         test/simulation/BatchService/BatchServiceBatschedQueueWaitTimePredictionTest.cpp
         test/simulation/wms/WMSTest.cpp
         test/simulation/wms/MultipleWMSTest.cpp
@@ -249,7 +251,7 @@ set(TEST_FILES
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        )
+        test/simulation/ScratchSpaceTest.cpp test/simulation/EnergyConsumptionTest.cpp)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
