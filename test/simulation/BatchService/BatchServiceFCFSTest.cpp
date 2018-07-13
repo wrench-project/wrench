@@ -18,9 +18,9 @@
 
 #include "../../include/TestWithFork.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_fcfs_test, "Log category for BatchServiceFCFSTest");
-
 #define EPSILON 0.05
+
+XBT_LOG_NEW_DEFAULT_CATEGORY(batch_service_fcfs_test, "Log category for BatchServiceFCFSTest");
 
 class BatchServiceFCFSTest : public ::testing::Test {
 
@@ -91,7 +91,7 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      // Create 4 tasks and submit them as three various shaped jobs
+      // Create 4 tasks and submit them as various shaped jobs
 
       wrench::WorkflowTask *tasks[8];
       wrench::StandardJob *jobs[8];

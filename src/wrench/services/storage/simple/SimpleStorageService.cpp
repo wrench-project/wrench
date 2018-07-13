@@ -304,7 +304,7 @@ namespace wrench {
                                                                                    new StorageServiceNotEnoughSpace(
                                                                                            file,
                                                                                            this)),
-                                                                           "",
+                                                                           "none",
                                                                            this->getMessagePayloadValueAsDouble(
                                                                                    SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {

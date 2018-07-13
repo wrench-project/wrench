@@ -113,10 +113,10 @@ namespace wrench {
         /** @brief The service's name */
         std::string name;
 
-        /** @brief The time (in seconds) after which a service that doesn't send back a reply message cause
-         *  a NetworkTimeOut exception. (default: 1 second; if <0 never timeout)
+        /** @brief The time (in seconds) after which a service that doesn't send back a reply (control) message causes
+         *  a NetworkTimeOut exception. (default: 30 second; if <0 never timeout)
          */
-        double network_timeout = 1.0;
+        double network_timeout = 30.0;
 
         /***********************/
         /** \endcond           */

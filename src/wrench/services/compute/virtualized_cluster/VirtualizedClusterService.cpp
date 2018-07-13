@@ -473,6 +473,7 @@ namespace wrench {
           }
 
           // create a VM on the provided physical machine
+          simulation->sleep(this->getPropertyValueAsDouble(VirtualizedClusterServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
           auto vm = std::make_shared<S4U_VirtualMachine>(vm_hostname, pm_hostname, num_cores, ram_memory);
 
           // create a multihost multicore compute service for the VM

@@ -43,6 +43,8 @@ namespace wrench {
       this->cores_per_node = cores_per_node;
       this->ending_time_stamp = ending_time_stamp;
       this->arrival_time_stamp = arrival_time_stamp;
+
+      this->csv_metadata = "color:red";
     }
 
     /**
@@ -178,4 +180,6 @@ namespace wrench {
       }
       this->resources_allocated = resources;
     }
+
+
 }
