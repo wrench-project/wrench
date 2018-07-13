@@ -516,50 +516,50 @@ namespace wrench {
                                       " for NETWORK_PROXIMITY_SERVICE_TYPE: " + network_service_type);
         }
       }
-      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD) < 0) {
-        throw std::invalid_argument(error_prefix + "Invalid STOP_DAEMON_MESSAGE_PAYLOAD value " +
-                                    this->getMessagePayloadValueAsString(
-                                            NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
-      }
-
-      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD) < 0) {
-        throw std::invalid_argument(error_prefix + "Invalid DAEMON_STOPPED_MESSAGE_PAYLOAD value " +
-                                    this->getMessagePayloadValueAsString(
-                                            NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD));
-      }
-
-      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD) < 0) {
-        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD value " +
-                                    this->getMessagePayloadValueAsString(
-                                            NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD));
-      }
-
-      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD) < 0) {
-        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD value " +
-                                    this->getMessagePayloadValueAsString(
-                                            NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
-      }
-
-      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD) <
-          0) {
-        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD value " +
-                                    this->getMessagePayloadValueAsString(
-                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD));
-      }
-
-      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD) <
-          0) {
-        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD value " +
-                                    this->getMessagePayloadValueAsString(
-                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD));
-      }
-
-      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD) <
-          0) {
-        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD value " +
-                                    this->getMessagePayloadValueAsString(
-                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD));
-      }
+//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD) < 0) {
+//        throw std::invalid_argument(error_prefix + "Invalid STOP_DAEMON_MESSAGE_PAYLOAD value " +
+//                                    this->getMessagePayloadValueAsString(
+//                                            NetworkProximityServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD));
+//      }
+//
+//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD) < 0) {
+//        throw std::invalid_argument(error_prefix + "Invalid DAEMON_STOPPED_MESSAGE_PAYLOAD value " +
+//                                    this->getMessagePayloadValueAsString(
+//                                            NetworkProximityServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD));
+//      }
+//
+//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD) < 0) {
+//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD value " +
+//                                    this->getMessagePayloadValueAsString(
+//                                            NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_REQUEST_MESSAGE_PAYLOAD));
+//      }
+//
+//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD) < 0) {
+//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD value " +
+//                                    this->getMessagePayloadValueAsString(
+//                                            NetworkProximityServiceMessagePayload::NETWORK_DB_LOOKUP_ANSWER_MESSAGE_PAYLOAD));
+//      }
+//
+//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD) <
+//          0) {
+//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD value " +
+//                                    this->getMessagePayloadValueAsString(
+//                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_REQUEST_PAYLOAD));
+//      }
+//
+//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD) <
+//          0) {
+//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD value " +
+//                                    this->getMessagePayloadValueAsString(
+//                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_CONTACT_ANSWER_PAYLOAD));
+//      }
+//
+//      if (this->getMessagePayloadValueAsDouble(NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD) <
+//          0) {
+//        throw std::invalid_argument(error_prefix + "Invalid NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD value " +
+//                                    this->getMessagePayloadValueAsString(
+//                                            NetworkProximityServiceMessagePayload::NETWORK_DAEMON_MEASUREMENT_REPORTING_PAYLOAD));
+//      }
 
       if (this->getPropertyValueAsDouble(NetworkProximityServiceProperty::LOOKUP_OVERHEAD) < 0) {
         throw std::invalid_argument(error_prefix + "Invalid LOOKUP_OVERHEAD value " +

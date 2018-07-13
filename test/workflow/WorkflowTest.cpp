@@ -90,6 +90,9 @@ TEST_F(WorkflowTest, WorkflowStructure) {
   ASSERT_EQ(3, workflow->getTasks().size());
 
   workflow->removeTask(t1);
+
+  // Create a bogus task using the constructor
+
 }
 
 TEST_F(WorkflowTest, ControlDependency) {
