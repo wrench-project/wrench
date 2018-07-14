@@ -25,6 +25,10 @@ namespace wrench {
         return this->date;
     }
 
+    /**
+     * @brief Retrieves the corresponding start/end SimulationTimestampType associated with this timestamp
+     * @return A pointer to a start SimulationTimestampType if this is a failure/completion timestamp or vise versa
+     */
     SimulationTimestampType *SimulationTimestampType::getEndpoint() {
         return this->endpoint;
     }
@@ -127,7 +131,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param file: the file associated with this file copy
+     * @param file: the WorkflowFile associated with this file copy
      * @param src: the source StorageService from which this file is being copied
      * @param src_partition: the partition in the source StorageService from which this file is being copied
      * @param dst: the destination StorageService where this file will be copied
@@ -138,7 +142,7 @@ namespace wrench {
     }
 
     /**
-     * @brief retrieves the file being copied
+     * @brief retrieves the WorkflowFile being copied
      * @return a pointer to the WorkflowFile associated with this copy
      */
     WorkflowFile* SimulationTimestampFileCopy::getFile() {
@@ -146,7 +150,7 @@ namespace wrench {
     }
 
     /**
-     * @brief retrieves the location from which the file is being copied
+     * @brief retrieves the location from which the WorkflowFile is being copied
      * @return a FileLocation object containing the source StorageService and source partition from which the file is being copied
      */
     SimulationTimestampFileCopy::FileLocation SimulationTimestampFileCopy::getSource() {
@@ -154,7 +158,7 @@ namespace wrench {
     }
 
     /**
-     * @brief retrieves the location where the file will be copied
+     * @brief retrieves the location where the WorkflowFile will be copied
      * @return a FileLocation object containing the destination StorageService and destination partition into which the file is being copied
      */
     SimulationTimestampFileCopy::FileLocation SimulationTimestampFileCopy::getDestination() {
@@ -171,7 +175,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param file: the file associated with this file copy
+     * @param file: the WorkflowFile associated with this file copy
      * @param src: the source StorageService from which this file is being copied
      * @param src_partition: the partition in the source StorageService from which this file is being copied
      * @param dst: the destination StorageService where this file will be copied
@@ -220,7 +224,7 @@ namespace wrench {
 
     /**
      * @brief Constructor
-     * @param file: the file associated with this file copy
+     * @param file: the WorkflowFile associated with this file copy
      * @param src: the source StorageService from which this file was being copied
      * @param src_partition: the partition in the source StorageService from which this file was being copied
      * @param dst: the destination StorageService where this file was going to be copied
