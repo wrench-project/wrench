@@ -539,19 +539,13 @@ namespace wrench {
 
         // Add the file to my storage (this will not add a duplicate in case of an overwrite, because it's a set)
         this->stored_files[connection->file_partition].insert(connection->file);
-        if (connection->start_timestamp != nullptr) {
-            this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyCompletion>(new SimulationTimestampFileCopyCompletion(
-                    connection->start_timestamp
-            ));
-
-        }
 
         // Send back the corresponding ack?
         if (not connection->ack_mailbox.empty()) {
           WRENCH_INFO(
                   "Sending back an ack since this was a file copy and some client is waiting for me to say something");
           try {
-              S4U_Mailbox::putMessage(connection->ack_mailbox,
+              S4U_Mailbox::dputMessage(connection->ack_mailbox,
                                       new StorageServiceFileCopyAnswerMessage(connection->file,
                                                                               this,
                                                                               connection->file_partition,
@@ -562,11 +556,17 @@ namespace wrench {
                                                                               this->getMessagePayloadValueAsDouble(
                                                                                       SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
           } catch (std::shared_ptr<NetworkError> &cause) {
-            return true;
+            // do nothing
           }
+
+            // finally, add the timestamp. the 'send ack' may have failed but the file copy itself is complete
+            this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyCompletion>(new SimulationTimestampFileCopyCompletion(
+                    connection->start_timestamp
+            ));
         }
 
-        return true;
+
+          return true;
       } else {
         throw std::runtime_error(
                 "SimpleStorageService::processControlMessage(): Unexpected [" + message->getName() + "] message");
