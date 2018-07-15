@@ -30,13 +30,15 @@ namespace wrench {
      * @param file_partition: the file partition inside the storage service where the file will be stored to/read from
      * @param mailbox: the mailbox: the mailbox for this connection
      * @param ack_mailbox: the mailbox to which an ack should be sent when the connection completes/fails
+     * @param start_timestamp: a pointer to a SimulationTimestampFileCopyStart if this connection is part of a file copy
      */
-    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string file_partition, std::string mailbox, std::string ack_mailbox) {
+    NetworkConnection::NetworkConnection(int type, WorkflowFile *file, std::string file_partition, std::string mailbox, std::string ack_mailbox, SimulationTimestampFileCopyStart *start_timestamp) {
       this->type = type;
       this->file = file;
       this->mailbox = mailbox;
       this->ack_mailbox = ack_mailbox;
       this->file_partition = file_partition;
+      this->start_timestamp = start_timestamp;
 
       if (this->mailbox.empty()) {
         throw std::invalid_argument("NetworkConnection::NetworkConnection(): empty mailbox_name");

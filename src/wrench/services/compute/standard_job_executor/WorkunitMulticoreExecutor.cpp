@@ -223,6 +223,7 @@ namespace wrench {
       for (auto task : work->tasks) {
 
         task->setInternalState(WorkflowTask::InternalState::TASK_RUNNING);
+        task->setStartDate(S4U_Simulation::getClock());
 
         // Read  all input files
         WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
@@ -237,7 +238,6 @@ namespace wrench {
 
         // Run the task's computation (which can be multicore)
         WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
-        task->setStartDate(S4U_Simulation::getClock());
 
         try {
           runMulticoreComputation(task->getFlops(), task->getParallelEfficiency());
@@ -260,6 +260,9 @@ namespace wrench {
         WRENCH_INFO("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
         task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
 
+        task->setEndDate(S4U_Simulation::getClock());
+        task->setExecutionHost(this->hostname);
+
         // Deal with Children
         for (auto child : task->getWorkflow()->getTaskChildren(task)) {
           bool all_parents_completed = true;
@@ -273,13 +276,6 @@ namespace wrench {
             child->setInternalState(WorkflowTask::InternalState::TASK_READY);
           }
         }
-
-        task->setEndDate(S4U_Simulation::getClock());
-        task->setExecutionHost(this->hostname);
-
-        // Generate a SimulationTimestamp
-        this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
-                new SimulationTimestampTaskCompletion(task));
       }
 
       WRENCH_INFO("Done with all tasks");
