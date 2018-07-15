@@ -642,7 +642,9 @@ private:
         throw std::runtime_error("Should not be able to create a job with a nullptr storage service in file deletions");
       }
 
-
+      if (job) {
+        // use job to avoid 'unused-but-set-variable' warning
+      }
 
       // Stop the Job Manager manually, just for kicks
       job_manager->stop();
@@ -965,7 +967,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithLocationMap_te
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
           simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
   ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
-  ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getDate(),
+  ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getDate(),
             task->getEndDate());
   ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
             task);
@@ -1086,7 +1088,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithDefaultStorage
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
           simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
   ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
-  ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getDate(),
+  ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getDate(),
             task->getEndDate());
   ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
             task);
@@ -1233,7 +1235,7 @@ void MultihostMulticoreComputeServiceOneTaskTest::do_ExecutionWithPrePostCopies_
   std::vector<wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *> task_completion_trace =
           simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
   ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>().size(), 1);
-  ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getDate(),
+  ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getDate(),
             task->getEndDate());
   ASSERT_EQ(simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>()[0]->getContent()->getTask(),
             task);
