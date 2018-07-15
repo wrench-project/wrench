@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "../include/TestWithFork.h"
+#include "../../include/TestWithFork.h"
 
 class SimulationOutputTest : public ::testing::Test {
 

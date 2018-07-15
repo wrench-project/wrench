@@ -116,6 +116,7 @@ namespace wrench {
         friend class Simulation;
         friend class FileRegistryService;
 
+
         void stageFile(WorkflowFile *);
 
         void removeFileFromStorage(WorkflowFile *, std::string);

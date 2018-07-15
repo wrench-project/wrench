@@ -95,6 +95,9 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+
+        void validateProperties();
+
         void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
 
         void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
@@ -136,8 +139,6 @@ namespace wrench {
                               std::map<std::string, std::string> messagepayload_list,
                               double ttl,
                               PilotJob *pj);
-
-        void validateProperties();
 
         std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
 

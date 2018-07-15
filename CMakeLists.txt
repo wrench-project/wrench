@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 11)
 # build the version number
 set(WRENCH_VERSION_MAJOR "1")
 set(WRENCH_VERSION_MINOR "0")
-set(WRENCH_VERSION_PATCH "1")
+set(WRENCH_VERSION_PATCH "0")
 set(WRENCH_VERSION_EXTRA "")
 
 if (${WRENCH_VERSION_PATCH} EQUAL "0")
@@ -204,6 +204,7 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/NetworkConnectionManager.cpp
         src/wrench/services/storage/simple/NetworkConnection.cpp
         src/wrench/util/UnitParser.cpp
+        src/wrench/simulation/SimulationTimestampTypes.cpp
         )
 
 # test files
@@ -243,7 +244,9 @@ set(TEST_FILES
         test/simulation/FileRegistryTest.cpp
         test/simulation/JobManagerTest.cpp
         test/simulation/SimpleSimulationTest.cpp
-        test/simulation/SimulationOutputTest.cpp
+        test/simulation/simulation_output/SimulationOutputTest.cpp
+        test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
+        test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp
         test/simulation/ScratchSpaceTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
