@@ -28,23 +28,22 @@ namespace wrench {
     public:
 
         /**
-         * Retrieve the timestamp's date
-         *
-         * @return the date (as a number of seconds since the beginning of the simulation)
-         */
-        double getDate() {
-          return this->date;
-        }
-
-        /**
          * Retrieve the timestamp's content
          *
          * @return a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          */
-        T *getContent() {
-          return this->content;
+        T * const getContent() {
+          return this->content.get();
         }
 
+        /**
+         * Retrieve the recorded time of the timestamp
+         *
+         * @return the recorded time of the timestamp
+         */
+        double getDate()  {
+            return this->getContent()->getDate();
+        }
         /***********************/
         /** \cond DEVELOPER    */
         /***********************/
@@ -54,24 +53,15 @@ namespace wrench {
          * @param content: a pointer to a object of class T, i.e., a particular SimulationTimestampXXXX class (defined in SimulationTimestampTypes.h)
          */
         SimulationTimestamp(T *content) {
-          // TODO: Make content a unique_ptr to make memory management better
-          this->content = content;
-          this->date = S4U_Simulation::getClock();
+            this->content = std::unique_ptr<T>(content);
         }
 
         /***********************/
         /** \endcond           */
         /***********************/
 
-
-        ~SimulationTimestamp() {
-          delete this->content;
-        }
-
     private:
-        double date = -1.0;
-        T *content;
-
+        std::unique_ptr<T>content;
     };
 
 };
