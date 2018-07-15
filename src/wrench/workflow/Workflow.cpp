@@ -247,6 +247,7 @@ namespace wrench {
       this->DAG_node_map = std::unique_ptr<lemon::ListDigraph::NodeMap<WorkflowTask *>>(
               new lemon::ListDigraph::NodeMap<WorkflowTask *>(*DAG));
       this->callback_mailbox = S4U_Mailbox::generateUniqueMailboxName("workflow_mailbox");
+      this->simulation = nullptr;
     };
 
     /**
