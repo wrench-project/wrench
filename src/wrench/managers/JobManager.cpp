@@ -560,7 +560,6 @@ namespace wrench {
           this->pending_standard_jobs.erase(job);
           this->completed_standard_jobs.insert(job);
 
-
           // Forward the notification along the notification chain
           std::string callback_mailbox = job->popCallbackMailbox();
           if (not callback_mailbox.empty()) {

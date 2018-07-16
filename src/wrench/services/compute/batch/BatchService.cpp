@@ -1391,7 +1391,7 @@ namespace wrench {
 
       // Remove the job from the running job list
       BatchJob *batch_job = nullptr;
-      for (auto it = this->running_jobs.begin(); it != this->running_jobs.end();) {
+      for (auto it = this->running_jobs.begin(); it != this->running_jobs.end(); it++) {
         if ((*it)->getWorkflowJob() == job) {
           batch_job = (*it);
           break;
@@ -1412,6 +1412,7 @@ namespace wrench {
 
       //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
+      WRENCH_INFO("FORWARDING TO BATSCHED");
       this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
       this->appendJobInfoToCSVOutputFile(batch_job, "success");
 #endif
