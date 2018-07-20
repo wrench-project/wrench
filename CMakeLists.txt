@@ -160,6 +160,8 @@ set(SOURCE_FILES
         src/wrench/services/storage/simple/SimpleStorageServiceProperty.cpp
         src/wrench/services/storage/simple/SimpleStorageServiceMessagePayload.cpp
         src/wrench/workflow/execution_events/FailureCause.cpp
+        src/wrench/managers/JobManagerMessage.cpp
+        src/wrench/managers/JobManagerMessage.h
         src/wrench/services/ServiceMessage.cpp
         src/wrench/services/compute/ComputeServiceMessage.cpp
         src/wrench/services/storage/StorageServiceMessage.cpp
