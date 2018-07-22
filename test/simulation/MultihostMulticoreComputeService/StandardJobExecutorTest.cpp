@@ -819,7 +819,7 @@ private:
                                    std::to_string(msg->cause->getCauseType()) + " (" + msg->cause->toString() + ")");
         }
 
-        auto real_cause = (wrench::StorageServiceFileAlreadyThere *) msg->cause.get();
+        auto real_cause = (wrench::FileNotFound *) msg->cause.get();
         if (real_cause->getFile() != this->getWorkflow()->getFileByID("input_file")) {
           throw std::runtime_error(
                   "Got the expected 'file not found' exception, but the failure cause does not point to the correct file");
