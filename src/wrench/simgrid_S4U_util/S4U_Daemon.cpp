@@ -170,7 +170,7 @@ namespace wrench {
     /**
     * @brief Suspend the daemon/actor.
     */
-    void S4U_Daemon::suspendActor() {
+    void S4U_Daemon::suspend() {
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         try {
           this->s4u_actor->suspend();
@@ -183,9 +183,24 @@ namespace wrench {
     }
 
     /**
-     * @brief Kill the daemon/actor.
+    * @brief Resume the daemon/actor.
+    */
+    void S4U_Daemon::resume() {
+      if ((this->s4u_actor != nullptr) && (not this->terminated)) {
+        try {
+          this->s4u_actor->resume();
+        } catch (xbt_ex &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        } catch (std::exception &e) {
+          throw std::shared_ptr<FatalFailure>(new FatalFailure());
+        }
+      }
+    }
+
+    /**
+     * @brief Join (i.e., wait for) the daemon.
      */
-    void S4U_Daemon::joinActor() {
+    void S4U_Daemon::join() {
       if ((this->s4u_actor != nullptr) && (not this->terminated)) {
         try {
           this->s4u_actor->join();

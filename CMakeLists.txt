@@ -250,6 +250,7 @@ set(TEST_FILES
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp
         test/simulation/simulation_output/SimulationTimestampFileCopyTest.cpp
         test/simulation/ScratchSpaceTest.cpp
+        test/simulation/S4U_DaemonTest.cpp
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
