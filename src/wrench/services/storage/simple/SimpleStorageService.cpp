@@ -269,51 +269,33 @@ namespace wrench {
      */
     bool SimpleStorageService::processFileWriteRequest(WorkflowFile *file, std::string dst_partition, std::string answer_mailbox) {
 
-      // If the file is already there, send back a failure
-//      if (this->stored_files.find(file) != this->stored_files.end()) {
-//        try {
-//          S4U_Mailbox::putMessage(answer_mailbox,
-//                                  new StorageServiceFileWriteAnswerMessage(file,
-//                                                                           this,
-//                                                                           false,
-//                                                                           std::shared_ptr<FailureCause>(
-//                                                                                   new StorageServiceFileAlreadyThere(
-//                                                                                           file,
-//                                                                                           this)),
-//                                                                           "",
-//                                                                           this->getMessagePayloadValueAsDouble(
-//                                                                                   SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-//        } catch (std::shared_ptr<NetworkError> &cause) {
-//          return true;
-//        }
-//        return true;
-//      }
-
       // If the file is not already there, do a capacity check/update
-      // (If the file is already there, then there will just be an overwrite. Not that
-      // if the overwrite fails, then the file will disappear)
+      // (If the file is already there, then there will just be an overwrite. Note that
+      // if the overwrite fails, then the file will disappear, which is expected)
+      if (this->stored_files.find(file->getID()) != this->stored_files.end()) {
 
-      // Check the file size and capacity, and reply "no" if not enough space
-      if (file->getSize() > (this->capacity - this->occupied_space)) {
-        try {
-          S4U_Mailbox::putMessage(answer_mailbox,
-                                  new StorageServiceFileWriteAnswerMessage(file,
-                                                                           this,
-                                                                           false,
-                                                                           std::shared_ptr<FailureCause>(
-                                                                                   new StorageServiceNotEnoughSpace(
-                                                                                           file,
-                                                                                           this)),
-                                                                           "none",
-                                                                           this->getMessagePayloadValueAsDouble(
-                                                                                   SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
+        // Check the file size and capacity, and reply "no" if not enough space
+        if (file->getSize() > (this->capacity - this->occupied_space)) {
+          try {
+            S4U_Mailbox::putMessage(answer_mailbox,
+                                    new StorageServiceFileWriteAnswerMessage(file,
+                                                                             this,
+                                                                             false,
+                                                                             std::shared_ptr<FailureCause>(
+                                                                                     new StorageServiceNotEnoughSpace(
+                                                                                             file,
+                                                                                             this)),
+                                                                             "none",
+                                                                             this->getMessagePayloadValueAsDouble(
+                                                                                     SimpleStorageServiceMessagePayload::FILE_WRITE_ANSWER_MESSAGE_PAYLOAD)));
+          } catch (std::shared_ptr<NetworkError> &cause) {
+            return true;
+          }
           return true;
         }
-        return true;
+        // Update occupied space, in advance (will have to be decreased later in case of failure)
+        this->occupied_space += file->getSize();
       }
-      // Update occupied space, in advance (will have to be decreased later in case of failure)
-      this->occupied_space += file->getSize();
 
       // Generate a mailbox_name name on which to receive the file
       std::string file_reception_mailbox = S4U_Mailbox::generateUniqueMailboxName("file_reception");
@@ -405,7 +387,7 @@ namespace wrench {
       if (file->getSize() > this->capacity - this->occupied_space) {
         WRENCH_INFO("Cannot perform file copy due to lack of space");
 
-          this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(start_timestamp));
+        this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(start_timestamp));
 
         try {
           S4U_Mailbox::putMessage(answer_mailbox,
@@ -516,12 +498,12 @@ namespace wrench {
         this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyFailure>(new SimulationTimestampFileCopyFailure(connection->start_timestamp));
 
         try {
-            S4U_Mailbox::dputMessage(connection->ack_mailbox,
-                                     new StorageServiceFileCopyAnswerMessage(connection->file, this,
-                                                                             connection->file_partition, nullptr, false,
-                                                                             false, connection->failure_cause,
-                                                                             this->getMessagePayloadValueAsDouble(
-                                                                                     SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
+          S4U_Mailbox::dputMessage(connection->ack_mailbox,
+                                   new StorageServiceFileCopyAnswerMessage(connection->file, this,
+                                                                           connection->file_partition, nullptr, false,
+                                                                           false, connection->failure_cause,
+                                                                           this->getMessagePayloadValueAsDouble(
+                                                                                   SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
           return true;
         }
@@ -539,6 +521,12 @@ namespace wrench {
 
         // Add the file to my storage (this will not add a duplicate in case of an overwrite, because it's a set)
         this->stored_files[connection->file_partition].insert(connection->file);
+        if (connection->start_timestamp != nullptr) {
+          this->simulation->getOutput().addTimestamp<SimulationTimestampFileCopyCompletion>(new SimulationTimestampFileCopyCompletion(
+                  connection->start_timestamp
+          ));
+
+        }
 
         // Send back the corresponding ack?
         if (not connection->ack_mailbox.empty()) {
