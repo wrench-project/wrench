@@ -897,7 +897,6 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
-     * @throw std::runtime_error
      *
      */
     void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file, StorageService *src,
