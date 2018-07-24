@@ -134,6 +134,29 @@ private:
       // Shutodown the proximity service
       (*network_proximity_service)->stop();
 
+      bool success = true;
+
+      try {
+        (*network_proximity_service)->query(hosts_to_compute_proximity);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        // Check Exception
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
+                                   std::to_string(e.getCause()->getCauseType()) + " (was expecting ServiceIsDown)");
+        }
+        // Check Exception details
+        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
+        if (real_cause->getService() != (*network_proximity_service)) {
+          throw std::runtime_error(
+                  "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
+        }
+      }
+
+      if (success) {
+        throw std::runtime_error("Should not be able to query a service that is down");
+      }
+
       return 0;
     }
 };
@@ -482,6 +505,44 @@ private:
       if (coordinates.first == 0 && coordinates.second == 0) {
         throw std::runtime_error("Vivaldi algorithm did not update the coordinates of host:" + target_host);
       }
+
+      // Try to get coordinates from a service that does not support coordinates
+      bool success = true;
+      try {
+        coordinates = alltoall_service->getCoordinate(target_host);
+      } catch (std::runtime_error &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error(
+                "Should not be able to get coordinates from an all-to-all proximity service");
+      }
+
+      // stop the service
+      vivaldi_service->stop();
+      success = true;
+      try {
+        coordinates = vivaldi_service->getCoordinate(target_host);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        // Check Exception
+        if (e.getCause()->getCauseType() != wrench::FailureCause::SERVICE_DOWN) {
+          throw std::runtime_error("Got an exception, as expected, but of the unexpected type " +
+                                   std::to_string(e.getCause()->getCauseType()) + " (was expecting ServiceIsDown)");
+        }
+        // Check Exception details
+        wrench::ServiceIsDown *real_cause = (wrench::ServiceIsDown *) e.getCause().get();
+        if (real_cause->getService() != vivaldi_service) {
+          throw std::runtime_error(
+                  "Got the expected 'service is down' exception, but the failure cause does not point to the correct service");
+        }
+      }
+
+      if (success) {
+        throw std::runtime_error("Should not be able to get coordinates from a service that is down");
+      }
+
+
       return 0;
     }
 };
