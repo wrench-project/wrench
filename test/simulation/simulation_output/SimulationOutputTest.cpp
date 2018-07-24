@@ -10,13 +10,13 @@
 #include <gtest/gtest.h>
 #include <wrench-dev.h>
 
-#include "../include/TestWithFork.h"
+#include "../../include/TestWithFork.h"
 
 class SimulationOutputTest : public ::testing::Test {
 
 public:
     wrench::Workflow *workflow;
-    wrench::WorkflowFile *input_file;
+/*    wrench::WorkflowFile *input_file;
     wrench::WorkflowFile *output_file1;
     wrench::WorkflowFile *output_file2;
     wrench::WorkflowFile *output_file3;
@@ -26,7 +26,7 @@ public:
     wrench::WorkflowTask *task3;
     wrench::WorkflowTask *task4;
     wrench::WorkflowTask *task5;
-    wrench::WorkflowTask *task6;
+    wrench::WorkflowTask *task6;*/
     wrench::ComputeService *compute_service = nullptr;
     wrench::StorageService *storage_service = nullptr;
 
@@ -149,7 +149,6 @@ void SimulationOutputTest::do_emptyTrace_test() {
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
-  // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
 
   // Get the number of task completions

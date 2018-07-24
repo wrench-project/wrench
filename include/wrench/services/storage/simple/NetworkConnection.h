@@ -23,6 +23,7 @@ namespace wrench {
     /***********************/
 
     class WorkflowFile;
+    class SimulationTimestampFileCopyStart;
 
     /**
      * @brief A helper class that implements a network connection abstraction to
@@ -42,7 +43,7 @@ namespace wrench {
             INCOMING_CONTROL
         };
 
-        NetworkConnection(int type, WorkflowFile* file, std::string file_partition, std::string mailbox, std::string ack_mailbox);
+        NetworkConnection(int type, WorkflowFile* file, std::string file_partition, std::string mailbox, std::string ack_mailbox, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
         bool start();
         bool hasFailed();
         std::unique_ptr<SimulationMessage> getMessage();
@@ -61,6 +62,8 @@ namespace wrench {
         std::shared_ptr<FailureCause> failure_cause;
         /** @brief: the mailbox to which to send an ack when this connection completes/fails */
         std::string ack_mailbox;
+        /** @brief: if this is a file copy, a start timestamp associated with it */
+        SimulationTimestampFileCopyStart *start_timestamp;
     };
 
     /***********************/

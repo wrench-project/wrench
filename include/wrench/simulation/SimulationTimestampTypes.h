@@ -10,48 +10,210 @@
 #ifndef WRENCH_SIMULATIONTIMESTAMPTYPES_H
 #define WRENCH_SIMULATIONTIMESTAMPTYPES_H
 
+#include "wrench/workflow/WorkflowTask.h"
 
 namespace wrench {
 
     class WorkflowTask;
+    class StorageService;
 
     /**
-    * @brief A "task completion event" simulation timestamp
+     * @brief A base class for simulation timestamps
+     */
+    class SimulationTimestampType {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampType();
+        SimulationTimestampType(SimulationTimestampType *endpoint);
+        virtual ~SimulationTimestampType() {}
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        double getDate();
+        virtual SimulationTimestampType *getEndpoint();
+
+
+    protected:
+        SimulationTimestampType *endpoint;
+
+    private:
+        double date = -1.0;
+    };
+
+    /**
+    * @brief A base class for simulation timestamps regarding workflow tasks
     */
-    class SimulationTimestampTaskCompletion {
+    class SimulationTimestampTask : public SimulationTimestampType {
 
     public:
 
         /***********************/
-        /** \cond DEVELOPER    */
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampTask(WorkflowTask *);
+        /***********************/
+        /** \endcond           */
         /***********************/
 
-        /**
-         * @brief Constructor
-         * @param task: a workflow task
-         */
-        SimulationTimestampTaskCompletion(WorkflowTask *task) {
-          this->task = task;
-        }
+        WorkflowTask *getTask();
+        SimulationTimestampTask *getEndpoint() override;
 
-        ~SimulationTimestampTaskCompletion() {
-        }
+    protected:
+        static std::map<std::string, SimulationTimestampTask *> pending_task_timestamps;
 
+        void setEndpoints();
+
+    private:
+        WorkflowTask *task;
+    };
+
+    /**
+     * @brief A simulation timestamp class for WorkflowTask start times
+     */
+    class SimulationTimestampTaskStart : public SimulationTimestampTask {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampTaskStart(WorkflowTask *);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    /**
+     * @brief A simulation timestamp class for WorkflowTask failure times
+     */
+    class SimulationTimestampTaskFailure : public SimulationTimestampTask {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampTaskFailure(WorkflowTask *);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+    };
+
+    /**
+     * @brief A simulation timestamp class for WorkflowTask completion times
+     */
+    class SimulationTimestampTaskCompletion : public SimulationTimestampTask {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampTaskCompletion(WorkflowTask *);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    class SimulationTimestampFileCopyStart;
+
+    /**
+     * @brief A base class for simulation timestamps regarding file copies
+     */
+    class SimulationTimestampFileCopy : public SimulationTimestampType {
+    public:
+
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileCopy(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition, SimulationTimestampFileCopyStart *start_timestamp = nullptr);
         /***********************/
         /** \endcond           */
         /***********************/
 
         /**
-         * @brief Retrieve the task that has completed
-         *
-         * @return the task
+         * @brief A file location struct that contains the storage service and partition where a file is located
          */
-        WorkflowTask *getTask() {
-          return this->task;
-        }
+        struct FileLocation {
+            StorageService *storage_service;
+            std::string partition;
 
-    private:
-        WorkflowTask *task;
+            FileLocation(StorageService *storage_service, std::string partition) : storage_service(storage_service), partition(partition) {
+
+            }
+
+            bool operator==(const FileLocation &rhs) {
+                return (this->storage_service == rhs.storage_service) && (this->partition == rhs.partition);
+            }
+
+            bool operator!=(const FileLocation &rhs) {
+                return !FileLocation::operator==(rhs);
+            }
+        };
+
+        SimulationTimestampFileCopy *getEndpoint() override;
+        WorkflowFile *getFile();
+        FileLocation getSource();
+        FileLocation getDestination();
+
+    protected:
+        WorkflowFile *file;
+
+        /**
+         * @brief The location where the WorkflowFile was being copied from
+         */
+        FileLocation source;
+
+        /**
+         * @brief The intended location where the WorkflowFile was being copied to
+         */
+        FileLocation destination;
+    };
+
+    class SimulationTimestampFileCopyFailure;
+    class SimulationTimestampFileCopyCompletion;
+
+    /**
+     * @brief A simulation timestamp class for file copy start times
+     */
+    class SimulationTimestampFileCopyStart : public SimulationTimestampFileCopy {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileCopyStart(WorkflowFile *file, StorageService *src, std::string src_partition, StorageService *dst, std::string dst_partition);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+
+        friend class SimulationTimestampFileCopyFailure;
+        friend class SimulationTimestampFileCopyCompletion;
+    };
+
+    /**
+     * @brief A simulation timestamp class for file copy failure times
+     */
+    class SimulationTimestampFileCopyFailure : public SimulationTimestampFileCopy {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileCopyFailure(SimulationTimestampFileCopyStart *start_timestamp);
+        /***********************/
+        /** \endcond           */
+        /***********************/
+    };
+
+    /**
+     * @brief A simulation timestamp class for file copy completions
+     */
+    class SimulationTimestampFileCopyCompletion : public SimulationTimestampFileCopy {
+    public:
+        /***********************/
+        /** \cond INTERNAL     */
+        /***********************/
+        SimulationTimestampFileCopyCompletion(SimulationTimestampFileCopyStart *start_timestamp);
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 };
 
