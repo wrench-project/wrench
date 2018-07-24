@@ -719,23 +719,11 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_JobTermination_test() 
   // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
 
-  // Check completion states and times
-  if ((this->task1->getState() != wrench::WorkflowTask::READY) ||
-      (this->task2->getState() != wrench::WorkflowTask::READY)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
-  }
+  ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
+  ASSERT_EQ(this->task2->getState(), wrench::WorkflowTask::READY);
 
-  // Check failure counts: Terminations DO NOT COUNT as failures
-  if ((this->task1->getFailureCount() != 0) ||
-      (this->task2->getFailureCount() != 0)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
-                             std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
-  }
-
+  ASSERT_EQ(this->task1->getFailureCount(), 0);
+  ASSERT_EQ(this->task2->getFailureCount(), 0);
 
   delete simulation;
   free(argv[0]);
@@ -849,21 +837,11 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_NonSubmittedJobTermina
   ASSERT_NO_THROW(simulation->launch());
 
   // Check completion states and times
-  if ((this->task1->getState() != wrench::WorkflowTask::READY) ||
-      (this->task2->getState() != wrench::WorkflowTask::READY)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
-  }
+  ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
+  ASSERT_EQ(this->task2->getState(), wrench::WorkflowTask::READY);
 
-  // Check failure counts: Terminations DO NOT count as failures
-  if ((this->task1->getFailureCount() != 0) ||
-      (this->task2->getFailureCount() != 0)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
-                             std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
-  }
+  ASSERT_EQ(this->task1->getFailureCount(), 0);
+  ASSERT_EQ(this->task2->getFailureCount(), 0);
 
   delete simulation;
   free(argv[0]);
@@ -989,21 +967,11 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_CompletedJobTerminatio
   ASSERT_NO_THROW(simulation->launch());
 
   // Check completion states and times
-  if ((this->task1->getState() != wrench::WorkflowTask::COMPLETED) ||
-      (this->task2->getState() != wrench::WorkflowTask::COMPLETED)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
-  }
+  ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::COMPLETED);
+  ASSERT_EQ(this->task2->getState(), wrench::WorkflowTask::COMPLETED);
 
-  // Check failure counts: Terminations DO NOT count as failures
-  if ((this->task1->getFailureCount() != 0) ||
-      (this->task2->getFailureCount() != 0)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
-                             std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
-  }
+  ASSERT_EQ(this->task1->getFailureCount(), 0);
+  ASSERT_EQ(this->task2->getFailureCount(), 0);
 
   delete simulation;
   free(argv[0]);
@@ -1134,21 +1102,11 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownComputeService
   ASSERT_NO_THROW(simulation->launch());
 
   // Check completion states and times
-  if ((this->task1->getState() != wrench::WorkflowTask::READY) ||
-      (this->task2->getState() != wrench::WorkflowTask::READY)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
-  }
+  ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
+  ASSERT_EQ(this->task2->getState(), wrench::WorkflowTask::READY);
 
-  // Check failure counts: Terminations DO NOT count as failures
-  if ((this->task1->getFailureCount() != 1) ||
-      (this->task2->getFailureCount() != 1)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
-                             std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
-  }
+  ASSERT_EQ(this->task1->getFailureCount(), 1);
+  ASSERT_EQ(this->task2->getFailureCount(), 1);
 
   delete simulation;
   free(argv[0]);
@@ -1272,22 +1230,11 @@ void MultihostMulticoreComputeServiceTestStandardJobs::do_ShutdownStorageService
   // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
 
-  // Check completion states and times
-  if ((this->task1->getState() != wrench::WorkflowTask::READY) ||
-      (this->task2->getState() != wrench::WorkflowTask::READY)) {
-    throw std::runtime_error("Unexpected task states: [" + this->task1->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task1->getState()) + ", " +
-                             this->task2->getID() + ": " +
-                             wrench::WorkflowTask::stateToString(this->task2->getState()) + "]");
-  }
+  ASSERT_EQ(this->task1->getState(), wrench::WorkflowTask::READY);
+  ASSERT_EQ(this->task2->getState(), wrench::WorkflowTask::READY);
 
-  // Check failure counts: Terminations DO NOT count as failures
-  if ((this->task1->getFailureCount() != 1) ||
-      (this->task2->getFailureCount() != 1)) {
-    throw std::runtime_error("Unexpected task failure counts: [" + this->task1->getID() + ": " +
-                             std::to_string(this->task1->getFailureCount()) + ", " +
-                             this->task2->getID() + ": " + std::to_string(this->task2->getFailureCount()) + "]");
-  }
+  ASSERT_EQ(this->task1->getFailureCount(), 1);
+  ASSERT_EQ(this->task2->getFailureCount(), 1);
 
   delete simulation;
   free(argv[0]);

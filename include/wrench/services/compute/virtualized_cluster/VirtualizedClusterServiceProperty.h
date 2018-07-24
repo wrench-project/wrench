@@ -21,6 +21,8 @@ namespace wrench {
     class VirtualizedClusterServiceProperty : public ComputeServiceProperty {
 
     public:
+        /** @brief The overhead, in seconds, to boot a VM **/
+        DECLARE_PROPERTY_NAME(VM_BOOT_OVERHEAD_IN_SECONDS);
     };
 
 }

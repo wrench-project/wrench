@@ -86,7 +86,8 @@ void InternalNetworkConnectionTest::do_Constructor_test() {
 
   ASSERT_NO_THROW(conn = new wrench::NetworkConnection(wrench::NetworkConnection::OUTGOING_DATA, file, "/", "mailbox_name", ""));
   ASSERT_THROW(conn->getMessage(), std::runtime_error);
-  delete conn;
 
+  delete conn;
+  delete workflow;
 
 }

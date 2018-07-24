@@ -17,5 +17,6 @@ namespace wrench {
     SET_PROPERTY_NAME(BatchServiceProperty, BATCH_QUEUE_ORDERING_ALGORITHM);
     SET_PROPERTY_NAME(BatchServiceProperty, BATCH_RJMS_DELAY);
     SET_PROPERTY_NAME(BatchServiceProperty, SIMULATED_WORKLOAD_TRACE_FILE);
+    SET_PROPERTY_NAME(BatchServiceProperty, OUTPUT_CSV_JOB_LOG);
 
 }

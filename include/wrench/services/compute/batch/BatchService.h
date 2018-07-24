@@ -63,7 +63,8 @@ namespace wrench {
                         {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
                 #endif
                  {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
-                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""}
+                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
+                 {BatchServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""}
                 };
 
         std::map<std::string, std::string> default_messagepayload_values = {
@@ -173,26 +174,26 @@ namespace wrench {
 
         //Queue of pending batch jobs
         std::deque<BatchJob *> pending_jobs;
+
         //A set of running batch jobs
         std::set<BatchJob *> running_jobs;
+
         // A set of waiting jobs that have been submitted to batsched, but not scheduled
         std::set<BatchJob *> waiting_jobs;
 
 
-
-        //Batch scheduling supported algorithms
 #ifdef ENABLE_BATSCHED
-        unsigned long batsched_port; // ONLY USED FOR BATSCHED
 
-        std::set<std::string> scheduling_algorithms = {"easy_bf", "conservative_bf", "easy_bf_plot_liquid_load_horizon",
+        std::set<std::string> scheduling_algorithms = {"conservative_bf", "crasher", "easy_bf", "easy_bf_fast",
+                                                       "easy_bf_plot_liquid_load_horizon",
                                                        "energy_bf", "energy_bf_dicho", "energy_bf_idle_sleeper",
                                                        "energy_bf_monitoring",
                                                        "energy_bf_monitoring_inertial", "energy_bf_subpart_sleeper",
-                                                       "filler", "killer", "killer2", "rejecter", "sleeper",
-                                                       "submitter", "waiting_time_estimator"
+                                                       "energy_watcher", "fcfs_fast", "fast_conservative_bf",
+                                                       "filler", "killer", "killer2", "random", "rejecter",
+                                                       "sequencer", "sleeper", "submitter", "waiting_time_estimator"
         };
 
-        //Batch queue ordering options
         std::set<std::string> queue_ordering_options = {"fcfs", "lcfs", "desc_bounded_slowdown", "desc_slowdown",
                                                         "asc_size", "desc_size", "asc_walltime", "desc_walltime"
 
@@ -206,7 +207,6 @@ namespace wrench {
         };
 
 #endif
-
 
 
         unsigned long generateUniqueJobID();
@@ -287,19 +287,18 @@ namespace wrench {
 
         std::map<std::string,double> getStartTimeEstimatesForFCFS(std::set<std::tuple<std::string,unsigned int,unsigned int, double>>);
 
-#ifdef ENABLE_BATSCHED
+
+        /** BATSCHED-related fields **/
         std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
-
-        friend class BatschedNetworkListener;
-
         pid_t pid;
+        unsigned long batsched_port;
 
-//        bool is_bat_sched_ready;
+
+#ifdef ENABLE_BATSCHED
+        friend class BatschedNetworkListener;
 
         void startBatsched();
         void stopBatsched();
-//        void setBatschedReady(bool v);
-//        bool isBatschedReady();
 
         std::map<std::string,double> getStartTimeEstimatesFromBatsched(std::set<std::tuple<std::string,unsigned int,unsigned int,double>>);
 
@@ -307,6 +306,9 @@ namespace wrench {
 
         void notifyJobEventsToBatSched(std::string job_id, std::string status, std::string job_state,
                                        std::string kill_reason, std::string even_type);
+
+        void appendJobInfoToCSVOutputFile(BatchJob *batch_job, std::string status);
+
         void sendAllQueuedJobsToBatsched();
 
         //process execute events from batsched

@@ -43,6 +43,25 @@ namespace wrench {
             }
           }
           (*msg_itr).second.clear();
+          break;
+        }
+      }
+    }
+
+    /**
+     * @brief Clean up all the messages that MessageManager has stored (so as to free up memory)
+     */
+    void MessageManager::cleanUpAllMessages() {
+      std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
+      for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
+        std::cerr << "Deleting a message from " << (*msg_itr).first << " mailbox\n";
+        for (size_t i = 0; i < (*msg_itr).second.size(); i++) {
+          if ((*msg_itr).second[i] != nullptr) {
+            delete (*msg_itr).second[i];
+          }
+        }
+        if ((*msg_itr).second.size() > 0) {
+          (*msg_itr).second.clear();
         }
       }
     }
