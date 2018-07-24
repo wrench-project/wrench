@@ -545,7 +545,7 @@ private:
         double computed_wattage_power_1 = energy_consumed_while_running_with_higher_speed/higher_speed_compuation_time;
         double computed_wattage_power_2 = energy_consumed_while_running_with_lower_speed/lower_speed_compuation_time;
 
-        if (abs(exact_max_wattage_power_1-computed_wattage_power_1) >EPSILON && abs(exact_max_wattage_power_2-computed_wattage_power_2)>1) {
+        if (abs(exact_max_wattage_power_1-computed_wattage_power_1) > EPSILON && abs(exact_max_wattage_power_2-computed_wattage_power_2) > EPSILON) {
           throw std::runtime_error(
                   "Something wrong with the computed energy and the expected energy consumption"
           );
