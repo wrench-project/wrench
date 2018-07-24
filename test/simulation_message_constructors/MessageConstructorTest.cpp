@@ -23,6 +23,7 @@ class MessageConstructorTest : public ::testing::Test {
 protected:
     MessageConstructorTest() {
       workflow = new wrench::Workflow();
+      workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
       task = workflow->addTask("task", 1, 1, 1, 1.0, 0);
       file = workflow->addFile("file", 1);
       storage_service = (wrench::StorageService *)(1234);
@@ -37,6 +38,7 @@ protected:
     }
 
     // data members
+    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
     wrench::WorkflowTask *task;
     wrench::WorkflowFile *file;
