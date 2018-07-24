@@ -316,7 +316,7 @@ namespace wrench {
     std::vector<int> S4U_Simulation::getListOfPstates(std::string hostname) {
       std::vector<int> list = {};
       int num_pstates = getNumberofPstates(hostname);
-      for(int i=0;i<num_pstates) {
+      for(int i=0;i<num_pstates;i++) {
         list.push_back(i);
       }
       return list;
