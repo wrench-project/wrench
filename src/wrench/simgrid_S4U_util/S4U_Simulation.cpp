@@ -309,6 +309,19 @@ namespace wrench {
       return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname), (simgrid::s4u::Host::by_name(hostname))->get_pstate());
     }
 
+    /**
+     * @brief Get the list of pstates that are available to the host as specified in the platform xml
+     * @return an vector referring list of pstates that are available to the host as specified in the platform xml
+     */
+    std::vector<int> S4U_Simulation::getListOfPstates(std::string hostname) {
+      std::vector<int> list = {};
+      int num_pstates = getNumberofPstates(hostname);
+      for(int i=0;i<num_pstates) {
+        list.push_back(i);
+      }
+      return list;
+    }
+
 
 
 

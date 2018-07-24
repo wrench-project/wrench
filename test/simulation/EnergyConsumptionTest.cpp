@@ -377,6 +377,8 @@ private:
           throw std::runtime_error("Unexpectedly the energy consumed is less than 0 for a lower speed ??");
         }
 
+        
+
       }
 
       return 0;

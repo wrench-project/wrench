@@ -38,6 +38,8 @@ namespace wrench {
 				static double getMemoryCapacity();
 				static void compute(double);
 				static void sleep(double);
+
+				//start enery related calls
 				static std::string getHostProperty(std::string hostname, std::string property_name);
 				static double getEnergyConsumedByHost(std::string hostname);
 				static double getTotalEnergyConsumed(std::vector<std::string> hostnames);
@@ -46,6 +48,9 @@ namespace wrench {
 				static int getCurrentPstate(std::string hostname);
 				static double getMinPowerAvailable(std::string hostname);
 				static double getMaxPowerPossible(std::string hostname);
+				std::vector<int> getListOfPstates(std::string hostname);
+				//end energy related calls
+
 				bool isInitialized();
         bool isPlatformSetup();
         std::vector<std::string> getAllHostnames();
