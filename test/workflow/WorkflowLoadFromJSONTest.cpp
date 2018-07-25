@@ -3185,7 +3185,9 @@ protected:
 
 TEST_F(WorkflowLoadFromJSONTest, LoadValidJSON) {
 
-  auto *workflow = new wrench::Workflow();
+      std::unique_ptr<wrench::Workflow> workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+      auto *workflow = workflow_unique_ptr.get();
 
   ASSERT_THROW(workflow->loadFromJSON("bogus", "1f"), std::invalid_argument);
   ASSERT_NO_THROW(workflow->loadFromJSON(this->json_file_path, "1f"));

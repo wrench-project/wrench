@@ -15,6 +15,7 @@ class WorkflowTest : public ::testing::Test {
 protected:
     WorkflowTest() {
       workflow = new wrench::Workflow();
+      workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
 
       // create simple diamond workflow
       t1 = workflow->addTask("task-test-01", 1, 1, 1, 1.0, 0);
@@ -46,6 +47,7 @@ protected:
     }
 
     // data members
+    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
     wrench::WorkflowTask *t1, *t2, *t3, *t4;
     wrench::WorkflowFile *f1, *f2, *f3, *f4;
