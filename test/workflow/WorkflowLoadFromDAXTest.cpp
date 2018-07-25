@@ -326,7 +326,9 @@ protected:
 
 TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
 
-  auto *workflow = new wrench::Workflow();
+  std::unique_ptr<wrench::Workflow> workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+  auto *workflow = workflow_unique_ptr.get();
 
   ASSERT_THROW(workflow->loadFromDAX("bogus", "1f"), std::invalid_argument);
   ASSERT_NO_THROW(workflow->loadFromDAX(this->dax_file_path, "1f"));
