@@ -553,7 +553,7 @@ namespace wrench {
                       "Workflow::loadFromDAX(): multiple \"number of cores/procs\" specification for task " + id);
             } else {
               found_one = true;
-              num_procs = std::stoi(job.attribute("num_procs").value());
+              num_procs = std::stoi(job.attribute(tag.c_str()).value());
             }
           }
         }
