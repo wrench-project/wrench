@@ -32,11 +32,14 @@ public:
     wrench::ComputeService *compute_service2 = nullptr;
     wrench::Simulation *simulation = nullptr;
 
+    void do_AccessEnergyApiExceptionTests_test();
+
     void do_EnergyConsumption_test();
 
     void do_EnergyConsumptionPStateChange_test();
 
     void do_SimpleApiChecksEnergy_test();
+
     std::unique_ptr<wrench::Workflow> workflow;
 
 protected:
@@ -86,6 +89,272 @@ protected:
 
 
 };
+
+
+/**********************************************************************/
+/**         ENERGY API TEST WITHOUT ENABLING ENERGY PLUGIN           **/
+/**********************************************************************/
+
+class EnergyApiAccessExceptionsTestWMS : public wrench::WMS {
+
+public:
+    EnergyApiAccessExceptionsTestWMS(EnergyConsumptionTest *test,
+                             const std::set<wrench::ComputeService *> &compute_services,
+                             std::string& hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, {}, {}, nullptr, hostname,
+                        "test") {
+      this->test = test;
+    }
+
+private:
+
+    EnergyConsumptionTest *test;
+
+    int main() {
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      {
+
+        std::vector<std::string> simulation_hosts = simulation->getHostnameList();
+
+        //Now based on this default speed, (100MF), execute a job requiring 10^10 flops and check the time
+        wrench::WorkflowTask *task = this->getWorkflow()->addTask("task1", 10000000000, 1, 1, 1.0, 1.0);
+
+        // Create a StandardJob
+        wrench::StandardJob *job = job_manager->createStandardJob(
+                task,
+                {
+                });
+        //sleep for 10 seconds
+        wrench::S4U_Simulation::sleep(10);
+        //let's execute the job, this should take ~100 sec based on the 100MF speed
+        std::string my_mailbox = "test_callback_mailbox";
+
+
+        // Create a StandardJobExecutor that will run stuff on one host and 6 core
+        std::shared_ptr<wrench::StandardJobExecutor> executor = std::unique_ptr<wrench::StandardJobExecutor>(
+                new wrench::StandardJobExecutor(
+                        test->simulation,
+                        my_mailbox,
+                        test->simulation->getHostnameList()[1],
+                        job,
+                        {std::make_tuple(test->simulation->getHostnameList()[1], 1, wrench::ComputeService::ALL_RAM)},
+                        nullptr,
+                        false,
+                        nullptr,
+                        {},
+                        {}
+                ));
+        executor->start(executor, true);
+
+        // Wait for a message on my mailbox_name
+        std::unique_ptr<wrench::SimulationMessage> message;
+        try {
+          message = wrench::S4U_Mailbox::getMessage(my_mailbox);
+        } catch (std::shared_ptr<wrench::NetworkError> &cause) {
+          throw std::runtime_error("Network error while getting reply from StandardJobExecutor!" + cause->toString());
+        }
+
+        // Did we get the expected message?
+        auto *msg = dynamic_cast<wrench::StandardJobExecutorDoneMessage *>(message.get());
+        if (!msg) {
+          throw std::runtime_error("Unexpected '" + message->getName() + "' message");
+        }
+
+        bool success = false;
+        try {
+          double value = wrench::S4U_Simulation::getEnergyConsumedByHost("dummy_unavailable_host");
+          success = false;
+        } catch (std::exception e) {
+          WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+          success = true;
+        }
+
+        if (!success) {
+          throw std::runtime_error(
+                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
+          );
+        }
+
+        success = false;
+        try {
+          double value = wrench::S4U_Simulation::getTotalEnergyConsumed({"dummy_unavailable_host"});
+          success = false;
+        } catch (std::exception e) {
+          WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+          success = true;
+        }
+
+        if (!success) {
+          throw std::runtime_error(
+                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
+          );
+        }
+
+        success = false;
+        try {
+          double value = wrench::S4U_Simulation::getNumberofPstates("dummy_unavailable_host");
+          success = false;
+        } catch (std::exception e) {
+          WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+          success = true;
+        }
+
+        if (!success) {
+          throw std::runtime_error(
+                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
+          );
+        }
+
+        success = false;
+        try {
+          double value = wrench::S4U_Simulation::getCurrentPstate("dummy_unavailable_host");
+          success = false;
+        } catch (std::exception e) {
+          WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+          success = true;
+        }
+
+        if (!success) {
+          throw std::runtime_error(
+                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
+          );
+        }
+
+        success = false;
+        try {
+          double value = wrench::S4U_Simulation::getMinPowerAvailable("dummy_unavailable_host");
+          success = false;
+        } catch (std::exception e) {
+          WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
+          success = true;
+        }
+
+        if (!success) {
+          throw std::runtime_error(
+                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
+          );
+        }
+
+        success = false;
+        try {
+          double value = wrench::S4U_Simulation::getMaxPowerPossible("dummy_unavailable_host");
+          success = false;
+        } catch (std::exception e) {
+          WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
+          success = true;
+        }
+
+        if (!success) {
+          throw std::runtime_error(
+                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
+          );
+        }
+
+        success = false;
+        try {
+          wrench::S4U_Simulation::setPstate("dummy_unavailable_host",1);
+          success = false;
+        } catch (std::exception e) {
+          WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
+          success = true;
+        }
+
+        if (!success) {
+          throw std::runtime_error(
+                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
+          );
+        }
+
+        success = false;
+        try {
+          wrench::S4U_Simulation::setPstate(simulation_hosts[1],2);
+          success = true;
+        } catch (std::exception e) {
+          WRENCH_INFO("Unexpected exception as we were trying to access energy plugin for a correct host that is available");
+          success = false;
+        }
+
+        if (!success) {
+          throw std::runtime_error(
+                  "Something is wrong. Should not have been able to read the energy for dummy hosts"
+          );
+        }
+
+
+
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(EnergyConsumptionTest, EnergyApiAccessExceptionsTest) {
+  DO_TEST_WITH_FORK(do_AccessEnergyApiExceptionTests_test);
+}
+
+
+void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
+
+
+  // Create and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 2;
+  auto argv = (char **) calloc(argc, sizeof(char *));
+  argv[0] = strdup("energy_consumption_test");
+  argv[1] = strdup("--activate_energy");
+
+  EXPECT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  EXPECT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service1 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+  // Create a Storage Service
+  EXPECT_NO_THROW(storage_service2 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 10000000000000.0)));
+
+
+  // Create a Compute Service
+  EXPECT_NO_THROW(compute_service = simulation->add(
+          new wrench::MultihostMulticoreComputeService(hostname,
+                                                       {std::make_tuple(hostname, wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},
+                                                       10000000000000.0, {})));
+
+  simulation->add(new wrench::FileRegistryService(hostname));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  EXPECT_NO_THROW(wms = simulation->add(
+          new EnergyApiAccessExceptionsTestWMS(
+                  this,  {compute_service}, hostname)));
+
+  EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+
+  // Create two workflow files
+  wrench::WorkflowFile *input_file = this->workflow->addFile("input_file", 10000.0);
+
+  // Staging the input_file on the storage service
+  EXPECT_NO_THROW(simulation->stageFile(input_file, storage_service1));
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  EXPECT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
 
 /**********************************************************************/
 /**                    ENERGY CONSUMPTION TEST                       **/
