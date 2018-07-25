@@ -864,6 +864,9 @@ private:
         if (real_cause->getStorageService() != this->test->storage_service_500) {
           throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right storage service");
         }
+        if (real_cause->getPartition() != "/") {
+          throw std::runtime_error("Got expected failure cause, but failure cause does not point to the right partition");
+        }
         real_cause->toString(); // for coverage
 
       }

@@ -10,6 +10,7 @@
 
 
 #include <wrench/simgrid_S4U_util/S4U_Mailbox.h>
+#include <managers/JobManagerMessage.h>
 
 #include "wrench/simulation/SimulationMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
@@ -42,11 +43,27 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
-      if (auto m = dynamic_cast<ComputeServiceStandardJobDoneMessage *>(message.get())) {
+      if (auto m = dynamic_cast<JobManagerStandardJobDoneMessage *>(message.get())) {
+        // Update task states
+        for (auto state_update : m->necessary_state_changes) {
+          WorkflowTask *task = state_update.first;
+          WorkflowTask::State state = state_update.second;
+          task->setState(state);
+        }
         return std::unique_ptr<StandardJobCompletedEvent>(
           new StandardJobCompletedEvent(m->job, m->compute_service));
 
-      } else if (auto m = dynamic_cast<ComputeServiceStandardJobFailedMessage *>(message.get())) {
+      } else if (auto m = dynamic_cast<JobManagerStandardJobFailedMessage *>(message.get())) {
+        // Update task states
+        for (auto state_update : m->necessary_state_changes) {
+          WorkflowTask *task = state_update.first;
+          WorkflowTask::State state = state_update.second;
+          task->setState(state);
+        }
+        // Update task failure counts
+        for (auto task : m->necessary_failure_count_increments) {
+          task->incrementFailureCount();
+        }
         return std::unique_ptr<StandardJobFailedEvent>(
                 new StandardJobFailedEvent(m->job, m->compute_service, m->cause));
 
