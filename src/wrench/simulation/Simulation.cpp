@@ -10,6 +10,7 @@
 
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
+#include <wrench/util/MessageManager.h>
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/Service.h"
@@ -61,6 +62,7 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
+      MessageManager::cleanUpAllMessages();
       this->s4u_simulation->shutdown();
     }
 
