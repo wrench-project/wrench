@@ -207,8 +207,8 @@ namespace wrench {
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       try {
-        comm_ptr = mailbox->put_async(msg, (uint64_t) msg->payload);
         MessageManager::manageMessage(mailbox_name,msg);
+        comm_ptr = mailbox->put_async(msg, (uint64_t) msg->payload);
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           throw std::shared_ptr<NetworkError>(

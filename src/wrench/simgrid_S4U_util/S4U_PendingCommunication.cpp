@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include <xbt/ex.hpp>
+#include <wrench/util/MessageManager.h>
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simulation/SimulationMessage.h"
@@ -94,6 +95,7 @@ namespace wrench {
       bool one_comm_failed = false;
       try {
         index = (unsigned long) simgrid::s4u::Comm::wait_any(&pending_s4u_comms);
+        MessageManager::removeReceivedMessages(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
       } catch (xbt_ex &e) {
         if (e.category != network_error) {
           throw std::runtime_error(

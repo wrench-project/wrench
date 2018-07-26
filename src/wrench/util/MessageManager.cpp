@@ -21,8 +21,17 @@ namespace wrench {
      * @brief Insert a message in the manager's  "database"
      * @param mailbox: the name of the relevant mailbox
      * @param msg: the message
+     * @throw std::runtime_error
      */
     void MessageManager::manageMessage(std::string mailbox, SimulationMessage *msg) {
+      if (mailbox=="file_reception_13") {
+        std::cerr << "received a message " << msg->name << "\n";
+      }
+      if (msg == nullptr) {
+        throw std::runtime_error(
+                "MessageManager::manageMessage()::Null Message cannot be saved by MessageManager"
+        );
+      }
       if (mailbox_messages.find(mailbox) == mailbox_messages.end()) {
         mailbox_messages.insert({mailbox, {}});
       }
@@ -54,7 +63,6 @@ namespace wrench {
     void MessageManager::cleanUpAllMessages() {
       std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
       for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
-        std::cerr << "Deleting a message from " << (*msg_itr).first << " mailbox\n";
         for (size_t i = 0; i < (*msg_itr).second.size(); i++) {
           if ((*msg_itr).second[i] != nullptr) {
             delete (*msg_itr).second[i];

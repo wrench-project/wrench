@@ -46,7 +46,8 @@ protected:
     SimpleStorageServiceFunctionalTest() {
 
       // Create the simplest workflow
-      workflow = new wrench::Workflow();
+      workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+      workflow = workflow_unique_ptr.get();
 
       // Create the files
       file_1 = workflow->addFile("file_1", 1.0);
@@ -69,6 +70,7 @@ protected:
     }
 
     std::string platform_file_path = "/tmp/platform.xml";
+    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
 };
 
