@@ -24,9 +24,6 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void MessageManager::manageMessage(std::string mailbox, SimulationMessage *msg) {
-      if (mailbox=="file_reception_13") {
-        std::cerr << "received a message " << msg->name << "\n";
-      }
       if (msg == nullptr) {
         throw std::runtime_error(
                 "MessageManager::manageMessage()::Null Message cannot be saved by MessageManager"
