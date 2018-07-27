@@ -278,7 +278,7 @@ namespace wrench {
         for (const auto &compute_service : this->compute_services) {
           if (compute_service->hasScratch()) {
             compute_service->getScratch()->simulation = this;
-            compute_service->getScratch()->start(std::shared_ptr<StorageService>(compute_service->getScratch()), true);
+            compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true);
           }
         }
 

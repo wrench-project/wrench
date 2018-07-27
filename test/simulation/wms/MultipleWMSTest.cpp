@@ -51,6 +51,7 @@ protected:
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
+      workflow_unique_ptrs.push_back(std::unique_ptr<wrench::Workflow>(workflow));
 
       // Create the files
       input_file = workflow->addFile("input_file", 10.0);
@@ -70,7 +71,7 @@ protected:
 
       return workflow;
     }
-
+    std::vector<std::unique_ptr<wrench::Workflow>> workflow_unique_ptrs;
     std::string platform_file_path = "/tmp/platform.xml";
 };
 
