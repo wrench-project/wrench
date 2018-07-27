@@ -99,6 +99,10 @@ namespace wrench {
 
         double getEndDate();
 
+        double getComputationStartDate();
+
+        double getComputationEndDate();
+
         std::string getExecutionHost();
 
         WorkflowTask::State getState() const;
@@ -141,6 +145,10 @@ namespace wrench {
 
         void setEndDate(double date);
 
+        void setComputationStartDate(double date);
+
+        void setComputationEndDate(double date);
+
         void incrementFailureCount();
 
         void setExecutionHost(std::string hostname);
@@ -167,8 +175,12 @@ namespace wrench {
 
         double start_date = -1.0;          // Date at which task began execution (getter?)
         double end_date = -1.0;            // Date at which task finished execution (getter?)
+
+        double task_computation_start_date = -1.0;
+        double task_computation_end_date = -1.0;
+
         unsigned int failure_count = 0;    // Number of times the tasks has failed
-        std::string execution_host;        // Host on which the task excuted ("" if not executed successfully - yet)
+        std::string execution_host;        // Host on which the task executed ("" if not executed successfully - yet)
 
         State visible_state;              // To be exposed to developer level
         InternalState internal_state;              // Not to be exposed to developer level

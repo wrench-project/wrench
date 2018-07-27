@@ -84,6 +84,14 @@ TEST_F(WorkflowTaskTest, GetSet) {
   ASSERT_EQ(t1->getFailureCount(), 0);
   t1->incrementFailureCount();
   ASSERT_EQ(t1->getFailureCount(), 1);
+
+  ASSERT_EQ(t1->getTaskType(), wrench::WorkflowTask::TaskType::COMPUTE);
+
+  ASSERT_NO_THROW(t1->setComputationStartDate(1.0));
+  ASSERT_DOUBLE_EQ(t1->getComputationStartDate(), 1.0);
+
+  ASSERT_NO_THROW(t1->setComputationEndDate(1.0));
+  ASSERT_DOUBLE_EQ(t1->getComputationEndDate(), 1.0);
 }
 
 TEST_F(WorkflowTaskTest, InputOutputFile) {

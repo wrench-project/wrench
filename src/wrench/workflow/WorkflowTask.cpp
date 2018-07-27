@@ -397,6 +397,23 @@ namespace wrench {
     }
 
     /**
+     * @brief Set the date when the computation portion of a WorkflowTask has begun
+     *
+     * @param date: the date when the computation portion of the WorkflowTask has begun
+     */
+    void WorkflowTask::setComputationStartDate(double date) {
+        this->task_computation_start_date = date;
+    }
+
+    /**
+     * @brief Set the date when the computation portion of a WorkflowTask has ended
+     * @param date: the date when the computation portion of the WorkflowTask has ended
+     */
+    void WorkflowTask::setComputationEndDate(double date) {
+        this->task_computation_end_date = date;
+    }
+
+    /**
      * @brief Helper method to add a file to a map if necessary
      *
      * @param map_to_insert: the map of workflow files to insert
@@ -476,6 +493,22 @@ namespace wrench {
     double WorkflowTask::getEndDate() {
       return this->end_date;
     }
+
+    /**
+     * @brief Get the tasks's computation start date
+     * @return the date when the computation portion of a task started
+     */
+     double WorkflowTask::getComputationStartDate() {
+         return this->task_computation_start_date;
+     }
+
+     /**
+      * @brief Get the task's computation end date
+      * @return the date when the computation portion of a task ended
+      */
+      double WorkflowTask::getComputationEndDate() {
+          return this->task_computation_end_date;
+      }
 
     /**
      * @brief Update the task's top level (looking only at the parents, and updating children)
