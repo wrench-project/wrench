@@ -240,7 +240,9 @@ namespace wrench {
         WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
 
         try {
+          task->setComputationStartDate(S4U_Simulation::getClock());
           runMulticoreComputation(task->getFlops(), task->getParallelEfficiency());
+          task->setComputationEndDate(S4U_Simulation::getClock());
         } catch (WorkflowExecutionEvent &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
