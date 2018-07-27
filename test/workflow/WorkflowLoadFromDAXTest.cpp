@@ -318,10 +318,36 @@ protected:
       FILE *dax_file = fopen(dax_file_path.c_str(), "w");
       fprintf(dax_file, "%s", xml.c_str());
       fclose(dax_file);
+
+      std::string xml2 =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            "<adag name=\"Test\" jobCount=\"1\" fileCount=\"0\" childCount=\"0\">"
+            "<job id=\"task1\" namespace=\"task\" runtime=\"1\" num_cores=\"4\"></job>"
+            "</adag>"
+            ;
+
+      FILE *one_task_dax_file = fopen(one_task_dax_file_path.c_str(), "w");
+      fprintf(one_task_dax_file, "%s", xml2.c_str());
+      fclose(one_task_dax_file);
+
+    std::string xml3 =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            "<adag name=\"Test\" jobCount=\"1\" fileCount=\"0\" childCount=\"0\">"
+            "<job id=\"task1\" namespace=\"task\" runtime=\"1\" num_cores=\"4\" num_procs=\"2\"></job>"
+            "</adag>"
+            ;
+
+
+    FILE *one_task_bad_attribute_file = fopen(one_task_bad_attribute_file_path.c_str(), "w");
+    fprintf(one_task_bad_attribute_file, "%s", xml3.c_str());
+    fclose(one_task_bad_attribute_file);
+
     }
 
     // data members
     std::string dax_file_path = "/tmp/workflow.dax";
+    std::string one_task_dax_file_path = "/tmp/one_task.dax";
+    std::string one_task_bad_attribute_file_path = "/tmp/one_task_bad_attribute.dax";
 };
 
 TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
@@ -351,6 +377,15 @@ TEST_F(WorkflowLoadFromDAXTest, LoadValidDAX) {
   ASSERT_EQ(workflow->getTasksInTopLevelRange(5,7).size(), 3);
 
   ASSERT_LT(workflow->getCompletionDate(), 0.0);
+
+  delete workflow;
+
+  auto *one_task_workflow = new wrench::Workflow();
+  ASSERT_NO_THROW(one_task_workflow->loadFromDAX(this->one_task_dax_file_path, "1f"));
+  delete one_task_workflow;
+
+  auto *one_task_bad_attribute_workflow = new wrench::Workflow();
+  ASSERT_THROW(one_task_bad_attribute_workflow->loadFromDAX(this->one_task_bad_attribute_file_path, "1f"), std::invalid_argument);
 
 }
 
