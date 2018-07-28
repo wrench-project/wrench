@@ -118,17 +118,23 @@ private:
         std::set<wrench::ComputeService *> compute_services = this->getAvailableComputeServices();
 
         // Run ready tasks with defined scheduler implementation
+        unsigned int job_count = 0;
         for (const auto &task_map : ready_clustered_tasks) {
           wrench::StandardJob *job = job_manager->createStandardJob(task_map.second, {}, {}, {}, {});
           job_manager->submitJob(job, this->test->compute_service);
+          job_count++;
         }
 
-        // Wait for a workflow execution event, and process it
-        try {
-          this->waitForAndProcessNextEvent();
-        } catch (wrench::WorkflowExecutionException &e) {
-          throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+        // Wait for all workflow execution events, and process them
+        for (unsigned int i=0; i < job_count; i++) {
+          try {
+            this->waitForAndProcessNextEvent();
+          } catch (wrench::WorkflowExecutionException &e) {
+            throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+          }
         }
+
+        // Are we done?
         if (this->getWorkflow()->isDone()) {
           break;
         }
