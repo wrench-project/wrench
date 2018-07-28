@@ -64,6 +64,10 @@ namespace wrench {
 
         void setTerminated();
 
+        void join();
+        void suspend();
+        void resume();
+
         std::string getName();
 
         /** @brief The daemon's life saved */
@@ -74,8 +78,6 @@ namespace wrench {
     protected:
 
         void killActor();
-        void suspendActor();
-        void joinActor();
         void acquireDaemonLock();
         void releaseDaemonLock();
 

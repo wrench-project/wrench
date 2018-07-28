@@ -297,10 +297,6 @@ namespace wrench {
           }
         } else {
           if (task_map.find(task->getClusterID()) != task_map.end()) {
-            if (task->getState() == WorkflowTask::State::NOT_READY) {
-              task->setInternalState(WorkflowTask::InternalState::TASK_READY);
-              task->setState(WorkflowTask::State::READY);
-            }
             task_map[task->getClusterID()].push_back(task);
           }
         }
