@@ -449,53 +449,54 @@ namespace wrench {
       return "Job cannot be forgotten (because it's not completed or failed)";
     };
 
-    /**
-     * @brief Constructor
-     * @param file: the file that is already there
-     * @param storage_service:  the storage service on which it is
-     */
-    StorageServiceFileAlreadyThere::StorageServiceFileAlreadyThere(WorkflowFile *file, StorageService *storage_service)
-            : FailureCause(FILE_ALREADY_THERE) {
-      this->file = file;
-      this->storage_service = storage_service;
-    }
-
-    /**
-     * @brief Getter
-     * @return the file
-     */
-    WorkflowFile *StorageServiceFileAlreadyThere::getFile() {
-      return this->file;
-    }
-
-    /**
-     * @brief Getter
-     * @return the storage service
-     */
-    StorageService *StorageServiceFileAlreadyThere::getStorageService() {
-      return this->storage_service;
-    }
-
-    /**
-     * @brief Get the human-readable failure message
-     * @return the message
-     */
-    std::string StorageServiceFileAlreadyThere::toString() {
-      return "Cannot write file " + this->file->getID() + " to Storage Service " +
-             this->storage_service->getName() + " because it's already stored there";
-    }
+//    /**
+//     * @brief Constructor
+//     * @param file: the file that is already there
+//     * @param storage_service:  the storage service on which it is
+//     */
+//    StorageServiceFileAlreadyThere::StorageServiceFileAlreadyThere(WorkflowFile *file, StorageService *storage_service)
+//            : FailureCause(FILE_ALREADY_THERE) {
+//      this->file = file;
+//      this->storage_service = storage_service;
+//    }
+//
+//    /**
+//     * @brief Getter
+//     * @return the file
+//     */
+//    WorkflowFile *StorageServiceFileAlreadyThere::getFile() {
+//      return this->file;
+//    }
+//
+//    /**
+//     * @brief Getter
+//     * @return the storage service
+//     */
+//    StorageService *StorageServiceFileAlreadyThere::getStorageService() {
+//      return this->storage_service;
+//    }
+//
+//    /**
+//     * @brief Get the human-readable failure message
+//     * @return the message
+//     */
+//    std::string StorageServiceFileAlreadyThere::toString() {
+//      return "Cannot write file " + this->file->getID() + " to Storage Service " +
+//             this->storage_service->getName() + " because it's already stored there";
+//    }
 
 
     /**
      * @brief Constructor
      * @param file: the file that is already being copied
      * @param storage_service:  the storage service to which is is being copied
+     * @param dst_partition: the destination partition
      */
-    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, StorageService *storage_service, std::string dst_dir)
+    FileAlreadyBeingCopied::FileAlreadyBeingCopied(WorkflowFile *file, StorageService *storage_service, std::string dst_partition)
             : FailureCause(FILE_ALREADY_BEING_COPIED) {
       this->file = file;
       this->storage_service = storage_service;
-      this->dst_dir = dst_dir;
+      this->dst_partition = dst_partition;
     }
 
     /**
@@ -516,10 +517,10 @@ namespace wrench {
 
     /**
     * @brief Getter
-    * @return the directory
+    * @return the destination partition
     */
-    std::string FileAlreadyBeingCopied::getDir() {
-      return this->dst_dir;
+    std::string FileAlreadyBeingCopied::getPartition() {
+      return this->dst_partition;
     }
 
 
