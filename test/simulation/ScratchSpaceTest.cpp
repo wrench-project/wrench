@@ -804,8 +804,8 @@ void ScratchSpaceTest::do_RaceConditionTest_test() {
           new ScratchSpaceRaceConditionTestWMS(this, {compute_service}, {storage_service1}, hostname)));
 
 
-  wrench::Workflow *workflow = new wrench::Workflow();
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+//  wrench::Workflow *workflow = new wrench::Workflow();
+  ASSERT_NO_THROW(wms->addWorkflow(this->workflow.get()));
 
   // Create a file registry
   ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -1021,8 +1021,8 @@ void ScratchSpaceTest::do_PartitionsTest_test() {
           new ScratchNonScratchPartitionsTestWMS(this, {compute_service}, {storage_service1}, hostname)));
 
 
-  auto workflow = new wrench::Workflow();
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+//  auto workflow = new wrench::Workflow();
+  ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
   // Create a file registry
   ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
