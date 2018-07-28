@@ -23,6 +23,7 @@
 #include "wrench/workflow/job/StandardJob.h"
 #include "wrench/workflow/job/PilotJob.h"
 #include "wrench/wms/WMS.h"
+#include "JobManagerMessage.h"
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(job_manager, "Log category for Job Manager");
@@ -520,10 +521,16 @@ namespace wrench {
           StandardJob *job = msg->job;
           job->state = StandardJob::State::COMPLETED;
 
-          // Update all visible states
+          // Determine all task state changes
+          std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
           for (auto task : job->tasks) {
             if (task->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
-              task->setState(WorkflowTask::State::COMPLETED);
+//              task->setState(WorkflowTask::State::COMPLETED);
+              if (necessary_state_changes.find(task) == necessary_state_changes.end()) {
+                necessary_state_changes.insert(std::make_pair(task, WorkflowTask::State::COMPLETED));
+              } else {
+                necessary_state_changes[task] = WorkflowTask::State::COMPLETED;
+              }
             } else {
               throw std::runtime_error("JobManager::main(): got a 'job done' message, but task " +
                                        task->getID() + " does not have a TASK_COMPLETED internal state (" +
@@ -542,13 +549,23 @@ namespace wrench {
                   if (child->getState() == WorkflowTask::State::NOT_READY) {
                     bool all_parents_ready = true;
                     for (auto parent : child->getWorkflow()->getTaskParents(child)) {
-                      if (parent->getState() != WorkflowTask::State::COMPLETED) {
-                        all_parents_ready = false;
-                        break;
+                      if (parent->getState() == WorkflowTask::State::COMPLETED) {
+                        continue; // COMPLETED FROM BEFORE
                       }
+                      if ((necessary_state_changes.find(parent) != necessary_state_changes.end()) &&
+                              (necessary_state_changes[parent] == WorkflowTask::State::COMPLETED)) {
+                        continue; // ABOUT TO BECOME COMPLETED
+                      }
+                      all_parents_ready = false;
+                      break;
                     }
                     if (all_parents_ready) {
-                      child->setState(WorkflowTask::State::READY);
+//                      child->setState(WorkflowTask::State::READY);
+                      if (necessary_state_changes.find(child) == necessary_state_changes.end()) {
+                        necessary_state_changes.insert(std::make_pair(child, WorkflowTask::State::READY));
+                      } else {
+                        necessary_state_changes[child] = WorkflowTask::State::READY;
+                      }
                     }
                   }
                   break;
@@ -560,13 +577,13 @@ namespace wrench {
           this->pending_standard_jobs.erase(job);
           this->completed_standard_jobs.insert(job);
 
-
           // Forward the notification along the notification chain
           std::string callback_mailbox = job->popCallbackMailbox();
           if (not callback_mailbox.empty()) {
             try {
-              S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                       new ComputeServiceStandardJobDoneMessage(job, msg->compute_service, 0.0));
+              JobManagerStandardJobDoneMessage *augmented_msg = new JobManagerStandardJobDoneMessage(
+                      job, msg->compute_service, necessary_state_changes);
+              S4U_Mailbox::dputMessage(job->popCallbackMailbox(), augmented_msg);
             } catch (std::shared_ptr<NetworkError> &cause) {
               // ignore
             }
@@ -579,10 +596,18 @@ namespace wrench {
           StandardJob *job = msg->job;
           job->state = StandardJob::State::FAILED;
 
-          // update the task states and failure counts!
+          // Determine all task state changes and failure count updates
+          std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
+          std::set<WorkflowTask *> necessary_failure_count_increments;
+
           for (auto t: job->getTasks()) {
             if (t->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
-              t->setState(WorkflowTask::State::COMPLETED);
+//              t->setState(WorkflowTask::State::COMPLETED);
+              if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
+                necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::COMPLETED));
+              } else {
+                necessary_state_changes[t] = WorkflowTask::State::COMPLETED;
+              }
               for (auto child : this->wms->getWorkflow()->getTaskChildren(t)) {
                 switch (child->getInternalState()) {
                   case WorkflowTask::InternalState::TASK_NOT_READY:
@@ -592,14 +617,25 @@ namespace wrench {
                     // no nothing
                     break;
                   case WorkflowTask::InternalState::TASK_READY:
-                    child->setState(WorkflowTask::State::READY);
+//                    child->setState(WorkflowTask::State::READY);
+                    if (necessary_state_changes.find(child) == necessary_state_changes.end()) {
+                      necessary_state_changes.insert(std::make_pair(child, WorkflowTask::State::READY));
+                    } else {
+                      necessary_state_changes[child] = WorkflowTask::State::READY;
+                    }
                     break;
                 }
               }
 
             } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_READY) {
-              t->setState(WorkflowTask::State::READY);
-              t->incrementFailureCount();
+//              t->setState(WorkflowTask::State::READY);
+              if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
+                necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::READY));
+              } else {
+                necessary_state_changes[t] = WorkflowTask::State::READY;
+              }
+//              t->incrementFailureCount();
+              necessary_failure_count_increments.insert(t);
 
             } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_FAILED) {
               bool ready = true;
@@ -610,8 +646,18 @@ namespace wrench {
               }
               if (ready) {
                 t->setState(WorkflowTask::State::READY);
+                if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
+                  necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::READY));
+                } else {
+                  necessary_state_changes[t] = WorkflowTask::State::READY;
+                }
               } else {
                 t->setState(WorkflowTask::State::NOT_READY);
+                if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
+                  necessary_state_changes.insert(std::make_pair(t, WorkflowTask::State::NOT_READY));
+                } else {
+                  necessary_state_changes[t] = WorkflowTask::State::NOT_READY;
+                }
               }
             }
           }
@@ -623,10 +669,12 @@ namespace wrench {
 
           // Forward the notification along the notification chain
           try {
-            S4U_Mailbox::dputMessage(job->popCallbackMailbox(),
-                                     new ComputeServiceStandardJobFailedMessage(job, msg->compute_service,
-                                                                                std::move(msg->cause),
-                                                                                0.0));
+            JobManagerStandardJobFailedMessage *augmented_message =
+                    new JobManagerStandardJobFailedMessage(job, msg->compute_service,
+                                                           necessary_state_changes,
+                                                           necessary_failure_count_increments,
+                                                           std::move(msg->cause));
+            S4U_Mailbox::dputMessage(job->popCallbackMailbox(), augmented_message);
           } catch (std::shared_ptr<NetworkError> &cause) {
             keep_going = true;
           }
