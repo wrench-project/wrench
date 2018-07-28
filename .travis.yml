@@ -31,7 +31,7 @@ before_install:
       docker run -m 1g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
       export BRANCH=`git rev-parse --abbrev-ref HEAD`;
       docker exec -it wrench git clone https://github.com/wrench-project/wrench;
-      docker exec -w /home/wrench/wrench/build -it wrench pip install --user cpp-coveralls;
+      docker exec -it wrench pip install --user cpp-coveralls;
     fi
   - if [[ "$BRANCH" != "HEAD" ]]; then
       docker exec -w /home/wrench/wrench -it wrench git checkout ${BRANCH};
