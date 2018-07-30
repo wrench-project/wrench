@@ -16,6 +16,7 @@
 #include <wrench/services/compute/batch/BatchServiceMessage.h>
 #include "wrench/workflow/job/PilotJob.h"
 #include <algorithm>
+#include <simgrid/plugins/energy.h>
 
 #include "../include/TestWithFork.h"
 
@@ -303,7 +304,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("energy_consumption_test");
-  argv[1] = strdup("--activate_energy");
+  argv[1] = strdup("--activate-energy");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -353,6 +354,7 @@ void EnergyConsumptionTest::do_AccessEnergyApiExceptionTests_test() {
   delete simulation;
 
   free(argv[0]);
+  free(argv[1]);
   free(argv);
 }
 
@@ -456,7 +458,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("energy_consumption_test");
-  argv[1] = strdup("activate_energy");
+  argv[1] = strdup("--activate-energy");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -506,6 +508,7 @@ void EnergyConsumptionTest::do_EnergyConsumption_test() {
   delete simulation;
 
   free(argv[0]);
+  free(argv[1]);
   free(argv);
 }
 
@@ -605,7 +608,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("energy_consumption_test");
-  argv[1] = strdup("activate_energy");
+  argv[1] = strdup("--activate-energy");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -635,7 +638,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   EXPECT_NO_THROW(wms = simulation->add(
-          new EnergyConsumptionTestWMS(
+          new EnergyAPICheckTestWMS(
                   this,  {compute_service}, hostname)));
 
   EXPECT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
@@ -655,6 +658,7 @@ void EnergyConsumptionTest::do_SimpleApiChecksEnergy_test() {
   delete simulation;
 
   free(argv[0]);
+  free(argv[1]);
   free(argv);
 }
 
@@ -840,7 +844,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
   int argc = 2;
   auto argv = (char **) calloc(argc, sizeof(char *));
   argv[0] = strdup("energy_consumption_test");
-  argv[1] = strdup("--activate_energy");
+  argv[1] = strdup("--activate-energy");
 
   EXPECT_NO_THROW(simulation->init(&argc, argv));
 
@@ -890,6 +894,7 @@ void EnergyConsumptionTest::do_EnergyConsumptionPStateChange_test() {
   delete simulation;
 
   free(argv[0]);
+  free(argv[1]);
   free(argv);
 }
 
