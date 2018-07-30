@@ -31,9 +31,6 @@ before_install:
       docker run -m 1g -d -t --name=wrench wrenchproject/wrench-build:${DIST}-${COMPILER} bash;
       export BRANCH=`git rev-parse --abbrev-ref HEAD`;
       docker exec -it wrench git clone https://github.com/wrench-project/wrench;
-      #docker exec -it wrench curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py;
-      #docker exec -it wrench python get-pip.py;
-      #docker exec -it wrench pip install --user cpp-coveralls;
     fi
   - if [[ "$BRANCH" != "HEAD" ]]; then
       docker exec -w /home/wrench/wrench -it wrench git checkout ${BRANCH};
@@ -44,7 +41,6 @@ before_install:
 
 script:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      #docker exec -w /home/wrench/wrench/build -it wrench ./configure --enable-gcov
       docker exec -w /home/wrench/wrench/build -it wrench cmake -DENABLE_BATSCHED=${BATSCHED} -DCMAKE_VERBOSE_MAKEFILE=ON -DCOVERAGE=1 ..;
       docker exec -w /home/wrench/wrench/build -it wrench make all unit_tests doc-gh;
       docker exec -w /home/wrench/wrench/build -it wrench ./unit_tests;
@@ -56,7 +52,6 @@ after_success:
       docker exec -w /home/wrench/wrench/build -it wrench lcov --directory . --capture --output-file coverage.info;
       docker exec -w /home/wrench/wrench/build -it wrench lcov --remove coverage.info '*/test/*' '*/examples/*' '*/include/*' --output-file coverage.info;
       docker exec -w /home/wrench/wrench/build -it wrench coveralls-lcov --repo-token ${COVERALLS_TOKEN} coverage.info;
-      #docker exec -w /home/wrench/wrench/build -it wrench coveralls --exclude lib --exclude tests --gcov-options '\-lp'
 
       docker cp wrench:/home/wrench/wrench/build .;
 
