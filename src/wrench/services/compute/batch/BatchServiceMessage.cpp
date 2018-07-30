@@ -76,7 +76,7 @@ namespace wrench {
     BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(std::string answer_mailbox,
                                                                            std::string batsched_decision_reply,
                                                                            double payload)
-            : BatchServiceMessage("BATCH_EXECUTE_JOB", payload) {
+            : BatchServiceMessage("BatchExecuteJobFromBatSchedMessage", payload) {
       if (answer_mailbox.empty()) {
         throw std::invalid_argument(
                 "BatchExecuteJobFromBatSchedMessage::BatchExecuteJobFromBatSchedMessage(): Empty answer mailbox");
@@ -97,7 +97,7 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     BatchQueryAnswerMessage::BatchQueryAnswerMessage(double estimated_job_start_time, double payload)
-            : BatchServiceMessage("BATCH_QUERY_ANSWER", payload) {
+            : BatchServiceMessage("BatchQueryAnswerMessage", payload) {
       this->estimated_start_time = estimated_job_start_time;
     }
 
@@ -156,7 +156,7 @@ namespace wrench {
      */
     BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(std::string answer_mailbox,
                                                                  BatchJob *job, double payload)
-            : BatchServiceMessage("SUBMIT_BATCH_JOB_REQUEST", payload) {
+            : BatchServiceMessage("BatchServiceJobRequestMessage", payload) {
       if (job == nullptr) {
         throw std::invalid_argument(
                 "BatchServiceJobRequestMessage::BatchServiceJobRequestMessage(): Invalid arguments");
@@ -177,7 +177,7 @@ namespace wrench {
      * @throw std::invalid_arguments
      */
     AlarmJobTimeOutMessage::AlarmJobTimeOutMessage(BatchJob *job, double payload)
-            : ServiceMessage("ALARM_JOB_TIMED_OUT", payload) {
+            : ServiceMessage("AlarmJobTimeOutMessage", payload) {
       if (job == nullptr) {
         throw std::invalid_argument(
                 "AlarmJobTimeOutMessage::AlarmJobTimeOutMessage: Invalid argument");
