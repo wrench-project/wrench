@@ -95,9 +95,9 @@ namespace wrench {
       }
       *argc = i - skip;
 
-      //activate energy plugin
+      // Activate energy plugin
       if (*argc >= 2) {
-        if (strcmp(argv[1], "--activate_energy") == 0) {
+        if (strcmp(argv[1], "--activate-energy") == 0) {
           sg_host_energy_plugin_init();
         }
       }
