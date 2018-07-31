@@ -2516,9 +2516,9 @@ namespace wrench {
         }
       }
       if (workflow_job == nullptr) {
-        throw std::runtime_error(
-                "BatchService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of jobs batchservice has"
-        );
+//        throw std::runtime_error("BatchService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of jobs batchservice has");
+        WRENCH_WARN("BatchService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of known jobs... ignoring (Batsched seems to send this back even when a job has been actively terminated)");
+        return;
       }
 
       /* Get the nodes and cores per nodes asked for */
