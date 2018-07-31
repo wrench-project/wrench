@@ -597,7 +597,7 @@ namespace wrench {
      * @return The minimum power available for the host (as specified in the platform xml description file)
      */
     double Simulation::getMinPowerAvailable(std::string hostname) {
-      return S4U_Simulation::getMaxPowerPossible(hostname);
+      return S4U_Simulation::getMinPowerAvailable(hostname);
     }
 
     /**
