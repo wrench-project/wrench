@@ -165,7 +165,7 @@ private:
 
         bool success = false;
         try {
-          double value = wrench::S4U_Simulation::getEnergyConsumedByHost("dummy_unavailable_host");
+          double value = this->simulation->getEnergyConsumedByHost("dummy_unavailable_host");
           success = false;
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
@@ -180,7 +180,7 @@ private:
 
         success = false;
         try {
-          double value = wrench::S4U_Simulation::getTotalEnergyConsumed({"dummy_unavailable_host"});
+          double value = this->simulation->getTotalEnergyConsumed({"dummy_unavailable_host"});
           success = false;
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
@@ -195,7 +195,7 @@ private:
 
         success = false;
         try {
-          double value = wrench::S4U_Simulation::getNumberofPstates("dummy_unavailable_host");
+          double value = this->simulation->getNumberofPstates("dummy_unavailable_host");
           success = false;
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
@@ -210,7 +210,7 @@ private:
 
         success = false;
         try {
-          double value = wrench::S4U_Simulation::getCurrentPstate("dummy_unavailable_host");
+          double value = this->simulation->getCurrentPstate("dummy_unavailable_host");
           success = false;
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
@@ -225,7 +225,7 @@ private:
 
         success = false;
         try {
-          double value = wrench::S4U_Simulation::getMinPowerAvailable("dummy_unavailable_host");
+          double value = this->simulation->getMinPowerAvailable("dummy_unavailable_host");
           success = false;
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to measure the energy for a dummy host that is not available");
@@ -240,7 +240,7 @@ private:
 
         success = false;
         try {
-          double value = wrench::S4U_Simulation::getMaxPowerPossible("dummy_unavailable_host");
+          double value = this->simulation->getMaxPowerPossible("dummy_unavailable_host");
           success = false;
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
@@ -255,7 +255,7 @@ private:
 
         success = false;
         try {
-          wrench::S4U_Simulation::setPstate("dummy_unavailable_host",1);
+          this->simulation->setPstate("dummy_unavailable_host",1);
           success = false;
         } catch (std::exception e) {
           WRENCH_INFO("Expected exception as we were trying to access energy plugin for a dummy host that is not available");
@@ -270,7 +270,7 @@ private:
 
         success = false;
         try {
-          wrench::S4U_Simulation::setPstate(simulation_hosts[1],2);
+          this->simulation->setPstate(simulation_hosts[1],2);
           success = true;
         } catch (std::exception e) {
           WRENCH_INFO("Unexpected exception as we were trying to access energy plugin for a correct host that is available");
@@ -538,17 +538,17 @@ private:
       {
         std::vector<std::string> simulation_hosts = test->simulation->getHostnameList();
 
-        int cur_pstate = wrench::S4U_Simulation::getCurrentPstate(simulation_hosts[1]);
-        double cur_max_possible = wrench::S4U_Simulation::getMaxPowerPossible(simulation_hosts[1]);
-        double cur_min_possible = wrench::S4U_Simulation::getMinPowerAvailable(simulation_hosts[1]);
+        int cur_pstate = this->simulation->getCurrentPstate(simulation_hosts[1]);
+        double cur_max_possible = this->simulation->getMaxPowerPossible(simulation_hosts[1]);
+        double cur_min_possible = this->simulation->getMinPowerAvailable(simulation_hosts[1]);
         //switch pstates right off the bat
-        std::vector<int> list_of_pstates = wrench::S4U_Simulation::getListOfPstates(simulation_hosts[1]);
+        std::vector<int> list_of_pstates = this->simulation->getListOfPstates(simulation_hosts[1]);
         int max_num_pstate = list_of_pstates.size();
         int pstate = std::max(0,max_num_pstate-1);
-        wrench::S4U_Simulation::setPstate(simulation_hosts[1],pstate);
+        this->simulation->setPstate(simulation_hosts[1],pstate);
 
         //check if the changed pstate is not equal to the current pstate
-        if (cur_pstate == wrench::S4U_Simulation::getCurrentPstate(simulation_hosts[1])) {
+        if (cur_pstate == this->simulation->getCurrentPstate(simulation_hosts[1])) {
           throw std::runtime_error(
                   "The pstate should have changed but it did not change"
           );
@@ -556,32 +556,32 @@ private:
 
         //check if the max power possible/min power available in this pstate is different than the maximum power possible/min power available in the previous state
         for (auto host:simulation_hosts) {
-          std::vector<int> states = wrench::S4U_Simulation::getListOfPstates(host);
+          std::vector<int> states = this->simulation->getListOfPstates(host);
           int prev_max_power = -1;
           int prev_min_power = -1;
           for (auto state:states) {
             //check if max power is different in all the states as is in xml
-            wrench::S4U_Simulation::setPstate(host,state);
-            if (prev_max_power == wrench::S4U_Simulation::getMaxPowerPossible(host)) {
+            this->simulation->setPstate(host,state);
+            if (prev_max_power == this->simulation->getMaxPowerPossible(host)) {
               throw std::runtime_error(
                       "The max power from the xml and the APIs do not match"
               );
             }
-            prev_max_power = wrench::S4U_Simulation::getMaxPowerPossible(host);
+            prev_max_power = this->simulation->getMaxPowerPossible(host);
 
             //check if the min power is diffrent in all the states as is in xml
-            wrench::S4U_Simulation::setPstate(host,state);
-            if (prev_min_power == wrench::S4U_Simulation::getMinPowerAvailable(host)) {
+            this->simulation->setPstate(host,state);
+            if (prev_min_power == this->simulation->getMinPowerAvailable(host)) {
               throw std::runtime_error(
                       "The min power from the xml and the APIs do not match"
               );
             }
-            prev_min_power = wrench::S4U_Simulation::getMinPowerAvailable(host);
+            prev_min_power = this->simulation->getMinPowerAvailable(host);
           }
         }
         //lets check if the energy consumed by host1 is less than the energy consumed by host1 + host2
-        double energy_consumed_1 = wrench::S4U_Simulation::getEnergyConsumedByHost(simulation_hosts[1]);
-        double energy_consumed_2 = wrench::S4U_Simulation::getTotalEnergyConsumed({simulation_hosts[1],simulation_hosts[2]});
+        double energy_consumed_1 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
+        double energy_consumed_2 = this->simulation->getTotalEnergyConsumed({simulation_hosts[1],simulation_hosts[2]});
 
         if (energy_consumed_1 > energy_consumed_2) {
           throw std::runtime_error(
@@ -711,7 +711,7 @@ private:
 
 
         //First energy consumption test
-        double before_current_energy_consumed_by_host1 = wrench::S4U_Simulation::getEnergyConsumedByHost(simulation_hosts[1]);
+        double before_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
         //run a new job
         //let's execute the job, this should take ~100 sec based on the 100MF speed
         std::string my_mailbox = "test_callback_mailbox";
@@ -747,7 +747,7 @@ private:
           throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
 
-        double after_current_energy_consumed_by_host1 = wrench::S4U_Simulation::getEnergyConsumedByHost(simulation_hosts[1]);
+        double after_current_energy_consumed_by_host1 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
         double energy_consumed_while_running_with_higher_speed = after_current_energy_consumed_by_host1 - before_current_energy_consumed_by_host1;
         double higher_speed_compuation_time = wrench::S4U_Simulation::getClock();
 
@@ -757,13 +757,13 @@ private:
         }
 
         //switch pstate
-        int max_pstate_possible = wrench::S4U_Simulation::getNumberofPstates(simulation_hosts[1]);
+        int max_pstate_possible = this->simulation->getNumberofPstates(simulation_hosts[1]);
         //let's directly switch to pstate 2
         int pstate = 2;
-        wrench::S4U_Simulation::setPstate(simulation_hosts[1],pstate);
+        this->simulation->setPstate(simulation_hosts[1],pstate);
 
         //Second energy consumption test
-        double before_current_energy_consumed_by_host2 = wrench::S4U_Simulation::getEnergyConsumedByHost(simulation_hosts[1]);
+        double before_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
         //run a new job
         //let's execute the job, this should take ~100 sec based on the 100MF speed
         my_mailbox = "test_callback_mailbox";
@@ -797,7 +797,7 @@ private:
           throw std::runtime_error("Unexpected '" + message->getName() + "' message");
         }
 
-        double after_current_energy_consumed_by_host2 = wrench::S4U_Simulation::getEnergyConsumedByHost(simulation_hosts[1]);
+        double after_current_energy_consumed_by_host2 = this->simulation->getEnergyConsumedByHost(simulation_hosts[1]);
         double energy_consumed_while_running_with_lower_speed = after_current_energy_consumed_by_host2 - before_current_energy_consumed_by_host2;
         double lower_speed_compuation_time = wrench::S4U_Simulation::getClock() - higher_speed_compuation_time;
 
@@ -812,8 +812,8 @@ private:
         //so, energy_consumed/time_taken might give us an approximate wattage power which should be in between these ranges
         //infact, we are using these hosts to the full power, so the power wattage should be near to max values
 
-        double exact_max_wattage_power_1 = wrench::S4U_Simulation::getMaxPowerPossible(simulation_hosts[1]);
-        double exact_max_wattage_power_2 = wrench::S4U_Simulation::getMaxPowerPossible(simulation_hosts[1]);
+        double exact_max_wattage_power_1 = this->simulation->getMaxPowerPossible(simulation_hosts[1]);
+        double exact_max_wattage_power_2 = this->simulation->getMaxPowerPossible(simulation_hosts[1]);
         double EPSILON = 1.0;
         double computed_wattage_power_1 = energy_consumed_while_running_with_higher_speed/higher_speed_compuation_time;
         double computed_wattage_power_2 = energy_consumed_while_running_with_lower_speed/lower_speed_compuation_time;

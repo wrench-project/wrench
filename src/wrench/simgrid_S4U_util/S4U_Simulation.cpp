@@ -252,6 +252,7 @@ namespace wrench {
 
     /**
      * @brief Get the energy consumed by the host up to now
+     * @param hostname the host name
      * @return the energy consumed by the host in Joules
      * @throw std::runtime_error
      */
@@ -270,6 +271,7 @@ namespace wrench {
 
     /**
      * @brief Get the total energy consumed by a set of hosts
+     * @param the list of hostnames
      * @return The total energy consumed by all the hosts in Joules
      * @throw std::runtime_error
      */

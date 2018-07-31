@@ -546,4 +546,76 @@ namespace wrench {
       return this->output;
     }
 
+    /**
+     * @brief Get the energy consumed by the host up to now
+     * @param hostname the host name
+     * @return the energy consumed by the host in Joules
+     */
+    double Simulation::getEnergyConsumedByHost(std::string hostname) {
+      return S4U_Simulation::getEnergyConsumedByHost(hostname);
+    }
+
+    /**
+     * @brief Get the total energy consumed by a set of hosts
+     * @param the list of hostnames
+     * @return The total energy consumed by all the hosts in Joules
+     */
+    double Simulation::getTotalEnergyConsumed(std::vector<std::string> hostnames) {
+      return S4U_Simulation::getTotalEnergyConsumed(hostnames);
+    }
+
+    /**
+     * @brief Set the power state of the host
+     * @param hostname: the host name
+     * @param pstate: the power state index (the power state index is specified in the platform xml description file)
+     */
+    void Simulation::setPstate(std::string hostname, int pstate) {
+      S4U_Simulation::setPstate(hostname, pstate);
+    }
+
+    /**
+     * @brief Get the total number of power states of a host
+     * @param hostname: the host name
+     * @return The number of power states available for the host (as specified in the platform xml description file)
+     */
+    int Simulation::getNumberofPstates(std::string hostname) {
+      return S4U_Simulation::getNumberofPstates(hostname);
+    }
+
+    /**
+     * @brief Get the current power state of a host
+     * @param hostname: the host name
+     * @return The index of the current pstate of the host (as specified in the platform xml description file)
+     */
+    int Simulation::getCurrentPstate(std::string hostname) {
+      return S4U_Simulation::getCurrentPstate(hostname);
+    }
+
+    /**
+     * @brief Get the minimum power available for a host
+     * @param hostname: the host name
+     * @return The minimum power available for the host (as specified in the platform xml description file)
+     */
+    double Simulation::getMinPowerAvailable(std::string hostname) {
+      return S4U_Simulation::getMaxPowerPossible(hostname);
+    }
+
+    /**
+     * @brief Get the maximum power available for a host
+     * @param hostname: the host name
+     * @return The maximum power available for the host (as specified in the platform xml description file)
+     */
+    double Simulation::getMaxPowerPossible(std::string hostname) {
+      return S4U_Simulation::getMaxPowerPossible(hostname);
+    }
+
+    /**
+     * @brief Get the list of power states available for a host
+     * @param hostname: the host name
+     * @return a list of power states available for the host (as specified in the platform xml description file)
+     */
+    std::vector<int> Simulation::getListOfPstates(std::string hostname) {
+      return S4U_Simulation::getListOfPstates(hostname);
+    }
+
 };
