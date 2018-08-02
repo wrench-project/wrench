@@ -1255,6 +1255,8 @@ namespace wrench {
 
       WRENCH_INFO("Asked to run a batch job with id %ld", job->getJobID());
 
+      auto unique_ref_to_batch_job  = std::unique_ptr<BatchJob>(job); // for freeing upon return
+
       // Check whether the job type is supported
       if ((job->getWorkflowJob()->getType() == WorkflowJob::STANDARD) and (not getPropertyValueAsBoolean(BatchServiceProperty::SUPPORTS_STANDARD_JOBS))) {
         try {
@@ -1379,7 +1381,7 @@ namespace wrench {
       // Add the RJMS delay to the job's requested time
       job->setAllocatedTime(job->getAllocatedTime() +
                             this->getPropertyValueAsDouble(BatchServiceProperty::BATCH_RJMS_DELAY));
-      this->all_jobs.insert(std::unique_ptr<BatchJob>(job));
+      this->all_jobs.insert(std::move(unique_ref_to_batch_job));
       this->pending_jobs.push_back(job);
     }
 
