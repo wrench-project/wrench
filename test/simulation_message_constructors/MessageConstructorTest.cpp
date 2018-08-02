@@ -34,6 +34,7 @@ protected:
       standard_job = (wrench::StandardJob *)(1234);
       batch_job = (wrench::BatchJob *)(1234);
       pilot_job = (wrench::PilotJob *)(1234);
+      file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file, storage_service, "dir", storage_service, "dir");
       failure_cause = std::make_shared<wrench::FileNotFound>(file, storage_service);
     }
 
@@ -50,6 +51,7 @@ protected:
     wrench::StandardJob *standard_job;
     wrench::BatchJob *batch_job;
     wrench::PilotJob *pilot_job;
+    wrench::SimulationTimestampFileCopyStart *file_copy_start_time_stamp;
     std::shared_ptr<wrench::FileNotFound> failure_cause;
 };
 
