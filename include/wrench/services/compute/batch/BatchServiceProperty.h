@@ -57,8 +57,10 @@ namespace wrench {
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 
         /**
-         * @brief Path to a workload trace file to be replayed. The trace file needed to
-         * be in the SWF format (see http://www.cs.huji.ac.il/labs/parallel/workload/swf.html).
+         * @brief Path to a workload trace file to be replayed. The trace file can be
+         * be in the SWF format (see http://www.cs.huji.ac.il/labs/parallel/workload/swf.html), in which
+         * case it must have extension ".swf", or in the JSON format as used in the BATSIM project
+         * (see https://github.com/oar-team/batsim), in which case is must have the ".json" extension).
          * Note that jobs in the trace whose node/host/processor/core requirements exceed the capacity
          * of the batch service will simply be capped at that capacity.
          */
