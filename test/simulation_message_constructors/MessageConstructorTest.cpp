@@ -54,7 +54,6 @@ protected:
     wrench::PilotJob *pilot_job;
     wrench::SimulationTimestampFileCopyStart *file_copy_start_time_stamp;
     std::shared_ptr<wrench::FileNotFound> failure_cause;
-    wrench::SimulationTimestampFileCopyStart *file_copy_start_time_stamp;
 };
 
 
