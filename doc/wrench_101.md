@@ -60,7 +60,9 @@ Here are the steps that a WRENCH-based simulator typically follows:
 -# **Create and initialize a simulation** -- In WRENCH, a user simulation is defined via the `wrench::Simulation` class. 
  An instance of this class must be created, and the `wrench::Simulation::init()` method is called to initialize the 
  simulation (and parse WRENCH-specific and [SimGrid-specific](http://simgrid.gforge.inria.fr/simgrid/3.19/doc/options.html) 
- command-line arguments).
+ command-line arguments).  Two useful such arguments are `--help-wrench`, which displays help messages about 
+ optional WRENCH-specific command-line arguments, and `--help-simgrid`, which displays help messages about optional
+ Simgrid-specific command-line arguments. 
 
 -# **Instantiate a simulated platform** --  This is done with the `wrench::Simulation::instantiatePlatform()`
  method which takes as argument a 
@@ -206,7 +208,8 @@ Disabling all logging is done with the SimGrid option `--log=root.threshold:crit
 
 
 Particular "log categories" can be toggled on and off. Log category names are attached to 
-`*.cpp` files in the WRENCH and SimGrid code. Using the `--help-log-categories` option shows the
+`*.cpp` files in the WRENCH and SimGrid code. Using the `--help-log-categories` command-line
+ argument shows the
 entire log category hierarchy. For instance, there is a log category that is called `wms` for the
 WMS, i.e., those logging messages in the `wrench:WMS` class and a log category that is called
 `simple_wms` for logging message in the `wrench::SimpleWMS` class, which inherits from `wrench::WMS`. 

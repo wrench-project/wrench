@@ -90,6 +90,7 @@ namespace wrench {
       int skip = 0;
       bool simgrid_help_requested = false;
       bool wrench_help_requested = false;
+      bool simulator_help_requested = false;
       bool version_requested = false;
       for (i = 1; i < *argc; i++) {
 
@@ -99,8 +100,11 @@ namespace wrench {
         } else if (not strcmp(argv[i], "--activate-energy")) {
           sg_host_energy_plugin_init();
           skip++;
-        } else if (not strcmp(argv[i], "--help")) {
+        } else if (not strcmp(argv[i], "--help-wrench")) {
           wrench_help_requested = true;
+          skip++;
+        } else if (not strcmp(argv[i], "--help")) {
+          simulator_help_requested = true;
           skip++;
         } else if (not strcmp(argv[i], "--help-simgrid")) {
           simgrid_help_requested = true;
@@ -142,6 +146,12 @@ namespace wrench {
 
       if (wrench_help_requested) {
         exit(0);
+      }
+
+      // If simulator help requested, put back in the "--help" argument that was passed down
+      if (simulator_help_requested) {
+        argv[*argc] = strdup("--help");
+        (*argc)++;
       }
 
     }

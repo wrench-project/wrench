@@ -29,9 +29,10 @@ int main(int argc, char **argv) {
   wrench::Simulation simulation;
 
   /*
-   * Initialization of the simulation, which may entail extracting WRENCH-specific
-   * command-line arguments that can modify general simulation behavior (this includes
-   * the many optional SimGrid command-line arguments as described in the SimGrid simulation)
+   * Initialization of the simulation, which may entail extracting WRENCH-specific and
+   * Simgrid-specific command-line arguments that can modify general simulation behavior.
+   * Two special command-line arguments are --help-wrench and --help-simgrid, which print
+   * details about available command-line arguments.
    */
   simulation.init(&argc, argv);
 
