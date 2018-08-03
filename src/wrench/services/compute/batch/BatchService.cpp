@@ -238,8 +238,8 @@ namespace wrench {
         std::ofstream file;
         file.open(output_csv_file, std::ios_base::out);
         if (not file) {
-            throw std::invalid_argument("BatchService(): Unable to create CSV output file " +
-               output_csv_file + " (as specified by the BatchServiceProperty::OUTPUT_CSV_JOB_LOG property)");
+          throw std::invalid_argument("BatchService(): Unable to create CSV output file " +
+                                      output_csv_file + " (as specified by the BatchServiceProperty::OUTPUT_CSV_JOB_LOG property)");
         }
       }
 #else
@@ -1413,7 +1413,7 @@ namespace wrench {
         this->pilot_job_alarms[job->getName()]->kill();
       }
 
-      //first forward this notification to the batsched
+        //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
       WRENCH_INFO("FORWARDING TO BATSCHED");
       this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
@@ -1942,7 +1942,7 @@ namespace wrench {
         }
       }
 
-      #if 0
+#if 0
       std::cerr << "TIMELINES AFTER ACCOUNTING FOR RUNNING JOBS: \n";
       for (auto h : core_available_times) {
         std::cerr << "  " << h.first << ":\n";
@@ -1951,7 +1951,7 @@ namespace wrench {
         }
       }
       std::cerr << "----------------------------------------\n";
-      #endif
+#endif
 
       // Go through the pending jobs and update core availabilities
       for (auto job : this->pending_jobs) {
@@ -1959,10 +1959,10 @@ namespace wrench {
         unsigned long num_hosts = job->getNumNodes();
         unsigned long num_cores_per_host = job->getAllocatedCoresPerNode();
 
-        #if 0
+#if 0
         std::cerr << "ACCOUNTING FOR RUNNING JOB WITH " << "duration:" <<
                   duration << " num_hosts=" << num_hosts << " num_cores_per_host=" << num_cores_per_host << "\n";
-        #endif
+#endif
 
         // Compute the  earliest start times on all hosts
         std::vector<std::pair<std::string, double>> earliest_start_times;
@@ -2002,7 +2002,7 @@ namespace wrench {
           std::sort(core_available_times[hostname].begin(), core_available_times[hostname].end());
         }
 
-        #if 0
+#if 0
         std::cerr << "AFTER ACCOUNTING FOR THIS JOB: \n";
         for (auto h : core_available_times) {
           std::cerr << "  " << h.first << ":\n";
@@ -2011,7 +2011,7 @@ namespace wrench {
           }
         }
         std::cerr << "----------------------------------------\n";
-        #endif
+#endif
 
       }
 
@@ -2034,10 +2034,10 @@ namespace wrench {
 
         } else {
 
-          #if 0
+#if 0
           std::cerr << "COMPUTING PREDICTIONS for JOB: num_hosts=" << num_hosts <<
                     ", num_cores_per_hosts=" << num_cores_per_host << ", duration=" << duration << "\n";
-          #endif
+#endif
 
           // Compute the earliest start times on all hosts
           std::vector<std::pair<std::string, double>> earliest_start_times;
@@ -2518,7 +2518,7 @@ namespace wrench {
         }
       }
       if (workflow_job == nullptr) {
-//        throw std::runtime_error("BatchService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of jobs batchservice has");
+        //throw std::runtime_error("BatchService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of jobs batchservice has");
         WRENCH_WARN("BatchService::processExecuteJobFromBatSched(): Job received from batsched that does not belong to the list of known jobs... ignoring (Batsched seems to send this back even when a job has been actively terminated)");
         return;
       }
@@ -2596,8 +2596,8 @@ namespace wrench {
       std::ofstream file;
       file.open(csv_file_path, std::ios_base::app);
       if (not file) {
-            throw std::runtime_error("BatchService(): Unable to append to CSV output file " +
-              csv_file_path + " (as specified by the BatchServiceProperty::OUTPUT_CSV_JOB_LOG property)");
+        throw std::runtime_error("BatchService(): Unable to append to CSV output file " +
+                                 csv_file_path + " (as specified by the BatchServiceProperty::OUTPUT_CSV_JOB_LOG property)");
       }
       std::string csv_line = "";
 
@@ -2624,7 +2624,7 @@ namespace wrench {
       csv_line += std::to_string(starting_time) + ",";
       // Stretch
       double stretch = (batch_job->getEndingTimeStamp() - batch_job->getArrivalTimeStamp()) /
-              (batch_job->getEndingTimeStamp() - batch_job->getBeginTimeStamp());
+                       (batch_job->getEndingTimeStamp() - batch_job->getBeginTimeStamp());
       csv_line += std::to_string(stretch) + ",";
       // Submission time
       double submission_time = batch_job->getArrivalTimeStamp();

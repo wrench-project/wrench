@@ -114,7 +114,7 @@ namespace wrench {
       //Remove this message from the message manager list
       MessageManager::removeReceivedMessages(mailbox_name,msg);
 
-      WRENCH_INFO("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
+      WRENCH_DEBUG("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
 
       return std::unique_ptr<SimulationMessage>(msg);
     }

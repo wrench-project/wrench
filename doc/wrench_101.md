@@ -185,22 +185,22 @@ to disable it.  WRENCH's logging system is a thin layer on top of SimGrid's logg
 is controlled via command-line arguments. The simple example in `examples/simple-example` is executed 
 as follows, assuming the working directory is `examples/simple-example`:
 
-```
+~~~~~~~~~~~~~{.cpp}
 ./wrench-simple-example-cloud  platform_files/cloud_hosts.xml workflow_files/genome.dax
-```
+~~~~~~~~~~~~~
 
 One first way in which to modify logging is to disable colors, which can be useful to redirect output
 to a file, is to use the `--wrench-no-color` command-line option, anywhere in the argument list, for instance:
 
-```
+~~~~~~~~~~~~~{.cpp}
 ./wrench-simple-example-cloud  --wrench-no-color platform_files/cloud_hosts.xml workflow_files/genome.dax
-```
+~~~~~~~~~~~~~
 
 Disabling all logging is done with the SimGrid option `--log=root.threshold:critical`:
 
-```
+~~~~~~~~~~~~~{.cpp}
 ./wrench-simple-example-cloud  --log=root.threshold:critical platform_files/cloud_hosts.xml workflow_files/genome.dax
-```
+~~~~~~~~~~~~~
 
 
 
@@ -213,9 +213,9 @@ WMS, i.e., those logging messages in the `wrench:WMS` class and a log category t
 These messages are thus logging output produced by the WMS in the simple example. They can be enabled
 while other messages are disabled as follows: 
 
-```
+~~~~~~~~~~~~~{.cpp}
 ./wrench-simple-example-cloud   platform_files/cloud_hosts.xml workflow_files/genome.dax --log=root.threshold:critical --log=simple_wms.threshold=debug --log=wms.threshold=debug
-```
+~~~~~~~~~~~~~
 
 Use the `--help-logs` option displays information on the way SimGrid logging works. See the 
 [full SimGrid logging documentation](http://simgrid.gforge.inria.fr/simgrid/latest/doc/outcomes_logs.html) for 
