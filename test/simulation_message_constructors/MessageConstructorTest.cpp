@@ -36,6 +36,7 @@ protected:
       pilot_job = (wrench::PilotJob *)(1234);
       file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file, storage_service, "dir", storage_service, "dir");
       failure_cause = std::make_shared<wrench::FileNotFound>(file, storage_service);
+      file_copy_start_time_stamp = new wrench::SimulationTimestampFileCopyStart(file, storage_service, "dir", storage_service, "dir");
     }
 
     // data members
@@ -53,6 +54,7 @@ protected:
     wrench::PilotJob *pilot_job;
     wrench::SimulationTimestampFileCopyStart *file_copy_start_time_stamp;
     std::shared_ptr<wrench::FileNotFound> failure_cause;
+    wrench::SimulationTimestampFileCopyStart *file_copy_start_time_stamp;
 };
 
 
@@ -244,7 +246,7 @@ TEST_F(MessageConstructorTest, StorageServiceMessages) {
   ASSERT_THROW(new wrench::StorageServiceFileDeleteAnswerMessage(file, storage_service, true, failure_cause, 666),
                std::invalid_argument);
 
-   ASSERT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, storage_service, root_dir, storage_service, root_dir, nullptr, file_copy_start_time_stamp, 666));
+  ASSERT_NO_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, storage_service, root_dir, storage_service, root_dir, nullptr, file_copy_start_time_stamp, 666));
   ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("", file, storage_service, root_dir, storage_service, root_dir, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
   ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", nullptr, storage_service, root_dir, storage_service, root_dir, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
   ASSERT_THROW(new wrench::StorageServiceFileCopyRequestMessage("mailbox", file, nullptr, root_dir, storage_service, root_dir, nullptr, file_copy_start_time_stamp, 666), std::invalid_argument);
