@@ -84,28 +84,66 @@ namespace wrench {
         throw std::invalid_argument("Simulation::init(): Invalid argument argv (nullptr)");
       }
 
+
+      // Extract WRENCH-specific argument
       int i;
       int skip = 0;
+      bool simgrid_help_requested = false;
+      bool wrench_help_requested = false;
+      bool version_requested = false;
       for (i = 1; i < *argc; i++) {
-        if (not strncmp(argv[i], "--wrench-no-color", strlen("--wrench-no-color"))) {
+
+        if (not strcmp(argv[i], "--wrench-no-color")) {
           TerminalOutput::disableColor();
           skip++;
+        } else if (not strcmp(argv[i], "--activate-energy")) {
+          sg_host_energy_plugin_init();
+          skip++;
+        } else if (not strcmp(argv[i], "--help")) {
+          wrench_help_requested = true;
+          skip++;
+        } else if (not strcmp(argv[i], "--help-simgrid")) {
+          simgrid_help_requested = true;
+          skip++;
+        } else if (not strcmp(argv[i], "--version")) {
+          version_requested = true;
         }
+
         argv[i] = argv[i + skip];
       }
       *argc = i - skip;
 
-      // Activate energy plugin
-      if (*argc >= 2) {
-        if (strcmp(argv[1], "--activate-energy") == 0) {
-          sg_host_energy_plugin_init();
-        }
+      // Always activate VM migration plugin
+      sg_vm_live_migration_plugin_init();
+
+      if (wrench_help_requested) {
+        std::cerr << "General WRENCH command-line arguments:\n";
+        std::cerr << "   --wrench-no-color: disables colored terminal output\n";
+        std::cerr << "   --activate-energy: activates SimGrid's energy plugin\n";
+        std::cerr << "     (requires host pstate definitions in XML platform description file)\n";
+        std::cerr << "   --log=root.threshold:critical: disables logging\n";
+        std::cerr << "     (use --help-logs for detailed help on SimGrid's logging options/syntax)\n";
+        std::cerr << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
+        std::cerr << "\n";
+      }
+
+      if (version_requested) {
+        std::cerr << "WRENCH version " << getWRENCHVersionString() << "\n";
+      }
+
+      // If SimGrid help is requested, put back in a "--help" argument
+      if (simgrid_help_requested) {
+        argv[*argc] = strdup("--help");
+        (*argc)++;
+        std::cerr << "\nSimgrid command-line arguments:\n\n";
       }
 
       this->s4u_simulation->initialize(argc, argv);
 
-      // activate VM migration plugin
-      sg_vm_live_migration_plugin_init();
+      if (wrench_help_requested) {
+        exit(0);
+      }
+
     }
 
     /**

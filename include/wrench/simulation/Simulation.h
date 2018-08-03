@@ -24,6 +24,8 @@
 
 namespace wrench {
 
+    #define WRENCH_VERSION_STRING "1.0-devel"
+
     class StorageService;
 
     /**
@@ -113,6 +115,8 @@ namespace wrench {
         void checkSimulationSetup();
 
         void startAllProcesses();
+
+        std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 
     };
 
