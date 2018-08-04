@@ -93,7 +93,6 @@ namespace wrench {
       bool simulator_help_requested = false;
       bool version_requested = false;
       for (i = 1; i < *argc; i++) {
-
         if (not strcmp(argv[i], "--wrench-no-color")) {
           TerminalOutput::disableColor();
           skip++;
@@ -112,8 +111,10 @@ namespace wrench {
         } else if (not strcmp(argv[i], "--version")) {
           version_requested = true;
         }
-
-        argv[i] = argv[i + skip];
+        // shift argument if necessary
+        if (i + skip < *argc) {
+          argv[i] = argv[i + skip];
+        }
       }
       *argc = i - skip;
 
