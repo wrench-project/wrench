@@ -24,7 +24,7 @@
 
 namespace wrench {
 
-    #define WRENCH_VERSION_STRING "1.0-devel"
+    #define WRENCH_VERSION_STRING "1.1-devel"
 
     class StorageService;
 
