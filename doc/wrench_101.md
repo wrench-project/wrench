@@ -198,17 +198,19 @@ to a file, is to use the `--wrench-no-color` command-line option, anywhere in th
 ./wrench-simple-example-cloud  --wrench-no-color platform_files/cloud_hosts.xml workflow_files/genome.dax
 ~~~~~~~~~~~~~
 
-Disabling all logging is done with the SimGrid option `--log=root.threshold:critical`:
+Disabling all logging is done with the SimGrid option `--wrench-no-log`:
 
 ~~~~~~~~~~~~~{.cpp}
-./wrench-simple-example-cloud  --log=root.threshold:critical platform_files/cloud_hosts.xml workflow_files/genome.dax
+./wrench-simple-example-cloud  --wrench-no-log platform_files/cloud_hosts.xml workflow_files/genome.dax
 ~~~~~~~~~~~~~
 
 
-
-
-Particular "log categories" can be toggled on and off. Log category names are attached to 
-`*.cpp` files in the WRENCH and SimGrid code. Using the `--help-log-categories` command-line
+The above `--wrench-no-log` option is a simple wrapper around the sophisticated Simgrid logging
+capabilities (it is equivalent to the Simgrid argument `--log=root.threshold:critical`). 
+Details on these capabilities are displayed when passing the
+ `--help-logs` command-line argument to your simulator. In a nutshell particular "log categories" 
+ can be toggled on and off. Log category names are attached to `*.cpp` files in the 
+ WRENCH and SimGrid code. Using the `--help-log-categories` command-line
  argument shows the
 entire log category hierarchy. For instance, there is a log category that is called `wms` for the
 WMS, i.e., those logging messages in the `wrench:WMS` class and a log category that is called

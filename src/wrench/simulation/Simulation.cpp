@@ -96,6 +96,8 @@ namespace wrench {
         if (not strcmp(argv[i], "--wrench-no-color")) {
           TerminalOutput::disableColor();
           skip++;
+        } else if (not strcmp(argv[i], "--wrench-no-log")) {
+          argv[i] = strdup("--log=root.threshold:critical");
         } else if (not strcmp(argv[i], "--activate-energy")) {
           sg_host_energy_plugin_init();
           skip++;
@@ -124,9 +126,9 @@ namespace wrench {
       if (wrench_help_requested) {
         std::cerr << "General WRENCH command-line arguments:\n";
         std::cerr << "   --wrench-no-color: disables colored terminal output\n";
+        std::cerr << "   --wrench-no-log: disables logging\n";
         std::cerr << "   --activate-energy: activates SimGrid's energy plugin\n";
         std::cerr << "     (requires host pstate definitions in XML platform description file)\n";
-        std::cerr << "   --log=root.threshold:critical: disables logging\n";
         std::cerr << "     (use --help-logs for detailed help on SimGrid's logging options/syntax)\n";
         std::cerr << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
         std::cerr << "\n";
