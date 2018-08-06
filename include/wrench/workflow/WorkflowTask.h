@@ -99,9 +99,22 @@ namespace wrench {
 
         double getEndDate();
 
+        double getFailureDate();
+
+        double getReadInputStartDate();
+
+        double getReadInputEndDate();
+
         double getComputationStartDate();
 
         double getComputationEndDate();
+
+        double getWriteOutputStartDate();
+
+        double getWriteOutputEndDate();
+
+        struct WorkflowTaskExecution;
+        std::stack<WorkflowTaskExecution> getExecutionHistory();
 
         std::string getExecutionHost();
 
@@ -145,13 +158,40 @@ namespace wrench {
 
         void setEndDate(double date);
 
+        void setReadInputStartDate(double date);
+
+        void setReadInputEndDate(double date);
+
         void setComputationStartDate(double date);
 
         void setComputationEndDate(double date);
 
+        void setWriteOutputStartDate(double date);
+
+        void setWriteOutputEndDate(double date);
+
+        void setFailureDate(double date);
+
         void incrementFailureCount();
 
         void setExecutionHost(std::string hostname);
+
+        struct WorkflowTaskExecution {
+            double task_start =         -1.0;
+            double read_input_start =   -1.0;
+            double read_input_end =     -1.0;
+            double computation_start =  -1.0;
+            double computation_end =    -1.0;
+            double write_output_start = -1.0;
+            double write_output_end =   -1.0;
+            double task_end =           -1.0;
+            double task_failed =        -1.0;
+
+            WorkflowTaskExecution(double task_start) : task_start(task_start) {
+
+            }
+        };
+
 
         /***********************/
         /** \endcond           */
@@ -172,13 +212,7 @@ namespace wrench {
         long priority = 0;
 
         unsigned long toplevel;           // 0 if entry task
-
-        double start_date = -1.0;          // Date at which task began execution (getter?)
-        double end_date = -1.0;            // Date at which task finished execution (getter?)
-
-        double task_computation_start_date = -1.0;
-        double task_computation_end_date = -1.0;
-
+        
         unsigned int failure_count = 0;    // Number of times the tasks has failed
         std::string execution_host;        // Host on which the task executed ("" if not executed successfully - yet)
 
@@ -207,6 +241,8 @@ namespace wrench {
         void addFileToMap(std::map<std::string, WorkflowFile *> &map_to_insert,
                           std::map<std::string, WorkflowFile *> &map_to_check,
                           WorkflowFile *f);
+
+        std::stack<WorkflowTaskExecution> execution_history;
     };
 };
 

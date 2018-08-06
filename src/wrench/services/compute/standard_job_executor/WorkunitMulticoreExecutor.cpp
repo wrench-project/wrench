@@ -224,15 +224,22 @@ namespace wrench {
 
         task->setInternalState(WorkflowTask::InternalState::TASK_RUNNING);
         task->setStartDate(S4U_Simulation::getClock());
+        this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(new
+        SimulationTimestampTaskStart(task));
 
         // Read  all input files
         WRENCH_INFO("Reading the %ld input files for task %s", task->getInputFiles().size(), task->getID().c_str());
         try {
+            task->setReadInputStartDate(S4U_Simulation::getClock());
             StorageService::readFiles(task->getInputFiles(),
                                       work->file_locations,
                                       this->scratch_space, files_stored_in_scratch, job);
+            task->setReadInputEndDate(S4U_Simulation::getClock());
         } catch (WorkflowExecutionException &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+          task->setFailureDate(S4U_Simulation::getClock());
+          this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
+                  new SimulationTimestampTaskFailure(task));
           throw;
         }
 
@@ -245,6 +252,9 @@ namespace wrench {
           task->setComputationEndDate(S4U_Simulation::getClock());
         } catch (WorkflowExecutionEvent &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+          task->setFailureDate(S4U_Simulation::getClock());
+          this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
+                  new SimulationTimestampTaskFailure(task));
           throw;
         }
 
@@ -252,16 +262,22 @@ namespace wrench {
 
         // Write all output files
         try {
+            task->setWriteOutputStartDate(S4U_Simulation::getClock());
             StorageService::writeFiles(task->getOutputFiles(), work->file_locations, this->scratch_space,
                                        files_stored_in_scratch, job);
+            task->setWriteOutputEndDate(S4U_Simulation::getClock());
         } catch (WorkflowExecutionException &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+          task->setFailureDate(S4U_Simulation::getClock());
+          this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
+                  new SimulationTimestampTaskFailure(task));
           throw;
         }
 
         WRENCH_INFO("Setting the internal state of %s to TASK_COMPLETED", task->getID().c_str());
         task->setInternalState(WorkflowTask::InternalState::TASK_COMPLETED);
-
+        this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
+                new SimulationTimestampTaskCompletion(task));
         task->setEndDate(S4U_Simulation::getClock());
         task->setExecutionHost(this->hostname);
 
@@ -296,7 +312,7 @@ namespace wrench {
           dst = this->scratch_space;
           files_stored_in_scratch.insert(file);
           WRENCH_WARN(
-                  "WARNING: WorkunitMulticoreExecutor::performWork(): Post copying files to the sratch space: Can cause implicit deletion afterwards"
+                  "WARNING: WorkunitMulticoreExecutor::performWork(): Post copying files to the scratch space: Can cause implicit deletion afterwards"
           );
         }
 

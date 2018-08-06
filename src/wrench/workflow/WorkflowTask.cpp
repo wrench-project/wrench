@@ -241,29 +241,6 @@ namespace wrench {
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
         this->internal_state = state;
-
-        if (this->workflow->simulation != nullptr) {
-            switch (state) {
-                case TASK_READY:
-                    break;
-                case TASK_NOT_READY:
-                    break;
-                case TASK_RUNNING:
-                    this->workflow->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(
-                            new SimulationTimestampTaskStart(this));
-                    break;
-
-                case TASK_FAILED:
-                    this->workflow->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(
-                            new SimulationTimestampTaskFailure(this));
-                    break;
-
-                case TASK_COMPLETED:
-                    this->workflow->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
-                            new SimulationTimestampTaskCompletion(this));
-                    break;
-            }
-        }
     }
 
     /**
@@ -379,38 +356,133 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the task's start date
+     * @brief Set the task's start date.
      *
-     * @param date: the end date
+     * @param date: the start date
      */
     void WorkflowTask::setStartDate(double date) {
-      this->start_date = date;
+      this->execution_history.push(WorkflowTask::WorkflowTaskExecution(date));
     }
 
     /**
      * @brief Set the task's end date
      *
      * @param date: the end date
+     * @throws std::runtime_error
      */
     void WorkflowTask::setEndDate(double date) {
-      this->end_date = date;
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().task_end = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::setEndDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
      * @brief Set the date when the computation portion of a WorkflowTask has begun
      *
      * @param date: the date when the computation portion of the WorkflowTask has begun
+     * @throws std::runtime_error
      */
     void WorkflowTask::setComputationStartDate(double date) {
-        this->task_computation_start_date = date;
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().computation_start = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::setComputationStartDate() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
 
     /**
      * @brief Set the date when the computation portion of a WorkflowTask has ended
+     *
      * @param date: the date when the computation portion of the WorkflowTask has ended
+     * @throws std::runtime_error
      */
     void WorkflowTask::setComputationEndDate(double date) {
-        this->task_computation_end_date = date;
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().computation_end = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::setComputationEndDate() cannot be called before WorkflowTask::setStartDate()");
+        }
+    }
+
+    /**
+     * @brief Set the date when the read input portion of a WorkflowTask has begun
+     *
+     * @param date: the date when the read input portion of a WorkflowTask has begun
+     * @throws std::runtime_error
+     */
+    void WorkflowTask::setReadInputStartDate(double date) {
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().read_input_start = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::setReadInputStartDate() cannot be called before WorkflowTask::setStartDate()");
+        }
+    }
+
+    /**
+     * @brief Set the date when the read input portion of a WorkflowTask has completed
+     *
+     * @param date: the date when the read input portion of a WorkflowTask has completed
+     * @throws std::runtime_error
+     */
+    void WorkflowTask::setReadInputEndDate(double date) {
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().read_input_end = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::setReadInputEndDate() cannot be called before WorkflowTask::setStartDate()");
+        }
+    }
+
+    /**
+     * @brief Set the date when the write output portion of a WorkflowTask has begun
+     *
+     * @param date: the date when the write output portion of a task has begun
+     * @throws std::runtime_error
+     */
+    void WorkflowTask::setWriteOutputStartDate(double date) {
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().write_output_start = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::setWriteOutputStartDate() cannot be called before WorkflowTask::setStartDate()");
+        }
+    }
+
+    /**
+     * @brief Set the date when the write output portion of a WorkflowTask has completed
+     *
+     * @param date: the date when the write output portion of a task has completed
+     * @throws std::runtime_error
+     */
+    void WorkflowTask::setWriteOutputEndDate(double date) {
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().write_output_end = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::setWriteOutputEndDate() cannot be called before WorkflowTask::setStartDate()");
+        }
+    }
+
+    /**
+     * @brief Set the date when the task has failed
+     *
+     * @param date: the date when the task has failed
+     */
+    void WorkflowTask::setFailureDate(double date) {
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().task_failed = date;
+        } else {
+            throw std::runtime_error("WorkflowTask::setFailureDate() cannot be called before WorkflowTask::setStartDate()");
+        }
+
+    }
+
+    /**
+     * @brief Get the execution history of this task
+     *
+     * @return a stack of WorkflowTaskExecution objects, one for each attempted execution of the task
+     */
+    std::stack<WorkflowTask::WorkflowTaskExecution> WorkflowTask::getExecutionHistory() {
+        return this->execution_history;
     }
 
     /**
@@ -483,31 +555,71 @@ namespace wrench {
      * @return a start date (-1 if task has not started yet)
      */
     double WorkflowTask::getStartDate() {
-      return this->start_date;
+      return (not this->execution_history.empty()) ? this->execution_history.top().task_start : -1.0;
     }
 
     /**
      * @brief Get the task's end date
-     * @return a start date (-1 if task has not completed yet)
+     * @return a end date (-1 if task has not completed yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getEndDate() {
-      return this->end_date;
+        return (not this->execution_history.empty()) ? this->execution_history.top().task_end: -1.0;
     }
 
     /**
      * @brief Get the tasks's computation start date
-     * @return the date when the computation portion of a task started
+     * @return the date when the computation portion of a task started (-1 if computation has not started yet or if no execution history exists for this task yet)
      */
      double WorkflowTask::getComputationStartDate() {
-         return this->task_computation_start_date;
+         return (not this->execution_history.empty()) ? this->execution_history.top().computation_start : -1.0;
      }
 
      /**
       * @brief Get the task's computation end date
-      * @return the date when the computation portion of a task ended
+      * @return the date when the computation portion of a task ended (-1 if computation has not ended yet or if no execution history exists for this task yet)
       */
       double WorkflowTask::getComputationEndDate() {
-          return this->task_computation_end_date;
+        return (not this->execution_history.empty()) ? this->execution_history.top().computation_end : -1.0;
+      }
+
+      /**
+       * @brief Get the tasks read input start date
+       * @return the date when the read input portion of the task has begun (-1 if it has not yet begun or if no execution history exists for this task yet)
+       */
+      double WorkflowTask::getReadInputStartDate() {
+          return (not this->execution_history.empty()) ? this->execution_history.top().read_input_start : -1.0;
+      }
+
+      /**
+       * @brief Get the tasks read input end date
+       * @return the date when the read input portion of the task has completed (-1 if it has not begun or if no execution history exists for this task yet)
+       */
+      double WorkflowTask::getReadInputEndDate() {
+          return (not this->execution_history.empty()) ? this->execution_history.top().read_input_end : -1.0;
+      }
+
+      /**
+       * @brief Get the tasks write output start date
+       * @return the date when the write output portion of a task has begun (-1 if it has not yet started or if no execution history exists for this task yet)
+       */
+      double WorkflowTask::getWriteOutputStartDate() {
+          return (not this->execution_history.empty()) ? this->execution_history.top().write_output_start : -1.0;
+      }
+
+      /**
+       * @brief Get the task's write output end date
+       * @return the date when the write output portion of a task has completed (-1 if it has not completed yet or if no execution history exists for this task yet)
+       */
+      double WorkflowTask::getWriteOutputEndDate() {
+          return (not this->execution_history.empty()) ? this->execution_history.top().write_output_end : -1.0;
+      }
+
+      /**
+       * @brief Get the task's failure date
+       * @return the date when the task failed (-1 if it didn't fail or if no execution history exists for this task yet)
+       */
+      double WorkflowTask::getFailureDate() {
+          return (not this->execution_history.empty()) ? this->execution_history.top().task_failed : -1.0;
       }
 
     /**
