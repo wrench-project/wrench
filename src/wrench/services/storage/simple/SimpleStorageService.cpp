@@ -99,11 +99,14 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
+      // number of files staged into the "/" partition
+      int num_stored_files = (*stored_files.find("/")).second.size();
+
       WRENCH_INFO("Simple Storage Service %s starting on host %s (capacity: %lf, holding %ld files, listening on %s)",
                   this->getName().c_str(),
                   S4U_Simulation::getHostName().c_str(),
                   this->capacity,
-                  this->stored_files.size(),
+                  num_stored_files,
                   this->mailbox_name.c_str());
 
       /** Main loop **/
