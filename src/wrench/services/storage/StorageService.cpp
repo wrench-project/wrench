@@ -530,11 +530,11 @@ namespace wrench {
     /**
      * @brief Synchronously and sequentially write/read a set of files to/from storage services
      *
-     * @param action: FileOperation::DONWLOAD or FileOperation::WRITE
+     * @param action: FileOperation::READ (download) or FileOperation::WRITE
      * @param files: the set of files to read/write
      * @param file_locations: a map of files to storage services
      * @param default_storage_service: the storage service to use when files don't appear in the file_locations map (which must be a compute service's scratch storage)
-     * @param files_in_scratch: the set of files that have been writted to the default storage service (which must be a compute service's scratch storage)
+     * @param files_in_scratch: the set of files that have been written to the default storage service (which must be a compute service's scratch storage)
      * @param job: the job associated to the write/read of the files
      *
      * @throw std::runtime_error
