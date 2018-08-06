@@ -12,10 +12,16 @@ class SimulationTimestampTaskTest : public ::testing::Test {
 public:
     wrench::ComputeService *compute_service = nullptr;
     wrench::StorageService *storage_service = nullptr;
+    wrench::StorageService *backup_storage_service = nullptr;
+    wrench::FileRegistryService *file_registry_service = nullptr;
 
     wrench::WorkflowTask *task1 = nullptr;
     wrench::WorkflowTask *task2 = nullptr;
+
     wrench::WorkflowTask *failed_task = nullptr;
+    wrench::WorkflowFile *small_input_file = nullptr;
+    wrench::WorkflowFile *large_input_file = nullptr;
+
 
     void do_SimulationTimestampTaskBasic_test();
     void do_SimulationTimestampTaskMultiple_test();
@@ -30,7 +36,7 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"WMSHost\" speed=\"1f\" core=\"1\"/> "
                           "       <host id=\"ExecutionHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+                          "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1000000us\"/>"
                           "       <route src=\"ExecutionHost\" dst=\"WMSHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
                           "</platform>";
@@ -83,16 +89,20 @@ private:
         job_manager->submitJob(job2, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
-        this->test->failed_task = this->getWorkflow()->addTask("failed_task", 1000.0, 1, 1, 1.0, 0);
-        wrench::StandardJob *failed_job = job_manager->createStandardJob(this->test->failed_task, {});
+        this->test->failed_task = this->getWorkflow()->addTask("failed_task", 100000.0, 1, 1, 1.0, 0);
+        this->test->failed_task->addInputFile(this->test->large_input_file);
+        this->test->failed_task->addInputFile(this->test->small_input_file);
+
+        wrench::StandardJob *failed_job = job_manager->createStandardJob(this->test->failed_task, {{this->test->small_input_file, this->test->storage_service},
+                                                                                                   {this->test->large_input_file, this->test->storage_service}});
         job_manager->submitJob(failed_job, this->test->compute_service);
-        this->test->compute_service->stop();
+        this->test->storage_service->deleteFile(this->getWorkflow()->getFileByID("small_input_file"), this->test->file_registry_service);
 
         std::unique_ptr<wrench::WorkflowExecutionEvent> workflow_execution_event;
         try {
            workflow_execution_event = this->getWorkflow()->waitForNextExecutionEvent();
         } catch (wrench::WorkflowExecutionException &e) {
-            throw std::runtime_error("Error getting the excution event: " + e.getCause()->toString());
+            throw std::runtime_error("Error getting the execution event: " + e.getCause()->toString());
         }
 
         if (workflow_execution_event->type != wrench::WorkflowExecutionEvent::STANDARD_JOB_FAILURE) {
@@ -136,6 +146,15 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
+    file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
+
+    small_input_file = this->workflow->addFile("small_input_file", 10);
+    large_input_file = this->workflow->addFile("large_input_file", 1000000);
+
+    ASSERT_NO_THROW(simulation->stageFiles({{large_input_file->getID(), large_input_file},
+                                            {small_input_file->getID(), small_input_file}},
+                                                    storage_service));
+
     ASSERT_NO_THROW(simulation->launch());
 
     /*
@@ -165,6 +184,7 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     auto timestamp_failure_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
     double failed_task_start_timestamp = timestamp_start_trace[2]->getContent()->getDate();
     double failed_task_end_date = this->failed_task->getEndDate();
+    std::cerr << "timestamp_failure_trace: " << timestamp_failure_trace.size() << std::endl;
     double failed_task_failure_timestamp = timestamp_failure_trace[0]->getContent()->getDate();
 
     ASSERT_GT(failed_task_start_timestamp, task2_completion_timestamp);
@@ -241,7 +261,7 @@ private:
 
         this->test->task1 = this->getWorkflow()->addTask("task1", 10.0, 1, 1, 1.0, 0);
 
-        int num_task1_runs = 5;
+        int num_task1_runs = 2;
 
         for (int i = 0; i < num_task1_runs; ++i) {
             this->test->task1->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
@@ -253,22 +273,20 @@ private:
         }
 
         this->test->failed_task = this->getWorkflow()->addTask("failed_task", 10, 1, 1, 1.0 ,0);
-        int num_failed_task_runs = 5;
+        this->test->failed_task->addInputFile(this->test->large_input_file);
+        this->test->failed_task->addInputFile(this->test->small_input_file);
 
-        for (int j = 0; j < num_failed_task_runs; ++j) {
-            /*
-             * Changing the internal state to TASK_FAILURE to emulate failure. WorkflowTask::setInternalState()
-             * should create SimulationTimestampTaskFailures
-             */
-            this->test->failed_task->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
-            this->test->failed_task->setInternalState(wrench::WorkflowTask::InternalState::TASK_RUNNING);
+        wrench::StandardJob *failed_job = job_manager->createStandardJob(this->test->failed_task, {{this->test->small_input_file, this->test->storage_service},
+                                                                                                   {this->test->large_input_file, this->test->storage_service}});
 
-            /*
-             * SimulationTimestampTaskFailure::getContent()->getDate() should be 10s after the start time of the task.
-             */
-            wrench::S4U_Simulation::sleep(10);
-            this->test->failed_task->setInternalState(wrench::WorkflowTask::InternalState::TASK_FAILED);
-        }
+        job_manager->submitJob(failed_job, this->test->compute_service);
+        this->test->storage_service->deleteFile(this->getWorkflow()->getFileByID("small_input_file"), this->test->file_registry_service);
+        this->waitForAndProcessNextEvent();
+
+        wrench::StandardJob *passing_job = job_manager->createStandardJob(this->test->failed_task, {{this->test->small_input_file, this->test->backup_storage_service},
+                                                                                                   {this->test->large_input_file, this->test->storage_service}});
+        job_manager->submitJob(passing_job, this->test->compute_service);
+        this->waitForAndProcessNextEvent();
 
         return 0;
     }
@@ -300,13 +318,27 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
                                                                                                    {})));
 
     ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
+    ASSERT_NO_THROW(backup_storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
+
 
     wrench::WMS *wms = nullptr;
     ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskMultipleTestWMS(
-            this, {compute_service}, {storage_service}, wms_host
+            this, {compute_service}, {storage_service, backup_storage_service}, wms_host
     )));
 
     ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    file_registry_service = simulation->add(new wrench::FileRegistryService(wms_host));
+
+    small_input_file = this->workflow->addFile("small_input_file", 10);
+    large_input_file = this->workflow->addFile("large_input_file", 1000000);
+
+    ASSERT_NO_THROW(simulation->stageFiles({{large_input_file->getID(), large_input_file},
+                                            {small_input_file->getID(), small_input_file}},
+                                           storage_service));
+
+    ASSERT_NO_THROW(simulation->stageFiles({{small_input_file->getID(), small_input_file}}, backup_storage_service));
+
 
     ASSERT_NO_THROW(simulation->launch());
 
@@ -314,34 +346,17 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     auto completions_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskCompletion>();
     auto failures_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
 
-/*    for (auto &s : starts) {
-        std::cerr << std::setw(15) << s->getContent()->getTask()->getID() << std::setw(15) << s->getContent()->getDate() << std::endl;
-    }
-
-    std::cerr << " " << std::endl;
-
-    for (auto &c : completions) {
-        std::cerr << std::setw(15) << c->getContent()->getTask()->getID() << std::setw(15) << c->getContent()->getDate() << std::endl;
-    }
-
-    std::cerr << " " << std::endl;
-
-    for (auto &f: failures) {
-        std::cerr << std::setw(15) << f->getContent()->getTask()->getID() << std::setw(15) << f->getContent()->getDate() << std::endl;
-    }*/
-
-
     /*
      * Check that we have the right number of SimulationTimestampTaskXXXX
      *
-     * Ran 10 tasks:
-     *  - 10 started: task1 x 5, failed_task x 5
-     *  - 5 completed: task1 x 5
-     *  - 5 failed : failed_task x 5
+     * Ran 4 single task jobs:
+     *  - 4 started: task1 x 2, failed_task x 2
+     *  - 3 completed: task1 x 2, failed_task x 1
+     *  - 1 failed : failed_task x 1
      */
-    ASSERT_EQ(starts_trace.size(), 10);
-    ASSERT_EQ(completions_trace.size(), 5);
-    ASSERT_EQ(failures_trace.size(), 5);
+    ASSERT_EQ(starts_trace.size(), 4);
+    ASSERT_EQ(completions_trace.size(), 3);
+    ASSERT_EQ(failures_trace.size(), 1);
 
     std::string task1_id = "task1";
     std::string failed_task_id = "failed_task";
@@ -366,35 +381,57 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
                                                      return ((*ts).getContent()->getTask()->getID() == failed_task_id);
                                                  });
 
-    ASSERT_EQ(num_task1_starts, 5);
-    ASSERT_EQ(num_failed_task_starts, 5);
-    ASSERT_EQ(num_task1_completions, 5);
-    ASSERT_EQ(num_failed_task_failures, 5);
+    int num_failed_task_completions = std::count_if(completions_trace.begin(), completions_trace.end(),
+                                                    [&failed_task_id](wrench::SimulationTimestamp<wrench::SimulationTimestampTaskCompletion> *ts) {
+                                                        return ((*ts).getContent()->getTask()->getID() == failed_task_id);
+                                                    });
+
+    ASSERT_EQ(num_task1_starts, 2);
+    ASSERT_EQ(num_failed_task_starts, 2);
+    ASSERT_EQ(num_task1_completions, 2);
+    ASSERT_EQ(num_failed_task_failures, 1);
+    ASSERT_EQ(num_failed_task_completions, 1);
 
     /*
-     * Check that the elapsed time between a task start and completion/failure is about 10 seconds.
-     * There should be about a 10s difference in each of the dates in each trace.
+     * EXPECTED TIMELINE:
+     *  task1 start
+     *      about 10 seconds passes
+     *  task1 end
+     *  task1 start again
+     *      about 10 seconds passes
+     *  task1 end again
+     *  failed_task start
+     *      large file being read from storage service
+     *          small file gets deleted in the mean time
+     *      large file read completes
+     *      attempt to read small file fails
+     *  failed_task fails
+     *  failed_task start again
+     *      large successfully read from storage service
+     *      small file successfully read from backup storage service
+     *      task computation runs
+     *  failed_task completes
      */
-    for (size_t i = 1; i < starts_trace.size(); ++i) {
-        double previous_start = std::floor(starts_trace.at(i-1)->getContent()->getDate());
-        double current_start = std::floor(starts_trace.at(i)->getContent()->getDate());
 
-        ASSERT_DOUBLE_EQ(current_start - previous_start, 10.0);
-    }
+    double task1_start_date_1 = starts_trace[0]->getDate();
+    double task1_completion_date_1 = completions_trace[0]->getDate();
 
-    for (size_t i = 1; i < completions_trace.size(); ++i) {
-        double previous_completion = std::floor(completions_trace.at(i-1)->getContent()->getDate());
-        double current_completion = std::floor(completions_trace.at(i)->getContent()->getDate());
+    ASSERT_DOUBLE_EQ(std::floor(task1_completion_date_1 - task1_start_date_1), 10.0);
 
-        ASSERT_DOUBLE_EQ(current_completion - previous_completion, 10.0);
-    }
+    double task1_start_date_2 = starts_trace[1]->getDate();
+    double task1_completion_date_2 = completions_trace[1]->getDate();
 
-    for (size_t i = 1; i < failures_trace.size(); ++i) {
-        double previous_failure = std::floor(failures_trace.at(i-1)->getContent()->getDate());
-        double current_failure = std::floor(failures_trace.at(i)->getContent()->getDate());
+    ASSERT_DOUBLE_EQ(std::floor(task1_completion_date_2 - task1_start_date_2), 10.0);
 
-        ASSERT_DOUBLE_EQ(current_failure - previous_failure, 10.0);
-    }
+    double failed_task_start_date_1 = starts_trace[2]->getDate();
+    double failed_task_failure_date_1 = failures_trace[0]->getDate();
+
+    ASSERT_GT(failed_task_failure_date_1, failed_task_start_date_1);
+
+    double failed_task_start_date_2 = starts_trace[3]->getDate();
+    double failed_task_completion_date_1 = completions_trace[2]->getDate();
+
+    ASSERT_GT(failed_task_completion_date_1, failed_task_start_date_2);
 
     delete simulation;
     free(argv[0]);
