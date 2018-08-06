@@ -2714,8 +2714,10 @@ void StandardJobExecutorTest::do_WorkUnit_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Create two WorkUnits
-  wrench::Workunit *wu1 = new wrench::Workunit({}, {}, {}, {}, {});
-  wrench::Workunit *wu2 = new wrench::Workunit({}, {}, {}, {}, {});
+  std::unique_ptr<wrench::Workunit> wu1_unique_ptr = std::unique_ptr<wrench::Workunit>(new wrench::Workunit({}, {}, {}, {}, {}));
+  std::unique_ptr<wrench::Workunit> wu2_unique_ptr = std::unique_ptr<wrench::Workunit>(new wrench::Workunit({}, {}, {}, {}, {}));
+  wrench::Workunit *wu1 = wu1_unique_ptr.get();
+  wrench::Workunit *wu2 = wu2_unique_ptr.get();
 
 
   ASSERT_THROW(wrench::Workunit::addDependency(wu1, nullptr), std::invalid_argument);

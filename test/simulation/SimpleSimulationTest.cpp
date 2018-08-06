@@ -29,6 +29,7 @@ public:
     wrench::WorkflowTask *task6;
     wrench::ComputeService *compute_service = nullptr;
     wrench::StorageService *storage_service = nullptr;
+    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 
     void do_getReadyTasksTest_test();
 
@@ -36,7 +37,8 @@ protected:
 
     SimpleSimulationTest() {
       // Create the simplest workflow
-      workflow = new wrench::Workflow();
+      workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+      workflow = workflow_unique_ptr.get();
 
       // Create the files
       input_file = workflow->addFile("input_file", 10.0);

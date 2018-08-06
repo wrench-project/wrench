@@ -24,6 +24,8 @@
 
 namespace wrench {
 
+    #define WRENCH_VERSION_STRING "1.1-devel"
+
     class StorageService;
 
     /**
@@ -65,6 +67,17 @@ namespace wrench {
 
         static double getHostFlopRate(std::string hostname);
 
+        //start energy related calls
+        static double getEnergyConsumedByHost(std::string hostname);
+        static double getTotalEnergyConsumed(std::vector<std::string> hostnames);
+        static void setPstate(std::string hostname, int pstate);
+        static int getNumberofPstates(std::string hostname);
+        static int getCurrentPstate(std::string hostname);
+        static double getMinPowerAvailable(std::string hostname);
+        static double getMaxPowerPossible(std::string hostname);
+        static std::vector<int> getListOfPstates(std::string hostname);
+        //end energy related calls
+
 
 
 
@@ -102,6 +115,8 @@ namespace wrench {
         void checkSimulationSetup();
 
         void startAllProcesses();
+
+        std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
 
     };
 

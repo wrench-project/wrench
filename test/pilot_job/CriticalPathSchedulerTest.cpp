@@ -16,7 +16,8 @@ namespace wrench {
 
     protected:
         CriticalPathSchedulerTest() {
-          workflow = new Workflow();
+          workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+          workflow = workflow_unique_ptr.get();
 
           // create simple diamond workflow
           t1 = workflow->addTask("task-test-01", 100, 1, 1, 1.0, 0);
@@ -36,6 +37,7 @@ namespace wrench {
 
         // data members
         Workflow *workflow;
+        std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
         WorkflowTask *t1, *t2, *t3, *t4, *t5, *t6;
     };
 

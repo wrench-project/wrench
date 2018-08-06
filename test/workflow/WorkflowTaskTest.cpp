@@ -15,6 +15,7 @@ class WorkflowTaskTest : public ::testing::Test {
 protected:
     WorkflowTaskTest() {
       workflow = new wrench::Workflow();
+      workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(workflow);
 
       t1 = workflow->addTask("task-01", 100000, 1, 1, 1.0, 0);
       t2 = workflow->addTask("task-02", 100, 2, 4, 0.5, 0);
@@ -23,6 +24,7 @@ protected:
     }
 
     // data members
+    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
     wrench::WorkflowTask *t1, *t2;
 };

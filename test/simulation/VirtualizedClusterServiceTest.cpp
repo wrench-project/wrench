@@ -46,7 +46,8 @@ protected:
     VirtualizedClusterServiceTest() {
 
       // Create the simplest workflow
-      workflow = new wrench::Workflow();
+      workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+      workflow = workflow_unique_ptr.get();
 
       // Create the files
       input_file = workflow->addFile("input_file", 10.0);
@@ -96,6 +97,7 @@ protected:
 
     std::string platform_file_path = "/tmp/platform.xml";
     wrench::Workflow *workflow;
+    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
 };
 
 /**********************************************************************/
@@ -318,6 +320,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, nothing, 100.0,
                                                 {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})), std::invalid_argument);
+
 
 
   // Create a Virtualized Cluster Service

@@ -10,6 +10,7 @@
 
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
+#include <wrench/util/MessageManager.h>
 
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/services/Service.h"
@@ -61,6 +62,7 @@ namespace wrench {
      * @brief Destructor
      */
     Simulation::~Simulation() {
+      MessageManager::cleanUpAllMessages();
       this->s4u_simulation->shutdown();
     }
 
@@ -82,28 +84,79 @@ namespace wrench {
         throw std::invalid_argument("Simulation::init(): Invalid argument argv (nullptr)");
       }
 
+
+      // Extract WRENCH-specific argument
       int i;
       int skip = 0;
+      bool simgrid_help_requested = false;
+      bool wrench_help_requested = false;
+      bool simulator_help_requested = false;
+      bool version_requested = false;
       for (i = 1; i < *argc; i++) {
-        if (not strncmp(argv[i], "--wrench-no-color", strlen("--wrench-no-color"))) {
+        if (not strcmp(argv[i], "--wrench-no-color")) {
           TerminalOutput::disableColor();
           skip++;
+        } else if (not strcmp(argv[i], "--wrench-no-log")) {
+          argv[i] = strdup("--log=root.threshold:critical");
+        } else if (not strcmp(argv[i], "--activate-energy")) {
+          sg_host_energy_plugin_init();
+          skip++;
+        } else if (not strcmp(argv[i], "--help-wrench")) {
+          wrench_help_requested = true;
+          skip++;
+        } else if (not strcmp(argv[i], "--help")) {
+          simulator_help_requested = true;
+          skip++;
+        } else if (not strcmp(argv[i], "--help-simgrid")) {
+          simgrid_help_requested = true;
+          skip++;
+        } else if (not strcmp(argv[i], "--version")) {
+          version_requested = true;
         }
-        argv[i] = argv[i + skip];
+        // shift argument if necessary
+        if (i + skip < *argc) {
+          argv[i] = argv[i + skip];
+        }
       }
       *argc = i - skip;
 
-      //activate energy plugin
-      if (*argc >= 2) {
-        if (strcmp(argv[1], "--activate_energy") == 0) {
-          sg_host_energy_plugin_init();
-        }
+      // Always activate VM migration plugin
+      sg_vm_live_migration_plugin_init();
+
+      if (wrench_help_requested) {
+        std::cerr << "General WRENCH command-line arguments:\n";
+        std::cerr << "   --wrench-no-color: disables colored terminal output\n";
+        std::cerr << "   --wrench-no-log: disables logging\n";
+        std::cerr << "   --activate-energy: activates SimGrid's energy plugin\n";
+        std::cerr << "     (requires host pstate definitions in XML platform description file)\n";
+        std::cerr << "     (use --help-logs for detailed help on SimGrid's logging options/syntax)\n";
+        std::cerr << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
+        std::cerr << "\n";
+      }
+
+      if (version_requested) {
+        std::cerr << "WRENCH version " << getWRENCHVersionString() << "\n";
+      }
+
+      // If SimGrid help is requested, put back in a "--help" argument
+      if (simgrid_help_requested) {
+        argv[*argc] = strdup("--help");
+        (*argc)++;
+        std::cerr << "\nSimgrid command-line arguments:\n\n";
       }
 
       this->s4u_simulation->initialize(argc, argv);
 
-      // activate VM migration plugin
-      sg_vm_live_migration_plugin_init();
+      if (wrench_help_requested) {
+        exit(0);
+      }
+
+      // If simulator help requested, put back in the "--help" argument that was passed down
+      if (simulator_help_requested) {
+        argv[*argc] = strdup("--help");
+        (*argc)++;
+      }
+
     }
 
     /**
@@ -276,7 +329,7 @@ namespace wrench {
         for (const auto &compute_service : this->compute_services) {
           if (compute_service->hasScratch()) {
             compute_service->getScratch()->simulation = this;
-            compute_service->getScratch()->start(std::shared_ptr<StorageService>(compute_service->getScratch()), true);
+            compute_service->getScratch()->start(compute_service->getScratchSharedPtr(), true);
           }
         }
 
@@ -542,6 +595,78 @@ namespace wrench {
      */
     SimulationOutput &Simulation::getOutput() {
       return this->output;
+    }
+
+    /**
+     * @brief Get the energy consumed by the host up to now
+     * @param hostname the host name
+     * @return the energy consumed by the host in Joules
+     */
+    double Simulation::getEnergyConsumedByHost(std::string hostname) {
+      return S4U_Simulation::getEnergyConsumedByHost(hostname);
+    }
+
+    /**
+     * @brief Get the total energy consumed by a set of hosts
+     * @param the list of hostnames
+     * @return The total energy consumed by all the hosts in Joules
+     */
+    double Simulation::getTotalEnergyConsumed(std::vector<std::string> hostnames) {
+      return S4U_Simulation::getTotalEnergyConsumed(hostnames);
+    }
+
+    /**
+     * @brief Set the power state of the host
+     * @param hostname: the host name
+     * @param pstate: the power state index (the power state index is specified in the platform xml description file)
+     */
+    void Simulation::setPstate(std::string hostname, int pstate) {
+      S4U_Simulation::setPstate(hostname, pstate);
+    }
+
+    /**
+     * @brief Get the total number of power states of a host
+     * @param hostname: the host name
+     * @return The number of power states available for the host (as specified in the platform xml description file)
+     */
+    int Simulation::getNumberofPstates(std::string hostname) {
+      return S4U_Simulation::getNumberofPstates(hostname);
+    }
+
+    /**
+     * @brief Get the current power state of a host
+     * @param hostname: the host name
+     * @return The index of the current pstate of the host (as specified in the platform xml description file)
+     */
+    int Simulation::getCurrentPstate(std::string hostname) {
+      return S4U_Simulation::getCurrentPstate(hostname);
+    }
+
+    /**
+     * @brief Get the minimum power available for a host
+     * @param hostname: the host name
+     * @return The minimum power available for the host (as specified in the platform xml description file)
+     */
+    double Simulation::getMinPowerAvailable(std::string hostname) {
+      return S4U_Simulation::getMinPowerAvailable(hostname);
+    }
+
+    /**
+     * @brief Get the maximum power available for a host
+     * @param hostname: the host name
+     * @return The maximum power available for the host (as specified in the platform xml description file)
+     */
+    double Simulation::getMaxPowerPossible(std::string hostname) {
+      return S4U_Simulation::getMaxPowerPossible(hostname);
+    }
+
+    /**
+     * @brief Get the list of power states available for a host
+     * @param hostname: the host name
+     * @return a list of power states available for the host (as specified in the platform xml description file)
+     */
+    std::vector<int> Simulation::getListOfPstates(std::string hostname) {
+      return S4U_Simulation::getListOfPstates(hostname);
     }
 
 };

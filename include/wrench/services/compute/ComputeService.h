@@ -130,6 +130,7 @@ namespace wrench {
 
         /** @brief A scratch storage service associated to the compute service */
         StorageService *scratch_space_storage_service;
+        std::shared_ptr<StorageService> scratch_space_storage_service_shared_ptr;
 
         /***********************/
         /** \endcond          **/
@@ -140,6 +141,7 @@ namespace wrench {
         /***********************/
 
         StorageService *getScratch();
+        std::shared_ptr<StorageService> getScratchSharedPtr();
 
         /***********************/
         /** \endcond          **/

@@ -33,7 +33,8 @@ public:
 
     void do_BatchTraceFileReplayTest_test();
 
-    void do_WorkloadTraceFileTest_test();
+    void do_WorkloadTraceFileTestSWF_test();
+    void do_WorkloadTraceFileTestJSON_test();
 
 protected:
     BatchServiceTest() {
@@ -131,7 +132,7 @@ private:
 //          std::cerr << "SUBMITTING " << "sub="<< sub_time << "num_nodes=" << num_nodes << " id="<<id << " flops="<<flops << " rflops="<<requested_flops << " ram="<<requested_ram << "\n";
           // TODO: Should we use the "requested_ram" instead of 0 below?
           wrench::WorkflowTask *task = this->getWorkflow()->addTask(id, flops, min_num_cores, max_num_cores,
-                                                               parallel_efficiency, 0);
+                                                                    parallel_efficiency, 0);
 
           wrench::StandardJob *standard_job = job_manager->createStandardJob(
                   {task},
@@ -202,7 +203,7 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 
   // Create a Batch Service
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, {})));
 
   // Create a WMS
@@ -225,16 +226,16 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
 }
 
 /**********************************************************************/
-/**  WORKLOAD TRACE FILE TEST                                        **/
+/**  WORKLOAD TRACE FILE TEST SWF                                    **/
 /**********************************************************************/
 
-class WorkloadTraceFileTestWMS : public wrench::WMS {
+class WorkloadTraceFileSWFTestWMS : public wrench::WMS {
 
 public:
-    WorkloadTraceFileTestWMS(BatchServiceTest *test,
-                             const std::set<wrench::ComputeService *> &compute_services,
-                             const std::set<wrench::StorageService *> &storage_services,
-                             std::string hostname) :
+    WorkloadTraceFileSWFTestWMS(BatchServiceTest *test,
+                                const std::set<wrench::ComputeService *> &compute_services,
+                                const std::set<wrench::StorageService *> &storage_services,
+                                std::string hostname) :
             wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
                         hostname, "test") {
       this->test = test;
@@ -263,9 +264,9 @@ private:
         int num_cores = 10;
         double parallel_efficiency = 1.0;
         tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
-                                          task_flops,
-                                          num_cores, num_cores, parallel_efficiency,
-                                          0.0));
+                                                     task_flops,
+                                                     num_cores, num_cores, parallel_efficiency,
+                                                     0.0));
       }
 
       // Create a Standard Job with only the tasks
@@ -289,9 +290,9 @@ private:
         int num_cores = 10;
         double parallel_efficiency = 1.0;
         tasks.push_back(this->getWorkflow()->addTask("test_job_2_task_" + std::to_string(i),
-                                          task_flops,
-                                          num_cores, num_cores, parallel_efficiency,
-                                          0.0));
+                                                     task_flops,
+                                                     num_cores, num_cores, parallel_efficiency,
+                                                     0.0));
       }
 
 
@@ -320,7 +321,7 @@ private:
             case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
               if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job) {
                 throw std::runtime_error("Wrong job completion order: got " +
-                                                 dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job->getName() + " but expected " + job->getName());
+                                         dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job->getName() + " but expected " + job->getName());
               }
               break;
             }
@@ -354,12 +355,12 @@ private:
     }
 };
 
-TEST_F(BatchServiceTest, WorkloadTraceFileTest) {
-  DO_TEST_WITH_FORK(do_WorkloadTraceFileTest_test);
+TEST_F(BatchServiceTest, WorkloadTraceFileSWFTest) {
+  DO_TEST_WITH_FORK(do_WorkloadTraceFileTestSWF_test);
 }
 
 
-void BatchServiceTest::do_WorkloadTraceFileTest_test() {
+void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
 
   // Create and initialize a simulation
   auto simulation = new wrench::Simulation();
@@ -375,14 +376,21 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
   // Get a hostname
   std::string hostname = "Host1";
 
-  // Create a Batch Service with a non-existing workload trace file, which should throw
+  // Create a Batch Service with a trace file with a bogus extension, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
-                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there"}}
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.invalid"}}
           )), std::invalid_argument);
 
-  std::string trace_file_path = "/tmp/swf_trace";
+  // Create a Batch Service with a non-existing workload trace file, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.swf"}}
+          )), std::invalid_argument);
+
+  std::string trace_file_path = "/tmp/swf_trace.swf";
   FILE *trace_file;
 
   // Create an invalid trace file
@@ -393,7 +401,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
@@ -406,7 +414,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
@@ -420,7 +428,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a bogus trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
@@ -434,8 +442,8 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
-                                   {"Host1", "Host2", "Host3", "Host4"}, 0, 
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )), std::invalid_argument);
 
@@ -449,7 +457,7 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::BatchService(hostname, 
+          new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
           )));
@@ -457,7 +465,484 @@ void BatchServiceTest::do_WorkloadTraceFileTest_test() {
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
-  ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileTestWMS(
+  ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileSWFTestWMS(
+          this, {compute_service}, {}, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+/**********************************************************************/
+/**  WORKLOAD TRACE FILE TEST JSON                                    **/
+/**********************************************************************/
+
+class WorkloadTraceFileJSONTestWMS : public wrench::WMS {
+
+public:
+    WorkloadTraceFileJSONTestWMS(BatchServiceTest *test,
+                                 const std::set<wrench::ComputeService *> &compute_services,
+                                 const std::set<wrench::StorageService *> &storage_services,
+                                 std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services, {}, nullptr,
+                        hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      wrench::Simulation::sleep(10);
+      // At this point, using the FCFS algorithm, a 2-node 30-min job should complete around t=1.5 hours
+      // and 4-node 30-min job should complete around t=2.5 hours
+
+      std::vector<wrench::WorkflowTask *> tasks;
+      std::map<std::string, std::string> batch_job_args;
+
+      // Create and submit a job that needs 2 nodes and 30 minutes
+      for (size_t i = 0; i < 2; i++) {
+        double time_fudge = 1; // 1 second seems to make it all work!
+        double task_flops = 10 * (1 * (1800 - time_fudge));
+        int num_cores = 10;
+        double parallel_efficiency = 1.0;
+        tasks.push_back(this->getWorkflow()->addTask("test_job_1_task_" + std::to_string(i),
+                                                     task_flops,
+                                                     num_cores, num_cores, parallel_efficiency,
+                                                     0.0));
+      }
+
+      // Create a Standard Job with only the tasks
+      wrench::StandardJob *standard_job_2_nodes;
+      standard_job_2_nodes = job_manager->createStandardJob(tasks, {});
+
+      // Create the batch-specific argument
+      batch_job_args["-N"] = std::to_string(2); // Number of nodes/tasks
+      batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
+      batch_job_args["-c"] = std::to_string(10); //number of cores per task
+
+      // Submit this job to the batch service
+      job_manager->submitJob(standard_job_2_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+
+
+      // Create and submit a job that needs 2 nodes and 30 minutes
+      tasks.clear();
+      for (size_t i = 0; i < 4; i++) {
+        double time_fudge = 1; // 1 second seems to make it all work!
+        double task_flops = 10 * (1 * (1800 - time_fudge));
+        int num_cores = 10;
+        double parallel_efficiency = 1.0;
+        tasks.push_back(this->getWorkflow()->addTask("test_job_2_task_" + std::to_string(i),
+                                                     task_flops,
+                                                     num_cores, num_cores, parallel_efficiency,
+                                                     0.0));
+      }
+
+
+      // Create a Standard Job with only the tasks
+      wrench::StandardJob *standard_job_4_nodes;
+      standard_job_4_nodes = job_manager->createStandardJob(tasks, {});
+
+      // Create the batch-specific argument
+      batch_job_args.clear();
+      batch_job_args["-N"] = std::to_string(4); // Number of nodes/tasks
+      batch_job_args["-t"] = std::to_string(1800); // Time in minutes (at least 1 minute)
+      batch_job_args["-c"] = std::to_string(10); //number of cores per task
+
+      // Submit this job to the batch service
+      job_manager->submitJob(standard_job_4_nodes, *(this->getAvailableComputeServices().begin()), batch_job_args);
+
+
+      // Wait for the two execution events
+      for (auto job : {standard_job_2_nodes, standard_job_4_nodes}) {
+        // Wait for the workflow execution event
+        WRENCH_INFO("Waiting for job completion of job %s", job->getName().c_str());
+        std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+        try {
+          event = this->getWorkflow()->waitForNextExecutionEvent();
+          switch (event->type) {
+            case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+              if (dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job != job) {
+                throw std::runtime_error("Wrong job completion order: got " +
+                                         dynamic_cast<wrench::StandardJobCompletedEvent*>(event.get())->standard_job->getName() + " but expected " + job->getName());
+              }
+              break;
+            }
+            default: {
+              throw std::runtime_error(
+                      "Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+            }
+          }
+        } catch (wrench::WorkflowExecutionException &e) {
+          //ignore (network error or something)
+        }
+
+        double completion_time = this->simulation->getCurrentSimulatedDate();
+        double expected_completion_time;
+        if (job == standard_job_2_nodes) {
+          expected_completion_time = 3600  + 1800;
+        } else if (job == standard_job_4_nodes) {
+          expected_completion_time = 3600 * 2 + 1800;
+        } else {
+          throw std::runtime_error("Phantom job completion!");
+        }
+        double delta = fabs(expected_completion_time - completion_time);
+        double tolerance = 5;
+        if (delta > tolerance) {
+          throw std::runtime_error("Unexpected job completion time for job " + job->getName() + ": " +
+                                   std::to_string(completion_time) + " (expected: " + std::to_string(expected_completion_time) + ")");
+        }
+
+      }
+      return 0;
+    }
+};
+
+TEST_F(BatchServiceTest, WorkloadTraceFileJSONTest) {
+  DO_TEST_WITH_FORK(do_WorkloadTraceFileTestJSON_test);
+}
+
+
+void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
+
+  // Create and initialize a simulation
+  auto simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("batch_service_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = "Host1";
+
+  // Create a Batch Service with a trace file with a bogus extension, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.invalid"}}
+          )), std::invalid_argument);
+
+  std::string json_string;
+
+  // Create a Batch Service with a non-existing workload trace file, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.json"}}
+          )), std::invalid_argument);
+
+  std::string trace_file_path = "/tmp/swf_trace.json";
+  FILE *trace_file;
+
+
+  /** Create an invalid trace file: Broken JSON Syntax **/
+
+  trace_file = fopen(trace_file_path.c_str(), "w");
+
+  json_string =
+          "{\n"
+                  "  \"command\": \"/home/pfdutot/forge/batsim//tools/swf_to_batsim_workload_compute_only.py -t -gwo -i 1 -pf 93312 /tmp/expe_out/workloads/curie_downloaded.swf /tmp/expe_out/workloads/curie.json -cs 100e6 --verbose\",\n"
+                  "  \"date\": \"2018-07-10 17:08:09.673026\",\n"
+                  "  \"description\": \"this workload had been automatically generated\",\n"
+                  "  \"BOGUS\","
+                  "  \"jobs\": [\n"
+                  "      {\n"
+                  "         \"id\": 0,\n"
+                  "         \"profile\": \"86396\",\n"
+                  "         \"res\": 256,\n"
+                  "         \"subtime\": 0.0,\n"
+                  "         \"walltime\": 86400.0\n"
+                  "      }\n"
+                  "   ]\n"
+                  "}\n";
+
+  fprintf(trace_file, "%s", json_string.c_str());
+  fclose(trace_file);
+
+  // Create a Batch Service with a bogus trace file, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )), std::invalid_argument);
+
+  /** Create an invalid trace file: Valid JSON Syntax but no jobs **/
+
+  trace_file = fopen(trace_file_path.c_str(), "w");
+
+  json_string =
+          "{\n"
+                  "  \"command\": \"/home/pfdutot/forge/batsim//tools/swf_to_batsim_workload_compute_only.py -t -gwo -i 1 -pf 93312 /tmp/expe_out/workloads/curie_downloaded.swf /tmp/expe_out/workloads/curie.json -cs 100e6 --verbose\",\n"
+                  "  \"date\": \"2018-07-10 17:08:09.673026\",\n"
+                  "  \"description\": \"this workload had been automatically generated\",\n"
+                  "  \"BOGUS\": [\n"
+                  "      {\n"
+                  "         \"id\": 0,\n"
+                  "         \"profile\": \"86396\",\n"
+                  "         \"res\": 256,\n"
+                  "         \"subtime\": 0.0,\n"
+                  "         \"walltime\": 86400.0\n"
+                  "      },\n"
+                  "      {\n"
+                  "         \"id\": 1,\n"
+                  "         \"profile\": \"1190\",\n"
+                  "         \"res\": 2048,\n"
+                  "         \"subtime\": 7644.0,\n"
+                  "         \"walltime\": 72000.0\n"
+                  "       }\n"
+                  "   ]\n"
+                  "}\n";
+
+  fprintf(trace_file, "%s", json_string.c_str());
+  fclose(trace_file);
+
+  // Create a Batch Service with a bogus trace file, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )), std::invalid_argument);
+
+
+  /** Create an invalid trace file: Valid JSON Syntax but weird job **/
+
+  trace_file = fopen(trace_file_path.c_str(), "w");
+
+  json_string =
+          "{\n"
+                  "  \"command\": \"/home/pfdutot/forge/batsim//tools/swf_to_batsim_workload_compute_only.py -t -gwo -i 1 -pf 93312 /tmp/expe_out/workloads/curie_downloaded.swf /tmp/expe_out/workloads/curie.json -cs 100e6 --verbose\",\n"
+                  "  \"date\": \"2018-07-10 17:08:09.673026\",\n"
+                  "  \"description\": \"this workload had been automatically generated\",\n"
+                  "  \"jobs\": [\n"
+                  "      \"weird\",\n"
+                  "      {\n"
+                  "         \"id\": 1,\n"
+                  "         \"profile\": \"1190\",\n"
+                  "         \"res\": 2048,\n"
+                  "         \"subtime\": 7644.0,\n"
+                  "         \"walltime\": 72000.0\n"
+                  "       }\n"
+                  "   ]\n"
+                  "}\n";
+
+  fprintf(trace_file, "%s", json_string.c_str());
+  fclose(trace_file);
+
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )), std::invalid_argument);
+
+  /** Create an invalid trace file: Valid JSON and jobs, but missing field **/
+
+  trace_file = fopen(trace_file_path.c_str(), "w");
+
+  json_string =
+          "{\n"
+                  "  \"command\": \"/home/pfdutot/forge/batsim//tools/swf_to_batsim_workload_compute_only.py -t -gwo -i 1 -pf 93312 /tmp/expe_out/workloads/curie_downloaded.swf /tmp/expe_out/workloads/curie.json -cs 100e6 --verbose\",\n"
+                  "  \"date\": \"2018-07-10 17:08:09.673026\",\n"
+                  "  \"description\": \"this workload had been automatically generated\",\n"
+                  "  \"jobs\": [\n"
+                  "      {\n"
+                  "         \"id\": 0,\n"
+                  "         \"profile\": \"86396\",\n"
+                  "         \"res\": 412,\n"  // Misssing sub time
+                  "         \"walltime\": 86400.0\n"
+                  "      },\n"
+                  "      {\n"
+                  "         \"id\": 1,\n"
+                  "         \"profile\": \"1190\",\n"
+                  "         \"res\": 2048,\n"
+                  "         \"subtime\": 7644.0,\n"
+                  "         \"walltime\": 72000.0\n"
+                  "       }\n"
+                  "   ]\n"
+                  "}\n";
+
+  fprintf(trace_file, "%s", json_string.c_str());
+  fclose(trace_file);
+
+  // Create a Batch Service with a bogus trace file, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )), std::invalid_argument);
+
+  /** Create an invalid trace file: Valid JSON and jobs, but invalid res field **/
+
+  trace_file = fopen(trace_file_path.c_str(), "w");
+
+  json_string =
+          "{\n"
+                  "  \"command\": \"/home/pfdutot/forge/batsim//tools/swf_to_batsim_workload_compute_only.py -t -gwo -i 1 -pf 93312 /tmp/expe_out/workloads/curie_downloaded.swf /tmp/expe_out/workloads/curie.json -cs 100e6 --verbose\",\n"
+                  "  \"date\": \"2018-07-10 17:08:09.673026\",\n"
+                  "  \"description\": \"this workload had been automatically generated\",\n"
+                  "  \"jobs\": [\n"
+                  "      {\n"
+                  "         \"id\": 0,\n"
+                  "         \"profile\": \"86396\",\n"
+                  "         \"res\": 0,\n"
+                  "         \"subtime\": 3123.0,\n"
+                  "         \"walltime\": 86400.0\n"
+                  "      },\n"
+                  "      {\n"
+                  "         \"id\": 1,\n"
+                  "         \"profile\": \"1190\",\n"
+                  "         \"res\": 2048,\n"
+                  "         \"subtime\": 7644.0,\n"
+                  "         \"walltime\": 72000.0\n"
+                  "       }\n"
+                  "   ]\n"
+                  "}\n";
+
+  fprintf(trace_file, "%s", json_string.c_str());
+  fclose(trace_file);
+
+  // Create a Batch Service with a bogus trace file, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )), std::invalid_argument);
+
+
+  /** Create an invalid trace file: Valid JSON and jobs, but invalid subtime field **/
+
+  trace_file = fopen(trace_file_path.c_str(), "w");
+
+  json_string =
+          "{\n"
+                  "  \"command\": \"/home/pfdutot/forge/batsim//tools/swf_to_batsim_workload_compute_only.py -t -gwo -i 1 -pf 93312 /tmp/expe_out/workloads/curie_downloaded.swf /tmp/expe_out/workloads/curie.json -cs 100e6 --verbose\",\n"
+                  "  \"date\": \"2018-07-10 17:08:09.673026\",\n"
+                  "  \"description\": \"this workload had been automatically generated\",\n"
+                  "  \"jobs\": [\n"
+                  "      {\n"
+                  "         \"id\": 0,\n"
+                  "         \"profile\": \"86396\",\n"
+                  "         \"res\": 10,\n"
+                  "         \"subtime\": -100,\n"
+                  "         \"walltime\": 86400.0\n"
+                  "      },\n"
+                  "      {\n"
+                  "         \"id\": 1,\n"
+                  "         \"profile\": \"1190\",\n"
+                  "         \"res\": 2048,\n"
+                  "         \"subtime\": 7644.0,\n"
+                  "         \"walltime\": 72000.0\n"
+                  "       }\n"
+                  "   ]\n"
+                  "}\n";
+
+  fprintf(trace_file, "%s", json_string.c_str());
+  fclose(trace_file);
+
+  // Create a Batch Service with a bogus trace file, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )), std::invalid_argument);
+
+  /** Create an invalid trace file: Valid JSON and jobs, but invalid walltime field **/
+
+  trace_file = fopen(trace_file_path.c_str(), "w");
+
+  json_string =
+          "{\n"
+                  "  \"command\": \"/home/pfdutot/forge/batsim//tools/swf_to_batsim_workload_compute_only.py -t -gwo -i 1 -pf 93312 /tmp/expe_out/workloads/curie_downloaded.swf /tmp/expe_out/workloads/curie.json -cs 100e6 --verbose\",\n"
+                  "  \"date\": \"2018-07-10 17:08:09.673026\",\n"
+                  "  \"description\": \"this workload had been automatically generated\",\n"
+                  "  \"jobs\": [\n"
+                  "      {\n"
+                  "         \"id\": 0,\n"
+                  "         \"profile\": \"86396\",\n"
+                  "         \"res\": 10,\n"
+                  "         \"subtime\": 100,\n"
+                  "         \"walltime\": 86400.0\n"
+                  "      },\n"
+                  "      {\n"
+                  "         \"id\": 1,\n"
+                  "         \"profile\": \"1190\",\n"
+                  "         \"res\": 2048,\n"
+                  "         \"subtime\": 7644.0,\n"
+                  "         \"walltime\": -1000.0\n"
+                  "       }\n"
+                  "   ]\n"
+                  "}\n";
+
+  fprintf(trace_file, "%s", json_string.c_str());
+  fclose(trace_file);
+
+  // Create a Batch Service with a bogus trace file, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )), std::invalid_argument);
+
+
+  /** Create an valid trace file **/
+
+  trace_file = fopen(trace_file_path.c_str(), "w");
+
+  json_string =
+          "{\n"
+                  "  \"command\": \"/home/pfdutot/forge/batsim//tools/swf_to_batsim_workload_compute_only.py -t -gwo -i 1 -pf 93312 /tmp/expe_out/workloads/curie_downloaded.swf /tmp/expe_out/workloads/curie.json -cs 100e6 --verbose\",\n"
+                  "  \"date\": \"2018-07-10 17:08:09.673026\",\n"
+                  "  \"description\": \"this workload had been automatically generated\",\n"
+                  "  \"jobs\": [\n"
+                  "      {\n"
+                  "         \"id\": 1,\n"
+                  "         \"profile\": \"666\",\n"
+                  "         \"res\": 4,\n"
+                  "         \"subtime\": 0.0,\n"
+                  "         \"walltime\": 3600.0\n"
+                  "      },\n"
+                  "      {\n"
+                  "         \"id\": 2,\n"
+                  "         \"profile\": \"666\",\n"
+                  "         \"res\": 2,\n"
+                  "         \"subtime\": 1.0,\n"
+                  "         \"walltime\": 3600.0\n"
+                  "       }\n"
+                  "   ]\n"
+                  "}\n";
+
+  fprintf(trace_file, "%s", json_string.c_str());
+  fclose(trace_file);
+
+
+  // Create a Batch Service with a non-existing workload trace file, which should throw
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )));
+
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(new WorkloadTraceFileJSONTestWMS(
           this, {compute_service}, {}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
