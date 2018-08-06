@@ -114,7 +114,7 @@ namespace wrench {
       //Remove this message from the message manager list
       MessageManager::removeReceivedMessages(mailbox_name,msg);
 
-      WRENCH_INFO("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
+      WRENCH_DEBUG("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
 
       return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -170,6 +170,7 @@ namespace wrench {
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
       try {
+        MessageManager::manageMessage(mailbox_name,msg);
         mailbox->put_init(msg, (uint64_t) msg->payload)->detach();
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
@@ -206,6 +207,7 @@ namespace wrench {
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       try {
+        MessageManager::manageMessage(mailbox_name,msg);
         comm_ptr = mailbox->put_async(msg, (uint64_t) msg->payload);
       } catch (xbt_ex &e) {
         if (e.category == network_error) {

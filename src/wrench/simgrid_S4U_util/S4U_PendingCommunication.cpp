@@ -11,6 +11,7 @@
 #include <iostream>
 
 #include <xbt/ex.hpp>
+#include <wrench/util/MessageManager.h>
 #include "wrench/logging/TerminalOutput.h"
 #include "wrench/simgrid_S4U_util/S4U_PendingCommunication.h"
 #include "wrench/simulation/SimulationMessage.h"
@@ -45,7 +46,7 @@ namespace wrench {
                   "S4U_PendingCommunication::wait(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       }
-      return std::unique_ptr<SimulationMessage>(this->simulation_message);
+      return std::move(this->simulation_message);
     }
 
     /**
@@ -79,7 +80,7 @@ namespace wrench {
     unsigned long S4U_PendingCommunication::waitForSomethingToHappen(
             std::vector<S4U_PendingCommunication *> pending_comms, double timeout) {
 
-      std::set<S4U_PendingCommunication *> completed_comms;
+//      std::set<S4U_PendingCommunication *> completed_comms;
 
       if (pending_comms.empty()) {
         throw std::invalid_argument("S4U_PendingCommunication::waitForSomethingToHappen(): invalid argument");
@@ -94,6 +95,7 @@ namespace wrench {
       bool one_comm_failed = false;
       try {
         index = (unsigned long) simgrid::s4u::Comm::wait_any(&pending_s4u_comms);
+        MessageManager::removeReceivedMessages(pending_comms[index]->mailbox_name, pending_comms[index]->simulation_message.get());
       } catch (xbt_ex &e) {
         if (e.category != network_error) {
           throw std::runtime_error(

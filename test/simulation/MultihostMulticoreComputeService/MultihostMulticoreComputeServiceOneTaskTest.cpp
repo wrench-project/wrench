@@ -51,7 +51,8 @@ protected:
     MultihostMulticoreComputeServiceOneTaskTest() {
 
       // Create the simplest workflow
-      workflow = new wrench::Workflow();
+      workflow_unique_ptr = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+      workflow = workflow_unique_ptr.get();
 
       // Create two files
       input_file = workflow->addFile("input_file", 10000.0);
@@ -84,6 +85,7 @@ protected:
     }
 
     std::string platform_file_path = "/tmp/platform.xml";
+    std::unique_ptr<wrench::Workflow> workflow_unique_ptr;
     wrench::Workflow *workflow;
 
 };

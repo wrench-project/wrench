@@ -136,6 +136,7 @@ namespace wrench {
         try {
           this->scratch_space_storage_service =
                   new SimpleStorageService(hostname, scratch_space_size);
+          this->scratch_space_storage_service_shared_ptr = std::shared_ptr<StorageService>(this->scratch_space_storage_service);
         } catch (std::runtime_error &e) {
           throw;
         }
@@ -399,6 +400,14 @@ namespace wrench {
     */
     StorageService *ComputeService::getScratch() {
       return this->scratch_space_storage_service;
+    }
+
+    /**
+    * @brief Get a shared pointer to the compute service's scratch storage space
+    * @return a shared pointer to the shared scratch space
+    */
+    std::shared_ptr<StorageService> ComputeService::getScratchSharedPtr() {
+      return this->scratch_space_storage_service_shared_ptr;
     }
 
     /**

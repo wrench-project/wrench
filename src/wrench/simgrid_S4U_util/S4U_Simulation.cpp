@@ -251,62 +251,152 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the energy consumed by the host
-     * @return a double referring to the energy consumed by the host
+     * @brief Get the energy consumed by the host up to now
+     * @param hostname the host name
+     * @return the energy consumed by the host in Joules
+     * @throw std::runtime_error
      */
     double S4U_Simulation::getEnergyConsumedByHost(std::string hostname) {
-      return  sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
+      double energy_consumed = 0;
+      try {
+        energy_consumed = sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
+      } catch (std::exception& e) {
+        throw std::runtime_error(
+                "S4U_Simulation::getEnergyConsumedByHost(): Was not able to get the energy consumed by the host. Make sure energy plugin is enabled and "
+                        "the host name is correct"
+        );
+      }
+      return energy_consumed;
     }
 
     /**
-     * @brief Get the total energy consumed by all the provided hosts
-     * @return a double referring to the total energy consumed by all the provided hosts
+     * @brief Get the total energy consumed by a set of hosts
+     * @param the list of hostnames
+     * @return The total energy consumed by all the hosts in Joules
+     * @throw std::runtime_error
      */
     double S4U_Simulation::getTotalEnergyConsumed(std::vector<std::string> hostnames) {
       double total_energy = 0;
-      for (auto hostname: hostnames) {
-        total_energy+=sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
+      try {
+        for (auto hostname: hostnames) {
+          total_energy += sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
+        }
+      } catch (std::exception& e) {
+        throw std::runtime_error(
+                "S4U_Simulation::getTotalEnergyConsumed(): Was not able to get the total energy consumed by the host. Make sure energy plugin is enabled and "
+                        "the host name is correct"
+        );
       }
       return total_energy;
     }
 
     /**
-     * @brief Set the power state of the host specified in the platform xml
+     * @brief Set the power state of the host
+     * @param hostname: the host name
+     * @param pstate: the power state index (the power state index is specified in the platform xml description file)
+     * @throw std::runtime_error
      */
     void S4U_Simulation::setPstate(std::string hostname, int pstate ) {
-      simgrid::s4u::Host::by_name(hostname)->set_pstate(pstate);
+      try {
+        simgrid::s4u::Host::by_name(hostname)->set_pstate(pstate);
+      } catch (std::exception& e) {
+        throw std::runtime_error(
+                "S4U_Simulation::setPstate(): Was not able to set the pstate of the. Make sure energy is plugin is enabled and "
+                        "the host name is correct and the pstate is within range of pstates available to the host"
+        );
+      }
     }
 
     /**
-     * @brief Get the total number of pstates of a host specified in the platform xml
-     * @return an int referring to the number of power states available to the current host as specified in the platform xml
+     * @brief Get the total number of power states of a host
+     * @param hostname: the host name
+     * @return The number of power states available for the host (as specified in the platform xml description file)
+     * @throw std::runtime_error
      */
     int S4U_Simulation::getNumberofPstates(std::string hostname) {
-      return simgrid::s4u::Host::by_name(hostname)->get_pstate_count();
+      try {
+        return simgrid::s4u::Host::by_name(hostname)->get_pstate_count();
+      } catch (std::exception& e) {
+        throw std::runtime_error(
+                "S4U_Simulation::getNumberofPstates():: Was not able to get the energy consumed by the host. Make sure energy plugin is enabled and "
+                        "the host name is correct"
+        );
+      }
     }
 
     /**
-     * @brief Get the current pstate of a host
-     * @return an int referring to the current pstate of the current host
+     * @brief Get the current power state of a host
+     * @param hostname: the host name
+     * @return The index of the current pstate of the host (as specified in the platform xml description file)
+     * @throw std::runtime_error
      */
     int S4U_Simulation::getCurrentPstate(std::string hostname) {
-      return simgrid::s4u::Host::by_name(hostname)->get_pstate();
+      try {
+        return simgrid::s4u::Host::by_name(hostname)->get_pstate();
+      } catch (std::exception& e) {
+        throw std::runtime_error(
+                "S4U_Simulation::getNumberofPstates(): Was not able to get the number of pstates of the host. Make sure energy plugin is enabled and "
+                        "the host name is correct"
+        );
+      }
     }
 
     /**
-     * @brief Get the minimum power available to the host as specified in the platform xml
-     * @return an double referring to the minimum power available to the host as specified in the platform xml
+     * @brief Get the minimum power available for a host
+     * @param hostname: the host name
+     * @return The minimum power available for the host (as specified in the platform xml description file)
+     * @throw std::runtime_error
      */
     double S4U_Simulation::getMinPowerAvailable(std::string hostname) {
-      return sg_host_get_wattmin_at(simgrid::s4u::Host::by_name(hostname), (simgrid::s4u::Host::by_name(hostname))->get_pstate());
+      try {
+        return sg_host_get_wattmin_at(simgrid::s4u::Host::by_name(hostname),
+                                      (simgrid::s4u::Host::by_name(hostname))->get_pstate());
+      } catch (std::exception& e) {
+        throw std::runtime_error(
+                "S4U_Simulation::getMinPowerAvailable(): Was not able to get the min power avaiable to the host. Make sure energy plugin is enabled and "
+                        "the host name is correct"
+        );
+      }
     }
 
     /**
-     * @brief Get the maximum power possible for the host to consume as specified in the platform xml
-     * @return an double referring to the maximum power possible for the host to consume as specified in the platform xml
+     * @brief Get the maximum power available for a host
+     * @param hostname: the host name
+     * @return The maximum power available for the host (as specified in the platform xml description file)
+     * @throw std::runtime_error
      */
     double S4U_Simulation::getMaxPowerPossible(std::string hostname) {
-      return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname), (simgrid::s4u::Host::by_name(hostname))->get_pstate());
+      try {
+        return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname),
+                                      (simgrid::s4u::Host::by_name(hostname))->get_pstate());
+      } catch (std::exception& e) {
+        throw std::runtime_error(
+                "S4U_Simulation::getMaxPowerPossible():: Was not able to get the max power possible for the host. Make sure energy is plugin is enabled and "
+                        "the host name is correct"
+        );
+      }
+    }
+
+    /**
+     * @brief Get the list of power states available for a host
+     * @param hostname: the host name
+     * @return a list of power states available for the host (as specified in the platform xml description file)
+     * @throw std::runtime_error
+     */
+    std::vector<int> S4U_Simulation::getListOfPstates(std::string hostname) {
+      std::vector<int> list = {};
+      try {
+        int num_pstates = getNumberofPstates(hostname);
+        for (int i = 0; i < num_pstates; i++) {
+          list.push_back(i);
+        }
+      } catch (std::exception& e) {
+        throw std::runtime_error(
+                "S4U_Simulation::getListOfPstates(): Was not able to get the list of pstates for the host. Make sure energy plugin is enabled and "
+                        "the host name is correct"
+        );
+      }
+      return list;
     }
 
 

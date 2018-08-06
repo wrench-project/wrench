@@ -21,8 +21,14 @@ namespace wrench {
      * @brief Insert a message in the manager's  "database"
      * @param mailbox: the name of the relevant mailbox
      * @param msg: the message
+     * @throw std::runtime_error
      */
     void MessageManager::manageMessage(std::string mailbox, SimulationMessage *msg) {
+      if (msg == nullptr) {
+        throw std::runtime_error(
+                "MessageManager::manageMessage()::Null Message cannot be saved by MessageManager"
+        );
+      }
       if (mailbox_messages.find(mailbox) == mailbox_messages.end()) {
         mailbox_messages.insert({mailbox, {}});
       }
@@ -38,8 +44,28 @@ namespace wrench {
       for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
         if ((*msg_itr).first == mailbox) {
           for (size_t i = 0; i < (*msg_itr).second.size(); i++) {
+            if ((*msg_itr).second[i] != nullptr) {
+              delete (*msg_itr).second[i];
+            }
+          }
+          (*msg_itr).second.clear();
+          break;
+        }
+      }
+    }
+
+    /**
+     * @brief Clean up all the messages that MessageManager has stored (so as to free up memory)
+     */
+    void MessageManager::cleanUpAllMessages() {
+      std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
+      for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
+        for (size_t i = 0; i < (*msg_itr).second.size(); i++) {
+          if ((*msg_itr).second[i] != nullptr) {
             delete (*msg_itr).second[i];
           }
+        }
+        if ((*msg_itr).second.size() > 0) {
           (*msg_itr).second.clear();
         }
       }

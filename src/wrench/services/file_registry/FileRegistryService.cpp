@@ -204,7 +204,7 @@ namespace wrench {
       if (auto msg = dynamic_cast<FileRegistryAddEntryAnswerMessage *>(message.get())) {
         return;
       } else {
-        std::runtime_error("Unexpected [" + message->getName() + "] message");
+        std::runtime_error("FileRegistryService::addEntry(): Unexpected [" + message->getName() + "] message");
       }
     }
 
@@ -253,7 +253,7 @@ namespace wrench {
         }
         return;
       } else {
-        std::runtime_error("Unexpected [" + message->getName() + "] message");
+        std::runtime_error("FileRegistryService::removeEntry(): Unexpected [" + message->getName() + "] message");
       }
     }
 

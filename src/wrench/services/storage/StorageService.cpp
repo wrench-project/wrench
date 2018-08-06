@@ -552,33 +552,43 @@ namespace wrench {
           throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid files argument");
         }
       }
+
       for (auto const &l : file_locations) {
         if ((l.first == nullptr) || (l.second == nullptr)) {
           throw std::invalid_argument("StorageService::writeOrReadFiles(): invalid file location argument");
         }
       }
+
+      // Create a temporary sorted list of files so that the order in which files are read/written is deterministic!
+      std::map<std::string, WorkflowFile*> sorted_files;
       for (auto const &f : files) {
+        sorted_files.insert(std::make_pair(f->getID(), f));
+      }
+
+      for (auto const &f : sorted_files) {
+
+        WorkflowFile *file = f.second;
 
         // Identify the Storage Service
         StorageService *storage_service = default_storage_service;
-        if (file_locations.find(f) != file_locations.end()) {
-          storage_service = file_locations[f];
+        if (file_locations.find(file) != file_locations.end()) {
+          storage_service = file_locations[file];
         }
         if (storage_service == nullptr) {
-          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoStorageServiceForFile(f)));
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoStorageServiceForFile(file)));
         }
 
         if (action == READ) {
           try {
-            WRENCH_INFO("Reading file %s from storage service %s", f->getID().c_str(), storage_service->getName().c_str());
+            WRENCH_INFO("Reading file %s from storage service %s", file->getID().c_str(), storage_service->getName().c_str());
             if (storage_service != default_storage_service) {
               //if the storage service where I am going to read from is not the default storage service (scratch), then I
               // don't want to read from job's temp partition, rather I would like to read from / partition of the storage service
-              storage_service->readFile(f, nullptr);
+              storage_service->readFile(file, nullptr);
             } else {
-              storage_service->readFile(f, job);
+              storage_service->readFile(file, job);
             }
-            WRENCH_INFO("File %s read", f->getID().c_str());
+            WRENCH_INFO("File %s read", file->getID().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -586,15 +596,15 @@ namespace wrench {
           }
         } else {
           try {
-            WRENCH_INFO("Writing file %s to storage service %s", f->getID().c_str(), storage_service->getName().c_str());
+            WRENCH_INFO("Writing file %s to storage service %s", file->getID().c_str(), storage_service->getName().c_str());
             // Write the file
             if (storage_service == default_storage_service) {
-              files_in_scratch.insert(f);
-              storage_service->writeFile(f, job);
+              files_in_scratch.insert(file);
+              storage_service->writeFile(file, job);
             } else {
-              storage_service->writeFile(f, nullptr);
+              storage_service->writeFile(file, nullptr);
             }
-            WRENCH_INFO("Wrote file %s", f->getID().c_str());
+            WRENCH_INFO("Wrote file %s", file->getID().c_str());
           } catch (std::runtime_error &e) {
             throw;
           } catch (WorkflowExecutionException &e) {
@@ -897,7 +907,6 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
-     * @throw std::runtime_error
      *
      */
     void StorageService::initiateFileCopy(std::string answer_mailbox, WorkflowFile *file, StorageService *src,

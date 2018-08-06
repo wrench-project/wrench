@@ -1050,9 +1050,9 @@ void BatchServiceTest::do_StandardPlusPilotJobTaskTest_test() {
 }
 
 
-/**********************************************************************/
-/**  INSUFFICIENT CORES JOB SUBMISSION TASK SIMULATION TEST ON ONE-ONE HOST                **/
-/**********************************************************************/
+/**************************************************************************/
+/**INSUFFICIENT CORES JOB SUBMISSION TASK SIMULATION TEST ON ONE-ONE HOST**/
+/**************************************************************************/
 
 class InsufficientCoresJobSubmissionTestWMS : public wrench::WMS {
 

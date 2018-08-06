@@ -53,6 +53,7 @@ protected:
 
       // Create the simplest workflow
       workflow = new wrench::Workflow();
+      workflow_unique_ptrs.push_back(std::unique_ptr<wrench::Workflow>(workflow));
 
       // Create the tasks
       task1 = workflow->addTask("task_1_10s_1core", 10.0, 1, 1, 1.0, 0);
@@ -65,6 +66,7 @@ protected:
       return workflow;
     }
 
+    std::vector<std::unique_ptr<wrench::Workflow>> workflow_unique_ptrs;
     std::string platform_file_path = "/tmp/platform.xml";
 };
 
