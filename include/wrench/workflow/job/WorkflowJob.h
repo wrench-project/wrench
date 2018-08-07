@@ -45,6 +45,8 @@ namespace wrench {
 
         std::string getName();
 
+        double getSubmitDate();
+
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -77,6 +79,8 @@ namespace wrench {
         Type type;
         /** @brief The job's name */
         std::string name;
+        /** @brief The date at which the job was last submitted */
+        double submit_date;
         /** @brief The compute service to which the job was submitted */
         ComputeService *parent_compute_service;
 
