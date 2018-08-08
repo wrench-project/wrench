@@ -50,6 +50,7 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
+        void setSubmitDate(double date);
 
         std::string popCallbackMailbox();
 
