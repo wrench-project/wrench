@@ -499,7 +499,10 @@ namespace wrench {
                                               this->scratch_space,
                                               workflow_job,
                                               this->getPropertyValueAsDouble(
-                                                      StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD)));
+                                                      StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD),
+                                              this->getPropertyValueAsBoolean(
+                                                      StandardJobExecutorProperty::SIMULATE_ONLY_ONE_COMPUTE_THREAD)
+        ));
 
         workunit_executor->simulation = this->simulation;
         workunit_executor->start(workunit_executor, true);
