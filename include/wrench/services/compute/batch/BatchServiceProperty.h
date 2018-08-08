@@ -87,6 +87,13 @@ namespace wrench {
          */
         DECLARE_PROPERTY_NAME(BATCH_RJMS_DELAY);
 
+        /** @brief Simulate only one compute thread per (standard) job. This is for scalability reason, and only simulation-valid
+        *         if one is sure that cores are space shared (i.e., only a single compute thread can ever
+        *         run on a core at once). Since space-sharing at the core level is typically the case in batch-scheduled
+         *         clusters, this is likely fine. Possible values are "false" (the default) or "true".
+        */
+        DECLARE_PROPERTY_NAME(SIMULATE_ONLY_ONE_COMPUTE_THREAD_PER_JOB);
+
         /***********************/
         /** \cond INTERNAL     */
         /***********************/

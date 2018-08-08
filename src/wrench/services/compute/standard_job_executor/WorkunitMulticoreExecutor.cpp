@@ -44,6 +44,7 @@ namespace wrench {
      * @param workunit: the work unit to perform
      * @param scratch_space: the service's scratch storage service (nullptr if none)
      * @param thread_startup_overhead: the thread_startup overhead, in seconds
+     * @param simulate_only_one_compute_thread: simulate just one compute thread (for simulation scalability reasons)
      */
     WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(
             Simulation *simulation,
@@ -54,7 +55,8 @@ namespace wrench {
             Workunit *workunit,
             StorageService *scratch_space,
             WorkflowJob* job,
-            double thread_startup_overhead) :
+            double thread_startup_overhead,
+            bool simulate_only_one_compute_thread) :
             Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
 
       if (thread_startup_overhead < 0) {
@@ -68,6 +70,7 @@ namespace wrench {
       this->callback_mailbox = callback_mailbox;
       this->workunit = workunit;
       this->thread_startup_overhead = thread_startup_overhead;
+      this->simulate_only_one_compute_thread = simulate_only_one_compute_thread;
       this->num_cores = num_cores;
       this->ram_utilization = ram_utilization;
       this->scratch_space = scratch_space;
@@ -240,7 +243,7 @@ namespace wrench {
         WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
 
         try {
-          runMulticoreComputation(task->getFlops(), task->getParallelEfficiency());
+          runMulticoreComputation(task->getFlops(), task->getParallelEfficiency(), this->simulate_only_one_compute_thread );
         } catch (WorkflowExecutionEvent &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
@@ -338,7 +341,7 @@ namespace wrench {
      * @param flops: the number of flops
      * @param parallel_efficiency: the parallel efficiency
      */
-    void WorkunitMulticoreExecutor::runMulticoreComputation(double flops, double parallel_efficiency) {
+    void WorkunitMulticoreExecutor::runMulticoreComputation(double flops, double parallel_efficiency, bool simulate_only_one_compute_thread) {
       double effective_flops = (flops / (this->num_cores * parallel_efficiency));
 
       std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");
@@ -346,10 +349,15 @@ namespace wrench {
       // Nobody kills me while I am starting compute threads!
       this->acquireDaemonLock();
 
-      WRENCH_INFO("%ld compute threads", this->num_cores);
+      unsigned long simulated_num_cores = this->num_cores;
+      if (simulate_only_one_compute_thread) {
+        simulated_num_cores = 1;
+      }
+
+      WRENCH_INFO("Simulating %ld compute threads (as %ld actual compute threads)", this->num_cores, simulated_num_cores);
       // Create a compute thread to run the computation on each core
       bool success = true;
-      for (unsigned long i = 0; i < this->num_cores; i++) {
+      for (unsigned long i = 0; i < simulated_num_cores; i++) {
 //        WRENCH_INFO("Creating compute thread %ld", i);
         try {
           S4U_Simulation::sleep(this->thread_startup_overhead);

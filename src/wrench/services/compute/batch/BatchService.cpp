@@ -1707,7 +1707,11 @@ namespace wrench {
                           nullptr,
                           {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                                    this->getPropertyValueAsString(
-                                           BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}},
+                                           BatchServiceProperty::THREAD_STARTUP_OVERHEAD)},
+                           {StandardJobExecutorProperty::SIMULATE_ONLY_ONE_COMPUTE_THREAD,
+                                   this->getPropertyValueAsString(
+                                           BatchServiceProperty::SIMULATE_ONLY_ONE_COMPUTE_THREAD_PER_JOB)},
+                          },
                           {}));
           executor->start(executor, true);
           batch_job->setBeginTimeStamp(S4U_Simulation::getClock());
