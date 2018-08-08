@@ -1708,9 +1708,9 @@ namespace wrench {
                           {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                                    this->getPropertyValueAsString(
                                            BatchServiceProperty::THREAD_STARTUP_OVERHEAD)},
-                           {StandardJobExecutorProperty::SIMULATE_ONLY_ONE_COMPUTE_THREAD,
+                           {StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP,
                                    this->getPropertyValueAsString(
-                                           BatchServiceProperty::SIMULATE_ONLY_ONE_COMPUTE_THREAD_PER_JOB)},
+                                           BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP)},
                           },
                           {}));
           executor->start(executor, true);

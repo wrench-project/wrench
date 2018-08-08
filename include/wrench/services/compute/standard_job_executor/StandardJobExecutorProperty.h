@@ -53,11 +53,11 @@ namespace wrench {
          */
         DECLARE_PROPERTY_NAME(HOST_SELECTION_ALGORITHM);
 
-        /** @brief Simulate only one compute thread. This is for scalability reason, and only simulation-valid
-         *         if one is sure that cores are space shared (i.e., only a single compute thread can ever
-         *         run on a core at once).
+        /** @brief Simulate computation as just a sleep instead of with an actual compute thread. This is for scalability reason,
+         *         and only simulation-valid if one is sure that cores are space shared (i.e., only a single compute thread can ever
+         *         run on a core at once). Possible values are "true" or "false"
          */
-        DECLARE_PROPERTY_NAME(SIMULATE_ONLY_ONE_COMPUTE_THREAD);
+        DECLARE_PROPERTY_NAME(SIMULATE_COMPUTATION_AS_SLEEP);
 
     };
 

@@ -49,7 +49,7 @@ namespace wrench {
                      StorageService *scratch_space,
                      WorkflowJob* job,
                      double thread_startup_overhead,
-                     bool simulate_only_one_compute_thread);
+                     bool simulate_computation_as_sleep);
 
         void kill();
 
@@ -66,13 +66,13 @@ namespace wrench {
 
         void performWork(Workunit *work);
 
-        void runMulticoreComputation(double flops, double parallel_efficiency, bool simulate_only_one_compute_thread);
+        void runMulticoreComputation(double flops, double parallel_efficiency, bool simulate_computation_as_sleep);
 
         std::string callback_mailbox;
         unsigned long num_cores;
         double ram_utilization;
         double thread_startup_overhead;
-        bool simulate_only_one_compute_thread;
+        bool simulate_computation_as_sleep;
 
         StorageService* scratch_space;
 
