@@ -19,5 +19,5 @@ namespace wrench {
     SET_PROPERTY_NAME(StandardJobExecutorProperty, TASK_SELECTION_ALGORITHM);
     SET_PROPERTY_NAME(StandardJobExecutorProperty, HOST_SELECTION_ALGORITHM);
 
-    SET_PROPERTY_NAME(StandardJobExecutorProperty, SIMULATE_ONLY_ONE_COMPUTE_THREAD);
+    SET_PROPERTY_NAME(StandardJobExecutorProperty, SIMULATE_COMPUTATION_AS_SLEEP);
 };

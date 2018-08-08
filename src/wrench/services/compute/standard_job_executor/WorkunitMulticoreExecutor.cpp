@@ -44,7 +44,7 @@ namespace wrench {
      * @param workunit: the work unit to perform
      * @param scratch_space: the service's scratch storage service (nullptr if none)
      * @param thread_startup_overhead: the thread_startup overhead, in seconds
-     * @param simulate_only_one_compute_thread: simulate just one compute thread (for simulation scalability reasons)
+     * @param simulate_computation_as_sleep: simulate computation as a sleep instead of an actual compute thread (for simulation scalability reasons)
      */
     WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(
             Simulation *simulation,
@@ -56,7 +56,7 @@ namespace wrench {
             StorageService *scratch_space,
             WorkflowJob* job,
             double thread_startup_overhead,
-            bool simulate_only_one_compute_thread) :
+            bool simulate_computation_as_sleep) :
             Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
 
       if (thread_startup_overhead < 0) {
@@ -70,7 +70,7 @@ namespace wrench {
       this->callback_mailbox = callback_mailbox;
       this->workunit = workunit;
       this->thread_startup_overhead = thread_startup_overhead;
-      this->simulate_only_one_compute_thread = simulate_only_one_compute_thread;
+      this->simulate_computation_as_sleep = simulate_computation_as_sleep;
       this->num_cores = num_cores;
       this->ram_utilization = ram_utilization;
       this->scratch_space = scratch_space;
@@ -243,7 +243,7 @@ namespace wrench {
         WRENCH_INFO("Executing task %s (%lf flops) on %ld cores (%s)", task->getID().c_str(), task->getFlops(), this->num_cores, S4U_Simulation::getHostName().c_str());
 
         try {
-          runMulticoreComputation(task->getFlops(), task->getParallelEfficiency(), this->simulate_only_one_compute_thread );
+          runMulticoreComputation(task->getFlops(), task->getParallelEfficiency(), this->simulate_computation_as_sleep );
         } catch (WorkflowExecutionEvent &e) {
           task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           throw;
@@ -341,7 +341,7 @@ namespace wrench {
      * @param flops: the number of flops
      * @param parallel_efficiency: the parallel efficiency
      */
-    void WorkunitMulticoreExecutor::runMulticoreComputation(double flops, double parallel_efficiency, bool simulate_only_one_compute_thread) {
+    void WorkunitMulticoreExecutor::runMulticoreComputation(double flops, double parallel_efficiency, bool simulate_computation_as_sleep) {
       double effective_flops = (flops / (this->num_cores * parallel_efficiency));
 
       std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");
@@ -349,82 +349,93 @@ namespace wrench {
       // Nobody kills me while I am starting compute threads!
       this->acquireDaemonLock();
 
-      unsigned long simulated_num_cores = this->num_cores;
-      if (simulate_only_one_compute_thread) {
-        simulated_num_cores = 1;
-      }
+      if (simulate_computation_as_sleep) {
 
-      WRENCH_INFO("Simulating %ld compute threads (as %ld actual compute threads)", this->num_cores, simulated_num_cores);
-      // Create a compute thread to run the computation on each core
-      bool success = true;
-      for (unsigned long i = 0; i < simulated_num_cores; i++) {
+        /** Simulate computation as sleep **/
+
+        // Still sleep for the thread startup overhead
+        S4U_Simulation::sleep(this->num_cores * this->thread_startup_overhead);
+
+        // Then sleep for the computation duration
+        double sleep_time = flops / Simulation::getFlopRate();
+        Simulation::sleep(sleep_time);
+
+      } else {
+        /** Simulate computation with actual compute threads **/
+
+        WRENCH_INFO("Simulating %ld compute threads", this->num_cores);
+
+        // Create a compute thread to run the computation on each core
+        bool success = true;
+        for (unsigned long i = 0; i < this->num_cores; i++) {
 //        WRENCH_INFO("Creating compute thread %ld", i);
-        try {
-          S4U_Simulation::sleep(this->thread_startup_overhead);
-        } catch (std::exception &e) {
-          WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
-          this->releaseDaemonLock();
-          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FatalFailure()));
+          try {
+            S4U_Simulation::sleep(this->thread_startup_overhead);
+          } catch (std::exception &e) {
+            WRENCH_INFO("Got an exception while sleeping... perhaps I am being killed?");
+            this->releaseDaemonLock();
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new FatalFailure()));
+          }
+          std::shared_ptr<ComputeThread> compute_thread;
+          try {
+            compute_thread = std::shared_ptr<ComputeThread>(
+                    new ComputeThread(this->simulation, S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
+            compute_thread->start(compute_thread, true);
+          } catch (std::exception &e) {
+            // Some internal SimGrid exceptions...????
+            WRENCH_INFO("Could not create compute thread... perhaps I am being killed?");
+            success = false;
+            break;
+          }
+          WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
+          this->compute_threads.push_back(compute_thread);
         }
-        std::shared_ptr<ComputeThread> compute_thread;
-        try {
-          compute_thread = std::shared_ptr<ComputeThread>(new ComputeThread(this->simulation, S4U_Simulation::getHostName(), effective_flops, tmp_mailbox));
-          compute_thread->start(compute_thread, true);
-        } catch (std::exception &e) {
-          // Some internal SimGrid exceptions...????
-          WRENCH_INFO("Could not create compute thread... perhaps I am being killed?");
-          success = false;
-          break;
-        }
-        WRENCH_INFO("Launched compute thread [%s]", compute_thread->getName().c_str());
-        this->compute_threads.push_back(compute_thread);
-      }
 
 
-
-      if (!success) {
-        WRENCH_INFO("Failed to create some compute threads...");
-        // TODO: Probably dangerous to kill these now...
+        if (!success) {
+          WRENCH_INFO("Failed to create some compute threads...");
+          // TODO: Probably dangerous to kill these now...
 //        for (auto ct : this->compute_threads) {
 //          ct->kill();
 //        }
-        this->releaseDaemonLock();
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
-      }
-      WRENCH_INFO("Waiting for completion of all compute threads");
-
-      this->releaseDaemonLock();  // People can kill me now
-
-      success = true;
-      // Wait for all actors to complete
-      #ifndef S4U_KILL_JOIN_WORKS
-      for (unsigned long i = 0; i < this->compute_threads.size(); i++) {
-        try {
-          S4U_Mailbox::getMessage(tmp_mailbox);
-        } catch (std::shared_ptr<NetworkError> &e) {
-          WRENCH_INFO("Got a network error when trying to get completion message from compute thread");
-          // Do nothing, perhaps the child has died
-          success = false;
-          continue;
+          this->releaseDaemonLock();
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
         }
-      }
-      #else
-      for (unsigned long i=0; i < this->compute_threads.size(); i++) {
-          WRENCH_INFO("JOINING WITH A COMPUTE THREAD %s", this->compute_threads[i]->process_name.c_str());
-        try {
-          this->compute_threads[i]->join();
-        } catch (std::shared_ptr<FatalFailure> &e) {
-          WRENCH_INFO("EXCEPTION WHILE JOINED");
-          // Do nothing, perhaps the child has died...
-          continue;
+        WRENCH_INFO("Waiting for completion of all compute threads");
+
+        this->releaseDaemonLock();  // People can kill me now
+
+        success = true;
+        // Wait for all actors to complete
+        #ifndef S4U_KILL_JOIN_WORKS
+        for (unsigned long i = 0; i < this->compute_threads.size(); i++) {
+          try {
+            S4U_Mailbox::getMessage(tmp_mailbox);
+          } catch (std::shared_ptr<NetworkError> &e) {
+            WRENCH_INFO("Got a network error when trying to get completion message from compute thread");
+            // Do nothing, perhaps the child has died
+            success = false;
+            continue;
+          }
         }
-        WRENCH_INFO("JOINED with COMPUTE THREAD %s", this->compute_threads[i]->process_name.c_str());
+        #else
+        for (unsigned long i=0; i < this->compute_threads.size(); i++) {
+            WRENCH_INFO("JOINING WITH A COMPUTE THREAD %s", this->compute_threads[i]->process_name.c_str());
+          try {
+            this->compute_threads[i]->join();
+          } catch (std::shared_ptr<FatalFailure> &e) {
+            WRENCH_INFO("EXCEPTION WHILE JOINED");
+            // Do nothing, perhaps the child has died...
+            continue;
+          }
+          WRENCH_INFO("JOINED with COMPUTE THREAD %s", this->compute_threads[i]->process_name.c_str());
 
-      }
-      #endif
+        }
+        #endif
 
-      if (!success) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
+        if (!success) {
+          throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ComputeThreadHasDied()));
+        }
       }
     }
 

@@ -65,7 +65,7 @@ namespace wrench {
                  {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
                  {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
                  {BatchServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
-                 {BatchServiceProperty::SIMULATE_ONLY_ONE_COMPUTE_THREAD_PER_JOB,    "false"}
+                 {BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,           "false"}
                 };
 
         std::map<std::string, std::string> default_messagepayload_values = {

@@ -501,7 +501,7 @@ namespace wrench {
                                               this->getPropertyValueAsDouble(
                                                       StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD),
                                               this->getPropertyValueAsBoolean(
-                                                      StandardJobExecutorProperty::SIMULATE_ONLY_ONE_COMPUTE_THREAD)
+                                                      StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP)
         ));
 
         workunit_executor->simulation = this->simulation;
