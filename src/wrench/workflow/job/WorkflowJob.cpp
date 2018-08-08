@@ -157,4 +157,12 @@ namespace wrench {
     double WorkflowJob::getSubmitDate() {
       return this->submit_date;
     }
+
+    /**
+     * @brief Set the date at which the job was last submitted
+     * @param the submit date
+     */
+    void WorkflowJob::setSubmitDate(double date) {
+      this->submit_date = date;
+    }
 };
