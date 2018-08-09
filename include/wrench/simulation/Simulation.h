@@ -92,6 +92,7 @@ namespace wrench {
         double getCurrentSimulatedDate();
 
         static void sleep(double duration);
+        static void compute(double flops);
 
         /***********************/
         /** \endcond            */

@@ -112,6 +112,10 @@ namespace wrench {
 
       while (should_continue) {
 
+        if (S4U_Simulation::getFlopRate() <= 0) {
+          S4U_Simulation::compute(0.001);
+        }
+
         // Post a recv on my standard mailbox_name in case there is none pending
         if (should_add_incoming_control_connection) {
           this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
@@ -253,6 +257,7 @@ namespace wrench {
         return processFileReadRequest(msg->file, msg->src_partition, msg->answer_mailbox, msg->mailbox_to_receive_the_file_content);
 
       } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
+
         return processFileCopyRequest(msg->file, msg->src, msg->src_partition, msg->dst_partition, msg->answer_mailbox, msg->start_timestamp);
 
       } else {
@@ -363,6 +368,7 @@ namespace wrench {
 
       // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
       if (success) {
+
         this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
                 new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, src_partition , mailbox_to_receive_the_file_content, "")
         ));

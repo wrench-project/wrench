@@ -176,6 +176,17 @@ namespace wrench {
       return flop_rate;
     }
 
+    /**
+     * @brief Get the flop rate of the current host
+     *
+     * @return the flop rate in floating point operations per second
+     *
+     * @throw std::invalid_argument
+     */
+    double S4U_Simulation::getFlopRate() {
+      return simgrid::s4u::Host::current()->get_speed(); // changed it to speed of the current pstate
+    }
+
 
 
     /**
@@ -212,6 +223,14 @@ namespace wrench {
      */
     double S4U_Simulation::getHostMemoryCapacity(std::string hostname) {
       return getHostMemoryCapacity(simgrid::s4u::Host::by_name(hostname));
+    }
+
+    /**
+     * @brief Get the memory capacity of the current host
+     * @return a memory capacity in bytes
+     */
+    double S4U_Simulation::getMemoryCapacity() {
+      return getHostMemoryCapacity(simgrid::s4u::Host::current());
     }
 
     /**
