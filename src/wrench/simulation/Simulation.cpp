@@ -590,6 +590,14 @@ namespace wrench {
     }
 
     /**
+     * @brief Make the calling process compute
+     * @param duration: a number of floating point operations
+     */
+    void Simulation::compute(double flops) {
+      S4U_Simulation::compute(flops);
+    }
+
+    /**
      * @brief Get the simulation output object
      * @return simulation output object
      */
