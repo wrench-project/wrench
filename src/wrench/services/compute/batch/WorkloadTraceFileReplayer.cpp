@@ -91,7 +91,6 @@ namespace wrench {
                             num_cores_per_node, num_cores_per_node, parallel_efficiency,
                             requested_ram);
           to_submit.push_back(task);
-          std::cerr << "ADDED TASK " << task->getID() << "\n";
         }
 
         // Create a Standard Job with only the tasks
@@ -105,12 +104,10 @@ namespace wrench {
         batch_job_args["-c"] = std::to_string(num_cores_per_node); //number of cores per task
         batch_job_args["-color"] = "green";
 
-        std::cerr << "SUBMITTING!!!\n";
         // Submit this job to the batch service
         WRENCH_INFO("Submitting a [-N:%s, -t:%s, -c:%s] job",
                     batch_job_args["-N"].c_str(), batch_job_args["-t"].c_str(), batch_job_args["-c"].c_str());
         job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
-        WRENCH_INFO("SUBMITTED");
 
       }
 

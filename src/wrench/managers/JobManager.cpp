@@ -492,7 +492,7 @@ namespace wrench {
                                        task->getID() + " does not have a TASK_COMPLETED internal state (" +
                                        WorkflowTask::stateToString(task->getInternalState()) + ")");
             }
-            auto children = this->wms->getWorkflow()->getTaskChildren(task);
+            auto children = task->getWorkflow()->getTaskChildren(task);
             for (auto child : children) {
               switch (child->getInternalState()) {
                 case WorkflowTask::InternalState::TASK_NOT_READY:
