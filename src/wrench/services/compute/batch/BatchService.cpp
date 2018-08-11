@@ -1127,6 +1127,8 @@ namespace wrench {
      */
     bool BatchService::processNextMessage() {
 
+      S4U_Simulation::computeZeroFlop();
+
       // Wait for a message
       std::unique_ptr<SimulationMessage> message = nullptr;
 
@@ -1140,6 +1142,7 @@ namespace wrench {
         WRENCH_INFO("Got a NULL message... Likely this means we're all done. Aborting!");
         return false;
       }
+
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
@@ -1707,7 +1710,11 @@ namespace wrench {
                           nullptr,
                           {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,
                                    this->getPropertyValueAsString(
-                                           BatchServiceProperty::THREAD_STARTUP_OVERHEAD)}},
+                                           BatchServiceProperty::THREAD_STARTUP_OVERHEAD)},
+                           {StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP,
+                                   this->getPropertyValueAsString(
+                                           BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP)},
+                          },
                           {}));
           executor->start(executor, true);
           batch_job->setBeginTimeStamp(S4U_Simulation::getClock());

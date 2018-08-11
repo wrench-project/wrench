@@ -19,4 +19,6 @@ namespace wrench {
     SET_PROPERTY_NAME(BatchServiceProperty, SIMULATED_WORKLOAD_TRACE_FILE);
     SET_PROPERTY_NAME(BatchServiceProperty, OUTPUT_CSV_JOB_LOG);
 
+    SET_PROPERTY_NAME(BatchServiceProperty, SIMULATE_COMPUTATION_AS_SLEEP);
+
 }

@@ -32,6 +32,7 @@ namespace wrench {
      */
     WorkflowJob::WorkflowJob(Type type) : type(type) {
       this->parent_compute_service = nullptr;
+      this->submit_date = -1.0;
     }
 
 
@@ -148,4 +149,20 @@ namespace wrench {
      ComputeService *WorkflowJob::getParentComputeService() {
        return this->parent_compute_service;
      }
+
+    /**
+     * @brief Get the date at which the job was last submitted (<0 means "never submitted")
+     * @return the submit date
+     */
+    double WorkflowJob::getSubmitDate() {
+      return this->submit_date;
+    }
+
+    /**
+     * @brief Set the date at which the job was last submitted
+     * @param the submit date
+     */
+    void WorkflowJob::setSubmitDate(double date) {
+      this->submit_date = date;
+    }
 };

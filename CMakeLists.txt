@@ -195,7 +195,7 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchServiceMessage.cpp
         src/wrench/services/compute/batch/BatchService.cpp
         src/wrench/services/compute/batch/WorkloadTraceFileReplayer.cpp
-        src/wrench/services/compute/batch/OneJobWMS.cpp
+        src/wrench/services/compute/batch/WorkloadTraceFileReplayerEventReceiver.cpp
         src/wrench/services/compute/batch/BatchServiceProperty.cpp
         src/wrench/services/compute/batch/BatchServiceMessagePayload.cpp
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
