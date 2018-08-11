@@ -913,7 +913,7 @@ namespace wrench {
 
       WRENCH_INFO("Failing running job %s", job->getName().c_str());
 
-      terminateRunningStandardJob(job);
+      terminateRunningStandardJob(job, MultihostMulticoreComputeService::JobTerminationCause::COMPUTE_SERVICE_KILLED);
 
       // Send back a job failed message (Not that it can be a partial fail)
       WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
@@ -932,7 +932,7 @@ namespace wrench {
     * @brief terminate a running standard job
     * @param job: the job
     */
-    void MultihostMulticoreComputeService::terminateRunningStandardJob(StandardJob *job) {
+    void MultihostMulticoreComputeService::terminateRunningStandardJob(StandardJob *job, MultihostMulticoreComputeService::JobTerminationCause termination_cause) {
 
       StandardJobExecutor *executor = nullptr;
       for (const auto &standard_job_executor : this->standard_job_executors) {
@@ -945,6 +945,29 @@ namespace wrench {
         throw std::runtime_error(
                 "MultihostMulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor "
                 "corresponding to job being terminated");
+      }
+
+      for (auto &task : job->getTasks()) {
+          if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
+              if (termination_cause == MultihostMulticoreComputeService::JobTerminationCause::TERMINATE) {
+                  task->setTerminationDate(S4U_Simulation::getClock());
+                  this->simulation->getOutput().addTimestamp<SimulationTimestampTaskTerminated>(new SimulationTimestampTaskTerminated(task));
+
+              } else if (termination_cause == MultihostMulticoreComputeService::JobTerminationCause::COMPUTE_SERVICE_KILLED) {
+                  task->setFailureDate(S4U_Simulation::getClock());
+                  this->simulation->getOutput().addTimestamp<SimulationTimestampTaskFailure>(new SimulationTimestampTaskFailure(task));
+              }
+          }
+      }
+
+      // The resources set aside for this job are available again
+      for (auto &resource : executor->getComputeResources()) {
+        std::string hostname = std::get<0>(resource);
+        unsigned long num_cores = std::get<1>(resource);
+        double ram = std::get<2>(resource);
+
+        this->core_and_ram_availabilities[hostname].first += num_cores;
+        this->core_and_ram_availabilities[hostname].second += ram;
       }
 
       // Terminate the executor
@@ -1328,7 +1351,7 @@ namespace wrench {
         // Remove the job from the list of running jobs
         this->running_jobs.erase(job);
         // terminate it
-        terminateRunningStandardJob(job);
+        terminateRunningStandardJob(job, MultihostMulticoreComputeService::JobTerminationCause::TERMINATE);
         // reply
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                 job, this, true, nullptr,
