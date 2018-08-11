@@ -37,7 +37,7 @@ namespace wrench {
 
 
     protected:
-        SimulationTimestampType *endpoint;
+        SimulationTimestampType *endpoint = nullptr;
 
     private:
         double date = -1.0;
@@ -112,6 +112,20 @@ namespace wrench {
         /** \endcond           */
         /***********************/
     };
+
+    /**
+     * @brief A simulation timestamp class for WorkflowTask termination times
+     */
+     class SimulationTimestampTaskTerminated : public SimulationTimestampTask {
+     public:
+         /***********************/
+         /** \cond INTERNAL     */
+         /***********************/
+         SimulationTimestampTaskTerminated(WorkflowTask *);
+         /***********************/
+         /** \endcond           */
+         /***********************/
+     };
 
     class SimulationTimestampFileCopyStart;
 

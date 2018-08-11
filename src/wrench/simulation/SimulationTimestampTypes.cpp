@@ -61,12 +61,12 @@ namespace wrench {
     }
 
     /**
-     * @brief A static map of SimulationTimestampTaskStart objects that have yet to matched with SimulationTimestampTaskFailure or SimulationTimestampTaskCompletion timestamps
+     * @brief A static map of SimulationTimestampTaskStart objects that have yet to matched with SimulationTimestampTaskFailure, SimulationTimestampTaskTerminated, SimulationTimestampTaskCompletion timestamps
      */
     std::map<std::string, SimulationTimestampTask *> SimulationTimestampTask::pending_task_timestamps;
 
     /**
-     * @brief Sets the endpoint of the calling object (SimulationTimestampTaskFailure or SimulationTimestampTaskStart) with a SimulationTimestampTaskStart object
+     * @brief Sets the endpoint of the calling object (SimulationTimestampTaskFailure, SimulationTimestampTaskTerminated, SimulationTimestampTaskStart) with a SimulationTimestampTaskStart object
      */
     void SimulationTimestampTask::setEndpoints() {
         // find the SimulationTimestampTaskStart object containing the same task
@@ -80,6 +80,8 @@ namespace wrench {
 
             // the SimulationTimestampTaskStart is no longer waiting to be matched with an end timestamp, remove it from the map
             pending_task_timestamps.erase(pending_tasks_itr);
+        } else {
+            throw std::runtime_error("SimulationTimestampTask::setEndpoints() could not find a SimulationTimestampTaskStart object with taskID: " + this->task->getID());
         }
     }
 
@@ -95,7 +97,7 @@ namespace wrench {
 
         /*
          * Upon creation, this object adds a pointer of itself to the 'pending_task_timestamps' map so that it's endpoint can
-         * be set when a SimulationTimestampTaskFailure or SimulationTimestampTaskCompletion is created
+         * be set when a SimulationTimestampTaskFailure, SimulationTimestampTaskTerminated, or SimulationTimestampTaskCompletion is created
          */
         pending_task_timestamps.insert(std::make_pair(task->getID(), this));
     }
@@ -128,6 +130,19 @@ namespace wrench {
         // match this timestamp with a SimulationTimestampTaskStart
         setEndpoints();
     }
+
+    /**
+     * @brief Constructor
+     * @param task: the WorkflowTask associated with this timestamp
+     */
+     SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated(WorkflowTask *task) : SimulationTimestampTask(task) {
+         if (task == nullptr) {
+             throw std::invalid_argument("SimulationTimestampTaskTerminated::SimulationTimestampTaskTerminated() requires a valid pointer to a WorkflowTask object");
+         }
+
+         // match this timestamp with a SimulationTimestampTaskStart
+         setEndpoints();
+     }
 
     /**
      * @brief Constructor
