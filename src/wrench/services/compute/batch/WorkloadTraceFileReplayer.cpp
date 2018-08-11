@@ -62,6 +62,8 @@ namespace wrench {
 
       double core_flop_rate = *(this->batch_service->getCoreFlopRate().begin());
 
+      unsigned long job_count = 0;
+
       for (auto job : this->workload_trace) {
         // Sleep until the submission time
         double sub_time = std::get<1>(job);
@@ -72,37 +74,43 @@ namespace wrench {
 
         // Get job information
         std::string job_id = std::get<0>(job);
-        double time = std::get<2>(job);3
+        double time = std::get<2>(job);
         double requested_time = std::get<3>(job);
         double requested_ram = std::get<4>(job);
         int num_nodes = std::get<5>(job);
 
 
         // Create the set of tasks
+        std::vector<WorkflowTask *> to_submit;
         for (int i = 0; i < num_nodes; i++) {
           double time_fudge = 1; // 1 second seems to make it all work!
-          double task_flops = num_cores_per_task * (core_flop_rate * (time - time_fudge));
+          double task_flops = num_cores_per_node * (core_flop_rate * (time - time_fudge));
           double parallel_efficiency = 1.0;
-          workflow->addTask(this->getName() + "_task_" + std::to_string(i),
+          WorkflowTask *task = workflow->addTask(this->getName() + "_job_" + std::to_string(job_count) + "_task_" + std::to_string(i),
                             task_flops,
-                            num_cores_per_task, num_cores_per_task, parallel_efficiency,
+                            num_cores_per_node, num_cores_per_node, parallel_efficiency,
                             requested_ram);
+          to_submit.push_back(task);
+          std::cerr << "ADDED TASK " << task->getID() << "\n";
         }
 
         // Create a Standard Job with only the tasks
-        StandardJob *standard_job = job_manager->createStandardJob(workflow->getTasks(), {});
+        StandardJob *standard_job = job_manager->createStandardJob(to_submit, {});
+        job_count++;
 
         // Create the batch-specific argument
         std::map<std::string, std::string> batch_job_args;
         batch_job_args["-N"] = std::to_string(num_nodes); // Number of nodes/taks
         batch_job_args["-t"] = std::to_string(1 + requested_time / 60); // Time in minutes (note the +1)
-        batch_job_args["-c"] = std::to_string(num_cores_per_task); //number of cores per task
+        batch_job_args["-c"] = std::to_string(num_cores_per_node); //number of cores per task
         batch_job_args["-color"] = "green";
 
+        std::cerr << "SUBMITTING!!!\n";
         // Submit this job to the batch service
         WRENCH_INFO("Submitting a [-N:%s, -t:%s, -c:%s] job",
                     batch_job_args["-N"].c_str(), batch_job_args["-t"].c_str(), batch_job_args["-c"].c_str());
-        job_manager->submitJob(standard_job, *(this->getAvailableComputeServices().begin()), batch_job_args);
+        job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
+        WRENCH_INFO("SUBMITTED");
 
       }
 
