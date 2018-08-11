@@ -267,6 +267,8 @@ namespace wrench {
       /** Main loop **/
       while (true) {
 
+        S4U_Simulation::computeZeroFlop();
+
         /** Dispatch currently ready workunits, as much as possible  **/
         dispatchReadyWorkunits();
 
@@ -403,7 +405,7 @@ namespace wrench {
       // hosts/cores, if possible
       for (auto wu : sorted_ready_workunits) {
 
-        // Compute the workunit's minimum number os cores, desired number of cores, and minimum amount of ram
+        // Compute the workunit's minimum number of cores, desired number of cores, and minimum amount of ram
         unsigned long minimum_num_cores;
         unsigned long desired_num_cores;
         double required_ram;
@@ -480,7 +482,7 @@ namespace wrench {
 
 
         // Create a workunit executor!
-        WRENCH_INFO("Starting a worker unit executor with %ld cores on host %s",
+        WRENCH_INFO("Starting a work unit executor with %ld cores on host %s",
                     target_num_cores, target_host.c_str());
 
 //        std::cerr << "CREATING A WORKUNIT EXECUTOR\n";
@@ -543,6 +545,8 @@ namespace wrench {
      */
     bool StandardJobExecutor::processNextMessage() {
 
+      S4U_Simulation::computeZeroFlop();
+
       // Wait for a message
       std::unique_ptr<SimulationMessage> message;
 
@@ -568,7 +572,7 @@ namespace wrench {
 
       } else if (WorkunitExecutorFailedMessage *msg = dynamic_cast<WorkunitExecutorFailedMessage *>(message.get())) {
         processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
-        return true;
+        return false; // We should exit since we've killed everything
 
       } else {
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");
@@ -729,11 +733,11 @@ namespace wrench {
       }
       if (!found_it) {
         throw std::runtime_error(
-                "StandardJobExecutor::processWorkunitExecutorCompletion(): couldn't find a recently failed workunit in the running workunit list");
+                "StandardJobExecutor::processWorkunitExecutorFailure(): couldn't find a recently failed workunit in the running workunit list");
       }
 
 
-      // Deal with running workunits!
+      // Deal with running work units!
       for (auto const &wu : this->running_workunits) {
         if ((not wu->post_file_copies.empty()) || (not wu->pre_file_copies.empty())) {
           throw std::runtime_error(
@@ -742,6 +746,7 @@ namespace wrench {
         // find the workunit executor  that's doing the work and kill it (lame iteration)
         for (auto const &wue : this->running_workunit_executors) {
           if (wue->workunit == wu.get()) {
+            WRENCH_INFO("KILLING WORKUNIT EXECUTOR %s", wue->getName().c_str());
             wue->kill();
             break;
           }

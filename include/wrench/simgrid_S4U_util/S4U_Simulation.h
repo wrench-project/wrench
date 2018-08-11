@@ -39,6 +39,7 @@ namespace wrench {
 				static double getMemoryCapacity();
 				static void compute(double);
 				static void sleep(double);
+        static void computeZeroFlop();
 				static std::string getHostProperty(std::string hostname, std::string property_name);
 
 				//start energy related calls

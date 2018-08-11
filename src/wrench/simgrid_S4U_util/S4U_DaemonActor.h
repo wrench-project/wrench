@@ -50,6 +50,7 @@ namespace wrench {
         void operator()() {
 //          std::cerr << "ACTOR: RUNNING MAIN: " << this->daemon->getName() << "\n";
           try {
+            S4U_Simulation::computeZeroFlop();
             this->daemon->main();
             wrench::S4U_Simulation::sleep(0.001);
           } catch (std::exception &e) {
