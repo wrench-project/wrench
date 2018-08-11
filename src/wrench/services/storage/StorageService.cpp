@@ -69,7 +69,7 @@ namespace wrench {
         this->stored_files["/"] = {file}; // By default all the staged files will go to the "/" partition
       }
       this->occupied_space += file->getSize();
-      WRENCH_INFO("Stored file %s (storage usage: %.10lf%%)", file->getID().c_str(),
+      WRENCH_INFO("Stored file %s (storage usage: %.4lf%%)", file->getID().c_str(),
                   100.0 * this->occupied_space / this->capacity);
     }
 

@@ -99,12 +99,11 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
-      WRENCH_INFO("Simple Storage Service %s starting on host %s (capacity: %lf, holding %ld files, listening on %s)",
+      WRENCH_INFO("Simple Storage Service %s starting on host %s (total capacity: %lf, holding %ld files)",
                   this->getName().c_str(),
                   S4U_Simulation::getHostName().c_str(),
                   this->capacity,
-                  this->stored_files.size(),
-                  this->mailbox_name.c_str());
+                  this->stored_files.size());
 
       /** Main loop **/
       bool should_add_incoming_control_connection = true;
@@ -112,9 +111,7 @@ namespace wrench {
 
       while (should_continue) {
 
-        if (S4U_Simulation::getFlopRate() <= 0) {
-          S4U_Simulation::compute(0.001);
-        }
+
 
         // Post a recv on my standard mailbox_name in case there is none pending
         if (should_add_incoming_control_connection) {
@@ -161,6 +158,8 @@ namespace wrench {
      */
     bool SimpleStorageService::processControlMessage(std::unique_ptr<NetworkConnection> connection) {
 
+      S4U_Simulation::computeZeroFlop();
+
       // Get the message
       std::unique_ptr<SimulationMessage> message;
       try {
@@ -174,6 +173,7 @@ namespace wrench {
         WRENCH_INFO("Got a NULL message. This likely means that we're all done...Aborting!");
         return false;
       }
+
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
@@ -477,6 +477,8 @@ namespace wrench {
     * @throw std::runtime_error
     */
     bool SimpleStorageService::processDataConnection(std::unique_ptr<NetworkConnection> connection) {
+
+      S4U_Simulation::computeZeroFlop();
 
       if (connection->type == NetworkConnection::INCOMING_DATA) {
         return processIncomingDataConnection(std::move(connection));

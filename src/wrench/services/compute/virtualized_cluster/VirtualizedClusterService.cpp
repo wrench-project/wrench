@@ -353,6 +353,9 @@ namespace wrench {
      * @throw std::runtime_error
      */
     bool VirtualizedClusterService::processNextMessage() {
+
+      S4U_Simulation::computeZeroFlop();
+
       // Wait for a message
       std::unique_ptr<SimulationMessage> message;
 

@@ -123,6 +123,8 @@ namespace wrench {
       bool success;
 
       try {
+        S4U_Simulation::computeZeroFlop();
+
         performWork(this->workunit);
 
         // build "success!" message

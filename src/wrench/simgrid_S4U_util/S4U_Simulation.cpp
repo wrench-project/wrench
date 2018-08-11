@@ -418,7 +418,16 @@ namespace wrench {
       return list;
     }
 
-
+    /**
+     * @brief Compute zero flop, which take zero time but will block if the host's pstate
+     *        has a zero flop/sec speed, until the host's pstate is changed to a pstate with
+     *        non-zero flop/sec speed.
+     */
+    void S4U_Simulation::computeZeroFlop() {
+      if (S4U_Simulation::getFlopRate() <= 0) {
+        S4U_Simulation::compute(0);
+      }
+    }
 
 
 };
