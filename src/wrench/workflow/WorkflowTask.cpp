@@ -473,8 +473,20 @@ namespace wrench {
         } else {
             throw std::runtime_error("WorkflowTask::setFailureDate() cannot be called before WorkflowTask::setStartDate()");
         }
-
     }
+
+    /**
+     * @brief Set the date when the task was terminated
+     *
+     * @param date: the date when the task was terminated
+     */
+     void WorkflowTask::setTerminationDate(double date) {
+         if (not this->execution_history.empty()) {
+             this->execution_history.top().task_terminated = date;
+         } else {
+             throw std::runtime_error("WorkflowTask::setTerminationDate() cannot be called before WorkflowTask::setStartDate()");
+         }
+     }
 
     /**
      * @brief Get the execution history of this task
@@ -620,6 +632,14 @@ namespace wrench {
        */
       double WorkflowTask::getFailureDate() {
           return (not this->execution_history.empty()) ? this->execution_history.top().task_failed : -1.0;
+      }
+
+      /**
+       * @brief Get the tasks's termination date (when it was explicitely requested to be terminated by the WMS)
+       * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
+       */
+      double WorkflowTask::getTerminationDate() {
+          return (not this->execution_history.empty()) ? this->execution_history.top().task_terminated : -1.0;
       }
 
     /**

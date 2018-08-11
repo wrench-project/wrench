@@ -21,7 +21,7 @@ public:
     wrench::FileRegistryService *file_registry_service;
 
     std::unique_ptr<wrench::Workflow> workflow;
-    wrench::WorkflowTask *t1, *t2, *t4;
+    wrench::WorkflowTask *t1, *t2, *t4, *t5, *t6;
     wrench::WorkflowFile *large_input_file, *small_input_file, *t4_output_file;
 
     void do_WorkflowTaskExecutionHistory_test();
@@ -47,6 +47,8 @@ protected:
         t4->addInputFile(small_input_file);
         t4->addOutputFile(t4_output_file);
 
+        t5 = workflow->addTask("task-05", 100, 1, 1, 1.0, 0);
+        t6 = workflow->addTask("task-06", 100, 1, 1, 1.0, 0);
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
@@ -135,6 +137,9 @@ TEST_F(WorkflowTaskTest, GetSet) {
 
   ASSERT_NO_THROW(t1->setEndDate(1.0));
   ASSERT_DOUBLE_EQ(t1->getEndDate(), 1.0);
+
+  ASSERT_NO_THROW(t1->setTerminationDate(1.0));
+  ASSERT_DOUBLE_EQ(t1->getTerminationDate(), 1.0);
 
   ASSERT_NO_THROW(t1->setReadInputStartDate(1.0));
   ASSERT_DOUBLE_EQ(t1->getReadInputStartDate(), 1.0);
@@ -232,6 +237,16 @@ private:
         job_manager->submitJob(job_that_will_complete, this->test->compute_service);
         this->waitForAndProcessNextEvent();
 
+        wrench::StandardJob *job_that_will_be_terminated = job_manager->createStandardJob(this->test->t5, {});
+        job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
+        wrench::S4U_Simulation::sleep(10.0);
+        job_manager->terminateJob(job_that_will_be_terminated);
+
+        wrench::StandardJob *job_that_will_fail_2 = job_manager->createStandardJob(this->test->t6, {});
+        job_manager->submitJob(job_that_will_fail_2, this->test->compute_service);
+        wrench::S4U_Simulation::sleep(10.0);
+        this->test->compute_service->stop();
+
         return 0;
     }
 };
@@ -326,6 +341,40 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.write_output_start, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.write_output_end, -1.0);
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.task_end, -1.0);
+
+    // t5 should have ran then been terminated right after computation started
+    auto t5_history = t5->getExecutionHistory();
+    ASSERT_EQ(t5_history.size(), 1);
+
+    auto t5_terminated_execution = t5_history.top();
+    ASSERT_NE(t5_terminated_execution.task_start, -1.0);
+    ASSERT_NE(t5_terminated_execution.read_input_start, -1.0);
+    ASSERT_NE(t5_terminated_execution.read_input_end, -1.0);
+    ASSERT_NE(t5_terminated_execution.computation_start, -1.0);
+    ASSERT_NE(t5_terminated_execution.task_terminated, -1.0);
+
+    ASSERT_EQ(t5_terminated_execution.computation_end, -1.0);
+    ASSERT_EQ(t5_terminated_execution.write_output_start, -1.0);
+    ASSERT_EQ(t5_terminated_execution.write_output_end, -1.0);
+    ASSERT_EQ(t5_terminated_execution.task_failed, -1.0);
+    ASSERT_EQ(t5_terminated_execution.task_end, -1.0);
+
+    // t6 should have ran then failed right after computation started because the compute service was stopped
+    auto t6_history = t6->getExecutionHistory();
+    ASSERT_EQ(t6_history.size(), 1);
+
+    auto t6_failed_execution = t6_history.top();
+    ASSERT_NE(t6_failed_execution.task_start, -1.0);
+    ASSERT_NE(t6_failed_execution.read_input_start, -1.0);
+    ASSERT_NE(t6_failed_execution.read_input_end, -1.0);
+    ASSERT_NE(t6_failed_execution.computation_start, -1.0);
+    ASSERT_NE(t6_failed_execution.task_failed, -1.0);
+
+    ASSERT_EQ(t6_failed_execution.computation_end, -1.0);
+    ASSERT_EQ(t6_failed_execution.write_output_start, -1.0);
+    ASSERT_EQ(t6_failed_execution.write_output_end, -1.0);
+    ASSERT_EQ(t6_failed_execution.task_terminated, -1.0);
+    ASSERT_EQ(t6_failed_execution.task_end, -1.0);
 
     delete simulation;
     free(argv[0]);
