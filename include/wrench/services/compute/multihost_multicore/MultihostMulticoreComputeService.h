@@ -208,7 +208,16 @@ namespace wrench {
 
 //        void createWorkForNewlyDispatchedJob(StandardJob *job);
 
-        void terminateRunningStandardJob(StandardJob *job);
+        /** @brief Reasons why a standard job could be terminated */
+        enum JobTerminationCause {
+            /** @brief The WMS intentionally requested, via a JobManager, that a running job is to be terminated */
+            TERMINATE,
+
+            /** @brief The compute service was directed to stop, and any running StandardJob will fail */
+            COMPUTE_SERVICE_KILLED
+        };
+
+        void terminateRunningStandardJob(StandardJob *job, JobTerminationCause termination_cause);
 
         void terminateRunningPilotJob(PilotJob *job);
 
