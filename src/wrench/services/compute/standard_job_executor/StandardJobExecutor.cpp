@@ -565,7 +565,7 @@ namespace wrench {
 
       } else if (WorkunitExecutorFailedMessage *msg = dynamic_cast<WorkunitExecutorFailedMessage *>(message.get())) {
         processWorkunitExecutorFailure(msg->workunit_executor, msg->workunit, msg->cause);
-        return true;
+        return false;
 
       } else {
         throw std::runtime_error("Unexpected [" + message->getName() + "] message");
