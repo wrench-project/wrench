@@ -25,6 +25,7 @@ public:
 
     void do_SimulationTimestampTaskBasic_test();
     void do_SimulationTimestampTaskMultiple_test();
+    void do_SimulationTimestampTaskTerminateAndFail_test();
 
 
 protected:
@@ -36,7 +37,7 @@ protected:
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"WMSHost\" speed=\"1f\" core=\"1\"/> "
                           "       <host id=\"ExecutionHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1000000us\"/>"
+                          "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
                           "       <route src=\"ExecutionHost\" dst=\"WMSHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
                           "</platform>";
@@ -184,7 +185,6 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskBasic_test(){
     auto timestamp_failure_trace = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
     double failed_task_start_timestamp = timestamp_start_trace[2]->getContent()->getDate();
     double failed_task_end_date = this->failed_task->getEndDate();
-    std::cerr << "timestamp_failure_trace: " << timestamp_failure_trace.size() << std::endl;
     double failed_task_failure_timestamp = timestamp_failure_trace[0]->getContent()->getDate();
 
     ASSERT_GT(failed_task_start_timestamp, task2_completion_timestamp);
@@ -438,3 +438,126 @@ void SimulationTimestampTaskTest::do_SimulationTimestampTaskMultiple_test() {
     free(argv);
 }
 
+
+/**********************************************************************/
+/**            SimulationTimestampTaskTestTerminateAndFail           **/
+/**********************************************************************/
+
+/*
+ * Testing that SimulationTimestampTaskFailure timestamps get created when tasks fail
+ * due to a compute service being shut down while containing standard jobs with
+ * running tasks.
+ *
+ * Also testing that SimulationTimestampTaskTerminated timestamps get created when
+ * tasks are deliberately terminated by the WMS.
+ */
+
+class SimulationTimestampTaskTerminateAndFailTestWMS : public wrench::WMS {
+public:
+    SimulationTimestampTaskTerminateAndFailTestWMS(SimulationTimestampTaskTest *test,
+            const std::set<wrench::ComputeService *> &compute_services,
+            const std::set<wrench::StorageService *> &storage_services,
+            std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+        this->test = test;
+    }
+
+private:
+    SimulationTimestampTaskTest *test;
+
+    int main() {
+
+        std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+        this->test->task1 = this->getWorkflow()->addTask("terminated_task", 1000.0, 1, 1, 1.0, 0);
+        wrench::StandardJob *job_that_will_be_terminated = job_manager->createStandardJob(this->test->task1, {});
+        job_manager->submitJob(job_that_will_be_terminated, this->test->compute_service);
+        wrench::S4U_Simulation::sleep(10.0);
+        job_manager->terminateJob(job_that_will_be_terminated);
+        // should a StandardJobTerminated event be sent? (if terminateJob is called then waitForAndProcessNextEvent() we get stuck)
+
+        this->test->task2 = this->getWorkflow()->addTask("failed_task", 1000.0, 1, 1, 1.0, 0);
+        wrench::StandardJob *job_that_will_fail = job_manager->createStandardJob(this->test->task2, {});
+        job_manager->submitJob(job_that_will_fail, this->test->compute_service);
+        wrench::S4U_Simulation::sleep(10.0);
+        this->test->compute_service->stop();
+
+        return 0;
+    }
+};
+
+TEST_F(SimulationTimestampTaskTest, SimulationTimestampTaskTerminateAndFailTest) {
+    DO_TEST_WITH_FORK(do_SimulationTimestampTaskTerminateAndFail_test);
+}
+
+void SimulationTimestampTaskTest::do_SimulationTimestampTaskTerminateAndFail_test() {
+    auto simulation = new wrench::Simulation();
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("simulation_timestamp_task_basic_test");
+
+    ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+    ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+    std::string wms_host = simulation->getHostnameList()[1];
+    std::string execution_host = simulation->getHostnameList()[0];
+
+    ASSERT_NO_THROW(compute_service = simulation->add(new wrench::MultihostMulticoreComputeService(execution_host,
+                                                                                                   {std::make_tuple(
+                                                                                                           execution_host,
+                                                                                                           wrench::ComputeService::ALL_CORES,
+                                                                                                           wrench::ComputeService::ALL_RAM)},
+                                                                                                   {})));
+
+    ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(wms_host, 100000000000000.0)));
+
+    wrench::WMS *wms = nullptr;
+    ASSERT_NO_THROW(wms = simulation->add(new SimulationTimestampTaskTerminateAndFailTestWMS(
+            this, {compute_service}, {storage_service}, wms_host
+    )));
+
+    ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+    ASSERT_NO_THROW(simulation->launch());
+
+    /**
+     * expected timeline of events:
+     *  - terminated_task start (SimulationTimestampTaskStart should be generated)
+     *  - some time passes and request sent to terminate the job
+     *  - terminated_task is terminated (SimulationTimestampTaskTerminated should be generated)
+     *  - failed_task start (SimulatonTimestampTaskStart should be generated)
+     *  - some time passes and compute services gets turned off while task is running
+     *  - failed_task fails (SimulationTimestampTaskFailure should be generated)
+     */
+     auto start_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskStart>();
+     auto terminated_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskTerminated>();
+     auto failure_timestamps = simulation->getOutput().getTrace<wrench::SimulationTimestampTaskFailure>();
+
+     // check the number of timestamps
+     ASSERT_EQ(start_timestamps.size(), 2);
+     ASSERT_EQ(terminated_timestamps.size(), 1);
+     ASSERT_EQ(failure_timestamps.size(), 1);
+
+     // check that endpoints were set correctly
+     wrench::SimulationTimestampTask *terminated_task_start = start_timestamps[0]->getContent();
+     wrench::SimulationTimestampTask *terminated_task_termination = terminated_timestamps[0]->getContent();
+     ASSERT_EQ(terminated_task_start->getEndpoint(), terminated_task_termination);
+     ASSERT_EQ(terminated_task_termination->getEndpoint(), terminated_task_start);
+
+     wrench::SimulationTimestampTask *failed_task_start = start_timestamps[1]->getContent();
+     wrench::SimulationTimestampTask *failed_task_failure = failure_timestamps[0]->getContent();
+     ASSERT_EQ(failed_task_start->getEndpoint(), failed_task_failure);
+     ASSERT_EQ(failed_task_failure->getEndpoint(), failed_task_start);
+
+     // check that dates were set correctly
+     ASSERT_EQ(std::floor(terminated_task_start->getDate()), 0);
+     ASSERT_EQ(std::floor(terminated_task_termination->getDate()), 10);
+
+     ASSERT_EQ(std::floor(failed_task_start->getDate()), 10);
+     ASSERT_EQ(std::floor(failed_task_failure->getDate()), 20);
+
+    delete simulation;
+    free(argv[0]);
+    free(argv);
+}
