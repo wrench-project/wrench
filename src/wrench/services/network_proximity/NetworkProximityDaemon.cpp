@@ -112,6 +112,8 @@ namespace wrench {
       bool life = true;
       /** Main loop **/
       while (life) {
+        S4U_Simulation::computeZeroFlop();
+
         double countdown = time_for_next_measurement - S4U_Simulation::getClock();
         if (countdown > 0) {
           life = this->processNextMessage(countdown);

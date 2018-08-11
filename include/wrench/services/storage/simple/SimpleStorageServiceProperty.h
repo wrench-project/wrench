@@ -21,7 +21,6 @@ namespace wrench {
     class SimpleStorageServiceProperty : public StorageServiceProperty {
     public:
 
-
     };
 
 };

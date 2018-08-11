@@ -113,6 +113,7 @@ namespace wrench {
                 {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, "maximum"},
                 {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM, "maximum_flops"},
                 {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM, "best_fit"},
+                {StandardJobExecutorProperty::SIMULATE_COMPUTATION_AS_SLEEP, "false"},
         };
 
         std::map<std::string, std::string> default_messagepayload_values = {

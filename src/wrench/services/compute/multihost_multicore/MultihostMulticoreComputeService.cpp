@@ -776,6 +776,8 @@ namespace wrench {
      */
     bool MultihostMulticoreComputeService::processNextMessage() {
 
+      S4U_Simulation::computeZeroFlop();
+
       // Wait for a message
       std::unique_ptr<SimulationMessage> message;
 
@@ -1144,13 +1146,13 @@ namespace wrench {
       // Remove the executor from the executor list
       if (!found_it) {
         throw std::runtime_error(
-                "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the executor is not in the executor list");
+                "MultihostMulticoreComputeService::processStandardJobFailure(): Received a standard job completion, but the executor is not in the executor list");
       }
 
       // Remove the job from the running job list
       if (this->running_jobs.find(job) == this->running_jobs.end()) {
         throw std::runtime_error(
-                "MultihostMulticoreComputeService::processStandardJobCompletion(): Received a standard job completion, but the job is not in the running job list");
+                "MultihostMulticoreComputeService::processStandardJobFailure(): Received a standard job completion, but the job is not in the running job list");
       }
       this->running_jobs.erase(job);
 

@@ -115,6 +115,8 @@ namespace wrench {
 
       while (should_continue) {
 
+
+
         // Post a recv on my standard mailbox_name in case there is none pending
         if (should_add_incoming_control_connection) {
           this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
@@ -160,6 +162,8 @@ namespace wrench {
      */
     bool SimpleStorageService::processControlMessage(std::unique_ptr<NetworkConnection> connection) {
 
+      S4U_Simulation::computeZeroFlop();
+
       // Get the message
       std::unique_ptr<SimulationMessage> message;
       try {
@@ -173,6 +177,7 @@ namespace wrench {
         WRENCH_INFO("Got a NULL message. This likely means that we're all done...Aborting!");
         return false;
       }
+
 
       WRENCH_INFO("Got a [%s] message", message->getName().c_str());
 
@@ -256,6 +261,7 @@ namespace wrench {
         return processFileReadRequest(msg->file, msg->src_partition, msg->answer_mailbox, msg->mailbox_to_receive_the_file_content);
 
       } else if (auto msg = dynamic_cast<StorageServiceFileCopyRequestMessage *>(message.get())) {
+
         return processFileCopyRequest(msg->file, msg->src, msg->src_partition, msg->dst_partition, msg->answer_mailbox, msg->start_timestamp);
 
       } else {
@@ -366,6 +372,7 @@ namespace wrench {
 
       // If success, then follow up with sending the file (ASYNCHRONOUSLY!)
       if (success) {
+
         this->network_connection_manager->addConnection(std::unique_ptr<NetworkConnection>(
                 new NetworkConnection(NetworkConnection::OUTGOING_DATA, file, src_partition , mailbox_to_receive_the_file_content, "")
         ));
@@ -474,6 +481,8 @@ namespace wrench {
     * @throw std::runtime_error
     */
     bool SimpleStorageService::processDataConnection(std::unique_ptr<NetworkConnection> connection) {
+
+      S4U_Simulation::computeZeroFlop();
 
       if (connection->type == NetworkConnection::INCOMING_DATA) {
         return processIncomingDataConnection(std::move(connection));
