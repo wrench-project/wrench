@@ -101,6 +101,8 @@ namespace wrench {
 
         double getFailureDate();
 
+        double getTerminationDate();
+
         double getReadInputStartDate();
 
         double getReadInputEndDate();
@@ -172,6 +174,8 @@ namespace wrench {
 
         void setFailureDate(double date);
 
+        void setTerminationDate(double date);
+
         void incrementFailureCount();
 
         void setExecutionHost(std::string hostname);
@@ -186,6 +190,7 @@ namespace wrench {
             double write_output_end =   -1.0;
             double task_end =           -1.0;
             double task_failed =        -1.0;
+            double task_terminated =    -1.0;
 
             WorkflowTaskExecution(double task_start) : task_start(task_start) {
 
