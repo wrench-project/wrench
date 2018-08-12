@@ -110,7 +110,7 @@ namespace wrench {
         try {
           job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
         } catch (WorkflowExecutionException &e) {
-          WRENCH_INFO("Couldn't submit the job: %s (ignoring)", e.getCause()->toString().c_str());
+          WRENCH_INFO("Couldn't submit a replayed job: %s (ignoring)", e.getCause()->toString().c_str());
         }
 
       }
