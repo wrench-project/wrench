@@ -87,38 +87,33 @@ namespace wrench {
 
       // Extract WRENCH-specific argument
       int i;
-      int skip = 0;
       bool simgrid_help_requested = false;
       bool wrench_help_requested = false;
       bool simulator_help_requested = false;
       bool version_requested = false;
-      for (i = 1; i < *argc; i++) {
+      bool wrench_no_log = false;
+
+      std::vector<std::string> cleanedup_args;
+
+      for (i = 0; i < *argc; i++) {
         if (not strcmp(argv[i], "--wrench-no-color")) {
           TerminalOutput::disableColor();
-          skip++;
         } else if (not strcmp(argv[i], "--wrench-no-log")) {
-          argv[i] = strdup("--log=root.threshold:critical");
+          wrench_no_log = true;
         } else if (not strcmp(argv[i], "--activate-energy")) {
           sg_host_energy_plugin_init();
-          skip++;
         } else if (not strcmp(argv[i], "--help-wrench")) {
           wrench_help_requested = true;
-          skip++;
         } else if (not strcmp(argv[i], "--help")) {
           simulator_help_requested = true;
-          skip++;
         } else if (not strcmp(argv[i], "--help-simgrid")) {
           simgrid_help_requested = true;
-          skip++;
         } else if (not strcmp(argv[i], "--version")) {
           version_requested = true;
-        }
-        // shift argument if necessary
-        if (i + skip < *argc) {
-          argv[i] = argv[i + skip];
+        } else {
+          cleanedup_args.push_back(std::string(argv[i]));
         }
       }
-      *argc = i - skip;
 
       // Always activate VM migration plugin
       sg_vm_live_migration_plugin_init();
@@ -138,11 +133,25 @@ namespace wrench {
         std::cerr << "WRENCH version " << getWRENCHVersionString() << "\n";
       }
 
+      // reconstruct argc/argv
+
+      *argc = 0;
+      for (auto a : cleanedup_args) {
+        argv[*argc] = strdup(a.c_str());
+        (*argc)++;
+      }
+
       // If SimGrid help is requested, put back in a "--help" argument
       if (simgrid_help_requested) {
         argv[*argc] = strdup("--help");
         (*argc)++;
         std::cerr << "\nSimgrid command-line arguments:\n\n";
+      }
+
+      // If WRENCH no loggin is requested, convert it to a SimGrid argument
+      if (wrench_no_log) {
+        argv[*argc] = strdup("--log=root.threshold:critical");
+        (*argc)++;
       }
 
       this->s4u_simulation->initialize(argc, argv);
