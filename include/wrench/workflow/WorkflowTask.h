@@ -68,7 +68,9 @@ namespace wrench {
             /** @brief Pending (has been submitted to a compute service) */
                     PENDING,
             /** @brief Completed (successfully completed) */
-                    COMPLETED
+                    COMPLETED,
+            /** @brief Some Unknown state (should not happen) */
+                    UNKNOWN
         };
 
         static std::string stateToString(WorkflowTask::State state);
@@ -132,6 +134,8 @@ namespace wrench {
         void setInternalState(WorkflowTask::InternalState);
 
         void setState(WorkflowTask::State);
+        void setUpcomingState(WorkflowTask::State);
+        WorkflowTask::State getUpcomingState() const;
 
         WorkflowTask::InternalState getInternalState() const;
 
@@ -171,7 +175,10 @@ namespace wrench {
         std::string execution_host;        // Host on which the task excuted ("" if not executed successfully - yet)
 
         State visible_state;              // To be exposed to developer level
-        InternalState internal_state;              // Not to be exposed to developer level
+        State upcoming_visible_state;     // A visible state that will become active once a WMS has
+                                          // process a previously sent workflow execution event
+        InternalState internal_state;     // Not to be exposed to developer level
+
         Workflow *workflow;                                    // Containing workflow
         lemon::ListDigraph *DAG;                              // Containing workflow
         lemon::ListDigraph::Node DAG_node;                    // pointer to the underlying DAG node
