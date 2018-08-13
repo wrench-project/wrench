@@ -43,6 +43,7 @@ namespace wrench {
         throw WorkflowExecutionException(cause);
       }
 
+
       if (auto m = dynamic_cast<JobManagerStandardJobDoneMessage *>(message.get())) {
         // Update task states
         for (auto state_update : m->necessary_state_changes) {
