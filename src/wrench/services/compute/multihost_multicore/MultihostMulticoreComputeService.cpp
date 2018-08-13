@@ -1021,7 +1021,7 @@ namespace wrench {
 
       while (not this->pending_jobs.empty()) {
         WorkflowJob *workflow_job = this->pending_jobs.front();
-        this->pending_jobs.pop_back();
+        this->pending_jobs.pop_front();
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto *job = (StandardJob *) workflow_job;
           this->failPendingStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
