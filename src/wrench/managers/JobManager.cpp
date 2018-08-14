@@ -498,14 +498,20 @@ namespace wrench {
             for (auto child : children) {
               switch (child->getInternalState()) {
                 case WorkflowTask::InternalState::TASK_NOT_READY:
-                case WorkflowTask::InternalState::TASK_RUNNING:
-                case WorkflowTask::InternalState::TASK_FAILED:
+                  if (child->getState() != WorkflowTask::State::NOT_READY) {
+                    throw std::runtime_error("JobManager::main(): Child's internal state if NOT READY, but child's visible state is " +
+                    WorkflowTask::stateToString(child->getState()));
+                  }
                 case WorkflowTask::InternalState::TASK_COMPLETED:
+                  break;
+                case WorkflowTask::InternalState::TASK_FAILED:
+                case WorkflowTask::InternalState::TASK_RUNNING:
                   // no nothing
+                  throw std::runtime_error("JobManager::main(): should never happen: " + WorkflowTask::stateToString(child->getInternalState()));
                   break;
                 case WorkflowTask::InternalState::TASK_READY:
                   if (child->getState() == WorkflowTask::State::NOT_READY) {
-                    bool all_parents_ready = true;
+                    bool all_parents_visibly_completed = true;
                     for (auto parent : child->getWorkflow()->getTaskParents(child)) {
                       if (parent->getState() == WorkflowTask::State::COMPLETED) {
                         continue; // COMPLETED FROM BEFORE
@@ -514,14 +520,13 @@ namespace wrench {
                         continue; // COMPLETED FROM BEFORE, BUT NOT YET SEEN BY WMS
                       }
                       if ((necessary_state_changes.find(parent) != necessary_state_changes.end()) &&
-                              (necessary_state_changes[parent] == WorkflowTask::State::COMPLETED)) {
+                          (necessary_state_changes[parent] == WorkflowTask::State::COMPLETED)) {
                         continue; // ABOUT TO BECOME COMPLETED
                       }
-                      all_parents_ready = false;
+                      all_parents_visibly_completed = false;
                       break;
                     }
-                    if (all_parents_ready) {
-//                      child->setState(WorkflowTask::State::READY);
+                    if (all_parents_visibly_completed) {
                       if (necessary_state_changes.find(child) == necessary_state_changes.end()) {
                         necessary_state_changes.insert(std::make_pair(child, WorkflowTask::State::READY));
                       } else {
@@ -539,7 +544,7 @@ namespace wrench {
           this->completed_standard_jobs.insert(job);
 
           /*
-          WRENCH_INFO("HERE ARE NECESSAGE STATE CHANGES");
+          WRENCH_INFO("HERE ARE NECESSARY STATE CHANGES");
           for (auto s : necessary_state_changes) {
             WRENCH_INFO("  STATE(%s) = %s", s.first->getID().c_str(),
             WorkflowTask::stateToString(s.second).c_str());
@@ -615,7 +620,7 @@ namespace wrench {
               bool ready = true;
               for (auto parent : this->wms->getWorkflow()->getTaskParents(t)) {
                 if ((parent->getInternalState() != WorkflowTask::InternalState::TASK_COMPLETED) and
-                        (parent->getUpcomingState() != WorkflowTask::State::COMPLETED)) {
+                    (parent->getUpcomingState() != WorkflowTask::State::COMPLETED)) {
                   ready = false;
                 }
               }
