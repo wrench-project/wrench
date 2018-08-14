@@ -16,7 +16,7 @@
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workflowTask, "Log category for WorkflowTask");
+XBT_LOG_NEW_DEFAULT_CATEGORY(workflow_task, "Log category for WorkflowTask");
 
 namespace wrench {
 
@@ -41,6 +41,7 @@ namespace wrench {
             memory_requirement(memory_requirement),
             execution_host(""),
             visible_state(WorkflowTask::State::READY),
+            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
             internal_state(WorkflowTask::InternalState::TASK_READY),
             job(nullptr) {
     }
@@ -171,6 +172,15 @@ namespace wrench {
       return this->visible_state;
     }
 
+    /**
+    * @brief Get the state of the task
+    *
+    * @return a task state
+    */
+    WorkflowTask::State WorkflowTask::getUpcomingState() const {
+      return this->upcoming_visible_state;
+    }
+
 
     /**
      * @brief Get the state of the task (as known to the "internal" layer)
@@ -196,8 +206,10 @@ namespace wrench {
           return "PENDING";
         case COMPLETED:
           return "COMPLETED";
+        case UNKNOWN:
+          return "UNKNOWN";
         default:
-          return "UNKNOWN STATE";
+          return "INVALID";
       }
     }
 
@@ -240,7 +252,11 @@ namespace wrench {
      * @param state: the task's internal state
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
-        this->internal_state = state;
+
+//      WRENCH_INFO("SETTING %s's INTERNAL STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
+
+
+      this->internal_state = state;
 
         if (this->workflow->simulation != nullptr) {
             switch (state) {
@@ -273,7 +289,8 @@ namespace wrench {
      */
     void WorkflowTask::setState(WorkflowTask::State state) {
 
-//      WRENCH_INFO("SETTING %s's STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
+//      WRENCH_INFO("WorkflowTask::setState(): SETTING %s's VISIBLE STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
+
       // Sanity check
       bool sane = true;
       switch (state) {
@@ -301,6 +318,9 @@ namespace wrench {
             sane = false;
           }
           break;
+        case UNKNOWN:
+          sane = false;
+          break;
       }
 
       if (not sane) {
@@ -310,6 +330,15 @@ namespace wrench {
                                  "state is " + stateToString(this->internal_state));
       }
       this->visible_state = state;
+    }
+
+    /**
+     * @brief Set the upcoming visible state of the task
+     *
+     * @param state: the task state
+     */
+    void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
+      this->upcoming_visible_state = state;
     }
 
     /**

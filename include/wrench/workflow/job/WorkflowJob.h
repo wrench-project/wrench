@@ -13,6 +13,7 @@
 
 #include <string>
 #include <stack>
+#include <map>
 
 namespace wrench {
 
@@ -45,6 +46,8 @@ namespace wrench {
 
         std::string getName();
 
+        double getSubmitDate();
+
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
@@ -61,13 +64,20 @@ namespace wrench {
 
         ComputeService *getParentComputeService();
 
+        std::map<std::string, std::string> getServiceSpecificArguments();
+
         virtual ~WorkflowJob();
 
     protected:
 
+        friend class JobManager;
+
         WorkflowJob(Type type);
 
         unsigned long getNewUniqueNumber();
+
+        /** @brief Service-specific arguments used during job submission **/
+        std::map<std::string, std::string> service_specific_args;
 
         /** @brief Stack of callback mailboxes (to pop notifications) */
         std::stack<std::string> callback_mailbox_stack;
@@ -77,6 +87,8 @@ namespace wrench {
         Type type;
         /** @brief The job's name */
         std::string name;
+        /** @brief The date at which the job was last submitted */
+        double submit_date;
         /** @brief The compute service to which the job was submitted */
         ComputeService *parent_compute_service;
 
