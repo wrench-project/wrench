@@ -295,7 +295,8 @@ namespace wrench {
 
       // Submit the job to the service
       try {
-        job->setSubmitDate(this->simulation->getCurrentSimulatedDate());
+        job->submit_date = this->simulation->getCurrentSimulatedDate();
+        job->service_specific_args = service_specific_args;
         compute_service->submitJob(job, service_specific_args);
         job->setParentComputeService(compute_service);
       } catch (WorkflowExecutionException &e) {

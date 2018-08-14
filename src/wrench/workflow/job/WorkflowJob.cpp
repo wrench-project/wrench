@@ -159,10 +159,10 @@ namespace wrench {
     }
 
     /**
-     * @brief Set the date at which the job was last submitted
-     * @param the submit date
+     * @brief Return the service-specific arguments that were used during job submission
+     * @return a map of argument name/values
      */
-    void WorkflowJob::setSubmitDate(double date) {
-      this->submit_date = date;
+    std::map<std::string, std::string> WorkflowJob::getServiceSpecificArguments() {
+      return this->service_specific_args;
     }
 };

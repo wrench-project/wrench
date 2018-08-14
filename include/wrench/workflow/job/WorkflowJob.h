@@ -13,6 +13,7 @@
 
 #include <string>
 #include <stack>
+#include <map>
 
 namespace wrench {
 
@@ -50,7 +51,6 @@ namespace wrench {
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        void setSubmitDate(double date);
 
         std::string popCallbackMailbox();
 
@@ -64,13 +64,20 @@ namespace wrench {
 
         ComputeService *getParentComputeService();
 
+        std::map<std::string, std::string> getServiceSpecificArguments();
+
         virtual ~WorkflowJob();
 
     protected:
 
+        friend class JobManager;
+
         WorkflowJob(Type type);
 
         unsigned long getNewUniqueNumber();
+
+        /** @brief Service-specific arguments used during job submission **/
+        std::map<std::string, std::string> service_specific_args;
 
         /** @brief Stack of callback mailboxes (to pop notifications) */
         std::stack<std::string> callback_mailbox_stack;
