@@ -163,7 +163,7 @@ namespace wrench {
       if (trials == max_num_trials) {
         throw std::runtime_error("Fatal Batsched Error (like some wront assert in the scheduler, could be transient)!");
       }
-      
+
       socket.close();
 
       std::string reply_data;
