@@ -2365,13 +2365,14 @@ namespace wrench {
       std::string batchsched_query_mailbox = S4U_Mailbox::generateUniqueMailboxName("batchsched_query_mailbox");
 
       std::shared_ptr<BatschedNetworkListener> network_listener =
-              std::unique_ptr<BatschedNetworkListener>(
+              std::shared_ptr<BatschedNetworkListener>(
                       new BatschedNetworkListener(this->hostname, this, batchsched_query_mailbox,
                                                   std::to_string(this->batsched_port),
                                                   data));
       network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
-      network_listeners.push_back(std::move(network_listener));
+      network_listener = nullptr; // detached mode
+//      this->network_listeners.insert(std::move(network_listener));
 
       std::map<std::string, double> job_estimated_start_times = {};
       for (auto job : set_of_jobs) {
@@ -2429,7 +2430,8 @@ namespace wrench {
                                                   data));
       network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
-      network_listeners.push_back(network_listener);
+      network_listener = nullptr; // detached mode
+//      this->network_listeners.insert(network_listener);
     }
 
     /**
@@ -2463,7 +2465,8 @@ namespace wrench {
                                                     data));
         network_listener->simulation = this->simulation;
         network_listener->start(network_listener, true);
-        this->network_listeners.push_back(std::move(network_listener));
+        network_listener = nullptr; // detached mode
+//        this->network_listeners.insert(std::move(network_listener));
       } catch (std::runtime_error &e) {
         throw;
       }
@@ -2506,13 +2509,14 @@ namespace wrench {
       }
       std::string data = batch_submission_data.dump();
       std::shared_ptr<BatschedNetworkListener> network_listener =
-              std::unique_ptr<BatschedNetworkListener>(
+              std::shared_ptr<BatschedNetworkListener>(
                       new BatschedNetworkListener(this->hostname, this, this->mailbox_name,
                                                   std::to_string(this->batsched_port),
                                                   data));
       network_listener->simulation = this->simulation;
       network_listener->start(network_listener, true);
-      network_listeners.push_back(std::move(network_listener));
+      network_listener = nullptr; // detached mode
+//      this->network_listeners.insert(std::move(network_listener));
     }
 
     /**

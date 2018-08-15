@@ -290,7 +290,7 @@ namespace wrench {
 
 
         /** BATSCHED-related fields **/
-        std::vector<std::shared_ptr<BatschedNetworkListener>> network_listeners;
+        std::set<std::shared_ptr<BatschedNetworkListener>> network_listeners;
         pid_t pid;
         unsigned long batsched_port;
 
