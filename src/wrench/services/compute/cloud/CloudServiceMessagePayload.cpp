@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,4 +12,10 @@
 
 namespace wrench {
 
+    SET_MESSAGEPAYLOAD_NAME(CloudServiceMessagePayload, GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(CloudServiceMessagePayload, GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(CloudServiceMessagePayload, CREATE_VM_REQUEST_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(CloudServiceMessagePayload, CREATE_VM_ANSWER_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(CloudServiceMessagePayload, MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(CloudServiceMessagePayload, MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD);
 }

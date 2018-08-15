@@ -176,6 +176,8 @@ set(SOURCE_FILES
         src/wrench/services/compute/cloud/CloudService.cpp
         src/wrench/services/compute/cloud/CloudServiceProperty.cpp
         src/wrench/services/compute/cloud/CloudServiceMessagePayload.cpp
+        src/wrench/services/compute/cloud/CloudServiceMessage.h
+        src/wrench/services/compute/cloud/CloudServiceMessage.cpp
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
         src/wrench/services/compute/standard_job_executor/Workunit.cpp

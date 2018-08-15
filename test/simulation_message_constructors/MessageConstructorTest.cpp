@@ -15,6 +15,7 @@
 #include "../../src/wrench/services/file_registry/FileRegistryMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
 #include "../../src/wrench/services/storage/StorageServiceMessage.h"
+#include "../../src/wrench/services/compute/cloud/CloudServiceMessage.h"
 #include "../../src/wrench/services/compute/virtualized_cluster/VirtualizedClusterServiceMessage.h"
 #include "../../src/wrench/services/network_proximity/NetworkProximityMessage.h"
 #include "wrench/workflow/execution_events/FailureCause.h"
@@ -193,19 +194,19 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
 
 TEST_F(MessageConstructorTest, CloudServiceMessages) {
 
-  ASSERT_NO_THROW(new wrench::VirtualizedClusterServiceGetExecutionHostsRequestMessage("mailbox", 600));
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceGetExecutionHostsRequestMessage("", 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("mailbox", 600));
+  ASSERT_THROW(new wrench::CloudServiceGetExecutionHostsRequestMessage("", 666), std::invalid_argument);
 
   std::vector<std::string> arg;
   arg.push_back("aaa");
-  ASSERT_NO_THROW(new wrench::VirtualizedClusterServiceGetExecutionHostsAnswerMessage(arg, 600));
+  ASSERT_NO_THROW(new wrench::CloudServiceGetExecutionHostsAnswerMessage(arg, 600));
 
   std::map<std::string, std::string> property_list;
   std::map<std::string, std::string> messagepayload_list;
-  ASSERT_NO_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("mailbox", "host", "host", 42, 10, property_list, messagepayload_list, 666));
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("", "host", "host", 42, 0, property_list, messagepayload_list, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("mailbox", "", "host", 42, 0, property_list, messagepayload_list, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::VirtualizedClusterServiceCreateVMRequestMessage("mailbox", "host", "", 42, 0, property_list, messagepayload_list, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "host", 42, 10, property_list, messagepayload_list, 666));
+  ASSERT_THROW(new wrench::CloudServiceCreateVMRequestMessage("", "host", "host", 42, 0, property_list, messagepayload_list, 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "", "host", 42, 0, property_list, messagepayload_list, 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudServiceCreateVMRequestMessage("mailbox", "host", "", 42, 0, property_list, messagepayload_list, 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "host", 666));
   ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("", "host", "host", 666), std::invalid_argument);

@@ -11,18 +11,16 @@
 #ifndef WRENCH_VIRTUALIZEDCLUSTERPROPERTY_H
 #define WRENCH_VIRTUALIZEDCLUSTERPROPERTY_H
 
-#include "wrench/services/compute/ComputeServiceProperty.h"
+#include "wrench/services/compute/cloud/CloudServiceProperty.h"
 
 namespace wrench {
 
     /**
      * @brief Configurable properties for a VirtualizedClusterService
      */
-    class VirtualizedClusterServiceProperty : public ComputeServiceProperty {
+    class VirtualizedClusterServiceProperty : public CloudServiceProperty {
 
     public:
-        /** @brief The overhead, in seconds, to boot a VM **/
-        DECLARE_PROPERTY_NAME(VM_BOOT_OVERHEAD_IN_SECONDS);
     };
 
 }
