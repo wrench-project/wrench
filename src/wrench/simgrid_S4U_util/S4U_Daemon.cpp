@@ -17,7 +17,13 @@
 #include <wrench/util/MessageManager.h>
 
 
+#include <boost/algorithm/string.hpp>
+
+
 XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon, "Log category for S4U_Daemon");
+
+
+std::map<std::string, unsigned long> num_actors;
 
 
 namespace wrench {
@@ -38,6 +44,26 @@ namespace wrench {
       if (simgrid::s4u::Host::by_name_or_null(hostname) == nullptr) {
         throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
       }
+
+      this->process_name_prefix = "";
+      std::vector<std::string> tokens;
+      boost::split(tokens, process_name_prefix, boost::is_any_of("_"));
+      for (auto t : tokens) {
+        if (t.at(0) < '0' or t.at(0) > '9') {
+          this->process_name_prefix += t + "_";
+        }
+      }
+
+      if (num_actors.find(this->process_name_prefix) == num_actors.end()) {
+        num_actors.insert(std::make_pair(this->process_name_prefix, 1));
+      } else {
+        num_actors[this->process_name_prefix]++;
+      }
+
+      for (auto a : num_actors) {
+        std::cerr << a.first << ":" << a.second << "\n";
+      }
+      std::cerr << "---------------\n";
 
 
       this->daemon_lock = simgrid::s4u::Mutex::create();
@@ -69,6 +95,8 @@ namespace wrench {
 
     S4U_Daemon::~S4U_Daemon() {
 //      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
+      num_actors[this->process_name_prefix]--;
+
     }
 
     /**
@@ -120,8 +148,8 @@ namespace wrench {
       // Create the s4u_actor
       try {
         this->s4u_actor = simgrid::s4u::Actor::create(this->process_name.c_str(),
-                                                           simgrid::s4u::Host::by_name(hostname),
-                                                           S4U_DaemonActor(this));
+                                                      simgrid::s4u::Host::by_name(hostname),
+                                                      S4U_DaemonActor(this));
       } catch (std::exception &e) {
         // Some internal SimGrid exceptions...
         std::abort();

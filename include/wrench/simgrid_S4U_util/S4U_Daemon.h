@@ -88,6 +88,8 @@ namespace wrench {
         bool terminated;
         simgrid::s4u::ActorPtr s4u_actor;
 
+        std::string process_name_prefix;
+
     };
 
     /***********************/
