@@ -15,6 +15,9 @@
 #include <simgrid/s4u.hpp>
 #include <iostream>
 
+#define ACTOR_TRACKING_OUTPUT yes
+
+
 namespace wrench {
 
     /***********************/
@@ -87,6 +90,10 @@ namespace wrench {
         simgrid::s4u::MutexPtr daemon_lock;
         bool terminated;
         simgrid::s4u::ActorPtr s4u_actor;
+
+#ifdef ACTOR_TRACKING_OUTPUT
+        std::string process_name_prefix;
+#endif
 
     };
 
