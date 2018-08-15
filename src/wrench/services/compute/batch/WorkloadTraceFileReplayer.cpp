@@ -107,7 +107,11 @@ namespace wrench {
         // Submit this job to the batch service
         WRENCH_INFO("Submitting a [-N:%s, -t:%s, -c:%s] job",
                     batch_job_args["-N"].c_str(), batch_job_args["-t"].c_str(), batch_job_args["-c"].c_str());
-        job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
+        try {
+          job_manager->submitJob(standard_job, this->batch_service, batch_job_args);
+        } catch (WorkflowExecutionException &e) {
+          WRENCH_INFO("Couldn't submit a replayed job: %s (ignoring)", e.getCause()->toString().c_str());
+        }
 
       }
 

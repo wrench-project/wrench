@@ -295,7 +295,8 @@ namespace wrench {
 
       // Submit the job to the service
       try {
-        job->setSubmitDate(this->simulation->getCurrentSimulatedDate());
+        job->submit_date = this->simulation->getCurrentSimulatedDate();
+        job->service_specific_args = service_specific_args;
         compute_service->submitJob(job, service_specific_args);
         job->setParentComputeService(compute_service);
       } catch (WorkflowExecutionException &e) {
@@ -453,7 +454,6 @@ namespace wrench {
       while (keep_going) {
         std::unique_ptr<SimulationMessage> message = nullptr;
         try {
-          WRENCH_INFO("Waiting for a message");
           message = S4U_Mailbox::getMessage(this->mailbox_name);
         } catch (std::shared_ptr<NetworkError> &cause) {
           continue;
@@ -480,12 +480,14 @@ namespace wrench {
           // Determine all task state changes
           std::map<WorkflowTask *, WorkflowTask::State> necessary_state_changes;
           for (auto task : job->tasks) {
+
             if (task->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
-//              task->setState(WorkflowTask::State::COMPLETED);
-              if (necessary_state_changes.find(task) == necessary_state_changes.end()) {
-                necessary_state_changes.insert(std::make_pair(task, WorkflowTask::State::COMPLETED));
-              } else {
-                necessary_state_changes[task] = WorkflowTask::State::COMPLETED;
+              if (task->getUpcomingState() != WorkflowTask::State::COMPLETED) {
+                if (necessary_state_changes.find(task) == necessary_state_changes.end()) {
+                  necessary_state_changes.insert(std::make_pair(task, WorkflowTask::State::COMPLETED));
+                } else {
+                  necessary_state_changes[task] = WorkflowTask::State::COMPLETED;
+                }
               }
             } else {
               throw std::runtime_error("JobManager::main(): got a 'job done' message, but task " +
@@ -496,27 +498,35 @@ namespace wrench {
             for (auto child : children) {
               switch (child->getInternalState()) {
                 case WorkflowTask::InternalState::TASK_NOT_READY:
-                case WorkflowTask::InternalState::TASK_RUNNING:
-                case WorkflowTask::InternalState::TASK_FAILED:
+                  if (child->getState() != WorkflowTask::State::NOT_READY) {
+                    throw std::runtime_error("JobManager::main(): Child's internal state if NOT READY, but child's visible state is " +
+                    WorkflowTask::stateToString(child->getState()));
+                  }
                 case WorkflowTask::InternalState::TASK_COMPLETED:
+                  break;
+                case WorkflowTask::InternalState::TASK_FAILED:
+                case WorkflowTask::InternalState::TASK_RUNNING:
                   // no nothing
+                  throw std::runtime_error("JobManager::main(): should never happen: " + WorkflowTask::stateToString(child->getInternalState()));
                   break;
                 case WorkflowTask::InternalState::TASK_READY:
                   if (child->getState() == WorkflowTask::State::NOT_READY) {
-                    bool all_parents_ready = true;
+                    bool all_parents_visibly_completed = true;
                     for (auto parent : child->getWorkflow()->getTaskParents(child)) {
                       if (parent->getState() == WorkflowTask::State::COMPLETED) {
                         continue; // COMPLETED FROM BEFORE
                       }
+                      if (parent->getUpcomingState() == WorkflowTask::State::COMPLETED) {
+                        continue; // COMPLETED FROM BEFORE, BUT NOT YET SEEN BY WMS
+                      }
                       if ((necessary_state_changes.find(parent) != necessary_state_changes.end()) &&
-                              (necessary_state_changes[parent] == WorkflowTask::State::COMPLETED)) {
+                          (necessary_state_changes[parent] == WorkflowTask::State::COMPLETED)) {
                         continue; // ABOUT TO BECOME COMPLETED
                       }
-                      all_parents_ready = false;
+                      all_parents_visibly_completed = false;
                       break;
                     }
-                    if (all_parents_ready) {
-//                      child->setState(WorkflowTask::State::READY);
+                    if (all_parents_visibly_completed) {
                       if (necessary_state_changes.find(child) == necessary_state_changes.end()) {
                         necessary_state_changes.insert(std::make_pair(child, WorkflowTask::State::READY));
                       } else {
@@ -532,6 +542,18 @@ namespace wrench {
           // move the job from the "pending" list to the "completed" list
           this->pending_standard_jobs.erase(job);
           this->completed_standard_jobs.insert(job);
+
+          /*
+          WRENCH_INFO("HERE ARE NECESSARY STATE CHANGES");
+          for (auto s : necessary_state_changes) {
+            WRENCH_INFO("  STATE(%s) = %s", s.first->getID().c_str(),
+            WorkflowTask::stateToString(s.second).c_str());
+          }
+          */
+
+          for (auto s : necessary_state_changes) {
+            s.first->setUpcomingState(s.second);
+          }
 
           // Forward the notification along the notification chain
           std::string callback_mailbox = job->popCallbackMailbox();
@@ -557,6 +579,7 @@ namespace wrench {
           std::set<WorkflowTask *> necessary_failure_count_increments;
 
           for (auto t: job->getTasks()) {
+
             if (t->getInternalState() == WorkflowTask::InternalState::TASK_COMPLETED) {
 //              t->setState(WorkflowTask::State::COMPLETED);
               if (necessary_state_changes.find(t) == necessary_state_changes.end()) {
@@ -596,7 +619,8 @@ namespace wrench {
             } else if (t->getInternalState() == WorkflowTask::InternalState::TASK_FAILED) {
               bool ready = true;
               for (auto parent : this->wms->getWorkflow()->getTaskParents(t)) {
-                if (parent->getInternalState() != WorkflowTask::InternalState::TASK_COMPLETED) {
+                if ((parent->getInternalState() != WorkflowTask::InternalState::TASK_COMPLETED) and
+                    (parent->getUpcomingState() != WorkflowTask::State::COMPLETED)) {
                   ready = false;
                 }
               }

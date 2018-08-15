@@ -136,7 +136,11 @@ private:
         if ((t1->getState() != wrench::WorkflowTask::COMPLETED) ||
             (t2->getState() != wrench::WorkflowTask::COMPLETED) ||
             (t3->getState() != wrench::WorkflowTask::COMPLETED)) {
-          throw std::runtime_error("Unexpected task states");
+          throw std::runtime_error("DEFAULT_PROPERTIES / 1: Unexpected task states (" +
+                                   wrench::WorkflowTask::stateToString(t1->getState()) + ", " +
+                                   wrench::WorkflowTask::stateToString(t2->getState()) + ", " +
+                                   wrench::WorkflowTask::stateToString(t3->getState()) + ")"
+          );
         }
 
         double task1_makespan = t1->getEndDate() - now;
@@ -204,7 +208,11 @@ private:
         if ((t1->getState() != wrench::WorkflowTask::COMPLETED) ||
             (t2->getState() != wrench::WorkflowTask::COMPLETED) ||
             (t3->getState() != wrench::WorkflowTask::COMPLETED)) {
-          throw std::runtime_error("Unexpected task states");
+          throw std::runtime_error("DEFAULT PROPERTIES / CASE 2: Unexpected task states (" +
+                                   wrench::WorkflowTask::stateToString(t1->getState()) + ", " +
+                                   wrench::WorkflowTask::stateToString(t2->getState()) + ", " +
+                                   wrench::WorkflowTask::stateToString(t3->getState()) + ")"
+          );
         }
 
         double task1_makespan = t1->getEndDate() - now;
@@ -270,7 +278,11 @@ private:
         if ((t1->getState() != wrench::WorkflowTask::COMPLETED) ||
             (t2->getState() != wrench::WorkflowTask::COMPLETED) ||
             (t3->getState() != wrench::WorkflowTask::COMPLETED)) {
-          throw std::runtime_error("Unexpected task states");
+          throw std::runtime_error("MIN CORE ALLOCATIONS / CASE 1: Unexpected task states (" +
+                                   wrench::WorkflowTask::stateToString(t1->getState()) + ", " +
+                                   wrench::WorkflowTask::stateToString(t2->getState()) + ", " +
+                                   wrench::WorkflowTask::stateToString(t3->getState()) + ")"
+          );
         }
 
         double task1_makespan = t1->getEndDate() - now;
@@ -336,7 +348,11 @@ private:
         if ((t1->getState() != wrench::WorkflowTask::COMPLETED) ||
             (t2->getState() != wrench::WorkflowTask::COMPLETED) ||
             (t3->getState() != wrench::WorkflowTask::COMPLETED)) {
-          throw std::runtime_error("Unexpected task states");
+          throw std::runtime_error("DEFAULT PROPERTIES BUT MAX_MIN_CORE_ALLOCATIONS / CASE 1: Unexpected task states (" +
+              wrench::WorkflowTask::stateToString(t1->getState()) + ", " +
+              wrench::WorkflowTask::stateToString(t2->getState()) + ", " +
+              wrench::WorkflowTask::stateToString(t3->getState()) + ")"
+          );
         }
 
         double task1_makespan = t1->getEndDate() - now;
