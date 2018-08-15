@@ -23,8 +23,10 @@
 XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon, "Log category for S4U_Daemon");
 
 
-std::map<std::string, unsigned long> num_actors;
 
+#ifdef ACTOR_TRACKING_OUTPUT
+std::map<std::string, unsigned long> num_actors;
+#endif
 
 namespace wrench {
 
@@ -45,6 +47,7 @@ namespace wrench {
         throw std::invalid_argument("S4U_Daemon::S4U_Daemon(): Unknown host '" + hostname + "'");
       }
 
+      #ifdef ACTOR_TRACKING_OUTPUT
       this->process_name_prefix = "";
       std::vector<std::string> tokens;
       boost::split(tokens, process_name_prefix, boost::is_any_of("_"));
@@ -64,6 +67,7 @@ namespace wrench {
         std::cerr << a.first << ":" << a.second << "\n";
       }
       std::cerr << "---------------\n";
+      #endif
 
 
       this->daemon_lock = simgrid::s4u::Mutex::create();
@@ -94,8 +98,10 @@ namespace wrench {
 //    }
 
     S4U_Daemon::~S4U_Daemon() {
-//      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
+      #ifdef ACTOR_TRACKING_OUTPUT
       num_actors[this->process_name_prefix]--;
+      #endif
+//      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
 
     }
 
