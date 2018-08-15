@@ -1414,6 +1414,7 @@ namespace wrench {
       this->freeUpResources(batch_job->getResourcesAllocated());
       if (this->pilot_job_alarms[job->getName()] != nullptr) {
         this->pilot_job_alarms[job->getName()]->kill();
+        this->pilot_job_alarms.erase(job->getName());
       }
 
         //first forward this notification to the batsched
@@ -1553,6 +1554,7 @@ namespace wrench {
                                                  &(this->finished_standard_job_executors));
           executor_on_the_list = true;
           this->standard_job_alarms[job->getName()]->kill();
+          this->standard_job_alarms.erase(job->getName());
           break;
         }
       }
@@ -1627,6 +1629,7 @@ namespace wrench {
                                                  &(this->finished_standard_job_executors));
           executor_on_the_list = true;
           this->standard_job_alarms[job->getName()]->kill();
+          this->standard_job_alarms.erase(job->getName());
           break;
         }
       }
