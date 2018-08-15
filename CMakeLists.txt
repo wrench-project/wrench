@@ -6,20 +6,20 @@ project(wrench CXX)
 add_definitions("-Wall -Wno-unused-variable -Wno-unused-private-field")
 if (ENABLE_BATSCHED)
     add_definitions(-DENABLE_BATSCHED)
-endif()
+endif ()
 
 set(CMAKE_CXX_STANDARD 11)
 
 # build the version number
 set(WRENCH_VERSION_MAJOR "1")
 set(WRENCH_VERSION_MINOR "0")
-set(WRENCH_VERSION_PATCH "0")
+set(WRENCH_VERSION_PATCH "1")
 set(WRENCH_VERSION_EXTRA "")
 
 if (${WRENCH_VERSION_PATCH} EQUAL "0")
     set(WRENCH_RELEASE_VERSION "${WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}")
 else ()
-    set(WRENCH_RELEASE_VERSION "$(WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}.${WRENCH_VERSION_PATCH}")
+    set(WRENCH_RELEASE_VERSION "${WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}.${WRENCH_VERSION_PATCH}")
 endif ()
 
 if (NOT ${WRENCH_VERSION_EXTRA} EQUAL "")
@@ -273,9 +273,9 @@ install(DIRECTORY include/ DESTINATION include)
 add_executable(unit_tests EXCLUDE_FROM_ALL ${SOURCE_FILES} ${HEADER_FILES} ${TEST_FILES})
 if (ENABLE_BATSCHED)
     target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm -lzmq)
-else()
+else ()
     target_link_libraries(unit_tests ${GTEST_LIBRARY} wrench -lpthread -lm)
-endif()
+endif ()
 
 
 set_target_properties(unit_tests PROPERTIES COMPILE_FLAGS "-g -O0 --coverage")
