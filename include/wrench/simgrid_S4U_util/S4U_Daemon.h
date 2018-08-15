@@ -15,7 +15,7 @@
 #include <simgrid/s4u.hpp>
 #include <iostream>
 
-#define ACTOR_TRACKING_OUTPUT yes
+//#define ACTOR_TRACKING_OUTPUT yes
 
 
 namespace wrench {
