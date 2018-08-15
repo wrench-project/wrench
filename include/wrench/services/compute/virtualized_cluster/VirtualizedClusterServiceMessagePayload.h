@@ -11,28 +11,17 @@
 #ifndef WRENCH_VIRTUALIZEDCLUSTERMESSAGEPAYLOAD_H
 #define WRENCH_VIRTUALIZEDCLUSTERMESSAGEPAYLOAD_H
 
-#include "wrench/services/compute/ComputeServiceMessagePayload.h"
+#include "wrench/services/compute/cloud/CloudServiceMessagePayload.h"
 
 namespace wrench {
 
     /**
      * @brief Configurable message payloads for a VirtualizedClusterService
      */
-    class VirtualizedClusterServiceMessagePayload : public ComputeServiceMessagePayload {
+    class VirtualizedClusterServiceMessagePayload : public CloudServiceMessagePayload {
 
     public:
-        /** @brief The number of bytes in the control message sent to the service to request a get execution hosts. **/
-        DECLARE_MESSAGEPAYLOAD_NAME(GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the service in answer to a get execution hosts request. **/
-        DECLARE_MESSAGEPAYLOAD_NAME(GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the service to request a VM creation. **/
-        DECLARE_MESSAGEPAYLOAD_NAME(CREATE_VM_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the service in answer to a VM creation request. **/
-        DECLARE_MESSAGEPAYLOAD_NAME(CREATE_VM_ANSWER_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the service to request a VM migration. **/
-        DECLARE_MESSAGEPAYLOAD_NAME(MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the service in answer to a VM migration request. **/
-        DECLARE_MESSAGEPAYLOAD_NAME(MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD);
+
     };
 
 }

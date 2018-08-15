@@ -245,9 +245,6 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      // Create a file registry service
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
-
       // Create a 2-task job
       wrench::StandardJob *two_task_job = job_manager->createStandardJob(
               {this->test->task1, this->test->task2}, {},
@@ -256,7 +253,7 @@ private:
 
       // Submit the 2-task job for execution
       try {
-        auto cs = (wrench::CloudService *) this->test->compute_service;
+        auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
         std::string src_host = cs->getExecutionHosts()[0];
         std::string vm_host = cs->createVM(src_host, 2, 10);
 
@@ -319,15 +316,15 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
   std::vector<std::string> nothing;
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, nothing, 100.0,
-                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})), std::invalid_argument);
-
-
+                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS,
+                                                         "false"}})), std::invalid_argument);
 
   // Create a Virtualized Cluster Service
   std::vector<std::string> execution_hosts = simulation->getHostnameList();
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::VirtualizedClusterService(hostname, execution_hosts, 100.0,
-                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS,
+                                                         "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -337,8 +334,7 @@ void VirtualizedClusterServiceTest::do_VMMigrationTest_test() {
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
   // Create a file registry
-  ASSERT_NO_THROW(simulation->add(
-          new wrench::FileRegistryService(hostname)));
+  ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
   // Staging the input_file on the storage service
   ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
@@ -377,8 +373,6 @@ private:
 
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
-
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
       wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);

@@ -11,9 +11,16 @@
 #ifndef WRENCH_CLOUDSERVICE_H
 #define WRENCH_CLOUDSERVICE_H
 
-#include "wrench/services/compute/virtualized_cluster/VirtualizedClusterService.h"
-#include "CloudServiceProperty.h"
-#include "CloudServiceMessagePayload.h"
+#include <map>
+#include <simgrid/s4u/VirtualMachine.hpp>
+
+#include "wrench/services/compute/ComputeService.h"
+#include "wrench/services/compute/cloud/CloudServiceProperty.h"
+#include "wrench/services/compute/cloud/CloudServiceMessagePayload.h"
+#include "wrench/simulation/Simulation.h"
+#include "wrench/simgrid_S4U_util/S4U_VirtualMachine.h"
+#include "wrench/workflow/job/PilotJob.h"
+
 
 namespace wrench {
 
@@ -26,40 +33,112 @@ namespace wrench {
      *        hosts and controls access to their resources by (transparently) executing jobs
      *        in VM instances.
      */
-    class CloudService : public VirtualizedClusterService {
+    class CloudService : public ComputeService {
 
     private:
         std::map<std::string, std::string> default_property_values = {
+                {CloudServiceProperty::SUPPORTS_PILOT_JOBS,         "true"},
+                {CloudServiceProperty::SUPPORTS_STANDARD_JOBS,      "true"},
                 {CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS, "0.0"}
-                };
+        };
 
         std::map<std::string, std::string> default_messagepayload_values = {
-                 {CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  "1024"},
-                 {CloudServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               "1024"},
-                 {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                 {CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
-                 {CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
-                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
-                 {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
-                 {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      "1024"}
-                };
+                {CloudServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                  "1024"},
+                {CloudServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,               "1024"},
+                {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                {CloudServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
+                {CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
+                {CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
+                {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
+                {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,      "1024"}
+        };
 
     public:
         CloudService(const std::string &hostname,
                      std::vector<std::string> &execution_hosts,
                      double scratch_space_size,
                      std::map<std::string, std::string> property_list = {},
-                     std::map<std::string, std::string> messagepayload_list = {}
-        );
+                     std::map<std::string, std::string> messagepayload_list = {});
 
-    private:
+        /***********************/
+        /** \cond DEVELOPER    */
+        /***********************/
+
+        virtual std::string createVM(const std::string &pm_hostname,
+                                     unsigned long num_cores = ComputeService::ALL_CORES,
+                                     double ram_memory = ComputeService::ALL_RAM,
+                                     std::map<std::string, std::string> property_list = {},
+                                     std::map<std::string, std::string> messagepayload_list = {});
+
+        std::vector<std::string> getExecutionHosts();
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+        void submitStandardJob(StandardJob *job, std::map<std::string, std::string> &service_specific_args) override;
+
+        void submitPilotJob(PilotJob *job, std::map<std::string, std::string> &service_specific_args) override;
+
+        void terminateStandardJob(StandardJob *job) override;
+
+        void terminatePilotJob(PilotJob *job) override;
+
+        ~CloudService();
+
+        /***********************/
+        /** \endcond          **/
+        /***********************/
+
+    protected:
+        /***********************/
+        /** \cond INTERNAL    */
+        /***********************/
+
         friend class Simulation;
 
         int main() override;
+
+        virtual bool processNextMessage();
+
+        virtual void processGetResourceInformation(const std::string &answer_mailbox);
+
+        virtual void processGetExecutionHosts(const std::string &answer_mailbox);
+
+        virtual void processCreateVM(const std::string &answer_mailbox,
+                                     const std::string &pm_hostname,
+                                     const std::string &vm_hostname,
+                                     unsigned long num_cores,
+                                     double ram_memory,
+                                     std::map<std::string, std::string> &property_list,
+                                     std::map<std::string, std::string> &messagepayload_list);
+
+        virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
+                                              std::map<std::string, std::string> &service_specific_args);
+
+        virtual void processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job);
+
+        void stopAllVMs();
+
+        /** @brief List of execution host names */
+        std::vector<std::string> execution_hosts;
+
+        /** @brief Map of available RAM at hosts */
+        std::map<std::string, double> cs_available_ram;
+
+        /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
+        std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>, unsigned long>> vm_list;
+
+        /***********************/
+        /** \endcond           */
+        /***********************/
     };
 
 }
