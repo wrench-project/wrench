@@ -2237,6 +2237,7 @@ namespace wrench {
         }
         switch (exit_code) {
           case 0: {
+            // Establish a tether so that if the main process dies, then batsched is brutally killed
             int tether[2]; // this is a local variable, only defined in this scope
             if (pipe(tether) != 0) {  // the pipe however is opened during the whole duration of both processes
               throw std::runtime_error("startBatsched(): pipe failed.");
@@ -2249,8 +2250,7 @@ namespace wrench {
             } else if (nested_pid == 0) {
               char foo;
               close(tether[1]); // closing write end
-              read(tether[0], &foo, 1); // blocking read which returns when the parent dies
-
+              int returned = read(tether[0], &foo, 1); // blocking read which returns when the parent dies
               //check if the child that forked batsched is still running
               if (getpgid(top_pid)) {
                 kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched

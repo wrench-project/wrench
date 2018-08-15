@@ -16,7 +16,7 @@
 #include "wrench/simulation/Simulation.h"
 #include "wrench/simulation/SimulationTimestampTypes.h"
 
-XBT_LOG_NEW_DEFAULT_CATEGORY(workflowTask, "Log category for WorkflowTask");
+XBT_LOG_NEW_DEFAULT_CATEGORY(workflow_task, "Log category for WorkflowTask");
 
 namespace wrench {
 
@@ -41,6 +41,7 @@ namespace wrench {
             memory_requirement(memory_requirement),
             execution_host(""),
             visible_state(WorkflowTask::State::READY),
+            upcoming_visible_state(WorkflowTask::State::UNKNOWN),
             internal_state(WorkflowTask::InternalState::TASK_READY),
             job(nullptr) {
     }
@@ -171,6 +172,15 @@ namespace wrench {
       return this->visible_state;
     }
 
+    /**
+    * @brief Get the state of the task
+    *
+    * @return a task state
+    */
+    WorkflowTask::State WorkflowTask::getUpcomingState() const {
+      return this->upcoming_visible_state;
+    }
+
 
     /**
      * @brief Get the state of the task (as known to the "internal" layer)
@@ -196,8 +206,10 @@ namespace wrench {
           return "PENDING";
         case COMPLETED:
           return "COMPLETED";
+        case UNKNOWN:
+          return "UNKNOWN";
         default:
-          return "UNKNOWN STATE";
+          return "INVALID";
       }
     }
 
@@ -240,6 +252,7 @@ namespace wrench {
      * @param state: the task's internal state
      */
     void WorkflowTask::setInternalState(WorkflowTask::InternalState state) {
+//      WRENCH_INFO("SETTING %s's INTERNAL STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
         this->internal_state = state;
     }
 
@@ -250,7 +263,8 @@ namespace wrench {
      */
     void WorkflowTask::setState(WorkflowTask::State state) {
 
-//      WRENCH_INFO("SETTING %s's STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
+//      WRENCH_INFO("WorkflowTask::setState(): SETTING %s's VISIBLE STATE TO %s", this->getID().c_str(), WorkflowTask::stateToString(state).c_str());
+
       // Sanity check
       bool sane = true;
       switch (state) {
@@ -278,6 +292,9 @@ namespace wrench {
             sane = false;
           }
           break;
+        case UNKNOWN:
+          sane = false;
+          break;
       }
 
       if (not sane) {
@@ -287,6 +304,15 @@ namespace wrench {
                                  "state is " + stateToString(this->internal_state));
       }
       this->visible_state = state;
+    }
+
+    /**
+     * @brief Set the upcoming visible state of the task
+     *
+     * @param state: the task state
+     */
+    void WorkflowTask::setUpcomingState(WorkflowTask::State state) {
+      this->upcoming_visible_state = state;
     }
 
     /**
@@ -563,7 +589,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the task's start date
+     * @brief Get the task's most recent start date
      * @return a start date (-1 if task has not started yet)
      */
     double WorkflowTask::getStartDate() {
@@ -571,7 +597,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the task's end date
+     * @brief Get the task's most recent end date
      * @return a end date (-1 if task has not completed yet or if no execution history exists for this task yet)
      */
     double WorkflowTask::getEndDate() {
@@ -579,7 +605,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Get the tasks's computation start date
+     * @brief Get the tasks's most recent computation start date
      * @return the date when the computation portion of a task started (-1 if computation has not started yet or if no execution history exists for this task yet)
      */
      double WorkflowTask::getComputationStartDate() {
@@ -587,7 +613,7 @@ namespace wrench {
      }
 
      /**
-      * @brief Get the task's computation end date
+      * @brief Get the task's most recent computation end date
       * @return the date when the computation portion of a task ended (-1 if computation has not ended yet or if no execution history exists for this task yet)
       */
       double WorkflowTask::getComputationEndDate() {
@@ -595,7 +621,7 @@ namespace wrench {
       }
 
       /**
-       * @brief Get the tasks read input start date
+       * @brief Get the task's most recent read input start date
        * @return the date when the read input portion of the task has begun (-1 if it has not yet begun or if no execution history exists for this task yet)
        */
       double WorkflowTask::getReadInputStartDate() {
@@ -603,7 +629,7 @@ namespace wrench {
       }
 
       /**
-       * @brief Get the tasks read input end date
+       * @brief Get the task's most recent read input end date
        * @return the date when the read input portion of the task has completed (-1 if it has not begun or if no execution history exists for this task yet)
        */
       double WorkflowTask::getReadInputEndDate() {
@@ -611,7 +637,7 @@ namespace wrench {
       }
 
       /**
-       * @brief Get the tasks write output start date
+       * @brief Get the task's most recent write output start date
        * @return the date when the write output portion of a task has begun (-1 if it has not yet started or if no execution history exists for this task yet)
        */
       double WorkflowTask::getWriteOutputStartDate() {
@@ -619,7 +645,7 @@ namespace wrench {
       }
 
       /**
-       * @brief Get the task's write output end date
+       * @brief Get the task's most recent write output end date
        * @return the date when the write output portion of a task has completed (-1 if it has not completed yet or if no execution history exists for this task yet)
        */
       double WorkflowTask::getWriteOutputEndDate() {
@@ -627,7 +653,7 @@ namespace wrench {
       }
 
       /**
-       * @brief Get the task's failure date
+       * @brief Get the task's most recent failure date
        * @return the date when the task failed (-1 if it didn't fail or if no execution history exists for this task yet)
        */
       double WorkflowTask::getFailureDate() {
@@ -635,7 +661,7 @@ namespace wrench {
       }
 
       /**
-       * @brief Get the tasks's termination date (when it was explicitely requested to be terminated by the WMS)
+       * @brief Get the tasks's most recent termination date (when it was explicitely requested to be terminated by the WMS)
        * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
        */
       double WorkflowTask::getTerminationDate() {

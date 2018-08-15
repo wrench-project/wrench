@@ -211,7 +211,7 @@ namespace wrench {
         /** @brief Reasons why a standard job could be terminated */
         enum JobTerminationCause {
             /** @brief The WMS intentionally requested, via a JobManager, that a running job is to be terminated */
-            TERMINATE,
+            TERMINATED,
 
             /** @brief The compute service was directed to stop, and any running StandardJob will fail */
             COMPUTE_SERVICE_KILLED

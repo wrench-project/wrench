@@ -951,7 +951,7 @@ namespace wrench {
 
       for (auto &task : job->getTasks()) {
           if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
-              if (termination_cause == MultihostMulticoreComputeService::JobTerminationCause::TERMINATE) {
+              if (termination_cause == MultihostMulticoreComputeService::JobTerminationCause::TERMINATED) {
                   task->setTerminationDate(S4U_Simulation::getClock());
                   this->simulation->getOutput().addTimestamp<SimulationTimestampTaskTerminated>(new SimulationTimestampTaskTerminated(task));
 
@@ -1046,7 +1046,7 @@ namespace wrench {
 
       while (not this->pending_jobs.empty()) {
         WorkflowJob *workflow_job = this->pending_jobs.front();
-        this->pending_jobs.pop_back();
+        this->pending_jobs.pop_front();
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto *job = (StandardJob *) workflow_job;
           this->failPendingStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
@@ -1353,7 +1353,7 @@ namespace wrench {
         // Remove the job from the list of running jobs
         this->running_jobs.erase(job);
         // terminate it
-        terminateRunningStandardJob(job, MultihostMulticoreComputeService::JobTerminationCause::TERMINATE);
+        terminateRunningStandardJob(job, MultihostMulticoreComputeService::JobTerminationCause::TERMINATED);
         // reply
         ComputeServiceTerminateStandardJobAnswerMessage *answer_message = new ComputeServiceTerminateStandardJobAnswerMessage(
                 job, this, true, nullptr,

@@ -23,6 +23,8 @@
 #include <zmq.hpp>
 #include <zmq.h>
 
+#include <unistd.h>
+
 #endif
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(batch_network_listener_service, "Log category for Batch Network Listener Service");
@@ -147,8 +149,21 @@ namespace wrench {
 
       //  Get the reply.
       zmq::message_t reply;
-      socket.recv(&reply);
-      socket.disconnect("tcp://localhost:" + this->sched_port);
+
+      // This "backoff" approach is to detect batsched errors!
+      int max_num_trials = 50;
+      int trials;
+      for (trials=0; trials < max_num_trials; trials++) {
+          usleep(100 + 200 * trials);
+          int ret = socket.recv(&reply, ZMQ_DONTWAIT);
+          if (ret > 0) {
+            break;
+          }
+      }
+      if (trials == max_num_trials) {
+        throw std::runtime_error("Fatal Batsched Error (like some wront assert in the scheduler, could be transient)!");
+      }
+
       socket.close();
 
       std::string reply_data;
