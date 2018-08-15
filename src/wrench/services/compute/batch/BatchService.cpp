@@ -714,6 +714,8 @@ namespace wrench {
           break;
         }
       }
+      this->finished_standard_job_executors.clear();
+
     }
 
     /**
@@ -1558,6 +1560,8 @@ namespace wrench {
           break;
         }
       }
+      this->finished_standard_job_executors.clear();
+
 
       if (not executor_on_the_list) {
         throw std::runtime_error(
@@ -1633,6 +1637,7 @@ namespace wrench {
           break;
         }
       }
+      this->finished_standard_job_executors.clear();
 
       if (not executor_on_the_list) {
         throw std::runtime_error(

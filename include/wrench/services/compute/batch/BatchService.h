@@ -167,7 +167,7 @@ namespace wrench {
         // Vector of standard job executors
         std::set<std::shared_ptr<StandardJobExecutor>> running_standard_job_executors;
 
-        // Vector of standard job executors
+        // Vector of standard job executors (which is cleared periodically)
         std::set<std::shared_ptr<StandardJobExecutor>> finished_standard_job_executors;
 
         // Master List of batch jobs
