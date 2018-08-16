@@ -2374,6 +2374,7 @@ namespace wrench {
       network_listener = nullptr; // detached mode
 //      this->network_listeners.insert(std::move(network_listener));
 
+
       std::map<std::string, double> job_estimated_start_times = {};
       for (auto job : set_of_jobs) {
         // Get the answer
