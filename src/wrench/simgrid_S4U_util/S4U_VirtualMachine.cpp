@@ -52,6 +52,13 @@ namespace wrench {
     }
 
     /**
+     * @brief Shutdown the virtual machine
+     */
+    void S4U_VirtualMachine::shutdown() {
+      this->vm->shutdown();
+    }
+
+    /**
      * @brief Stop the virtual machine
      */
     void S4U_VirtualMachine::stop() {

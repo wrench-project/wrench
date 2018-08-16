@@ -42,6 +42,8 @@ public:
 
     void do_StopAllVMsTest_test();
 
+    void do_ShutdownVMTest_test();
+
 protected:
     VirtualizedClusterServiceTest() {
 
@@ -721,3 +723,160 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
   free(argv[0]);
   free(argv);
 }
+
+/**********************************************************************/
+/**  VM SHUTDOWN TEST                                                **/
+/**********************************************************************/
+
+class ShutdownVMTestWMS : public wrench::WMS {
+
+public:
+    std::map<std::string, std::string> default_messagepayload_values = {
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, "1024"}
+    };
+
+    ShutdownVMTestWMS(VirtualizedClusterServiceTest *test,
+                      const std::set<wrench::ComputeService *> &compute_services,
+                      const std::set<wrench::StorageService *> &storage_services,
+                      std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+
+      this->test = test;
+      this->setMessagePayloads(this->default_messagepayload_values, {});
+    }
+
+private:
+
+    VirtualizedClusterServiceTest *test;
+
+    int main() {
+      // Create a data movement manager
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+
+      // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
+
+      std::vector<std::string> vm_list;
+
+      // Submit the pilot job for execution
+      try {
+        auto cs = (wrench::CloudService *) this->test->compute_service;
+        std::string execution_host = cs->getExecutionHosts()[0];
+
+        vm_list.push_back(cs->createVM(execution_host, 1, 10));
+        vm_list.push_back(cs->createVM(execution_host, 1, 10));
+        vm_list.push_back(cs->createVM(execution_host, 1, 10));
+        vm_list.push_back(cs->createVM(execution_host, 1, 10));
+
+        job_manager->submitJob(pilot_job, this->test->compute_service);
+
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      // Wait for a workflow execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          // success, do nothing for now
+          break;
+        }
+        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
+      }
+
+      // attempt to shutdown non-existent VM
+      try {
+        auto cs = (wrench::CloudService *) this->test->compute_service;
+        if (cs->shutdownVM("NON_EXISTENT_VM")) {
+          throw std::runtime_error("Cannot shutdown a non-existent VM");
+        }
+
+      } catch (wrench::WorkflowExecutionException &e) {
+        // do nothing, since it is the expected behavior
+      }
+
+      // shutdown VMs
+      try {
+        auto cs = (wrench::CloudService *) this->test->compute_service;
+        for (auto &vm : vm_list) {
+          if (!cs->shutdownVM(vm)) {
+            throw std::runtime_error("Unable to shutdown VM");
+          }
+        }
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(VirtualizedClusterServiceTest, ShutdownVMTestWMS) {
+  DO_TEST_WITH_FORK(do_ShutdownVMTest_test);
+}
+
+void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
+
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("virtualized_cluster_service_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Storage Service
+  ASSERT_NO_THROW(storage_service = simulation->add(
+          new wrench::SimpleStorageService(hostname, 100.0)));
+
+  // Create a Cloud Service
+  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::CloudService(hostname, execution_hosts, 0,
+                                   {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new ShutdownVMTestWMS(this, {compute_service}, {storage_service}, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Create a file registry
+  ASSERT_NO_THROW(simulation->add(
+          new wrench::FileRegistryService(hostname)));
+
+  // Staging the input_file on the storage service
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+  // Running a "run a single task" simulation
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+  free(argv[0]);
+  free(argv);
+}
+

@@ -34,6 +34,8 @@ namespace wrench {
 
         simgrid::s4u::Host *getPm();
 
+        void shutdown();
+
         void stop();
 
     private:

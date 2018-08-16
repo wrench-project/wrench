@@ -166,6 +166,49 @@ namespace wrench {
     }
 
     /**
+     * @brief Shutdown an active VM
+     *
+     * @param vm_hostname: the name of the VM host
+     *
+     * @return Whether the VM shutdown was succeeded
+     *
+     * @throw WorkflowExecutionException
+     */
+    bool CloudService::shutdownVM(const std::string &vm_hostname) {
+
+      serviceSanityCheck();
+
+      // send a "shutdown vm" message to the daemon's mailbox_name
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("shutdown_vm");
+
+      try {
+        S4U_Mailbox::putMessage(
+                this->mailbox_name,
+                new CloudServiceShutdownVMRequestMessage(
+                        answer_mailbox, vm_hostname,
+                        this->getMessagePayloadValueAsDouble(
+                                CloudServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD)));
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      // Wait for a reply
+      std::unique_ptr<SimulationMessage> message = nullptr;
+
+      try {
+        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        throw WorkflowExecutionException(cause);
+      }
+
+      if (auto msg = dynamic_cast<CloudServiceShutdownVMAnswerMessage *>(message.get())) {
+        return msg->success;
+      } else {
+        throw std::runtime_error("CloudService::shutdownVM(): Unexpected [" + msg->getName() + "] message");
+      }
+    }
+
+    /**
      * @brief Submit a standard job to the cloud service
      *
      * @param job: a standard job
@@ -352,6 +395,10 @@ namespace wrench {
                         msg->property_list, msg->messagepayload_list);
         return true;
 
+      } else if (auto msg = dynamic_cast<CloudServiceShutdownVMRequestMessage *>(message.get())) {
+        processShutdownVM(msg->answer_mailbox, msg->vm_hostname);
+        return true;
+
       } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
         processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
@@ -472,6 +519,44 @@ namespace wrench {
                           this->getMessagePayloadValueAsDouble(
                                   CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD)));
         }
+      } catch (std::shared_ptr<NetworkError> &cause) {
+        return;
+      }
+    }
+
+    /**
+     * @brief: Process a VM shutdown request
+     *
+     * @param answer_mailbox: the mailbox to which the answer message should be sent
+     * @param vm_hostname: the name of the VM host
+     */
+    void CloudService::processShutdownVM(const std::string &answer_mailbox, const std::string &vm_hostname) {
+
+      try {
+        WRENCH_INFO("Asked to shutdown VM %s", vm_hostname.c_str());
+
+        auto vm_tuple = this->vm_list.find(vm_hostname);
+
+        if (vm_tuple == this->vm_list.end()) {
+          S4U_Mailbox::dputMessage(
+                  answer_mailbox,
+                  new CloudServiceShutdownVMAnswerMessage(
+                          false,
+                          this->getMessagePayloadValueAsDouble(
+                                  CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD)));
+          return;
+        }
+
+        auto vm = std::get<0>(vm_tuple->second);
+        vm->shutdown();
+
+        S4U_Mailbox::dputMessage(
+                answer_mailbox,
+                new CloudServiceShutdownVMAnswerMessage(
+                        true,
+                        this->getMessagePayloadValueAsDouble(
+                                CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD)));
+
       } catch (std::shared_ptr<NetworkError> &cause) {
         return;
       }

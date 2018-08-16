@@ -13,4 +13,7 @@
 
 namespace wrench {
 
+    SET_MESSAGEPAYLOAD_NAME(VirtualizedClusterServiceMessagePayload, MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD);
+    SET_MESSAGEPAYLOAD_NAME(VirtualizedClusterServiceMessagePayload, MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD);
+
 }

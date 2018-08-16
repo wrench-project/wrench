@@ -101,4 +101,37 @@ namespace wrench {
                                                                          double payload) :
             CloudServiceMessage("CREATE_VM_ANSWER", payload), success(success) {}
 
+    /**
+     * @brief Constructor
+     *
+     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param vm_hostname: the name of the VM host
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    CloudServiceShutdownVMRequestMessage::CloudServiceShutdownVMRequestMessage(
+            const std::string &answer_mailbox,
+            const std::string &vm_hostname,
+            double payload) :
+            CloudServiceMessage("SHUTDOWN_VM_REQUEST", payload) {
+
+      if (answer_mailbox.empty() || vm_hostname.empty()) {
+        throw std::invalid_argument(
+                "CloudServiceShutdownVMRequestMessage::CloudServiceShutdownVMRequestMessage(): Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+      this->vm_hostname = vm_hostname;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param success: whether the VM shutdown succeeded
+     * @param payload: the message size in bytes
+     */
+    CloudServiceShutdownVMAnswerMessage::CloudServiceShutdownVMAnswerMessage(bool success,
+                                                                             double payload) :
+            CloudServiceMessage("SHUTDOWN_VM_ANSWER", payload), success(success) {}
+
 }

@@ -162,6 +162,10 @@ namespace wrench {
                         msg->property_list, msg->messagepayload_list);
         return true;
 
+      } else if (auto msg = dynamic_cast<CloudServiceShutdownVMRequestMessage *>(message.get())) {
+        processShutdownVM(msg->answer_mailbox, msg->vm_hostname);
+        return true;
+
       } else if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMRequestMessage *>(message.get())) {
         processMigrateVM(msg->answer_mailbox, msg->vm_hostname, msg->dest_pm_hostname);
         return true;

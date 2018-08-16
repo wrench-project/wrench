@@ -51,6 +51,8 @@ namespace wrench {
                 {CloudServiceMessagePayload::GET_EXECUTION_HOSTS_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                 {CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
                 {CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
+                {CloudServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD,          "1024"},
+                {CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,           "1024"},
                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                 {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
@@ -73,6 +75,8 @@ namespace wrench {
                                      double ram_memory = ComputeService::ALL_RAM,
                                      std::map<std::string, std::string> property_list = {},
                                      std::map<std::string, std::string> messagepayload_list = {});
+
+        virtual bool shutdownVM(const std::string &vm_hostname);
 
         std::vector<std::string> getExecutionHosts();
 
@@ -119,6 +123,8 @@ namespace wrench {
                                      double ram_memory,
                                      std::map<std::string, std::string> &property_list,
                                      std::map<std::string, std::string> &messagepayload_list);
+
+        virtual void processShutdownVM(const std::string &answer_mailbox, const std::string &vm_hostname);
 
         virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                               std::map<std::string, std::string> &service_specific_args);

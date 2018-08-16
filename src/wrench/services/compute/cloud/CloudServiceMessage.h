@@ -95,6 +95,33 @@ namespace wrench {
         bool success;
     };
 
+    /**
+     * @brief A message sent to a CloudService to request a VM shutdown
+     */
+    class CloudServiceShutdownVMRequestMessage : public CloudServiceMessage {
+    public:
+        CloudServiceShutdownVMRequestMessage(const std::string &answer_mailbox,
+                                             const std::string &vm_hostname,
+                                             double payload);
+
+    public:
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The name of the new VM host */
+        std::string vm_hostname;
+    };
+
+    /**
+     * @brief A message sent by a CloudService in answer to a VM shutdown request
+     */
+    class CloudServiceShutdownVMAnswerMessage : public CloudServiceMessage {
+    public:
+        CloudServiceShutdownVMAnswerMessage(bool success, double payload);
+
+        /** @brief Whether the VM shutdown was successful or not */
+        bool success;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/
