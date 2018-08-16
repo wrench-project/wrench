@@ -161,7 +161,7 @@ namespace wrench {
           }
       }
       if (trials == max_num_trials) {
-        throw std::runtime_error("Fatal Batsched Error (like some wront assert in the scheduler, could be transient)!");
+        throw std::runtime_error("Fatal Batsched Error (like some failed assert in the scheduler, could be transient)!");
       }
 
       socket.close();
@@ -181,10 +181,11 @@ namespace wrench {
         double time_to_sleep = S4U_Simulation::getClock() - decision_timestamp;
         nlohmann::json execute_json_data = decisions["data"];
         std::string job_reply_data = execute_json_data.dump();
-        if (time_to_sleep > 0) {
-          S4U_Simulation::sleep(time_to_sleep);
-        }
+
         if (strcmp(decision_type.c_str(), "EXECUTE_JOB") == 0) {
+          if (time_to_sleep > 0) {
+            S4U_Simulation::sleep(time_to_sleep);
+          }
           sendExecuteMessageToBatchService(answer_mailbox, job_reply_data);
         } else if (strcmp(decision_type.c_str(), "ANSWER") == 0) {
           double estimated_waiting_time = execute_json_data["estimate_waiting_time"]["estimated_waiting_time"];
