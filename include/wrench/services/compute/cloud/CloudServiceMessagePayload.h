@@ -28,10 +28,10 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(CREATE_VM_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the service in answer to a VM creation request. **/
         DECLARE_MESSAGEPAYLOAD_NAME(CREATE_VM_ANSWER_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent to the service to request a VM migration. **/
-        DECLARE_MESSAGEPAYLOAD_NAME(MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD);
-        /** @brief The number of bytes in the control message sent by the service in answer to a VM migration request. **/
-        DECLARE_MESSAGEPAYLOAD_NAME(MIGRATE_VM_ANSWER_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent to the service to request a VM shutdown. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent by the service in answer to a VM shutdown request. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD);
     };
 }
 
