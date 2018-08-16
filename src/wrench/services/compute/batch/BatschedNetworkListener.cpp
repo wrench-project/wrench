@@ -151,10 +151,10 @@ namespace wrench {
       zmq::message_t reply;
 
       // This "backoff" approach is to detect batsched errors!
-      int max_num_trials = 50;
+      int max_num_trials = 100;
       int trials;
       for (trials=0; trials < max_num_trials; trials++) {
-          usleep(100 + 200 * trials);
+          usleep(100 + 100 * trials);
           int ret = socket.recv(&reply, ZMQ_DONTWAIT);
           if (ret > 0) {
             break;
