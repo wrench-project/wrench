@@ -58,31 +58,17 @@ namespace wrench {
      */
     bool VirtualizedClusterService::migrateVM(const std::string &vm_hostname, const std::string &dest_pm_hostname) {
 
-      serviceSanityCheck();
-
       // send a "migrate vm" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("migrate_vm");
 
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new VirtualizedClusterServiceMigrateVMRequestMessage(
-                                        answer_mailbox, vm_hostname, dest_pm_hostname,
-                                        this->getMessagePayloadValueAsDouble(
-                                                VirtualizedClusterServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
+      std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+              answer_mailbox,
+              new VirtualizedClusterServiceMigrateVMRequestMessage(
+                      answer_mailbox, vm_hostname, dest_pm_hostname,
+                      this->getMessagePayloadValueAsDouble(
+                              VirtualizedClusterServiceMessagePayload::MIGRATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
-      // Wait for a reply
-      std::unique_ptr<SimulationMessage> message = nullptr;
-
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMAnswerMessage *>(message.get())) {
+      if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMAnswerMessage *>(answer_message.get())) {
         return msg->success;
       } else {
         throw std::runtime_error("VirtualizedClusterService::migrateVM(): Unexpected [" + msg->getName() + "] message");
@@ -164,6 +150,18 @@ namespace wrench {
 
       } else if (auto msg = dynamic_cast<CloudServiceShutdownVMRequestMessage *>(message.get())) {
         processShutdownVM(msg->answer_mailbox, msg->vm_hostname);
+        return true;
+
+      } else if (auto msg = dynamic_cast<CloudServiceStartVMRequestMessage *>(message.get())) {
+        processStartVM(msg->answer_mailbox, msg->vm_hostname);
+        return true;
+
+      } else if (auto msg = dynamic_cast<CloudServiceSuspendVMRequestMessage *>(message.get())) {
+        processSuspendVM(msg->answer_mailbox, msg->vm_hostname);
+        return true;
+
+      } else if (auto msg = dynamic_cast<CloudServiceResumeVMRequestMessage *>(message.get())) {
+        processResumeVM(msg->answer_mailbox, msg->vm_hostname);
         return true;
 
       } else if (auto msg = dynamic_cast<VirtualizedClusterServiceMigrateVMRequestMessage *>(message.get())) {
