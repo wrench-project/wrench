@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@
 
 
 XBT_LOG_NEW_DEFAULT_CATEGORY(s4u_daemon, "Log category for S4U_Daemon");
-
 
 
 #ifdef ACTOR_TRACKING_OUTPUT
@@ -102,7 +101,6 @@ namespace wrench {
       num_actors[this->process_name_prefix]--;
       #endif
 //      std::cerr << "### DESTRUCTOR OF DAEMON " << this->getName() << "\n";
-
     }
 
     /**
@@ -111,7 +109,6 @@ namespace wrench {
     void S4U_Daemon::cleanup() {
 //      WRENCH_INFO("Cleaning Up (default: nothing to do)");
     }
-
 
     /**
      * \cond
@@ -122,10 +119,10 @@ namespace wrench {
         auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
         service->cleanup();
         delete service->life_saver;
+        service->life_saver = nullptr;
       }
       return 0;
     }
-
 
     /**
      * \endcond

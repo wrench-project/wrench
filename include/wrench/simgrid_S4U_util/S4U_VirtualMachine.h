@@ -34,9 +34,19 @@ namespace wrench {
 
         simgrid::s4u::Host *getPm();
 
+        void start();
+
+        void suspend();
+
+        void resume();
+
         void shutdown();
 
         void stop();
+
+        bool isRunning();
+
+        bool isSuspended();
 
     private:
         /** @brief a pointer to the simgrid::s4u::VirtualMachine object */
