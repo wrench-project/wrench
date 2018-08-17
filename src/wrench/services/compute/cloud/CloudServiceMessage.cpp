@@ -9,6 +9,7 @@
  */
 
 #include "CloudServiceMessage.h"
+#include <iostream>
 
 namespace wrench {
 
@@ -83,6 +84,7 @@ namespace wrench {
             property_list(property_list), messagepayload_list(messagepayload_list) {
 
       if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty()) {
+        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_hostname << std::endl;
         throw std::invalid_argument(
                 "CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(): Invalid arguments");
       }
@@ -134,4 +136,102 @@ namespace wrench {
                                                                              double payload) :
             CloudServiceMessage("SHUTDOWN_VM_ANSWER", payload), success(success) {}
 
+    /**
+     * @brief Constructor
+     *
+     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param vm_hostname: the name of the VM host
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    CloudServiceStartVMRequestMessage::CloudServiceStartVMRequestMessage(
+            const std::string &answer_mailbox,
+            const std::string &vm_hostname,
+            double payload) :
+            CloudServiceMessage("START_VM_REQUEST", payload) {
+
+      if (answer_mailbox.empty() || vm_hostname.empty()) {
+        throw std::invalid_argument(
+                "CloudServiceStartVMRequestMessage::CloudServiceStartVMRequestMessage(): Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+      this->vm_hostname = vm_hostname;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param success: whether the VM start succeeded
+     * @param payload: the message size in bytes
+     */
+    CloudServiceStartVMAnswerMessage::CloudServiceStartVMAnswerMessage(bool success,
+                                                                       double payload) :
+            CloudServiceMessage("START_VM_ANSWER", payload), success(success) {}
+
+    /**
+     * @brief Constructor
+     *
+     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param vm_hostname: the name of the VM host
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    CloudServiceSuspendVMRequestMessage::CloudServiceSuspendVMRequestMessage(
+            const std::string &answer_mailbox,
+            const std::string &vm_hostname,
+            double payload) :
+            CloudServiceMessage("SUSPEND_VM_REQUEST", payload) {
+
+      if (answer_mailbox.empty() || vm_hostname.empty()) {
+        throw std::invalid_argument(
+                "CloudServiceSuspendVMRequestMessage::CloudServiceSuspendVMRequestMessage(): Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+      this->vm_hostname = vm_hostname;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param success: whether the VM suspend succeeded
+     * @param payload: the message size in bytes
+     */
+    CloudServiceSuspendVMAnswerMessage::CloudServiceSuspendVMAnswerMessage(bool success,
+                                                                           double payload) :
+            CloudServiceMessage("SUSPEND_VM_ANSWER", payload), success(success) {}
+
+    /**
+     * @brief Constructor
+     *
+     * @param answer_mailbox: the mailbox to which to send the answer
+     * @param vm_hostname: the name of the VM host
+     * @param payload: the message size in bytes
+     *
+     * @throw std::invalid_argument
+     */
+    CloudServiceResumeVMRequestMessage::CloudServiceResumeVMRequestMessage(
+            const std::string &answer_mailbox,
+            const std::string &vm_hostname,
+            double payload) :
+            CloudServiceMessage("RESUME_VM_REQUEST", payload) {
+
+      if (answer_mailbox.empty() || vm_hostname.empty()) {
+        throw std::invalid_argument(
+                "CloudServiceResumeVMRequestMessage::CloudServiceResumeVMRequestMessage(): Invalid arguments");
+      }
+      this->answer_mailbox = answer_mailbox;
+      this->vm_hostname = vm_hostname;
+    }
+
+    /**
+     * @brief Constructor
+     *
+     * @param success: whether the VM resume succeeded
+     * @param payload: the message size in bytes
+     */
+    CloudServiceResumeVMAnswerMessage::CloudServiceResumeVMAnswerMessage(bool success,
+                                                                         double payload) :
+            CloudServiceMessage("RESUME_VM_ANSWER", payload), success(success) {}
 }

@@ -764,9 +764,10 @@ private:
 
       std::vector<std::string> vm_list;
 
+      auto cs = (wrench::CloudService *) this->test->compute_service;
+
       // Submit the pilot job for execution
       try {
-        auto cs = (wrench::CloudService *) this->test->compute_service;
         std::string execution_host = cs->getExecutionHosts()[0];
 
         vm_list.push_back(cs->createVM(execution_host, 1, 10));
@@ -774,10 +775,55 @@ private:
         vm_list.push_back(cs->createVM(execution_host, 1, 10));
         vm_list.push_back(cs->createVM(execution_host, 1, 10));
 
-        job_manager->submitJob(pilot_job, this->test->compute_service);
-
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
+      }
+
+      // shutdown VMs
+      try {
+
+        for (auto &vm : vm_list) {
+          if (!cs->shutdownVM(vm)) {
+            throw std::runtime_error("Unable to shutdown VM");
+          }
+        }
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      try {
+        job_manager->submitJob(pilot_job, this->test->compute_service);
+        throw std::runtime_error("should have thrown an exception since there are no resources available");
+      } catch (wrench::WorkflowExecutionException &e) {
+        // do nothing, should have thrown an exception since there are no resources available
+      }
+
+      try {
+        cs->startVM(vm_list[3]);
+        job_manager->submitJob(pilot_job, this->test->compute_service);
+      } catch (std::runtime_error &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      try {
+        cs->suspendVM(vm_list[3]);
+        job_manager->submitJob(pilot_job, this->test->compute_service);
+        throw std::runtime_error("should have thrown an exception since there are no resources available");
+      } catch (wrench::WorkflowExecutionException &e) {
+        // do nothing, should have thrown an exception since there are no resources available
+      }
+
+      try {
+        if (!cs->resumeVM(vm_list[3])) {
+          throw std::runtime_error("Could not resume the VM");
+        }
+        job_manager->submitJob(pilot_job, this->test->compute_service);
+      } catch (std::runtime_error &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      if (cs->resumeVM(vm_list[3])) {
+        throw std::runtime_error("VM was already resumed, so an exception was expected!");
       }
 
       // Wait for a workflow execution event
@@ -803,25 +849,12 @@ private:
 
       // attempt to shutdown non-existent VM
       try {
-        auto cs = (wrench::CloudService *) this->test->compute_service;
         if (cs->shutdownVM("NON_EXISTENT_VM")) {
           throw std::runtime_error("Cannot shutdown a non-existent VM");
         }
 
       } catch (wrench::WorkflowExecutionException &e) {
         // do nothing, since it is the expected behavior
-      }
-
-      // shutdown VMs
-      try {
-        auto cs = (wrench::CloudService *) this->test->compute_service;
-        for (auto &vm : vm_list) {
-          if (!cs->shutdownVM(vm)) {
-            throw std::runtime_error("Unable to shutdown VM");
-          }
-        }
-      } catch (wrench::WorkflowExecutionException &e) {
-        throw std::runtime_error(e.what());
       }
 
       return 0;

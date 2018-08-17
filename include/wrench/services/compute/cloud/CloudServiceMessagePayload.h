@@ -32,6 +32,18 @@ namespace wrench {
         DECLARE_MESSAGEPAYLOAD_NAME(SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD);
         /** @brief The number of bytes in the control message sent by the service in answer to a VM shutdown request. **/
         DECLARE_MESSAGEPAYLOAD_NAME(SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent to the service to request a VM start. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(START_VM_REQUEST_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent by the service in answer to a VM start request. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(START_VM_ANSWER_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent to the service to request a VM suspend. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent by the service in answer to a VM suspend request. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent to the service to request a VM resume. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(RESUME_VM_REQUEST_MESSAGE_PAYLOAD);
+        /** @brief The number of bytes in the control message sent by the service in answer to a VM resume request. **/
+        DECLARE_MESSAGEPAYLOAD_NAME(RESUME_VM_ANSWER_MESSAGE_PAYLOAD);
     };
 }
 

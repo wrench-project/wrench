@@ -14,6 +14,7 @@
 #include <map>
 #include <simgrid/s4u/VirtualMachine.hpp>
 
+#include "wrench/services/compute/ComputeServiceMessage.h"
 #include "wrench/services/compute/ComputeService.h"
 #include "wrench/services/compute/cloud/CloudServiceProperty.h"
 #include "wrench/services/compute/cloud/CloudServiceMessagePayload.h"
@@ -53,6 +54,12 @@ namespace wrench {
                 {CloudServiceMessagePayload::CREATE_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
                 {CloudServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD,          "1024"},
                 {CloudServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,           "1024"},
+                {CloudServiceMessagePayload::START_VM_REQUEST_MESSAGE_PAYLOAD,             "1024"},
+                {CloudServiceMessagePayload::START_VM_ANSWER_MESSAGE_PAYLOAD,              "1024"},
+                {CloudServiceMessagePayload::SUSPEND_VM_REQUEST_MESSAGE_PAYLOAD,           "1024"},
+                {CloudServiceMessagePayload::SUSPEND_VM_ANSWER_MESSAGE_PAYLOAD,            "1024"},
+                {CloudServiceMessagePayload::RESUME_VM_REQUEST_MESSAGE_PAYLOAD,            "1024"},
+                {CloudServiceMessagePayload::RESUME_VM_ANSWER_MESSAGE_PAYLOAD,             "1024"},
                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
                 {CloudServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,   "1024"},
                 {CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,     "1024"},
@@ -77,6 +84,12 @@ namespace wrench {
                                      std::map<std::string, std::string> messagepayload_list = {});
 
         virtual bool shutdownVM(const std::string &vm_hostname);
+
+        virtual bool startVM(const std::string &vm_hostname);
+
+        virtual bool suspendVM(const std::string &vm_hostname);
+
+        virtual bool resumeVM(const std::string &vm_hostname);
 
         std::vector<std::string> getExecutionHosts();
 
@@ -110,6 +123,8 @@ namespace wrench {
 
         int main() override;
 
+        std::unique_ptr<SimulationMessage> sendRequest(std::string &answer_mailbox, ComputeServiceMessage *message);
+
         virtual bool processNextMessage();
 
         virtual void processGetResourceInformation(const std::string &answer_mailbox);
@@ -118,13 +133,19 @@ namespace wrench {
 
         virtual void processCreateVM(const std::string &answer_mailbox,
                                      const std::string &pm_hostname,
-                                     const std::string &vm_hostname,
+                                     const std::string &vm_name,
                                      unsigned long num_cores,
                                      double ram_memory,
                                      std::map<std::string, std::string> &property_list,
                                      std::map<std::string, std::string> &messagepayload_list);
 
         virtual void processShutdownVM(const std::string &answer_mailbox, const std::string &vm_hostname);
+
+        virtual void processStartVM(const std::string &answer_mailbox, const std::string &vm_hostname);
+
+        virtual void processSuspendVM(const std::string &answer_mailbox, const std::string &vm_hostname);
+
+        virtual void processResumeVM(const std::string &answer_mailbox, const std::string &vm_hostname);
 
         virtual void processSubmitStandardJob(const std::string &answer_mailbox, StandardJob *job,
                                               std::map<std::string, std::string> &service_specific_args);
@@ -146,7 +167,6 @@ namespace wrench {
         /** \endcond           */
         /***********************/
     };
-
 }
 
 #endif //WRENCH_CLOUDSERVICE_H

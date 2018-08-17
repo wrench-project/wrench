@@ -31,7 +31,7 @@ namespace wrench {
 
       // TODO: Why is this call below needed? The RAM size is passed to the constructor above...
       this->vm->set_ramsize((size_t)ram_memory);
-      this->vm->start();
+      start();
     }
 
     /**
@@ -52,6 +52,27 @@ namespace wrench {
     }
 
     /**
+     * @brief Start the virtual machine
+     */
+    void S4U_VirtualMachine::start() {
+      this->vm->start();
+    }
+
+    /**
+     * @brief Suspend the virtual machine
+     */
+    void S4U_VirtualMachine::suspend() {
+      this->vm->suspend();
+    }
+
+    /**
+     * @brief Resume the virtual machine
+     */
+    void S4U_VirtualMachine::resume() {
+      this->vm->resume();
+    }
+
+    /**
      * @brief Shutdown the virtual machine
      */
     void S4U_VirtualMachine::shutdown() {
@@ -63,5 +84,21 @@ namespace wrench {
      */
     void S4U_VirtualMachine::stop() {
       this->vm->destroy();
+    }
+
+    /**
+     * @brief Check whether the VM is running
+     * @return True if the VM is running, false otherwise
+     */
+    bool S4U_VirtualMachine::isRunning() {
+      return this->vm->get_state() == simgrid::s4u::VirtualMachine::state::RUNNING;
+    }
+
+    /**
+     * @brief Check whether the VM is suspended
+     * @return True if the VM is suspended, false otherwise
+     */
+    bool S4U_VirtualMachine::isSuspended() {
+      return this->vm->get_state() == simgrid::s4u::VirtualMachine::state::SUSPENDED;
     }
 }

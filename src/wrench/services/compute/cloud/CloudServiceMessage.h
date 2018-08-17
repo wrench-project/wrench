@@ -122,6 +122,87 @@ namespace wrench {
         bool success;
     };
 
+    /**
+     * @brief A message sent to a CloudService to request a VM start
+     */
+    class CloudServiceStartVMRequestMessage : public CloudServiceMessage {
+    public:
+        CloudServiceStartVMRequestMessage(const std::string &answer_mailbox,
+                                          const std::string &vm_hostname,
+                                          double payload);
+
+    public:
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The name of the new VM host */
+        std::string vm_hostname;
+    };
+
+    /**
+     * @brief A message sent by a CloudService in answer to a VM start request
+     */
+    class CloudServiceStartVMAnswerMessage : public CloudServiceMessage {
+    public:
+        CloudServiceStartVMAnswerMessage(bool success, double payload);
+
+        /** @brief Whether the VM start was successful or not */
+        bool success;
+    };
+
+    /**
+     * @brief A message sent to a CloudService to request a VM suspend
+     */
+    class CloudServiceSuspendVMRequestMessage : public CloudServiceMessage {
+    public:
+        CloudServiceSuspendVMRequestMessage(const std::string &answer_mailbox,
+                                            const std::string &vm_hostname,
+                                            double payload);
+
+    public:
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The name of the new VM host */
+        std::string vm_hostname;
+    };
+
+    /**
+     * @brief A message sent by a CloudService in answer to a VM suspend request
+     */
+    class CloudServiceSuspendVMAnswerMessage : public CloudServiceMessage {
+    public:
+        CloudServiceSuspendVMAnswerMessage(bool success, double payload);
+
+        /** @brief Whether the VM suspend was successful or not */
+        bool success;
+    };
+
+    /**
+     * @brief A message sent to a CloudService to request a VM resume
+     */
+    class CloudServiceResumeVMRequestMessage : public CloudServiceMessage {
+    public:
+        CloudServiceResumeVMRequestMessage(const std::string &answer_mailbox,
+                                           const std::string &vm_hostname,
+                                           double payload);
+
+    public:
+        /** @brief The mailbox to which the answer message should be sent */
+        std::string answer_mailbox;
+        /** @brief The name of the new VM host */
+        std::string vm_hostname;
+    };
+
+    /**
+     * @brief A message sent by a CloudService in answer to a VM resume request
+     */
+    class CloudServiceResumeVMAnswerMessage : public CloudServiceMessage {
+    public:
+        CloudServiceResumeVMAnswerMessage(bool success, double payload);
+
+        /** @brief Whether the VM resume was successful or not */
+        bool success;
+    };
+
     /***********************/
     /** \endcond           */
     /***********************/
