@@ -767,7 +767,20 @@ namespace wrench {
         return;
       }
 
-      for (auto &vm_tuple : vm_list) {
+      std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>,
+              unsigned long>> vm_local_list = this->vm_list;
+
+      // whether the job should be mapped to a single VM
+      auto vm_it = service_specific_args.find(CloudServiceProperty::JOB_MAPPING_TO_VM);
+      if (vm_it != service_specific_args.end()) {
+        auto vm_tuple_it = this->vm_list.find(vm_it->second);
+        if (vm_tuple_it != this->vm_list.end()) {
+          vm_local_list.clear();
+          vm_local_list.insert(std::make_pair(vm_it->second, vm_tuple_it->second));
+        }
+      }
+
+      for (auto vm_tuple : vm_local_list) {
         std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>(vm_tuple.second);
         if (vm->isRunning()) {
 

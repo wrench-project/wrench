@@ -299,7 +299,26 @@ namespace wrench {
         job->service_specific_args = service_specific_args;
         compute_service->submitJob(job, service_specific_args);
         job->setParentComputeService(compute_service);
+
       } catch (WorkflowExecutionException &e) {
+        job->popCallbackMailbox();
+        switch (job->getType()) {
+          case WorkflowJob::STANDARD: {
+            // Modify task states
+            ((StandardJob *) job)->state = StandardJob::NOT_SUBMITTED;
+            for (auto t : ((StandardJob *) job)->tasks) {
+              t->setState(WorkflowTask::State::READY);
+            }
+
+            this->pending_standard_jobs.erase((StandardJob *) job);
+            break;
+          }
+          case WorkflowJob::PILOT: {
+            ((PilotJob *) job)->state = PilotJob::NOT_SUBMITTED;
+            this->pending_pilot_jobs.erase((PilotJob *) job);
+            break;
+          }
+        }
         throw;
       }
 

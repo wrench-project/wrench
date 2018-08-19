@@ -22,6 +22,8 @@ namespace wrench {
     public:
         /** @brief The overhead, in seconds, to boot a VM **/
         DECLARE_PROPERTY_NAME(VM_BOOT_OVERHEAD_IN_SECONDS);
+        /** @brief The VM name to which the job should be mapped to **/
+        DECLARE_PROPERTY_NAME(JOB_MAPPING_TO_VM);
     };
 }
 
