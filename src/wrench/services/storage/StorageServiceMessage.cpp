@@ -251,7 +251,7 @@ namespace wrench {
         if ((answer_mailbox == "") || (file == nullptr)) {
             throw std::invalid_argument("StorageServiceFileWriteRequestMessage::StorageServiceFileWriteRequestMessage(): Invalid arguments");
         }
-        this->payload += file->getSize();
+        this->payload = payload;
         this->answer_mailbox = answer_mailbox;
         this->file = file;
         this->dst_partition = dst_partition;
