@@ -289,18 +289,27 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Create a Storage Service (note the BOGUS property, which is for testing puposes
-  //  and doesn't matter because we do not stop the service)
-  ASSERT_NO_THROW(storage_service = simulation->add(
+  // Create a Storage Service
+  ASSERT_THROW(storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0,
-                                           {{wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD, "BOGUS"}})));
+                                           {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "BOGUS"}},
+                                           {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, "BOGUS"}})), std::invalid_argument);
+  storage_service = simulation->add(
+          new wrench::SimpleStorageService(hostname, 100.0,
+                                           {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "BOGUS"}},
+                                           {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, "123"}}));
+
 
   // Try to get a bogus property as string or double
   ASSERT_THROW(storage_service->getPropertyValueAsString("BOGUS"), std::invalid_argument);
   ASSERT_THROW(storage_service->getPropertyValueAsDouble("BOGUS"), std::invalid_argument);
+  ASSERT_THROW(storage_service->getPropertyValueAsBoolean("BOGUS"), std::invalid_argument);
   // Try to get a non-double double property (property value is "infinity", which is not a number)
-  ASSERT_THROW(storage_service->getPropertyValueAsDouble(wrench::SimpleStorageServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD),
+  ASSERT_THROW(storage_service->getPropertyValueAsDouble(wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY),
                std::invalid_argument);
+
+  ASSERT_THROW(storage_service->getMessagePayloadValueAsDouble("BOGUS"), std::invalid_argument);
+  ASSERT_EQ(123, storage_service->getMessagePayloadValueAsDouble(wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
 
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
