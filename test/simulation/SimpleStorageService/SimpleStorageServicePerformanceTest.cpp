@@ -18,6 +18,7 @@
 
 
 #define FILE_SIZE 10000000000.00
+#define MBPS_BANDWIDTH 100
 #define STORAGE_SIZE (100.0 * FILE_SIZE)
 
 class SimpleStorageServicePerformanceTest : public ::testing::Test {
@@ -54,7 +55,7 @@ protected:
               "       <host id=\"SrcHost\" speed=\"1f\"/> "
               "       <host id=\"DstHost\" speed=\"1f\"/> "
               "       <host id=\"WMSHost\" speed=\"1f\"/> "
-              "       <link id=\"link\" bandwidth=\"10MBps\" latency=\"100us\"/>"
+              "       <link id=\"link\" bandwidth=\"" + std::to_string(MBPS_BANDWIDTH) + "MBps\" latency=\"10us\"/>"
               "       <route src=\"SrcHost\" dst=\"DstHost\">"
               "         <link_ctn id=\"link\"/>"
               "       </route>"
@@ -136,6 +137,7 @@ private:
       double transfer_time_2 = event2_arrival - copy2_start;
       double transfer_time_3 = event3_arrival - copy3_start;
 
+      // Do relative checks
       if (fabs(copy2_start - copy3_start) > 0.1) {
         throw std::runtime_error("Time between two asynchronous operations is too big");
       }
@@ -147,6 +149,22 @@ private:
 
       if (fabs(event2_arrival - event3_arrival) > 0.1) {
         throw std::runtime_error("Time between two asynchronous operation completions is too big");
+      }
+
+
+      // Do absolute checks
+      double expected_transfer_time_1 =  FILE_SIZE / (0.92 * MBPS_BANDWIDTH*1000*1000);
+
+      if (fabs(transfer_time_1 - expected_transfer_time_1) > 1.0) {
+        throw std::runtime_error("Unexpected transfer time #1 " + std::to_string(transfer_time_1) +
+                                         " (should be around " + std::to_string(expected_transfer_time_1) + ")");
+      }
+
+      double expected_transfer_time_2 =  FILE_SIZE / (0.5 * 0.92 * MBPS_BANDWIDTH*1000*1000);
+
+      if (fabs(transfer_time_2 - expected_transfer_time_2) > 1.0) {
+        throw std::runtime_error("Unexpected transfer time #2 " + std::to_string(transfer_time_2) +
+                                 " (should be around " + std::to_string(expected_transfer_time_2) + ")");
       }
 
       return 0;
