@@ -39,8 +39,6 @@ namespace wrench {
         /***********************/
 
     private:
-        std::string choosePMHostname();
-
         std::vector<std::string> execution_hosts;
         std::map<std::string, std::vector<std::string>> vm_list;
         Simulation *simulation;

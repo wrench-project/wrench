@@ -74,12 +74,7 @@ namespace wrench {
 
         if (sum_num_idle_cores < mim_num_cores) {
           try {
-            std::string pm_host = choosePMHostname();
-            std::string vm_host = cloud_service->createVM(pm_host, mim_num_cores, task->getMemoryRequirement());
-
-            if (not vm_host.empty()) {
-              this->vm_list[pm_host].push_back(vm_host);
-            }
+            std::string vm_host = cloud_service->createVM(mim_num_cores, task->getMemoryRequirement());
 
           } catch (WorkflowExecutionException &e) {
             // unable to create a new VM, tasks won't be scheduled in this iteration.
@@ -91,27 +86,4 @@ namespace wrench {
       WRENCH_INFO("Done with scheduling tasks as standard jobs");
     }
 
-    /**
-     * @brief Select a physical host (PM) with the least number of VMs.
-     *
-     * @return a physical hostname
-     */
-    std::string CloudStandardJobScheduler::choosePMHostname() {
-
-      std::pair<std::string, unsigned long> min_pm("", ComputeService::ALL_CORES);
-
-      for (auto &host : this->execution_hosts) {
-        auto entry = this->vm_list.find(host);
-
-        if (entry == this->vm_list.end()) {
-          return host;
-        }
-        if (entry->second.size() < min_pm.second) {
-          min_pm.first = entry->first;
-          min_pm.second = entry->second.size();
-        }
-      }
-
-      return min_pm.first;
-    }
 }
