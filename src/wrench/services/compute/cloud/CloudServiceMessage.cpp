@@ -84,7 +84,7 @@ namespace wrench {
             property_list(property_list), messagepayload_list(messagepayload_list) {
 
       if (answer_mailbox.empty() || pm_hostname.empty() || vm_hostname.empty()) {
-        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_hostname << std::endl;
+//        std::cerr << answer_mailbox << " - " << pm_hostname << " - " << vm_hostname << std::endl;
         throw std::invalid_argument(
                 "CloudServiceCreateVMRequestMessage::CloudServiceCreateVMRequestMessage(): Invalid arguments");
       }
