@@ -169,8 +169,7 @@ private:
           }
 
           auto cs = (wrench::CloudService *) this->test->compute_service;
-          std::string execution_host = cs->getExecutionHosts()[0];
-          cs->createVM(execution_host, 2, 10);
+          cs->createVM(2, 10);
 
           job_manager->submitJob(one_task_jobs[job_index], this->test->compute_service);
         } catch (wrench::WorkflowExecutionException &e) {

@@ -60,6 +60,14 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+        using CloudService::createVM;
+
+        virtual std::string createVM(const std::string &pm_hostname,
+                                     unsigned long num_cores = ComputeService::ALL_CORES,
+                                     double ram_memory = ComputeService::ALL_RAM,
+                                     std::map<std::string, std::string> property_list = {},
+                                     std::map<std::string, std::string> messagepayload_list = {});
+
         virtual bool migrateVM(const std::string &vm_hostname, const std::string &dest_pm_hostname);
 
         /***********************/

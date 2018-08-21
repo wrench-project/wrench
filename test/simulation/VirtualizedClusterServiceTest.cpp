@@ -141,8 +141,7 @@ private:
       // Submit the 2-task job for execution
       try {
         auto cs = (wrench::CloudService *) this->test->compute_service;
-        std::string execution_host = cs->getExecutionHosts()[0];
-        cs->createVM(execution_host, 2, 10);
+        cs->createVM(2, 10);
         job_manager->submitJob(two_task_job, this->test->compute_service);
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
@@ -383,10 +382,10 @@ private:
         auto cs = (wrench::CloudService *) this->test->compute_service;
         std::string execution_host = cs->getExecutionHosts()[0];
 
-        cs->createVM(execution_host, 1, 10);
-        cs->createVM(execution_host, 1, 10);
-        cs->createVM(execution_host, 1, 10);
-        cs->createVM(execution_host, 1, 10);
+        cs->createVM(1, 10);
+        cs->createVM(1, 10);
+        cs->createVM(1, 10);
+        cs->createVM(1, 10);
 
         job_manager->submitJob(pilot_job, this->test->compute_service);
 
@@ -505,9 +504,7 @@ private:
 
         // create a VM with the PM number of cores
         auto cs = (wrench::CloudService *) this->test->compute_service;
-        std::string execution_host = cs->getExecutionHosts()[0];
-
-        cs->createVM(execution_host, 0, 10);
+        cs->createVM(0, 10);
         num_cores = cs->getNumCores();
         sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
 
@@ -519,7 +516,7 @@ private:
         }
 
         // create a VM with two cores
-        cs->createVM(execution_host, 2, 10);
+        cs->createVM(2, 10);
         num_cores = cs->getNumCores();
         sum_num_cores = (unsigned long) std::accumulate(num_cores.begin(), num_cores.end(), 0);
 
@@ -622,17 +619,15 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
-
       // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
       wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
 
       // Submit the pilot job for execution
       try {
-        auto cs = (wrench::CloudService *) this->test->compute_service;
+        auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
         std::string execution_host = cs->getExecutionHosts()[0];
 
-        cs->createVM(execution_host, 1, 10);
+        cs->createVM(1, 10);
         cs->createVM(execution_host, 1, 10);
         cs->createVM(execution_host, 1, 10);
         cs->createVM(execution_host, 1, 10);
@@ -698,8 +693,8 @@ void VirtualizedClusterServiceTest::do_StopAllVMsTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, execution_hosts, 0,
-                                   {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+          new wrench::VirtualizedClusterService(hostname, execution_hosts, 0,
+                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -761,7 +756,7 @@ private:
 
       std::vector<std::string> vm_list;
 
-      auto cs = (wrench::CloudService *) this->test->compute_service;
+      auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
 
       // Submit the pilot job for execution
       try {
@@ -885,8 +880,8 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, execution_hosts, 0,
-                                   {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+          new wrench::VirtualizedClusterService(hostname, execution_hosts, 0,
+                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;
@@ -956,7 +951,7 @@ private:
                                                                  {}, {});
       std::vector<std::string> vm_list;
 
-      auto cs = (wrench::CloudService *) this->test->compute_service;
+      auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
 
       // Submit standard job for execution
       try {
@@ -1057,7 +1052,7 @@ void VirtualizedClusterServiceTest::do_SubmitToVMTest_test() {
   // Create a Cloud Service
   std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
   ASSERT_NO_THROW(compute_service = simulation->add(
-          new wrench::CloudService(hostname, execution_hosts, 1000)));
+          new wrench::VirtualizedClusterService(hostname, execution_hosts, 1000)));
 
   // Create a WMS
   wrench::WMS *wms = nullptr;

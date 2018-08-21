@@ -23,9 +23,7 @@ XBT_LOG_NEW_DEFAULT_CATEGORY(cloud_service, "Log category for Cloud Service");
 
 namespace wrench {
 
-    /** \cond */
-    static unsigned long VM_ID = 1;
-    /** \endcond */
+    unsigned long CloudService::VM_ID = 1;
 
     /**
      * @brief Constructor
@@ -93,9 +91,8 @@ namespace wrench {
     }
 
     /**
-     * @brief Create a MultihostMulticoreComputeService VM on a physical machine
+     * @brief Create a MultihostMulticoreComputeService VM (balances load on execution hosts)
      *
-     * @param pm_hostname: the name of the physical machine host
      * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
      *                   available on the host)
      * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the
@@ -103,18 +100,31 @@ namespace wrench {
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
      *
-     * @return Virtual machine hostname
+     * @return Virtual machine name
      *
      * @throw WorkflowExecutionException
      */
-    std::string CloudService::createVM(const std::string &pm_hostname,
-                                       unsigned long num_cores,
+    std::string CloudService::createVM(unsigned long num_cores,
                                        double ram_memory,
                                        std::map<std::string, std::string> property_list,
                                        std::map<std::string, std::string> messagepayload_list) {
 
+      // determine physical machine hostname
+      std::string pm_hostname;
+      unsigned long min_cores = ULONG_MAX;
+      for (auto &host : this->execution_hosts) {
+        if (this->used_cores_per_execution_host.find(host) == this->used_cores_per_execution_host.end()) {
+          pm_hostname = host;
+          break;
+        }
+        if (this->used_cores_per_execution_host[host] < min_cores) {
+          pm_hostname = host;
+          min_cores = this->used_cores_per_execution_host[host];
+        }
+      }
+
       // vm host name
-      std::string vm_hostname = "vm" + std::to_string(VM_ID++) + "_" + pm_hostname;
+      std::string vm_name = "vm" + std::to_string(CloudService::VM_ID++) + "_" + pm_hostname;
 
       // send a "create vm" message to the daemon's mailbox_name
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
@@ -122,14 +132,14 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> answer_message = sendRequest(
               answer_mailbox,
               new CloudServiceCreateVMRequestMessage(
-                      answer_mailbox, pm_hostname, vm_hostname,
+                      answer_mailbox, pm_hostname, vm_name,
                       num_cores, ram_memory, property_list, messagepayload_list,
                       this->getMessagePayloadValueAsDouble(
                               CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
 
       if (auto msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(answer_message.get())) {
         if (msg->success) {
-          return vm_hostname;
+          return vm_name;
         }
         return nullptr;
       } else {
@@ -528,7 +538,7 @@ namespace wrench {
           }
 
           // create a VM on the provided physical machine
-          simulation->sleep(
+          Simulation::sleep(
                   this->getPropertyValueAsDouble(CloudServiceProperty::VM_BOOT_OVERHEAD_IN_SECONDS));
           auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, pm_hostname, num_cores, ram_memory);
 
@@ -558,6 +568,12 @@ namespace wrench {
           }
 
           this->vm_list[vm_name] = std::make_tuple(vm, cs, num_cores);
+
+          if (this->used_cores_per_execution_host.find(pm_hostname) == this->used_cores_per_execution_host.end()) {
+            this->used_cores_per_execution_host.insert(std::make_pair(pm_hostname, num_cores));
+          } else {
+            this->used_cores_per_execution_host[pm_hostname] += num_cores;
+          }
 
           S4U_Mailbox::dputMessage(
                   answer_mailbox,

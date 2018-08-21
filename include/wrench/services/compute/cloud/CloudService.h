@@ -78,8 +78,7 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
-        virtual std::string createVM(const std::string &pm_hostname,
-                                     unsigned long num_cores = ComputeService::ALL_CORES,
+        virtual std::string createVM(unsigned long num_cores = ComputeService::ALL_CORES,
                                      double ram_memory = ComputeService::ALL_RAM,
                                      std::map<std::string, std::string> property_list = {},
                                      std::map<std::string, std::string> messagepayload_list = {});
@@ -155,6 +154,10 @@ namespace wrench {
 
         void stopAllVMs();
 
+        /** \cond */
+        static unsigned long VM_ID;
+        /** \endcond */
+
         /** @brief List of execution host names */
         std::vector<std::string> execution_hosts;
 
@@ -163,6 +166,9 @@ namespace wrench {
 
         /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
         std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>, unsigned long>> vm_list;
+
+        /** @brief A map of the number of used cores (per VM) per execution host */
+        std::map<std::string, unsigned long> used_cores_per_execution_host;
 
         /***********************/
         /** \endcond           */

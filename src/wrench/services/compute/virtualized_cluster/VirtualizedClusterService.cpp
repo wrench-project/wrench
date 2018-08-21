@@ -49,6 +49,51 @@ namespace wrench {
     }
 
     /**
+     * @brief Create a MultihostMulticoreComputeService VM on a physical machine
+     *
+     * @param pm_hostname: the name of the physical machine host
+     * @param num_cores: the number of cores the service can use (use ComputeService::ALL_CORES to use all cores
+     *                   available on the host)
+     * @param ram_memory: the VM's RAM memory capacity (use ComputeService::ALL_RAM to use all RAM available on the
+     *                    host, this can be lead to an out of memory issue)
+     * @param property_list: a property list ({} means "use all defaults")
+     * @param messagepayload_list: a message payload list ({} means "use all defaults")
+     *
+     * @return Virtual machine name
+     *
+     * @throw WorkflowExecutionException
+     */
+    std::string VirtualizedClusterService::createVM(const std::string &pm_hostname,
+                                                    unsigned long num_cores,
+                                                    double ram_memory,
+                                                    std::map<std::string, std::string> property_list,
+                                                    std::map<std::string, std::string> messagepayload_list) {
+
+      // vm host name
+      std::string vm_name = "vm" + std::to_string(CloudService::VM_ID++) + "_" + pm_hostname;
+
+      // send a "create vm" message to the daemon's mailbox_name
+      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("create_vm");
+
+      std::unique_ptr<SimulationMessage> answer_message = sendRequest(
+              answer_mailbox,
+              new CloudServiceCreateVMRequestMessage(
+                      answer_mailbox, pm_hostname, vm_name,
+                      num_cores, ram_memory, property_list, messagepayload_list,
+                      this->getMessagePayloadValueAsDouble(
+                              CloudServiceMessagePayload::CREATE_VM_REQUEST_MESSAGE_PAYLOAD)));
+
+      if (auto msg = dynamic_cast<CloudServiceCreateVMAnswerMessage *>(answer_message.get())) {
+        if (msg->success) {
+          return vm_name;
+        }
+        return nullptr;
+      } else {
+        throw std::runtime_error("VirtualizedClusterService::createVM(): Unexpected [" + msg->getName() + "] message");
+      }
+    }
+
+    /**
      * @brief Synchronously migrate a VM to another physical host
      *
      * @param vm_hostname: virtual machine hostname
