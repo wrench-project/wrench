@@ -853,7 +853,7 @@ private:
     }
 };
 
-TEST_F(VirtualizedClusterServiceTest, ShutdownVMTestWMS) {
+TEST_F(VirtualizedClusterServiceTest, DISABLED_ShutdownVMTestWMS) {
   DO_TEST_WITH_FORK(do_ShutdownVMTest_test);
 }
 
@@ -1025,7 +1025,7 @@ private:
     }
 };
 
-TEST_F(VirtualizedClusterServiceTest, SubmitToVMTestWMS) {
+TEST_F(VirtualizedClusterServiceTest, DISABLED_SubmitToVMTestWMS) {
   DO_TEST_WITH_FORK(do_SubmitToVMTest_test);
 }
 
