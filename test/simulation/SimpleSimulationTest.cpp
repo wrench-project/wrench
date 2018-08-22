@@ -252,6 +252,20 @@ private:
         }
       }
 
+      // For converage,
+      unsigned long num_cores = this->simulation->getNumCores();
+      if (num_cores != 2) {
+        throw std::runtime_error("Unexpected number of cores!");
+      }
+      double flop_rate = this->simulation->getFlopRate();
+      if (flop_rate != 1.0) {
+        throw std::runtime_error("Unexpected flop rate");
+      }
+      this->simulation->compute(1 / flop_rate);
+
+      std::map<std::string, std::vector<std::string>> clusters =
+              this->simulation->getHostnameListByCluster();
+
       return 0;
     }
 };
@@ -286,7 +300,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
 
   // Get a hostname
-  std::string hostname = simulation->getHostnameList()[0];
+  std::string hostname = "DualCoreHost";
 
   // Create a Storage Service
   ASSERT_THROW(storage_service = simulation->add(
@@ -311,7 +325,7 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   ASSERT_EQ(123, storage_service->getMessagePayloadValueAsDouble(wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD));
 
   // Create a Cloud Service
-  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+  std::vector<std::string> execution_hosts = {"QuadCoreHost"};
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::CloudService(hostname, execution_hosts, 100.0,
                                    { {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
@@ -333,6 +347,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   ASSERT_THROW(simulation->add((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
   ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
 
+  // Try to stage a file without a file registry
+  ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
 
   // Create a file registry
   ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
@@ -340,6 +356,8 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   // Staging the input_file on the storage service
   ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
 
+  // Staging an invalid file on the storage service
+  ASSERT_THROW(simulation->stageFile(output_file1, storage_service), std::runtime_error);
 
   // Won't work without a workflow!
   ASSERT_THROW(simulation->launch(), std::runtime_error);
