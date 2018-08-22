@@ -73,7 +73,7 @@ namespace wrench {
 
         std::string getName();
 
-        /** @brief The daemon's life saved */
+        /** @brief The daemon's life saver */
         LifeSaver *life_saver = nullptr;
 
         /** @brief a pointer to the simulation object */
