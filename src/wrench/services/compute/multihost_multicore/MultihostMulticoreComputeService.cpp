@@ -363,7 +363,7 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_RED);
 
-      WRENCH_INFO("New Multicore Job Executor starting (%s) on %ld hosts with a total of %ld cores",
+      WRENCH_INFO("New MultihostMulticore Compute Service starting (%s) on %ld hosts with a total of %ld cores",
                   this->mailbox_name.c_str(), this->compute_resources.size(), this->total_num_cores);
 
       // Set an alarm for my timely death, if necessary
