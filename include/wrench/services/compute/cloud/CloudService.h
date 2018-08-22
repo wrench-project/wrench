@@ -141,7 +141,7 @@ namespace wrench {
 
         virtual void processShutdownVM(const std::string &answer_mailbox, const std::string &vm_hostname);
 
-        virtual void processStartVM(const std::string &answer_mailbox, const std::string &vm_hostname);
+        virtual void processStartVM(const std::string &answer_mailbox, const std::string &vm_name);
 
         virtual void processSuspendVM(const std::string &answer_mailbox, const std::string &vm_hostname);
 
@@ -164,8 +164,8 @@ namespace wrench {
         /** @brief Map of available RAM at hosts */
         std::map<std::string, double> cs_available_ram;
 
-        /** @brief A map of VMs described by the VM actor, the actual compute service, and the total number of cores */
-        std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>, unsigned long>> vm_list;
+        /** @brief A map of VMs described by the VM actor, the actual compute service, the total number of cores, and RAM size */
+        std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>, unsigned long, unsigned long>> vm_list;
 
         /** @brief A map of the number of used cores (per VM) per execution host */
         std::map<std::string, unsigned long> used_cores_per_execution_host;

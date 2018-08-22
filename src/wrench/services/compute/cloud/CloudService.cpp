@@ -567,7 +567,7 @@ namespace wrench {
             throw;
           }
 
-          this->vm_list[vm_name] = std::make_tuple(vm, cs, num_cores);
+          this->vm_list[vm_name] = std::make_tuple(vm, cs, num_cores, ram_memory);
 
           if (this->used_cores_per_execution_host.find(pm_hostname) == this->used_cores_per_execution_host.end()) {
             this->used_cores_per_execution_host.insert(std::make_pair(pm_hostname, num_cores));
@@ -621,6 +621,7 @@ namespace wrench {
         cs->stop();
         auto vm = std::get<0>(vm_tuple->second);
         vm->shutdown();
+        std::get<1>(vm_tuple->second) = nullptr;
 
         S4U_Mailbox::dputMessage(
                 answer_mailbox,
@@ -638,14 +639,14 @@ namespace wrench {
      * @brief: Process a VM start request
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
-     * @param vm_hostname: the name of the VM host
+     * @param vm_name: the name of the VM host
      */
-    void CloudService::processStartVM(const std::string &answer_mailbox, const std::string &vm_hostname) {
+    void CloudService::processStartVM(const std::string &answer_mailbox, const std::string &vm_name) {
 
       try {
-        WRENCH_INFO("Asked to start VM %s", vm_hostname.c_str());
+        WRENCH_INFO("Asked to start VM %s", vm_name.c_str());
 
-        auto vm_tuple = this->vm_list.find(vm_hostname);
+        auto vm_tuple = this->vm_list.find(vm_name);
 
         if (vm_tuple == this->vm_list.end()) {
           S4U_Mailbox::dputMessage(
@@ -660,8 +661,21 @@ namespace wrench {
         try {
           auto vm = std::get<0>(vm_tuple->second);
           vm->start();
-          auto cs = std::get<1>(vm_tuple->second);
-          cs->start(cs, true);
+
+          // TODO: creating a MHMC would not be necessary once auto_restart will be available
+          // create a multihost multicore compute service for the VM
+          std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
+                  std::make_tuple(vm_name, std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second))};
+
+          std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
+                  new MultihostMulticoreComputeService(vm_name,
+                                                       compute_resources,
+                                                       property_list,
+                                                       messagepayload_list,
+                                                       getScratch()));
+          cs->simulation = this->simulation;
+          cs->start(cs, true); // Daemonize!
+          std::get<1>(vm_tuple->second) = cs;
 
         } catch (std::runtime_error &e) {
           throw;
@@ -784,7 +798,7 @@ namespace wrench {
       }
 
       std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>,
-              unsigned long>> vm_local_list = this->vm_list;
+              unsigned long, unsigned long>> vm_local_list = this->vm_list;
 
       // whether the job should be mapped to a single VM
       auto vm_it = service_specific_args.find(CloudServiceProperty::JOB_MAPPING_TO_VM);
