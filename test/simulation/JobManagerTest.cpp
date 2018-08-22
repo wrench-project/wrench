@@ -34,6 +34,8 @@ public:
 
     void do_JobManagerSubmitJobTest_test();
 
+    void do_JobManagerResubmitJobTest_test();
+
 
 protected:
     JobManagerTest() {
@@ -42,22 +44,18 @@ protected:
       workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
       std::string xml = "<?xml version='1.0'?>"
-                        "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                        "<platform version=\"4.1\"> "
-                        "   <zone id=\"AS0\" routing=\"Full\"> "
-                        "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
-                        "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
-                        "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
-                        "       <host id=\"Host4\" speed=\"1f\" core=\"10\">  "
-                        "         <prop id=\"ram\" value=\"1024\"/> "
-                        "       </host>  "
-                        "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                        "       <link id=\"2\" bandwidth=\"0.0001MBps\" latency=\"1000000us\"/>"
-                        "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
-                        "       <route src=\"Host3\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
-                        "       <route src=\"Host1\" dst=\"Host4\"> <link_ctn id=\"2\"/> </route>"
-                        "   </zone> "
-                        "</platform>";
+              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+              "<platform version=\"4.1\"> "
+              "   <zone id=\"AS0\" routing=\"Full\"> "
+              "       <host id=\"Host1\" speed=\"1f\" core=\"10\"/> "
+              "       <host id=\"Host2\" speed=\"1f\" core=\"10\"/> "
+              "       <host id=\"Host3\" speed=\"1f\" core=\"10\"/> "
+              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"1us\"/>"
+              "       <link id=\"2\" bandwidth=\"5000GBps\" latency=\"1us\"/>"
+              "       <route src=\"Host1\" dst=\"Host2\"> <link_ctn id=\"1\"/> </route>"
+              "       <route src=\"Host1\" dst=\"Host3\"> <link_ctn id=\"2\"/> </route>"
+              "   </zone> "
+              "</platform>";
       // Create a four-host 10-core platform file
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
@@ -324,7 +322,7 @@ private:
 
     int main() {
 
-      // Submit a job manager
+      // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
       bool success;
@@ -380,7 +378,7 @@ TEST_F(JobManagerTest, SubmitJobTest) {
 
 void JobManagerTest::do_JobManagerSubmitJobTest_test() {
 
-  // Submit and initialize a simulation
+  // Create and initialize a simulation
   simulation = new wrench::Simulation();
   int argc = 1;
   char **argv = (char **) calloc(1, sizeof(char *));
@@ -394,11 +392,169 @@ void JobManagerTest::do_JobManagerSubmitJobTest_test() {
   // Get a hostname
   std::string hostname = simulation->getHostnameList()[0];
 
-  // Submit a WMS
+  // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new JobManagerSubmitJobTestWMS(
                   this, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
+
+
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+/**********************************************************************/
+/**  DO SUBMIT JOB TEST                                              **/
+/**********************************************************************/
+
+class JobManagerResubmitJobTestWMS : public wrench::WMS {
+
+public:
+    JobManagerResubmitJobTestWMS(JobManagerTest *test,
+                                 std::string hostname,
+                                 std::set<wrench::ComputeService *> compute_services) :
+            wrench::WMS(nullptr, nullptr,
+                        compute_services, {}, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    JobManagerTest *test;
+
+    int main() {
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Get the compute_services
+      wrench::ComputeService *cs_does_support_standard_jobs;
+      wrench::ComputeService *cs_does_not_support_standard_jobs;
+      for (auto cs : this->getAvailableComputeServices()) {
+        if (cs->supportsStandardJobs()) {
+          cs_does_support_standard_jobs = cs;
+        } else {
+          cs_does_not_support_standard_jobs = cs;
+        }
+      }
+
+      // Create a standard job
+      wrench::StandardJob *job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
+
+      // Try to submit a standard job to the wrong service
+      bool success = true;
+      try {
+        job_manager->submitJob(job, cs_does_not_support_standard_jobs);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        if (e.getCause()->getCauseType() != wrench::FailureCause::JOB_TYPE_NOT_SUPPORTED) {
+          throw std::runtime_error("Got expected exception, but cause type is wrong");
+        }
+        auto real_cause = (wrench::JobTypeNotSupported *) e.getCause().get();
+        if (real_cause->getJob() != job) {
+          throw std::runtime_error(
+                  "Got expected execption and failure cause, but the failure cause does not point to the correct job");
+        }
+        if (real_cause->getComputeService() != cs_does_not_support_standard_jobs) {
+          throw std::runtime_error(
+                  "Got expected execption and failure cause, but the failure cause does not point to the correct compute service");
+        }
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to submit a standard job to a service that does not support them");
+      }
+
+      // Check task states
+      wrench::WorkflowTask *task1 = this->getWorkflow()->getTaskByID("task1");
+      wrench::WorkflowTask *task2 = this->getWorkflow()->getTaskByID("task2");
+      if (task1->getState() != wrench::WorkflowTask::State::READY) {
+        throw std::runtime_error("Unexpected task1 state (should be READY but is " +
+                                 wrench::WorkflowTask::stateToString(task1->getState()));
+      }
+      if (task2->getState() != wrench::WorkflowTask::State::NOT_READY) {
+        throw std::runtime_error("Unexpected task2 state (should be READY but is " +
+                                 wrench::WorkflowTask::stateToString(task2->getState()));
+      }
+
+      // Resubmit the SAME job to the right service
+      try {
+        job_manager->submitJob(job, cs_does_support_standard_jobs);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Should be able to subkmit a standard job to a service that supports them");
+      }
+
+      // Wait for the workflow execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          // success, do nothing
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
+      }
+
+
+      return 0;
+    }
+};
+
+TEST_F(JobManagerTest, ResubmitJobTest) {
+  DO_TEST_WITH_FORK(do_JobManagerResubmitJobTest_test);
+}
+
+void JobManagerTest::do_JobManagerResubmitJobTest_test() {
+
+  // Create and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Create a ComputeService that does not support standard jobs
+  wrench::ComputeService *cs1, *cs2;
+
+  ASSERT_NO_THROW(cs1 = simulation->add(
+          new wrench::MultihostMulticoreComputeService("Host2",
+                                                       {std::make_tuple("Host2", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},100.0,
+                                                       {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+
+  // Create a ComputeService that does support standard jobs
+  ASSERT_NO_THROW(cs2 = simulation->add(
+          new wrench::MultihostMulticoreComputeService("Host3",
+                                                       {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},100.0,
+                                                       {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new JobManagerResubmitJobTestWMS(
+                  this, "Host1", {cs1, cs2})));
+
+  // Add tasks to the workflow
+  wrench::WorkflowTask *task1 = workflow->addTask("task1", 10.0, 10, 10, 1.0, 0.0);
+  wrench::WorkflowTask *task2 = workflow->addTask("task2", 10.0, 10, 10, 1.0, 0.0);
+  workflow->addControlDependency(task1, task2);
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
