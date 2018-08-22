@@ -119,13 +119,14 @@ namespace wrench {
       sg_vm_live_migration_plugin_init();
 
       if (wrench_help_requested) {
-        std::cerr << "General WRENCH command-line arguments:\n";
-        std::cerr << "   --wrench-no-color: disables colored terminal output\n";
-        std::cerr << "   --wrench-no-log: disables logging\n";
-        std::cerr << "   --activate-energy: activates SimGrid's energy plugin\n";
-        std::cerr << "     (requires host pstate definitions in XML platform description file)\n";
-        std::cerr << "     (use --help-logs for detailed help on SimGrid's logging options/syntax)\n";
-        std::cerr << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
+        std::cout << "General WRENCH command-line arguments:\n";
+        std::cout << "   --wrench-no-color: disables colored terminal output\n";
+        std::cout << "   --wrench-no-log: disables logging\n";
+        std::cout << "     (use --help-logs for detailed help on SimGrid's logging options/syntax)\n";
+        std::cout << "   --activate-energy: activates SimGrid's energy plugin\n";
+        std::cout << "     (requires host pstate definitions in XML platform description file)\n";
+        std::cout << "   --help-simgrid: show full help on general Simgrid command-line arguments\n";
+        std::cout << "   --help-wrench: displays this help message\n";
         std::cerr << "\n";
       }
 
@@ -137,7 +138,7 @@ namespace wrench {
 
       // If version requested, put back the "--version" argument
       if (version_requested) {
-        std::cerr << "WRENCH version " << getWRENCHVersionString() << "\n";
+        std::cout << "WRENCH version " << getWRENCHVersionString() << "\n";
         argv[*argc] = strdup("--version");
         (*argc)++;
       }
@@ -149,7 +150,7 @@ namespace wrench {
       if (simgrid_help_requested) {
         argv[*argc] = strdup("--help");
         (*argc)++;
-        std::cerr << "\nSimgrid command-line arguments:\n\n";
+        std::cout << "\nSimgrid command-line arguments:\n\n";
       }
 
       // If WRENCH no logging is requested, put back and convert it to a SimGrid argument

@@ -661,6 +661,7 @@ namespace wrench {
           auto vm = std::get<0>(vm_tuple->second);
           vm->start();
           auto cs = std::get<1>(vm_tuple->second);
+          std::cerr << "CALLLING START ON CS " << cs->getName() << "\n";
           cs->start(cs, true);
 
         } catch (std::runtime_error &e) {
