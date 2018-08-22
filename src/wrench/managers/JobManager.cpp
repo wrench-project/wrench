@@ -265,6 +265,8 @@ namespace wrench {
       // so that it will getMessage the initial callback
       job->pushCallbackMailbox(this->mailbox_name);
 
+      std::map<WorkflowTask*, WorkflowTask::State> original_states;
+
       // Update the job state and insert it into the pending list
       switch (job->getType()) {
         case WorkflowJob::STANDARD: {
@@ -280,6 +282,7 @@ namespace wrench {
           // Modify task states
           ((StandardJob *) job)->state = StandardJob::PENDING;
           for (auto t : ((StandardJob *) job)->tasks) {
+            original_states.insert(std::make_pair(t, t->getState()));
             t->setState(WorkflowTask::State::PENDING);
           }
 
@@ -301,15 +304,15 @@ namespace wrench {
         job->setParentComputeService(compute_service);
 
       } catch (WorkflowExecutionException &e) {
+
+        // "Undo" everything
         job->popCallbackMailbox();
         switch (job->getType()) {
           case WorkflowJob::STANDARD: {
-            // Modify task states
             ((StandardJob *) job)->state = StandardJob::NOT_SUBMITTED;
             for (auto t : ((StandardJob *) job)->tasks) {
-              t->setState(WorkflowTask::State::READY);
+              t->setState(original_states[t]);
             }
-
             this->pending_standard_jobs.erase((StandardJob *) job);
             break;
           }
