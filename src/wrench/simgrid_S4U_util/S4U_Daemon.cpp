@@ -119,7 +119,6 @@ namespace wrench {
         auto service = reinterpret_cast<S4U_Daemon *>(service_instance);
         service->cleanup();
         delete service->life_saver;
-        service->life_saver = nullptr;
       }
       return 0;
     }
