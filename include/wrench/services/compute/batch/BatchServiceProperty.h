@@ -69,7 +69,7 @@ namespace wrench {
         /**
          * @brief Path to a to-be-generated Batsim-style CSV trace file (e.g. for b3atch schedule visualization purposes).
          *      - If ENABLE_BATSCHED is set to off or not set: ignored
-         *      - In ENABLE_BATSCHED is set to on: The trace file is generated in CVS format as follows:
+         *      - If ENABLE_BATSCHED is set to on: The trace file is generated in CVS format as follows:
          *          allocated_processors,consumed_energy,execution_time,finish_time,job_id,metadata,
          *          requested_number_of_processors,requested_time,starting_time,stretch,submission_time,success,
          *          turnaround_time,waiting_time,workload_name
@@ -94,6 +94,14 @@ namespace wrench {
          *        clusters, this is likely fine. Possible values are "false" (the default) or "true".
         */
         DECLARE_PROPERTY_NAME(SIMULATE_COMPUTATION_AS_SLEEP);
+
+        /** @brief Controls Batsched logging
+         *      - If ENABLE_BATSCHED is set to off or not set: ignored
+         *      - If ENABLE_BATSCHED is set to on:
+         *          - "true": do not show Batsched logging output on the terminal (default)
+         *          - "false": show Batsched logging output on the terminal
+         */
+        DECLARE_PROPERTY_NAME(BATSCHED_LOGGING_MUTED);
 
         /***********************/
         /** \cond INTERNAL     */

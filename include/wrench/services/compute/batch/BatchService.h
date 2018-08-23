@@ -52,40 +52,41 @@ namespace wrench {
     private:
 
         std::map<std::string, std::string> default_property_values = {
-                 {BatchServiceProperty::SUPPORTS_PILOT_JOBS,                         "true"},
-                 {BatchServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
-                 {BatchServiceProperty::THREAD_STARTUP_OVERHEAD,                     "0"},
-                 {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
-                #ifdef ENABLE_BATSCHED
-                 {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
-                 {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
-                #else
-                        {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
-                #endif
-                 {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
-                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
-                 {BatchServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
-                 {BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,           "false"}
-                };
+                {BatchServiceProperty::SUPPORTS_PILOT_JOBS,                         "true"},
+                {BatchServiceProperty::SUPPORTS_STANDARD_JOBS,                      "true"},
+                {BatchServiceProperty::THREAD_STARTUP_OVERHEAD,                     "0"},
+                {BatchServiceProperty::HOST_SELECTION_ALGORITHM,                    "FIRSTFIT"},
+        #ifdef ENABLE_BATSCHED
+                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,                  "easy_bf"},
+                {BatchServiceProperty::BATCH_QUEUE_ORDERING_ALGORITHM,              "fcfs"},
+        #else
+                {BatchServiceProperty::BATCH_SCHEDULING_ALGORITHM,            "FCFS"},
+        #endif
+                {BatchServiceProperty::BATCH_RJMS_DELAY,                            "0"},
+                {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
+                {BatchServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
+                {BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,           "false"},
+                {BatchServiceProperty::BATSCHED_LOGGING_MUTED,                  "true"}
+        };
 
         std::map<std::string, std::string> default_messagepayload_values = {
-                 {BatchServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
-                 {BatchServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,"1024"},
-                 {BatchServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, "1024"},
-                 {BatchServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,              "1024"},
-                 {BatchServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           "1024"},
-                 {BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                 {BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
-                 {BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {BatchServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
-                 {BatchServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
-                 {BatchServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         "1024"},
-                 {BatchServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,           "1024"},
-                 {BatchServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
-                 {BatchServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
-                 {BatchServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
-                };
+                {BatchServiceMessagePayload::STOP_DAEMON_MESSAGE_PAYLOAD,                 "1024"},
+                {BatchServiceMessagePayload::RESOURCE_DESCRIPTION_REQUEST_MESSAGE_PAYLOAD,"1024"},
+                {BatchServiceMessagePayload::RESOURCE_DESCRIPTION_ANSWER_MESSAGE_PAYLOAD, "1024"},
+                {BatchServiceMessagePayload::DAEMON_STOPPED_MESSAGE_PAYLOAD,              "1024"},
+                {BatchServiceMessagePayload::STANDARD_JOB_DONE_MESSAGE_PAYLOAD,           "1024"},
+                {BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
+                {BatchServiceMessagePayload::SUBMIT_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                {BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_REQUEST_MESSAGE_PAYLOAD,  "1024"},
+                {BatchServiceMessagePayload::TERMINATE_STANDARD_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                {BatchServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD,    "1024"},
+                {BatchServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,     "1024"},
+                {BatchServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD,         "1024"},
+                {BatchServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD,           "1024"},
+                {BatchServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD,           "1024"},
+                {BatchServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+                {BatchServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD, "1024"},
+        };
 
     public:
         BatchService(std::string &hostname,

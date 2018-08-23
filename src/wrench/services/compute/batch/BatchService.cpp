@@ -2225,9 +2225,11 @@ namespace wrench {
         const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
                               socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
 
-        // Comment the two lines below to see Batsched output
-        //fclose(stdout);
-        //fclose(stderr);
+        // Mute Batsched output if need be
+        if (this->getPropertyValueAsBoolean(BatchServiceProperty::BATSCHED_LOGGING_MUTED)) {
+          fclose(stdout);
+          fclose(stderr);
+        }
         if (execvp(args[0], (char **) args) == -1) {
           exit(3);
         }
