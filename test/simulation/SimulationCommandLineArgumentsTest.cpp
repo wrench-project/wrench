@@ -325,7 +325,7 @@ void SimulationCommandLineArgumentsTest::do_NoColorArgument_test() {
   bool found_color = false;
   while (getline(&line, &linecapp, stderr_file) != -1) {
     if (linecapp >= 3) {
-      for (int i = 0; i < strlen(line) - 2; i++) {
+      for (size_t i = 0; i < strlen(line) - 2; i++) {
         if ((line[i] == '\033') and (line[i + 1] == '[') and (line[i + 2] == '1')) {
           found_color = true;
           break;
@@ -482,7 +482,7 @@ void SimulationCommandLineArgumentsTest::do_ActivateEnergyArgument_test() {
   bool found_error = false;
   char *to_find = strdup("No power range properties");
   while (getline(&line, &linecapp, stderr_file) != -1) {
-    for (int i=0; i < strlen(line) - strlen(to_find); i++) {
+    for (size_t i=0; i < strlen(line) - strlen(to_find); i++) {
       if (!strncmp(line+i, to_find, strlen(to_find))) {
         found_error = true;
         break;
