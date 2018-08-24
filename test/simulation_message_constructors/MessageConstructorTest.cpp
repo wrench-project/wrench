@@ -212,6 +212,32 @@ TEST_F(MessageConstructorTest, CloudServiceMessages) {
   ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("", "host", "host", 666), std::invalid_argument);
   ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "", "host", 666), std::invalid_argument);
   ASSERT_THROW(new wrench::VirtualizedClusterServiceMigrateVMRequestMessage("mailbox", "host", "", 666), std::invalid_argument);
+
+  ASSERT_NO_THROW(new wrench::CloudServiceShutdownVMRequestMessage("mailbox", "vm", 666));
+  ASSERT_THROW(new wrench::CloudServiceShutdownVMRequestMessage("", "vm", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudServiceShutdownVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+
+  ASSERT_NO_THROW(new wrench::CloudServiceShutdownVMAnswerMessage(true, 666));
+
+  ASSERT_NO_THROW(new wrench::CloudServiceStartVMRequestMessage("mailbox", "vm", 666));
+  ASSERT_THROW(new wrench::CloudServiceStartVMRequestMessage("", "vm", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudServiceStartVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+
+  ASSERT_NO_THROW(new wrench::CloudServiceStartVMAnswerMessage(true, 666));
+
+  ASSERT_NO_THROW(new wrench::CloudServiceSuspendVMRequestMessage("mailbox", "vm", 666));
+  ASSERT_THROW(new wrench::CloudServiceSuspendVMRequestMessage("", "vm", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudServiceSuspendVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+
+  ASSERT_NO_THROW(new wrench::CloudServiceSuspendVMAnswerMessage(true, 666));
+
+  ASSERT_NO_THROW(new wrench::CloudServiceResumeVMRequestMessage("mailbox", "vm", 666));
+  ASSERT_THROW(new wrench::CloudServiceResumeVMRequestMessage("", "vm", 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::CloudServiceResumeVMRequestMessage("mailbox", "", 666), std::invalid_argument);
+
+  ASSERT_NO_THROW(new wrench::CloudServiceResumeVMAnswerMessage(true, 666));
+
+
 }
 
 
@@ -341,8 +367,6 @@ TEST_F(MessageConstructorTest, BatchServiceMessages) {
 
   ASSERT_NO_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", batch_job, 666));
   ASSERT_THROW(new wrench::BatchServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
-
   ASSERT_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job, 666));
   ASSERT_THROW(new wrench::AlarmJobTimeOutMessage(nullptr, 666), std::invalid_argument);
 
