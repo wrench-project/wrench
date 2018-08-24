@@ -123,6 +123,12 @@ TEST_F(WorkflowTest, WorkflowTaskThrow) {
   ASSERT_THROW(workflow->removeTask(nullptr), std::invalid_argument);
   workflow->removeTask(t1);
 
+  wrench::Workflow *bogus_workflow = new wrench::Workflow();
+  wrench::WorkflowTask *bogus = bogus_workflow->addTask("bogus", 100.0, 1, 1, 1.0, 0.0);
+  ASSERT_THROW(workflow->removeTask(bogus), std::invalid_argument);
+  bogus_workflow->removeTask(bogus);
+  delete bogus_workflow;
+
   ASSERT_THROW(workflow->getTaskChildren(nullptr), std::invalid_argument);
   ASSERT_THROW(workflow->getTaskParents(nullptr), std::invalid_argument);
 
