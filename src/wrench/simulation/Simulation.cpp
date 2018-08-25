@@ -625,7 +625,7 @@ namespace wrench {
      * @param hostname the host name
      * @return the energy consumed by the host in Joules
      */
-    double Simulation::getEnergyConsumedByHost(std::string hostname) {
+    double Simulation::getEnergyConsumedByHost(const std::string &hostname) {
       return S4U_Simulation::getEnergyConsumedByHost(hostname);
     }
 
@@ -634,7 +634,7 @@ namespace wrench {
      * @param the list of hostnames
      * @return The total energy consumed by all the hosts in Joules
      */
-    double Simulation::getTotalEnergyConsumed(std::vector<std::string> hostnames) {
+    double Simulation::getTotalEnergyConsumed(const std::vector<std::string> &hostnames) {
       return S4U_Simulation::getTotalEnergyConsumed(hostnames);
     }
 
@@ -643,7 +643,7 @@ namespace wrench {
      * @param hostname: the host name
      * @param pstate: the power state index (the power state index is specified in the platform xml description file)
      */
-    void Simulation::setPstate(std::string hostname, int pstate) {
+    void Simulation::setPstate(const std::string &hostname, int pstate) {
       S4U_Simulation::setPstate(hostname, pstate);
     }
 
@@ -652,7 +652,7 @@ namespace wrench {
      * @param hostname: the host name
      * @return The number of power states available for the host (as specified in the platform xml description file)
      */
-    int Simulation::getNumberofPstates(std::string hostname) {
+    int Simulation::getNumberofPstates(const std::string &hostname) {
       return S4U_Simulation::getNumberofPstates(hostname);
     }
 
@@ -661,7 +661,7 @@ namespace wrench {
      * @param hostname: the host name
      * @return The index of the current pstate of the host (as specified in the platform xml description file)
      */
-    int Simulation::getCurrentPstate(std::string hostname) {
+    int Simulation::getCurrentPstate(const std::string &hostname) {
       return S4U_Simulation::getCurrentPstate(hostname);
     }
 
@@ -670,7 +670,7 @@ namespace wrench {
      * @param hostname: the host name
      * @return The minimum power available for the host (as specified in the platform xml description file)
      */
-    double Simulation::getMinPowerAvailable(std::string hostname) {
+    double Simulation::getMinPowerAvailable(const std::string &hostname) {
       return S4U_Simulation::getMinPowerAvailable(hostname);
     }
 
@@ -679,7 +679,7 @@ namespace wrench {
      * @param hostname: the host name
      * @return The maximum power available for the host (as specified in the platform xml description file)
      */
-    double Simulation::getMaxPowerPossible(std::string hostname) {
+    double Simulation::getMaxPowerPossible(const std::string &hostname) {
       return S4U_Simulation::getMaxPowerPossible(hostname);
     }
 
@@ -688,7 +688,7 @@ namespace wrench {
      * @param hostname: the host name
      * @return a list of power states available for the host (as specified in the platform xml description file)
      */
-    std::vector<int> Simulation::getListOfPstates(std::string hostname) {
+    std::vector<int> Simulation::getListOfPstates(const std::string &hostname) {
       return S4U_Simulation::getListOfPstates(hostname);
     }
 
