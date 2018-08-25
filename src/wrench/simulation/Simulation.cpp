@@ -145,7 +145,6 @@ namespace wrench {
 
       // reconstruct argc/argv
 
-
       // If SimGrid help is requested, put back in a "--help" argument
       if (simgrid_help_requested) {
         argv[*argc] = strdup("--help");
@@ -164,7 +163,6 @@ namespace wrench {
       if (wrench_help_requested) {
         exit(0);
       }
-      
 
       // If simulator help requested, put back in the "--help" argument that was passed down
       if (simulator_help_requested) {
@@ -203,6 +201,7 @@ namespace wrench {
     std::vector<std::string> Simulation::getHostnameList() {
       return this->s4u_simulation->getAllHostnames();
     }
+
     /**
      * @brief Get the list of names of all the hosts in each cluster composing the platform
      *
@@ -212,6 +211,7 @@ namespace wrench {
     std::map<std::string, std::vector<std::string>> Simulation::getHostnameListByCluster() {
       return this->s4u_simulation->getAllHostnamesByCluster();
     }
+
     /**
      * @brief Check that a hostname exists in the platform
      * @param hostname: a host name
@@ -301,7 +301,7 @@ namespace wrench {
           if (this->file_registry_services.empty()) {
             throw std::runtime_error(
                     "At least one FileRegistryService should have been instantiated and passed to Simulation.add()"
-                            "because there are workflow input files to be staged.");
+                    "because there are workflow input files to be staged.");
           }
         }
 
@@ -374,7 +374,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    ComputeService * Simulation::add(ComputeService *service) {
+    ComputeService *Simulation::add(ComputeService *service) {
       if (service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
@@ -394,7 +394,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    NetworkProximityService * Simulation::add(NetworkProximityService *service) {
+    NetworkProximityService *Simulation::add(NetworkProximityService *service) {
       if (service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
@@ -415,7 +415,7 @@ namespace wrench {
     * @throw std::invalid_argument
     * @throw std::runtime_error
     */
-    StorageService * Simulation::add(StorageService *service) {
+    StorageService *Simulation::add(StorageService *service) {
       if (service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid argument (nullptr service)");
       }
@@ -435,7 +435,7 @@ namespace wrench {
      * @throw std::invalid_argument
      * @throw std::runtime_error
      */
-    WMS * Simulation::add(WMS *wms) {
+    WMS *Simulation::add(WMS *wms) {
       if (wms == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid argument (nullptr wms)");
       }
@@ -454,7 +454,7 @@ namespace wrench {
      *
      * @throw std::invalid_argument
      */
-    FileRegistryService * Simulation::add(FileRegistryService *file_registry_service) {
+    FileRegistryService *Simulation::add(FileRegistryService *file_registry_service) {
       if (file_registry_service == nullptr) {
         throw std::invalid_argument("Simulation::add(): invalid arguments");
       }
