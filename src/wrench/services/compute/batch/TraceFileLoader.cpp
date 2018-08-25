@@ -46,7 +46,7 @@ namespace wrench {
 
       if (tokens.size() < 2) {
         throw std::invalid_argument(
-                "TraceFileLoader::loadFromTraceFile(): batch workload trace file name must end with '.swf' or 'json'");
+                "TraceFileLoader::loadFromTraceFile(): batch workload trace file name must end with '.swf' or '.json'");
       }
       if (tokens[tokens.size() - 1] == "swf") {
         return loadFromTraceFileSWF(filename, load_time_compensation);
@@ -54,7 +54,7 @@ namespace wrench {
         return loadFromTraceFileJSON(filename, load_time_compensation);
       } else {
         throw std::invalid_argument(
-                "TraceFileLoader::loadFromTraceFile(): batch workload trace file name must end with '.swf' or 'json'");
+                "TraceFileLoader::loadFromTraceFile(): batch workload trace file name must end with '.swf' or '.json'");
       }
     }
 
