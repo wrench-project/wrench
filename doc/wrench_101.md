@@ -241,6 +241,28 @@ are all classes named `wrench::SimulationTimestampSomething`, where `Something` 
 (e.g., `TaskCompletion`).
 
 
+# Measuring Energy Consumption #                 {#wrench-101-energy}
+
+WRENCH leverages [SimGrid's energy plugin](http://simgrid.gforge.inria.fr/simgrid/latest/doc/group__plugin__energy.html),
+which provides accounting for computing time and dissipated energy in the simulated platform. SimGrid's energy plugin 
+requires host **pstate** definitions (levels of performance, CPU frequency) in the
+[XML platform description file](http://simgrid.gforge.inria.fr/simgrid/latest/doc/platform.html). The following is a 
+list of current available information provided by the plugin: 
+
+- `wrench::Simulation::getEnergyConsumedByHost()`
+- `wrench::Simulation::getTotalEnergyConsumed()`
+- `wrench::Simulation::setPstate()`
+- `wrench::Simulation::getNumberofPstates()`
+- `wrench::Simulation::getCurrentPstate()`
+- `wrench::Simulation::getMinPowerAvailable()`
+- `wrench::Simulation::getMaxPowerPossible()`
+- `wrench::Simulation::getListOfPstates()`
+
+**Note:** The energy plugin is NOT enabled by default in WRENCH simulation. To enable the plugin, the 
+`--activate-energy` command line option should be provided when running a simulator.
+
+
+
 @endWRENCHDoc
 
 

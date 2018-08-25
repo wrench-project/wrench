@@ -275,7 +275,7 @@ namespace wrench {
      * @return the energy consumed by the host in Joules
      * @throw std::runtime_error
      */
-    double S4U_Simulation::getEnergyConsumedByHost(std::string hostname) {
+    double S4U_Simulation::getEnergyConsumedByHost(const std::string &hostname) {
       double energy_consumed = 0;
       try {
         energy_consumed = sg_host_get_consumed_energy(simgrid::s4u::Host::by_name(hostname));
@@ -294,7 +294,7 @@ namespace wrench {
      * @return The total energy consumed by all the hosts in Joules
      * @throw std::runtime_error
      */
-    double S4U_Simulation::getTotalEnergyConsumed(std::vector<std::string> hostnames) {
+    double S4U_Simulation::getTotalEnergyConsumed(const std::vector<std::string> &hostnames) {
       double total_energy = 0;
       try {
         for (auto hostname: hostnames) {
@@ -315,7 +315,7 @@ namespace wrench {
      * @param pstate: the power state index (the power state index is specified in the platform xml description file)
      * @throw std::runtime_error
      */
-    void S4U_Simulation::setPstate(std::string hostname, int pstate ) {
+    void S4U_Simulation::setPstate(const std::string &hostname, int pstate ) {
       try {
         simgrid::s4u::Host::by_name(hostname)->set_pstate(pstate);
       } catch (std::exception& e) {
@@ -332,7 +332,7 @@ namespace wrench {
      * @return The number of power states available for the host (as specified in the platform xml description file)
      * @throw std::runtime_error
      */
-    int S4U_Simulation::getNumberofPstates(std::string hostname) {
+    int S4U_Simulation::getNumberofPstates(const std::string &hostname) {
       try {
         return simgrid::s4u::Host::by_name(hostname)->get_pstate_count();
       } catch (std::exception& e) {
@@ -349,7 +349,7 @@ namespace wrench {
      * @return The index of the current pstate of the host (as specified in the platform xml description file)
      * @throw std::runtime_error
      */
-    int S4U_Simulation::getCurrentPstate(std::string hostname) {
+    int S4U_Simulation::getCurrentPstate(const std::string &hostname) {
       try {
         return simgrid::s4u::Host::by_name(hostname)->get_pstate();
       } catch (std::exception& e) {
@@ -366,7 +366,7 @@ namespace wrench {
      * @return The minimum power available for the host (as specified in the platform xml description file)
      * @throw std::runtime_error
      */
-    double S4U_Simulation::getMinPowerAvailable(std::string hostname) {
+    double S4U_Simulation::getMinPowerAvailable(const std::string &hostname) {
       try {
         return sg_host_get_wattmin_at(simgrid::s4u::Host::by_name(hostname),
                                       (simgrid::s4u::Host::by_name(hostname))->get_pstate());
@@ -384,7 +384,7 @@ namespace wrench {
      * @return The maximum power available for the host (as specified in the platform xml description file)
      * @throw std::runtime_error
      */
-    double S4U_Simulation::getMaxPowerPossible(std::string hostname) {
+    double S4U_Simulation::getMaxPowerPossible(const std::string &hostname) {
       try {
         return sg_host_get_wattmax_at(simgrid::s4u::Host::by_name(hostname),
                                       (simgrid::s4u::Host::by_name(hostname))->get_pstate());
@@ -402,7 +402,7 @@ namespace wrench {
      * @return a list of power states available for the host (as specified in the platform xml description file)
      * @throw std::runtime_error
      */
-    std::vector<int> S4U_Simulation::getListOfPstates(std::string hostname) {
+    std::vector<int> S4U_Simulation::getListOfPstates(const std::string &hostname) {
       std::vector<int> list = {};
       try {
         int num_pstates = getNumberofPstates(hostname);
