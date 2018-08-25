@@ -376,6 +376,13 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
   // Get a hostname
   std::string hostname = "Host1";
 
+  // Create a Batch Service with a trace file with no extension, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there_invalid"}}
+          )), std::invalid_argument);
+
   // Create a Batch Service with a trace file with a bogus extension, which should throw
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname,
@@ -633,6 +640,13 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
   // Get a hostname
   std::string hostname = "Host1";
 
+  // Create a Batch Service with a trace file with no extension, which should throw
+  ASSERT_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there_invalid"}}
+          )), std::invalid_argument);
+
   // Create a Batch Service with a trace file with a bogus extension, which should throw
   ASSERT_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname,
@@ -640,7 +654,6 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
                                    {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, "/not_there.invalid"}}
           )), std::invalid_argument);
 
-  std::string json_string;
 
   // Create a Batch Service with a non-existing workload trace file, which should throw
   ASSERT_THROW(compute_service = simulation->add(
@@ -657,7 +670,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestJSON_test() {
 
   trace_file = fopen(trace_file_path.c_str(), "w");
 
-  json_string =
+  std::string json_string =
           "{\n"
                   "  \"command\": \"/home/pfdutot/forge/batsim//tools/swf_to_batsim_workload_compute_only.py -t -gwo -i 1 -pf 93312 /tmp/expe_out/workloads/curie_downloaded.swf /tmp/expe_out/workloads/curie.json -cs 100e6 --verbose\",\n"
                   "  \"date\": \"2018-07-10 17:08:09.673026\",\n"
