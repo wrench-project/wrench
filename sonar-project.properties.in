@@ -1,6 +1,6 @@
 sonar.projectKey=wrench
 sonar.projectName=WRENCH
-sonar.projectVersion=1.1-dev
+sonar.projectVersion=@WRENCH_RELEASE_VERSION@
 
 sonar.links.homepage=http://wrench-project.org
 sonar.links.ci=https://travis-ci.org/wrench-project/wrench

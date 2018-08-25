@@ -20,11 +20,10 @@
 #include "wrench/simulation/SimulationOutput.h"
 #include "wrench/wms/WMS.h"
 #include "wrench/workflow/job/StandardJob.h"
+#include "Version.h"
 
 
 namespace wrench {
-
-    #define WRENCH_VERSION_STRING "1.1-devel"
 
     class StorageService;
 

@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(WRENCH_VERSION_MAJOR "1")
 set(WRENCH_VERSION_MINOR "1")
 set(WRENCH_VERSION_PATCH "0")
-set(WRENCH_VERSION_EXTRA "")
+set(WRENCH_VERSION_EXTRA "dev")
 
 if (${WRENCH_VERSION_PATCH} EQUAL "0")
     set(WRENCH_RELEASE_VERSION "${WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}")
@@ -22,10 +22,11 @@ else ()
     set(WRENCH_RELEASE_VERSION "${WRENCH_VERSION_MAJOR}.${WRENCH_VERSION_MINOR}.${WRENCH_VERSION_PATCH}")
 endif ()
 
-if (NOT ${WRENCH_VERSION_EXTRA} EQUAL "")
+if (NOT ${WRENCH_VERSION_EXTRA} STREQUAL "")
     set(WRENCH_RELEASE_VERSION "${WRENCH_RELEASE_VERSION}-${WRENCH_VERSION_EXTRA}")
 endif ()
 
+message(STATUS "Building WRENCH Version: ${WRENCH_RELEASE_VERSION}")
 
 include_directories(src/wrench/ include/ /usr/include /usr/local/include /opt/local/include)
 
@@ -90,6 +91,7 @@ set(HEADER_FILES
         include/wrench/services/network_proximity/NetworkProximityServiceProperty.h
         include/wrench/services/network_proximity/NetworkProximityServiceMessagePayload.h
         include/wrench/services/network_proximity/NetworkProximityDaemon.h
+        include/wrench/simulation/Version.h
         include/wrench/simulation/Simulation.h
         include/wrench/simulation/SimulationTimestampTypes.h
         include/wrench/simulation/SimulationOutput.h
@@ -268,6 +270,9 @@ find_library(GTEST_LIBRARY NAMES gtest)
 add_library(wrench STATIC ${SOURCE_FILES})
 set_target_properties(wrench PROPERTIES VERSION ${WRENCH_RELEASE_VERSION})
 target_link_libraries(wrench ${SIMGRID_LIBRARY} ${PUGIXML_LIBRARY} ${LEMON_LIBRARY})
+
+# wrench version
+add_custom_command(TARGET wrench PRE_LINK COMMAND ${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DWRENCH_RELEASE_VERSION=${WRENCH_RELEASE_VERSION} -P ${CMAKE_HOME_DIRECTORY}/tools/cmake/Version.cmake)
 
 install(TARGETS wrench DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
