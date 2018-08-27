@@ -85,15 +85,15 @@ protected:
 
       // Create a platform file
       std::string xml = "<?xml version='1.0'?>"
-                        "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
-                        "<platform version=\"4.1\"> "
-                        "   <zone id=\"AS0\" routing=\"Full\"> "
-                        "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
-                        "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
-                        "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
-                        "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
-                        "   </zone> "
-                        "</platform>";
+              "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+              "<platform version=\"4.1\"> "
+              "   <zone id=\"AS0\" routing=\"Full\"> "
+              "       <host id=\"DualCoreHost\" speed=\"1f\" core=\"2\"/> "
+              "       <host id=\"QuadCoreHost\" speed=\"1f\" core=\"4\"/> "
+              "       <link id=\"1\" bandwidth=\"5000GBps\" latency=\"0us\"/>"
+              "       <route src=\"DualCoreHost\" dst=\"QuadCoreHost\"> <link_ctn id=\"1\"/> </route>"
+              "   </zone> "
+              "</platform>";
       FILE *platform_file = fopen(platform_file_path.c_str(), "w");
       fprintf(platform_file, "%s", xml.c_str());
       fclose(platform_file);
@@ -374,26 +374,32 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
-      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
 
-      // Submit the pilot job for execution
+      // Create VMs
+      auto cs = (wrench::CloudService *) this->test->compute_service;
+      std::string specific_vm;
+
       try {
-        auto cs = (wrench::CloudService *) this->test->compute_service;
-        std::string execution_host = cs->getExecutionHosts()[0];
+//        std::string execution_host = cs->getExecutionHosts()[0];
 
+        specific_vm = cs->createVM(1, 10);
         cs->createVM(1, 10);
         cs->createVM(1, 10);
         cs->createVM(1, 10);
-        cs->createVM(1, 10);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
 
+      // Submit a pilot job for execution (1 host, 1 core, 0 bytes, and 1 minute)
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
+      try {
         job_manager->submitJob(pilot_job, this->test->compute_service);
 
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
       }
 
-      // Wait for a workflow execution event
+      // Wait for a workflow execution event (PILOT JOB START)
       std::unique_ptr<wrench::WorkflowExecutionEvent> event;
       try {
         event = this->getWorkflow()->waitForNextExecutionEvent();
@@ -401,10 +407,64 @@ private:
         throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
       }
       switch (event->type) {
-        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+        case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
           // success, do nothing for now
           break;
         }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
+      }
+      // Wait for a workflow execution event (PILOT JOB EXPIRATION)
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::PILOT_JOB_EXPIRATION: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
+      }
+
+      // Submit a pilot job for execution on a BOGUS VM (1 host, 1 core, 0 bytes, and 1 minute)
+      job_manager->forgetJob(pilot_job);
+      pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
+      bool success = true;
+      try {
+        std::map<std::string, std::string> invalid_properties_map;
+        invalid_properties_map.insert(std::make_pair("-vm", "non-existent-vm"));
+        job_manager->submitJob(pilot_job, this->test->compute_service, invalid_properties_map);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to submit a job to a bogus VM");
+      }
+
+      // Submit a pilot job for execution on a specific VM (1 host, 1 core, 0 bytes, and 1 minute)
+      job_manager->forgetJob(pilot_job);
+      pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
+      try {
+        std::map<std::string, std::string> invalid_properties_map;
+        invalid_properties_map.insert(std::make_pair("-vm", specific_vm));
+        job_manager->submitJob(pilot_job, this->test->compute_service, invalid_properties_map);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+
+      // Wait for a workflow execution event (PILOT JOB START)
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting and execution event: " + e.getCause()->toString());
+      }
+      switch (event->type) {
         case wrench::WorkflowExecutionEvent::PILOT_JOB_START: {
           // success, do nothing for now
           break;
@@ -965,7 +1025,7 @@ private:
       }
 
       std::map<std::string, std::string> properties_map;
-      properties_map.insert(std::make_pair(wrench::CloudServiceProperty::JOB_MAPPING_TO_VM, vm_list[1]));
+      properties_map.insert(std::make_pair("-vm", vm_list[1]));
 
       try {
         for (auto &vm_name : vm_list) {
@@ -994,7 +1054,7 @@ private:
       }
 
       std::map<std::string, std::string> invalid_properties_map;
-      invalid_properties_map.insert(std::make_pair(wrench::CloudServiceProperty::JOB_MAPPING_TO_VM, "non-existent-vm"));
+      invalid_properties_map.insert(std::make_pair("-vm", "non-existent-vm"));
 
       try {
         job_manager->submitJob(job2, this->test->compute_service, invalid_properties_map);

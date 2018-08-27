@@ -218,7 +218,7 @@ namespace wrench {
         return true;
 
       } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-        processSubmitPilotJob(msg->answer_mailbox, msg->job);
+        processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
 
       } else {

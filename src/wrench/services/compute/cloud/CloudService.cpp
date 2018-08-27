@@ -263,7 +263,9 @@ namespace wrench {
      * @brief Submit a standard job to the cloud service
      *
      * @param job: a standard job
-     * @param service_specific_args: service specific arguments (likely just {})
+     * @param service_specific_args: batch-specific arguments
+     *      - optional: "-vm": name of vm on which to start the job
+     *        (if not provided, the service will pick the vm)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -294,7 +296,9 @@ namespace wrench {
      * @brief Asynchronously submit a pilot job to the cloud service
      *
      * @param job: a pilot job
-     * @param service_specific_args: service specific arguments (likely just {})
+     * @param service_specific_args: service specific arguments
+     *      - optional: "-vm": name of vm on which to start the job
+     *        (if not provided, the service will pick the vm)
      *
      * @throw WorkflowExecutionException
      * @throw std::runtime_error
@@ -306,7 +310,7 @@ namespace wrench {
       std::unique_ptr<SimulationMessage> answer_message = sendRequest(
               answer_mailbox,
               new ComputeServiceSubmitPilotJobRequestMessage(
-                      answer_mailbox, job, this->getMessagePayloadValueAsDouble(
+                      answer_mailbox, job, service_specific_args, this->getMessagePayloadValueAsDouble(
                               CloudServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
 
       if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobAnswerMessage *>(answer_message.get())) {
@@ -468,7 +472,7 @@ namespace wrench {
         return true;
 
       } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-        processSubmitPilotJob(msg->answer_mailbox, msg->job);
+        processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
 
       } else {
@@ -800,15 +804,16 @@ namespace wrench {
       std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>,
               unsigned long, unsigned long>> vm_local_list = this->vm_list;
 
-      // whether the job should be mapped to a single VM
-      auto vm_it = service_specific_args.find(CloudServiceProperty::JOB_MAPPING_TO_VM);
+      // whether the job should be mapped to a particular VM
+      auto vm_it = service_specific_args.find("-vm");
       if (vm_it != service_specific_args.end()) {
+        vm_local_list.clear();
         auto vm_tuple_it = this->vm_list.find(vm_it->second);
         if (vm_tuple_it != this->vm_list.end()) {
-          vm_local_list.clear();
           vm_local_list.insert(std::make_pair(vm_it->second, vm_tuple_it->second));
         }
       }
+
 
       for (auto vm_tuple : vm_local_list) {
         std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>(vm_tuple.second);
@@ -855,10 +860,12 @@ namespace wrench {
      *
      * @param answer_mailbox: the mailbox to which the answer message should be sent
      * @param job: the job
+     * @param service_specific_args: service specific arguments
      *
      * @throw std::runtime_error
      */
-    void CloudService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job) {
+    void CloudService::processSubmitPilotJob(const std::string &answer_mailbox, PilotJob *job,
+                                             std::map<std::string, std::string> &service_specific_args) {
 
       WRENCH_INFO("Asked to run a pilot job with %ld hosts and %ld cores per host for %lf seconds",
                   job->getNumHosts(), job->getNumCoresPerHost(), job->getDuration());
@@ -876,10 +883,24 @@ namespace wrench {
         return;
       }
 
+      std::map<std::string, std::tuple<std::shared_ptr<S4U_VirtualMachine>, std::shared_ptr<ComputeService>,
+              unsigned long, unsigned long>> vm_local_list = this->vm_list;
+
+
+      // whether the job should be mapped to a particular VM
+      auto vm_it = service_specific_args.find("-vm");
+      if (vm_it != service_specific_args.end()) {
+        vm_local_list.clear();
+        auto vm_tuple_it = this->vm_list.find(vm_it->second);
+        if (vm_tuple_it != this->vm_list.end()) {
+          vm_local_list.insert(std::make_pair(vm_it->second, vm_tuple_it->second));
+        }
+      }
+
       // count the number of hosts that have enough cores
       bool available_host = false;
 
-      for (auto &vm_tuple : vm_list) {
+      for (auto &vm_tuple : vm_local_list) {
         std::shared_ptr<S4U_VirtualMachine> vm = std::get<0>(vm_tuple.second);
         if (vm->isRunning()) {
           if (std::get<2>(vm_tuple.second) >= job->getNumCoresPerHost()) {
@@ -893,7 +914,7 @@ namespace wrench {
       }
 
       // Do we have enough hosts?
-      // currently, the cloud service does not support
+      // currently, the cloud service cannot support the job
       if (job->getNumHosts() > 1 || not available_host) {
         try {
           S4U_Mailbox::dputMessage(
