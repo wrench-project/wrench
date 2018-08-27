@@ -135,12 +135,14 @@ namespace wrench {
      */
     class ComputeServiceSubmitPilotJobRequestMessage : public ComputeServiceMessage {
     public:
-        ComputeServiceSubmitPilotJobRequestMessage(std::string answer_mailbox, PilotJob *, double payload);
+        ComputeServiceSubmitPilotJobRequestMessage(std::string answer_mailbox, PilotJob *, std::map<std::string, std::string> &service_specific_args, double payload);
 
         /** @brief The mailbox to which the answer message should be sent */
         std::string answer_mailbox;
         /** @brief The submitted pilot job */
         PilotJob *job;
+        /** @brief Service specific arguments */
+        std::map<std::string, std::string> service_specific_args;
     };
 
     /**

@@ -148,9 +148,9 @@ TEST_F(MessageConstructorTest, ComputeServiceMessages) {
   ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, true, failure_cause, 666), std::invalid_argument);
   ASSERT_THROW(new wrench::ComputeServiceTerminateStandardJobAnswerMessage(standard_job, compute_service, false, nullptr, 666), std::invalid_argument);
 
-  ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox", pilot_job, 666));
-  ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("", pilot_job, 666), std::invalid_argument);
-  ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
+  ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox", pilot_job, args, 666));
+  ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("", pilot_job, args, 666), std::invalid_argument);
+  ASSERT_THROW(new wrench::ComputeServiceSubmitPilotJobRequestMessage("mailbox", nullptr, args, 666), std::invalid_argument);
 
   ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job, compute_service, true, nullptr, 666));
   ASSERT_NO_THROW(new wrench::ComputeServiceSubmitPilotJobAnswerMessage(pilot_job, compute_service, false, failure_cause, 666));

@@ -105,7 +105,7 @@ namespace wrench {
         S4U_Mailbox::putMessage(
                 this->mailbox_name,
                 new ComputeServiceSubmitPilotJobRequestMessage(
-                        answer_mailbox, job, this->getMessagePayloadValueAsDouble(
+                        answer_mailbox, job, service_specific_args, this->getMessagePayloadValueAsDouble(
                                 MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);

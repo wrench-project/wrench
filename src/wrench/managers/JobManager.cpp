@@ -248,8 +248,8 @@ namespace wrench {
      * @param service_specific_args: arguments specific for compute services:
      *      - to a MultihostMulticoreComputeService: {}
      *      - to a BatchService: {"-t":"<int>" (requested number of minutes),"-N":"<int>" (number of requested hosts),"-c":"<int>" (number of requestes cores per host)}
-     *      - to a VirtualizedClusterService: {}
-     *      - to a CloudService: {}
+     *      - to a VirtualizedClusterService: {} (in which case the service will pick the vm) or {"-vm":"<vm name>"}
+     *      - to a CloudService: {} (in which case the service will pick the vm) or {"-vm":"<vm name>"}
      *
      * @throw std::invalid_argument
      * @throw WorkflowExecutionException

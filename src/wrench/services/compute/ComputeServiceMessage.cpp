@@ -172,12 +172,14 @@ namespace wrench {
      * @brief Constructor
      * @param answer_mailbox: mailbox to which the answer message should be sent
      * @param job: a pilot job submitted for execution
+     * @param service_specific_args: a map of extra arguments (each specified by a name and value, both strings) required by some services
      * @param payload: message size in bytes
      *
      * @throw std::invalid_argument
      */
     ComputeServiceSubmitPilotJobRequestMessage::ComputeServiceSubmitPilotJobRequestMessage(std::string answer_mailbox,
                                                                                            PilotJob *job,
+                                                                                           std::map<std::string, std::string> &service_specific_args,
                                                                                            double payload)
             : ComputeServiceMessage(
             "SUBMIT_PILOT_JOB_REQUEST", payload) {
@@ -187,6 +189,7 @@ namespace wrench {
       }
       this->answer_mailbox = answer_mailbox;
       this->job = job;
+      this->service_specific_args = service_specific_args;
     }
 
     /**

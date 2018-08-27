@@ -135,17 +135,6 @@ private:
               four_hosts_five_cores
       };
 
-      double expected_completion_times[8] = {
-              60,
-              120,
-              180,
-              180,
-              240,
-              240,
-              240,
-              300
-      };
-
       // Submit jobs
       try {
         for (int i=0; i < 8; i++) {
@@ -157,7 +146,6 @@ private:
         );
       }
 
-      double actual_completion_times[8];
       for (int i=0; i < 8; i++) {
         // Wait for a workflow execution event
         std::unique_ptr<wrench::WorkflowExecutionEvent> event;
@@ -168,7 +156,6 @@ private:
         }
         switch (event->type) {
           case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
-            actual_completion_times[i] =  this->simulation->getCurrentSimulatedDate();
             break;
           }
           default: {
@@ -176,6 +163,8 @@ private:
           }
         }
       }
+
+
 
       return 0;
     }
