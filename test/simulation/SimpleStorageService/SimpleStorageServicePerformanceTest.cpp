@@ -16,6 +16,8 @@
 
 #include "../../include/TestWithFork.h"
 
+XBT_LOG_NEW_DEFAULT_CATEGORY(simple_storage_service_performance_test, "Log category for SimpleStorageServicePerformanceTest");
+
 
 #define FILE_SIZE 10000000000.00
 #define MBPS_BANDWIDTH 100
@@ -32,7 +34,8 @@ public:
 
     wrench::ComputeService *compute_service = nullptr;
 
-    void do_ConcurrencyFileCopies_test();
+    void do_FileRead_test();
+    void do_ConcurrentFileCopies_test();
 
 
 protected:
@@ -55,7 +58,7 @@ protected:
               "       <host id=\"SrcHost\" speed=\"1f\"/> "
               "       <host id=\"DstHost\" speed=\"1f\"/> "
               "       <host id=\"WMSHost\" speed=\"1f\"/> "
-              "       <link id=\"link\" bandwidth=\"" + std::to_string(MBPS_BANDWIDTH) + "MBps\" latency=\"10us\"/>"
+              "       <link id=\"link\" bandwidth=\"" + std::to_string(MBPS_BANDWIDTH) + "MBps\" latency=\"1us\"/>"
               "       <route src=\"SrcHost\" dst=\"DstHost\">"
               "         <link_ctn id=\"link\"/>"
               "       </route>"
@@ -83,10 +86,10 @@ protected:
 /**  CONCURRENT FILE COPIES TEST                                     **/
 /**********************************************************************/
 
-class SimpleStorageServiceConcurrencyFileCopiesTestWMS : public wrench::WMS {
+class SimpleStorageServiceConcurrentFileCopiesTestWMS : public wrench::WMS {
 
 public:
-    SimpleStorageServiceConcurrencyFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
+    SimpleStorageServiceConcurrentFileCopiesTestWMS(SimpleStorageServicePerformanceTest *test,
                                                      const std::set<wrench::ComputeService *> compute_services,
                                                      const std::set<wrench::StorageService *> &storage_services,
                                                      std::string hostname) :
@@ -171,11 +174,11 @@ private:
     }
 };
 
-TEST_F(SimpleStorageServicePerformanceTest, ConcurrencyFileCopies) {
-  DO_TEST_WITH_FORK(do_ConcurrencyFileCopies_test);
+TEST_F(SimpleStorageServicePerformanceTest, ConcurrentFileCopies) {
+  DO_TEST_WITH_FORK(do_ConcurrentFileCopies_test);
 }
 
-void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
+void SimpleStorageServicePerformanceTest::do_ConcurrentFileCopies_test() {
 
   // Create and initialize a simulation
   wrench::Simulation *simulation = new wrench::Simulation();
@@ -202,7 +205,7 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   // Create a WMS
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
-          new SimpleStorageServiceConcurrencyFileCopiesTestWMS(
+          new SimpleStorageServiceConcurrentFileCopiesTestWMS(
                   this, {compute_service}, {storage_service_1, storage_service_2},
                           "WMSHost")));
 
@@ -212,6 +215,98 @@ void SimpleStorageServicePerformanceTest::do_ConcurrencyFileCopies_test() {
   simulation->add(new wrench::FileRegistryService("WMSHost"));
 
   // Staging all files on the Src storage service
+  ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(), file_1}, {file_2->getID(), file_2}, {file_3->getID(), file_3}}, storage_service_1));
+
+  // Running a "run a single task" simulation
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  FILE READ  TEST                                                 **/
+/**********************************************************************/
+
+class SimpleStorageServiceFileReadTestWMS : public wrench::WMS {
+
+public:
+    SimpleStorageServiceFileReadTestWMS(SimpleStorageServicePerformanceTest *test,
+                                                     const std::set<wrench::StorageService *> &storage_services,
+                                                     std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    SimpleStorageServicePerformanceTest *test;
+
+    int main() {
+
+      // Create a data movement manager
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+
+      double before_read = simulation->getCurrentSimulatedDate();
+      try {
+        this->test->storage_service_1->readFile(this->test->file_1);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      double elapsed = simulation->getCurrentSimulatedDate() - before_read;
+
+      double effecive_bandwidth = (MBPS_BANDWIDTH * 1000 * 1000) * 0.92;
+
+      double expected_elapsed = this->test->file_1->getSize() / effecive_bandwidth;
+
+      if (fabs(elapsed - expected_elapsed) > 1.0) {
+        throw std::runtime_error("Incorrect file read time " + std::to_string(elapsed) + " (expected: " + std::to_string(expected_elapsed) + ")");
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(SimpleStorageServicePerformanceTest, FileRead) {
+  DO_TEST_WITH_FORK(do_FileRead_test);
+}
+
+void SimpleStorageServicePerformanceTest::do_FileRead_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("performance_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Create Two Storage Services
+  ASSERT_NO_THROW(storage_service_1 = simulation->add(
+          new wrench::SimpleStorageService("SrcHost", STORAGE_SIZE)));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new SimpleStorageServiceFileReadTestWMS(
+                  this, {storage_service_1},
+                  "WMSHost")));
+
+  wms->addWorkflow(this->workflow);
+
+  // Create a file registry
+  simulation->add(new wrench::FileRegistryService("WMSHost"));
+
+  // Staging all files on the  storage service
   ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(), file_1}, {file_2->getID(), file_2}, {file_3->getID(), file_3}}, storage_service_1));
 
   // Running a "run a single task" simulation
