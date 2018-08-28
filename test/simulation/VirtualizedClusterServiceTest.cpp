@@ -44,6 +44,8 @@ public:
 
     void do_ShutdownVMTest_test();
 
+    void do_ShutdownVMAndThenShutdownServiceTest_test();
+
     void do_SubmitToVMTest_test();
 
 protected:
@@ -947,6 +949,135 @@ void VirtualizedClusterServiceTest::do_ShutdownVMTest_test() {
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new ShutdownVMTestWMS(this, {compute_service}, {storage_service}, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Create a file registry
+  ASSERT_NO_THROW(simulation->add(
+          new wrench::FileRegistryService(hostname)));
+
+  // Staging the input_file on the storage service
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+  // Running a "run a single task" simulation
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  VM START-SHUTDOWN, and then SERVICE SHUTDOWN                    **/
+/**********************************************************************/
+
+class ShutdownVMAndThenShutdownServiceTestWMS : public wrench::WMS {
+
+public:
+    std::map<std::string, std::string> default_messagepayload_values = {
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_ANSWER_MESSAGE_PAYLOAD,  "1024"},
+            {wrench::VirtualizedClusterServiceMessagePayload::SHUTDOWN_VM_REQUEST_MESSAGE_PAYLOAD, "1024"}
+    };
+
+    ShutdownVMAndThenShutdownServiceTestWMS(VirtualizedClusterServiceTest *test,
+                      const std::set<wrench::ComputeService *> &compute_services,
+                      const std::set<wrench::StorageService *> &storage_services,
+                      std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+
+      this->test = test;
+      this->setMessagePayloads(this->default_messagepayload_values, {});
+    }
+
+private:
+
+    VirtualizedClusterServiceTest *test;
+
+    int main() {
+      // Create a data movement manager
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Create a pilot job that requests 1 host, 1 code, 0 bytes, and 1 minute
+      wrench::PilotJob *pilot_job = job_manager->createPilotJob(1, 1, 0.0, 60.0);
+
+      std::vector<std::string> vm_list;
+
+      auto cs = (wrench::VirtualizedClusterService *) this->test->compute_service;
+
+      // Create VMs
+      try {
+        std::string execution_host = cs->getExecutionHosts()[0];
+
+        vm_list.push_back(cs->createVM(execution_host, 1, 10));
+        vm_list.push_back(cs->createVM(execution_host, 1, 10));
+        vm_list.push_back(cs->createVM(execution_host, 1, 10));
+        vm_list.push_back(cs->createVM(execution_host, 1, 10));
+
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      // shutdown VMs
+      try {
+
+        for (auto &vm : vm_list) {
+          if (!cs->shutdownVM(vm)) {
+            throw std::runtime_error("Unable to shutdown VM");
+          }
+        }
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      // stop service
+      cs->stop();
+
+      // Sleep a bit
+      this->simulation->sleep(10.0);
+
+      return 0;
+    }
+};
+
+TEST_F(VirtualizedClusterServiceTest, DISABLED_ShutdownVMAndThenShutdownServiceTestWMS) {
+  DO_TEST_WITH_FORK(do_ShutdownVMAndThenShutdownServiceTest_test);
+}
+
+void VirtualizedClusterServiceTest::do_ShutdownVMAndThenShutdownServiceTest_test() {
+
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("virtualized_cluster_service_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Storage Service
+  ASSERT_NO_THROW(storage_service = simulation->add(
+          new wrench::SimpleStorageService(hostname, 100.0)));
+
+  // Create a Cloud Service
+  std::vector<std::string> execution_hosts = {simulation->getHostnameList()[1]};
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::VirtualizedClusterService(hostname, execution_hosts, 0,
+                                                {{wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "false"}})));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new ShutdownVMAndThenShutdownServiceTestWMS(this, {compute_service}, {storage_service}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow));
 
