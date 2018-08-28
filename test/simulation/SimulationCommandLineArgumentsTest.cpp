@@ -101,6 +101,7 @@ void SimulationCommandLineArgumentsTest::do_versionArgument_test() {
     FILE *stdout_file = fopen("/tmp/unit_tests.stdout", "w");
     ASSERT_NO_THROW(simulation->init(&argc, argv));
     // Will not get here
+    fclose(stdout_file);
   }
 
   int exit_code;
@@ -219,6 +220,7 @@ void SimulationCommandLineArgumentsTest::do_HelpSimGridArgument_test() {
     FILE *stdout_file = fopen("/tmp/unit_tests.stdout", "w");
     simulation->init(&argc, argv);
     // Will not get here
+    fclose(stdout_file);
   }
 
   int exit_code;
