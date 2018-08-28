@@ -1044,7 +1044,7 @@ private:
     }
 };
 
-TEST_F(VirtualizedClusterServiceTest, DISABLED_ShutdownVMAndThenShutdownServiceTestWMS) {
+TEST_F(VirtualizedClusterServiceTest, ShutdownVMAndThenShutdownServiceTestWMS) {
   DO_TEST_WITH_FORK(do_ShutdownVMAndThenShutdownServiceTest_test);
 }
 

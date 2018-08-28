@@ -1008,7 +1008,11 @@ namespace wrench {
       for (auto &vm : this->vm_list) {
         this->cs_available_ram[(std::get<0>(vm.second))->getPm()->get_name()] += S4U_Simulation::getHostMemoryCapacity(
                 std::get<0>(vm));
-        std::get<1>(vm.second)->stop();
+        // Deal with the compute service (if it hasn't been stopped before)
+        if (std::get<1>(vm.second)) {
+          std::get<1>(vm.second)->stop();
+        }
+        // Deal with the VM
         std::get<0>(vm.second)->stop();
       }
       this->vm_list.clear();
