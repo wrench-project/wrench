@@ -16,9 +16,9 @@
 class WorkflowTaskTest : public ::testing::Test {
 
 public:
-    wrench::ComputeService *compute_service;
-    wrench::StorageService *storage_service, *backup_storage_service;
-    wrench::FileRegistryService *file_registry_service;
+    wrench::ComputeService *compute_service = nullptr;
+    wrench::StorageService *storage_service = nullptr, *backup_storage_service = nullptr;
+    wrench::FileRegistryService *file_registry_service = nullptr;
 
     std::unique_ptr<wrench::Workflow> workflow;
     wrench::WorkflowTask *t1, *t2, *t4, *t5, *t6;
