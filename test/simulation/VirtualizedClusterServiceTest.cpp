@@ -982,9 +982,9 @@ public:
     };
 
     ShutdownVMAndThenShutdownServiceTestWMS(VirtualizedClusterServiceTest *test,
-                      const std::set<wrench::ComputeService *> &compute_services,
-                      const std::set<wrench::StorageService *> &storage_services,
-                      std::string &hostname) :
+                                            const std::set<wrench::ComputeService *> &compute_services,
+                                            const std::set<wrench::StorageService *> &storage_services,
+                                            std::string &hostname) :
             wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
 
       this->test = test;
@@ -1022,13 +1022,13 @@ private:
         throw std::runtime_error(e.what());
       }
 
-      // shutdown VMs
+      // shutdown some VMs
       try {
-
-        for (auto &vm : vm_list) {
-          if (!cs->shutdownVM(vm)) {
-            throw std::runtime_error("Unable to shutdown VM");
-          }
+        if (!cs->shutdownVM(vm_list.at(0))) {
+          throw std::runtime_error("Unable to shutdown VM");
+        }
+        if (!cs->shutdownVM(vm_list.at(2))) {
+          throw std::runtime_error("Unable to shutdown VM");
         }
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error(e.what());
