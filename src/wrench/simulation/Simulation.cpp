@@ -463,17 +463,36 @@ namespace wrench {
       return file_registry_service;
     }
 
+    /**
+        * @brief Stage a copy of a file on a storage service (to the "/" partition)
+        *
+        * @param file: a file to stage on a storage service
+        * @param storage_service: the storage service
+        *
+        * @throw std::runtime_error
+        * @throw std::invalid_argument
+        */
+    void Simulation::stageFile(WorkflowFile *file, StorageService *storage_service) {
+      try {
+        this->stageFile(file, storage_service, "/");
+      } catch (std::runtime_error &e) {
+        throw;
+      } catch (std::invalid_argument &e) {
+        throw;
+      }
+    }
 
     /**
      * @brief Stage a copy of a file on a storage service
      *
      * @param file: a file to stage on a storage service
      * @param storage_service: the storage service
+     * @param partition: the partition on which to store the files
      *
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void Simulation::stageFile(WorkflowFile *file, StorageService *storage_service) {
+    void Simulation::stageFile(WorkflowFile *file, StorageService *storage_service, std::string partition) {
       if ((file == nullptr) || (storage_service == nullptr)) {
         throw std::invalid_argument("Simulation::stageFile(): Invalid arguments");
       }
@@ -488,6 +507,10 @@ namespace wrench {
       if (file->isOutput()) {
         throw std::runtime_error(
                 "Simulation::stageFile(): Cannot stage a file that's the output of task that hasn't executed yet");
+      }
+
+      if (partition.empty()) {
+        partition = "/";
       }
 
       XBT_INFO("Staging file %s (%lf)", file->getID().c_str(), file->getSize());
@@ -505,8 +528,8 @@ namespace wrench {
     }
 
     /**
-   * @brief Stage a set of a file copies on a storage service
-     *
+   * @brief Stage file copies on a storage service (to the "/" partition)
+   *
    * @param files: a map of files (indexed by file ids) to stage on a storage service
    * @param storage_service: the storage service
    *
@@ -514,6 +537,26 @@ namespace wrench {
    * @throw std::invalid_argument
    */
     void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service) {
+      try {
+        this->stageFiles(files, storage_service, "/");
+      } catch (std::runtime_error &e) {
+        throw e;
+      } catch (std::invalid_argument &e) {
+        throw e;
+      }
+    }
+
+/**
+  * @brief Stage file copies on a storage service
+  *
+  * @param files: a map of files (indexed by file ids) to stage on a storage service
+  * @param storage_service: the storage service
+  * @param partition: the partition on which to store the files
+  *
+  * @throw std::runtime_error
+  * @throw std::invalid_argument
+  */
+    void Simulation::stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service, std::string partition) {
 
       if (storage_service == nullptr) {
         throw std::invalid_argument("Simulation::stageFiles(): Invalid arguments");
@@ -525,9 +568,13 @@ namespace wrench {
                 "Simulation::stageFiles(): A FileRegistryService must be instantiated and passed to Simulation.add() before files can be staged on storage services");
       }
 
+      if (partition.empty()) {
+        partition = "/";
+      }
+
       try {
         for (auto const &f : files) {
-          this->stageFile(f.second, storage_service);
+          this->stageFile(f.second, storage_service, partition);
         }
       } catch (std::runtime_error &e) {
         throw;

@@ -99,8 +99,12 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_CYAN);
 
-      // number of files staged into the "/" partition
-      unsigned long num_stored_files = (*stored_files.find("/")).second.size();
+      // number of files staged
+      unsigned long num_stored_files = 0;
+
+      for (auto partition : this->stored_files) {
+        num_stored_files += partition.second.size();
+      }
 
       WRENCH_INFO("Simple Storage Service %s starting on host %s (capacity: %lf, holding %ld files, listening on %s)",
                   this->getName().c_str(),

@@ -55,8 +55,10 @@ namespace wrench {
         FileRegistryService * add(FileRegistryService *);
 
         void stageFile(WorkflowFile *file, StorageService *storage_service);
+        void stageFile(WorkflowFile *file, StorageService *storage_service, std::string partition);
 
         void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service);
+        void stageFiles(std::map<std::string, WorkflowFile *> files, StorageService *storage_service, std::string partition);
 
         SimulationOutput &getOutput();
 
