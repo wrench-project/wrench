@@ -653,11 +653,13 @@ void SimpleStorageServiceFunctionalTest::do_BasicFunctionality_test() {
   // Another bogus staging
   ASSERT_THROW(simulation->stageFile(file_500, storage_service_100), std::runtime_error);
 
-  // Staging all files on the 1000 storage service
+  // Staging all files on the 1000 storage service (in default "/" partition)
   ASSERT_NO_THROW(simulation->stageFiles({{file_1->getID(),   file_1},
-                                          {file_10->getID(),  file_10},
-                                          {file_100->getID(), file_100},
-                                          {file_500->getID(), file_500}}, storage_service_1000));
+                                          {file_10->getID(),  file_10}}, storage_service_1000));
+
+  // Staging all files on the 1000 storage service (in "" partition, which will end up being default "/")
+  ASSERT_NO_THROW(simulation->stageFiles({{file_100->getID(), file_100},
+                                          {file_500->getID(), file_500}}, storage_service_1000, ""));
 
   // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
