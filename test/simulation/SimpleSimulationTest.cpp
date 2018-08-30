@@ -347,23 +347,27 @@ void SimpleSimulationTest::do_getReadyTasksTest_test() {
   ASSERT_THROW(simulation->add((wrench::NetworkProximityService *) nullptr), std::invalid_argument);
   ASSERT_THROW(simulation->add((wrench::FileRegistryService *) nullptr), std::invalid_argument);
 
+  // Won't work without a workflow!
+  ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Won't work due to missing file staging
+  ASSERT_THROW(simulation->launch(), std::runtime_error);
+
+
   // Try to stage a file without a file registry
   ASSERT_THROW(simulation->stageFile(input_file, storage_service), std::runtime_error);
 
   // Create a file registry
   ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
 
-  // Staging the input_file on the storage service
-  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
-
   // Staging an invalid file on the storage service
   ASSERT_THROW(simulation->stageFile(output_file1, storage_service), std::runtime_error);
 
-  // Won't work without a workflow!
-  ASSERT_THROW(simulation->launch(), std::runtime_error);
-
-  ASSERT_NO_THROW(wms->addWorkflow(workflow));
-
+  // Staging the input_file on the storage service
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+  
   // Running a "run a single task" simulation
   ASSERT_NO_THROW(simulation->launch());
 
