@@ -250,6 +250,7 @@ set(TEST_FILES
         test/simulation/FileRegistryTest.cpp
         test/simulation/JobManagerTest.cpp
         test/simulation/SimpleSimulationTest.cpp
+        test/simulation/DynamicServiceCreationTest.cpp
         test/simulation/SimulationCommandLineArgumentsTest.cpp
         test/simulation/simulation_output/SimulationOutputTest.cpp
         test/simulation/simulation_output/SimulationTimestampTaskTest.cpp

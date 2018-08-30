@@ -433,6 +433,7 @@ namespace wrench {
         dst_partition = "/";
       }
 
+
       // Send a  message to the daemon
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
       try {

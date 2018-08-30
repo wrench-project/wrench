@@ -1421,7 +1421,6 @@ namespace wrench {
 
         //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
-      WRENCH_INFO("FORWARDING TO BATSCHED");
       this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
       this->appendJobInfoToCSVOutputFile(batch_job, "success");
 #endif

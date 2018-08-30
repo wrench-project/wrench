@@ -243,6 +243,8 @@ namespace wrench {
         throw std::runtime_error("Simulation::launch(): " + std::string(e.what()));
       }
 
+      this->is_running = true;
+
       // Run the simulation
       try {
         this->s4u_simulation->runSimulation();
@@ -737,6 +739,37 @@ namespace wrench {
      */
     std::vector<int> Simulation::getListOfPstates(const std::string &hostname) {
       return S4U_Simulation::getListOfPstates(hostname);
+    }
+
+    /**
+     * @brief Starts a new service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     *        Simulation::launch() was called).
+     * @param service: An instance of a service
+     * @return A pointer to the service instance
+     *
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    ComputeService *Simulation::startNewService(ComputeService *service) {
+
+      if (service == nullptr) {
+        throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+      }
+
+      if (not this->is_running) {
+        throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+      }
+
+      service->simulation = this;
+      std::shared_ptr<ComputeService> shared_ptr = std::shared_ptr<ComputeService>(service);
+      this->compute_services.insert(shared_ptr);
+      shared_ptr->start(shared_ptr, true);
+      if (service->hasScratch()) {
+        service->getScratch()->simulation = this;
+        service->getScratch()->start(service->getScratchSharedPtr(), true);
+      }
+
+      return shared_ptr.get();
     }
 
 };

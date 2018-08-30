@@ -84,6 +84,9 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+        ComputeService * startNewService(ComputeService *service);
+
+
         static double getMemoryCapacity();
         static unsigned long getNumCores();
         static double getFlopRate();
@@ -117,6 +120,8 @@ namespace wrench {
         void startAllProcesses();
 
         std::string getWRENCHVersionString() { return WRENCH_VERSION_STRING; }
+
+        bool is_running = false;
 
     };
 
