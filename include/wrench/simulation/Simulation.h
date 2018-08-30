@@ -84,7 +84,9 @@ namespace wrench {
         /** \cond DEVELOPER    */
         /***********************/
 
+
         ComputeService * startNewService(ComputeService *service);
+        StorageService * startNewService(StorageService *service);
 
 
         static double getMemoryCapacity();

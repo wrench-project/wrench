@@ -124,9 +124,16 @@ private:
       // Get a file registry service
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
+      // Dynamically create a Storage Service on this host
+      auto dynamically_created_storage_service = (wrench::SimpleStorageService *) simulation->startNewService(
+              new wrench::SimpleStorageService(hostname, 100.0,
+                                               {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "0"}},
+                                               {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, "123"}}));
+
+
       // Dynamically Create a Cloud Service
       std::vector<std::string> execution_hosts = {"QuadCoreHost"};
-      auto dynamically_created_service = (wrench::CloudService *) simulation->startNewService(
+      auto dynamically_created_compute_service = (wrench::CloudService *) simulation->startNewService(
               new wrench::CloudService(hostname, execution_hosts, 100.0,
                                        { {wrench::MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"}}));
 
@@ -137,15 +144,15 @@ private:
       for (auto task : tasks) {
         try {
           one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
-                                                                    {}, {}, {});
+                                                                    {}, {{this->test->input_file, this->test->storage_service, dynamically_created_storage_service}}, {});
 
           if (one_task_jobs[job_index]->getNumTasks() != 1) {
             throw std::runtime_error("A one-task job should say it has one task");
           }
 
-          dynamically_created_service->createVM(2, 10);
+          dynamically_created_compute_service->createVM(2, 10);
 
-          job_manager->submitJob(one_task_jobs[job_index], dynamically_created_service);
+          job_manager->submitJob(one_task_jobs[job_index], dynamically_created_compute_service);
         } catch (wrench::WorkflowExecutionException &e) {
           throw std::runtime_error(e.what());
         }
@@ -214,7 +221,7 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
   // Get a hostname
   std::string hostname = "DualCoreHost";
 
-  // Create a Storage Service
+//  // Create a Storage Service
   storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0,
                                            {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "0"}},
