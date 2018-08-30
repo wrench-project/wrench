@@ -125,7 +125,7 @@ private:
       wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
 
       // Dynamically create a Storage Service on this host
-      auto dynamically_created_storage_service = (wrench::SimpleStorageService *) simulation->startNewService(
+      auto dynamically_created_storage_service = simulation->startNewService(
               new wrench::SimpleStorageService(hostname, 100.0,
                                                {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "0"}},
                                                {{wrench::SimpleStorageServiceMessagePayload::FILE_COPY_ANSWER_MESSAGE_PAYLOAD, "123"}}));
