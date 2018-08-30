@@ -743,7 +743,8 @@ namespace wrench {
 
     /**
      * @brief Starts a new service during WMS execution (i.e., one that was not passed to Simulation::add() before
-     *        Simulation::launch() was called).
+     *        Simulation::launch() was called). The simulation takes ownership of
+     *        the reference and will call the destructor.
      * @param service: An instance of a service
      * @return A pointer to the service instance
      *
