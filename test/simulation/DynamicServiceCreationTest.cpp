@@ -144,7 +144,7 @@ private:
       for (auto task : tasks) {
         try {
           one_task_jobs[job_index] = job_manager->createStandardJob({task}, {{this->test->input_file, this->test->storage_service}},
-                                                                    {}, {{this->test->input_file, this->test->storage_service, dynamically_created_storage_service}}, {});
+                                                                    {}, {std::make_tuple(this->test->input_file, this->test->storage_service, dynamically_created_storage_service)}, {});
 
           if (one_task_jobs[job_index]->getNumTasks() != 1) {
             throw std::runtime_error("A one-task job should say it has one task");
