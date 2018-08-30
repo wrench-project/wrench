@@ -742,7 +742,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Starts a new service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     * @brief Starts a new compute service during WMS execution (i.e., one that was not passed to Simulation::add() before
      *        Simulation::launch() was called). The simulation takes ownership of
      *        the reference and will call the destructor.
      * @param service: An instance of a service
@@ -772,5 +772,34 @@ namespace wrench {
 
       return shared_ptr.get();
     }
+
+    /**
+     * @brief Starts a new storage service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     *        Simulation::launch() was called). The simulation takes ownership of
+     *        the reference and will call the destructor.
+     * @param service: An instance of a service
+     * @return A pointer to the service instance
+     *
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    StorageService *Simulation::startNewService(StorageService *service) {
+
+      if (service == nullptr) {
+        throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+      }
+
+      if (not this->is_running) {
+        throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+      }
+
+      service->simulation = this;
+      std::shared_ptr<StorageService> shared_ptr = std::shared_ptr<StorageService>(service);
+      this->storage_services.insert(shared_ptr);
+      shared_ptr->start(shared_ptr, true);
+
+      return shared_ptr.get();
+    }
+
 
 };
