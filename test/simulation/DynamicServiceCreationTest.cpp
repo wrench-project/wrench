@@ -121,8 +121,13 @@ private:
       // Create a job manager
       std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
 
-      // Get a file registry service
-      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+      // Dynamically create a File Registry Service on this host
+      auto dynamically_created_file_registry_service = simulation->startNewService(
+              new wrench::FileRegistryService(hostname));
+
+      // Dynamically create a Networ Proximity Service on this host
+      auto dynamically_created_network_proximity_service = simulation->startNewService(
+              new wrench::NetworkProximityService(hostname, {"DualCoreHost", "QuadCoreHost"}));
 
       // Dynamically create a Storage Service on this host
       auto dynamically_created_storage_service = simulation->startNewService(

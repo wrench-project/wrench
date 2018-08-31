@@ -801,5 +801,61 @@ namespace wrench {
       return shared_ptr.get();
     }
 
+    /**
+     * @brief Starts a new network proximity service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     *        Simulation::launch() was called). The simulation takes ownership of
+     *        the reference and will call the destructor.
+     * @param service: An instance of a service
+     * @return A pointer to the service instance
+     *
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    NetworkProximityService *Simulation::startNewService(NetworkProximityService *service) {
+
+      if (service == nullptr) {
+        throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+      }
+
+      if (not this->is_running) {
+        throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+      }
+
+      service->simulation = this;
+      std::shared_ptr<NetworkProximityService> shared_ptr = std::shared_ptr<NetworkProximityService>(service);
+      this->network_proximity_services.insert(shared_ptr);
+      shared_ptr->start(shared_ptr, true);
+
+      return shared_ptr.get();
+    }
+
+    /**
+     * @brief Starts a new file registry service during WMS execution (i.e., one that was not passed to Simulation::add() before
+     *        Simulation::launch() was called). The simulation takes ownership of
+     *        the reference and will call the destructor.
+     * @param service: An instance of a service
+     * @return A pointer to the service instance
+     *
+     * @throw std::invalid_argument
+     * @throw std::runtime_error
+     */
+    FileRegistryService *Simulation::startNewService(FileRegistryService *service) {
+
+      if (service == nullptr) {
+        throw std::invalid_argument("Simulation::startNewService(): invalid argument (nullptr service)");
+      }
+
+      if (not this->is_running) {
+        throw std::runtime_error("Simulation::startNewService(): simulation is not running yet");
+      }
+
+      service->simulation = this;
+      std::shared_ptr<FileRegistryService> shared_ptr = std::shared_ptr<FileRegistryService>(service);
+      this->file_registry_services.insert(shared_ptr);
+      shared_ptr->start(shared_ptr, true);
+
+      return shared_ptr.get();
+    }
+
 
 };
