@@ -87,6 +87,8 @@ namespace wrench {
 
         ComputeService * startNewService(ComputeService *service);
         StorageService * startNewService(StorageService *service);
+        NetworkProximityService * startNewService(NetworkProximityService *service);
+        FileRegistryService * startNewService(FileRegistryService *service);
 
 
         static double getMemoryCapacity();
