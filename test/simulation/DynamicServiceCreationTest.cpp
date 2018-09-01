@@ -125,7 +125,7 @@ private:
       auto dynamically_created_file_registry_service = simulation->startNewService(
               new wrench::FileRegistryService(hostname));
 
-      // Dynamically create a Networ Proximity Service on this host
+      // Dynamically create a Network Proximity Service on this host
       auto dynamically_created_network_proximity_service = simulation->startNewService(
               new wrench::NetworkProximityService(hostname, {"DualCoreHost", "QuadCoreHost"}));
 
@@ -226,7 +226,19 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
   // Get a hostname
   std::string hostname = "DualCoreHost";
 
-//  // Create a Storage Service
+  // Bogus startNewService() calls
+  ASSERT_THROW(simulation->startNewService((wrench::ComputeService *)nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->startNewService((wrench::StorageService *)nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->startNewService((wrench::NetworkProximityService *)nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->startNewService((wrench::FileRegistryService *)nullptr), std::invalid_argument);
+  ASSERT_THROW(simulation->startNewService((wrench::ComputeService *)666), std::runtime_error);
+  ASSERT_THROW(simulation->startNewService((wrench::StorageService *)666), std::runtime_error);
+  ASSERT_THROW(simulation->startNewService((wrench::NetworkProximityService *)666), std::runtime_error);
+  ASSERT_THROW(simulation->startNewService((wrench::FileRegistryService *)666), std::runtime_error);
+
+
+
+ // Create a Storage Service
   storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0,
                                            {{wrench::SimpleStorageServiceProperty::SELF_CONNECTION_DELAY, "0"}},
