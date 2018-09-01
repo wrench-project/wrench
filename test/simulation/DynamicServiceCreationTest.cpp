@@ -236,8 +236,6 @@ void DynamicServiceCreationTest::do_getReadyTasksTest_test() {
   ASSERT_THROW(simulation->startNewService((wrench::NetworkProximityService *)666), std::runtime_error);
   ASSERT_THROW(simulation->startNewService((wrench::FileRegistryService *)666), std::runtime_error);
 
-
-
  // Create a Storage Service
   storage_service = simulation->add(
           new wrench::SimpleStorageService(hostname, 100.0,
