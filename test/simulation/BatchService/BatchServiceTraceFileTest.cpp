@@ -545,7 +545,7 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
   // Create a Valid trace file
   trace_file = fopen(trace_file_path.c_str(), "w");
   fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1\n");  // job that takes the whole machine
-  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
+  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine (and times out, for coverage)
   fclose(trace_file);
 
 
