@@ -196,6 +196,7 @@ TEST_F(WorkflowTaskTest, StateToString) {
   ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::State::UNKNOWN), "UNKNOWN");
   ASSERT_EQ(wrench::WorkflowTask::stateToString((wrench::WorkflowTask::State)100), "INVALID");
 
+  ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_NOT_READY), "NOT READY");
   ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_READY), "READY");
   ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_RUNNING), "RUNNING");
   ASSERT_EQ(wrench::WorkflowTask::stateToString(wrench::WorkflowTask::InternalState::TASK_COMPLETED), "COMPLETED");
