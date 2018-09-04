@@ -266,6 +266,9 @@ private:
       std::map<std::string, std::vector<std::string>> clusters =
               this->simulation->getHostnameListByCluster();
 
+      data_movement_manager->kill();
+      job_manager->kill();
+
       return 0;
     }
 };
