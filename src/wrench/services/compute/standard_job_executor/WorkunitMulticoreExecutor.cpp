@@ -228,7 +228,11 @@ namespace wrench {
       for (auto task : work->tasks) {
 
         task->setInternalState(WorkflowTask::InternalState::TASK_RUNNING);
+
         task->setStartDate(S4U_Simulation::getClock());
+        task->setExecutionHost(this->hostname);
+        task->setNumCoresUsed(this->num_cores);
+
         this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(new
         SimulationTimestampTaskStart(task));
 
@@ -284,7 +288,6 @@ namespace wrench {
         this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
                 new SimulationTimestampTaskCompletion(task));
         task->setEndDate(S4U_Simulation::getClock());
-        task->setExecutionHost(this->hostname);
 
         // Deal with Children
         for (auto child : task->getWorkflow()->getTaskChildren(task)) {
