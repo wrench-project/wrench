@@ -366,9 +366,11 @@ TEST_F(MessageConstructorTest, BatchServiceMessages) {
   ASSERT_NO_THROW(new wrench::BatchQueryAnswerMessage(1.0, 666));
 
   ASSERT_NO_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", batch_job, 666));
+  ASSERT_THROW(new wrench::BatchServiceJobRequestMessage("mailbox", nullptr, 666), std::invalid_argument);
   ASSERT_THROW(new wrench::BatchServiceJobRequestMessage("", batch_job, 666), std::invalid_argument);
   ASSERT_NO_THROW(new wrench::AlarmJobTimeOutMessage(batch_job, 666));
   ASSERT_THROW(new wrench::AlarmJobTimeOutMessage(nullptr, 666), std::invalid_argument);
+
 
 //  ASSERT_NO_THROW(new wrench::AlarmNotifyBatschedMessage("job_id", 666));
 }

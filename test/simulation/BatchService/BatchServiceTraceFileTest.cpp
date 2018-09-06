@@ -34,6 +34,7 @@ public:
     void do_BatchTraceFileReplayTest_test();
 
     void do_WorkloadTraceFileTestSWF_test();
+    void do_BatchTraceFileReplayTestWithFailedJob_test();
     void do_WorkloadTraceFileTestJSON_test();
 
 protected:
@@ -210,6 +211,92 @@ void BatchServiceTest::do_BatchTraceFileReplayTest_test() {
   wrench::WMS *wms = nullptr;
   ASSERT_NO_THROW(wms = simulation->add(
           new BatchTraceFileReplayTestWMS(
+                  this, {compute_service}, {}, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
+
+  // Running a "run a single task" simulation
+  // Note that in these tests the WMS creates workflow tasks, which a user would
+  // of course not be likely to do
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+/**********************************************************************/
+/**  BATCH TRACE FILE REPLAY SIMULATION TEST: FAILED JOB             **/
+/**********************************************************************/
+
+class BatchTraceFileReplayTestWithFailedJobWMS : public wrench::WMS {
+
+public:
+    BatchTraceFileReplayTestWithFailedJobWMS(BatchServiceTest *test,
+                                const std::set<wrench::ComputeService *> &compute_services,
+                                const std::set<wrench::StorageService *> &storage_services,
+                                std::string hostname) :
+            wrench::WMS(nullptr, nullptr,  compute_services, storage_services,
+                        {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    BatchServiceTest *test;
+
+    int main() {
+
+      this->simulation->sleep(10 * 3600);
+
+      return 0;
+    }
+};
+
+TEST_F(BatchServiceTest, BatchTraceFileReplayTestWithFailedJob) {
+  DO_TEST_WITH_FORK(do_BatchTraceFileReplayTestWithFailedJob_test);
+}
+
+void BatchServiceTest::do_BatchTraceFileReplayTestWithFailedJob_test() {
+
+  // Create and initialize a simulation
+  auto simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("batch_service_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = "Host1";
+
+  // Create a Valid trace file
+  std::string trace_file_path = "/tmp/swf_trace.swf";
+
+  FILE *trace_file = fopen(trace_file_path.c_str(), "w");
+  fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1\n");  // job that takes the whole machine
+  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 1000 -1\n");  // job that takes half the machine
+  fclose(trace_file);
+
+
+  // Create a Batch Service with a the valid trace file
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::BatchService(hostname,
+                                   {"Host1", "Host2", "Host3", "Host4"}, 0,
+                                   {{wrench::BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE, trace_file_path}}
+          )));
+
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new BatchTraceFileReplayTestWithFailedJobWMS(
                   this, {compute_service}, {}, hostname)));
 
   ASSERT_NO_THROW(wms->addWorkflow(std::move(workflow.get())));
@@ -458,11 +545,11 @@ void BatchServiceTest::do_WorkloadTraceFileTestSWF_test() {
   // Create a Valid trace file
   trace_file = fopen(trace_file_path.c_str(), "w");
   fprintf(trace_file, "1 0 -1 3600 -1 -1 -1 4 3600 -1\n");  // job that takes the whole machine
-  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine
+  fprintf(trace_file, "2 1 -1 3600 -1 -1 -1 2 3600 -1\n");  // job that takes half the machine (and times out, for coverage)
   fclose(trace_file);
 
 
-  // Create a Batch Service with a non-existing workload trace file, which should throw
+  // Create a Batch Service with a the valid trace file
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::BatchService(hostname,
                                    {"Host1", "Host2", "Host3", "Host4"}, 0,
