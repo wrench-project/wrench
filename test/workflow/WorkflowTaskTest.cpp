@@ -36,7 +36,7 @@ protected:
         workflow->addControlDependency(t1, t2);
 
         // t3 is created in InputOutputFile test..
-        t4 = workflow->addTask("task-04", 10, 1, 1, 1.0, 0);
+        t4 = workflow->addTask("task-04", 10, 1, 3, 1.0, 0);
 
 
         large_input_file = workflow->addFile("large_input_file", 1000000);
@@ -47,15 +47,15 @@ protected:
         t4->addInputFile(small_input_file);
         t4->addOutputFile(t4_output_file);
 
-        t5 = workflow->addTask("task-05", 100, 1, 1, 1.0, 0);
-        t6 = workflow->addTask("task-06", 100, 1, 1, 1.0, 0);
+        t5 = workflow->addTask("task-05", 100, 1, 2, 1.0, 0);
+        t6 = workflow->addTask("task-06", 100, 1, 3, 1.0, 0);
 
         std::string xml = "<?xml version='1.0'?>"
                           "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
                           "<platform version=\"4.1\"> "
                           "   <zone id=\"AS0\" routing=\"Full\"> "
                           "       <host id=\"WMSHost\" speed=\"1f\" core=\"1\"/> "
-                          "       <host id=\"ExecutionHost\" speed=\"1f\" core=\"1\"/> "
+                          "       <host id=\"ExecutionHost\" speed=\"1f\" core=\"3\"/> "
                           "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1000000us\"/>"
                           "       <route src=\"ExecutionHost\" dst=\"WMSHost\"> <link_ctn id=\"1\"/> </route>"
                           "   </zone> "
@@ -122,7 +122,7 @@ TEST_F(WorkflowTaskTest, GetSet) {
   t2->setInternalState(wrench::WorkflowTask::InternalState::TASK_READY);
   ASSERT_EQ(t2->getInternalState(), wrench::WorkflowTask::InternalState::TASK_READY);
 
-  // without setting a start date first, the following 8 'setXXXXXXDate' should fail
+  // without setting a start date first, the following 10 'setXXXXXX' should fail
   ASSERT_THROW(t1->setReadInputStartDate(1.0), std::runtime_error);
   ASSERT_THROW(t1->setReadInputEndDate(1.0), std::runtime_error);
   ASSERT_THROW(t1->setComputationStartDate(1.0), std::runtime_error);
@@ -131,6 +131,11 @@ TEST_F(WorkflowTaskTest, GetSet) {
   ASSERT_THROW(t1->setWriteOutputEndDate(1.0), std::runtime_error);
   ASSERT_THROW(t1->setEndDate(1.0), std::runtime_error);
   ASSERT_THROW(t1->setFailureDate(1.0), std::runtime_error);
+  ASSERT_THROW(t1->setNumCoresUsed(10), std::runtime_error);
+  ASSERT_THROW(t1->setExecutionHost("host"), std::runtime_error);
+
+  // getting the execution_host before a task has run at least once should return an empty string
+  ASSERT_TRUE(t1->getExecutionHost().empty());
 
   ASSERT_NO_THROW(t1->setStartDate(1.0)); // need to set start date first before anything else
   ASSERT_DOUBLE_EQ(t1->getStartDate(), 1.0);
@@ -158,6 +163,12 @@ TEST_F(WorkflowTaskTest, GetSet) {
 
   ASSERT_NO_THROW(t1->setWriteOutputEndDate(1.0));
   ASSERT_DOUBLE_EQ(t1->getWriteOutputEndDate(), 1.0);
+
+  ASSERT_NO_THROW(t1->setExecutionHost("hostname"));
+  ASSERT_STREQ(t1->getExecutionHost().c_str(), "hostname");
+
+  ASSERT_NO_THROW(t1->setNumCoresUsed(10));
+  ASSERT_EQ(t1->getNumCoresUsed(), 10);
 
   ASSERT_EQ(t1->getFailureCount(), 0);
   t1->incrementFailureCount();
@@ -327,13 +338,19 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
         ASSERT_GE(t4_successful_execution_history_values.at(i), t4_successful_execution_history_values.at(i-1));
     }
 
+    // execution_host and num_cores_used should be set
+    ASSERT_EQ(t4_successful_execution.num_cores_used, 3);
+    ASSERT_STREQ(t4_successful_execution.execution_host.c_str(), "ExecutionHost");
+
     t4_history.pop();
 
-    // t4's first execution was unsuccessful, only task_start and read_input_start should be set, everything else should be -1
+    // t4's first execution was unsuccessful, only task_start, read_input_start, execution_host, and num_cores_used should be set, everything else should be -1
     wrench::WorkflowTask::WorkflowTaskExecution t4_unsuccessful_execution = t4_history.top();
     ASSERT_NE(t4_unsuccessful_execution.task_start, -1.0);
     ASSERT_NE(t4_unsuccessful_execution.read_input_start, -1.0);
     ASSERT_NE(t4_unsuccessful_execution.task_failed, -1.0);
+    ASSERT_EQ(t4_unsuccessful_execution.num_cores_used, 3);
+    ASSERT_STREQ(t4_unsuccessful_execution.execution_host.c_str(), "ExecutionHost");
 
     // the rest of the values should be set to -1 since the task failed while reading input
     ASSERT_DOUBLE_EQ(t4_unsuccessful_execution.read_input_end, -1.0);
@@ -359,6 +376,8 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_EQ(t5_terminated_execution.write_output_end, -1.0);
     ASSERT_EQ(t5_terminated_execution.task_failed, -1.0);
     ASSERT_EQ(t5_terminated_execution.task_end, -1.0);
+    ASSERT_EQ(t5_terminated_execution.num_cores_used, 2);
+    ASSERT_STREQ(t5_terminated_execution.execution_host.c_str(), "ExecutionHost");
 
     // t6 should have ran then failed right after computation started because the compute service was stopped
     auto t6_history = t6->getExecutionHistory();
@@ -376,6 +395,8 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_EQ(t6_failed_execution.write_output_end, -1.0);
     ASSERT_EQ(t6_failed_execution.task_terminated, -1.0);
     ASSERT_EQ(t6_failed_execution.task_end, -1.0);
+    ASSERT_EQ(t6_failed_execution.num_cores_used, 3);
+    ASSERT_STREQ(t6_failed_execution.execution_host.c_str(), "ExecutionHost");
 
     delete simulation;
     free(argv[0]);
