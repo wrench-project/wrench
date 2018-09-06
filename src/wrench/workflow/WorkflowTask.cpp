@@ -700,22 +700,46 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the name of the host on which the task has executed, or "" if
-     *        the task has not been (successfully) executed yet
+     * @brief Returns the name of the host on which the task has most recently been executed, or "" if
+     *        the task has never been executed yet
      * @return hostname
      */
     std::string WorkflowTask::getExecutionHost() {
-      return this->execution_host;
+        return (not this->execution_history.empty()) ? this->execution_history.top().execution_host : "";
     }
 
     /**
-     * @brief Sets the execution host
+     * @brief Returns the number of cores allocated for this task's most recent execution
+     * @return number of cores
+     */
+     unsigned long WorkflowTask::getNumCoresUsed() {
+         return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_used : 0;
+     }
+
+    /**
+     * @brief Sets the host on which this task is running
      *
      * @param hostname: the host name
      */
     void WorkflowTask::setExecutionHost(std::string hostname) {
-      this->execution_host = hostname;
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().execution_host = hostname;
+        } else {
+            throw std::runtime_error("WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
+
+    /**
+     * @brief Sets the number of cores used by this task
+     * @param num_cores: the number of cores this task will use or has used
+     */
+     void WorkflowTask::setNumCoresUsed(unsigned long num_cores) {
+         if (not this->execution_history.empty()) {
+             this->execution_history.top().num_cores_used = num_cores;
+         } else {
+             throw std::runtime_error("WorkflowTask::setNumCoresUsed() cannot be called before WorkflowTask::setStartDate()");
+         }
+     }
 
     /**
      * @brief Get a map of src and dst hosts for file transfers
