@@ -260,7 +260,7 @@ set(TEST_FILES
         test/pilot_job/CriticalPathSchedulerTest.cpp
         test/misc/PointerUtilTest.cpp
         examples/simple-example/scheduler/pilot_job/CriticalPathPilotJobScheduler.cpp
-        test/simulation/ScratchSpaceTest.cpp test/simulation/EnergyConsumptionTest.cpp)
+        test/simulation/ScratchSpaceTest.cpp test/simulation/EnergyConsumptionTest.cpp test/simulation/simulation_output/SimulationDumpJSONTest.cpp)
 
 # wrench library
 find_library(SIMGRID_LIBRARY NAMES simgrid)
