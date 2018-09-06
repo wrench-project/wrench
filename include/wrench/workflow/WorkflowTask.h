@@ -117,7 +117,7 @@ namespace wrench {
 
         double getWriteOutputEndDate();
 
-        unsigned long getNumCoresUsed();
+        unsigned long getNumCoresAllocated();
 
         struct WorkflowTaskExecution;
         std::stack<WorkflowTaskExecution> getExecutionHistory();
@@ -186,7 +186,7 @@ namespace wrench {
 
         void setExecutionHost(std::string hostname);
 
-        void setNumCoresUsed(unsigned long num_cores);
+        void setNumCoresAllocated(unsigned long num_cores);
 
         struct WorkflowTaskExecution {
             double task_start =         -1.0;
@@ -201,7 +201,7 @@ namespace wrench {
             double task_terminated =    -1.0;
 
             std::string execution_host = "";
-            unsigned long num_cores_used = 0;
+            unsigned long num_cores_allocated = 0;
 
             WorkflowTaskExecution(double task_start) : task_start(task_start) {
 

@@ -131,7 +131,7 @@ TEST_F(WorkflowTaskTest, GetSet) {
   ASSERT_THROW(t1->setWriteOutputEndDate(1.0), std::runtime_error);
   ASSERT_THROW(t1->setEndDate(1.0), std::runtime_error);
   ASSERT_THROW(t1->setFailureDate(1.0), std::runtime_error);
-  ASSERT_THROW(t1->setNumCoresUsed(10), std::runtime_error);
+  ASSERT_THROW(t1->setNumCoresAllocated(10), std::runtime_error);
   ASSERT_THROW(t1->setExecutionHost("host"), std::runtime_error);
 
   // getting the execution_host before a task has run at least once should return an empty string
@@ -167,8 +167,8 @@ TEST_F(WorkflowTaskTest, GetSet) {
   ASSERT_NO_THROW(t1->setExecutionHost("hostname"));
   ASSERT_STREQ(t1->getExecutionHost().c_str(), "hostname");
 
-  ASSERT_NO_THROW(t1->setNumCoresUsed(10));
-  ASSERT_EQ(t1->getNumCoresUsed(), 10);
+  ASSERT_NO_THROW(t1->setNumCoresAllocated(10));
+  ASSERT_EQ(t1->getNumCoresAllocated(), 10);
 
   ASSERT_EQ(t1->getFailureCount(), 0);
   t1->incrementFailureCount();
@@ -339,18 +339,18 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
         ASSERT_GE(t4_successful_execution_history_values.at(i), t4_successful_execution_history_values.at(i-1));
     }
 
-    // execution_host and num_cores_used should be set
-    ASSERT_EQ(t4_successful_execution.num_cores_used, 3);
+    // execution_host and num_cores_allocated should be set
+    ASSERT_EQ(t4_successful_execution.num_cores_allocated, 3);
     ASSERT_STREQ(t4_successful_execution.execution_host.c_str(), "ExecutionHost");
 
     t4_history.pop();
 
-    // t4's first execution was unsuccessful, only task_start, read_input_start, execution_host, and num_cores_used should be set, everything else should be -1
+    // t4's first execution was unsuccessful, only task_start, read_input_start, execution_host, and num_cores_allocated should be set, everything else should be -1
     wrench::WorkflowTask::WorkflowTaskExecution t4_unsuccessful_execution = t4_history.top();
     ASSERT_NE(t4_unsuccessful_execution.task_start, -1.0);
     ASSERT_NE(t4_unsuccessful_execution.read_input_start, -1.0);
     ASSERT_NE(t4_unsuccessful_execution.task_failed, -1.0);
-    ASSERT_EQ(t4_unsuccessful_execution.num_cores_used, 3);
+    ASSERT_EQ(t4_unsuccessful_execution.num_cores_allocated, 3);
     ASSERT_STREQ(t4_unsuccessful_execution.execution_host.c_str(), "ExecutionHost");
 
     // the rest of the values should be set to -1 since the task failed while reading input
@@ -377,7 +377,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_EQ(t5_terminated_execution.write_output_end, -1.0);
     ASSERT_EQ(t5_terminated_execution.task_failed, -1.0);
     ASSERT_EQ(t5_terminated_execution.task_end, -1.0);
-    ASSERT_EQ(t5_terminated_execution.num_cores_used, 2);
+    ASSERT_EQ(t5_terminated_execution.num_cores_allocated, 2);
     ASSERT_STREQ(t5_terminated_execution.execution_host.c_str(), "ExecutionHost");
 
     // t6 should have ran then failed right after computation started because the compute service was stopped
@@ -396,7 +396,7 @@ void WorkflowTaskTest::do_WorkflowTaskExecutionHistory_test() {
     ASSERT_EQ(t6_failed_execution.write_output_end, -1.0);
     ASSERT_EQ(t6_failed_execution.task_terminated, -1.0);
     ASSERT_EQ(t6_failed_execution.task_end, -1.0);
-    ASSERT_EQ(t6_failed_execution.num_cores_used, 3);
+    ASSERT_EQ(t6_failed_execution.num_cores_allocated, 3);
     ASSERT_STREQ(t6_failed_execution.execution_host.c_str(), "ExecutionHost");
 
     delete simulation;
