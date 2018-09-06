@@ -36,22 +36,22 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
 
     t1->setStartDate(1.0);
     t1->setExecutionHost("host1");
-    t1->setNumCoresUsed(10);
+    t1->setNumCoresAllocated(10);
 
     t1->setStartDate(2.0);
     t1->setExecutionHost("host2");
-    t1->setNumCoresUsed(20);
+    t1->setNumCoresAllocated(20);
 
     t2->setStartDate(3.0);
     t2->setExecutionHost("host2");
-    t2->setNumCoresUsed(30);
+    t2->setNumCoresAllocated(30);
 
     const nlohmann::json EXPECTED_JSON = R"(
         [
             {
                 "task_id": "task1",
                 "execution_host": "host2",
-                "num_cores_used": 20,
+                "num_cores_allocated": 20,
                 "whole_task": {"start": 2.0, "end": -1},
                 "read": {"start": -1, "end": -1},
                 "compute": {"start": -1, "end": -1},
@@ -62,7 +62,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
             {
                 "task_id": "task1",
                 "execution_host": "host1",
-                "num_cores_used": 10,
+                "num_cores_allocated": 10,
                 "whole_task": {"start": 1.0, "end": -1},
                 "read": {"start": -1, "end": -1},
                 "compute": {"start": -1, "end": -1},
@@ -73,7 +73,7 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
             {
                 "task_id": "task2",
                 "execution_host": "host2",
-                "num_cores_used": 30,
+                "num_cores_allocated": 30,
                 "whole_task": {"start": 3.0, "end": -1},
                 "read": {"start": -1, "end": -1},
                 "compute": {"start": -1, "end": -1},

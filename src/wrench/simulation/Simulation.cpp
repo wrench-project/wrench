@@ -683,7 +683,7 @@ namespace wrench {
          *      {
          *          task_id: <id>,
          *          execution_host: <hostname>,
-         *          num_cores_used: <number>,
+         *          num_cores_allocated: <number>,
          *          whole_task: { start: <number>, end: <number> },
          *          read:       { start: <number>, end: <number> },
          *          compute:    { start: <number>, end: <number> },
@@ -717,7 +717,7 @@ namespace wrench {
 
                 task_execution_json["task_id"]        = task->getID();
                 task_execution_json["execution_host"] = task_execution.execution_host;
-                task_execution_json["num_cores_used"] = task_execution.num_cores_used;
+                task_execution_json["num_cores_allocated"] = task_execution.num_cores_allocated;
 
                 task_execution_json["whole_task"] = {{START, task_execution.task_start},        {END, task_execution.task_end}};
                 task_execution_json["read"]       = {{START, task_execution.read_input_start},  {END, task_execution.read_input_end}};
