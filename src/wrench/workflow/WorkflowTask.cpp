@@ -661,7 +661,7 @@ namespace wrench {
       }
 
       /**
-       * @brief Get the tasks's most recent termination date (when it was explicitely requested to be terminated by the WMS)
+       * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the WMS)
        * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
        */
       double WorkflowTask::getTerminationDate() {
@@ -709,11 +709,11 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the number of cores allocated for this task's most recent execution
+     * @brief Returns the number of cores allocated for this task's most recent execution or 0 if an execution attempt was never made
      * @return number of cores
      */
-     unsigned long WorkflowTask::getNumCoresUsed() {
-         return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_used : 0;
+     unsigned long WorkflowTask::getNumCoresAllocated() {
+         return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_allocated : 0;
      }
 
     /**
@@ -730,14 +730,14 @@ namespace wrench {
     }
 
     /**
-     * @brief Sets the number of cores used by this task
-     * @param num_cores: the number of cores this task will use or has used
+     * @brief Sets the number of cores allocated for this task
+     * @param num_cores: the number of cores allocated to this task
      */
-     void WorkflowTask::setNumCoresUsed(unsigned long num_cores) {
+     void WorkflowTask::setNumCoresAllocated(unsigned long num_cores) {
          if (not this->execution_history.empty()) {
-             this->execution_history.top().num_cores_used = num_cores;
+             this->execution_history.top().num_cores_allocated = num_cores;
          } else {
-             throw std::runtime_error("WorkflowTask::setNumCoresUsed() cannot be called before WorkflowTask::setStartDate()");
+             throw std::runtime_error("WorkflowTask::setNumCoresAllocated() cannot be called before WorkflowTask::setStartDate()");
          }
      }
 

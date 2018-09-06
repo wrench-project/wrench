@@ -231,7 +231,7 @@ namespace wrench {
 
         task->setStartDate(S4U_Simulation::getClock());
         task->setExecutionHost(this->hostname);
-        task->setNumCoresUsed(this->num_cores);
+        task->setNumCoresAllocated(this->num_cores);
 
         this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(new
         SimulationTimestampTaskStart(task));
