@@ -37,8 +37,8 @@ namespace wrench {
      * @brief Constructor
      *
      * @param simulation: a pointer to the simulation object
-     * @param hostname: the name of the host on which the service will run
-     * @param num_cores: the number of cores available to the service
+     * @param hostname: the name of the host on which the workunit execution will run
+     * @param num_cores: the number of cores available to the workunit executor
      * @param ram_utilization: the number of bytes of RAM used by the service
      * @param callback_mailbox: the callback mailbox to which a "work done" or "work failed" message will be sent
      * @param workunit: the work unit to perform
