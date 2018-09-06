@@ -49,7 +49,7 @@ namespace wrench {
 
 
       if ((flops < 0.0) || (min_num_cores < 1) || (min_num_cores > max_num_cores) ||
-          (parallel_efficiency < 0.0) || (parallel_efficiency > 1.0) || (memory_requirement < 0)) {
+          (parallel_efficiency <= 0.0) || (parallel_efficiency > 1.0) || (memory_requirement < 0)) {
         throw std::invalid_argument("WorkflowTask::addTask(): Invalid argument");
       }
 

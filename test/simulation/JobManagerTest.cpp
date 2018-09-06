@@ -36,6 +36,8 @@ public:
 
     void do_JobManagerResubmitJobTest_test();
 
+    void do_JobManagerTerminateJobTest_test();
+
 
 protected:
     JobManagerTest() {
@@ -558,6 +560,134 @@ void JobManagerTest::do_JobManagerResubmitJobTest_test() {
 
   ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
+
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+
+  free(argv[0]);
+  free(argv);
+}
+
+
+
+/**********************************************************************/
+/**  DO TERMINATE JOB TEST                                           **/
+/**********************************************************************/
+
+class JobManagerTerminateJobTestWMS : public wrench::WMS {
+
+public:
+    JobManagerTerminateJobTestWMS(JobManagerTest *test,
+                                  std::string hostname,
+                                  std::set<wrench::ComputeService *> compute_services) :
+            wrench::WMS(nullptr, nullptr,
+                        compute_services, {}, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+
+private:
+
+    JobManagerTest *test;
+
+    int main() {
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Get the compute_services
+      wrench::ComputeService *cs = *(this->getAvailableComputeServices().begin());
+
+      // Add tasks to the workflow
+      wrench::WorkflowTask *t1 = this->getWorkflow()->addTask("task1", 600, 10, 10, 1.0, 0);
+      wrench::WorkflowTask *t2 = this->getWorkflow()->addTask("task2", 600, 10, 10, 1.0, 0);
+      wrench::WorkflowTask *t3 = this->getWorkflow()->addTask("task3", 600, 10, 10, 1.0, 0);
+      wrench::WorkflowTask *t4 = this->getWorkflow()->addTask("task4", 600, 10, 10, 1.0, 0);
+
+      this->getWorkflow()->addControlDependency(t1, t3);
+      this->getWorkflow()->addControlDependency(t2, t3);
+      this->getWorkflow()->addControlDependency(t3, t4);
+
+      // Create a standard job
+      wrench::StandardJob *job = job_manager->createStandardJob(this->getWorkflow()->getTasks(), {});
+
+      // Submit the standard job
+      try {
+        job_manager->submitJob(job, cs);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(
+                "Should be able to submit the job");
+      }
+
+      // Sleep for 90 seconds
+      this->simulation->sleep(90);
+
+      // Terminate the job
+      try {
+        job_manager->terminateJob(job);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(
+                "Should be able to terminate job");
+      }
+
+      // Check task states
+      bool t1_and_t2_valid_states;
+
+      t1_and_t2_valid_states = ((t1->getState() == wrench::WorkflowTask::State::COMPLETED) and
+                                (t2->getState() == wrench::WorkflowTask::State::READY)) or
+                               ((t1->getState() == wrench::WorkflowTask::State::READY) and
+                                (t2->getState() == wrench::WorkflowTask::State::COMPLETED));
+
+      if (not t1_and_t2_valid_states) {
+        throw std::runtime_error("Unexpected task1 and task 2 states (" +
+                                 wrench::WorkflowTask::stateToString(t1->getState()) + " and " +
+                                 wrench::WorkflowTask::stateToString(t2->getState()));
+      }
+      if (t3->getState() != wrench::WorkflowTask::State::NOT_READY) {
+        throw std::runtime_error("Unexpected task1 state (should be NOT_READY but is " +
+                                 wrench::WorkflowTask::stateToString(t3->getState()));
+      }
+      if (t4->getState() != wrench::WorkflowTask::State::NOT_READY) {
+        throw std::runtime_error("Unexpected task1 state (should be NOT_READY but is " +
+                                 wrench::WorkflowTask::stateToString(t4->getState()));
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(JobManagerTest, TerminateJobTest) {
+  DO_TEST_WITH_FORK(do_JobManagerTerminateJobTest_test);
+}
+
+void JobManagerTest::do_JobManagerTerminateJobTest_test() {
+
+  // Create and initialize a simulation
+  simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("one_task_test");
+
+  simulation->init(&argc, argv);
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Create a ComputeService that supports standard jobs
+  wrench::ComputeService *cs = nullptr;
+  ASSERT_NO_THROW(cs = simulation->add(
+          new wrench::MultihostMulticoreComputeService("Host3",
+                                                       {std::make_tuple("Host3", wrench::ComputeService::ALL_CORES, wrench::ComputeService::ALL_RAM)},100.0,
+                                                       {{wrench::ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"}})));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new JobManagerTerminateJobTestWMS(
+                  this, "Host1", {cs})));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow.get()));
 
   ASSERT_NO_THROW(simulation->launch());
 
