@@ -187,6 +187,15 @@ private:
           throw std::runtime_error("Should not be able to forget a pending/running job");
         }
 
+        // Get the job's service-specific arguments (coverage)
+        one_task_jobs[job_index]->getServiceSpecificArguments();
+
+        // Get the job submit date
+        double job_submit_date = one_task_jobs[job_index]->getSubmitDate();
+        if (simulation->getCurrentSimulatedDate() - job_submit_date > 1.0) {
+          throw std::runtime_error("Job submit date is likely wrong");
+        }
+
         job_index++;
       }
 
