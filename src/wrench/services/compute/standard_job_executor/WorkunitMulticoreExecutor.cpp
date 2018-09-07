@@ -113,10 +113,10 @@ namespace wrench {
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
-      WRENCH_INFO("New WorkunitExecutor starting (%s) to do: %ld pre file copies, %ld tasks, %ld post file copies",
+      WRENCH_INFO("New WorkunitExecutor starting (%s) to do: %ld pre file copies, %d tasks, %ld post file copies",
                   this->mailbox_name.c_str(),
                   this->workunit->pre_file_copies.size(),
-                  this->workunit->tasks.size(),
+                  (this->workunit->task != nullptr) ? 1 : 0,
                   this->workunit->post_file_copies.size());
 
       SimulationMessage *msg_to_send_back = nullptr;
@@ -225,10 +225,15 @@ namespace wrench {
       }
 
       /** Perform all tasks **/
-      for (auto task : work->tasks) {
+      if (this->workunit->task != nullptr) {
+        auto task = this->workunit->task;
 
         task->setInternalState(WorkflowTask::InternalState::TASK_RUNNING);
+
         task->setStartDate(S4U_Simulation::getClock());
+        task->setExecutionHost(this->hostname);
+        task->setNumCoresAllocated(this->num_cores);
+
         this->simulation->getOutput().addTimestamp<SimulationTimestampTaskStart>(new
         SimulationTimestampTaskStart(task));
 
@@ -284,7 +289,6 @@ namespace wrench {
         this->simulation->getOutput().addTimestamp<SimulationTimestampTaskCompletion>(
                 new SimulationTimestampTaskCompletion(task));
         task->setEndDate(S4U_Simulation::getClock());
-        task->setExecutionHost(this->hostname);
 
         // Deal with Children
         for (auto child : task->getWorkflow()->getTaskChildren(task)) {

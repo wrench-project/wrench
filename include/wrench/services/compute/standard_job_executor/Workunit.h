@@ -36,7 +36,7 @@ namespace wrench {
     public:
 
         Workunit(std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies,
-                 std::vector<WorkflowTask *> tasks,
+                 WorkflowTask * task,
                  std::map<WorkflowFile *, StorageService *> file_locations,
                  std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> post_file_copies,
                  std::set<std::tuple<WorkflowFile *, StorageService *>> cleanup_file_deletions);
@@ -50,8 +50,8 @@ namespace wrench {
 
         /** @brief File copies to perform before computational tasks begin */
         std::set<std::tuple<WorkflowFile *, StorageService *, StorageService *>> pre_file_copies;
-        /** @brief Computational tasks to perform */
-        std::vector<WorkflowTask *> tasks;
+        /** @brief Computational task to perform */
+        WorkflowTask *task = nullptr;
         /** @brief Locations where computational tasks should read/write files */
         std::map<WorkflowFile *, StorageService *> file_locations;
         /** @brief File copies to perform after computational tasks completes */

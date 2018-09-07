@@ -213,9 +213,9 @@ namespace wrench {
     void StandardJobExecutor::cleanup() {
       for (auto wue: this->running_workunit_executors) {
         Workunit *wu = wue->workunit;
-        for (auto task : wu->tasks) {
-          if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
-            task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
+        if (wu->task != nullptr) {
+          if (wu->task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
+            wu->task->setInternalState(WorkflowTask::InternalState::TASK_FAILED);
           }
         }
       }
@@ -300,20 +300,9 @@ namespace wrench {
      * @brief Computes the minimum number of cores required to execute a work unit
      * @param wu: the work unit
      * @return a number of cores
-     *
-     * @throw std::runtime_error
      */
     unsigned long StandardJobExecutor::computeWorkUnitMinNumCores(Workunit *wu) {
-      unsigned long minimum_num_cores;
-      if (wu->tasks.empty()) {
-        minimum_num_cores = 1;
-      } else if (wu->tasks.size() == 1) {
-        minimum_num_cores = wu->tasks[0]->getMinNumCores();
-      } else {
-        throw std::runtime_error(
-                "StandardJobExecutor::computeWorkUnitMinNumCores(): Found a workunit with more than one computational tasks!!");
-      }
-      return minimum_num_cores;
+      return (wu->task != nullptr) ? wu->task->getMinNumCores() : 1;
     }
 
     /**
@@ -325,25 +314,23 @@ namespace wrench {
      */
     unsigned long StandardJobExecutor::computeWorkUnitDesiredNumCores(Workunit *wu) {
       unsigned long desired_num_cores;
-      if (wu->tasks.empty()) {
+      if (wu->task == nullptr) {
         desired_num_cores = 1;
 
-      } else if (wu->tasks.size() == 1) {
+      } else {
         std::string core_allocation_algorithm =
                 this->getPropertyValueAsString(StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM);
 
         if (core_allocation_algorithm == "maximum") {
-          desired_num_cores = wu->tasks[0]->getMaxNumCores();
+          desired_num_cores = wu->task->getMaxNumCores();
         } else if (core_allocation_algorithm == "minimum") {
-          desired_num_cores = wu->tasks[0]->getMinNumCores();
+          desired_num_cores = wu->task->getMinNumCores();
         } else {
           throw std::runtime_error("StandardjobExecutor::computeWorkUnitDesiredNumCores(): Unknown StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM property '"
                                    + core_allocation_algorithm + "'");
         }
-      } else {
-        throw std::runtime_error(
-                "StandardjobExecutor::computeWorkUnitDesiredNumCores(): Found a workunit with more than one computational tasks!!");
       }
+
       return desired_num_cores;
     }
 
@@ -351,21 +338,9 @@ namespace wrench {
     * @brief Computes the desired amount of RAM required to execute a work unit
     * @param wu: the work unit
     * @return a number of bytes
-    *
-    * @throw std::runtime_error
     */
     double StandardJobExecutor::computeWorkUnitMinMemory(Workunit *wu) {
-      double  min_ram;
-      if (wu->tasks.empty()) {
-        min_ram  = 0.0;
-
-      } else if (wu->tasks.size() == 1) {
-        min_ram = wu->tasks[0]->getMemoryRequirement();
-      } else {
-        throw std::runtime_error(
-                "StandardjobExecutor::computeWorkUnitMinMemory(): Found a workunit with more than one computational tasks!!");
-      }
-      return min_ram;
+      return (wu->task != nullptr) ? wu->task->getMemoryRequirement() : 0.0;
     }
 
     /**
@@ -623,9 +598,9 @@ namespace wrench {
       }
 
       // Process task completions, if any
-      for (auto task : workunit->tasks) {
-        WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)", task->getID().c_str(),
-                    WorkflowTask::stateToString(task->getInternalState()).c_str());
+      if (workunit->task != nullptr) {
+        WRENCH_INFO("A workunit executor completed task %s (and its state is: %s)", workunit->task->getID().c_str(),
+                    WorkflowTask::stateToString(workunit->task->getInternalState()).c_str());
 
         // Increase the "completed tasks" count of the job
         this->job->incrementNumCompletedTasks();
@@ -653,10 +628,10 @@ namespace wrench {
           child->num_pending_parents--;
           if (child->num_pending_parents == 0) {
             // Make the child's tasks ready
-            for (auto task : child->tasks) {
-              if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
+            if (child->task != nullptr) {
+              if (child->task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
                 throw std::runtime_error("StandardJobExecutor::processWorkunitExecutorCompletion(): Weird task state " +
-                                         std::to_string(task->getInternalState()) + " for task " + task->getID());
+                                         std::to_string(child->task->getInternalState()) + " for task " + child->task->getID());
               }
             }
 
@@ -782,37 +757,34 @@ namespace wrench {
 
       // Create the cleanup workunit, if any
       if (not job->cleanup_file_deletions.empty()) {
-        cleanup_workunit = new Workunit({}, {}, {}, {}, job->cleanup_file_deletions);
+        cleanup_workunit = new Workunit({}, nullptr, {}, {}, job->cleanup_file_deletions);
       }
 
       // Create the pre_file_copies work unit, if any
       if (not job->pre_file_copies.empty()) {
-        pre_file_copies_work_unit = new Workunit(job->pre_file_copies, {}, {}, {}, {});
+        pre_file_copies_work_unit = new Workunit(job->pre_file_copies, nullptr, {}, {}, {});
       }
 
       // Create the post_file_copies work unit, if any
       if (not job->post_file_copies.empty()) {
-        post_file_copies_work_unit = new Workunit({}, {}, {}, job->post_file_copies, {});
+        post_file_copies_work_unit = new Workunit({}, nullptr, {}, job->post_file_copies, {});
       }
 
       // Create the task work units, if any
       for (auto const &task : job->tasks) {
-        task_work_units.push_back(new Workunit({}, {task}, job->file_locations, {}, {}));
+        task_work_units.push_back(new Workunit({}, task, job->file_locations, {}, {}));
       }
 
       // Add dependencies between task work units, if any
-      for (auto const &twu : task_work_units) {
-        std::set<Workunit *> parent_work_units;
-        for (auto const &task : twu->tasks) {
-          if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
-            std::vector<WorkflowTask *> parents = task->getWorkflow()->getTaskParents(task);
-              for (auto const &potential_parent_twu : task_work_units) {
-                for (auto const &t : potential_parent_twu->tasks) {
-                if (std::find(parents.begin(), parents.end(), t) != parents.end()) {
-                  Workunit::addDependency(potential_parent_twu, twu);
-                  break;
-                }
-              }
+      for (auto const &task_work_unit : task_work_units) {
+        const WorkflowTask *task = task_work_unit->task;
+
+        if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
+          std::vector<WorkflowTask *> current_task_parents = task->getWorkflow()->getTaskParents(task);
+
+          for (auto const &potential_parent_task_work_unit : task_work_units) {
+            if (std::find(current_task_parents.begin(), current_task_parents.end(), potential_parent_task_work_unit->task) != current_task_parents.end()) {
+              Workunit::addDependency(potential_parent_task_work_unit, task_work_unit);
             }
           }
         }
@@ -903,26 +875,28 @@ namespace wrench {
 //                    std::cerr << "IN LAMBDA2: " << wu1->tasks.size() << "  " << wu2->tasks.size() << "\n";
                     // Non-computational workunits have higher priority
 
-                    if (wu1->tasks.empty() and wu2->tasks.empty()) {
+                    if (wu1->task == nullptr and wu2->task == nullptr) {
                       return ((uintptr_t) wu1 > (uintptr_t) wu2);
                     }
-                    if (wu1->tasks.empty()) {
+                    if (wu1->task == nullptr) {
                       return true;
                     }
-                    if (wu2->tasks.empty()) {
+                    if (wu2->task == nullptr) {
                       return false;
                     }
 
                     if (selection_algorithm == "maximum_flops") {
-                      if (wu1->tasks[0]->getFlops() == wu2->tasks[0]->getFlops()) {
+                      if (wu1->task->getFlops() == wu2->task->getFlops()) {
                         return ((uintptr_t) wu1 > (uintptr_t) wu2);
                       }
-                      return (wu1->tasks[0]->getFlops() >= wu2->tasks[0]->getFlops());
+                      return (wu1->task->getFlops() >= wu2->task->getFlops());
+
                     } else if (selection_algorithm == "maximum_minimum_cores") {
-                      if (wu1->tasks[0]->getMinNumCores() == wu2->tasks[0]->getMinNumCores()) {
+                      if (wu1->task->getMinNumCores() == wu2->task->getMinNumCores()) {
                         return ((uintptr_t) wu1 > (uintptr_t) wu2);
                       }
-                      return (wu1->tasks[0]->getMinNumCores() >= wu2->tasks[0]->getMinNumCores());
+                      return (wu1->task->getMinNumCores() >= wu2->task->getMinNumCores());
+
                     } else {
                       throw std::runtime_error("Unknown StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM property '"
                                                + selection_algorithm + "'");

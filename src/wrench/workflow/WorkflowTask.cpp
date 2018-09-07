@@ -661,7 +661,7 @@ namespace wrench {
       }
 
       /**
-       * @brief Get the tasks's most recent termination date (when it was explicitely requested to be terminated by the WMS)
+       * @brief Get the tasks's most recent termination date (when it was explicitly requested to be terminated by the WMS)
        * @return the date when the task was terminated (-1 if it wasn't terminated or if not execution history exists for this task yet)
        */
       double WorkflowTask::getTerminationDate() {
@@ -700,22 +700,46 @@ namespace wrench {
     }
 
     /**
-     * @brief Returns the name of the host on which the task has executed, or "" if
-     *        the task has not been (successfully) executed yet
+     * @brief Returns the name of the host on which the task has most recently been executed, or "" if
+     *        the task has never been executed yet
      * @return hostname
      */
     std::string WorkflowTask::getExecutionHost() {
-      return this->execution_host;
+        return (not this->execution_history.empty()) ? this->execution_history.top().execution_host : "";
     }
 
     /**
-     * @brief Sets the execution host
+     * @brief Returns the number of cores allocated for this task's most recent execution or 0 if an execution attempt was never made
+     * @return number of cores
+     */
+     unsigned long WorkflowTask::getNumCoresAllocated() {
+         return (not this->execution_history.empty()) ? this->execution_history.top().num_cores_allocated : 0;
+     }
+
+    /**
+     * @brief Sets the host on which this task is running
      *
      * @param hostname: the host name
      */
     void WorkflowTask::setExecutionHost(std::string hostname) {
-      this->execution_host = hostname;
+        if (not this->execution_history.empty()) {
+            this->execution_history.top().execution_host = hostname;
+        } else {
+            throw std::runtime_error("WorkflowTask::setExecutionHost() cannot be called before WorkflowTask::setStartDate()");
+        }
     }
+
+    /**
+     * @brief Sets the number of cores allocated for this task
+     * @param num_cores: the number of cores allocated to this task
+     */
+     void WorkflowTask::setNumCoresAllocated(unsigned long num_cores) {
+         if (not this->execution_history.empty()) {
+             this->execution_history.top().num_cores_allocated = num_cores;
+         } else {
+             throw std::runtime_error("WorkflowTask::setNumCoresAllocated() cannot be called before WorkflowTask::setStartDate()");
+         }
+     }
 
     /**
      * @brief Get a map of src and dst hosts for file transfers
