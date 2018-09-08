@@ -1416,10 +1416,10 @@ private:
       try {
         job_manager->submitJob(job, test->compute_service);
       } catch (wrench::WorkflowExecutionException &e) {
-        if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_COMPUTE_RESOURCES) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
           throw std::runtime_error("Received the expected exception, but the failure cause is incorrect");
         }
-        auto real_cause = (wrench::NotEnoughComputeResources *) e.getCause().get();
+        auto real_cause = (wrench::NotEnoughResources *) e.getCause().get();
         std::string error_msg = real_cause->toString();
         if (real_cause->getJob() != job) {
           throw std::runtime_error(
@@ -1544,10 +1544,10 @@ private:
       try {
         job_manager->submitJob(job, test->compute_service);
       } catch (wrench::WorkflowExecutionException &e) {
-        if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_COMPUTE_RESOURCES) {
+        if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
           throw std::runtime_error("Received the expected exception, but the failure cause is incorrect");
         }
-        auto real_cause = (wrench::NotEnoughComputeResources *) e.getCause().get();
+        auto real_cause = (wrench::NotEnoughResources *) e.getCause().get();
         std::string error_msg = real_cause->toString();
         if (real_cause->getJob() != job) {
           throw std::runtime_error(

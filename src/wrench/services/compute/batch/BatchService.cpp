@@ -1326,7 +1326,7 @@ namespace wrench {
                               this,
                               false,
                               std::shared_ptr<FailureCause>(
-                                      new NotEnoughComputeResources(
+                                      new NotEnoughResources(
                                               job->getWorkflowJob(),
                                               this)),
                               this->getMessagePayloadValueAsDouble(
@@ -1347,7 +1347,7 @@ namespace wrench {
                                            this,
                                            false,
                                            std::shared_ptr<FailureCause>(
-                                                   new NotEnoughComputeResources(
+                                                   new NotEnoughResources(
                                                            job->getWorkflowJob(),
                                                            this)),
                                            this->getMessagePayloadValueAsDouble(
@@ -2236,7 +2236,8 @@ namespace wrench {
 
       } else if (top_pid > 0) {
         // parent process
-        sleep(1); // Wait one second to let batsched the time to start (this is pretty ugly)
+        sleep(1); // Wait one second to let batsched the time to start 
+                  // (this is pretty ugly)
         int exit_code = 0;
         int status = waitpid(top_pid, &exit_code, WNOHANG);
         if (status == 0) {
@@ -2249,6 +2250,7 @@ namespace wrench {
             // Establish a tether so that if the main process dies, then batsched is brutally killed
             int tether[2]; // this is a local variable, only defined in this scope
             if (pipe(tether) != 0) {  // the pipe however is opened during the whole duration of both processes
+                // TODO: Kill Batsched since it's running!
               throw std::runtime_error("startBatsched(): pipe failed.");
             }
             //now fork a process that sleeps until its parent is dead
