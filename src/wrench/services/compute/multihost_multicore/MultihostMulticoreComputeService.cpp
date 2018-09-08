@@ -1486,7 +1486,7 @@ namespace wrench {
           S4U_Mailbox::dputMessage(
                   answer_mailbox,
                   new ComputeServiceSubmitStandardJobAnswerMessage(
-                          job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
+                          job, this, false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this)),
                           this->getMessagePayloadValueAsDouble(
                                   MultihostMulticoreComputeServiceMessagePayload::NOT_ENOUGH_CORES_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {
@@ -1549,7 +1549,7 @@ namespace wrench {
         try {
           S4U_Mailbox::dputMessage(
                   answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                          job, this, false, std::shared_ptr<FailureCause>(new NotEnoughComputeResources(job, this)),
+                          job, this, false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this)),
                           this->getMessagePayloadValueAsDouble(
                                   MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
         } catch (std::shared_ptr<NetworkError> &cause) {

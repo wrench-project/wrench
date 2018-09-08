@@ -1104,7 +1104,7 @@ private:
           job_manager->submitJob(job, this->test->compute_service, batch_job_args);
         } catch (wrench::WorkflowExecutionException &e) {
           success = false;
-          if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_COMPUTE_RESOURCES) {
+          if (e.getCause()->getCauseType() != wrench::FailureCause::NOT_ENOUGH_RESOURCES) {
             throw std::runtime_error("Got an exception, as expected, but the failure cause seems wrong");
           }
         }

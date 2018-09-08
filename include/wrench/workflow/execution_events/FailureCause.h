@@ -56,8 +56,8 @@ namespace wrench {
                     SERVICE_DOWN,
             /** @brief The compute service does not support this job type */
                     JOB_TYPE_NOT_SUPPORTED,
-            /** @brief The compute service cannot run the job (ever) due to insufficient resources */
-                    NOT_ENOUGH_COMPUTE_RESOURCES,
+            /** @brief The compute service cannot run the job (ever) due to insufficient resources (cores and/or ram) */
+                    NOT_ENOUGH_RESOURCES,
             /** @brief There was a network error, or an endpoint was down */
                     NETWORK_ERROR,
             /** @brief There was a network timeout (for a "with timeout" network operation) */
@@ -301,12 +301,12 @@ namespace wrench {
     /**
      * @brief A "compute service doesn't have enough cores" failure cause
      */
-    class NotEnoughComputeResources : public FailureCause {
+    class NotEnoughResources : public FailureCause {
     public:
         /***********************/
         /** \cond INTERNAL     */
         /***********************/
-        NotEnoughComputeResources(WorkflowJob *job, ComputeService *compute_service);
+        NotEnoughResources(WorkflowJob *job, ComputeService *compute_service);
         /***********************/
         /** \endcond           */
         /***********************/
