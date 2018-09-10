@@ -1749,7 +1749,19 @@ private:
 
       bool success = true;
       try {
-        this->test->storage_service_100->writeFile(this->test->file_500);
+        this->test->storage_service_100->writeFile(nullptr, "/");
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to write a nullptr file to a service");
+      }
+
+      
+
+      success = true;
+      try {
+        this->test->storage_service_100->writeFile(this->test->file_500, "");
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::STORAGE_NOT_ENOUGH_SPACE) {
