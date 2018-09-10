@@ -41,6 +41,8 @@ public:
     
     void do_Partitions_test();
 
+    void do_FileWrite_test();
+
 
 protected:
     SimpleStorageServiceFunctionalTest() {
@@ -241,7 +243,7 @@ private:
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
         if (e.getCause()->getCauseType() != wrench::FailureCause::FILE_NOT_FOUND) {
-          throw std::runtime_error("Got an expected 'file not found' exception, but not the expected failure cause type");
+          throw std::runtime_error("Got an expected exception, but not the expected failure cause type");
         }
         auto real_cause = (wrench::FileNotFound *) e.getCause().get();
         if (real_cause->getStorageService() != this->test->storage_service_100) {
@@ -1713,3 +1715,107 @@ void SimpleStorageServiceFunctionalTest::do_Partitions_test() {
   free(argv[0]);
   free(argv);
 }
+
+
+
+
+
+
+
+/**********************************************************************/
+/**  FILE WRITE TEST                                                **/
+/**********************************************************************/
+
+class FileWriteTestWMS : public wrench::WMS {
+
+public:
+    FileWriteTestWMS(SimpleStorageServiceFunctionalTest *test,
+                      const std::set<wrench::StorageService *> &storage_services,
+                      std::string hostname) :
+            wrench::WMS(nullptr, nullptr, {}, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    SimpleStorageServiceFunctionalTest *test;
+
+    int main() {
+
+      // Create a data movement manager
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+      wrench::FileRegistryService *file_registry_service = this->getAvailableFileRegistryService();
+
+      bool success = true;
+      try {
+        this->test->storage_service_100->writeFile(this->test->file_500);
+      } catch (wrench::WorkflowExecutionException &e) {
+        success = false;
+        if (e.getCause()->getCauseType() != wrench::FailureCause::STORAGE_NOT_ENOUGH_SPACE) {
+          throw std::runtime_error("Got an expected exception, but not the expected failure cause type");
+        }
+        auto real_cause = (wrench::StorageServiceNotEnoughSpace *) e.getCause().get();
+        if (real_cause->getStorageService() != this->test->storage_service_100) {
+          throw std::runtime_error(
+                  "Got the expected 'not enough space' exception, but the failure cause does not point to the correct storage service");
+        }
+        if (real_cause->getFile() != this->test->file_500) {
+          throw std::runtime_error(
+                  "Got the expected 'not enough space' exception, but the failure cause does not point to the correct file");
+        }
+      }
+
+      if (success) {
+        throw std::runtime_error("Should not be able to write to a storage service with not enough space");
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(SimpleStorageServiceFunctionalTest, FileWrite) {
+  DO_TEST_WITH_FORK(do_FileWrite_test);
+}
+
+void SimpleStorageServiceFunctionalTest::do_FileWrite_test() {
+
+  // Create and initialize a simulation
+  wrench::Simulation *simulation = new wrench::Simulation();
+  int argc = 1;
+  char **argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("capacity_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create 2 Storage Services
+  ASSERT_NO_THROW(storage_service_100 = simulation->add(
+          new wrench::SimpleStorageService(hostname, 100.0)));
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new FileWriteTestWMS(
+                  this, {
+                          storage_service_100
+                  }, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Create a file registry
+  simulation->add(new wrench::FileRegistryService(hostname));
+
+  // Running a "run a single task" simulation
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+  free(argv[0]);
+  free(argv);
+}
+

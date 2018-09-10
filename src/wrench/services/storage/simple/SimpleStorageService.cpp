@@ -287,7 +287,7 @@ namespace wrench {
       // If the file is not already there, do a capacity check/update
       // (If the file is already there, then there will just be an overwrite. Note that
       // if the overwrite fails, then the file will disappear, which is expected)
-      if (this->stored_files.find(file->getID()) != this->stored_files.end()) {
+      if (this->stored_files.find(file->getID()) == this->stored_files.end()) {
 
         // Check the file size and capacity, and reply "no" if not enough space
         if (file->getSize() > (this->capacity - this->occupied_space)) {
