@@ -186,6 +186,9 @@ private:
 
       frs->removeEntry(file1, this->test->storage_service1);
 
+      // Doing it again, which does nothing (coverage)
+      frs->removeEntry(file1, this->test->storage_service1);
+
       // Getting file1
       locations = frs->lookupEntry(file1);
 
