@@ -218,9 +218,20 @@ private:
                 "Free space on storage service is wrong (" + std::to_string(free_space) + ") instead of 90.0");
       }
 
+      // Bogus read
+      success = true;
+      try {
+        this->test->storage_service_100->readFile(nullptr);
+      } catch (std::invalid_argument &e) {
+        success = false;
+      }
+      if (success) {
+        throw std::runtime_error("Should not be able to read nullptr file");
+      }
+
       // Read a file on a storage service
       try {
-        this->test->storage_service_100->readFile(this->test->file_10, nullptr);
+        this->test->storage_service_100->readFile(this->test->file_10, "");
       } catch (wrench::WorkflowExecutionException &e) {
         throw std::runtime_error("Should be able to read a file available on a storage service");
       }
@@ -228,7 +239,7 @@ private:
       // Read a file on a storage service that doesn't have that file
       success = true;
       try {
-        this->test->storage_service_100->readFile(this->test->file_100, nullptr);
+        this->test->storage_service_100->readFile(this->test->file_100);
       } catch (wrench::WorkflowExecutionException &e) {
         success = false;
       }
