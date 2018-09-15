@@ -716,7 +716,7 @@ namespace wrench {
     /**
      * @brief Returns all tasks with top-levels in a range
      * @param min: the low end of the range (inclusive)
-     * @param max: the high end of the range (exclusive)
+     * @param max: the high end of the range (inclusive)
      * @return a vector of tasks
      */
     std::vector<WorkflowTask *> Workflow::getTasksInTopLevelRange(unsigned long min, unsigned long max) {
