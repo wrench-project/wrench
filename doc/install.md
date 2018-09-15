@@ -57,7 +57,7 @@ make install # try "sudo make install" if you do not have write privileges
 
 To enable the use of Batsched (provided you have installed that package, see above):
 ~~~~~~~~~~~~~{.sh}
-cmake -DENABLE_BATSCHED .
+cmake -DENABLE_BATSCHED=on .
 ~~~~~~~~~~~~~
 
 
