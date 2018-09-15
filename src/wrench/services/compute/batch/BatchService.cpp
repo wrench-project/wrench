@@ -1419,7 +1419,7 @@ namespace wrench {
         this->pilot_job_alarms.erase(job->getName());
       }
 
-        //first forward this notification to the batsched
+      //first forward this notification to the batsched
 #ifdef ENABLE_BATSCHED
       this->notifyJobEventsToBatSched(std::to_string(batch_job->getJobID()), "SUCCESS", "COMPLETED_SUCCESSFULLY", "", "JOB_COMPLETED");
       this->appendJobInfoToCSVOutputFile(batch_job, "success");
@@ -2221,23 +2221,27 @@ namespace wrench {
 
         std::string rjms_delay = this->getPropertyValueAsString(BatchServiceProperty::BATCH_RJMS_DELAY);
         std::string socket_endpoint = "tcp://*:" + std::to_string(this->batsched_port);
-        const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
-                              socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
 
         // Mute Batsched output if need be
         if (this->getPropertyValueAsBoolean(BatchServiceProperty::BATSCHED_LOGGING_MUTED)) {
-          fclose(stdout);
-          fclose(stderr);
-        }
-        if (execvp(args[0], (char **) args) == -1) {
-          exit(3);
+          const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
+                                socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), "--verbosity=silent", NULL};
+          if (execvp(args[0], (char **) args) == -1) {
+            exit(3);
+          }
+        } else {
+          const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
+                                socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
+          if (execvp(args[0], (char **) args) == -1) {
+            exit(3);
+          }
         }
 
 
       } else if (top_pid > 0) {
         // parent process
         sleep(1); // Wait one second to let batsched the time to start 
-                  // (this is pretty ugly)
+        // (this is pretty ugly)
         int exit_code = 0;
         int status = waitpid(top_pid, &exit_code, WNOHANG);
         if (status == 0) {
@@ -2250,21 +2254,21 @@ namespace wrench {
             // Establish a tether so that if the main process dies, then batsched is brutally killed
             int tether[2]; // this is a local variable, only defined in this scope
             if (pipe(tether) != 0) {  // the pipe however is opened during the whole duration of both processes
-                // TODO: Kill Batsched since it's running!
-              throw std::runtime_error("startBatsched(): pipe failed.");
+              kill(top_pid, SIGKILL); //kill the other child (that has fork-exec'd batsched)
+              throw std::runtime_error("startBatsched(): tether pipe creation failed!");
             }
             //now fork a process that sleeps until its parent is dead
             int nested_pid = fork();
 
             if (nested_pid > 0) {
-              //I am the parent, whose child fork exec'd batsched
+              //I am the parent, whose child has fork-exec'd batsched
             } else if (nested_pid == 0) {
               char foo;
               close(tether[1]); // closing write end
               int returned = read(tether[0], &foo, 1); // blocking read which returns when the parent dies
               //check if the child that forked batsched is still running
               if (getpgid(top_pid)) {
-                kill(top_pid, SIGKILL); //kill the other child that fork exec'd batsched
+                kill(top_pid, SIGKILL); //kill the other child that has fork-exec'd batsched
               }
               //my parent has died so, I will kill myself instead of exiting and becoming a zombie
               kill(getpid(), SIGKILL);
