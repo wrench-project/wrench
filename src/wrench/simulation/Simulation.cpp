@@ -8,6 +8,7 @@
  *
  */
 
+#include <iomanip>
 #include <csignal>
 #include <simgrid/plugins/live_migration.h>
 #include <wrench/util/MessageManager.h>
