@@ -2222,16 +2222,24 @@ namespace wrench {
         std::string rjms_delay = this->getPropertyValueAsString(BatchServiceProperty::BATCH_RJMS_DELAY);
         std::string socket_endpoint = "tcp://*:" + std::to_string(this->batsched_port);
 
+        char *policy;
+        if (this->getPropertyValueAsBoolean(BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION)) {
+          policy = (char *)"--policy=contiguous";
+        } else {
+          policy = NULL;
+        }
+
         // Mute Batsched output if need be
         if (this->getPropertyValueAsBoolean(BatchServiceProperty::BATSCHED_LOGGING_MUTED)) {
           const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
-                                socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), "--verbosity=silent", NULL};
+                                socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), "--verbosity=silent",
+                                policy, NULL};
           if (execvp(args[0], (char **) args) == -1) {
             exit(3);
           }
         } else {
           const char *args[] = {"batsched", "-v", algorithm.c_str(), "-o", queue_ordering.c_str(), "-s",
-                                socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), NULL};
+                                socket_endpoint.c_str(), "--rjms_delay", rjms_delay.c_str(), policy, NULL};
           if (execvp(args[0], (char **) args) == -1) {
             exit(3);
           }

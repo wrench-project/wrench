@@ -103,6 +103,16 @@ namespace wrench {
          */
         DECLARE_PROPERTY_NAME(BATSCHED_LOGGING_MUTED);
 
+        /** @brief Controls Batsched node allocation policy
+        *      - If ENABLE_BATSCHED is set to off or not set: ignored
+        *      - If ENABLE_BATSCHED is set to on:
+        *          - "false": do not enforce contiguous nodes for allocations (default)
+        *          - "true": enforce contiguous nodes for allocations (note that not all algorithms
+        *            implemented by batsched support contiguous allocations, so this option may
+        *            have no effect in some cases).
+        */
+        DECLARE_PROPERTY_NAME(BATSCHED_CONTIGUOUS_ALLOCATION);
+
         /***********************/
         /** \cond INTERNAL     */
         /***********************/

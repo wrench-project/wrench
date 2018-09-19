@@ -151,7 +151,7 @@ namespace wrench {
       zmq::message_t reply;
 
       // This "backoff" approach is to detect batsched errors!
-      int max_num_trials = 100;
+      int max_num_trials = 1000;
       int trials;
       for (trials=0; trials < max_num_trials; trials++) {
           usleep(100 + 100 * trials);

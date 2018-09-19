@@ -22,5 +22,6 @@ namespace wrench {
     SET_PROPERTY_NAME(BatchServiceProperty, SIMULATE_COMPUTATION_AS_SLEEP);
 
     SET_PROPERTY_NAME(BatchServiceProperty, BATSCHED_LOGGING_MUTED);
+    SET_PROPERTY_NAME(BatchServiceProperty, BATSCHED_CONTIGUOUS_ALLOCATION);
 
 }
