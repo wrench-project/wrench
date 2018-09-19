@@ -66,7 +66,8 @@ namespace wrench {
                 {BatchServiceProperty::SIMULATED_WORKLOAD_TRACE_FILE,               ""},
                 {BatchServiceProperty::OUTPUT_CSV_JOB_LOG,                          ""},
                 {BatchServiceProperty::SIMULATE_COMPUTATION_AS_SLEEP,           "false"},
-                {BatchServiceProperty::BATSCHED_LOGGING_MUTED,                  "true"}
+                {BatchServiceProperty::BATSCHED_LOGGING_MUTED,                  "true"},
+                {BatchServiceProperty::BATSCHED_CONTIGUOUS_ALLOCATION,          "false"}
         };
 
         std::map<std::string, std::string> default_messagepayload_values = {
