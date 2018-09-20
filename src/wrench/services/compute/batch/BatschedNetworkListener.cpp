@@ -151,17 +151,17 @@ namespace wrench {
       zmq::message_t reply;
 
       // This "backoff" approach is to detect batsched errors!
-      int max_num_trials = 1000;
-      int trials;
+      useconds_t max_num_trials = 1000;
+      useconds_t trials;
       for (trials=0; trials < max_num_trials; trials++) {
-          usleep(100 + 100 * trials);
+          usleep(100 + 100 * trials * trials);
           int ret = socket.recv(&reply, ZMQ_DONTWAIT);
           if (ret > 0) {
             break;
           }
       }
       if (trials == max_num_trials) {
-        throw std::runtime_error("Fatal Batsched Error (like some failed assert in the scheduler, could be transient)!");
+        throw std::runtime_error("Fatal Batsched Error (perhaps a failed assert in the scheduler or a time-out due to batsched taking so long... could be transient)!");
       }
 
       socket.close();
