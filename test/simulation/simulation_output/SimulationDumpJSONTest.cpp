@@ -85,10 +85,10 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
     )"_json;
 
     std::string json_file_path("/tmp/workflow_data.json");
-    EXPECT_THROW(simulation->dumpWorkflowTaskDataJSON(nullptr, json_file_path), std::invalid_argument);
-    EXPECT_THROW(simulation->dumpWorkflowTaskDataJSON(workflow.get(), ""), std::invalid_argument);
+    EXPECT_THROW(simulation->dumpWorkflowExecutionJSON(nullptr, json_file_path), std::invalid_argument);
+    EXPECT_THROW(simulation->dumpWorkflowExecutionJSON(workflow.get(), ""), std::invalid_argument);
 
-    EXPECT_NO_THROW(simulation->dumpWorkflowTaskDataJSON(workflow.get(), json_file_path));
+    EXPECT_NO_THROW(simulation->dumpWorkflowExecutionJSON(workflow.get(), json_file_path));
 
     std::ifstream json_file(json_file_path);
     nlohmann::json RESULT_JSON;

@@ -677,7 +677,7 @@ namespace wrench {
      * @breif Writes WorkflowTask execution history for each task to a file, formatted as a JSON array
      * @param file_path: the path to write the file
      */
-    void Simulation::dumpWorkflowTaskDataJSON(Workflow *workflow, std::string file_path) {
+    void Simulation::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path) {
 
         /* formatted as an array of objects, where each object is an execution of some task at some point in time
          *  [
