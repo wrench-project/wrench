@@ -683,7 +683,12 @@ namespace wrench {
          *  [
          *      {
          *          task_id: <id>,
-         *          execution_host: <hostname>,
+         *          execution_host: {
+         *              hostname: <hostname>,
+         *              flop_rate: <FLOPS>,
+         *              memory: <bytes>,
+         *              cores: <num_cores>
+         *          },
          *          num_cores_allocated: <number>,
          *          whole_task: { start: <number>, end: <number> },
          *          read:       { start: <number>, end: <number> },
@@ -717,7 +722,13 @@ namespace wrench {
                 nlohmann::json task_execution_json;
 
                 task_execution_json["task_id"]        = task->getID();
-                task_execution_json["execution_host"] = task_execution.execution_host;
+                task_execution_json["execution_host"] = {
+                        {"hostname", task_execution.execution_host},
+                        {"flop_rate", this->getHostFlopRate(task_execution.execution_host)},
+                        {"memory", this->getHostMemoryCapacity(task_execution.execution_host)},
+                        {"cores", this->getHostNumCores(task_execution.execution_host)}
+                };
+
                 task_execution_json["num_cores_allocated"] = task_execution.num_cores_allocated;
 
                 task_execution_json["whole_task"] = {{START, task_execution.task_start},        {END, task_execution.task_end}};

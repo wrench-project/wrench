@@ -13,6 +13,8 @@
 
 #include <nlohmann/json.hpp>
 
+#include "../../include/TestWithFork.h"
+
 #include <fstream>
 
 /**********************************************************************/
@@ -20,38 +22,81 @@
 /**********************************************************************/
 
 class SimulationDumpJSONTest : public ::testing::Test {
+
 public:
-    wrench::WorkflowTask *t1, *t2;
+    wrench::WorkflowTask *t1 = nullptr;
+    wrench::WorkflowTask *t2 = nullptr;
+
+    void do_SimulationDumpWorkflowExecutionJSON_test();
+
+protected:
+    SimulationDumpJSONTest() {
+
+        std::string xml = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<platform version=\"4.1\"> "
+                          "   <zone id=\"AS0\" routing=\"Full\"> "
+                          "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
+                          "         <prop id=\"ram\" value=\"10\"/>"
+                          "       </host>"
+                          "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
+                          "          <prop id=\"ram\" value=\"20\"/> "
+                          "       </host> "
+                          "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                          "       <route src=\"host1\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
+                          "   </zone> "
+                          "</platform>";
+        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+        fprintf(platform_file, "%s", xml.c_str());
+        fclose(platform_file);
+
+        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    }
+
+    std::string platform_file_path = "/tmp/platform.xml";
     std::unique_ptr<wrench::Workflow> workflow;
+
 };
 
-TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
-
+void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
     t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
 
-    std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
-
     t1->setStartDate(1.0);
     t1->setExecutionHost("host1");
-    t1->setNumCoresAllocated(10);
+    t1->setNumCoresAllocated(8);
 
     t1->setStartDate(2.0);
     t1->setExecutionHost("host2");
-    t1->setNumCoresAllocated(20);
+    t1->setNumCoresAllocated(10);
 
     t2->setStartDate(3.0);
     t2->setExecutionHost("host2");
-    t2->setNumCoresAllocated(30);
+    t2->setNumCoresAllocated(20);
+
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("simulation_dump_workflow_execution_test");
+
+    std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
+
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(platform_file_path);
 
     const nlohmann::json EXPECTED_JSON = R"(
         [
             {
                 "task_id": "task1",
-                "execution_host": "host2",
-                "num_cores_allocated": 20,
+                "execution_host": {
+                    "hostname": "host2",
+                    "flop_rate": 1.0,
+                    "memory": 20.0,
+                    "cores": 20
+                },
+                "num_cores_allocated": 10,
                 "whole_task": {"start": 2.0, "end": -1},
                 "read": {"start": -1, "end": -1},
                 "compute": {"start": -1, "end": -1},
@@ -61,8 +106,13 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
             },
             {
                 "task_id": "task1",
-                "execution_host": "host1",
-                "num_cores_allocated": 10,
+                "execution_host": {
+                    "hostname": "host1",
+                    "flop_rate": 1.0,
+                    "memory": 10.0,
+                    "cores": 10
+                },
+                "num_cores_allocated": 8,
                 "whole_task": {"start": 1.0, "end": -1},
                 "read": {"start": -1, "end": -1},
                 "compute": {"start": -1, "end": -1},
@@ -72,8 +122,13 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
             },
             {
                 "task_id": "task2",
-                "execution_host": "host2",
-                "num_cores_allocated": 30,
+                "execution_host": {
+                    "hostname": "host2",
+                    "flop_rate": 1.0,
+                    "memory": 20.0,
+                    "cores": 20
+                },
+                "num_cores_allocated": 20,
                 "whole_task": {"start": 3.0, "end": -1},
                 "read": {"start": -1, "end": -1},
                 "compute": {"start": -1, "end": -1},
@@ -102,5 +157,12 @@ TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
      */
     EXPECT_TRUE(RESULT_JSON == EXPECTED_JSON);
     //std::cerr << std::setw(4) << RESULT_JSON << std::endl;
+
+    free(argv[0]);
+    free(argv);
+}
+
+TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
+    DO_TEST_WITH_FORK(do_SimulationDumpWorkflowExecutionJSON_test);
 }
 
