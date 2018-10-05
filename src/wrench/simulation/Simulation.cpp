@@ -674,8 +674,11 @@ namespace wrench {
     }
 
     /**
-     * @breif Writes WorkflowTask execution history for each task to a file, formatted as a JSON array
+     * @brief Writes WorkflowTask execution history for each task to a file, formatted as a JSON array
+     * @param workflow: a pointer to the Workflow
      * @param file_path: the path to write the file
+     *
+     * @throws std::invalid_argument
      */
     void Simulation::dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path) {
 
@@ -685,9 +688,9 @@ namespace wrench {
          *          task_id: <id>,
          *          execution_host: {
          *              hostname: <hostname>,
-         *              flop_rate: <FLOPS>,
-         *              memory: <bytes>,
-         *              cores: <num_cores>
+         *              flop_rate: <number>,
+         *              memory: <number>,
+         *              cores: <number>
          *          },
          *          num_cores_allocated: <number>,
          *          whole_task: { start: <number>, end: <number> },
@@ -749,6 +752,120 @@ namespace wrench {
         output.close();
     }
 
+    /**
+     * @brief Writes JSON graph representation of the Workflow to a file
+     * @description A node is added for each WorkflowFile and WorkflowTask. A link directed link is added for each dependency in the Workflow.
+     * @param workflow: a pointer to the workflow
+     * @param file_path: the path to write the file
+     *
+     * @throws std::invalid_argument
+     */
+    void Simulation::dumpWorkflowGraphJSON(wrench::Workflow *workflow, std::string file_path) {
+        if (workflow == nullptr || file_path.empty()) {
+            throw std::invalid_argument("Simulation::dumpTaskDataJSON() requires a valid workflow and file_path");
+        }
+
+        /* format of the JSON object
+         *  {
+         *      "nodes": [
+         *          {
+         *              "type": <task>,
+         *              "id": <task id>,
+         *              "flops": <number>,
+         *              "min_cores": <number>,
+         *              "max_cores": <number>,
+         *              "parallel_efficiency": <number>,
+         *              "memory": <number>,
+         *          },
+         *          {
+         *              "type": <file>,
+         *              "id": <filename>,
+         *              "size": <number>
+         *          }
+         *          .
+         *          .
+         *          .
+         *      ],
+         *
+         *      "links": [
+         *          {
+         *              "source": <id>,
+         *              "target": <id>
+         *          },
+         *          {
+         *              "source": <id>,
+         *              "target": <id>
+         *          },
+         *          .
+         *          .
+         *          .
+         *      ]
+         *  }
+         */
+        nlohmann::json nodes;
+        nlohmann::json links;
+
+        // add the task nodes
+        for (const auto &task : workflow->getTasks()) {
+            nodes.push_back({
+                {"type", "task"},
+                {"id", task->getID()},
+                {"flops", task->getFlops()},
+                {"min_cores", task->getMinNumCores()},
+                {"max_cores", task->getMaxNumCores()},
+                {"parallel_efficiency", task->getParallelEfficiency()},
+                {"memory", task->getMemoryRequirement()}
+            });
+        }
+
+        // add the file nodes
+        for (const auto &file : workflow->getFiles()) {
+            nodes.push_back({
+                {"type", "file"},
+                {"id", file->getID()},
+                {"size", file->getSize()}
+            });
+        }
+
+        // add the links
+        for (const auto &task : workflow->getTasks()) {
+            // create links between input files (if any) and the current task
+            for (const auto &input_file : task->getInputFiles()) {
+                links.push_back({
+                    {"source", input_file->getID()},
+                    {"target", task->getID()}
+                });
+            }
+
+
+            bool has_output_files = (task->getOutputFiles().size() > 0) ? true : false;
+            bool has_children = (task->getNumberOfChildren() > 0) ? true : false;
+
+            if (has_output_files) {
+                // create the links between current task and its output files (if any)
+                for (const auto &output_file : task->getOutputFiles()) {
+                    links.push_back({{"source", task->getID()},
+                                     {"target", output_file->getID()}});
+                }
+            } else if (has_children) {
+                // then create the links from the current task to its children tasks (if it has not output files)
+                for (const auto & child : workflow->getTaskChildren(task)) {
+                    links.push_back({
+                                            {"source", task->getID()},
+                                            {"target", child->getID()}});
+                }
+            }
+        }
+
+        nlohmann::json workflow_task_graph;
+        workflow_task_graph["nodes"] = nodes;
+        workflow_task_graph["links"] = links;
+
+
+        std::ofstream output(file_path);
+        output << std::setw(4) << workflow_task_graph << std::endl;
+        output.close();
+    }
 
     /**
      * @brief Get the energy consumed by the host up to now

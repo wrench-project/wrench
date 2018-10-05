@@ -63,6 +63,7 @@ namespace wrench {
         SimulationOutput &getOutput();
 
         void dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path);
+        void dumpWorkflowGraphJSON(Workflow *workflow, std::string file_path);
 
         static double getHostMemoryCapacity(std::string hostname);
 
