@@ -78,6 +78,11 @@ set(HEADER_FILES
         include/wrench/services/compute/cloud/CloudService.h
         include/wrench/services/compute/cloud/CloudServiceProperty.h
         include/wrench/services/compute/cloud/CloudServiceMessagePayload.h
+        include/wrench/services/compute/htcondor/HTCondorService.h
+        include/wrench/services/compute/htcondor/HTCondorCentralManagerService.h
+        include/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.h
+        include/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.h
+        include/wrench/services/compute/htcondor/HTCondorNegotiatorService.h
         include/wrench/services/storage/StorageService.h
         include/wrench/services/storage/StorageServiceProperty.h
         include/wrench/services/storage/StorageServiceMessagePayload.h
@@ -203,6 +208,11 @@ set(SOURCE_FILES
         src/wrench/services/compute/batch/BatchServiceProperty.cpp
         src/wrench/services/compute/batch/BatchServiceMessagePayload.cpp
         src/wrench/services/compute/batch/BatschedNetworkListener.cpp
+        src/wrench/services/compute/htcondor/HTCondorService.cpp
+        src/wrench/services/compute/htcondor/HTCondorCentralManagerService.cpp
+        src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessage.cpp
+        src/wrench/services/compute/htcondor/HTCondorCentralManagerServiceMessagePayload.cpp
+        src/wrench/services/compute/htcondor/HTCondorNegotiatorService.cpp
         src/wrench/services/helpers/Alarm.cpp
         src/wrench/util/PointerUtil.cpp
         src/wrench/util/MessageManager.cpp
