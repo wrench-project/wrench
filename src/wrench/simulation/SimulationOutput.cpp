@@ -56,7 +56,8 @@ namespace wrench {
 
     /**
      * @brief Function called by the nlohmann::json constructor when a WorkflowTaskExecutionInstance is passed in as
-     *      a parameter. This returns the JSON representation of a WorkflowTaskExecutionInstance
+     *      a parameter. This returns the JSON representation of a WorkflowTaskExecutionInstance. The name of this function
+     *      is important and should not be changed as it is what nlohmann expects (hardcoded in there).
      * @param j: reference to a JSON object
      * @param w: reference to a WorkflowTaskExecutionInstance
      */
