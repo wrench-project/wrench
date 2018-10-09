@@ -13,6 +13,7 @@
 
 #include <string>
 #include <vector>
+#include <nlohmann/json.hpp>
 
 #include "wrench/services/file_registry/FileRegistryService.h"
 #include "wrench/services/network_proximity/NetworkProximityService.h"
@@ -62,9 +63,6 @@ namespace wrench {
 
         SimulationOutput &getOutput();
 
-        void dumpWorkflowExecutionJSON(Workflow *workflow, std::string file_path);
-        void dumpWorkflowGraphJSON(Workflow *workflow, std::string file_path);
-
         static double getHostMemoryCapacity(std::string hostname);
 
         static unsigned long getHostNumCores(std::string hostname);
@@ -104,7 +102,7 @@ namespace wrench {
         static void compute(double flops);
 
         /***********************/
-        /** \endcond            */
+        /** \endcond           */
         /***********************/
 
     private:
