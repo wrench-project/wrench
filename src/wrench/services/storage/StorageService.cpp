@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ namespace wrench {
      * @param mailbox_name_prefix: the mailbox name prefix
      * @param capacity: the storage capacity in bytes
      */
-    StorageService::StorageService(std::string hostname, std::string service_name, std::string mailbox_name_prefix,
-                                   double capacity) :
+    StorageService::StorageService(const std::string &hostname, const std::string &service_name,
+                                   const std::string &mailbox_name_prefix, double capacity) :
             Service(hostname, service_name, mailbox_name_prefix) {
 
       if (capacity < 0) {
@@ -93,8 +93,8 @@ namespace wrench {
         dst_partition = "/";
       }
 
-      std::set<WorkflowFile*> files = this->stored_files[dst_partition];
-      if (files.size() > 0) {
+      std::set<WorkflowFile *> files = this->stored_files[dst_partition];
+      if (not files.empty()) {
         if (files.find(file) == files.end()) {
           throw std::runtime_error(
                   "StorageService::removeFileFromStorage(): Attempting to remove a file that is not on the storage service");
@@ -141,7 +141,8 @@ namespace wrench {
       try {
         S4U_Mailbox::putMessage(this->mailbox_name, new StorageServiceFreeSpaceRequestMessage(
                 answer_mailbox,
-                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(
+                        StorageServiceMessagePayload::FREE_SPACE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -183,7 +184,7 @@ namespace wrench {
       }
 
       std::string dst_partition = "/";
-      return this->lookupFile(file,dst_partition);
+      return this->lookupFile(file, dst_partition);
     }
 
     /**
@@ -197,7 +198,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::invalid_arguments
      */
-    bool StorageService::lookupFile(WorkflowFile *file, WorkflowJob* job) {
+    bool StorageService::lookupFile(WorkflowFile *file, WorkflowJob *job) {
 
       if (file == nullptr) {
         throw std::invalid_argument("StorageService::lookupFile(): Invalid arguments");
@@ -211,7 +212,7 @@ namespace wrench {
       if (job != nullptr) {
         dst_partition += job->getName();
       }
-      return this->lookupFile(file,dst_partition);
+      return this->lookupFile(file, dst_partition);
     }
 
     /**
@@ -248,7 +249,8 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 dst_partition,
-                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(
+                        StorageServiceMessagePayload::FILE_LOOKUP_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -279,7 +281,7 @@ namespace wrench {
     void StorageService::readFile(WorkflowFile *file) {
 
       std::string src_partition = "/";
-      this->readFile(file,src_partition);
+      this->readFile(file, src_partition);
     }
 
     /**
@@ -291,14 +293,14 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::invalid_arguments
      */
-    void StorageService::readFile(WorkflowFile *file, WorkflowJob* job) {
+    void StorageService::readFile(WorkflowFile *file, WorkflowJob *job) {
 
 
       std::string src_partition = "/";
       if (job != nullptr) {
         src_partition += job->getName();
       }
-      this->readFile(file,src_partition);
+      this->readFile(file, src_partition);
     }
 
     /**
@@ -331,12 +333,13 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("read_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
-                                new StorageServiceFileReadRequestMessage(answer_mailbox,
-                                                                         answer_mailbox,
-                                                                         file,
-                                                                         src_partition,
-                                                                         this->getMessagePayloadValueAsDouble(
-                                                                                 StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
+                                new StorageServiceFileReadRequestMessage(
+                                        answer_mailbox,
+                                        answer_mailbox,
+                                        file,
+                                        src_partition,
+                                        this->getMessagePayloadValueAsDouble(
+                                                StorageServiceMessagePayload::FILE_READ_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -388,7 +391,7 @@ namespace wrench {
     void StorageService::writeFile(WorkflowFile *file) {
 
       std::string dst_partition = "/";
-      this->writeFile(file,dst_partition);
+      this->writeFile(file, dst_partition);
     }
 
 
@@ -400,13 +403,13 @@ namespace wrench {
      *
      * @throw WorkflowExecutionException
      */
-    void StorageService::writeFile(WorkflowFile *file, WorkflowJob* job) {
+    void StorageService::writeFile(WorkflowFile *file, WorkflowJob *job) {
 
       std::string dst_partition = "/";
       if (job != nullptr) {
         dst_partition += job->getName();
       }
-      this->writeFile(file,dst_partition);
+      this->writeFile(file, dst_partition);
     }
 
     /**
@@ -438,11 +441,12 @@ namespace wrench {
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("write_file");
       try {
         S4U_Mailbox::putMessage(this->mailbox_name,
-                                new StorageServiceFileWriteRequestMessage(answer_mailbox,
-                                                                          file,
-                                                                          dst_partition,
-                                                                          this->getMessagePayloadValueAsDouble(
-                                                                                  StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
+                                new StorageServiceFileWriteRequestMessage(
+                                        answer_mailbox,
+                                        file,
+                                        dst_partition,
+                                        this->getMessagePayloadValueAsDouble(
+                                                StorageServiceMessagePayload::FILE_WRITE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -490,10 +494,11 @@ namespace wrench {
     void StorageService::readFiles(std::set<WorkflowFile *> files,
                                    std::map<WorkflowFile *, StorageService *> file_locations,
                                    StorageService *default_storage_service,
-                                   std::set<WorkflowFile*>& files_in_scratch,
-                                   WorkflowJob* job) {
+                                   std::set<WorkflowFile *> &files_in_scratch,
+                                   WorkflowJob *job) {
       try {
-        StorageService::writeOrReadFiles(READ, std::move(files), std::move(file_locations), default_storage_service, files_in_scratch, job);
+        StorageService::writeOrReadFiles(READ, std::move(files), std::move(file_locations), default_storage_service,
+                                         files_in_scratch, job);
       } catch (std::runtime_error &e) {
         throw;
       } catch (WorkflowExecutionException &e) {
@@ -502,7 +507,7 @@ namespace wrench {
     }
 
     /**
-     * @brief Synchronously and sequentially uppload a set of files from storage services
+     * @brief Synchronously and sequentially upload a set of files from storage services
      *
      * @param files: the set of files to write
      * @param file_locations: a map of files to storage services
@@ -517,10 +522,11 @@ namespace wrench {
     void StorageService::writeFiles(std::set<WorkflowFile *> files,
                                     std::map<WorkflowFile *, StorageService *> file_locations,
                                     StorageService *default_storage_service,
-                                    std::set<WorkflowFile*>& files_in_scratch,
-                                    WorkflowJob* job) {
+                                    std::set<WorkflowFile *> &files_in_scratch,
+                                    WorkflowJob *job) {
       try {
-        StorageService::writeOrReadFiles(WRITE, std::move(files), std::move(file_locations), default_storage_service, files_in_scratch, job);
+        StorageService::writeOrReadFiles(WRITE, std::move(files), std::move(file_locations), default_storage_service,
+                                         files_in_scratch, job);
       } catch (std::runtime_error &e) {
         throw;
       } catch (WorkflowExecutionException &e) {
@@ -545,8 +551,8 @@ namespace wrench {
                                           std::set<WorkflowFile *> files,
                                           std::map<WorkflowFile *, StorageService *> file_locations,
                                           StorageService *default_storage_service,
-                                          std::set<WorkflowFile*>& files_in_scratch,
-                                          WorkflowJob* job) {
+                                          std::set<WorkflowFile *> &files_in_scratch,
+                                          WorkflowJob *job) {
 
       for (auto const &f : files) {
         if (f == nullptr) {
@@ -561,7 +567,7 @@ namespace wrench {
       }
 
       // Create a temporary sorted list of files so that the order in which files are read/written is deterministic!
-      std::map<std::string, WorkflowFile*> sorted_files;
+      std::map<std::string, WorkflowFile *> sorted_files;
       for (auto const &f : files) {
         sorted_files.insert(std::make_pair(f->getID(), f));
       }
@@ -581,7 +587,8 @@ namespace wrench {
 
         if (action == READ) {
           try {
-            WRENCH_INFO("Reading file %s from storage service %s", file->getID().c_str(), storage_service->getName().c_str());
+            WRENCH_INFO("Reading file %s from storage service %s", file->getID().c_str(),
+                        storage_service->getName().c_str());
             if (storage_service != default_storage_service) {
               //if the storage service where I am going to read from is not the default storage service (scratch), then I
               // don't want to read from job's temp partition, rather I would like to read from / partition of the storage service
@@ -597,7 +604,8 @@ namespace wrench {
           }
         } else {
           try {
-            WRENCH_INFO("Writing file %s to storage service %s", file->getID().c_str(), storage_service->getName().c_str());
+            WRENCH_INFO("Writing file %s to storage service %s", file->getID().c_str(),
+                        storage_service->getName().c_str());
             // Write the file
             if (storage_service == default_storage_service) {
               files_in_scratch.insert(file);
@@ -653,7 +661,7 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_argument
      */
-    void StorageService::deleteFile(WorkflowFile *file , WorkflowJob* job, FileRegistryService *file_registry_service) {
+    void StorageService::deleteFile(WorkflowFile *file, WorkflowJob *job, FileRegistryService *file_registry_service) {
 
       if (file == nullptr) {
         throw std::invalid_argument("StorageService::deleteFile(): Invalid arguments");
@@ -681,7 +689,8 @@ namespace wrench {
     * @throw std::runtime_error
     * @throw std::invalid_argument
     */
-    void StorageService::deleteFile(WorkflowFile *file, std::string dst_partition, FileRegistryService *file_registry_service) {
+    void StorageService::deleteFile(WorkflowFile *file, std::string dst_partition,
+                                    FileRegistryService *file_registry_service) {
 
       // Empty partition means "/"
       if (dst_partition.empty()) {
@@ -696,7 +705,8 @@ namespace wrench {
                 answer_mailbox,
                 file,
                 dst_partition,
-                this->getMessagePayloadValueAsDouble(StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
+                this->getMessagePayloadValueAsDouble(
+                        StorageServiceMessagePayload::FILE_DELETE_REQUEST_MESSAGE_PAYLOAD)));
       } catch (std::shared_ptr<NetworkError> &cause) {
         throw WorkflowExecutionException(cause);
       }
@@ -777,7 +787,8 @@ namespace wrench {
       }
 
       if (src == this) {
-        throw std::invalid_argument("StorageService::copyFile(file,src): Cannot redundantly copy a file to its own partition");
+        throw std::invalid_argument(
+                "StorageService::copyFile(file,src): Cannot redundantly copy a file to its own partition");
       }
 
       if (this->state == DOWN) {
@@ -788,7 +799,7 @@ namespace wrench {
 
       std::string dst_partition = "/";
 
-      this->copyFile(file,src,src_partition,dst_partition);
+      this->copyFile(file, src, src_partition, dst_partition);
     }
 
     /**
@@ -801,7 +812,7 @@ namespace wrench {
      * @throw WorkflowExecutionException
      * @throw std::invalid_argument
      */
-    void StorageService::copyFile(WorkflowFile *file, StorageService *src, WorkflowJob* src_job, WorkflowJob* dst_job) {
+    void StorageService::copyFile(WorkflowFile *file, StorageService *src, WorkflowJob *src_job, WorkflowJob *dst_job) {
 
 
       if ((file == nullptr) || (src == nullptr)) {
@@ -813,7 +824,8 @@ namespace wrench {
       }
 
       if (src_job != nullptr && dst_job != nullptr) {
-        throw std::invalid_argument("StorageService::copyFile(file,src,src_job,dst_job): Cannot copy files from one job's private partition to another job's private partition");
+        throw std::invalid_argument(
+                "StorageService::copyFile(file,src,src_job,dst_job): Cannot copy files from one job's private partition to another job's private partition");
       }
 
       if (this->state == DOWN) {
@@ -830,7 +842,7 @@ namespace wrench {
         dst_partition += dst_job->getName();
       }
 
-      this->copyFile(file,src,src_partition,dst_partition);
+      this->copyFile(file, src, src_partition, dst_partition);
     }
 
     /**
@@ -845,10 +857,11 @@ namespace wrench {
      * @throw std::invalid_argument
      */
     void StorageService::copyFile(WorkflowFile *file, StorageService *src, std::string src_partition,
-                                            std::string dst_partition) {
+                                  std::string dst_partition) {
 
       if (src == this && (src_partition == dst_partition)) {
-        throw std::invalid_argument("StorageService::copyFile(file,src,src_partition,dst_partition): Cannot redundantly copy a file to its own partition");
+        throw std::invalid_argument(
+                "StorageService::copyFile(file,src,src_partition,dst_partition): Cannot redundantly copy a file to its own partition");
       }
 
       // Empty partition means "/"
@@ -926,7 +939,8 @@ namespace wrench {
       }
 
       if ((src == this) && (src_partition == dst_partition)) {
-        throw std::invalid_argument("StorageService::copyFile(): Cannot redundantly copy a file to the its own partition");
+        throw std::invalid_argument(
+                "StorageService::copyFile(): Cannot redundantly copy a file to the its own partition");
       }
 
       if (this->state == DOWN) {
@@ -965,7 +979,8 @@ namespace wrench {
      * @throw std::runtime_error
      * @throw std::invalid_arguments
      */
-    void StorageService::initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file, std::string src_partition) {
+    void StorageService::initiateFileRead(std::string mailbox_that_should_receive_file_content, WorkflowFile *file,
+                                          std::string src_partition) {
 
       WRENCH_INFO("Initiating a file read operation for file %s on storage service %s",
                   file->getID().c_str(), this->getName().c_str());

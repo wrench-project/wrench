@@ -32,7 +32,7 @@ namespace wrench {
      */
     HTCondorCentralManagerService::HTCondorCentralManagerService(
             const std::string &hostname,
-            std::set<std::shared_ptr<ComputeService>> compute_resources,
+            std::set<ComputeService *> compute_resources,
             std::map<std::string, std::string> property_list,
             std::map<std::string, std::string> messagepayload_list)
             : ComputeService(hostname, "htcondor_central_manager", "htcondor_central_manager", nullptr) {
@@ -53,10 +53,10 @@ namespace wrench {
      * @brief Destructor
      */
     HTCondorCentralManagerService::~HTCondorCentralManagerService() {
-      this->pending_jobs.clear();
-      this->compute_resources.clear();
-      this->compute_resources_map.clear();
-      this->running_jobs.clear();
+//      this->pending_jobs.clear();
+//      this->compute_resources.clear();
+//      this->compute_resources_map.clear();
+//      this->running_jobs.clear();
     }
 
     /**
@@ -150,19 +150,18 @@ namespace wrench {
      */
     int HTCondorCentralManagerService::main() {
 
-      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
+      TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_MAGENTA);
       WRENCH_INFO("HTCondor Service starting on host %s listening on mailbox_name %s", this->hostname.c_str(),
                   this->mailbox_name.c_str());
 
       // start the compute resource services
       try {
-        for (auto &cs : this->compute_resources) {
-          cs->simulation = this->simulation;
-          cs->start(cs, true); // Daemonize!
+        for (auto cs : this->compute_resources) {
+          this->simulation->startNewService(cs);
 
           // for cloud services
-          if (auto cloud = dynamic_cast<CloudService *>(cs.get())) {
-            for (auto host : cloud->getExecutionHosts()) {
+          if (auto cloud = dynamic_cast<CloudService *>(cs)) {
+            for (auto &host : cloud->getExecutionHosts()) {
               for (int i = 0; i < S4U_Simulation::getHostNumCores(host); i++) {
                 cloud->createVM(1, ComputeService::ALL_RAM);
               }
@@ -174,8 +173,6 @@ namespace wrench {
           std::vector<unsigned long> num_idle_cores = cs->getNumIdleCores();
           sum_num_idle_cores = std::accumulate(num_idle_cores.begin(), num_idle_cores.end(), 0ul);
           this->compute_resources_map.insert(std::make_pair(cs, sum_num_idle_cores));
-          WRENCH_INFO("SERVICE_VM %ld", sum_num_idle_cores);
-
         }
       } catch (std::runtime_error &e) {
         throw;
@@ -220,7 +217,7 @@ namespace wrench {
         return false;
       }
 
-      WRENCH_INFO("Got a [%s] message", message->getName().c_str());
+      WRENCH_INFO("HTCondor Central Manager got a [%s] message", message->getName().c_str());
 
       if (auto *msg = dynamic_cast<ServiceStopDaemonMessage *>(message.get())) {
         this->terminate();
@@ -341,10 +338,13 @@ namespace wrench {
      */
     void HTCondorCentralManagerService::terminate() {
       this->setStateToDown();
-      WRENCH_INFO("Stopping Compute Services");
-      for (auto &cs : this->compute_resources) {
+      for (auto cs : this->compute_resources) {
         cs->stop();
       }
+      this->compute_resources.clear();
+      this->compute_resources_map.clear();
+      this->pending_jobs.clear();
+      this->running_jobs.clear();
     }
 
 }

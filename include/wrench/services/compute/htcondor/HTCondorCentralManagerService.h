@@ -32,7 +32,7 @@ namespace wrench {
 
     public:
         HTCondorCentralManagerService(const std::string &hostname,
-                                      std::set<std::shared_ptr<ComputeService>> compute_resources,
+                                      std::set<ComputeService *> compute_resources,
                                       std::map<std::string, std::string> property_list = {},
                                       std::map<std::string, std::string> messagepayload_list = {});
 
@@ -74,7 +74,7 @@ namespace wrench {
         void terminate();
 
         /** set of compute resources **/
-        std::set<std::shared_ptr<ComputeService>> compute_resources;
+        std::set<ComputeService *> compute_resources;
         /** queue of pending jobs **/
         std::vector<StandardJob *> pending_jobs;
         /** whether a negotiator is dispatching jobs **/
@@ -82,9 +82,9 @@ namespace wrench {
         /** whether a negotiator could not dispach jobs **/
         bool resources_unavailable = false;
         /** **/
-        std::map<std::shared_ptr<ComputeService>, unsigned long> compute_resources_map;
+        std::map<ComputeService *, unsigned long> compute_resources_map;
         /** **/
-        std::map<StandardJob *, std::shared_ptr<ComputeService>> running_jobs;
+        std::map<StandardJob *, ComputeService *> running_jobs;
     };
 
 }
