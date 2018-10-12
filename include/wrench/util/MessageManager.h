@@ -10,6 +10,8 @@
 #ifndef WRENCH_MESSAGEMANAGER_H
 #define WRENCH_MESSAGEMANAGER_H
 
+#include <unordered_set>
+
 #include <wrench/services/Service.h>
 #include <wrench/simulation/SimulationMessage.h>
 
@@ -26,7 +28,7 @@ namespace wrench {
 
     class MessageManager {
 
-        static std::map<std::string,std::vector<SimulationMessage*>> mailbox_messages;
+        static std::map<std::string,std::unordered_set<SimulationMessage*>> mailbox_messages;
 
     public:
 

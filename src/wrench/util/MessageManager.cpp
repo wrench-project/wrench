@@ -15,7 +15,7 @@ namespace wrench {
 
     // TODO: At some point, we may want to make this with only unique pointers...
 
-    std::map<std::string, std::vector<SimulationMessage *>> MessageManager::mailbox_messages = {};
+    std::map<std::string, std::unordered_set<SimulationMessage *>> MessageManager::mailbox_messages = {};
 
     /**
      * @brief Insert a message in the manager's  "database"
@@ -32,7 +32,7 @@ namespace wrench {
       if (mailbox_messages.find(mailbox) == mailbox_messages.end()) {
         mailbox_messages.insert({mailbox, {}});
       }
-      mailbox_messages[mailbox].push_back(msg);
+      mailbox_messages[mailbox].insert(msg);
     }
 
     /**
@@ -40,17 +40,11 @@ namespace wrench {
      * @param mailbox: the mailbox name
      */
     void MessageManager::cleanUpMessages(std::string mailbox) {
-      std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
-      for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
-        if ((*msg_itr).first == mailbox) {
-          for (size_t i = 0; i < (*msg_itr).second.size(); i++) {
-            if ((*msg_itr).second[i] != nullptr) {
-              delete (*msg_itr).second[i];
-            }
-          }
-          (*msg_itr).second.clear();
-          break;
+      if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
+        for (auto msg : mailbox_messages[mailbox]) {
+          delete msg;
         }
+        mailbox_messages[mailbox].clear();
       }
     }
 
@@ -59,15 +53,8 @@ namespace wrench {
      */
     void MessageManager::cleanUpAllMessages() {
       std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
-      for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
-        for (size_t i = 0; i < (*msg_itr).second.size(); i++) {
-          if ((*msg_itr).second[i] != nullptr) {
-            delete (*msg_itr).second[i];
-          }
-        }
-        if ((*msg_itr).second.size() > 0) {
-          (*msg_itr).second.clear();
-        }
+      for (auto m : mailbox_messages) {
+        cleanUpMessages(m.first);
       }
     }
 
@@ -77,6 +64,13 @@ namespace wrench {
      * @param msg: the message
      */
     void MessageManager::removeReceivedMessages(std::string mailbox, SimulationMessage *msg) {
+      if (mailbox_messages.find(mailbox) != mailbox_messages.end()) {
+        if (mailbox_messages[mailbox].find(msg) != mailbox_messages[mailbox].end()) {
+          mailbox_messages[mailbox].erase(msg);
+        }
+      }
+
+      #if 0
       std::map<std::string, std::vector<SimulationMessage *>>::iterator msg_itr;
       for (msg_itr = mailbox_messages.begin(); msg_itr != mailbox_messages.end(); msg_itr++) {
         if ((*msg_itr).first == mailbox) {
@@ -89,5 +83,6 @@ namespace wrench {
           }
         }
       }
+      #endif
     }
 }
