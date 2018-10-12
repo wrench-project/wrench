@@ -13,94 +13,1048 @@
 
 #include <nlohmann/json.hpp>
 
+#include "../../include/TestWithFork.h"
+
 #include <fstream>
+
+#include <algorithm>
 
 /**********************************************************************/
 /**                    SimulationDumpJSONTest                        **/
 /**********************************************************************/
 
 class SimulationDumpJSONTest : public ::testing::Test {
+
 public:
-    wrench::WorkflowTask *t1, *t2;
+    wrench::WorkflowTask *t1 = nullptr;
+    wrench::WorkflowTask *t2 = nullptr;
+    wrench::WorkflowTask *t3 = nullptr;
+    wrench::WorkflowTask *t4 = nullptr;
+
+    void do_SimulationDumpWorkflowExecutionJSON_test();
+    void do_SimulationDumpWorkflowGraphJSON_test();
+    void do_SimulationSearchForHostUtilizationGraphLayout_test();
+
+protected:
+    SimulationDumpJSONTest() {
+
+        std::string xml = "<?xml version='1.0'?>"
+                          "<!DOCTYPE platform SYSTEM \"http://simgrid.gforge.inria.fr/simgrid/simgrid.dtd\">"
+                          "<platform version=\"4.1\"> "
+                          "   <zone id=\"AS0\" routing=\"Full\"> "
+                          "       <host id=\"host1\" speed=\"1f\" core=\"10\"> "
+                          "         <prop id=\"ram\" value=\"10\"/>"
+                          "       </host>"
+                          "       <host id=\"host2\" speed=\"1f\" core=\"20\"> "
+                          "          <prop id=\"ram\" value=\"20\"/> "
+                          "       </host> "
+                          "       <link id=\"1\" bandwidth=\"1Gbps\" latency=\"1us\"/>"
+                          "       <route src=\"host1\" dst=\"host2\"> <link_ctn id=\"1\"/> </route>"
+                          "   </zone> "
+                          "</platform>";
+        FILE *platform_file = fopen(platform_file_path.c_str(), "w");
+        fprintf(platform_file, "%s", xml.c_str());
+        fclose(platform_file);
+
+        workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+    }
+
+    std::string platform_file_path = "/tmp/platform.xml";
+    std::string execution_data_json_file_path = "/tmp/workflow_data.json";
+    std::string workflow_graph_json_file_path = "/tmp/workflow_graph_data.json";
     std::unique_ptr<wrench::Workflow> workflow;
+
 };
 
-TEST_F(SimulationDumpJSONTest, SimulationDumpJSONTest) {
+// some comparison functions to be used when sorting lists of JSON objects so that the tests are deterministic
+bool compareStartTimes(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return lhs["whole_task"]["start"] < rhs["whole_task"]["start"];
+}
+
+bool compareTaskIDs(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return lhs["task_id"] < rhs["task_id"];
+}
+
+bool compareNodes(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    return lhs["id"] < rhs["id"];
+}
+
+bool compareLinks(const nlohmann::json &lhs, const nlohmann::json &rhs) {
+    if (lhs["source"] < rhs["source"]) {
+        return true;
+    }
+
+    if (lhs["source"] > rhs["source"]) {
+        return false;
+    }
+
+    if (lhs["target"] < rhs["target"]) {
+        return true;
+    }
+
+    if (lhs["target"] > rhs["target"]) {
+        return false;
+    }
+
+    return false;
+}
+
+/**********************************************************************/
+/**          SimulationDumpWorkflowExecutionJSONTest                 **/
+/**********************************************************************/
+void SimulationDumpJSONTest::do_SimulationDumpWorkflowExecutionJSON_test() {
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("simulation_dump_workflow_execution_test");
+
+    std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
+
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(platform_file_path);
 
     workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
 
     t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
     t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
 
-    std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
-
     t1->setStartDate(1.0);
+    t1->setEndDate(2.0);
     t1->setExecutionHost("host1");
-    t1->setNumCoresAllocated(10);
+    t1->setNumCoresAllocated(8);
 
     t1->setStartDate(2.0);
+    t1->setEndDate(3.0);
     t1->setExecutionHost("host2");
-    t1->setNumCoresAllocated(20);
+    t1->setNumCoresAllocated(10);
 
     t2->setStartDate(3.0);
+    t2->setEndDate(4.0);
     t2->setExecutionHost("host2");
-    t2->setNumCoresAllocated(30);
+    t2->setNumCoresAllocated(20);
 
-    const nlohmann::json EXPECTED_JSON = R"(
+    nlohmann::json expected_json = R"(
         [
             {
-                "task_id": "task1",
-                "execution_host": "host2",
-                "num_cores_allocated": 20,
-                "whole_task": {"start": 2.0, "end": -1},
-                "read": {"start": -1, "end": -1},
-                "compute": {"start": -1, "end": -1},
-                "write": {"start": -1, "end": -1},
-                "failed": -1,
-                "terminated": -1
-            },
-            {
-                "task_id": "task1",
-                "execution_host": "host1",
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 20,
+                    "flop_rate": 1.0,
+                    "hostname": "host2",
+                    "memory": 20.0
+                },
+                "failed": -1.0,
                 "num_cores_allocated": 10,
-                "whole_task": {"start": 1.0, "end": -1},
-                "read": {"start": -1, "end": -1},
-                "compute": {"start": -1, "end": -1},
-                "write": {"start": -1, "end": -1},
-                "failed": -1,
-                "terminated": -1
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task1",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 3.0,
+                    "start": 2.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
             },
             {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 10,
+                    "flop_rate": 1.0,
+                    "hostname": "host1",
+                    "memory": 10.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 8,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task1",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 2.0,
+                    "start": 1.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
+            },
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 20,
+                    "flop_rate": 1.0,
+                    "hostname": "host2",
+                    "memory": 20.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 20,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
                 "task_id": "task2",
-                "execution_host": "host2",
-                "num_cores_allocated": 30,
-                "whole_task": {"start": 3.0, "end": -1},
-                "read": {"start": -1, "end": -1},
-                "compute": {"start": -1, "end": -1},
-                "write": {"start": -1, "end": -1},
-                "failed": -1,
-                "terminated": -1
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 4.0,
+                    "start": 3.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
             }
         ]
     )"_json;
 
-    std::string json_file_path("/tmp/workflow_data.json");
-    EXPECT_THROW(simulation->dumpWorkflowTaskDataJSON(nullptr, json_file_path), std::invalid_argument);
-    EXPECT_THROW(simulation->dumpWorkflowTaskDataJSON(workflow.get(), ""), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(nullptr, execution_data_json_file_path), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), ""), std::invalid_argument);
 
-    EXPECT_NO_THROW(simulation->dumpWorkflowTaskDataJSON(workflow.get(), json_file_path));
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path));
 
-    std::ifstream json_file(json_file_path);
-    nlohmann::json RESULT_JSON;
-    json_file >> RESULT_JSON;
-
+    std::ifstream json_file(execution_data_json_file_path);
+    nlohmann::json result_json;
+    json_file >> result_json;
 
     /*
-     * The setters/getters for WorkflowTask data are tested in WorkflowTaskTest.cpp using a simulated environment.
-     * Here we want to make sure that all task runs (whether they were successful or not) have been written as json
-     * to the file.
+     * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
+     * comparing results with expected values, we sort the json lists so the test is deterministic.
      */
-    EXPECT_TRUE(RESULT_JSON == EXPECTED_JSON);
-    //std::cerr << std::setw(4) << RESULT_JSON << std::endl;
+    std::sort(result_json.begin(), result_json.end(), compareStartTimes);
+    std::sort(expected_json.begin(), expected_json.end(), compareStartTimes);
+
+    EXPECT_TRUE(result_json == expected_json);
+
+    free(argv[0]);
+    free(argv);
 }
 
+TEST_F(SimulationDumpJSONTest, SimulationDumpWorkflowExecutionJSONTest) {
+    DO_TEST_WITH_FORK(do_SimulationDumpWorkflowExecutionJSON_test);
+}
+
+/**********************************************************************/
+/**         SimulationSearchForHostUtilizationGraphLayout            **/
+/**********************************************************************/
+void SimulationDumpJSONTest::do_SimulationSearchForHostUtilizationGraphLayout_test() {
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("simulation_search_for_host_utilization_graph_layout_test");
+
+    std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
+
+    simulation->init(&argc, argv);
+
+    simulation->instantiatePlatform(platform_file_path);
+
+    std::ifstream json_file;
+
+    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+
+    /*
+     * Two tasks run in parallel on a single host. Both use 5 out of the 10 cores.
+     * We expect the following vertical positions to be set:
+     *  - task1: 0 (uses cores 0-4)
+     *  - task2: 5 (uses cores 5-9)
+     */
+    t1->setStartDate(1.0);
+    t1->setEndDate(2.0);
+    t1->setExecutionHost("host1");
+    t1->setNumCoresAllocated(5);
+
+    t2->setStartDate(1.0);
+    t2->setEndDate(2.0);
+    t2->setExecutionHost("host1");
+    t2->setNumCoresAllocated(5);
+
+    nlohmann::json expected_json1 = R"(
+        [
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 10,
+                    "flop_rate": 1.0,
+                    "hostname": "host1",
+                    "memory": 10.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 5,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task1",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 2.0,
+                    "start": 1.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
+            },
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 10,
+                    "flop_rate": 1.0,
+                    "hostname": "host1",
+                    "memory": 10.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 5,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task2",
+                "terminated": -1.0,
+                "vertical_position": 5,
+                "whole_task": {
+                    "end": 2.0,
+                    "start": 1.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
+            }
+        ]
+    )"_json;
+
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path));
+
+    json_file = std::ifstream(execution_data_json_file_path);
+    nlohmann::json result_json1;
+    json_file >> result_json1;
+
+    /*
+     * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
+     * comparing results with expected values, we sort the json lists so the test is deterministic.
+     */
+    std::sort(result_json1.begin(), result_json1.end(), compareTaskIDs);
+    std::sort(expected_json1.begin(), expected_json1.end(), compareTaskIDs);
+
+    EXPECT_TRUE(result_json1 == expected_json1);
+
+    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow);
+
+    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+
+    /*
+     * Two tasks run, one after the other on host1. task2 starts at the same time that task1 ends.
+     * Both tasks should have a vertical position of 0.
+     */
+    t1->setStartDate(1.0);
+    t1->setEndDate(2.0);
+    t1->setExecutionHost("host1");
+    t1->setNumCoresAllocated(5);
+
+    t2->setStartDate(2.0);
+    t2->setEndDate(3.0);
+    t2->setExecutionHost("host1");
+    t2->setNumCoresAllocated(5);
+
+    nlohmann::json expected_json2 = R"(
+        [
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 10,
+                    "flop_rate": 1.0,
+                    "hostname": "host1",
+                    "memory": 10.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 5,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task1",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 2.0,
+                    "start": 1.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
+            },
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 10,
+                    "flop_rate": 1.0,
+                    "hostname": "host1",
+                    "memory": 10.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 5,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task2",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 3.0,
+                    "start": 2.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
+            }
+        ]
+    )"_json;
+
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path));
+
+    json_file = std::ifstream(execution_data_json_file_path);
+    nlohmann::json result_json2;
+    json_file >> result_json2;
+
+    /*
+     * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
+     * comparing results with expected values, we sort the json lists so the test is deterministic.
+     */
+    std::sort(result_json2.begin(), result_json2.end(), compareTaskIDs);
+    std::sort(expected_json2.begin(), expected_json2.end(), compareTaskIDs);
+
+    EXPECT_TRUE(result_json2 == expected_json2);
+
+    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow);
+
+    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+    t3 = workflow->addTask("task3", 1, 1, 1, 1.0, 0);
+    t4 = workflow->addTask("task4", 1, 1, 1, 1.0, 0);
+
+    /*
+     * Two hosts run two tasks each. We expect the following vertical positions to be set:
+     *  - task1: 0
+     *  - task2: 5
+     *  - task3: 0
+     *  - task4: 1
+     */
+    t1->setStartDate(1.0);
+    t1->setEndDate(2.0);
+    t1->setExecutionHost("host1");
+    t1->setNumCoresAllocated(5);
+
+    t2->setStartDate(1.0);
+    t2->setEndDate(2.0);
+    t2->setExecutionHost("host1");
+    t2->setNumCoresAllocated(5);
+
+    t3->setStartDate(1.0);
+    t3->setEndDate(2.0);
+    t3->setExecutionHost("host2");
+    t3->setNumCoresAllocated(1);
+
+    t4->setStartDate(1.0);
+    t4->setEndDate(2.0);
+    t4->setExecutionHost("host2");
+    t4->setNumCoresAllocated(1);
+
+    nlohmann::json expected_json3 = R"(
+        [
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 10,
+                    "flop_rate": 1.0,
+                    "hostname": "host1",
+                    "memory": 10.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 5,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task1",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 2.0,
+                    "start": 1.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
+            },
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 10,
+                    "flop_rate": 1.0,
+                    "hostname": "host1",
+                    "memory": 10.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 5,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task2",
+                "terminated": -1.0,
+                "vertical_position": 5,
+                "whole_task": {
+                    "end": 2.0,
+                    "start": 1.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
+            },
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 20,
+                    "flop_rate": 1.0,
+                    "hostname": "host2",
+                    "memory": 20.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 1,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task3",
+                "terminated": -1.0,
+                "vertical_position": 0,
+                "whole_task": {
+                    "end": 2.0,
+                    "start": 1.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
+            },
+            {
+                "compute": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "execution_host": {
+                    "cores": 20,
+                    "flop_rate": 1.0,
+                    "hostname": "host2",
+                    "memory": 20.0
+                },
+                "failed": -1.0,
+                "num_cores_allocated": 1,
+                "read": {
+                    "end": -1.0,
+                    "start": -1.0
+                },
+                "task_id": "task4",
+                "terminated": -1.0,
+                "vertical_position": 1,
+                "whole_task": {
+                    "end": 2.0,
+                    "start": 1.0
+                },
+                "write": {
+                    "end": -1.0,
+                    "start": -1.0
+                }
+            }
+        ]
+    )"_json;
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path));
+
+    json_file = std::ifstream(execution_data_json_file_path);
+    nlohmann::json result_json3;
+    json_file >> result_json3;
+
+    /*
+     * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
+     * comparing results with expected values, we sort the json lists so the test is deterministic.
+     */
+    std::sort(result_json3.begin(), result_json3.end(), compareTaskIDs);
+    std::sort(expected_json3.begin(), expected_json3.end(), compareTaskIDs);
+
+    EXPECT_TRUE(result_json3 == expected_json3);
+
+    workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow);
+
+    t1 = workflow->addTask("task1", 1, 1, 1, 1.0, 0);
+    t2 = workflow->addTask("task2", 1, 1, 1, 1.0, 0);
+
+    /*
+     * An execution that has no layout because we were possibly oversubscribed. std::runtime_error should be thrown.
+     */
+    t1->setStartDate(1.0);
+    t1->setEndDate(2.0);
+    t1->setExecutionHost("host1");
+    t1->setNumCoresAllocated(10);
+
+    t2->setStartDate(1.0);
+    t2->setEndDate(2.0);
+    t2->setExecutionHost("host1");
+    t2->setNumCoresAllocated(10);
+
+    EXPECT_THROW(simulation->getOutput().dumpWorkflowExecutionJSON(workflow.get(), execution_data_json_file_path), std::runtime_error);
+
+    free(argv[0]);
+    free(argv);
+
+}
+
+TEST_F(SimulationDumpJSONTest, SimulationSearchForHostUtilizationGraphLayoutTest) {
+    DO_TEST_WITH_FORK(do_SimulationSearchForHostUtilizationGraphLayout_test);
+}
+
+/**********************************************************************/
+/**         SimulationDumpWorkflowGraphJSONTest                      **/
+/**********************************************************************/
+void SimulationDumpJSONTest::do_SimulationDumpWorkflowGraphJSON_test() {
+    int argc = 1;
+    auto argv = (char **) calloc(1, sizeof(char *));
+    argv[0] = strdup("simulation_dump_workflow_execution_test");
+
+    std::unique_ptr<wrench::Simulation> simulation = std::unique_ptr<wrench::Simulation>(new wrench::Simulation());
+
+    simulation->init(&argc, argv);
+
+    EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON(nullptr, "/tmp/file.json"), std::invalid_argument);
+    EXPECT_THROW(simulation->getOutput().dumpWorkflowGraphJSON((wrench::Workflow *)&argc, ""), std::invalid_argument);
+
+    std::ifstream graph_json_file;
+
+    // Generate a workflow with two independent tasks. Both tasks each have one input file and one output file.
+    std::unique_ptr<wrench::Workflow> independent_tasks_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+    t1 = independent_tasks_workflow->addTask("task1", 1.0, 1, 1, 1.0, 0);
+    t1->addInputFile(independent_tasks_workflow->addFile("task1_input", 1.0));
+    t1->addOutputFile(independent_tasks_workflow->addFile("task1_output", 1.0));
+
+    t2 = independent_tasks_workflow->addTask("task2", 1.0, 1, 1, 1.0, 0);
+    t2->addInputFile(independent_tasks_workflow->addFile("task2_input", 1.0));
+    t2->addOutputFile(independent_tasks_workflow->addFile("task2_output", 1.0));
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(independent_tasks_workflow.get(), workflow_graph_json_file_path));
+
+    nlohmann::json result_json1;
+    graph_json_file = std::ifstream(workflow_graph_json_file_path);
+    graph_json_file >> result_json1;
+
+    auto expected_json1 = R"(
+    {
+        "links": [
+            {
+                "source": "task1_input",
+                "target": "task1"
+            },
+            {
+                "source": "task1",
+                "target": "task1_output"
+            },
+            {
+                "source": "task2_input",
+                "target": "task2"
+            },
+            {
+                "source": "task2",
+                "target": "task2_output"
+            }
+        ],
+        "nodes": [
+            {
+                "flops": 1.0,
+                "id": "task1",
+                "max_cores": 1,
+                "memory": 0.0,
+                "min_cores": 1,
+                "parallel_efficiency": 1.0,
+                "type": "task"
+            },
+            {
+                "flops": 1.0,
+                "id": "task2",
+                "max_cores": 1,
+                "memory": 0.0,
+                "min_cores": 1,
+                "parallel_efficiency": 1.0,
+                "type": "task"
+            },
+            {
+                "id": "task1_input",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "task1_output",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "task2_input",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "task2_output",
+                "size": 1.0,
+                "type": "file"
+            }
+        ]
+    })"_json;
+
+    /*
+     * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
+     * comparing results with expected values, we sort the json lists so the test is deterministic.
+     */
+    std::sort(result_json1["links"].begin(), result_json1["links"].end(), compareLinks);
+    std::sort(result_json1["nodes"].begin(), result_json1["nodes"].end(), compareNodes);
+
+    std::sort(expected_json1["links"].begin(), expected_json1["links"].end(), compareLinks);
+    std::sort(expected_json1["nodes"].begin(), expected_json1["nodes"].end(), compareNodes);
+
+    EXPECT_TRUE(result_json1 == expected_json1);
+
+    // Generate a workflow with two tasks, two input files, and four output files. Both tasks use both input files and produce two output files each.
+    std::unique_ptr<wrench::Workflow> two_tasks_use_all_files_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+    t1 = two_tasks_use_all_files_workflow->addTask("task1", 1.0, 1, 1, 1.0, 0);
+    t1->addInputFile(two_tasks_use_all_files_workflow->addFile("input_file1", 1));
+    t1->addInputFile(two_tasks_use_all_files_workflow->addFile("input_file2", 2));
+    t1->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file1", 1));
+    t1->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file2", 2));
+
+    t2 = two_tasks_use_all_files_workflow->addTask("task2", 1.0, 1, 1, 1.0, 0);
+    for (auto &file : t1->getInputFiles()) {
+        t2->addInputFile(file);
+    }
+
+    t2->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file3", 1));
+    t2->addOutputFile(two_tasks_use_all_files_workflow->addFile("output_file4", 1));
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(two_tasks_use_all_files_workflow.get(), workflow_graph_json_file_path));
+
+    nlohmann::json result_json2;
+    graph_json_file = std::ifstream(workflow_graph_json_file_path);
+    graph_json_file >> result_json2;
+
+    auto expected_json2 = R"(
+    {
+        "links": [
+            {
+                "source": "input_file1",
+                "target": "task1"
+            },
+            {
+                "source": "input_file2",
+                "target": "task1"
+            },
+            {
+                "source": "task1",
+                "target": "output_file1"
+            },
+            {
+                "source": "task1",
+                "target": "output_file2"
+            },
+            {
+                "source": "input_file1",
+                "target": "task2"
+            },
+            {
+                "source": "input_file2",
+                "target": "task2"
+            },
+            {
+                "source": "task2",
+                "target": "output_file3"
+            },
+            {
+                "source": "task2",
+                "target": "output_file4"
+            }
+        ],
+        "nodes": [
+            {
+                "flops": 1.0,
+                "id": "task1",
+                "max_cores": 1,
+                "memory": 0.0,
+                "min_cores": 1,
+                "parallel_efficiency": 1.0,
+                "type": "task"
+            },
+            {
+                "flops": 1.0,
+                "id": "task2",
+                "max_cores": 1,
+                "memory": 0.0,
+                "min_cores": 1,
+                "parallel_efficiency": 1.0,
+                "type": "task"
+            },
+            {
+                "id": "input_file1",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "input_file2",
+                "size": 2.0,
+                "type": "file"
+            },
+            {
+                "id": "output_file1",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "output_file2",
+                "size": 2.0,
+                "type": "file"
+            },
+            {
+                "id": "output_file3",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "output_file4",
+                "size": 1.0,
+                "type": "file"
+            }
+        ]
+    })"_json;
+
+    /*
+     * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
+     * comparing results with expected values, we sort the json lists so the test is deterministic.
+     */
+    std::sort(result_json2["links"].begin(), result_json2["links"].end(), compareLinks);
+    std::sort(result_json2["nodes"].begin(), result_json2["nodes"].end(), compareNodes);
+
+    std::sort(expected_json2["links"].begin(), expected_json2["links"].end(), compareLinks);
+    std::sort(expected_json2["nodes"].begin(), expected_json2["nodes"].end(), compareNodes);
+
+    EXPECT_TRUE(result_json2 == expected_json2);
+
+    // Generate a workflow where one task forks into two tasks, then those two tasks join into one.
+    std::unique_ptr<wrench::Workflow> fork_join_workflow = std::unique_ptr<wrench::Workflow>(new wrench::Workflow());
+
+    t1 = fork_join_workflow->addTask("task1", 1.0, 1, 1, 1.0, 0);
+    t1->addInputFile(fork_join_workflow->addFile("task1_input", 1.0));
+    t1->addOutputFile(fork_join_workflow->addFile("task1_output1", 1.0));
+    t1->addOutputFile(fork_join_workflow->addFile("task1_output2", 1.0));
+
+    t2 = fork_join_workflow->addTask("task2", 1.0, 1, 1, 1.0, 0);
+    t2->addInputFile(fork_join_workflow->getFileByID("task1_output1"));
+    t2->addOutputFile(fork_join_workflow->addFile("task2_output1", 1.0));
+    fork_join_workflow->addControlDependency(t1, t2);
+
+    t3 = fork_join_workflow->addTask("task3", 1.0, 1, 1, 1.0, 0);
+    t3->addInputFile(fork_join_workflow->getFileByID("task1_output2"));
+    t3->addOutputFile(fork_join_workflow->addFile("task3_output1", 1.0));
+    fork_join_workflow->addControlDependency(t1, t3);
+
+    t4 = fork_join_workflow->addTask("task4", 1.0, 1, 1, 1.0, 0);
+    t4->addInputFile(fork_join_workflow->getFileByID("task2_output1"));
+    t4->addInputFile(fork_join_workflow->getFileByID("task3_output1"));
+    t4->addOutputFile(fork_join_workflow->addFile("task4_output1", 1.0));
+    fork_join_workflow->addControlDependency(t2, t4);
+    fork_join_workflow->addControlDependency(t3, t4);
+
+    EXPECT_NO_THROW(simulation->getOutput().dumpWorkflowGraphJSON(fork_join_workflow.get(), workflow_graph_json_file_path));
+
+    nlohmann::json result_json3;
+    graph_json_file = std::ifstream(workflow_graph_json_file_path);
+
+    graph_json_file >> result_json3;
+
+    auto expected_json3 = R"(
+    {
+        "links": [
+            {
+                "source": "task1_input",
+                "target": "task1"
+            },
+            {
+                "source": "task1",
+                "target": "task1_output1"
+            },
+            {
+                "source": "task1",
+                "target": "task1_output2"
+            },
+            {
+                "source": "task1_output1",
+                "target": "task2"
+            },
+            {
+                "source": "task2",
+                "target": "task2_output1"
+            },
+            {
+                "source": "task1_output2",
+                "target": "task3"
+            },
+            {
+                "source": "task3",
+                "target": "task3_output1"
+            },
+            {
+                "source": "task2_output1",
+                "target": "task4"
+            },
+            {
+                "source": "task3_output1",
+                "target": "task4"
+            },
+            {
+                "source": "task4",
+                "target": "task4_output1"
+            }
+        ],
+        "nodes": [
+            {
+                "flops": 1.0,
+                "id": "task1",
+                "max_cores": 1,
+                "memory": 0.0,
+                "min_cores": 1,
+                "parallel_efficiency": 1.0,
+                "type": "task"
+            },
+            {
+                "flops": 1.0,
+                "id": "task2",
+                "max_cores": 1,
+                "memory": 0.0,
+                "min_cores": 1,
+                "parallel_efficiency": 1.0,
+                "type": "task"
+            },
+            {
+                "flops": 1.0,
+                "id": "task3",
+                "max_cores": 1,
+                "memory": 0.0,
+                "min_cores": 1,
+                "parallel_efficiency": 1.0,
+                "type": "task"
+            },
+            {
+                "flops": 1.0,
+                "id": "task4",
+                "max_cores": 1,
+                "memory": 0.0,
+                "min_cores": 1,
+                "parallel_efficiency": 1.0,
+                "type": "task"
+            },
+            {
+                "id": "task1_input",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "task1_output1",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "task1_output2",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "task2_output1",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "task3_output1",
+                "size": 1.0,
+                "type": "file"
+            },
+            {
+                "id": "task4_output1",
+                "size": 1.0,
+                "type": "file"
+            }
+        ]
+    })"_json;
+
+    /*
+     * nlohmann::json doesn't maintain order when you push_back json objects into a vector so, before
+     * comparing results with expected values, we sort the json lists so the test is deterministic.
+     */
+    std::sort(result_json3["links"].begin(), result_json3["links"].end(), compareLinks);
+    std::sort(result_json3["nodes"].begin(), result_json3["nodes"].end(), compareNodes);
+
+    std::sort(expected_json3["links"].begin(), expected_json3["links"].end(), compareLinks);
+    std::sort(expected_json3["nodes"].begin(), expected_json3["nodes"].end(), compareNodes);
+
+    EXPECT_TRUE(result_json3 == expected_json3);
+
+}
+
+TEST_F(SimulationDumpJSONTest, SimulationDumpWorkflowGraphJSONTest) {
+    DO_TEST_WITH_FORK(do_SimulationDumpWorkflowGraphJSON_test);
+}
