@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,10 +49,11 @@ namespace wrench {
           throw std::shared_ptr<NetworkError>(
                   new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
         } else if (e.category == timeout_error) {
-            throw std::shared_ptr<NetworkError>(
-                    new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
+          throw std::shared_ptr<NetworkError>(
+                  new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
         } else {
-          throw std::runtime_error("S4U_Mailbox::getMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
+          throw std::runtime_error(
+                  "S4U_Mailbox::getMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       } catch (std::exception &e) {
         throw std::shared_ptr<NetworkError>(
@@ -65,7 +66,7 @@ namespace wrench {
       }
 
       //Remove this message from the message manager list
-      MessageManager::removeReceivedMessages(mailbox_name,msg);
+      MessageManager::removeReceivedMessages(mailbox_name, msg);
       WRENCH_DEBUG("Received a '%s' message from mailbox_name %s", msg->getName().c_str(), mailbox_name.c_str());
       return std::unique_ptr<SimulationMessage>(msg);
     }
@@ -93,26 +94,31 @@ namespace wrench {
         data = mailbox->get(timeout);
       } catch (xbt_ex &e) {
         if (e.category == timeout_error) {
-          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
+          throw std::shared_ptr<NetworkError>(
+                  new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
         }
         if (e.category == network_error) {
-          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+          throw std::shared_ptr<NetworkError>(
+                  new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
         } else {
-          throw std::runtime_error("S4U_Mailbox::getMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
+          throw std::runtime_error(
+                  "S4U_Mailbox::getMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       } catch (std::exception &e) {
-        throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+        throw std::shared_ptr<NetworkError>(
+                new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
       }
 
       // This is just because it seems that after something like a killAll() we get a nullptr
       if (data == nullptr) {
-        throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+        throw std::shared_ptr<NetworkError>(
+                new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
       }
 
       auto msg = static_cast<SimulationMessage *>(data);
 
       //Remove this message from the message manager list
-      MessageManager::removeReceivedMessages(mailbox_name,msg);
+      MessageManager::removeReceivedMessages(mailbox_name, msg);
 
       WRENCH_DEBUG("Received a '%s' message from mailbox_name '%s'", msg->getName().c_str(), mailbox_name.c_str());
 
@@ -134,21 +140,23 @@ namespace wrench {
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       try {
         //also let the MessageManager manage this message
-        MessageManager::manageMessage(mailbox_name,msg);
+        MessageManager::manageMessage(mailbox_name, msg);
         mailbox->put(msg, (uint64_t) msg->payload);
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
-          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
+          throw std::shared_ptr<NetworkError>(
+                  new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
         } else if (e.category == timeout_error) {
-          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
+          throw std::shared_ptr<NetworkError>(
+                  new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
         } else {
-          throw std::runtime_error("S4U_Mailbox::putMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
+          throw std::runtime_error(
+                  "S4U_Mailbox::putMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       } catch (std::exception &e) {
-        throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
+        throw std::shared_ptr<NetworkError>(
+                new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
       }
-
-      return;
     }
 
     /**
@@ -170,21 +178,23 @@ namespace wrench {
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
 
       try {
-        MessageManager::manageMessage(mailbox_name,msg);
+        MessageManager::manageMessage(mailbox_name, msg);
         mailbox->put_init(msg, (uint64_t) msg->payload)->detach();
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
-          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
+          throw std::shared_ptr<NetworkError>(
+                  new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
         } else if (e.category == timeout_error) {
-          throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
+          throw std::shared_ptr<NetworkError>(
+                  new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
         } else {
-          throw std::runtime_error("S4U_Mailbox::dputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
+          throw std::runtime_error(
+                  "S4U_Mailbox::dputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       } catch (std::exception &e) {
-        throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
+        throw std::shared_ptr<NetworkError>(
+                new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
       }
-
-      return;
     }
 
     /**
@@ -197,7 +207,8 @@ namespace wrench {
     *
     * @throw std::shared_ptr<NetworkError>
     */
-    std::unique_ptr<S4U_PendingCommunication> S4U_Mailbox::iputMessage(std::string mailbox_name, SimulationMessage *msg) {
+    std::unique_ptr<S4U_PendingCommunication>
+    S4U_Mailbox::iputMessage(std::string mailbox_name, SimulationMessage *msg) {
 
       WRENCH_DEBUG("Iputting a %s message (%.2lf bytes) to mailbox_name '%s'",
                    msg->getName().c_str(), msg->payload,
@@ -207,7 +218,7 @@ namespace wrench {
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       try {
-        MessageManager::manageMessage(mailbox_name,msg);
+        MessageManager::manageMessage(mailbox_name, msg);
         comm_ptr = mailbox->put_async(msg, (uint64_t) msg->payload);
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
@@ -217,12 +228,15 @@ namespace wrench {
           throw std::shared_ptr<NetworkError>(
                   new NetworkError(NetworkError::SENDING, NetworkError::TIMEOUT, mailbox_name));
         } else {
-          throw std::runtime_error("S4U_Mailbox::iputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
+          throw std::runtime_error(
+                  "S4U_Mailbox::iputMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       } catch (std::exception &e) {
-        throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
+        throw std::shared_ptr<NetworkError>(
+                new NetworkError(NetworkError::SENDING, NetworkError::FAILURE, mailbox_name));
       }
-      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication(mailbox_name));
+      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(
+              new S4U_PendingCommunication(mailbox_name));
       pending_communication->comm_ptr = comm_ptr;
       return pending_communication;
     }
@@ -242,11 +256,12 @@ namespace wrench {
 
       WRENCH_DEBUG("Igetting a message from mailbox_name '%s'", mailbox_name.c_str());
 
-      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(new S4U_PendingCommunication(mailbox_name));
+      std::unique_ptr<S4U_PendingCommunication> pending_communication = std::unique_ptr<S4U_PendingCommunication>(
+              new S4U_PendingCommunication(mailbox_name));
 
       simgrid::s4u::MailboxPtr mailbox = simgrid::s4u::Mailbox::by_name(mailbox_name);
       try {
-        comm_ptr = mailbox->get_async((void**)(&(pending_communication->simulation_message)));
+        comm_ptr = mailbox->get_async((void **) (&(pending_communication->simulation_message)));
       } catch (xbt_ex &e) {
         if (e.category == network_error) {
           throw std::shared_ptr<NetworkError>(
@@ -255,10 +270,12 @@ namespace wrench {
           throw std::shared_ptr<NetworkError>(
                   new NetworkError(NetworkError::RECEIVING, NetworkError::TIMEOUT, mailbox_name));
         } else {
-          throw std::runtime_error("S4U_Mailbox::igetMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
+          throw std::runtime_error(
+                  "S4U_Mailbox::igetMessage(): Unexpected xbt_ex exception (" + std::to_string(e.category) + ")");
         }
       } catch (std::exception &e) {
-        throw std::shared_ptr<NetworkError>(new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
+        throw std::shared_ptr<NetworkError>(
+                new NetworkError(NetworkError::RECEIVING, NetworkError::FAILURE, mailbox_name));
       }
       pending_communication->comm_ptr = comm_ptr;
       return pending_communication;

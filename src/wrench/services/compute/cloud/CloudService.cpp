@@ -61,6 +61,7 @@ namespace wrench {
      */
     CloudService::~CloudService() {
       this->default_property_values.clear();
+      this->vm_list.clear();
     }
 
     /**

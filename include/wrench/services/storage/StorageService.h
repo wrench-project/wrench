@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2017. The WRENCH Team.
+ * Copyright (c) 2017-2018. The WRENCH Team.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,9 +105,9 @@ namespace wrench {
                                 std::map<WorkflowFile *, StorageService *> file_locations,
                                 StorageService *default_storage_service);
 
-        StorageService(std::string hostname,
-                       std::string service_name,
-                       std::string data_mailbox_name_prefix,
+        StorageService(const std::string &hostname,
+                       const std::string &service_name,
+                       const std::string &data_mailbox_name_prefix,
                        double capacity);
 
 

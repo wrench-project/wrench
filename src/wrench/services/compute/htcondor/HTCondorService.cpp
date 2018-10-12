@@ -30,10 +30,10 @@ namespace wrench {
      */
     HTCondorService::HTCondorService(const std::string &hostname,
                                      const std::string &pool_name,
-                                     std::set<std::shared_ptr<ComputeService>> compute_resources,
+                                     std::set<ComputeService *> compute_resources,
                                      std::map<std::string, std::string> property_list,
                                      std::map<std::string, std::string> messagepayload_list) :
-            ComputeService(hostname, "htcondor_service", "htcondor_service", nullptr) {
+            ComputeService(hostname, "htcondor_service", "htcondor_service", 100) {
 
       if (pool_name.empty()) {
         throw std::runtime_error("A pool name for the HTCondor service should be provided.");
@@ -55,6 +55,7 @@ namespace wrench {
      * @brief Destructor
      */
     HTCondorService::~HTCondorService() {
+      this->central_manager = nullptr;
       this->default_property_values.clear();
       this->default_messagepayload_values.clear();
     }
@@ -270,5 +271,7 @@ namespace wrench {
     void HTCondorService::terminate() {
       this->setStateToDown();
       this->central_manager->stop();
+      this->default_property_values.clear();
+      this->default_messagepayload_values.clear();
     }
 }

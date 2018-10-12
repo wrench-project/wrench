@@ -360,7 +360,7 @@ namespace wrench {
         }
 
         // Start the file registry services
-        for (auto frs : this->file_registry_services) {
+        for (const auto &frs : this->file_registry_services) {
           frs->start(frs, true);
         }
 
