@@ -53,10 +53,10 @@ namespace wrench {
      * @brief Destructor
      */
     HTCondorCentralManagerService::~HTCondorCentralManagerService() {
-//      this->pending_jobs.clear();
-//      this->compute_resources.clear();
-//      this->compute_resources_map.clear();
-//      this->running_jobs.clear();
+      this->pending_jobs.clear();
+      this->compute_resources.clear();
+      this->compute_resources_map.clear();
+      this->running_jobs.clear();
     }
 
     /**
