@@ -121,7 +121,6 @@ namespace wrench {
       throw std::runtime_error("HTCondorService::terminateStandardJob(): Not implemented yet!");
     }
 
-
     /**
      * @brief Terminate a standard job to the compute service (virtual)
      * @param job: the job
