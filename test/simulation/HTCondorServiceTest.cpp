@@ -277,12 +277,14 @@ private:
         }
       }
 
+      this->test->compute_service->stop();
+
       return 0;
     }
 };
 
 TEST_F(HTCondorServiceTest, HTCondorSimpleServiceTestWMS) {
-  DO_TEST_WITH_FORK(do_StandardJobTaskTest_test);
+  DO_TEST_WITH_FORK(do_SimpleServiceTest_test);
 }
 
 void HTCondorServiceTest::do_SimpleServiceTest_test() {
@@ -313,15 +315,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
                                                    100000000000.0));
 
   // Create a HTCondor Service
-  ASSERT_THROW(simulation->add(
-          new wrench::HTCondorService(hostname, "", std::move(compute_services),
-                                      {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})),
-               std::runtime_error);
-  ASSERT_THROW(simulation->add(
-          new wrench::HTCondorService(hostname, nullptr, std::move(compute_services),
-                                      {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})),
-               std::runtime_error);
-
+  ASSERT_THROW(simulation->add(new wrench::HTCondorService(hostname, "", {})), std::runtime_error);
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::HTCondorService(hostname, "local", std::move(compute_services),
                                       {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
