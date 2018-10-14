@@ -34,6 +34,8 @@ public:
 
     void do_StandardJobTaskTest_test();
 
+    void do_SimpleServiceTest_test();
+
 protected:
     HTCondorServiceTest() {
 
@@ -183,7 +185,6 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
   std::string execution_host = simulation->getHostnameList()[1];
   std::vector<std::string> execution_hosts;
   execution_hosts.push_back(execution_host);
-//  compute_services.insert(new wrench::CloudService(hostname, execution_hosts, 100000000000.0));
   compute_services.insert(new wrench::MultihostMulticoreComputeService(
           execution_host,
           {std::make_tuple(
@@ -218,3 +219,132 @@ void HTCondorServiceTest::do_StandardJobTaskTest_test() {
   free(argv);
 }
 
+/**********************************************************************/
+/**  SIMPLE SERVICE TESTS                                            **/
+/**********************************************************************/
+
+class HTCondorSimpleServiceTestWMS : public wrench::WMS {
+
+public:
+    HTCondorSimpleServiceTestWMS(HTCondorServiceTest *test,
+                                 const std::set<wrench::ComputeService *> &compute_services,
+                                 const std::set<wrench::StorageService *> &storage_services,
+                                 std::string &hostname) :
+            wrench::WMS(nullptr, nullptr, compute_services, storage_services, {}, nullptr, hostname, "test") {
+      this->test = test;
+    }
+
+private:
+
+    HTCondorServiceTest *test;
+
+    int main() {
+      // Create a data movement manager
+      std::shared_ptr<wrench::DataMovementManager> data_movement_manager = this->createDataMovementManager();
+
+      // Create a job manager
+      std::shared_ptr<wrench::JobManager> job_manager = this->createJobManager();
+
+      // Create a 2-task job
+      wrench::StandardJob *two_task_job = job_manager->createStandardJob(
+              {this->test->task1}, {},
+              {std::make_tuple(this->test->input_file,
+                               ((wrench::HTCondorService *) this->test->compute_service)->getLocalStorageService(),
+                               wrench::ComputeService::SCRATCH)},
+              {}, {});
+
+      // Submit the 2-task job for execution
+      try {
+        job_manager->submitJob(two_task_job, this->test->compute_service);
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error(e.what());
+      }
+
+      // Wait for a workflow execution event
+      std::unique_ptr<wrench::WorkflowExecutionEvent> event;
+      try {
+        event = this->getWorkflow()->waitForNextExecutionEvent();
+      } catch (wrench::WorkflowExecutionException &e) {
+        throw std::runtime_error("Error while getting an execution event: " + e.getCause()->toString());
+      }
+      switch (event->type) {
+        case wrench::WorkflowExecutionEvent::STANDARD_JOB_COMPLETION: {
+          // success, do nothing for now
+          break;
+        }
+        default: {
+          throw std::runtime_error("Unexpected workflow execution event: " + std::to_string((int) (event->type)));
+        }
+      }
+
+      return 0;
+    }
+};
+
+TEST_F(HTCondorServiceTest, HTCondorSimpleServiceTestWMS) {
+  DO_TEST_WITH_FORK(do_StandardJobTaskTest_test);
+}
+
+void HTCondorServiceTest::do_SimpleServiceTest_test() {
+
+  // Create and initialize a simulation
+  auto *simulation = new wrench::Simulation();
+  int argc = 1;
+  auto argv = (char **) calloc(1, sizeof(char *));
+  argv[0] = strdup("htcondor_service_test");
+
+  ASSERT_NO_THROW(simulation->init(&argc, argv));
+
+  // Setting up the platform
+  ASSERT_NO_THROW(simulation->instantiatePlatform(platform_file_path));
+
+  // Get a hostname
+  std::string hostname = simulation->getHostnameList()[0];
+
+  // Create a Storage Service
+  ASSERT_NO_THROW(storage_service = simulation->add(new wrench::SimpleStorageService(hostname, 100.0)));
+
+  // Create list of compute services
+  std::set<wrench::ComputeService *> compute_services;
+  std::string execution_host = simulation->getHostnameList()[1];
+  std::vector<std::string> execution_hosts;
+  execution_hosts.push_back(execution_host);
+  compute_services.insert(new wrench::CloudService(hostname, execution_hosts,
+                                                   100000000000.0));
+
+  // Create a HTCondor Service
+  ASSERT_THROW(simulation->add(
+          new wrench::HTCondorService(hostname, "", std::move(compute_services),
+                                      {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})),
+               std::runtime_error);
+  ASSERT_THROW(simulation->add(
+          new wrench::HTCondorService(hostname, nullptr, std::move(compute_services),
+                                      {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})),
+               std::runtime_error);
+
+  ASSERT_NO_THROW(compute_service = simulation->add(
+          new wrench::HTCondorService(hostname, "local", std::move(compute_services),
+                                      {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+
+  ((wrench::HTCondorService *) compute_service)->setLocalStorageService(storage_service);
+
+  // Create a WMS
+  wrench::WMS *wms = nullptr;
+  ASSERT_NO_THROW(wms = simulation->add(
+          new HTCondorSimpleServiceTestWMS(this, {compute_service}, {storage_service}, hostname)));
+
+  ASSERT_NO_THROW(wms->addWorkflow(workflow));
+
+  // Create a file registry
+  ASSERT_NO_THROW(simulation->add(new wrench::FileRegistryService(hostname)));
+
+  // Staging the input_file on the storage service
+  ASSERT_NO_THROW(simulation->stageFile(input_file, storage_service));
+
+  // Running a "run a single task" simulation
+  ASSERT_NO_THROW(simulation->launch());
+
+  delete simulation;
+  free(argv[0]);
+  free(argv);
+}
