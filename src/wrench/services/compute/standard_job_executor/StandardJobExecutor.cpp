@@ -9,8 +9,8 @@
 
 #include <cfloat>
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutor.h"
-#include "wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h"
-#include "wrench/services/compute/standard_job_executor/Workunit.h"
+#include "wrench/services/compute/workunit_executor/WorkunitExecutor.h"
+#include "wrench/services/compute/workunit_executor/Workunit.h"
 #include "wrench/simulation/Simulation.h"
 #include "wrench/workflow/job/StandardJob.h"
 
@@ -262,7 +262,17 @@ namespace wrench {
       }
 
       /** Create all Workunits **/
-      createWorkunits();
+      std::set<std::unique_ptr<Workunit>> all_work_units = Workunit::createWorkunits(this->job);
+
+      /** Put each workunit either in the "non-ready" list or the "ready" list **/
+      while (not all_work_units.empty()) {
+        auto wu = all_work_units.begin();
+        if ((*wu)->num_pending_parents == 0) {
+          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->ready_workunits));
+        } else {
+          PointerUtil::moveUniquePtrFromSetToSet<Workunit>(wu, &all_work_units, &(this->non_ready_workunits));
+        }
+      }
 
       /** Main loop **/
       while (true) {
@@ -466,8 +476,8 @@ namespace wrench {
         if (this->part_of_pilot_job) {
           workflow_job = this->parent_pilot_job;
         }
-        std::shared_ptr<WorkunitMulticoreExecutor> workunit_executor = std::shared_ptr<WorkunitMulticoreExecutor>(
-                new WorkunitMulticoreExecutor(this->simulation,
+        std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
+                new WorkunitExecutor(this->simulation,
                                               target_host,
                                               target_num_cores,
                                               required_ram,
@@ -564,7 +574,7 @@ namespace wrench {
  * @throw std::runtime_error
  */
     void StandardJobExecutor::processWorkunitExecutorCompletion(
-            WorkunitMulticoreExecutor *workunit_executor,
+            WorkunitExecutor *workunit_executor,
             Workunit *workunit) {
 
       // Don't kill me while I am doing this
@@ -674,7 +684,7 @@ namespace wrench {
  */
 
     void StandardJobExecutor::processWorkunitExecutorFailure(
-            WorkunitMulticoreExecutor *workunit_executor,
+            WorkunitExecutor *workunit_executor,
             Workunit *workunit,
             std::shared_ptr<FailureCause> cause) {
 
@@ -744,104 +754,7 @@ namespace wrench {
 
 
 
-/**
- * @brief Create all work for a newly dispatched job
- * @param job: the job
- */
-    void StandardJobExecutor::createWorkunits() {
 
-      Workunit *pre_file_copies_work_unit = nullptr;
-      std::vector<Workunit *> task_work_units;
-      Workunit *post_file_copies_work_unit = nullptr;
-      Workunit *cleanup_workunit = nullptr;
-
-      // Create the cleanup workunit, if any
-      if (not job->cleanup_file_deletions.empty()) {
-        cleanup_workunit = new Workunit({}, nullptr, {}, {}, job->cleanup_file_deletions);
-      }
-
-      // Create the pre_file_copies work unit, if any
-      if (not job->pre_file_copies.empty()) {
-        pre_file_copies_work_unit = new Workunit(job->pre_file_copies, nullptr, {}, {}, {});
-      }
-
-      // Create the post_file_copies work unit, if any
-      if (not job->post_file_copies.empty()) {
-        post_file_copies_work_unit = new Workunit({}, nullptr, {}, job->post_file_copies, {});
-      }
-
-      // Create the task work units, if any
-      for (auto const &task : job->tasks) {
-        task_work_units.push_back(new Workunit({}, task, job->file_locations, {}, {}));
-      }
-
-      // Add dependencies between task work units, if any
-      for (auto const &task_work_unit : task_work_units) {
-        const WorkflowTask *task = task_work_unit->task;
-
-        if (task->getInternalState() != WorkflowTask::InternalState::TASK_READY) {
-          std::vector<WorkflowTask *> current_task_parents = task->getWorkflow()->getTaskParents(task);
-
-          for (auto const &potential_parent_task_work_unit : task_work_units) {
-            if (std::find(current_task_parents.begin(), current_task_parents.end(), potential_parent_task_work_unit->task) != current_task_parents.end()) {
-              Workunit::addDependency(potential_parent_task_work_unit, task_work_unit);
-            }
-          }
-        }
-      }
-
-      // Add dependencies from pre copies to possible successors
-      if (pre_file_copies_work_unit != nullptr) {
-        if (not task_work_units.empty()) {
-          for (auto const &twu: task_work_units) {
-            Workunit::addDependency(pre_file_copies_work_unit, twu);
-          }
-        } else if (post_file_copies_work_unit != nullptr) {
-          Workunit::addDependency(pre_file_copies_work_unit, post_file_copies_work_unit);
-        } else if (cleanup_workunit != nullptr) {
-          Workunit::addDependency(pre_file_copies_work_unit, cleanup_workunit);
-        }
-      }
-
-      // Add dependencies from tasks to possible successors
-      for (auto const &twu: task_work_units) {
-        if (post_file_copies_work_unit != nullptr) {
-          Workunit::addDependency(twu, post_file_copies_work_unit);
-        } else if (cleanup_workunit != nullptr) {
-          Workunit::addDependency(twu, cleanup_workunit);
-        }
-      }
-
-      // Add dependencies from post copies to possible successors
-      if (post_file_copies_work_unit != nullptr) {
-        if (cleanup_workunit != nullptr) {
-          Workunit::addDependency(post_file_copies_work_unit, cleanup_workunit);
-        }
-      }
-
-      // Create a list of all work units
-      std::vector<Workunit*> all_work_units;
-      if (pre_file_copies_work_unit) all_work_units.push_back(pre_file_copies_work_unit);
-      for (auto const &twu : task_work_units) {
-        all_work_units.push_back(twu);
-      }
-      if (post_file_copies_work_unit) all_work_units.push_back(post_file_copies_work_unit);
-      if (cleanup_workunit) all_work_units.push_back(cleanup_workunit);
-
-      task_work_units.clear();
-
-      // Insert work units in the ready or non-ready queues
-      for (auto const &wu : all_work_units) {
-        if (wu->num_pending_parents == 0) {
-          this->ready_workunits.insert(std::unique_ptr<Workunit>(wu));
-        } else {
-          this->non_ready_workunits.insert(std::unique_ptr<Workunit>(wu));
-        }
-      }
-
-      all_work_units.clear();
-
-    }
 
 
 /**

@@ -35,11 +35,11 @@ namespace wrench {
     /**
      * @brief An service that performs a WorkUnit
      */
-    class WorkunitMulticoreExecutor : public Service {
+    class WorkunitExecutor : public Service {
 
     public:
 
-        WorkunitMulticoreExecutor(
+        WorkunitExecutor(
                      Simulation *simulation,
                      std::string hostname,
                      unsigned long num_cores,

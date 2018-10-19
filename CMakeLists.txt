@@ -64,8 +64,8 @@ set(HEADER_FILES
         include/wrench/services/compute/ComputeServiceProperty.h
         include/wrench/services/compute/ComputeServiceMessagePayload.h
         include/wrench/services/compute/ComputeServiceMessage.h
-        include/wrench/services/compute/standard_job_executor/Workunit.h
-        include/wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h
+        include/wrench/services/compute/workunit_executor/Workunit.h
+        include/wrench/services/compute/workunit_executor/WorkunitExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutor.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h
         include/wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.h
@@ -187,8 +187,8 @@ set(SOURCE_FILES
         src/wrench/services/compute/cloud/CloudServiceMessage.cpp
         src/wrench/services/compute/standard_job_executor/ComputeThread.h
         src/wrench/services/compute/standard_job_executor/ComputeThread.cpp
-        src/wrench/services/compute/standard_job_executor/Workunit.cpp
-        src/wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.cpp
+        src/wrench/services/compute/work_unit_executor/Workunit.cpp
+        src/wrench/services/compute/work_unit_executor/WorkunitExecutor.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.h
         src/wrench/services/compute/standard_job_executor/StandardJobExecutorMessage.cpp
         src/wrench/services/compute/standard_job_executor/StandardJobExecutor.cpp

@@ -15,10 +15,10 @@
 #include <set>
 
 #include "wrench/services/compute/ComputeService.h"
-#include "wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h"
+#include "wrench/services/compute/workunit_executor/WorkunitExecutor.h"
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutorProperty.h"
 #include "wrench/services/compute/standard_job_executor/StandardJobExecutorMessagePayload.h"
-#include "wrench/services/compute/standard_job_executor/Workunit.h"
+#include "wrench/services/compute/workunit_executor/Workunit.h"
 
 
 namespace wrench {
@@ -95,9 +95,9 @@ namespace wrench {
         std::map<std::string, double> ram_availabilities;
 
         // Sets of workunit executors
-        std::set<std::shared_ptr<WorkunitMulticoreExecutor>> running_workunit_executors;
-        std::set<std::shared_ptr<WorkunitMulticoreExecutor>> finished_workunit_executors;
-        std::set<std::shared_ptr<WorkunitMulticoreExecutor>> failed_workunit_executors;
+        std::set<std::shared_ptr<WorkunitExecutor>> running_workunit_executors;
+        std::set<std::shared_ptr<WorkunitExecutor>> finished_workunit_executors;
+        std::set<std::shared_ptr<WorkunitExecutor>> failed_workunit_executors;
 
         // Work units
         std::set<std::unique_ptr<Workunit>> non_ready_workunits;
@@ -127,10 +127,10 @@ namespace wrench {
 //        std::string getPropertyValueAsString(std::string property);
 //        double getPropertyValueAsDouble(std::string property);
 
-        void processWorkunitExecutorCompletion(WorkunitMulticoreExecutor *workunit_executor,
+        void processWorkunitExecutorCompletion(WorkunitExecutor *workunit_executor,
                                                Workunit *workunit);
 
-        void processWorkunitExecutorFailure(WorkunitMulticoreExecutor *workunit_executor,
+        void processWorkunitExecutorFailure(WorkunitExecutor *workunit_executor,
                                             Workunit *workunit,
                                             std::shared_ptr<FailureCause> cause);
 

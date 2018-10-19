@@ -14,13 +14,13 @@
 #include <wrench/logging/TerminalOutput.h>
 #include <wrench/exceptions/WorkflowExecutionException.h>
 #include <wrench/simgrid_S4U_util/S4U_Simulation.h>
-#include "wrench/services/compute/standard_job_executor/WorkunitMulticoreExecutor.h"
-#include "StandardJobExecutorMessage.h"
+#include "wrench/services/compute/workunit_executor/WorkunitExecutor.h"
+#include "services/compute/standard_job_executor/StandardJobExecutorMessage.h"
 #include <wrench/workflow/WorkflowTask.h>
 #include <wrench/workflow/job/StandardJob.h>
 #include <wrench/simulation/SimulationTimestampTypes.h>
-#include "wrench/services/compute/standard_job_executor/Workunit.h"
-#include "ComputeThread.h"
+#include "wrench/services/compute/workunit_executor/Workunit.h"
+#include "services/compute/standard_job_executor/ComputeThread.h"
 #include "wrench/simulation/Simulation.h"
 
 #include <xbt.h>
@@ -43,10 +43,11 @@ namespace wrench {
      * @param callback_mailbox: the callback mailbox to which a "work done" or "work failed" message will be sent
      * @param workunit: the work unit to perform
      * @param scratch_space: the service's scratch storage service (nullptr if none)
+     * @param job: the SandardJob the workunit corresponds to
      * @param thread_startup_overhead: the thread_startup overhead, in seconds
      * @param simulate_computation_as_sleep: simulate computation as a sleep instead of an actual compute thread (for simulation scalability reasons)
      */
-    WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(
+    WorkunitExecutor::WorkunitExecutor(
             Simulation *simulation,
             std::string hostname,
             unsigned long num_cores,
@@ -60,10 +61,10 @@ namespace wrench {
             Service(hostname, "workunit_multicore_executor", "workunit_multicore_executor") {
 
       if (thread_startup_overhead < 0) {
-        throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): thread_startup_overhead must be >= 0");
+        throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): thread_startup_overhead must be >= 0");
       }
       if (num_cores < 1) {
-        throw std::invalid_argument("WorkunitMulticoreExecutor::WorkunitMulticoreExecutor(): num_cores must be >= 1");
+        throw std::invalid_argument("WorkunitExecutor::WorkunitExecutor(): num_cores must be >= 1");
       }
 
       this->simulation = simulation;
@@ -82,7 +83,7 @@ namespace wrench {
     /**
      * @brief Kill the worker thread
      */
-    void WorkunitMulticoreExecutor::kill() {
+    void WorkunitExecutor::kill() {
 
       this->acquireDaemonLock();
 
@@ -108,12 +109,12 @@ namespace wrench {
     *
     * @throw std::runtime_error
     */
-    int WorkunitMulticoreExecutor::main() {
+    int WorkunitExecutor::main() {
 
 
       TerminalOutput::setThisProcessLoggingColor(TerminalOutput::COLOR_BLUE);
 
-      WRENCH_INFO("New WorkunitExecutor starting (%s) to do: %ld pre file copies, %d tasks, %ld post file copies",
+      WRENCH_INFO("New work_unit_executor starting (%s) to do: %ld pre file copies, %d tasks, %ld post file copies",
                   this->mailbox_name.c_str(),
                   this->workunit->pre_file_copies.size(),
                   (this->workunit->task != nullptr) ? 1 : 0,
@@ -175,7 +176,7 @@ namespace wrench {
      * @param work: the work to perform
      */
     void
-    WorkunitMulticoreExecutor::performWork(Workunit *work) {
+    WorkunitExecutor::performWork(Workunit *work) {
 
 //      std::set<WorkflowFile* > files_stored_in_scratch = {};
 
@@ -186,21 +187,21 @@ namespace wrench {
         StorageService *src = std::get<1>(file_copy);
         if (src == ComputeService::SCRATCH) {
           if (this->scratch_space == nullptr) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as source but is null")));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitExecutor::performWork(): Scratch Space was asked to be used as source but is null")));
           }
           src = this->scratch_space;
         }
         StorageService *dst = std::get<2>(file_copy);
         if (dst == ComputeService::SCRATCH) {
           if (this->scratch_space == nullptr) {
-            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitMulticoreExecutor::performWork(): Scratch Space was asked to be used as destination but is null")));
+            throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new NoScratchSpace("WorkunitExecutor::performWork(): Scratch Space was asked to be used as destination but is null")));
           } else {
             dst = this->scratch_space;
           }
         }
 
         if ((file == nullptr) || (src == nullptr) || (dst == nullptr)) {
-          throw std::runtime_error("WorkunitMulticoreExecutor::performWork(): internal error: malformed workunit");
+          throw std::runtime_error("WorkunitExecutor::performWork(): internal error: malformed workunit");
         }
 
         try {
@@ -321,7 +322,7 @@ namespace wrench {
           dst = this->scratch_space;
           files_stored_in_scratch.insert(file);
           WRENCH_WARN(
-                  "WARNING: WorkunitMulticoreExecutor::performWork(): Post copying files to the scratch space: Can cause implicit deletion afterwards"
+                  "WARNING: WorkunitExecutor::performWork(): Post copying files to the scratch space: Can cause implicit deletion afterwards"
           );
         }
 
@@ -365,7 +366,7 @@ namespace wrench {
      * @param flops: the number of flops
      * @param parallel_efficiency: the parallel efficiency
      */
-    void WorkunitMulticoreExecutor::runMulticoreComputation(double flops, double parallel_efficiency, bool simulate_computation_as_sleep) {
+    void WorkunitExecutor::runMulticoreComputation(double flops, double parallel_efficiency, bool simulate_computation_as_sleep) {
       double effective_flops = (flops / (this->num_cores * parallel_efficiency));
 
       std::string tmp_mailbox = S4U_Mailbox::generateUniqueMailboxName("workunit_executor");
@@ -467,7 +468,7 @@ namespace wrench {
      * @brief Returns the number of cores the service has been allocated
      * @return a number of cores
      */
-    unsigned long WorkunitMulticoreExecutor::getNumCores() {
+    unsigned long WorkunitExecutor::getNumCores() {
       return this->num_cores;
     }
 
@@ -475,7 +476,7 @@ namespace wrench {
      * @brief Returns the RAM the service has been allocated
      * @return a number of bytes
      */
-    double WorkunitMulticoreExecutor::getMemoryUtilization() {
+    double WorkunitExecutor::getMemoryUtilization() {
       return this->ram_utilization;
     }
 
@@ -483,7 +484,7 @@ namespace wrench {
      * @brief Retrieve the list of files stored in scratch space storage
      * @return  a list of files
      */
-    std::set<WorkflowFile *> WorkunitMulticoreExecutor::getFilesStoredInScratch() {
+    std::set<WorkflowFile *> WorkunitExecutor::getFilesStoredInScratch() {
       return this->files_stored_in_scratch;
     }
 
