@@ -43,7 +43,10 @@ namespace wrench {
 
         static void addDependency(Workunit *parent, Workunit *child);
 
-        /** @brief The Workunits that depend on this Workunit */
+        static std::set<std::unique_ptr<Workunit>> createWorkunits(StandardJob *job);
+
+
+            /** @brief The Workunits that depend on this Workunit */
         std::set<Workunit*> children;
         /** @brief The number of Workunits this Workunit depends on */
         unsigned long num_pending_parents;
