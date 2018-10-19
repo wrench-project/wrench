@@ -20,7 +20,7 @@
 namespace wrench {
 
     /**
-     * @brief A multicore Scheduler for schedd
+     * @brief A workload management framework compute service
      *
      */
     class HTCondorService : public ComputeService {
