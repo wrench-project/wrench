@@ -67,11 +67,6 @@ protected:
       task6->addInputFile(input_file);
 
       task1->addOutputFile(output_file1);
-//      task2->addOutputFile(output_file2);
-//      task3->addOutputFile(output_file3);
-//      task4->addOutputFile(output_file4);
-//      task5->addOutputFile(output_file3);
-//      task6->addOutputFile(output_file4);
 
       // Create a platform file
       std::string xml = "<?xml version='1.0'?>"
@@ -318,7 +313,7 @@ void HTCondorServiceTest::do_SimpleServiceTest_test() {
   ASSERT_THROW(simulation->add(new wrench::HTCondorService(hostname, "", {})), std::runtime_error);
   ASSERT_NO_THROW(compute_service = simulation->add(
           new wrench::HTCondorService(hostname, "local", std::move(compute_services),
-                                      {{wrench::CloudServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
+                                      {{wrench::HTCondorServiceProperty::SUPPORTS_PILOT_JOBS, "false"}})));
 
   ((wrench::HTCondorService *) compute_service)->setLocalStorageService(storage_service);
 
