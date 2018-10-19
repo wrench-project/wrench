@@ -14,6 +14,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <iomanip>
 #include <fstream>
 #include <algorithm>
 #include <vector>
@@ -151,13 +152,20 @@ namespace wrench {
         unsigned long long execution_host_num_cores = current_execution_instance.host_num_cores;
         auto num_vertical_positions = execution_host_num_cores - num_cores_allocated + 1;
 
-        /*
-         * For each possible vertical position that an event can be in, we perform a check to see that its vertical
-         * position doesn't make the event (a rectangle on the graph) overlap with any of the other events. If it does not
-         * overlap, then we can evaluate all events up to this one with the next event in the list (recursive call). If
-         * it does overlap, then we try another vertical position. If it doesn't overlap and this is the last item in the list,
-         * we have found a valid layout.
-         */
+      std::string spaces = "";
+      for (int i=0; i < index; i++) {
+        spaces += "  ";
+      }
+      std::cout << spaces + "task = " << index <<"\n";
+
+
+      /*
+       * For each possible vertical position that an event can be in, we perform a check to see that its vertical
+       * position doesn't make the event (a rectangle on the graph) overlap with any of the other events. If it does not
+       * overlap, then we can evaluate all events up to this one with the next event in the list (recursive call). If
+       * it does overlap, then we try another vertical position. If it doesn't overlap and this is the last item in the list,
+       * we have found a valid layout.
+       */
         for (std::size_t vertical_position = 0; vertical_position < num_vertical_positions; ++vertical_position) {
 
             // Set the vertical positions as we go so the entire graph layout is set when the function returns
@@ -168,12 +176,14 @@ namespace wrench {
                     vertical_position + num_cores_allocated
             );
 
+              std::cout << spaces + "  pos = " <<  vertical_position << "\n";
             /*
              * We check this current event's position against all other events that were added
              * before it to make sure it doesn't overlap with any of those events.
              */
             bool has_overlap = false;
             for (std::size_t i = 0; i < index; ++i) {
+
                 WorkflowTaskExecutionInstance other_execution_instance = data.at(i);
 
                 // Evaluate the current event's position only against others that occurred on the same host.
