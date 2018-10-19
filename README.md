@@ -12,7 +12,7 @@
 WRENCH is an _open-source library_ for developing workflow simulators. WRENCH exposes several high-level simulation 
 abstractions to provide the **building blocks** for developing custom simulators.
 
-More information: [WRENCH Project Website](http://wrench-project.org)
+More information and Documentation: [WRENCH Project Website](http://wrench-project.org)
 
 ## Prerequisites
 
@@ -30,7 +30,7 @@ And, one of the following:
 
 ### Required Dependencies
 
-- [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.20 or higher
+- [SimGrid](http://simgrid.gforge.inria.fr/) - version 3.21
 - [Lemon C++ library](http://lemon.cs.elte.hu/) - version 1.3.1 or higher 
 - [PugiXML](http://pugixml.org/) - version 1.8 or higher 
 - [JSON for Modern C++](https://github.com/nlohmann/json) - version 3.1.0 or higher 
