@@ -60,51 +60,76 @@ function generateGraph() {
             'translate(0,' + (CONTAINER_HEIGHT - PADDING) + ')')
         .call(x_axis);
         
+    console.log(data);
+    svg.append("g")
+        .selectAll("g")
+        .data(data)
+        .enter()
+        .append("g")
+        .attr("id", (d, i) => d.task_id)
+        //   .attr("fill", (d, i) => color(data.keys[i]))
+        // .selectAll("rect")
+        // .data()
+        // .enter().append("rect")
+        //   .attr("x", (d, i) => x(data[i].start))
+        //   .attr("y", (d, i) => y(i))
+        //   .attr("height", d => y(d[0]) - y(d[1]))
+        //   .attr("width", (d) => d.whole_task);
+
+    data.forEach(function(d, i) {
+        console.log(xscale(d.whole_task.start))
+        svg.select("#" + d.task_id)
+            .append("rect")
+                .attr("x", xscale(d.whole_task.start))
+                .attr("y", yscale(d.task_id))
+                .attr("height", yscale(data[0].task_id)-yscale(data[1].task_id))
+                .attr("width", xscale(d.whole_task.end - d.whole_task.end))
+    });
     // svg.append('g')
     //     .attr("fill", "steelblue")
     //     .selectAll("rect").data(data).enter().append("rect")
 
 
     // Stack layout
-    var stack = d3.stack().keys([
-        'read', 'compute', 'write'
-    ]);
+    // var stack = d3.stack().keys([
+    //     'read', 'compute', 'write'
+    // ]);
 
-    var stack_data = stack(data);
-    console.log(stack_data)
+    // var stack_data = stack(data);
+    // console.log(stack_data)
 
-    // Groups
-    var groups = svg.selectAll('g')
-        .data(stack_data[0])
-        .enter()
-        .append('g')
-        // .attr('class', function(d) {
-        //     return d.key;
-        // })
-        // .style('fill', function(d, i) {
-        //     return colors[i];
-        // });
-    console.log(groups);
+    // // Groups
+    // var groups = svg.selectAll('g')
+    //     .data(stack_data[0])
+    //     .enter()
+    //     .append('g')
+    //     // .attr('class', function(d) {
+    //     //     return d.key;
+    //     // })
+    //     // .style('fill', function(d, i) {
+    //     //     return colors[i];
+    //     // });
+    // console.log(groups);
 
-    // Add the data
-    groups.selectAll('rect')
-        .data(function(d) {
-            return d;
-        })
-        .enter()
-        .append('rect')
-        .attr('x', function(d) {
-            return xscale(d[0] + d['data'].start);
-        })
-        .attr('y', function(d) {
-            return yscale(d['data'].task_id);
-        })
-        .attr('height', function(d) {
-            return yscale.bandwidth();
-        })
-        .attr('width', function(d) {
-            return xscale(d[1]) - xscale(d[0]);
-        })
+    // // Add the data
+    // groups.selectAll('rect')
+    //     .data(function(d) {
+    //         return d;
+    //     })
+    //     .enter()
+    //     .append('rect')
+    //     .attr('x', function(d) {
+    //         return xscale(d[0] + d['data'].start);
+    //     })
+    //     .attr('y', function(d) {
+    //         return yscale(d['data'].task_id);
+    //     })
+    //     .attr('height', function(d) {
+    //         return yscale.bandwidth();
+    //     })
+    //     .attr('width', function(d) {
+    //         return xscale(d[1]) - xscale(d[0]);
+    //     })
         // .on('mouseover', function() {
         //     tooltip.style('display', 'inline');
 
