@@ -152,11 +152,11 @@ namespace wrench {
         unsigned long long execution_host_num_cores = current_execution_instance.host_num_cores;
         auto num_vertical_positions = execution_host_num_cores - num_cores_allocated + 1;
 
-      std::string spaces = "";
-      for (int i=0; i < index; i++) {
-        spaces += "  ";
-      }
-      std::cout << spaces + "task = " << index <<"\n";
+//      std::string spaces = "";
+//      for (int i=0; i < index; i++) {
+//        spaces += "  ";
+//      }
+//      std::cout << spaces + "task = " << index <<"\n";
 
 
       /*
@@ -176,7 +176,7 @@ namespace wrench {
                     vertical_position + num_cores_allocated
             );
 
-              std::cout << spaces + "  pos = " <<  vertical_position << "\n";
+//              std::cout << spaces + "  pos = " <<  vertical_position << "\n";
             /*
              * We check this current event's position against all other events that were added
              * before it to make sure it doesn't overlap with any of those events.

@@ -9,6 +9,8 @@
 
 #include <map>
 #include <wrench/util/PointerUtil.h>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/classification.hpp>
 
 #include "wrench/services/ServiceMessage.h"
 #include "wrench/services/compute/ComputeServiceMessage.h"
@@ -32,6 +34,7 @@ namespace wrench {
      * @param service_specific_args: service specific arguments ({} most likely)
      *
      * @throw WorkflowExecutionException
+     * @throw std::invalid_argument
      * @throw std::runtime_error
      */
     void MultihostMulticoreComputeService::submitStandardJob(StandardJob *job,
@@ -39,6 +42,35 @@ namespace wrench {
 
       if (this->state == Service::DOWN) {
         throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
+      }
+
+      /* Check that the service-specific args are specific and well-formatted */
+      for (auto t : job->getTasks()) {
+        if (service_specific_args.find(t->getID()) == service_specific_args.end()) {
+          throw std::invalid_argument("Service-specific argument map should contain an entry for task '" + t->getID() + "'");
+        }
+        std::string arg = service_specific_args[t->getID()];
+        std::vector<std::string> tokens;
+        boost::algorithm::split(tokens, arg, boost::is_any_of(":"));
+        if (tokens.size() != 2) {
+          throw std::invalid_argument("Invalid service-specific argument '" + arg + "' for task '" + t->getID() + "'");
+        }
+        std::string hostname = tokens[0];
+        std::string string_num_threads = tokens[1];
+        unsigned long num_threads;
+
+        if (sscanf(string_num_threads.c_str(), "%lu", &num_threads) != 1) {
+          throw std::invalid_argument("Invalid service-specific argument '" + arg + "' for task '" + t->getID() + "'");
+        }
+
+        if (this->compute_resources.find(hostname) == this->compute_resources.end()) {
+          throw std::invalid_argument("Invalid service-specific argument  host '" + arg + "' for task '" + t->getID() + "': no such host");
+        }
+
+        // At this point, there may still be insufficient resources to run the task, but that will
+        // be handled later (and a WorkflowExecutionError with a "not enough resources" FailureCause
+        // may be generated.
+
       }
 
       std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("submit_standard_job");
@@ -140,7 +172,7 @@ namespace wrench {
      * @brief Constructor
      *
      * @param hostname: the name of the host on which the service should be started
-     * @param compute_resources: a list of <hostname, num_cores, memory> tuples, which represent
+     * @param compute_resources: a map of <num_cores, memory> tuples, indexed by hostname, which represents
      *        the compute resources available to this service.
      *          - use num_cores = ComputeService::ALL_CORES to use all cores available on the host
      *          - use memory = ComputeService::ALL_RAM to use all RAM available on the host
@@ -150,7 +182,7 @@ namespace wrench {
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
             const std::string &hostname,
-            std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+            std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             double scratch_space_size,
             std::map<std::string, std::string> property_list,
             std::map<std::string, std::string> messagepayload_list
@@ -186,9 +218,9 @@ namespace wrench {
                            "multihost_multicore",
                            scratch_space_size) {
 
-      std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
+      std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
       for (auto h : compute_hosts) {
-        compute_resources.insert(std::make_tuple(h, ComputeService::ALL_CORES, ComputeService::ALL_RAM));
+        compute_resources.insert(std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
       }
 
       initiateInstance(hostname,
@@ -212,7 +244,7 @@ namespace wrench {
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(
             const std::string &hostname,
-            std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+            std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             std::map<std::string, std::string> property_list,
             std::map<std::string, std::string> messagepayload_list,
             double ttl,
@@ -231,6 +263,37 @@ namespace wrench {
     }
 
     /**
+    * @brief Internal constructor
+    *
+    * @param hostname: the name of the host on which the job executor should be started
+    * @param compute_hosts:: a list of <hostname, num_cores, memory> tuples, which represent
+    *        the compute resources available to this service
+    * @param property_list: a property list ({} means "use all defaults")
+    * @param messagepayload_list: a message payload list ({} means "use all defaults")
+    * @param scratch_space: the scratch space for this compute service
+    */
+    MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
+                                                                       const std::set<std::string> compute_hosts,
+                                                                       std::map<std::string, std::string> property_list,
+                                                                       std::map<std::string, std::string> messagepayload_list,
+                                                                       StorageService *scratch_space) :
+            ComputeService(hostname,
+                           "multihost_multicore",
+                           "multihost_multicore",
+                           scratch_space) {
+
+      std::map<std::string, std::tuple<unsigned long, double>> compute_resources;
+      for (auto h : compute_hosts) {
+        compute_resources.insert(std::make_pair(h, std::make_tuple(ComputeService::ALL_CORES, ComputeService::ALL_RAM)));
+      }
+
+      initiateInstance(hostname,
+                       compute_resources,
+                       std::move(property_list), std::move(messagepayload_list), DBL_MAX, nullptr);
+
+    }
+
+    /**
      * @brief Internal constructor
      *
      * @param hostname: the name of the host on which the job executor should be started
@@ -241,7 +304,7 @@ namespace wrench {
      * @param scratch_space: the scratch space for this compute service
      */
     MultihostMulticoreComputeService::MultihostMulticoreComputeService(const std::string &hostname,
-                                                                       const std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                                                       const std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                                                        std::map<std::string, std::string> property_list,
                                                                        std::map<std::string, std::string> messagepayload_list,
                                                                        StorageService *scratch_space) :
@@ -260,7 +323,7 @@ namespace wrench {
      * @brief Helper method called by all constructors to initiate object instance
      *
      * @param hostname: the name of the host
-     * @param compute_resources: compute_resources: a list of <hostname, num_cores, memory> pairs, which represent
+     * @param compute_resources: compute_resources: a map of <num_cores, memory> pairs, indexed by hostname, which represent
      *        the compute resources available to this service
      * @param property_list: a property list ({} means "use all defaults")
      * @param messagepayload_list: a message payload list ({} means "use all defaults")
@@ -271,7 +334,7 @@ namespace wrench {
      */
     void MultihostMulticoreComputeService::initiateInstance(
             const std::string &hostname,
-            std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+            std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
             std::map<std::string, std::string> property_list,
             std::map<std::string, std::string> messagepayload_list,
             double ttl,
@@ -293,8 +356,8 @@ namespace wrench {
 
       // Check that there is at least one core per host and that hosts have enough cores
       for (auto host : compute_resources) {
-        std::string hname = std::get<0>(host);
-        unsigned long requested_cores = std::get<1>(host);
+        std::string hname = host.first;
+        unsigned long requested_cores = std::get<0>(host.second);
         unsigned long available_cores;
         try {
           available_cores = S4U_Simulation::getHostNumCores(hname);
@@ -316,7 +379,7 @@ namespace wrench {
                   std::to_string(requested_cores) + " are requested");
         }
 
-        double requested_ram = std::get<2>(host);
+        double requested_ram = std::get<0>(host.second);
         double available_ram = S4U_Simulation::getHostMemoryCapacity(hname);
         if (requested_ram < 0) {
           throw std::invalid_argument(
@@ -334,18 +397,17 @@ namespace wrench {
                   std::to_string(requested_ram) + " are requested");
         }
 
-        this->compute_resources.insert(std::make_tuple(hname, requested_cores, requested_ram));
+        this->compute_resources.insert(std::make_pair(hname, std::make_tuple(requested_cores, requested_ram)));
       }
 
       // Compute the total number of cores and set initial core (and ram) availabilities
       this->total_num_cores = 0;
       for (auto host : this->compute_resources) {
-        this->total_num_cores += std::get<1>(host);
+        this->total_num_cores += std::get<0>(host.second);
         this->core_and_ram_availabilities.insert(std::make_pair(
-                std::get<0>(host), std::make_pair(std::get<1>(host),
+                host.first, std::make_pair(std::get<0>(host.second),
                                                   S4U_Simulation::getHostMemoryCapacity(
-                                                          std::get<0>(
-                                                                  host)))));
+                                                                  host.first))));
       }
 
       this->ttl = ttl;
@@ -382,390 +444,73 @@ namespace wrench {
       /** Main loop **/
       while (this->processNextMessage()) {
 
-        /** Dispatch jobs **/
-        while (this->dispatchNextPendingJob());
+        /** Dispatch ready work units **/
+        this->dispatchReadyWorkunits();
       }
-
-
 
       WRENCH_INFO("Multicore Job Executor on host %s terminated!", S4U_Simulation::getHostName().c_str());
       return 0;
     }
 
     /**
-     * @brief Dispatch one pending job, if possible
-     * @return true if a job was dispatched, false otherwise
+     *
      */
-    bool MultihostMulticoreComputeService::dispatchNextPendingJob() {
+    void MultihostMulticoreComputeService::dispatchReadyWorkunits() {
 
-      if (this->pending_jobs.empty()) {
-        return false;
-      }
+      for (auto const &wus : this->all_workunits) {
+        WorkflowJob *job = wus.first;
+        for (auto const &wu: wus.second) {
 
-      std::string job_selection_policy =
-              this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::JOB_SELECTION_POLICY);
-      if (job_selection_policy != "FCFS") {
-        throw std::runtime_error(
-                "MultihostMulticoreComputeService::dispatchNextPendingJob(): Unsupported JOB_SELECTION_POLICY '" +
-                job_selection_policy + "'");
-      }
-
-      WorkflowJob *picked_job = nullptr;
-      picked_job = this->pending_jobs.back();
-
-      bool dispatched = false;
-      switch (picked_job->getType()) {
-        case WorkflowJob::STANDARD: {
-          dispatched = dispatchStandardJob((StandardJob *) picked_job);
-          break;
-        }
-        case WorkflowJob::PILOT: {
-          dispatched = dispatchPilotJob((PilotJob *) picked_job);
-          break;
-        }
-      }
-
-      // If we dispatched, take the job out of the pending job list
-      if (dispatched) {
-        this->pending_jobs.pop_back();
-      }
-      return dispatched;
-    }
-
-    /**
-     * @brief Compute a resource allocation for a standard job
-     * @param job: the job
-     * @return the resource allocation
-     */
-    std::set<std::tuple<std::string, unsigned long, double>>
-    MultihostMulticoreComputeService::computeResourceAllocation(StandardJob *job) {
-
-      std::string resource_allocation_policy =
-              this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::RESOURCE_ALLOCATION_POLICY);
-
-      if (resource_allocation_policy == "aggressive") {
-        return computeResourceAllocationAggressive(job);
-      } else {
-        throw std::runtime_error("MultihostMulticoreComputeService::computeResourceAllocation():"
-                                 " Unsupported resource allocation policy '" +
-                                 resource_allocation_policy + "'");
-      }
-    }
-
-    /**
-     * @brief Compute a resource allocation for a standard job using the "aggressive" policy
-     * @param job: the job
-     * @return the resource allocation
-     */
-    std::set<std::tuple<std::string, unsigned long, double>>
-    MultihostMulticoreComputeService::computeResourceAllocationAggressive(StandardJob *job) {
-
-//      WRENCH_INFO("COMPUTING RESOURCE ALLOCATION");
-      // Make a copy of core_and_ram_availabilities
-      std::map<std::string, std::pair<unsigned long, double>> tentative_core_and_ram_availabilities;
-      for (auto r : this->core_and_ram_availabilities) {
-        tentative_core_and_ram_availabilities.insert(
-                std::make_pair(r.first, std::make_pair(std::get<0>(r.second), std::get<1>(r.second))));
-      }
-
-      // Make a copy of the tasks
-      std::set<WorkflowTask *> tasks;
-      for (auto t : job->getTasks()) {
-        tasks.insert(t);
-      }
-
-      std::map<std::string, std::tuple<unsigned long, double>> allocation;
-
-
-      // Find the task that can use the most cores somewhere, update availabilities, repeat
-      bool keep_going = true;
-      while (keep_going) {
-
-        WorkflowTask *picked_task = nullptr;
-        std::string picked_picked_host;
-        unsigned long picked_picked_num_cores = 0;
-        double picked_picked_ram = 0.0;
-
-        for (auto t : tasks) {
-//          WRENCH_INFO("LOOKING AT TASK %s", t->getID().c_str());
-          std::string picked_host;
-          unsigned long picked_num_cores = 0;
-          double picked_ram = 0.0;
-
-//          WRENCH_INFO("---> %ld", tentative_availabilities.size());
-          for (auto r : tentative_core_and_ram_availabilities) {
-//            WRENCH_INFO("   LOOKING AT HOST %s", r.first.c_str());
-            std::string hostname = r.first;
-            unsigned long num_available_cores = std::get<0>(r.second);
-            double available_ram = std::get<1>(r.second);
-
-            if ((num_available_cores < t->getMinNumCores()) or (available_ram < t->getMemoryRequirement())) {
-//              WRENCH_INFO("      NO DICE");
-              continue;
-            }
-
-            unsigned long desired_num_cores;
-            if (this->getPropertyValueAsString(
-                    MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) == "maximum") {
-              desired_num_cores = t->getMaxNumCores();
-            } else {
-              desired_num_cores = t->getMinNumCores();
-            }
-
-            if ((picked_num_cores == 0) || (picked_num_cores < std::min(num_available_cores, desired_num_cores))) {
-              picked_host = hostname;
-              picked_num_cores = std::min(num_available_cores, desired_num_cores);
-              picked_ram = t->getMemoryRequirement();
-            }
-          }
-
-          if (picked_num_cores == 0) {
+          /** If the task is not ready, continue */
+          if (wu->num_pending_parents != 0) {
             continue;
           }
 
-          if (picked_num_cores > picked_picked_num_cores) {
-            picked_task = t;
-            picked_picked_num_cores = picked_num_cores;
-            picked_picked_ram = picked_ram;
-            picked_picked_host = picked_host;
-          }
-        }
-
-
-        if (picked_picked_num_cores > 0) {
-//          WRENCH_INFO("ALLOCATION %s/%ld-%.2lf for task %s", picked_picked_host.c_str(),
-//                      picked_picked_num_cores, picked_picked_ram, picked_task->getID().c_str());
-
-          if (allocation.find(picked_picked_host) != allocation.end()) {
-            std::get<0>(allocation[picked_picked_host]) += picked_picked_num_cores;
-            std::get<1>(allocation[picked_picked_host]) += picked_picked_ram;
+          /** Figure out what resources it needs */
+          std::string required_host;
+          unsigned long required_num_cores;
+          double required_ram;
+          // If it contains a task, then get the submitted service-specific argument
+          if (wu->task) {
+            if (job->getServiceSpecificArguments().find(wu->task->getID()) == job->getServiceSpecificArguments().end()) {
+              throw std::runtime_error("MultihostMulticoreComputeService::dispatchReadyWorkunits(): Invalid job-specific argument: no host found for task '" + wu->task->getID() + "'");
+            }
+            std::string resource_spec = job->getServiceSpecificArguments()[wu->task->getID()];
+            std::vector<std::string> tokens;
+            boost::algorithm::split(tokens, resource_spec, boost::is_any_of(":"));
+            required_host = tokens[0];
+            sscanf(tokens[1].c_str(), "%lu", &required_num_cores);
+            required_ram = wu->task->getMemoryRequirement();
           } else {
-            allocation.insert(
-                    std::make_pair(picked_picked_host,
-                                   std::make_tuple(picked_picked_num_cores,
-                                                   picked_picked_ram)));
+            required_host = (*(this->compute_resources.begin())).first;  // some arbitrary host for non-compute intentive stuff
+            required_num_cores = 1;
+            required_ram = 0;
           }
 
-          // Update availabilities
-          std::get<0>(tentative_core_and_ram_availabilities[picked_picked_host]) -= picked_picked_num_cores;
-          std::get<1>(tentative_core_and_ram_availabilities[picked_picked_host]) -= picked_picked_ram;
+          /** Dispatch it */
+          std::shared_ptr<WorkunitExecutor> workunit_executor = std::shared_ptr<WorkunitExecutor>(
+                  new WorkunitExecutor(this->simulation,
+                                       required_host,
+                                       required_num_cores,
+                                       required_ram,
+                                       this->mailbox_name,
+                                       wu.get(),
+                                       this->getScratch(),
+                                       job,
+                                       this->getPropertyValueAsDouble(
+                                               MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD),
+                                       false
+                  ));
 
-          // Remove the task
-          tasks.erase(picked_task);
+          workunit_executor->simulation = this->simulation;
+          workunit_executor->start(workunit_executor, true);
 
-          // We should keep trying!
-          keep_going = not tasks.empty();
-        } else {
-          keep_going = false;
+          // Keep track of this workunit executor
+          this->workunit_executors[job].insert(workunit_executor);
         }
       }
-
-      // Convert back to a set, which is lame
-      std::set<std::tuple<std::string, unsigned long, double>> to_return;
-      for (auto h : allocation) {
-        to_return.insert(std::make_tuple(h.first, std::get<0>(h.second), std::get<1>(h.second)));
-      }
-      return to_return;
     }
 
-    /**
-     * @brief Try to dispatch a standard job
-     * @param job: the job
-     * @return true is the job was dispatched, false otherwise
-     */
-    bool MultihostMulticoreComputeService::dispatchStandardJob(StandardJob *job) {
-
-      // Compute the required minimum number of cores
-      unsigned long max_min_required_num_cores = 1;
-      for (auto t : (job)->getTasks()) {
-        max_min_required_num_cores = std::max(max_min_required_num_cores, t->getMinNumCores());
-      }
-
-      // Compute the required minimum ram
-      double max_min_required_ram = 0.0;
-      for (auto t : (job)->getTasks()) {
-        max_min_required_ram = std::max(max_min_required_ram, t->getMemoryRequirement());
-      }
-
-      // Find the list of hosts with the required number of cores AND the required RAM
-      std::set<std::string> possible_hosts;
-      for (auto it = this->core_and_ram_availabilities.begin(); it != this->core_and_ram_availabilities.end(); it++) {
-//        WRENCH_INFO("%s: %ld %.2lf", it->first.c_str(), std::get<0>(it->second), std::get<1>(it->second));
-        if ((std::get<0>(it->second) >= max_min_required_num_cores) and
-            (std::get<1>(it->second) >= max_min_required_ram)) {
-          possible_hosts.insert(it->first);
-        }
-      }
-
-      // If not even one host, give up
-      if (possible_hosts.empty()) {
-//      WRENCH_INFO("*** THERE ARE NOT ENOUGH RESOURCES FOR THIS JOB!!");
-        return false;
-      }
-
-//      WRENCH_INFO("*** THERE ARE POSSIBLE HOSTS FOR THIS JOB!!");
-
-//      // Compute the max num cores usable by a job task
-//      unsigned long maximum_num_cores = 0;
-//      for (auto t : job->getTasks()) {
-//        WRENCH_INFO("===> %s", this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM).c_str()
-//        );
-//        if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM) == "minimum") {
-//          maximum_num_cores = std::max(maximum_num_cores, t->getMinNumCores());
-//        } else {
-//          maximum_num_cores = std::max(maximum_num_cores, t->getMaxNumCores());
-//        }
-//      }
-//
-//      WRENCH_INFO("MAXIMUM NUMBER OF CORES = %ld", maximum_num_cores);
-
-      // Allocate resources for the job based on resource allocation strategies
-      std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
-      compute_resources = computeResourceAllocation(job);
-
-      // Update core availabilities (and compute total number of cores for printing)
-      unsigned long total_cores = 0;
-      double total_ram = 0.0;
-      for (auto r : compute_resources) {
-        std::get<0>(this->core_and_ram_availabilities[std::get<0>(r)]) -= std::get<1>(r);
-        std::get<1>(this->core_and_ram_availabilities[std::get<0>(r)]) -= std::get<2>(r);
-        total_cores += std::get<1>(r);
-        total_ram += std::get<2>(r);
-      }
-
-      WRENCH_INFO(
-              "Creating a StandardJobExecutor on %ld hosts (total of %ld cores and %.2ef bytes of RAM) for a standard job",
-              compute_resources.size(), total_cores, total_ram);
-
-      // Create and start a standard job executor
-      // If this is itself NOT a pilot job
-      bool part_of_pilot_job = false;
-      if (this->containing_pilot_job != nullptr) {
-        part_of_pilot_job = true;
-      }
-      std::shared_ptr<StandardJobExecutor> executor = std::shared_ptr<StandardJobExecutor>(new StandardJobExecutor(
-              this->simulation,
-              this->mailbox_name,
-              this->hostname,
-              job,
-              compute_resources,
-              getScratch(),
-              part_of_pilot_job,
-              this->containing_pilot_job,
-              {{StandardJobExecutorProperty::THREAD_STARTUP_OVERHEAD,   this->getPropertyValueAsString(
-                      MultihostMulticoreComputeServiceProperty::THREAD_STARTUP_OVERHEAD)},
-               {StandardJobExecutorProperty::CORE_ALLOCATION_ALGORITHM, this->getPropertyValueAsString(
-                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_CORE_ALLOCATION_ALGORITHM)},
-               {StandardJobExecutorProperty::TASK_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
-                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_TASK_SELECTION_ALGORITHM)},
-               {StandardJobExecutorProperty::HOST_SELECTION_ALGORITHM,  this->getPropertyValueAsString(
-                       MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM)}},
-              {}));
-
-      executor->start(executor, true);
-      this->standard_job_executors.insert(executor);
-      this->running_jobs.insert(job);
-
-      // Tell the caller that a job was dispatched!
-      return true;
-    }
-
-    /**
-     * @brief Try to dispatch a pilot job
-     * @param job: the job
-     * @return true is the job was dispatched, false otherwise
-     *
-     * @throw std::runtime_error
-     */
-    bool MultihostMulticoreComputeService::dispatchPilotJob(PilotJob *job) {
-
-      // Find a list of hosts with the required number of cores and ram
-      std::vector<std::string> chosen_hosts;
-      for (auto &core_availability : this->core_and_ram_availabilities) {
-        if ((std::get<0>(core_availability.second) >= job->getNumCoresPerHost()) and
-            (std::get<1>(core_availability.second) >= job->getMemoryPerHost())) {
-          chosen_hosts.push_back(core_availability.first);
-          if (chosen_hosts.size() == job->getNumHosts()) {
-            break;
-          }
-        }
-      }
-
-      // If we didn't find enough, give up
-      if (chosen_hosts.size() < job->getNumHosts()) {
-        return false;
-      }
-
-      /* Allocate resources to the job */
-      WRENCH_INFO("Allocating %ld/%ld hosts/cores to a pilot job", job->getNumHosts(), job->getNumCoresPerHost());
-
-      // Update core and ram availabilities
-      for (auto const &h : chosen_hosts) {
-        std::get<0>(this->core_and_ram_availabilities[h]) -= job->getNumCoresPerHost();
-        std::get<1>(this->core_and_ram_availabilities[h]) -= job->getMemoryPerHost();
-      }
-
-      // Creates a compute service (that does not support pilot jobs!!)
-      std::set<std::tuple<std::string, unsigned long, double>> compute_resources;
-      for (auto const &h : chosen_hosts) {
-        compute_resources.insert(std::make_tuple(h, job->getNumCoresPerHost(), job->getMemoryPerHost()));
-      }
-
-      // Create the properties for the new compute service
-      std::map<std::string, std::string> cs_properties = this->property_list;
-      if (cs_properties.find(ComputeServiceProperty::SUPPORTS_PILOT_JOBS) != cs_properties.end()) {
-        cs_properties[ComputeServiceProperty::SUPPORTS_PILOT_JOBS] = "false";
-      } else {
-        // This shouldn't happen, but let's be paranoid
-        cs_properties.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_PILOT_JOBS, "false"));
-      }
-      if (cs_properties.find(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS) != cs_properties.end()) {
-        cs_properties[ComputeServiceProperty::SUPPORTS_STANDARD_JOBS] = "true";
-      } else {
-        // This shouldn't happen, but let's be paranoid
-        cs_properties.insert(std::make_pair(ComputeServiceProperty::SUPPORTS_STANDARD_JOBS, "true"));
-      }
-
-      std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
-              new MultihostMulticoreComputeService(this->hostname,
-                                                   compute_resources,
-                                                   cs_properties,
-                                                   this->messagepayload_list,
-                                                   job->getDuration(),
-                                                   job,
-                                                   "_pilot_job",
-                                                   getScratch()));
-      cs->simulation = this->simulation;
-      job->setComputeService(cs);
-
-      // Start the compute service
-      try {
-        cs->start(cs, true);
-      } catch (std::runtime_error &e) {
-        throw;
-      }
-
-      // Put the job in the running queue
-      this->running_jobs.insert((WorkflowJob *) job);
-
-      // Send the "Pilot job has started" callback
-      // Note the getCallbackMailbox instead of the popCallbackMailbox, because
-      // there will be another callback upon termination.
-      try {
-        S4U_Mailbox::dputMessage(job->getCallbackMailbox(),
-                                 new ComputeServicePilotJobStartedMessage(
-                                         job, this, this->getMessagePayloadValueAsDouble(
-                                                 MultihostMulticoreComputeServiceMessagePayload::PILOT_JOB_STARTED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-
-      // Push my own mailbox_name onto the pilot job!
-      job->pushCallbackMailbox(this->mailbox_name);
-
-      return true;
-    }
 
     /**
      * @brief Wait for and react to any incoming message
@@ -826,25 +571,15 @@ namespace wrench {
       } else if (auto msg = dynamic_cast<ComputeServiceSubmitStandardJobRequestMessage *>(message.get())) {
         processSubmitStandardJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
-
       } else if (auto msg = dynamic_cast<ComputeServiceSubmitPilotJobRequestMessage *>(message.get())) {
-        processSubmitPilotJob(msg->answer_mailbox, msg->job);
+        processSubmitPilotJob(msg->answer_mailbox, msg->job, msg->service_specific_args);
         return true;
-
-      } else if (auto msg = dynamic_cast<ComputeServicePilotJobExpiredMessage *>(message.get())) {
-        processPilotJobCompletion(msg->job);
-        return true;
-
       } else if (auto *msg = dynamic_cast<ComputeServiceResourceInformationRequestMessage *>(message.get())) {
         processGetResourceInformation(msg->answer_mailbox);
         return true;
 
       } else if (auto *msg = dynamic_cast<ComputeServiceTerminateStandardJobRequestMessage *>(message.get())) {
         processStandardJobTerminationRequest(msg->job, msg->answer_mailbox);
-        return true;
-
-      } else if (auto *msg = dynamic_cast<ComputeServiceTerminatePilotJobRequestMessage *>(message.get())) {
-        processPilotJobTerminationRequest(msg->job, msg->answer_mailbox);
         return true;
 
       } else if (auto msg = dynamic_cast<StandardJobExecutorDoneMessage *>(message.get())) {
@@ -860,50 +595,8 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Terminate all pilot job compute services
-     */
-    void MultihostMulticoreComputeService::terminateAllPilotJobs() {
-      for (auto job : this->running_jobs) {
-        if (job->getType() == WorkflowJob::PILOT) {
-          auto *pj = (PilotJob *) job;
-          WRENCH_INFO("Terminating pilot job %s", job->getName().c_str());
-          pj->getComputeService()->stop();
-        }
-      }
-    }
 
-    /**
-     * @brief fail a pending standard job
-     * @param job: the job
-     * @param cause: the failure cause
-     */
-    void
-    MultihostMulticoreComputeService::failPendingStandardJob(StandardJob *job, std::shared_ptr<FailureCause> cause) {
-      WRENCH_INFO("Failing pending job %s", job->getName().c_str());
-      // Set all tasks back to the READY state and wipe out output files
-      for (auto failed_task: job->getTasks()) {
-        failed_task->setInternalState(WorkflowTask::InternalState::TASK_READY);
-        try {
-          StorageService::deleteFiles(failed_task->getOutputFiles(), job->getFileLocations(),
-                                      getScratch());
-        } catch (WorkflowExecutionException &e) {
-          WRENCH_WARN("Warning: %s", e.getCause()->toString().c_str());
-        }
-      }
 
-      // Send back a job failed message
-      WRENCH_INFO("Sending job failure notification to '%s'", job->getCallbackMailbox().c_str());
-      // NOTE: This is synchronous so that the process doesn't fall off the end
-      try {
-        S4U_Mailbox::putMessage(job->popCallbackMailbox(),
-                                new ComputeServiceStandardJobFailedMessage(
-                                        job, this, cause, this->getMessagePayloadValueAsDouble(
-                                                MultihostMulticoreComputeServiceMessagePayload::STANDARD_JOB_FAILED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
 
     /**
      * @brief fail a running standard job
@@ -936,19 +629,17 @@ namespace wrench {
     */
     void MultihostMulticoreComputeService::terminateRunningStandardJob(StandardJob *job, MultihostMulticoreComputeService::JobTerminationCause termination_cause) {
 
-      StandardJobExecutor *executor = nullptr;
-      for (const auto &standard_job_executor : this->standard_job_executors) {
-        if (standard_job_executor->getJob() == job) {
-          executor = standard_job_executor.get();
-        }
+      /** Kill all relevant work unit executors */
+      for (auto const &wue : this->workunit_executors[job]) {
+        wue->kill();
       }
+      this->workunit_executors[job].clear();
+      this->workunit_executors.erase(job);
 
-      if (executor == nullptr) {
-        throw std::runtime_error(
-                "MultihostMulticoreComputeService::terminateRunningStandardJob(): Cannot find standard job executor "
-                "corresponding to job being terminated");
-      }
+      /** Remove all relevant work units */
+      this->all_workunits[job].clear();
 
+      /** Deal with task states */
       for (auto &task : job->getTasks()) {
           if (task->getInternalState() == WorkflowTask::InternalState::TASK_RUNNING) {
               if (termination_cause == MultihostMulticoreComputeService::JobTerminationCause::TERMINATED) {
@@ -962,20 +653,6 @@ namespace wrench {
           }
       }
 
-      // The resources set aside for this job are available again
-      for (auto &resource : executor->getComputeResources()) {
-        std::string hostname = std::get<0>(resource);
-        unsigned long num_cores = std::get<1>(resource);
-        double ram = std::get<2>(resource);
-
-        this->core_and_ram_availabilities[hostname].first += num_cores;
-        this->core_and_ram_availabilities[hostname].second += ram;
-      }
-
-      // Terminate the executor
-      WRENCH_INFO("Terminating a standard job executor");
-      executor->kill();
-
       for (auto failed_task: job->getTasks()) {
         switch (failed_task->getInternalState()) {
           case WorkflowTask::InternalState::TASK_NOT_READY:
@@ -988,7 +665,7 @@ namespace wrench {
                     "MultihostMulticoreComputeService::terminateRunningStandardJob(): task state shouldn't be 'RUNNING'"
                     "after a StandardJobExecutor was killed!");
           case WorkflowTask::InternalState::TASK_FAILED:
-            // Making failed task READY again
+            // Making failed task READY again!!!
             failed_task->setInternalState(WorkflowTask::InternalState::TASK_READY);
             break;
 
@@ -1000,36 +677,6 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Terminate a running pilot job
-     * @param job: the job
-     *
-     * @throw std::runtime_error
-     */
-    void MultihostMulticoreComputeService::terminateRunningPilotJob(PilotJob *job) {
-
-      // Get the associated compute service
-      auto compute_service = (MultihostMulticoreComputeService *) (job->getComputeService());
-
-      if (compute_service == nullptr) {
-        throw std::runtime_error(
-                "MultihostMulticoreComputeService::terminateRunningPilotJob(): can't find compute service associated to pilot job");
-      }
-
-      // Stop it
-      compute_service->stop();
-
-      // Remove the job from the running list
-      this->running_jobs.erase(job);
-
-      // Update the number of available cores
-      for (auto const &r : compute_service->compute_resources) {
-        std::string hostname = std::get<0>(r);
-        unsigned long num_cores = std::get<1>(r);
-
-        std::get<0>(this->core_and_ram_availabilities[hostname]) -= num_cores;
-      }
-    }
 
     /**
     * @brief Declare all current jobs as failed (likely because the daemon is being terminated
@@ -1041,15 +688,6 @@ namespace wrench {
         if (workflow_job->getType() == WorkflowJob::STANDARD) {
           auto job = (StandardJob *) workflow_job;
           this->failRunningStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
-        }
-      }
-
-      while (not this->pending_jobs.empty()) {
-        WorkflowJob *workflow_job = this->pending_jobs.front();
-        this->pending_jobs.pop_front();
-        if (workflow_job->getType() == WorkflowJob::STANDARD) {
-          auto *job = (StandardJob *) workflow_job;
-          this->failPendingStandardJob(job, std::shared_ptr<FailureCause>(new JobKilled(workflow_job, this)));
         }
       }
     }
@@ -1159,7 +797,7 @@ namespace wrench {
       WRENCH_INFO("A standard job executor has failed to perform job %s", job->getName().c_str());
 
       // Fail the job
-      this->failPendingStandardJob(job, std::move(cause));
+      this->failRunningStandardJob(job, std::move(cause));
 
     }
 
@@ -1174,9 +812,6 @@ namespace wrench {
 
       WRENCH_INFO("Failing current standard jobs");
       this->failCurrentStandardJobs();
-
-      WRENCH_INFO("Terminate all pilot jobs");
-      this->terminateAllPilotJobs();
 
       // Am I myself a pilot job?
       if (notify_pilot_job_submitters && this->containing_pilot_job) {
@@ -1196,37 +831,7 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Process a pilot job completion
-     *
-     * @param job: the pilot job
-     */
-    void MultihostMulticoreComputeService::processPilotJobCompletion(PilotJob *job) {
 
-      // Remove the job from the running list
-      this->running_jobs.erase(job);
-
-      auto *cs = (MultihostMulticoreComputeService *) job->getComputeService();
-
-      // Update core and ram availabilities
-      for (auto const &r : cs->compute_resources) {
-        std::string hostname = std::get<0>(r);
-        unsigned long num_cores = job->getNumCoresPerHost();
-        double ram = job->getMemoryPerHost();
-
-        std::get<0>(this->core_and_ram_availabilities[hostname]) += num_cores;
-        std::get<1>(this->core_and_ram_availabilities[hostname]) += ram;
-      }
-
-      // Forward the notification
-      try {
-        S4U_Mailbox::dputMessage(job->popCallbackMailbox(), new ComputeServicePilotJobExpiredMessage(
-                job, this, this->getMessagePayloadValueAsDouble(
-                        MultihostMulticoreComputeServiceMessagePayload::PILOT_JOB_EXPIRED_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
 
     /**
      * @brief Synchronously terminate a standard job previously submitted to the compute service
@@ -1274,53 +879,7 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Synchronously terminate a pilot job previously submitted to the compute service
-     *
-     * @param job: a pilot job
-     *
-     * @throw WorkflowExecutionException
-     * @throw std::runtime_error
-     */
-    void MultihostMulticoreComputeService::terminatePilotJob(PilotJob *job) {
 
-      if (this->state == Service::DOWN) {
-        throw WorkflowExecutionException(std::shared_ptr<FailureCause>(new ServiceIsDown(this)));
-      }
-
-      std::string answer_mailbox = S4U_Mailbox::generateUniqueMailboxName("terminate_pilot_job");
-
-      // Send a "terminate a pilot job" message to the daemon's mailbox_name
-      try {
-        S4U_Mailbox::putMessage(this->mailbox_name,
-                                new ComputeServiceTerminatePilotJobRequestMessage(
-                                        answer_mailbox, job, this->getMessagePayloadValueAsDouble(
-                                                MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_REQUEST_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      // Get the answer
-      std::unique_ptr<SimulationMessage> message = nullptr;
-
-      try {
-        message = S4U_Mailbox::getMessage(answer_mailbox, this->network_timeout);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        throw WorkflowExecutionException(cause);
-      }
-
-      if (auto msg = dynamic_cast<ComputeServiceTerminatePilotJobAnswerMessage *>(message.get())) {
-        // If no success, throw an exception
-        if (not msg->success) {
-          throw WorkflowExecutionException(msg->failure_cause);
-        }
-
-      } else {
-        throw std::runtime_error(
-                "MultihostMulticoreComputeService::terminatePilotJob(): Received an unexpected ["
-                + message->getName() + "] message!");
-      }
-    }
 
     /**
      * @brief Process a standard job termination request
@@ -1380,61 +939,7 @@ namespace wrench {
       }
     }
 
-    /**
-     * @brief Process a pilot job termination request
-     *
-     * @param job: the job to terminate
-     * @param answer_mailbox: the mailbox to which the answer message should be sent
-     */
-    void
-    MultihostMulticoreComputeService::processPilotJobTerminationRequest(PilotJob *job,
-                                                                        const std::string &answer_mailbox) {
 
-      // Check whether job is pending
-      for (auto it = this->pending_jobs.begin(); it < this->pending_jobs.end(); it++) {
-        if (*it == job) {
-          this->pending_jobs.erase(it);
-          ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-                  job, this, true, nullptr,
-                  this->getMessagePayloadValueAsDouble(
-                          MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-          try {
-            S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-          } catch (std::shared_ptr<NetworkError> &cause) {
-            return;
-          }
-          return;
-        }
-      }
-
-      // Check whether the job is running
-      if (this->running_jobs.find(job) != this->running_jobs.end()) {
-        this->running_jobs.erase(job);
-        terminateRunningPilotJob(job);
-        ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-                job, this, true, nullptr,
-                this->getMessagePayloadValueAsDouble(
-                        MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-        try {
-          S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return;
-        }
-        return;
-      }
-
-      // If we got here, we're in trouble
-      WRENCH_INFO("Trying to terminate a pilot job that's neither pending nor running!");
-      ComputeServiceTerminatePilotJobAnswerMessage *answer_message = new ComputeServiceTerminatePilotJobAnswerMessage(
-              job, this, false, std::shared_ptr<FailureCause>(new JobCannotBeTerminated(job)),
-              this->getMessagePayloadValueAsDouble(
-                      MultihostMulticoreComputeServiceMessagePayload::TERMINATE_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD));
-      try {
-        S4U_Mailbox::dputMessage(answer_mailbox, answer_message);
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
-    }
 
     /**
      * @brief Process a submit standard job request
@@ -1473,8 +978,8 @@ namespace wrench {
         double required_ram = t->getMemoryRequirement();
 
         for (auto r : this->compute_resources) {
-          unsigned long num_cores = std::get<1>(r);
-          double ram = std::get<2>(r);
+          unsigned long num_cores = std::get<0>(r.second);
+          double ram = std::get<1>(r.second);
           if ((num_cores >= required_num_cores) and (ram >= required_ram)) {
             enough_resources = true;
           }
@@ -1519,7 +1024,8 @@ namespace wrench {
      * @throw std::runtime_error
      */
     void MultihostMulticoreComputeService::processSubmitPilotJob(const std::string &answer_mailbox,
-                                                                 PilotJob *job) {
+                                                                 PilotJob *job,
+                                          std::map<std::string, std::string> service_specific_args) {
       WRENCH_INFO("Asked to run a pilot job with %ld hosts and %ld cores per host for %lf seconds",
                   job->getNumHosts(), job->getNumCoresPerHost(), job->getDuration());
 
@@ -1536,39 +1042,8 @@ namespace wrench {
         return;
       }
 
-      // count the number of hosts that have enough cores
-      unsigned long num_possible_hosts = 0;
-      for (const auto &compute_resource : this->compute_resources) {
-        if (std::get<1>(compute_resource) >= job->getNumCoresPerHost()) {
-          num_possible_hosts++;
-        }
-      }
-
-      // Do we have enough hosts?
-      if (num_possible_hosts < job->getNumHosts()) {
-        try {
-          S4U_Mailbox::dputMessage(
-                  answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                          job, this, false, std::shared_ptr<FailureCause>(new NotEnoughResources(job, this)),
-                          this->getMessagePayloadValueAsDouble(
-                                  MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-        } catch (std::shared_ptr<NetworkError> &cause) {
-          return;
-        }
-        return;
-      }
-
-      // success
-      this->pending_jobs.push_front((WorkflowJob *) job);
-      try {
-        S4U_Mailbox::dputMessage(
-                answer_mailbox, new ComputeServiceSubmitPilotJobAnswerMessage(
-                        job, this, true, nullptr,
-                        this->getMessagePayloadValueAsDouble(
-                                MultihostMulticoreComputeServiceMessagePayload::SUBMIT_PILOT_JOB_ANSWER_MESSAGE_PAYLOAD)));
-      } catch (std::shared_ptr<NetworkError> &cause) {
-        return;
-      }
+      throw std::runtime_error(
+              "MultihostMulticoreComputeService::processSubmitPilotJob(): We shouldn't be here! (fatal)");
     }
 
     /**
@@ -1587,7 +1062,7 @@ namespace wrench {
       // Num cores per hosts
       std::vector<double> num_cores;
       for (auto r : this->compute_resources) {
-        num_cores.push_back((double) (std::get<1>(r)));
+        num_cores.push_back((double) (std::get<0>(r.second)));
       }
       dict.insert(std::make_pair("num_cores", num_cores));
 
@@ -1725,6 +1200,11 @@ namespace wrench {
       if (this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM) != "best_fit") {
         throw std::invalid_argument("Invalid TASK_SCHEDULING_HOST_SELECTION_ALGORITHM property specification: " +
                                     this->getPropertyValueAsString(MultihostMulticoreComputeServiceProperty::TASK_SCHEDULING_HOST_SELECTION_ALGORITHM));
+      }
+
+      // Supporting Pilot jobs
+      if (this->getPropertyValueAsBoolean(MultihostMulticoreComputeServiceProperty::SUPPORTS_PILOT_JOBS)) {
+        throw std::invalid_argument("Invalid SUPPORTS_PILOT_JOBS property specification: a BareMetalService cannot support pilot jobs");
       }
 
       return;

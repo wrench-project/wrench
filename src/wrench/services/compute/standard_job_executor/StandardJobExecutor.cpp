@@ -44,7 +44,7 @@ namespace wrench {
      * @param callback_mailbox: the mailbox to which a reply will be sent
      * @param hostname: the name of the host on which this service will run (could be the first compute resources - see below)
      * @param job: the standard job to execute
-     * @param compute_resources: a non-empty list of <hostname, num_cores, memory> tuples, which represent
+     * @param compute_resources: a non-empty map of <num_cores, memory> tuples, indexed by hostname, which represent
      *           the compute resources the job should execute on
      *              - If num_cores == ComputeService::ALL_CORES, then ALL the cores of the host are used
      *              - If memory == ComputeService::ALL_RAM, then ALL the ram of the host is used
@@ -60,7 +60,7 @@ namespace wrench {
                                              std::string callback_mailbox,
                                              std::string hostname,
                                              StandardJob *job,
-                                             std::set<std::tuple<std::string, unsigned long, double>> compute_resources,
+                                             std::map<std::string, std::tuple<unsigned long, double>> compute_resources,
                                              StorageService* scratch_space,
                                              bool part_of_pilot_job,
                                              PilotJob* parent_pilot_job,

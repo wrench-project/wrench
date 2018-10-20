@@ -548,8 +548,8 @@ namespace wrench {
           auto vm = std::make_shared<S4U_VirtualMachine>(vm_name, pm_hostname, num_cores, ram_memory);
 
           // create a multihost multicore compute service for the VM
-          std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
-                  std::make_tuple(vm_name, num_cores, ram_memory)};
+          std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
+                  std::make_pair(vm_name, std::make_tuple(num_cores, ram_memory))};
 
           // Merge the compute service property and message payload lists
           property_list.insert(this->property_list.begin(), this->property_list.end());
@@ -669,8 +669,8 @@ namespace wrench {
 
           // TODO: creating a MHMC would not be necessary once auto_restart will be available
           // create a multihost multicore compute service for the VM
-          std::set<std::tuple<std::string, unsigned long, double>> compute_resources = {
-                  std::make_tuple(vm_name, std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second))};
+          std::map<std::string, std::tuple<unsigned long, double>> compute_resources = {
+                  std::make_pair(vm_name, std::make_tuple(std::get<2>(vm_tuple->second), std::get<3>(vm_tuple->second)))};
 
           std::shared_ptr<ComputeService> cs = std::shared_ptr<ComputeService>(
                   new MultihostMulticoreComputeService(vm_name,
